@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/09 01:21:48 $
+# @(#) $RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/09 21:36:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/03/09 01:21:48 $ by $Author: brian $
+# Last Modified $Date: 2004/03/09 21:36:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,9 +75,8 @@ fi
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
-reexec="$SHELL $0"
 
-ident='$RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/09 01:21:48 $'
+ident='$RCSfile: strsetup,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/09 21:36:43 $'
 
 HELP="Try \`$program --help' for more information."
 
@@ -127,6 +126,7 @@ strsetup_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
 # Defaults
 
 default_command="config"
+default_filesrch="/etc/strsetup.conf:/etc/sysconfig/streams/strsetup.conf:$HOME/strsetup.conf:./strsetup.conf"
 default_filename="/etc/strsetup.conf"
 
 command=
@@ -136,23 +136,27 @@ verbose=1
 
 function version()
 {
+    if test ${show:-yes} = no ; then
+	return
+    fi
     cat <<EOF
 $program:
     $ident
     Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.
     Distributed under GPL Version 2, included here by reference.
 EOF
-    exit 0
 }
 
 function usage()
 {
+    if test ${show:-yes} = no ; then
+	return
+    fi
     cat <<EOF
 Usage:
-    $program [options] { -c | --config }
-    $program [options] { -i | --install }
-    $program [options] { -f | --filename } FILENAME
-    $program [options] { -d | --delete }
+    $program [options] [{ -c | --config }]
+    $program [options] [{ -i | --install }] [{ -f | --filename } FILENAME]
+    $program [options] { -d | --delete } [{ -f | --filename } FILENAME]
     $program { -h | --help }
     $program { -V | --version }
     $program { -C | --copying }
@@ -161,19 +165,22 @@ EOF
 
 function help()
 {
+    if test ${show:-yes} = no ; then
+	return
+    fi
     usage
     cat <<EOF
 Options:
-    -a, --age=AGE
-        age of files (in days) to delete [default: '$default_age']
-    -b, --basename=BASENAME
-        file basename [default: '$default_basename']
-    -d, --directory=DIRECTORY
-        directory in which to search for logfiles [default: '$default_directory']
-    -o, --outfile=OUTFILE
-        remove files matching outfile [default: '$default_outfile']
-    -e, --errfile=ERRFILE
-        remove files matching errfile [default: '$default_errfile']
+    -c, --config
+        show current configuration, this is the default when no command
+	options are specified
+    -i, --install
+        install devices from configuration file, this is the default when a
+	filename is specified
+    -d, --delete
+        remove devices from configuration file
+    -f, --filename FILENAME
+        specify configuration file [default: '$default_filename']
     -q, --quiet
         suppress normal output
     -D, --debug [LEVEL]
@@ -187,11 +194,13 @@ Options:
     -C, --copying
         prints copying permissions and exits
 EOF
-    exit 0
 }
 
 function copying()
 {
+    if test ${show:-yes} = no ; then
+	return
+    fi
     cat <<EOF
 --------------------------------------------------------------------------------
 $ident
@@ -232,28 +241,90 @@ Commercial  licensing  and  support of this  software is  available from OpenSS7
 Corporation at a fee.  See http://www.openss7.com/
 --------------------------------------------------------------------------------
 EOF
-    exit 0
+}
+
+function option_unrec()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+	$ECHO "$program: syntax error -- \`$opt' unrecognized" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+function option_noarg()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+	$ECHO "$program: syntax error -- \`$opt' does not accept an argument" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+function option_needarg()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	$ECHO "$program: syntax error -- \`$1' requires an argument" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+function option_after()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	$ECHO "$program: syntax error -- \`$1' cannot occur after \`$2'" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+function option_with()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	$ECHO "$program: syntax error -- \`$1' cannot occur with \`$2'" >&2
+	( usage ) >&2
+    fi
+    exit 2
 }
 
 # Parse our command line options once, thoroughly.
-while test "$#" -gt 0
+while test "$#" -gt 0 -o ":$more" != ":"
 do
-    arg="$1"
-    shift
+    if test ":$more" != ":" ; then
+	arg="-$more"
+	more=
+    else
+	arg="$1"
+	shift
+    fi
     if test x"$more_options" = xno ; then
 	nonopt="$arg"
 	break
     fi
     # check for attached option argument
     case $arg in
-	--*=*)
+	--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'`
 	    ;;
-	-c | -d | -f | -i | -q | -D | -v | -h | -V | -C)
+	--*=*)
+	    option_noarg $arg
+	    ;;
+	-[cdinqDvhVC])
 	    optarg=
 	    ;;
-	-c* | -d* | -f* | -i* | -q* | -D* | -v* | -h* | -V* | -C*)
-	    optarg=`$ECHO "X$arg" | $Xsed -e 's/-[cdfiqDvhVC]//'`
+	-[cdinqDvhVC]*)
+	    optarg=
+	    more=`$ECHO "X$arg" | $Xsed -e 's|-[cdinqDvhVC]||'`
+	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
+	    ;;
+	-f)
+	    optarg=
+	    ;;
+	-f*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-f||'`
 	    ;;
 	*)
 	    optarg=
@@ -264,110 +335,102 @@ do
 	case $arg in
 	    -*)
 		case $prev in
-		    # these have optional arguments
+		    # these have optional arguments not forthcoming
 		    debug | verbose)
-			eval "prev=\"\$(($prev++))\""
-			reexec="$reexec $prevopt"
+			eval "(($prev++))"
 			;;
 		    # these have required arguments
 		    filename)
-			$ECHO "$program: option \`$prevopt' requires an argument" 1>&2
-			$ECHO "$HELP" 1>&2
-			exit 2
+			option_needarg $prevopt
 			;;
-		    *)
-			$ECHO "$program: option \`$prevopt' requires an argument" 1>&2
-			$ECHO "$HELP" 1>&2
-			exit 2
+		    *)	
+			option_needarg $prevopt
 			;;
 		esac
+		prev=
+		prevopt=
 		;;
 	    *)
 		# if the previous option needs an argument, assign it.
 		eval "$prev=\"\$arg\""
-		reexec="$reexec --$prev=\"$arg\""
+		prev=
+		prevopt=
+		continue
 		;;
 	esac
-	prev=
-	prevopt=
-	continue
     fi
     # Have we seen a non-optional argument yet?
     case $arg in
 	--help | --h | --Help | --H | -h | -H | -\? | --\?)
-	    help
-	    reexec="$reexec --help"
+	    show_help=yes
+	    if test ":$command" = ":" ; then command=none ; fi
 	    ;;
 	--version | --versio | --versi | --vers | -V)
-	    version
-	    reexec="$reexec --version"
+	    show_version=yes
+	    if test ":$command" = ":" ; then command=none ; fi
 	    ;;
 	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
-	    copying
-	    reexec="$reexec --copying"
+	    show_copying=yes
+	    if test ":$command" = ":" ; then command=none ; fi
 	    ;;
-	--verbose | --verbos | --verbo | --verb | -v)
+	--verbose | --verbos | --verbo | --verb)
 	    prevopt="$arg"
 	    prev=verbose
 	    ;;
-	--verbose=* | --verbos=* | --verbo=* | --verb=* | -v*)
-	    verbose="$optarg"
-	    reexec="$reexec --verbose=\"$optarg\""
+	-v)
+	    ((verbose++))
 	    ;;
-	--debug | -D)
+	--verbose=* | --verbos=* | --verbo=* | --verb=*)
+	    verbose="$optarg"
+	    ;;
+	--debug | --debu | --deb)
+	    prevopt="$arg"
+	    prev=debug
+	    ;;
+	-D)
 	    $ECHO "$program: enabling shell trace mode" 1>&2
-	    reexec="$reexec --debug"
 	    set -x
 	    ;;
+	--debug=* | --debu=* | --deb=*)
+	    debug="$optarg"
+	    ;;
 	--dry-run | --dryrun | --n | -n)
-	    reexec="$reexec --dryrun"
-	    run=:
+	    run=no
 	    ;;
 	--quiet | --silent | -q)
-	    reexec="$reexec --quiet"
-	    show=:
+	    show=no
+	    verbose=0
+	    debug=0
 	    ;;
 	--filename | --filenam | --filena | --filen | --file | --fis | --fi | --f | -f)
+	    if test ":$command" = ":config" ; then option_with --filename --config ; fi
+	    if test ":$command" = ":" ; then command=filename ; fi
 	    prevopt="$arg"
 	    prev=filename
 	    ;;
 	--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=* | -f*)
 	    filename="$optarg"
-	    if test ":$command" != ":" ; then
-		:
-	    fi
-	    command=filename
-	    reexec="$reexec --filename=\"$optarg\""
+	    if test ":$command" = ":config" ; then option_with --filename --config ; fi
+	    if test ":$command" = ":" ; then command=filename ; fi
 	    ;;
 	--config | --confi | --conf | --con | --co | --c | -c)
-	    if test ":$command" != ":" ; then
-		:
-	    fi
+	    if test ":$command" != ":" -a ":$command" != ":config" ; then option_after $arg --$command ; fi
 	    command=config
-	    reexec="$reexec --config"
 	    ;;
 	--install | --instal | --insta | --inst | --ins | --in | --i | -i)
-	    if test ":$command" != ":" ; then
-		:
-	    fi
+	    if test ":$command" != ":" -a ":$command" != ":install" ; then option_after $arg --$command ; fi
 	    command=install
-	    reexec="$reexec --install"
 	    ;;
 	--delete | --delet | --dele | --del | --de | --d | -d)
-	    if test ":$command" != ":" ; then
-		:
-	    fi
+	    if test ":$command" != ":" -a ":$command" != ":delete" ; then option_after $arg --$command ; fi
 	    command=delete
-	    reexec="$reexec --delete"
 	    ;;
 	--)
 	    # end of options
 	    more_options=no
 	    ;;
 	-*)
-	    $ECHO "$program: unrecognized option \`$arg'" 1>&2
-	    $ECHO "$HELP" 1>&2
-	    exit 2
+	    option_unrec $arg
 	    ;;
 	*)
 	    nonopt="$arg"
@@ -377,33 +440,31 @@ do
 done
 
 # hit end of list wanting an argument
-if test -n "$prev" ; then
-    case $arg in
-	-*)
-	    case $prev in
-		# these have optional arguments
-		debug | verbose)
-		    eval "$prev=\"\$(($prev++))\""
-		    reexec="$reexec $prevopt"
-		    ;;
-		# the rest have required arguments
-		*)
-		    $ECHO "$program: option \`$prevopt' requires an argument" 1>&2
-		    $ECHO "$HELP" 1>&2
-		    ;;
-	    esac
-	    ;;
-	*)
-	    # if the previous option needs an argument, assign it
-	    eval "$prev=\"\$arg\""
-	    reexec="$reexec --$prev=\"$arg\""
-	    ;;
-    esac
-fi
+case $prev in
+    # these have optional arguments
+    debug | verbose)
+	if test ":$nonopt" = ":" ; then
+	    eval "(($prev++))"
+	else
+	    eval "$prev=\"$nonopt\""
+	    nonopt=
+	    shift
+	fi
+	;;
+    # the rest have required arguments
+    filename)
+	if test ":$nonopt" = ":" ; then
+	    option_needarg $prevopt
+	else
+	    eval "$prev=\"$nonopt\""
+	    nonopt=
+	    shift
+	fi
+	;;
+esac
 
-if test x"$nonopt" != "x" ; then
-    files="$nonopt ${1-$@}"
-    reexec="$reexec $files"
+if test x"$nonopt${nonopt:+ }${1-$@}" != "x" ; then
+    files="$nonopt${nonopt:+ }${1-$@}"
 else
     files=''
 fi
@@ -413,9 +474,348 @@ if test ":$command" = ":" ; then
     command=config
 fi
 if test ":$filename" = ":" ; then
+    for file in `$ECHO -n "$default_filesrch" | $SED -e 's|:| |g'` ; do
+	if test -f $file ; then
+	    default_filename="$file"
+	    break
+	fi
+    done
     filename="$default_filename"
 fi
 
-echo "executing: $reexec"
+function parse_file()
+{
+    lineno=0
+    while read -a tokens
+    do
+	((lineno++))
+	numb=${#tokens[*]}
+	case ":${tokens[0]}" in
+	    :#*) # comment
+		continue
+		;;
+	    :) # blank line
+		continue
+		;;
+	esac
+	# check for too few tokens
+	if test $numb -lt 4 ; then
+	    if test ${verbose:-0} -gt 0 ; then
+		$ECHO "$program: error: \`$filename' at line $lineno: too few tokens, $numb instead of 4" >&2
+	    fi
+	    continue
+	fi
+	# check for excess tokens
+	if test $numb -gt 4 ; then
+	    case ":${tokens[4]}" in
+		:# | :#*) # comment
+		    ;;
+		:*)
+		    if test ${verbose:-0} -gt 0 ; then
+			$ECHO "$program: warning: \`$filename' at line $lineno: too many tokens" >&2
+		    fi
+		    ;;
+		:) # blank tokens
+		    ;;
+	    esac
+	fi
+	driver="${tokens[0]}"
+	device="${tokens[1]}"
+	access="${tokens[2]}"
+	minors="${tokens[3]}"
+	case "::${tokens[0]}::${tokens[1]}::${tokens[2]}::${tokens[3]}::" in
+	    *::#*) # one token is comment
+		if test ${verbose:-0} -gt 0 ; then
+		    $ECHO "$program: error: \`$filename at line $lineno: too few tokens" >&2
+		fi
+		continue
+		;;
+	esac
+	# token 0 is the driver name
+	token=`$ECHO -n "$driver$lineno" | $strsetup_tokenize`
+	# token 1 is the device name spec
+	case ":$device" in
+	    :/*)
+		;;
+	    :*)
+		if test ${verbose:-0} -gt 0 ; then
+		    $ECHO "$program: error: \`$filename' at line $lineno token 2: expecting absolute path, got \`$device'" >&2
+		fi
+		continue
+		;;
+	esac
+	dir=`$ECHO -n "$device" | $SED -e 's|/[^/]*$||'`
+	dir="${dir:-/}"
+	if test ! -e $dir ; then
+	    if test ${verbose:-0} -gt 0 ; then
+		$ECHO "$program: warning: \`$filename' at line $lineno token 2: \`$dir' does not exist" 2>&1
+	    fi
+	elif test ! -d $dir ; then
+	    if test ${verbose:-0} -gt 0 ; then
+		$ECHO "$program: warning: \`$filename' at line $lineno token 2: \`$dir' is not a directory" 2>&1
+	    fi
+	fi
+	# token 2 is the (octal) file mode
+	case ":$access" in
+	    :0[0-7][0-7][0-7])
+		;;
+	    :*)
+		if test ${verbose:-0} -gt 0 ; then
+		    $ECHO "$program: error: \`$filename' at line $lineno token 3: expecting octal mode, got \`$access'" >&2
+		fi
+		continue
+		;;
+	esac
+	# token 3 is "clone" or a minor device number or a minor device number range
+	case ":$minors" in
+	    :[0-9] | :[0-9][0-9] | :[0-9][0-9][0-9] | :[0-9]-[0-9] | \
+	    :[0-9]-[0-9][0-9] | :[0-9]-[0-9][0-9][0-9] | :[0-9][0-9]-[0-9] | \
+	    :[0-9][0-9]-[0-9][0-9] | :[0-9][0-9]-[0-9][0-9][0-9] | \
+	    :[0-9][0-9][0-9]-[0-9] | :[0-9][0-9][0-9]-[0-9][0-9] | \
+	    :[0-9][0-9][0-9]-[0-9][0-9][0-9] | :clone)
+		;;
+	    :*)
+		if test ${verbose:-0} -gt 0 ; then
+		    $ECHO "$program: error: \`$filename' at line $lineno token 4: N or N-N or clone, got \`$minors'" >&2
+		fi
+		continue
+		;;
+	esac
+	fminor=`$ECHO -n $minors | $SED -e 's|-.*||' -e 's|clone||'`
+	lminor=`$ECHO -n $minors | $SED -e 's|.*-||' -e 's|clone||'`
+	# driver name assignment
+	entries="$entries${entries:+ }$token"
+	eval "lineno_$token=\"$lineno\""
+	eval "driver_$token=\"$driver\""
+	# device name spec assignment
+	eval "device_$token=\"$device\""
+	# mode assignment
+	eval "access_$token=\"$access\""
+	# minor device assignment
+	eval "minors_$token=\"$minors\""
+	eval "fminor_$token=\"$fminor\""
+	eval "lminor_$token=\"$lminor\""
+    done
+}
+
+function none_command()
+{
+    if test -n "$show_version$show_help$show_copying" ; then
+	if test ${verbose:-0} -gt 1 ; then
+	    $ECHO "Displaying information"
+	fi
+	if test ":$show_version" != ":" ; then
+	    version
+	fi
+	if test ":$show_help" != ":" ; then
+	    help
+	fi
+	if test ":$show_copying" != ":" ; then
+	    copying
+	fi
+    fi
+}
+
+function config_command()
+{
+    if test ${verbose:-0} -gt 1 ; then
+	$ECHO "Displaying configuration"
+    fi
+}
+
+function test_input_file()
+{
+    if test ! -e $filename ; then
+	if test ${verbose:-0} -gt 0 ; then
+	    $ECHO "$program: error: file \`$filename' does not exist"
+	fi
+	exit 1
+    fi
+    if test ! -f $filename ; then
+	if test ${verbose:-0} -gt 0 ; then
+	    $ECHO "$program: error: file \`$filename' is not a regular file"
+	fi
+	exit 1
+    fi
+    if test ! -r $filename ; then
+	if test ${verbose:-0} -gt 0 ; then
+	    $ECHO "$program: error: file \`$filename' cannot be read"
+	fi
+	exit 1
+    fi
+}
+
+function install_command()
+{
+    if test ${verbose:-0} -gt 1 ; then
+	$ECHO "Installing devices using \`$filename'"
+    fi
+    files=
+    for entry in $entries ; do
+	eval "driver=\"\$driver_$entry\""
+	eval "device=\"\$device_$entry\""
+	eval "access=\"\$access_$entry\""
+	eval "minors=\"\$minors_$entry\""
+	eval "fminor=\"\$fminor_$entry\""
+	eval "lminor=\"\$lminor_$entry\""
+	if test ":$minors" = ":clone" ; then
+	    files="$files${files:+ }$device"
+	else
+	    minor="$fminor"
+	    while test $minor -le $lminor ; do
+		devname="$device"
+		decimal=`printf '%d' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%d|$decimal|g'\`"
+		lchexad=`printf '%x' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%x|$lchexad|g'\`"
+		uchexad=`printf '%X' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%X|$uchexad|g'\`"
+		octalno=`printf '%o' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%o|$octalno|g'\`"
+		unsignd=`printf '%u' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%u|$unsignd|g'\`"
+		integno=`printf '%i' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%i|$integno|g'\`"
+		files="$files${files:+ }$devname"
+		((minor++))
+	    done
+	fi
+    done
+# create all directories
+    for file in $files ; do
+	# strip filename
+	comps=`$ECHO ":$file" | $SED -ne 's|^:/|#|;s|^:||;s|/| |g;s|^#|/|;p'`
+	eval "components=($comps)"
+	count=0
+	pathcomp=
+	numb=${#components[*]}
+	((numb--))
+	while test $count -lt $numb ; do
+	    eval "pathcomp=\"$pathcomp\${components[$count]}\""
+	    ((count++))
+	    case $pathcomp in
+		-*) pathcomp=./$pathcomp ;;
+	    esac
+	    if test ! -d "$pathcomp" ; then
+		if test -e "$pathcomp" ; then
+		    if test ${verbose:-0} -gt 1 ; then $ECHO "$RM \"$pathcomp\"" ; fi
+		    if test ":${run:-yes}" != ":no" ; then $RM "$pathcomp" ; fi
+		fi
+		if test ${verbose:-0} -gt 1 ; then $ECHO "mkdir \"$pathcomp\" || lasterr=$?" ; fi
+		if test ":${run:-yes}" != ":no" ; then
+		    mkdir "$pathcomp" || lasterr=$?
+		    if test ! -d "$pathcomp" ; then
+			errstatus=$lasterr
+		    elif test ! -z "$permission" ; then
+			lasterr=
+			chmod 0777 "$pathcomp" || lasterr=$?
+			if test ! -z "$lasterr" ; then
+			    errstatus=$lasterr
+			fi
+		    fi
+		fi
+	    fi
+	    pathcomp="$pathcomp/"
+	done
+    done
+    for entry in $entries ; do
+	eval "driver=\"\$driver_$entry\""
+	eval "device=\"\$device_$entry\""
+	eval "access=\"\$access_$entry\""
+	eval "minors=\"\$minors_$entry\""
+	eval "fminor=\"\$fminor_$entry\""
+	eval "lminor=\"\$lminor_$entry\""
+	if test ":$minors" = ":clone" ; then
+	    if test ${verbose:-0} -gt 1 ; then $ECHO "mknod -m $access $device c $minors $driver" ; fi
+	    if test ":${run:-yes}" != ":no" ; then mknod -m $access $device c $minors $driver ; fi
+	else
+	    minor="$fminor"
+	    while test $minor -le $lminor ; do
+		devname="$device"
+		decimal=`printf '%d' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%d|$decimal|g'\`"
+		lchexad=`printf '%x' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%x|$lchexad|g'\`"
+		uchexad=`printf '%X' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%X|$uchexad|g'\`"
+		octalno=`printf '%o' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%o|$octalno|g'\`"
+		unsignd=`printf '%u' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%u|$unsignd|g'\`"
+		integno=`printf '%i' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%i|$integno|g'\`"
+		if test ${verbose:-0} -gt 1 ; then $ECHO "mknod -m $access $devname c $driver $minor" ; fi
+		if test ":$run" != ":no" ;  then mknod -m $access $devname c $driver $minor ; fi
+		((minor++))
+	    done
+	fi
+    done
+}
+
+function delete_command()
+{
+    if test ${verbose:-0} -gt 1 ; then
+	$ECHO "Deleting devices using \`$filename'"
+    fi
+    for entry in $entries ; do
+	eval "device=\"\$device_$entry\""
+	eval "minors=\"\$minors_$entry\""
+	eval "fminor=\"\$fminor_$entry\""
+	eval "lminor=\"\$lminor_$entry\""
+	if test ":$minors" = ":clone" ; then
+	    if test ${verbose:-0} -gt 1 ; then $ECHO "$RM $device" ; fi
+	    if test ":${run:-yes}" != ":no" ; then $RM $device ; fi
+	else
+	    minor="$fminor"
+	    while test $minor -le $lminor ; do
+		devname="$device"
+		decimal=`printf '%d' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%d|$decimal|g'\`"
+		lchexad=`printf '%x' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%x|$lchexad|g'\`"
+		uchexad=`printf '%X' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%X|$uchexad|g'\`"
+		octalno=`printf '%o' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%o|$octalno|g'\`"
+		unsignd=`printf '%u' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%u|$unsignd|g'\`"
+		integno=`printf '%i' $minor`
+		eval "devname=\`$ECHO \"$devname\" | $SED -e 's|%i|$integno|g'\`"
+		if test ${verbose:-0} -gt 1 ; then $ECHO "$RM $devname" ; fi
+		if test ":${run:-yes}" != ":no" ; then $RM $devname ; fi
+		((minor++))
+	    done
+	fi
+    done
+}
+
+case "$command" in
+    none)
+	none_command
+	;;
+    config)
+	none_command
+	config_command
+	;;
+    install | filename)
+	none_command
+	test_input_file
+	parse_file <$filename
+	delete_command
+	install_command
+	;;
+    delete)
+	none_command
+	test_input_file
+	parse_file <$filename
+	delete_command
+	;;
+    *)
+	( usage ) >&2
+	exit 1
+	;;
+esac
+
+exit 0
 
 # vim: ft=sh sw=4

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $
+ @(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:38:56 $ by $Author: brian $
+ Last Modified $Date: 2004/03/09 21:36:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $"
+#ident "@(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $"
 
-static char const ident[] = "$RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $";
+static char const ident[] = "$RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -173,6 +173,30 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+enum { CMN_NONE, CMN_CONFIG, CMN_INSTALL, CMN_FILE, CMN_DELETE, } command = CMN_NONE;
+
+int devices = 0;
+int modules = 0;
+
+void
+printit(struct sc_mlist *l)
+{
+	if (output <= 0 || l->major == -1)
+		return;
+	fprintf(stdout, "%s", l->mi.mi_idname);
+	if (l->major != 0) {
+		fprintf(stdout, "\tdevice");
+		fprintf(stdout, "\t%u", l->major);
+		devices++;
+	} else {
+		fprintf(stdout, "\tmodule");
+		fprintf(stdout, "\t");
+		modules++;
+	}
+	fprintf(stdout, "\t%lu", l->mi.mi_idnum);
+	fprintf(stdout, "\n");
+}
+
 void
 strsetup(int argc, char *argv[])
 {
@@ -187,6 +211,10 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"config",	no_argument,		NULL, 'c'},
+			{"install",	no_argument,		NULL, 'i'},
+			{"filename",	required_argument,	NULL, 'f'},
+			{"delete",	no_argument,		NULL, 'd'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -196,9 +224,9 @@ main(int argc, char *argv[])
 			{"?",		no_argument,		NULL, 'H'},
 		};
 		/* *INDENT-ON* */
-		c = getopt_long_only(argc, argv, "qdvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "cif:dqDvhVC?", long_options, &option_index);
 #else
-		c = getopt(argc, argv, "qdvhVC?");
+		c = getopt(argc, argv, "cif:dqDvhVC?");
 #endif
 		if (c == -1) {
 			if (debug)
@@ -206,6 +234,28 @@ main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
+		case 'c': /* -c, --config */
+			if (command != CMN_NONE)
+				goto bad_option;
+			command = CMN_CONFIG;
+			break;
+		case 'i': /* -i, --install */
+			if (command != CMN_NONE && command != CMN_FILE)
+				goto bad_option;
+			if (command == CMN_NONE)
+				command = CMN_INSTALL;
+			break;
+		case 'f': /* -f, --filename FILENAME */
+			if (command != CMN_NONE && command != CMN_INSTALL)
+				goto bad_option;
+			strncpy(filename, sizeof(filename), optarg);
+			command = CMN_FILE;
+			break;
+		case 'd': /* -d, --delete */
+			if (command != CMN_NONE)
+				goto bad_option;
+			command = CMN_DELETE;
+			break;
 		case 'q':	/* -q, --quiet */
 			if (debug)
 				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
