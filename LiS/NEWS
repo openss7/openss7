@@ -1,4 +1,4 @@
-OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2004-2-22
+OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-03-15
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
@@ -20,6 +20,9 @@ See the end for copying conditions.
   multithreaded test program patches, POSIX threads compilant library functions.
 
   Please note that the entire package is released under GPL.
+
+  For the next release I will make an attempt to collect all of the 2.18.0
+  patches that were reported to the LiS mailing list.
 
 * Major changes in LiS-2.16.19-1
 

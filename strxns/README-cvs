@@ -1,20 +1,20 @@
-# OpenSS7 Linux Fast STREAMS -- CVS procedures.  2005-03-15
-# $Id: README-cvs,v 0.9.2.2 2005/03/15 21:54:39 brian Exp $
+# OpenSS7 STREAMS XNS -- CVS procedures.  2005-03-15
+# $Id: README-cvs,v 0.9.2.1 2005/03/15 21:54:50 brian Exp $
 # Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 # See the end for copying conditions.
 
 The following is an extract from the manual to assist CVS developers:
 
-6.1.6 Downloading from CVS
+5.1.6 Downloading from CVS
 --------------------------
 
 If you are a subscriber or sponsor of The OpenSS7 Project
 (http://www.openss7.org/) with CVS archive access privileges then you can
-download release or mid-release versions of the 'streams' package from the
+download release or mid-release versions of the 'strxns' package from the
 project CVS archive.
 
-The Linux Fast-STREAMS package is located in the 'streams' subdirectory of
+The OpenSS7 XNS Networking package is located in the 'strxns' subdirectory of
 '/var/cvs'.  For release tag information, see *Note Releases::.
 
 To access the archive from the project CVS pserver, use the following commands
@@ -23,7 +23,7 @@ to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r streams_0-7a-3 streams
+     % cvs co -r strxns_0-9-2-1 strxns
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.  For more
@@ -32,7 +32,7 @@ information, see *Note cvs(1): (*manpages*)cvs(1).
 Preparing the CVS Working Directory
 ...................................
 
-Although public releases of the 'streams' package do not require
+Although public releases of the 'strxns' package do not require
 reconfiguration, creating a configurable directory from the CVS archive
 requires tools not normally distributed with the other releases.
 
@@ -61,9 +61,9 @@ target host, including kernel tools such as 'genksyms' and others.
 To generate a configuration script and the necessary scriptlets required by the
 GNU autoconf system, execute the following commands on the working directory:
 
-     % autoreconf -fiv streams
+     % autoreconf -fiv strxns
 
-where, 'streams' is the name of the directory to where the working copy was
+where, 'strxns' is the name of the directory to where the working copy was
 checked out under the previous step.  This command generates the 'configure'
 script and other missing pieces that are normally distributed with the release
 Tar Balls, SRPMs and DSCs.
@@ -72,7 +72,7 @@ Make sure that 'autoreconf --version' returns '2.59'.  Otherwise, you may need
 to perform something like the following:
 
      % PATH="/usr/local/bin:$PATH"
-     % autoreconf -fiv streams
+     % autoreconf -fiv strxns
 
 After reconfiguring the directory, the package can then be configured and built
 using the same instructions as are used for the Tar Ball, see *Note Configuring

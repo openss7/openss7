@@ -1,9 +1,21 @@
-OpenSS7 Master Package -- history of user-visible changes.  2004-4-03
+OpenSS7 Master Package -- history of user-visible changes.  2005-03-15
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
 
 * Initial release OpenSS7 0.9.2.A
+
+  With this release version numbers were changed to reflect an upstream version
+  only to be consistent with other OpenSS7 package releases.  All RPM release
+  numbers will be -1$(PACKAGE_RPMEXTRA) and all Debian release numbers will be
+  _0.  If you wish to apply patches and relelease the package, please bump up
+  the release number and apply a suitable release suffix for your organization.
+  We leave Debian release number _1 reserved for your use, so you can still
+  bundle the source in the .dsc file.
+
+  Major changes for this release include build against Linux 2.6 kernels and
+  popular distributions based on the 2.6 kernel as well as wider distribution
+  support.
 
 * Initial release OpenSS7 0.9.2-1
 
