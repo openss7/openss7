@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/06/28 08:59:34 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/11/08 10:38:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/06/28 08:59:34 $ by $Author: brian $
+# Last Modified $Date: 2004/11/08 10:38:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -596,6 +596,21 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MARCH], [dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_BAD_KERNEL_RHBOOT
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_BAD_KERNEL_RHBOOT], [dnl
+    AC_MSG_ERROR([
+**** 
+**** Build is for RedHat $linux_cv_rh_boot_kernel kernel but the machine architecture is $linux_cv_march.
+**** RedHat $linux_cv_rh_boot_kernel kernels cannot be compiled for $linux_cv_march machine architecture.
+**** If you are automatically building with the rebuild make target this error
+**** is to be expected on a couple of kernel permutations.
+**** 
+    ])
+])# _LINUX_BAD_KERNEL_RHBOOT
+# =========================================================================
+
+# =========================================================================
 # _LINUX_CHECK_KERNEL_RHBOOT
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
@@ -630,15 +645,31 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
         case "${linux_cv_rh_boot_kernel:-no}" in
             BOOT)
                 AC_DEFINE([__BOOT_KERNEL_BOOT], [1], [Define for Red Hat BOOT kernel.])
+                case "$linux_cv_march" in
+                    i586 | i686 | athlon)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
                 ;;
             smp)
                 AC_DEFINE([__BOOT_KERNEL_SMP], [1], [Define for Red Hat SMP kernel.])
+                case "$linux_cv_march" in
+                    i386)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
                 ;;
             bigmem)
                 AC_DEFINE([__BOOT_KERNEL_BIGMEM], [1], [Define for Red Hat BIGMEM kernel.])
+                case "$linux_cv_march" in
+                    i386 | i586 | athlon)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
                 ;;
             hugemem)
                 AC_DEFINE([__BOOT_KERNEL_HUGEMEM], [1], [Define for Red Hat HUGEMEM kernel.])
+                case "$linux_cv_march" in
+                    i386 | i586 | athlon)
+                        _LINUX_BAD_KERNEL_RHBOOT ;;
+                esac
                 ;;
             debug)
                 AC_DEFINE([__BOOT_KERNEL_DEBUG], [1], [Define for Red Hat DEBUG kernel.])

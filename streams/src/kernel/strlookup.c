@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:54 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2004/11/08 10:37:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:54 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/11/08 10:37:14 $";
 
 #define __NO_VERSION__
 
@@ -134,12 +134,15 @@ struct list_head fmodsw_list = LIST_HEAD_INIT(fmodsw_list);	/* Modules go here *
 struct list_head cminsw_list = LIST_HEAD_INIT(cminsw_list);	/* Minors go here */
 
 #if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(cdevsw_lock);
 EXPORT_SYMBOL_GPL(cdevsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(fmodsw_lock);
 EXPORT_SYMBOL_GPL(fmodsw_list);
 #endif
 #if	defined CONFIG_STREAMS_SC_MODULE
+EXPORT_SYMBOL_GPL(nodesw_lock);
 EXPORT_SYMBOL_GPL(cminsw_list);
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/08/22 06:17:53 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/11/08 10:37:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:53 $ by $Author: brian $
+ Last Modified $Date: 2004/11/08 10:37:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/08/22 06:17:53 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/11/08 10:37:13 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/08/22 06:17:53 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/11/08 10:37:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2004/08/22 06:17:53 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2004/11/08 10:37:13 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2094,9 +2094,8 @@ int lis_fdetach(const char *path)
 EXPORT_SYMBOL_GPL(lis_fdetach);
 int lis_pipe(unsigned int *fd)
 {
-	/* FIXME */
-	extern int do_pipe(int *fd);
-	return WARN(do_pipe(fd));
+	long do_spipe(int *fd);
+	return WARN(do_spipe(fd));
 }
 
 EXPORT_SYMBOL_GPL(lis_pipe);

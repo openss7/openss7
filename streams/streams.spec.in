@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2004/11/06 10:21:03 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2004/11/08 10:36:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/11/06 10:21:03 $ by $Author: brian $
+# Last Modified $Date: 2004/11/08 10:36:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -712,17 +712,17 @@ manual pages necessary for developing %{title} application programs.
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
+#%if %{BUILD_libs}
 %{_libdir}/*.a
-%endif
+#%endif
 %{_includedir}/streams/*.h
 %{_includedir}/streams/sys/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
 #%{_mandir}/man2/*
-%if %{BUILD_libs}
+#%if %{BUILD_libs}
 %{_mandir}/man3/*
-%endif
+#%endif
 %{_mandir}/man4/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -857,12 +857,16 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.37  2004/11/06 10:21:03  brian
-# - Updates to handle full versioned symbols.
+# Revision 0.9.2.38  2004/11/08 10:36:48  brian
+# - Removed nested ifs.
 #
-# Revision 0.9.2.5  2004/11/06 10:21:03  brian
-# - Updates to handle full versioned symbols.
+# Revision 0.9.2.6  2004/11/08 10:36:48  brian
+# - Removed nested ifs.
 #
+
+* Sat Nov  6 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.5  2004/11/06 10:21:03  brian
+- Updates to handle full versioned symbols.
 
 * Wed Oct 13 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.4  2004/10/13 01:49:05  brian
