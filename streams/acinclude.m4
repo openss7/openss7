@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.13 2004/04/22 12:08:30 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.14 2004/04/23 04:02:06 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,15 +53,17 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/22 12:08:30 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/23 04:02:06 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/kernel.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/libraries.m4])
+m4_include([m4/strconf.m4])
 
 # =========================================================================
 # AC_LFS
@@ -71,6 +73,9 @@ AC_DEFUN([AC_LFS], [
     _LFS_OPTIONS
     AC_MAN_CONVERSION
     AC_PUBLIC_RELEASE
+    AC_RPM_SPEC
+    AC_LDCONFIG
+    AC_STRCONF
     _LFS_SETUP_COMPAT
     LFS_INCLUDES="-D_LFS_SOURCE=1 -I- -imacros ./config.h -I./include -I${srcdir}/include"
     USER_CPPFLAGS="$CPPFLAGS"
@@ -88,15 +93,6 @@ AC_DEFUN([AC_LFS], [
     AC_MSG_NOTICE([final kern CFLAGS    = $KERNEL_CFLAGS])
     CPPFLAGS=
     CFLAGS=
-    _LFS_GET_STRCONF
-dnl 
-dnl Acutally generating output files is last.  We don't want to generate a thing
-dnl until we have performed all the checks and balances.
-dnl 
-    AC_RPM_SPEC
-    AC_LDCONFIG
-    _LFS_OUTPUT_CONFIG_MASTER
-    _LFS_OUTPUT_CONFIG
 ])# AC_LFS
 # =========================================================================
 
@@ -266,119 +262,13 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [
     AC_LINUX_KERNEL
+    AC_GENKSYMS
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _LFS_CHECK_KERNEL
     _LFS_SETUP_DEBUG
-    # all our config substitutions
-    LFS_SC_MAJBASE=230
-    LFS_SC_CONFIG='include/sys/config.h'
-    LFS_SC_MODCONF='modconf.h'
-    LFS_SC_DRVCONF='drvrconf.mk'
-    LFS_SC_CONFMOD='conf.modules'
-    LFS_SC_MAKEDEV='devices.lst'
-    LFS_SC_MKNODES='src/util/strmakenodes.c'
-    LFS_SC_STSETUP='strsetup.conf'
-    LFS_SC_STRLOAD='strload.conf'
-    # all our config substitutions
-    AC_SUBST(LFS_SC_CONFIG)
-    AC_SUBST(LFS_SC_CONFMOD)
-    AC_SUBST(LFS_SC_MAKEDEV)
-    AC_SUBST(LFS_SC_DRVCONF)
-    AC_SUBST(LFS_SC_MAJBASE)
-    AC_SUBST(LFS_SC_MKNODES)
-    AC_SUBST(LFS_SC_MODCONF)
-    AC_SUBST(LFS_SC_STSETUP)
-    AC_SUBST(LFS_SC_STRLOAD)
 ])# _LFS_SETUP
 # =========================================================================
-
-# =========================================================================
-# _LFS_GET_STRCONF
-# -------------------------------------------------------------------------
-AC_DEFUN([_LFS_GET_STRCONF], [
-    AC_REQUIRE([_LFS_SETUP])
-    lfs_configs=
-    for lfs_config in `find $srcdir -type f -name "Config"`
-    do
-        if test -r "$lfs_config" ; then
-            lfs_configs="$lfs_configs $lfs_config"
-        fi
-    done
-    AC_SUBST(lfs_configs)
-])# _LFS_GET_STRCONF
-# =========================================================================
-
-# =============================================================================
-# _LFS_OUTPUT_CONFIG_MASTER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_OUTPUT_CONFIG_MASTER], [
-    if test -n "$lfs_configs" ; then
-dnl     Note that we never generate Config.master in the makefiles, we generate
-dnl     it once here.
-        cat $lfs_configs > Config.master
-    fi
-])# _LFS_OUTPUT_CONFIG_MASTER
-# =============================================================================
-
-# =============================================================================
-# _LFS_OUTPUT_CONFIG_COMMANDS
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_OUTPUT_CONFIG_COMMANDS], [
-          if test :"${LFS_SC_CONFIG:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_CONFIG from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --hconfig=$LFS_SC_CONFIG $lfs_configs"
-          fi
-          if test :"${LFS_SC_MODCONF:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_MODCONF from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --modconf=$LFS_SC_MODCONF $lfs_configs"
-          fi
-          if test :"${LFS_SC_MKNODES:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_MKNODES from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --makenodes=$LFS_SC_MKNODES $lfs_configs"
-          fi
-          if test :"${LFS_SC_DRVCONF:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_DRVCONF from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --driverconf=$LFS_SC_DRVCONF $lfs_configs"
-          fi
-          if test :"${LFS_SC_CONFMOD:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_CONFMOD from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --confmodules=$LFS_SC_CONFMOD $lfs_configs"
-          fi
-          if test :"${LFS_SC_MAKEDEV:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_MAKEDEV from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strmknods=$LFS_SC_MAKEDEV $lfs_configs"
-          fi
-          if test :"${LFS_SC_STSETUP:+set}" = :set; then
-              AC_MSG_NOTICE([creating $LFS_SC_STSETUP from $lfs_configs])
-              eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strsetup=$LFS_SC_STSETUP $lfs_configs"
-          fi
-#         if test :"${LFS_SC_STRLOAD:+set}" = :set; then
-#             AC_MSG_NOTICE([creating $LFS_SC_STRLOAD from $lfs_configs])
-#             eval "$SHELL $ac_aux_dir/strconf-sh -b${LFS_SC_MAJBASE} --strload=$LFS_SC_STRLOAD $lfs_configs"
-#         fi
-])# _LFS_OUTPUT_CONFIG_COMMANDS
-# =============================================================================
-
-# =============================================================================
-# _LFS_OUTPUT_CONFIG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_LFS_OUTPUT_CONFIG], [
-    AC_CONFIG_COMMANDS([strconf],
-        [_LFS_OUTPUT_CONFIG_COMMANDS],
-        [ac_aux_dir="$ac_aux_dir" \
-        lfs_configs="$lfs_configs" \
-        LFS_SC_MAJBASE="$LFS_SC_MAJBASE" \
-        LFS_SC_CONFIG="$LFS_SC_CONFIG" \
-        LFS_SC_MODCONF="$LFS_SC_MODCONF" \
-        LFS_SC_MKNODES="$LFS_SC_MKNODES" \
-        LFS_SC_DRVCONF="$LFS_SC_DRVCONF" \
-        LFS_SC_CONFMOD="$LFS_SC_CONFMOD" \
-        LFS_SC_MAKEDEV="$LFS_SC_MAKEDEV" \
-        LFS_SC_STSETUP="$LFS_SC_STSETUP" \
-        LFS_SC_STRLOAD="$LFS_SC_STRLOAD"])
-])# _LFS_OUTPUT_CONFIG
-# =============================================================================
 
 # =========================================================================
 # _LFS_CHECK_KERNEL
