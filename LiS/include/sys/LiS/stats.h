@@ -35,7 +35,7 @@
 #ifndef _STATS_H
 #define _STATS_H 1
 
-#ident "@(#) LiS stats.h 2.5 4/17/03 15:55:12 "
+#ident "@(#) LiS stats.h 2.7 04/05/04 14:23:05 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -71,8 +71,10 @@
 #define	PUTMSGTIME	22			/* file putmsg time */
 #define	POLLTIME	23			/* poll time */
 #define	LOCKCNTS	24			/* locks and contention */
+#define	WRITECNT	25			/* write/putmsg */
+#define	READCNT		26			/* read/getmsg */
 
-#define	STRMAXSTAT	25			/* largest slot */
+#define	STRMAXSTAT	27			/* largest slot */
 #define HEADERSSTR      "In-Use Message Blocks"
 #define FREEHDRSSTR     "Free Message Blocks"
 #define DATABSSTR       "Data Blocks"
@@ -98,6 +100,8 @@
 #define	PUTMSGTIMESTR	"Putmsg Processing Time"
 #define	POLLTIMESTR	"Poll Processing Time"
 #define LOCKCNTSSTR	"Spin Lock Counts"
+#define	WRITESTR	"Write/Putmsg"
+#define READSTR		"Read/Getmsg"
 
 /* per item statistics & their names
  */
@@ -156,28 +160,28 @@ extern void    lis_stat_neg(void) ;
 
 /* increment fail count for item
  */
-#define LisUpFailCount(item)	lis_atomic_inc(&lis_strstats[item][FAILURES])
+#define LisUpFailCount(item)	K_ATOMIC_INC(&lis_strstats[item][FAILURES])
 
 /* decrement count for item
  */
 #define	LisChkNeg(item)	     do	{					     \
-				  if (lis_atomic_read(			     \
+				  if (K_ATOMIC_READ(			     \
 					  &lis_strstats[item][CURRENT]) < 0) \
 				    lis_stat_neg() ;			     \
 				} while (0)
 #define LisDownCount(item)   do	{					     \
-				  if (lis_atomic_read(			     \
+				  if (K_ATOMIC_READ(			     \
 					  &lis_strstats[item][CURRENT]) != 0)\
-				      lis_atomic_dec(			     \
+				      K_ATOMIC_DEC(			     \
 					  &lis_strstats[item][CURRENT]) ;    \
 				  else					     \
 				    lis_stat_neg() ;			     \
 				} while (0)
 #define LisDownCounter(item,n)	do {					     \
 				  int	_n = (n) ;			     \
-				  if (lis_atomic_read(			     \
+				  if (K_ATOMIC_READ(			     \
 				       &lis_strstats[item][CURRENT]) >= _n)  \
-				      lis_atomic_sub(			     \
+				      K_ATOMIC_SUB(			     \
 				       &lis_strstats[item][CURRENT], _n) ;   \
 				  else					     \
 				    lis_stat_neg() ;			     \

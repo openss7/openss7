@@ -1,0 +1,137 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff
+.\"
+.\" @(#) $Id: INET.4.man,v 0.9 2004/04/05 19:52:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\"
+.\" Modified $Date: 2004/04/05 19:52:53 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strxnet.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxnet.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH INET 4 "$Date: 2004/04/05 19:52:53 $" "$Name:  $" "OpenSS7 INET Devices"
+.SH NAME
+.B INET
+\- OpenSS7 INET Devices
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int " inet_stream " = open(" inet_device ", " flags );
+.SH DESCRIPTION
+.PP
+.PP
+The
+.B INET
+related collection of drivers and modules provide INET capabilities in a
+number of related forms, including TCP, UDP and IP variants.
+.SS "Drivers"
+.PP
+.PP
+.B INET
+provides the following
+.I STREAMS
+pseudo-device drivers:
+.TP
+.BR socksys (4)
+.TP
+.BR sctp (4)
+.TP
+.BR sscop (4)
+.TP
+.BR tcp (4)
+.TP
+.BR udp (4)
+.TP
+.BR ip (4)
+.SS "Modules"
+.PP
+.PP
+.B INET
+provides the following pushable
+.I STREAMS
+modules:
+.TP
+.BR timod (4)
+.TP
+.BR sockmod (4)
+.SS "Devices"
+.PP
+.PP
+.B INET
+provides the following
+.I STREAMS
+device drivers:
+.TP
+.BR ldl (4)
+.SH "SEE ALSO"
+.PP
+.SH VERSIONS
+.PP
+This manpage was updated $Date: 2004/04/05 19:52:53 $ for
+.B strinet
+release $Name:  $($Revision: 0.9 $).
+.PP
+Most of the devices and modules listed here do not appear until
+.BR strss7-0.8.4 .
+.[
+$LIST$
+.]
+.TI
