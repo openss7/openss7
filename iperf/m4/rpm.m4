@@ -81,6 +81,7 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 # _RPM_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP], [dnl
+    _RPM_SPEC_SETUP_DIST
     _RPM_SPEC_SETUP_EPOCH
     _RPM_SPEC_SETUP_RELEASE
     _RPM_SPEC_SETUP_DATE
@@ -90,6 +91,65 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
     _RPM_SPEC_SETUP_BUILD
     _RPM_SPEC_SETUP_SIGN
 ])# _RPM_SPEC_SETUP
+# =========================================================================
+
+# =========================================================================
+# _RPM_SPEC_SETUP_DIST
+# -------------------------------------------------------------------------
+AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
+    AC_ARG_WITH([rpm-dist],
+        AS_HELP_STRING([--with-rpm-dist=DISTRO],
+            [specify the DISTRO for the RPM spec file. @<:@default=none@:>@]),
+        [with_rpm_distro="$withval"],
+        [with_rpm_distro=""])
+    AC_CACHE_CHECK([for rpm distribution vendor], [rpm_cv_dist_vendor], [dnl
+        rpm_cv_dist_vendor=
+        rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
+        rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
+        rpm_tmp=`echo $rpm_tmp | sed -e 's| Linux.*$||'`
+        case $rpm_tmp in
+            Red?Hat|Mandrake|Debian|SuSE)
+                rpm_cv_dist_vendor="$rpm_tmp"
+                ;;
+        esac
+    ])
+    AC_CACHE_CHECK([for rpm distribution release], [rpm_cv_dist_release], [dnl
+        rpm_cv_dist_release=
+        if test ":${rpm_cv_dist_vendor:-unknown}" != :unknown
+        then
+            rpm_tmp=`$CC $CFLAGS -v 2>&1 | grep 'gcc version'`
+            rpm_tmp=`echo $rpm_tmp | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||'`
+            rpm_tmp=`echo $rpm_tmp | sed -e 's|^.*Linux ||'`
+            if test -n "$rpm_tmp"
+            then
+                rpm_cv_dist_release="$rpm_tmp"
+            fi
+        fi
+    ])
+    PACKAGE_RPMDIST="${rpm_cv_dist_vendor:-Unknown} Linux ${rpm_cv_dist_release:-Unknown}"
+    case $rpm_cv_dist_vendor in
+        Red?Hat)
+            case $rpm_cv_dist_release in
+                7.0|7.1|7.2|7.3)
+                    PACKAGE_RPMEXTRA=".7.x"
+                    ;;
+                9)
+                    PACKAGE_RPMEXTRA=".9"
+                    ;;
+            esac
+            ;;
+        Mandrake)
+            PACKAGE_RPMEXTRA="mdk"
+            ;;
+        SuSE)
+            PACKAGE_RPMEXTRA=".1"
+            ;;
+    esac
+    AC_SUBST([PACKAGE_RPMEXTRA])dnl
+    AC_SUBST([PACKAGE_RPMDIST])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
+        defaults to none.])
+])# _RPM_SPEC_SETUP_DIST
 # =========================================================================
 
 # =========================================================================
