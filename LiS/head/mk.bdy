@@ -26,47 +26,83 @@
 #
 
 # How to compile
-CC += -DLiS -D__KERNEL__ -DVERSION_2 $(XOPTS) $(OPT)
+CC += -DLiS -D__KERNEL__ -DVERSION_2 $(CCREGPARM) $(XOPTS) $(OPT)
 
 #
 # The object files that need to be made for all targets
 #
 OBJS = head.o dki.o msg.o mod.o buffcall.o mdep.o events.o \
 	msgutl.o queue.o safe.o stats.o stream.o strmdbg.o wait.o \
-	cmn_err.o slog.o sputbuf.o version.o
+	cmn_err.o version.o
 
 ifeq ($(LIS_TARG),linux)
 OBJS += osif.o
 endif
 
+# strmdbg always needs -DLIS_SRC; it's usually only passed if DBG_OPT=y
+#
+common-dep strmdbg.o strmdbg.c:  XOPTS += -DLIS_SRC=\"$(SRCDIR)\"
+
 #
 # All we want is a streams head object file
 #
-all: streamshead.o
+all: $(Q_CC) streamshead.o
+	$(nothing)
 
-clean: 
-	-rm -f streamshead.o $(OBJS) $(XOBJS) $(ASMOBJS)
-
-realclean: clean
-	-rm -f .depend
+streamshead.o: $(OBJS) $(XOBJS) $(ASMOBJS)
+	$(Q_ECHO) $(qtag_LD)$(relpwdtarget)
+	$(Q)$(LD) -r -o $@ $^
 
 #
 # Some rules to make object files
 #
 %.o: $(HEADDIR)/%.c
-	$(CC) -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -c -o $@ $<
 
 %.o: %.c
-	$(CC) -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -c -o $@ $<
 
 %.o: $(HEADDIR)/%.S
-	$(CC) -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -c -o $@ $<
 
 %.o: %.S
-	$(CC) -c -o $@ $<
+	$(Q_ECHO) $(qtag_CC)$(relpwdtarget)
+	$(Q)$(CC) -c -o $@ $<
 
-streamshead.o: $(OBJS) $(XOBJS) $(ASMOBJS)
-	$(LD) -r -o $@ $^
+
+install: .compiler
+	$(Q_ECHO) $(qtag_INSTALL)$(relpwd)
+	$(Q)install -d $(DESTDIR)$(pkgdatadir)/$(relpwd)
+	$(Q)cat .compiler | \
+	    sed "s:^:CC=\(:" | sed "s:$$:\):" | \
+	    sed "s:$(SRCDIR)/include:$$\{pkgincludedir\}:g" | \
+	    sed "s:$(SRCDIR):$$\{pkgdatadir\}:g" | \
+	    sed "s:$(KINCL):$$\{KINCL\}:g" | \
+	    sed "s:$(KSRC):$$\{KSRC\}:g" | \
+	    cat > $(DESTDIR)$(pkgdatadir)/$(relpwd)/.compiler
+
+uninstall:
+	$(nothing)
+
+
+# the following relates to the Q_CC variable, which may be set to .compiler if
+# this target's output is desired
+#
+.compiler:
+	$(Q_ECHO) $(qtag__WD_)$(relpwd)
+	$(Q_ECHO) $(qtag__CC_)$(CC)
+	@echo $(CC) > $@
+
+
+realclean: clean
+	-$(Q)rm -f .depend
+
+clean: 
+	$(Q_ECHO) $(qtag_CLEAN)$(relpwd)
+	-$(Q)rm -f streamshead.o $(OBJS) $(XOBJS) $(ASMOBJS) .compiler
 
 #
 # $(HEADDIR)/modconf.inc is created by the configuration and included
@@ -82,10 +118,10 @@ mod.o: $(HEADDIR)/modconf.inc
 # This is not used by default.
 #
 %.E: $(HEADDIR)/%.c
-	$(CC) -E $^ >$@
+	$(Q)$(CC) -E $^ >$@
 
 %.E: %.c
-	$(CC) -E $^ >$@
+	$(Q)$(CC) -E $^ >$@
 
 
 #
@@ -94,6 +130,6 @@ mod.o: $(HEADDIR)/modconf.inc
 -include .depend
 
 common-dep:
-	$(CC) -M -DDEP$(ASMOBJS:%.o=$(HEADDIR)/%.S) $(OBJS:%.o=$(HEADDIR)/%.c)  >.depend
+	$(Q)$(CC) -M -DDEP$(ASMOBJS:%.o=$(HEADDIR)/%.S) $(OBJS:%.o=$(HEADDIR)/%.c)  >.depend
 
 

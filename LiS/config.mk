@@ -1,29 +1,37 @@
 #
 # This file includes and calculates some make variables that are useful
 # when compiling LiS and utilities.
-# The makefile that includes this one will have to define LIS_HOME to the
-# root of the LiS tree & LIS_ROOT to the supposed root filesystem.
+#
+# The makefile that includes this one will have to define SRCDIR to the
+# root of the LiS tree & DESTDIR to the supposed root filesystem.
 #
 # It must not contain any rules.
 #
+# NOTE: the old -include of config.in here was removed, being a circular
+# reference.  It must primarily define SRCDIR, but the include itself
+# referenced SRCDIR...
+# In the present form, having invoked config.in is an implicit prereq.
 
+# the following are conveniences for staged installs - convention is that
+# DESTDIR must be overridden on the command line to be set
 #
-# Get LiS configuration, if it exists.
+DESTDIR =
+DEST_INCLUDEDIR    = $(DESTDIR)$(includedir)
+DEST_LIBDIR        = $(DESTDIR)$(libdir)
+DEST_BINDIR        = $(DESTDIR)$(bindir)
+DEST_SBINDIR       = $(DESTDIR)$(sbindir)
+DEST_SYSCONFDIR    = $(DESTDIR)$(sysconfdir)
+DEST_DATADIR       = $(DESTDIR)$(datadir)
+DEST_PKGINCLUDEDIR = $(DESTDIR)$(pkgincludedir)
+DEST_PKGLIBDIR     = $(DESTDIR)$(pkglibdir)
+DEST_PKGDATADIR    = $(DESTDIR)$(pkgdatadir)
+DEST_PKGSRCDIR     = $(DESTDIR)$(pkgsrcdir)
+DEST_MANDIR        = $(DESTDIR)$(mandir)
 #
--include $(LIS_HOME)/config.in
-
-#
-# These variables could be configurable some day
-#
-# We are moving libLiS.{so,a} to /lib from /usr/lib.  Some more recent
-# versions of Linux process /etc/ld.so.preload *prior* to mounting
-# local file systems such as /usr.
-#
-INST_LIB = $(LIS_ROOT)/lib
-INST_LIB = $(LIS_ROOT)/usr/lib
-INST_BIN = $(LIS_ROOT)/usr/bin
-INST_SBIN = $(LIS_ROOT)/usr/sbin
-MANDIR = $(LIS_ROOT)/usr/share/man
+# FIXME - libc uses some 'LIB64' variables, but I have no idea how
+# to set them - they should be set here if not to be defined from
+# the command line
+DEST_LIB64DIR      = /usr/lib64
 
 #
 # If we are cross compiling then the user needs to supply us with a
@@ -44,7 +52,7 @@ ifndef CC_NAME
     CC_OPTIMIZE=-O2
 endif
 ifeq ($(CROSS_COMPILING),y)
--include $(LIS_HOME)/cross-compile
+-include $(SRCDIR)/cross-compile
 CC	=$(CROSS_COMPILE)gcc
 else
 CROSS_COMPILE	:=
@@ -60,6 +68,7 @@ STRIP	=$(CROSS_COMPILE)strip
 OBJCOPY	=$(CROSS_COMPILE)objcopy
 OBJDUMP	=$(CROSS_COMPILE)objdump
 RANLIB	=$(CROSS_COMPILE)ranlib
+LN	=ln -sf
 
 #
 # Calculate LIS_TARG
@@ -105,17 +114,19 @@ export ARCH
 #
 # This is where we have LiS specific includes
 #
-LIS_INCL = $(LIS_HOME)/include
+LIS_INCL = $(SRCDIR)/include
 
 #
 # Calculate the names of some often used directories.
 #
-LIBDIR  = $(LIS_HOME)/libc
-UTILDIR = $(LIS_HOME)/util
-HEADDIR = $(LIS_HOME)/head
-DRVRDIR = $(LIS_HOME)/drivers/str
+LIBDIR  = $(SRCDIR)/libc
+LIBDIR32OVER64 = $(SRCDIR)/libc32over64
+UTILDIR = $(SRCDIR)/util
+HEADDIR = $(SRCDIR)/head
+DRVRDIR = $(SRCDIR)/drivers/str
 
 LIBOBJ  = $(LIBDIR)/$(LIS_TARG)
+LIBOBJ32OVER64  = $(LIBDIR32OVER64)/$(LIS_TARG)
 UTILOBJ = $(UTILDIR)/$(LIS_TARG)
 HEADOBJ = $(HEADDIR)/$(LIS_TARG)
 DRVROBJ = $(DRVRDIR)/$(LIS_TARG)
@@ -137,7 +148,7 @@ XOPTS+= -fno-strict-aliasing -Wno-sign-compare -fno-common
 # Compiler options for debugging and optimization.
 #
 ifeq ($(DBG_OPT),y)
-XOPTS += -DINLINE="" -DSTATIC="" -ggdb -O -DLIS_SRC=\"$(LIS_HOME)\"
+XOPTS += -ggdb -O $(CC_OPT2)
 else
 XOPTS += $(CC_OPTIMIZE) $(CC_OPT2) -DINLINE=inline -DSTATIC=static -fomit-frame-pointer
 endif
@@ -231,17 +242,14 @@ endif
 #
 XOPTS += -I$(LIS_INCL)
 
+# use of the /usr/include/linux, /usr/src/linux/, ... symlinks is
+# deprecated as of 2.4 kernels, which is the oldest LiS still supports
 #
-# If running in the Linux kernel we need the kernel includes too.
-# Only the Linux kernel target use this include path.
-# The default link /usr/include/linux -> ../src/linux/include/linux
-# could be to the wrong kernel!
+# the following (set by Configure) should all be to kernel-version-specific
+# directories
 #
 ifeq ($(LIS_TARG),linux)
-XOPTS += -I$(KSRC)/include $(MACHINE_INCL)
-ifneq ($(KSRC),/usr/src/linux)
-XOPTS += -I/usr/src/linux/include
-endif
+XOPTS += -I$(KINCL) $(KINCL_MACH_GENERIC) $(KINCL_MACH_DEFAULT)
 ifeq ($(RH_71_KLUDGE),y)
 XOPTS += -DRH_71_KLUDGE
 endif
@@ -298,14 +306,14 @@ endif
 # Use Linux Kernel memory caches for performance
 #
 ifeq ($(USE_KMEM_CACHE),y)
-XOPTS += -DUSE_LINUX_KMEM_CACHE
+XOPTS += -DUSE_KMEM_CACHE
 endif
 
 #
 # Use Linux Kernel memory cache and native timer management routines
 #
-ifeq ($(USE_LINUX_KMEM_TIMER),y)
-XOPTS += -DUSE_LINUX_KMEM_TIMER
+ifeq ($(USE_KMEM_TIMER),y)
+XOPTS += -DUSE_KMEM_TIMER
 endif
 
 #

@@ -32,7 +32,7 @@
  *    nemo@ordago.uc3m.es, 100741.1151@compuserve.com
  */
 
-#ident "@(#) LiS mod.c 2.22 11/22/03 23:01:43 "
+#ident "@(#) LiS mod.c 2.38 10/11/04 10:40:44 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -51,21 +51,22 @@
 #if defined(LINUX)		/* compiling for Linux kernel */
 #include <linux/sched.h>
 #include <linux/ioport.h>
-#if defined(KERNEL_2_3)
 #undef module_info		/* LiS definition */
 #define module_info	kernel_module_info
 #include <linux/module.h>
 #undef module_info
-#endif
 #include <linux/ptrace.h>	/* for pt_regs */
 #include <sys/osif.h>
 #endif
+#include <sys/LiS/modcnt.h>
 
 /*  -------------------------------------------------------------------  */
 /*				  Glob. vars                             */
 
 struct fmodsw lis_fstr_sw[MAX_STRDEV];	/* streams devices */
 struct fmodsw lis_fmod_sw[MAX_STRMOD];	/* streams modules */
+lis_semaphore_t lis_mod_reg ;		/* module/driver serialization */
+volatile int	lis_mod_initialized ;
 
 extern struct file_operations lis_streams_fops;
 
@@ -142,6 +143,7 @@ typedef struct module_config
     char               cnf_name[LIS_NAMESZ+1];
     struct streamtab  *cnf_str;
     char               cnf_objname[LIS_NAMESZ+1];
+    int		       cnf_qlock_option;
 
 } module_config_t ;
 
@@ -183,20 +185,22 @@ typedef struct driver_config
     int                 *cnf_major;
     int                  cnf_n_majors;
     int                  cnf_n_minors;
-    void                (*cnf_init)(void);
-    void		(*cnf_term)(void);
+    void                (*cnf_init)(void) _RP;
+    void		(*cnf_term)(void) _RP;
+    int			 cnf_qlock_option;
 
 } driver_config_t ;
 
 #if !defined(LINUX) && !defined(_PPC_LIS_)
 struct pt_regs { void	*nothing; } ;
+typedef int  (*lis_int_handler) (int, void *, struct pt_regs *) ;
 #endif
 typedef struct device_config
 {
 	char		*name;
 	char 		*prefix;
 	struct streamtab *strtb;
-	void (*handler)(int,void *,struct pt_regs *);
+	lis_int_handler handler;
 	int		unit;
 	long		port;
 	int		nports;
@@ -345,6 +349,61 @@ int find_drv_objname(major_t major)
 	return -1;
 }
 
+static
+void initialize_module(int id, const char *name, int state)
+{
+    lis_fmod_sw[id].f_state = state ;
+    if (!(lis_fmod_sw[id].f_state & LIS_MODSTATE_INITED))
+    {				/* do this once */
+	lis_fmod_sw[id].f_count = 0;
+	strncpy(lis_fmod_sw[id].f_name, name, LIS_NAMESZ);
+	lis_sem_init(&lis_fmod_sw[id].f_sem, 1) ;
+	lis_fmod_sw[id].f_state |= LIS_MODSTATE_INITED ;
+    }
+}
+
+static
+int deinitialize_module(int id)
+{
+    if (lis_fmod_sw[id].f_state & LIS_MODSTATE_INITED)
+	lis_sem_destroy(&lis_fmod_sw[id].f_sem) ;
+
+    lis_fmod_sw[id].f_state = LIS_MODSTATE_UNKNOWN ;
+    lis_fmod_sw[id].f_count = 0;
+    lis_fmod_sw[id].f_name[0] = 0 ;
+    return(LIS_NULL_MID) ;
+}
+
+/*
+ * Find an empty slot in the fmod_sw table.  Caller holds the
+ * lis_mod_reg semaphore.
+ */
+static
+int find_empty_mod_index(const char *name)
+{
+    int	id ;
+
+    for (id = 1; id < lis_fmodcnt; ++id)
+    {
+	if (lis_fmod_sw[id].f_name[0] == 0)
+	{
+	    initialize_module(id, name, LIS_MODSTATE_UNKNOWN);
+	    break;
+	}
+    }
+
+    if (id == lis_fmodcnt)
+    {
+	if (id == MAX_STRMOD)
+	{
+	    printk("No available module number for \"%s\"\n", name) ;
+	    return LIS_NULL_MID;
+	}
+	lis_fmodcnt++;
+    }
+
+    return(id) ;
+}
 
 /*  -------------------------------------------------------------------  */
 /*			   Local functions & macros                      */
@@ -356,13 +415,13 @@ static void apush_free(autopush_t *a)
 {
 	int i;
 
-	ASSERT(a->push.npush >= 0);
-	ASSERT(a->push.npush <= MAXAPUSH);
+	LISASSERT(a->push.npush >= 0);
+	LISASSERT(a->push.npush <= MAXAPUSH);
 
 	for (i = 0; i < a->push.npush; ++i) {
-		ASSERT(a->push.mod[i] > 0);
-		ASSERT(a->push.mod[i] < MAX_STRMOD);
-		ASSERT(apush_nref[a->push.mod[i]] > 0);
+		LISASSERT(a->push.mod[i] > 0);
+		LISASSERT(a->push.mod[i] < MAX_STRMOD);
+		LISASSERT(apush_nref[a->push.mod[i]] > 0);
 
 		--apush_nref[a->push.mod[i]];
 	}
@@ -377,7 +436,7 @@ static void apush_free_major(major_t major)
 {
 	autopush_t *a, *b;
 
-	ASSERT(major < MAX_STRDEV);
+	LISASSERT(major < MAX_STRDEV);
 
 	if ((a = apush[major]) == NULL)
 		return;
@@ -403,7 +462,7 @@ static void apush_free_all(void)
 
 	/* Pure paranoia: Can go away when we know this stuff works */
 	for (i = 0; i < MAX_STRMOD; ++i)
-		ASSERT(apush_nref[i] == 0);
+		LISASSERT(apush_nref[i] == 0);
 }
 
 /*
@@ -413,8 +472,8 @@ static void apush_drop_mod(modID_t mod)
 {
 	int i;
 
-	ASSERT(mod > 0);
-	ASSERT(mod < MAX_STRMOD);
+	LISASSERT(mod > 0);
+	LISASSERT(mod < MAX_STRMOD);
 
 	if (apush_nref[mod] == 0)
 		return;
@@ -486,7 +545,7 @@ static int apush_conf(major_t major, autopush_t *a)
 	 *  Check for conflicting entries and insert new entry.
 	 *
 	 *  This code may look a bit hairy. I have tried to state
-	 *  inherited predicates in the form of ASSERT's to clarify.
+	 *  inherited predicates in the form of LISASSERT's to clarify.
 	 */
 	switch (a->cmd) {
 	    case SAP_CLEAR:
@@ -496,7 +555,7 @@ static int apush_conf(major_t major, autopush_t *a)
 		}
 		ap = &apush[major];
 		if (a->minor == 0 && (*ap)->cmd == SAP_ALL) {
-			ASSERT((*ap)->next == NULL);
+			LISASSERT((*ap)->next == NULL);
 			ar = *ap;
 			*ap = (*ap)->next;
 			apush_free(ar);
@@ -523,7 +582,7 @@ static int apush_conf(major_t major, autopush_t *a)
 		}
 		/*NOTREACHED*/
 	   case SAP_ONE:
-		ASSERT(apush_validate(&a->push) >= 0);
+		LISASSERT(apush_validate(&a->push) >= 0);
 		ap = &apush[major];
 		if (*ap != NULL) {
 			if ((*ap)->cmd == SAP_ALL)
@@ -538,8 +597,8 @@ static int apush_conf(major_t major, autopush_t *a)
 					if (ar->minor == a->minor)
 						return -EEXIST;
 				} else {
-					ASSERT(ar->cmd == SAP_RANGE);
-					ASSERT(a->minor >= ar->minor);
+					LISASSERT(ar->cmd == SAP_RANGE);
+					LISASSERT(a->minor >= ar->minor);
 					if (a->minor <= ar->lastminor)
 						return -EEXIST;
 				}
@@ -550,7 +609,7 @@ static int apush_conf(major_t major, autopush_t *a)
 		*ap = a;
 		break;
 	    case SAP_RANGE:
-		ASSERT(apush_validate(&a->push) >= 0);
+		LISASSERT(apush_validate(&a->push) >= 0);
 		if (a->minor >= a->lastminor)
 			return -ERANGE;
 		ap = &apush[major];
@@ -564,15 +623,15 @@ static int apush_conf(major_t major, autopush_t *a)
 				if (ar->minor > a->lastminor)
 					break; /* insert here */
 				if (ar->minor >= a->minor) {
-					ASSERT(ar->minor <= a->lastminor);
+					LISASSERT(ar->minor <= a->lastminor);
 					return -EEXIST;
 				}
 				if (ar->cmd != SAP_ONE) {
-					ASSERT(ar->cmd == SAP_RANGE);
-					ASSERT(ar->minor <= a->lastminor);
-					ASSERT(ar->minor < a->minor);
-					ASSERT(a->minor < a->lastminor);
-					ASSERT(ar->minor < a->lastminor);
+					LISASSERT(ar->cmd == SAP_RANGE);
+					LISASSERT(ar->minor <= a->lastminor);
+					LISASSERT(ar->minor < a->minor);
+					LISASSERT(a->minor < a->lastminor);
+					LISASSERT(ar->minor < a->lastminor);
 					if (ar->lastminor <= a->lastminor
 					    || ar->lastminor >= a->minor)
 						return -EEXIST;
@@ -584,7 +643,7 @@ static int apush_conf(major_t major, autopush_t *a)
 		*ap = a;
 		break;
 	    case SAP_ALL:
-		ASSERT(apush_validate(&a->push) >= 0);
+		LISASSERT(apush_validate(&a->push) >= 0);
 		if (apush[major] != NULL)
 			return -EEXIST;
 		a->next = NULL;
@@ -604,10 +663,10 @@ static struct autopush *find_apush_entry(major_t major, minor_t minor)
 {
 	struct autopush *a;
 
-	ASSERT(major < MAX_STRDEV);
+	LISASSERT(major < MAX_STRDEV);
 
 	for (a = apush[major]; a != NULL; a = a->next) {
-		ASSERT(a->cmd==SAP_ALL || a->cmd==SAP_ONE || a->cmd==SAP_RANGE);
+		LISASSERT(a->cmd==SAP_ALL || a->cmd==SAP_ONE || a->cmd==SAP_RANGE);
 
 		if (a->cmd == SAP_ALL)
 			break;
@@ -619,7 +678,7 @@ static struct autopush *find_apush_entry(major_t major, minor_t minor)
 			break;
 	}
 
-	ASSERT(a == NULL || a->minor <= minor);
+	LISASSERT(a == NULL || a->minor <= minor);
 
 	return a;
 }
@@ -632,40 +691,36 @@ static struct autopush *find_apush_entry(major_t major, minor_t minor)
 /*  -------------------------------------------------------------------  */
 /* register a new module
  */
-modID_t
+modID_t _RP
 lis_register_strmod(struct streamtab *strtab, const char *name)
 {
 	modID_t id = LIS_NULL_MID;
 	int	inx ;
 	int	new_entry = 0 ;
+	int	ret ;
 
 	if (name == NULL)
 		return LIS_NULL_MID;
 
-	/* See if the module is already registered */
-	if (strtab != NULL)
-	{
-	    for (id = 1; id < lis_fmodcnt; ++id)
-		if (lis_fmod_sw[id].f_str == strtab)
-		    return(id) ;	/* return existing slot number */
-	}
+	id = lis_findmod_strtab(strtab) ;
+	if (id > 0)
+	    return(id) ;
+
+	if ((ret = lis_down(&lis_mod_reg)) < 0)
+	    return(ret) ;
 
 	inx = find_mod(name) ;		/* find by name */
 	if (inx > 0)
 	    id = inx ;			/* found */
 	else
 	{				/* not in the table */
-	    /* Find a free id */
-	    for (id = 1; id < lis_fmodcnt; ++id)
-		if (lis_fmod_sw[id].f_name[0] == 0)
-		{
-		    new_entry = 1 ;
-		    break;
-		}
+	    id = find_empty_mod_index(name) ;
+	    new_entry = 1 ;
 	}
 
 	if (id == lis_fmodcnt) {
 		if (id == MAX_STRMOD) {
+			lis_up(&lis_mod_reg) ;
 			printk("Unable to register module \"%s\", "
 			       "all lis_fmod_sw slots in use.\n", name);
 			return LIS_NULL_MID;
@@ -674,17 +729,10 @@ lis_register_strmod(struct streamtab *strtab, const char *name)
 	}
 
 	lis_fmod_sw[id].f_str = strtab;	/* always save strtab */
+	initialize_module(id, name, 
+	    (new_entry && strtab) ? LIS_MODSTATE_LOADED : LIS_MODSTATE_LINKED);
 
-	if (!(lis_fmod_sw[id].f_state & LIS_MODSTATE_INITED))
-	{				/* do this once */
-	    lis_fmod_sw[id].f_count = 0;
-	    strncpy(lis_fmod_sw[id].f_name, name, LIS_NAMESZ);
-	    lis_sem_init(&lis_fmod_sw[id].f_sem, 1) ;
-	    if (new_entry && strtab)	/* must be extl module, now loaded */
-		lis_fmod_sw[id].f_state = LIS_MODSTATE_LOADED ;
-	    lis_fmod_sw[id].f_state |= LIS_MODSTATE_INITED ;
-	}
-
+	lis_up(&lis_mod_reg) ;
 	printk("STREAMS module \"%s\" registered%s, id %d\n",
 	       lis_fmod_sw[id].f_name,
 	       strtab == NULL ? " (loadable)" : "",
@@ -693,10 +741,26 @@ lis_register_strmod(struct streamtab *strtab, const char *name)
 	return id;
 } /* lis_register_strmod */
 
+int _RP
+lis_register_module_qlock_option(modID_t id, int qlock_option)
+{
+	int	ret ;
+
+	if ((ret = lis_down(&lis_mod_reg)) < 0)
+	    return(ret) ;
+
+	lis_fmod_sw[id].f_qlock_option = qlock_option ;
+
+	lis_up(&lis_mod_reg) ;
+
+	return 0;
+
+} /* lis_register_module_qlock_option */
+
 /*  -------------------------------------------------------------------  */
 /* unregister this module
  */
-static int unregister_module(fmodsw_t *slot)
+static int _RP unregister_module(fmodsw_t *slot)
 {
     modID_t id;
     int	    err;
@@ -725,7 +789,8 @@ static int unregister_module(fmodsw_t *slot)
     switch (slot->f_state & LIS_MODSTATE_MASK)
     {
     case LIS_MODSTATE_LINKED:
-    case LIS_MODSTATE_LOADED:
+	lis_up(&slot->f_sem) ;
+	deinitialize_module(id) ;
 	break ;
 
     case LIS_MODSTATE_LOADING:
@@ -733,37 +798,76 @@ static int unregister_module(fmodsw_t *slot)
 	printk("LiS: unregister module \"%s\" -- loading\n", slot->f_name) ;
 	return(-EBUSY) ;
 
+    case LIS_MODSTATE_LOADED:
     case LIS_MODSTATE_UNLOADED:
+    case LIS_MODSTATE_UNKNOWN:
 	slot->f_str = NULL;
+	deinitialize_module(id) ;
 	break ;
     }
 
     apush_drop_mod(id);
-    lis_up(&slot->f_sem) ;
-    lis_sem_destroy(&slot->f_sem) ;
-    slot->f_state &= ~LIS_MODSTATE_INITED ;
 
     printk("STREAMS module \"%s\" unregistered, id %d\n", name, id);
 
     return 0;
 }
 
-int
+int _RP
 lis_unregister_strmod(struct streamtab *strtab)
 {
     fmodsw_t *slot;
+    int       ret ;
+
+    if ((ret = lis_down(&lis_mod_reg)) < 0)
+	return(ret) ;
 
     for (slot = lis_fmod_sw + lis_fmodcnt; 
 	 slot != lis_fmod_sw + 1 && slot->f_str != strtab; slot--)
 	    ;
-    if (slot->f_str != strtab)
-	    return -EINVAL;
 
-    return(unregister_module(slot)) ;
+    if (slot->f_str != strtab)
+    {
+	lis_up(&lis_mod_reg) ;
+	return -EINVAL;
+    }
+
+    ret = unregister_module(slot) ;
+    lis_up(&lis_mod_reg) ;
+    return(ret) ;
 
 } /* lis_unregister_strmod */
 
 /*  -------------------------------------------------------------------  */
+/*  -------------------------------------------------------------------  */
+/* Find module by strtab entry.  Called from other routines, so get the 
+ * lis_mod_reg semaphore while searching the table.
+ */
+modID_t
+lis_findmod_strtab(struct streamtab *strtab)
+{
+    int	    ret ;
+    modID_t id ;
+
+    if (strtab != NULL)
+    {
+	if ((ret = lis_down(&lis_mod_reg)) < 0)
+	    return(ret) ;
+
+	for (id = 1; id < lis_fmodcnt; ++id)
+	{
+	    if (lis_fmod_sw[id].f_str == strtab)
+	    {
+		lis_up(&lis_mod_reg) ;
+		return(id) ;	/* return existing slot number */
+	    }
+	}
+	lis_up(&lis_mod_reg) ;
+    }
+
+    return(LIS_NULL_MID) ;
+}
+
 /* Find module by name in lis_fmod_sw[] 
  */
 modID_t
@@ -785,23 +889,51 @@ lis_findmod(const char *name)
 /*  -------------------------------------------------------------------  */
 /* Load module by name into lis_fmod_sw[]
  */
+#ifdef LIS_LOADABLE_SUPPORT
+/*
+ * Having requested a module load, wait until there is some evidence
+ * that the module's init function has run.  There is no semaphore
+ * type interlock for this, so we just have to wait a little bit
+ * in case the module's init function is running on a different CPU
+ * from ours.
+ */
+int lis_wait_for_module(modID_t id)
+{
+    int		i ;
+
+    if (lis_fmod_sw[id].f_str != NULL) return(0) ;	/* OK */
+
+    for (i = 0; i < 50; i++)
+    {
+	udelay(100) ;
+	if (lis_fmod_sw[id].f_str != NULL) return(0) ;	/* OK */
+    }
+
+    return(1) ;			/* nothing ever showed up */
+}
+#endif
+
 modID_t
 lis_loadmod(const char *name)
 {
 	int id = lis_findmod(name);
 	int err;
-	int configured;
+	int configured = 0;
 	const char *objname;
-#ifdef LIS_LOADABLE_SUPPORT
-	char req[LIS_NAMESZ + 10];
-#endif
 
-	if (id == LIS_NULL_MID)
-	    return LIS_NULL_MID;
+	if ((err = lis_down(&lis_mod_reg)) < 0)
+	    return(err) ;
+
+	if (   id == LIS_NULL_MID
+	    && (id = find_empty_mod_index(name)) == LIS_NULL_MID
+	   )
+	{				/* mod table is full */
+	    lis_up(&lis_mod_reg) ;
+	    return(LIS_NULL_MID) ;
+	}
 
 	/* Find object name of this module */
-	objname = name; /* default objname */
-	configured = 0;
+	objname = name;			/* default objname */
 	if (lis_fmod_sw[id].f_objname[0])
 	{
 	    objname = lis_fmod_sw[id].f_objname ;
@@ -816,52 +948,61 @@ lis_loadmod(const char *name)
 	case LIS_MODSTATE_LINKED:
 	case LIS_MODSTATE_LOADED:
 	    lis_up(&lis_fmod_sw[id].f_sem) ;
-	    return id ;				/* found and loaded */
+	    break ;
 
 	case LIS_MODSTATE_UNLOADED:		/* needs loading */
+	case LIS_MODSTATE_UNKNOWN:
+#ifdef LIS_LOADABLE_SUPPORT
+	    {
+		char req[LIS_NAMESZ + 10];
+
+		/* Ask kerneld to load the module.
+		 * When the module loads it will call lis_register_strmod()
+		 * to register itself and will then acquire an available
+		 * slot in the fmod_sw table.  So if the module can now
+		 * be found the load succeeded, otherwise not.
+		 */
+		sprintf(req, "streams-%s", objname);
+		lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
+		lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADING ;
+		lis_up(&lis_fmod_sw[id].f_sem) ;
+		lis_up(&lis_mod_reg) ;
+		if (   (err = request_module(req)) < 0
+		    || lis_wait_for_module(id))
+		{
+		    if (configured)
+			printk("Unable to demand load LiS objname %s, "
+			       "STREAMS module %s err=%d\n ",
+					   objname, (name) ? name : "(null)",
+					   err);
+		    else
+			printk("Unable to demand load STREAMS module %s "
+				"err=%d\n",
+					   (name) ? name : "(null)", err);
+
+		    return(deinitialize_module(id)) ;
+		}
+
+		lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
+		lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADED ;
+		return(id) ;
+	    }
+#else
+	    id = deinitialize_module(id) ;
+#endif
 	    break ;
 
 	case LIS_MODSTATE_LOADING:
 	    printk("Bad module state for %s (LOADING)\n", name) ;
 	    lis_up(&lis_fmod_sw[id].f_sem) ;
-	    return(LIS_NULL_MID);
+	    id = LIS_NULL_MID ;
+	    break ;
 	}
 
-#ifdef LIS_LOADABLE_SUPPORT
-	/* Ask kerneld to load the module.
-	 * When the module loads it will call lis_register_strmod()
-	 * to register itself and will then acquire an available
-	 * slot in the fmod_sw table.  So if the module can now
-	 * be found the load succeeded, otherwise not.
-	 */
-	sprintf(req, "streams-%s", objname);
-	lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
-	lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADING ;
-	if (request_module(req) < 0 || lis_fmod_sw[id].f_str == NULL)
-	{
-	    if (configured)
-		printk("Unable to demand load LiS objname %s, "
-		       "STREAMS module %s\n ",
-				       objname, (name) ? name : "(null)");
-	    else
-		printk("Unable to demand load STREAMS module %s\n",
-					       (name) ? name : "(null)");
 
-	    lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
-	    lis_fmod_sw[id].f_state |= LIS_MODSTATE_UNLOADED ;
-	    lis_up(&lis_fmod_sw[id].f_sem) ;
-	    return LIS_NULL_MID;
-	}
-
-	lis_fmod_sw[id].f_state &= ~LIS_MODSTATE_MASK ;
-	lis_fmod_sw[id].f_state |= LIS_MODSTATE_LOADED ;
-#else
-	printk("Cannot load %s, LIS_LOADABLE_SUPPORT not set\n", name) ;
-	id = LIS_NULL_MID;
-#endif
-
-	lis_up(&lis_fmod_sw[id].f_sem) ;
+	lis_up(&lis_mod_reg) ;
 	return id;
+
 } /* lis_loadmod */
 
 /*  -------------------------------------------------------------------  */
@@ -881,6 +1022,7 @@ lis_enable_intr(struct streamtab *strtab, int major, const char *name)
     if (devptr->irq <= 0)
 	return ;
 
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
     retval =  request_irq(devptr->irq, devptr->handler, 0, name, NULL);
     if (retval)
     {
@@ -888,6 +1030,7 @@ lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 		name, devptr->irq, retval);
 	return;
     }
+#endif
 
     if (devptr->port > 0 && devptr->nports > 0)
     {
@@ -910,7 +1053,7 @@ lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 /*  -------------------------------------------------------------------  */
 /* register a new streams device
  */
-int 
+int _RP
 lis_register_strdev(major_t major, 
 		    struct streamtab *strtab, int nminor, const char *name)
 {
@@ -927,11 +1070,15 @@ lis_register_strdev(major_t major,
 
 	(void)nminor; /* ignore minor count, compiler happiness */
 
+	if ((rslt = lis_down(&lis_mod_reg)) < 0)
+	    return(rslt) ;
+
 	rslt = register_chrdev(major, name, &lis_streams_fops);
 	if (rslt < 0) {
-		printk("Unable to get major %lu "
+		printk("Unable to get major %u "
 		       "for stream driver \"%s\", errno=%d\n",
 		       major, (name != NULL) ? name : "", rslt);
+		lis_up(&lis_mod_reg) ;
 		return -EIO;
 	}
 
@@ -941,9 +1088,10 @@ lis_register_strdev(major_t major,
 	slot = &lis_fstr_sw[major];
 
 	if (slot->f_str != strtab && slot->f_str != NULL) {
-		printk("Unable to register major %lu "
+		printk("Unable to register major %u "
 		       "for stream driver \"%s\": In use for driver \"%s\".\n",
 		       major, (name != NULL) ? name : "", slot->f_name);
+		lis_up(&lis_mod_reg) ;
 		return -EBUSY;
 	}
 
@@ -951,36 +1099,62 @@ lis_register_strdev(major_t major,
 
 	slot->f_str = strtab;
 	slot->f_count = 0;
+	slot->f_qlock_option = LIS_QLOCK_QUEUE ;	/* default */
 	if (name)
 		strncpy(slot->f_name, name, LIS_NAMESZ);
 	else
 		*slot->f_name = '\0';
 
-	printk("STREAMS driver \"%s\" registered, major %lu\n",
+	printk("STREAMS driver \"%s\" registered, major %u\n",
 	       slot->f_name, major);
 
+	lis_up(&lis_mod_reg) ;
 	return major;
+
 } /* lis_register_strdev */
+
+int _RP
+lis_register_driver_qlock_option(major_t major, int qlock_option)
+{
+	int rslt;
+	fmodsw_t *slot;
+
+	if ((rslt = lis_down(&lis_mod_reg)) < 0)
+	    return(rslt) ;
+
+	slot = &lis_fstr_sw[major];
+	slot->f_qlock_option = qlock_option ;
+
+	lis_up(&lis_mod_reg) ;
+
+	return 0;
+
+} /* lis_register_driver_qlock_option */
 
 /*  -------------------------------------------------------------------  */
 /* unregister a streams device
  */
-int 
+int _RP
 lis_unregister_strdev(major_t major)
 {
+	int	ret ;
+
 	if (major >= MAX_STRDEV || lis_fstr_sw[major].f_str == NULL) {
 		printk("STREAMS driver not registered, "
-		       "cannot unregister major %lu\n", major);
+		       "cannot unregister major %u\n", major);
 		return -ENODEV;
 	}
 
 	if (lis_fstr_sw[major].f_count) {
 		printk("STREAMS driver \"%s\" has open count %d, "
-		       "cannot unregister major %lu\n",
+		       "cannot unregister major %u\n",
 		       lis_fstr_sw[major].f_name, lis_fstr_sw[major].f_count,
 		       major);
 		return -EBUSY;
 	}
+
+	if ((ret = lis_down(&lis_mod_reg)) < 0)
+	    return(ret) ;
 
 	apush_free_major(major);
 
@@ -995,7 +1169,9 @@ lis_unregister_strdev(major_t major)
 		devptr = &lis_device_config[i] ;
 		if (devptr->irq > 0)
 		{
+#if (!defined(_S390_LIS_) && !defined(_S390X_LIS_))
 		    free_irq(devptr->irq, NULL) ;
+#endif
 		
 		    if (devptr->port > 0 && devptr->nports > 0)
 			release_region(devptr->port, devptr->nports);
@@ -1006,10 +1182,12 @@ lis_unregister_strdev(major_t major)
 	lis_fstr_sw[major].f_str = NULL;
 	unregister_chrdev(major, lis_fstr_sw[major].f_name);
 
-	printk("STREAMS driver \"%s\" unregistered, major %lu\n",
+	lis_up(&lis_mod_reg) ;
+	printk("STREAMS driver \"%s\" unregistered, major %u\n",
 	       lis_fstr_sw[major].f_name, major);
 
 	return 0;
+
 } /* lis_unregister_strdev */
 
 /*  -------------------------------------------------------------------  */
@@ -1027,6 +1205,7 @@ lis_find_strdev(major_t major)
 		const char *objname = NULL, *initname = NULL;
 		char name[30];
 		int i;
+		int err ;
 
 		/* Find object name of this driver */
 		if ((i = find_drv_objname(major)) >= 0) {
@@ -1034,60 +1213,43 @@ lis_find_strdev(major_t major)
 			initname = lis_drv_objnames[i].initname;
 		}
 		if (objname == NULL)
-			sprintf(name, "char-major-%lu", major);
+			sprintf(name, "char-major-%u", major);
 		else
 			sprintf(name, "streams-%s", objname);
 
-		request_module(name);
+		err = request_module(name);
 
 		if (lis_fstr_sw[major].f_str == NULL) {
 			if (objname != NULL) {
-			    sprintf(name, "char-major-%lu", major);
-			    request_module(name);
+			    sprintf(name, "char-major-%u", major);
+			    err = request_module(name);
 			    if (lis_fstr_sw[major].f_str == NULL) {
 				printk("Unable to demand load "
 				       "configured STREAMS object %s, "
-				       "device major %lu\n",
-				       objname, major);
+				       "device major %u err=%d\n",
+				       objname, major, err);
 				return NULL;
 			    }
 			} else {
 				printk("Unable to demand load "
 				       "unconfigured STREAMS "
-				       "device major %lu\n",
-				       major);
+				       "device major %u err=%d\n",
+				       major, err);
 				return NULL;
 			}
 		}
 		if (initname != NULL) { /* call initialization */
 			void (* init)(void);
-#if defined(KERNEL_2_3)
 			init = inter_module_get_request(initname, name) ;
-#else
-			/*
-			 *  get_module_symbol() author forgot to declare
-			 *  untouched arguments as "const char *".
-			 *  Avoid warning by declaring prototype here
-			 *  instead of including <linux/module.h>.
-			 *  This is a bit dirty, but I *did* check the
-			 *  function source.
-			 */
-			extern void *get_module_symbol(const char *,
-						       const char *);
-
-			init = get_module_symbol(name, initname);
-#endif
 			if (init == NULL)
 				printk("lis_find_strdev(): "
 				       "Unable to resolve init function %s "
-				       "in module %s for major %lu\n",
+				       "in module %s for major %u\n",
 				       initname, objname, major);
 			else
 			{
 				(* init)();
-#if defined(KERNEL_2_3)
 				inter_module_put(initname) ;
-#endif
 			}
 		}
 	}
@@ -1104,8 +1266,8 @@ lis_find_strdev(major_t major)
  */
 int lis_apushm(dev_t dev, const char *mods[])
 {
-	int major = STR_MAJOR(dev);
-	int minor = STR_MINOR(dev);
+	int major = getmajor(dev);
+	int minor = getminor(dev);
 	struct autopush *a;
 	int i;
 
@@ -1121,9 +1283,9 @@ int lis_apushm(dev_t dev, const char *mods[])
 	for (i = 0; i < a->push.npush; ++i) {
 		modID_t mod = a->push.mod[i];
 
-		ASSERT(mod > 0);
-		ASSERT(mod < MAX_STRMOD);
-		ASSERT(lis_fmod_sw[mod].f_str != NULL);
+		LISASSERT(mod > 0);
+		LISASSERT(mod < MAX_STRMOD);
+		LISASSERT(lis_fmod_sw[mod].f_str != NULL);
 		mods[i] = lis_fmod_sw[mod].f_name;
 	}
 	lis_spin_unlock(&lis_apush_lock) ;
@@ -1131,12 +1293,12 @@ int lis_apushm(dev_t dev, const char *mods[])
 	return a->push.npush;
 } /* lis_apushm */
 
-int lis_apush_set(struct strapush *ap)
+int _RP lis_apush_set(struct strapush *ap)
 {
 	int i, j, err;
 	autopush_t *a;
 
-	ASSERT(ap != NULL);
+	LISASSERT(ap != NULL);
 
 	if (lis_fstr_sw[ap->sap_major].f_str == NULL) {
 		/* Is this a configured loadable driver? */
@@ -1186,7 +1348,7 @@ int lis_apush_set(struct strapush *ap)
 	return 0;
 } /* lis_apush_set */
 
-int lis_apush_get(struct strapush *ap)
+int _RP lis_apush_get(struct strapush *ap)
 {
 	autopush_t *a;
 	int i;
@@ -1207,16 +1369,16 @@ int lis_apush_get(struct strapush *ap)
 	}
 
 	ap->sap_cmd = a->cmd;
-	ASSERT(ap->sap_minor == a->minor);
+	LISASSERT(ap->sap_minor == a->minor);
 	ap->sap_lastminor = a->lastminor;
 	ap->sap_npush = a->push.npush;
 
 	for (i = 0; i < a->push.npush; ++i) {
 	    modID_t id = a->push.mod[i];
 
-	    ASSERT(id > 0);
-	    ASSERT(id < MAX_STRMOD);
-	    ASSERT(lis_fmod_sw[id].f_str != NULL);
+	    LISASSERT(id > 0);
+	    LISASSERT(id < MAX_STRMOD);
+	    LISASSERT(lis_fmod_sw[id].f_str != NULL);
 	    strncpy(ap->sap_list[i], lis_fmod_sw[id].f_name, LIS_NAMESZ + 1);
 	}
 	lis_spin_unlock(&lis_apush_lock) ;
@@ -1252,8 +1414,10 @@ void lis_init_mod(void)
 {
 	int i, j;
 	int modid ;
+	int maj ;
 
 	lis_spin_lock_init(&lis_apush_lock, "AutoPush-Lock") ;
+	lis_sem_init(&lis_mod_reg, 1) ;
 	memset(lis_fstr_sw, 0, sizeof lis_fstr_sw);
 	memset(lis_fmod_sw, 0, sizeof lis_fmod_sw);
 	memset(apush,       0, sizeof apush);
@@ -1262,7 +1426,7 @@ void lis_init_mod(void)
 	lis_fmodcnt = 1;
 
 	for (i = 0; i < MOD_CONFIG_SIZE; ++i) {
-		ASSERT(lis_fmodcnt < MAX_STRMOD);
+		LISASSERT(lis_fmodcnt < MAX_STRMOD);
 
 		if (!lis_module_config[i].cnf_name[0])
 		    continue ;			/* no name */
@@ -1272,6 +1436,14 @@ void lis_init_mod(void)
 		if (modid == LIS_NULL_MID)
 		{
 		    printk("Failed to register module \"%s\".\n",
+				       lis_module_config[i].cnf_name);
+		    continue ;
+		}
+
+		if (lis_register_module_qlock_option(modid, 
+			    lis_module_config[i].cnf_qlock_option) < 0)
+		{
+		    printk("Failed to register module \"%s\" qlock option.\n",
 				       lis_module_config[i].cnf_name);
 		    continue ;
 		}
@@ -1289,19 +1461,30 @@ void lis_init_mod(void)
 		    lis_fmod_sw[modid].f_state |= LIS_MODSTATE_LINKED ;
 	}
 
-	for (i = 0; i < DRV_CONFIG_SIZE; ++i) {
-	    for (j = 0;  j < lis_driver_config[i].cnf_n_majors;  j++) {
-		if (lis_register_strdev(lis_driver_config[i].cnf_major[j],
+	for (i = 0; i < DRV_CONFIG_SIZE; ++i)
+	{
+	    for (j = 0;  j < lis_driver_config[i].cnf_n_majors;  j++)
+	    {
+		if ((maj = lis_register_strdev(
+					lis_driver_config[i].cnf_major[j],
 					lis_driver_config[i].cnf_str,
 					lis_driver_config[i].cnf_n_minors,
-					lis_driver_config[i].cnf_name ) < 0) {
+					lis_driver_config[i].cnf_name)) < 0)
+		{
 			printk("Failed to register driver \"%s\".\n",
 			       lis_driver_config[i].cnf_name);
 			continue;
 		}
+		if (lis_register_driver_qlock_option(maj,
+				lis_driver_config[i].cnf_qlock_option) < 0)
+		{
+		    printk("Failed to register driver \"%s\" qlock option.\n",
+			   lis_driver_config[i].cnf_name);
+		    continue;
+		}
 	    }
-		if (lis_driver_config[i].cnf_init != NULL)
-			(*lis_driver_config[i].cnf_init)();
+	    if (lis_driver_config[i].cnf_init != NULL)
+		    (*lis_driver_config[i].cnf_init)();
 	}
 
 	for (i = 0; i < AP_CONFIG_SIZE; ++i) {
@@ -1345,6 +1528,7 @@ void lis_init_mod(void)
 	}
 	if (AP_CONFIG_SIZE > 0)
 		printk("Added initial autopush entries.\n");
+    lis_mod_initialized = 1 ;
 }
 
 /*
@@ -1386,6 +1570,12 @@ void lis_terminate_mod(void)
 	   )
 	    printk("Failed to unregister driver \"%s\".\n",
 					   lis_fmod_sw[i].f_name);
+    }
+
+    if (lis_mod_initialized)
+    {
+	lis_mod_initialized = 0 ;
+	lis_sem_destroy(&lis_mod_reg) ;
     }
 }
 
