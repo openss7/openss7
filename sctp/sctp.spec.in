@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/04/02 16:47:28 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/04/05 01:57:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:47:28 $ by $Author: brian $
+# Last Modified $Date: 2005/04/05 01:57:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1134,10 +1134,10 @@ if [ $1 = 1 ] ; then : # upgrade
             # This groovy sed script just pulls out the first matching line and leaves the rest
             # untouched.
             sed -e '
-/^[[:space:]].*'"$m"'[[:space:]]*$/!b
+\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
 N
-s/^[[:space:]].*'"$m"'[[:space:]]*\
-//
+s|^[[:space:]].*'"$m"'[[:space:]]*\
+||
 : loop
 n
 b loop' $prel_new > $prel_tmp
@@ -1182,15 +1182,20 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.48  2005/04/02 16:47:28  brian
-# - improvements for arch indep build
+# Revision 0.9.2.49  2005/04/05 01:57:05  brian
+# - more robust sed
 #
-# Revision 1.48  2005/04/02 16:47:28  brian
-# - improvements for arch indep build
+# Revision 1.49  2005/04/05 01:57:05  brian
+# - more robust sed
 #
-# Revision 1.47  2005/04/02 16:25:35  brian
-# - more adjustments to arch indep build
-#
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.48  2005/04/02 16:47:28  brian
+- improvements for arch indep build
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.47  2005/04/02 16:25:35  brian
+- more adjustments to arch indep build
 
 * Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.46  2005/04/02 04:39:06  brian

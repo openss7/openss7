@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.10 2005/03/30 13:38:46 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.11 2005/04/05 02:02:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/05 02:02:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -248,7 +248,36 @@ drivers to
 .[
 LiS
 .]
-does not provide this function.
+does not provide these functions.
+.I LiS
+provide a completely non-standard and non-portable set of functions,
+.BR lis_time_till (9),
+.BR lis_target_time (9),
+.BR liz_usectohz (9),
+and
+.BR lis_milli_to_ticks (9).
+Of these,
+.BR lis_uzectohz (9)
+and
+.BR lis_milli_to_ticks (9)
+are equivalent to
+.BR drv_usectohz ().
+and
+.BR drv_msectohz ().
+.IP \(em
+Later
+.B Linux
+kernels provide the functions
+.BR jiffies_to_msecs (9),
+.BR msecs_to_jiffies (9),
+and
+.BR jiffies_to_usecs (9),
+and these are used where available to implement
+.BR drv_hztomsec (),
+.BR drv_msectohz (),
+and
+.BR drv_hztousec (),
+respectively.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/26 12:55:34 $
+# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/05 01:58:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 12:55:34 $ by $Author: brian $
+# Last Modified $Date: 2005/04/05 01:58:18 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -96,17 +96,19 @@ function prerm_oldmods() {
 }
 
 function prerm_preload() {
-    @WITH_KO_MODULES_FALSE@preloads=modules
-    @WITH_KO_MODULES_TRUE@preloads=modprobe.preload
-    if [ -f $sysconfdir/$preloads ] ; then
-	cp -f $sysconfdir/$preloads $tmppath/$preloads.new.$$
-	for m in $KERNEL_PRELOADS ; do
-	    sed -e "/^$m\>/d" $tmppath/$preloads.new.$$ > $tmppath/$preloads.tmp.$$
-	    mv -f $tmppath/$preloads.tmp.$$ $tmppath/$preloads.new.$$
+    @WITH_KO_MODULES_FALSE@prel_fil="${sysconfdir}/modules"
+    @WITH_KO_MODULES_TRUE@prel_fil="${sysconfdir}/modprobe.preload"
+    if [ -f $prel_fil ] ; then
+	prel_tmp="$tmppath/modules.tmp.$$"
+	prel_new="$tmppath/modules.new.$$"
+	cp -f -- $prel_fil $prel_new
+	for m in ${KERNEL_PRELOADS} ; do
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
+	    mv -f -- $prel_tmp $tmp_new
 	done
-	chmod --reference=$sysconfdir/$preloads $tmppath/$preloads.new.$$
-	cp -fb --suffix=.rpmsave $tmppath/$preloads.new.$$ $sysconfdir/$preloads
-	rm -f $tmppath/$preloads.new.$$
+	chmod --reference=$prel_fil -- $prel_new
+	cp -fb --suffix=.rpmsave -- $prel_new $prel_fil
+	rm -f -- $prel_new
     fi
 }
 
@@ -142,6 +144,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: lis-core.prerm.in,v $
+# Revision 1.1.2.4  2005/04/05 01:58:18  brian
+# - working on scriptlets
+#
 # Revision 1.1.2.3  2005/03/26 12:55:34  brian
 # - working up debian scripts
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.13 2005/03/30 02:24:25 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.14 2005/04/05 02:00:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:25 $ by $Author: brian $
+ Last Modified $Date: 2005/04/05 02:00:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -158,7 +158,7 @@ typedef int tid_t;
 #ifdef LFS
 #define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
 #define FREE(__p) kmem_free((__p), sizeof(*(__p)))
-#define SPLSTR(__pl) ({ (__pl) = spl7(); (void)0; })
+#define SPLSTR(__pl) ({ (__pl) = splstr(); (void)0; })
 #define SPLX(__pl) splx(__pl)
 #else				/* LFS */
 typedef lis_flags_t pl_t;

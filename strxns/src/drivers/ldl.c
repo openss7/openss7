@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/01 06:23:27 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/01 06:23:27 $ by $Author: brian $
+ Last Modified $Date: 2005/04/05 02:01:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/01 06:23:27 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/01 06:23:27 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/04/01 06:23:27 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -444,6 +444,14 @@ ldl_gstats_ioctl_t ldl_gstats;
 #define	ginc(field)	atomic_inc(&ldl_gstats.field)
 STATIC unsigned long ldl_debug_mask;
 
+#ifdef LIS
+#undef SPLSTR
+#undef SPLX
+STATIC spinlock_t ldl_spin_lock = SPIN_LOCK_UNLOCKED;
+#define SPLSTR(__psw) while(0){ (void)(__psw); spin_lock(&ldl_spin_lock);   }
+#define SPLX(__psw)   while(0){ (void)(__psw); spin_unlock(&ldl_spin_lock); }
+#endif
+
 STATIC struct pt *first_pt = NULL;
 STATIC spinlock_t first_pt_lock = SPIN_LOCK_UNLOCKED;
 STATIC struct ndev *first_ndev = NULL;
@@ -721,7 +729,7 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 #if HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT
 		pt->pt.next = NULL;
 #elif HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST
-		pt->pt.list = (struct list_head)LIST_HEAD_INIT(pt->pt.list);
+		pt->pt.list = (struct list_head) LIST_HEAD_INIT(pt->pt.list);
 #else
 #error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT or HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST defined.
 #endif
@@ -733,10 +741,10 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		ASSERT(pt->pt.type == saptype);
 		ASSERT(pt->pt.func == rcv_func);
 
-		write_lock(&pt->lock);
+		write_lock_bh(&pt->lock);
 		sap->next_listen = pt->listen;
 		pt->listen = sap;
-		write_unlock(&pt->lock);
+		write_unlock_bh(&pt->lock);
 		spin_unlock(&first_pt_lock);
 	}
 
@@ -767,10 +775,10 @@ sap_destroy(struct dl *dl, struct sap *sap)
 
 	SPLSTR(psw);
 	spin_lock(&first_pt_lock);
-	write_lock(&pt->lock);
+	write_lock_bh(&pt->lock);
 	if (pt->listen == sap && sap->next_listen == NULL) {
 		/* It is the last use of this packet_type */
-		write_unlock(&pt->lock);
+		write_unlock_bh(&pt->lock);
 		if (pt == first_pt)
 			first_pt = pt->next;
 		else {
@@ -795,7 +803,7 @@ sap_destroy(struct dl *dl, struct sap *sap)
 				 * Not found, but it should be there:
 				 * Emergency brake
 				 */
-				write_unlock(&pt->lock);
+				write_unlock_bh(&pt->lock);
 				SPLX(psw);
 				return -1;
 			}
@@ -804,7 +812,7 @@ sap_destroy(struct dl *dl, struct sap *sap)
 			sapp_pt = &(*sapp_pt)->next_listen;
 		}
 		*sapp_pt = sap->next_listen;
-		write_unlock(&pt->lock);
+		write_unlock_bh(&pt->lock);
 	}
 
 	if (dl->sap == sap) {

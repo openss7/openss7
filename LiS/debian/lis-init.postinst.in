@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-init.postinst.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/26 22:21:06 $
+# @(#) $RCSfile: lis-init.postinst.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/05 01:58:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 22:21:06 $ by $Author: brian $
+# Last Modified $Date: 2005/04/05 01:58:18 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -58,16 +58,16 @@ configure_modconf() { :
     # For modconf entries, we remove reference to our include from the modules.conf file and then
     # add our include back to the file.
     #
-    conf_old=$tmppath/modules.conf
-    if [ -f $conf_old ] ; then
+    conf_fil=$tmppath/modules.conf
+    if [ -f $conf_fil ] ; then
 	conf_new=$tmppath/modules.conf.new.$$
 	conf_tmp=$tmppath/modules.conf.tmp.$$
-	cp -f -- $conf_old $conf_new
-	sed -e '/^[[:space:]]*include[[:space:]][[:space:]]*'"$modutildir/$name"'[[:space:]]*$/d' $conf_new > $conf_tmp
+	cp -f -- $conf_fil $conf_new
+	sed -e '\|^[[:space:]]*include[[:space:]][[:space:]]*'"$modutildir/$name"'[[:space:]]*$|d' $conf_new > $conf_tmp
 	mv -f -- $conf_tmp $conf_new
 	echo "include $modutildir/$name" >> $conf_new
-	chmod --reference=$conf_old -- $conf_new
-	cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+	chmod --reference=$conf_fil -- $conf_new
+	cp -f -b --suffix=.dpkg-save -- $conf_new $conf_fil
 	rm -f -- $conf_new
     fi
 }
@@ -77,20 +77,20 @@ configure_preloads() { :
     # For preloads we remove reference to any of our modules from the preloads file and then add
     # only our preloadable modules back to the file.
     #
-    prel_old="@preload@"
-    if [ -f $prel_old ] ; then
+    prel_fil="@preload@"
+    if [ -f $prel_fil ] ; then
 	prel_tmp=$tmppath/modprobe.preload.tmp.$$
 	prel_new=$tmppath/modprobe.preload.new.$$
-	cp -f -- $prel_old $prel_new
+	cp -f -- $prel_fil $prel_new
 	for m in $modules ; do
-	    sed -e '/^[[:space:]]*'"$m"'[[:space:]]*$/d' $prel_new > $prel_tmp
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
 	    mv -f -- $prel_tmp $prel_new
 	done
 	for p in $preloads ; do
 	    echo "$p" >> $prel_new
 	done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+        chmod --reference=$prel_fil -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_fil
         rm -f -- $prel_new
     fi
 }
@@ -117,6 +117,9 @@ subpkg=init
 # =============================================================================
 #
 # $Log: lis-init.postinst.in,v $
+# Revision 1.1.2.4  2005/04/05 01:58:18  brian
+# - working on scriptlets
+#
 # Revision 1.1.2.3  2005/03/26 22:21:06  brian
 # - working up debian maint scripts
 #

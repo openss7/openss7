@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.31 $) $Date: 2005/04/02 16:25:18 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.32 $) $Date: 2005/04/05 01:57:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:25:18 $ by $Author: brian $
+# Last Modified $Date: 2005/04/05 01:57:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -568,9 +568,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.31  2005/04/02 16:25:18  brian
-# - more adjustments to arch indep build
+# Revision 1.1.2.32  2005/04/05 01:57:04  brian
+# - more robust sed
 #
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.31  2005/04/02 16:25:18  brian
+- more adjustments to arch indep build
 
 * Tue Mar 29 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.30  2005/03/29 17:16:25  brian

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2005/04/02 22:13:39 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.18 $) $Date: 2005/04/05 01:57:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 22:13:39 $ by $Author: brian $
+# Last Modified $Date: 2005/04/05 01:57:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -527,6 +527,14 @@ kernel version %{kernel_version}.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
+function remove_depmods() {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+        remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
+    done
+}
 if [ $1 = 1 ] ; then : # fresh install
     # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
     # installed kernel modules hanging around for this kernel version.
@@ -958,9 +966,9 @@ if [ $1 = 0 ] ; then : # final removal
 fi
 %endif
 
-# ---------------------------------------------------------------------------
 %if %{FILES_makedev}
 %files dev
+# ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %endif
 
@@ -1109,12 +1117,12 @@ function remove_depmods() {
 }
 # This is an initial installation of the init subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
-# treat every fresh installation like an upgrade from non-deb install.
+# treat every fresh installation like an upgrade from non-deb/rpm install.
 if [ $1 = 1 ] ; then : # fresh install
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
     # postun actions.
-    for dir in /%_lib/modules/2.[456]\.* /%_lib/modules/preferred /%_lib/modules/default /%_lib/modules/boot ; do
+    for dir in %{_kmoduledir}/../* ; do
         [ -d $dir ] || continue
         strm_mods="`find $dir \
             \( -name 'streams.o'     -o -name 'streams.ko'    \
@@ -1170,16 +1178,16 @@ if [ $1 = 1 ] ; then : # fresh install
             for suffix in %name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
                 # This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
                 if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
-                    sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'              $conf_new > $conf_tmp
+                    sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'            $conf_new > $conf_tmp
                     mv -f -- $conf_tmp $conf_new
                 fi
                 # This is my newer technique with a prune and an if statement in the modules.conf
                 # file that was also used by davem in LiS-2.18.0.
                 if [ -f $dir/modules.$suffix ] ; then
                     rm -f -- $dir/modules.$suffix
-                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'         $conf_new > $conf_tmp
-                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d'   $conf_tmp > $conf_new
-                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'       $conf_new > $conf_tmp
+                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
+                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
+                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
                     mv -f -- $conf_tmp $conf_new
                 fi
                 # This is my newer latest technique with only an include statement in modules.conf
@@ -1378,10 +1386,10 @@ if [ $1 = 1 ] ; then : # upgrade
         # This groovy sed script just pulls out the first matching line and leaves the rest
         # untouched.
         sed -e '
-/^include[[:space:]].*%_modutildir\/%name/!b
+\|^include[[:space:]].*%_modutildir/%name|!b
 N
-s/^include[[:space:]].*%_modutildir\/%name.*\
-//
+s|^include[[:space:]].*%_modutildir/%name.*\
+||
 : loop
 n
 b loop' $conf_new > $conf_tmp
@@ -1408,10 +1416,10 @@ b loop' $conf_new > $conf_tmp
             # This groovy sed script just pulls out the first matching line and leaves the rest
             # untouched.
             sed -e '
-/^[[:space:]].*'"$m"'[[:space:]]*$/!b
+\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
 N
-s/^[[:space:]].*'"$m"'[[:space:]]*\
-//
+s|^[[:space:]].*'"$m"'[[:space:]]*\
+||
 : loop
 n
 b loop' $prel_new > $prel_tmp
@@ -1458,15 +1466,21 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.17  2005/04/02 22:13:39  brian
-# - remove _streams macro from streams packages
+# Revision 1.1.6.18  2005/04/05 01:57:04  brian
+# - more robust sed
 #
-# Revision 1.1.6.16  2005/04/02 16:47:25  brian
-# - improvements for arch indep build
-#
-# Revision 1.1.6.15  2005/04/02 16:24:59  brian
-# - more adjustments to arch indep build
-#
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.17  2005/04/02 22:13:39  brian
+- remove _streams macro from streams packages
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.16  2005/04/02 16:47:25  brian
+- improvements for arch indep build
+
+* Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.15  2005/04/02 16:24:59  brian
+- more adjustments to arch indep build
 
 * Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.14  2005/04/02 03:23:38  brian
