@@ -28,7 +28,7 @@
  *    3) This source is ugly.
  */
 
-#ident "@(#) LiS ldltest.c 2.12 12/19/02"
+#ident "@(#) LiS ldltest.c 2.13 9/9/03"
 
 #ifndef LINUX
 #define LINUX 2
@@ -62,7 +62,7 @@
 #include <sys/ldl.h>
 
 
-#ifndef _I386_TYPES_H
+#if !defined(_I386_TYPES_H) && !defined(_ASM_IA64_TYPES_H)
 typedef unsigned char	__u8;
 typedef unsigned short	__u16;
 typedef unsigned int	__u32;
