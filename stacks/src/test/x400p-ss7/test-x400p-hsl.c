@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:29:10 $
+ @(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,14 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:29:10 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/02/22 18:14:55 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:29:10 $"
+#ident "@(#) $RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:55 $"
 
 static char const ident[] =
-    "$RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:29:10 $";
+    "$RCSfile: test-x400p-hsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:55 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -76,9 +76,16 @@ static char const ident[] =
 #include <arpa/inet.h>
 #include <time.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
+int verbose = 1;
+
 #define BUFSIZE 272
 
-const char *lmi_strreason(unsigned int reason)
+const char *
+lmi_strreason(unsigned int reason)
 {
 	const char *r;
 	switch (reason) {
@@ -201,7 +208,8 @@ const char *lmi_strreason(unsigned int reason)
 	return r;
 }
 
-void do_lmi_get_msg(int fd)
+void
+do_lmi_get_msg(int fd)
 {
 	int ret, flags = 0;
 	struct strbuf ctrl;
@@ -348,7 +356,8 @@ void do_lmi_get_msg(int fd)
 	}
 }
 
-void info_req(int fd)
+void
+info_req(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -368,7 +377,8 @@ void info_req(int fd)
 	do_lmi_get_msg(fd);
 }
 
-void attach_req(int fd, uint16_t ppa)
+void
+attach_req(int fd, uint16_t ppa)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -389,7 +399,8 @@ void attach_req(int fd, uint16_t ppa)
 	do_lmi_get_msg(fd);
 }
 
-void detach_req(int fd)
+void
+detach_req(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -409,7 +420,8 @@ void detach_req(int fd)
 	do_lmi_get_msg(fd);
 }
 
-void enable_req(int fd)
+void
+enable_req(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -429,7 +441,8 @@ void enable_req(int fd)
 	do_lmi_get_msg(fd);
 }
 
-void disable_req(int fd)
+void
+disable_req(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -449,7 +462,8 @@ void disable_req(int fd)
 	do_lmi_get_msg(fd);
 }
 
-void sdt_daedt_start(int fd)
+void
+sdt_daedt_start(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -469,7 +483,8 @@ void sdt_daedt_start(int fd)
 	// do_lmi_get_msg(fd);
 }
 
-void sdt_daedr_start(int fd)
+void
+sdt_daedr_start(int fd)
 {
 	int ret;
 	struct strbuf ctrl;
@@ -489,7 +504,8 @@ void sdt_daedr_start(int fd)
 	// do_lmi_get_msg(fd);
 }
 
-void sdt_write(int fd)
+void
+sdt_write(int fd)
 {
 
 #if 0
@@ -543,9 +559,9 @@ void sdt_write(int fd)
 #endif
 #endif
 #endif
-//      int i;
+	// int i;
 	int ret;
-//      for (i = 0; i < 10; i++) {
+	// for (i = 0; i < 10; i++) {
 	printf("\nAttempting write\n");
 	ret = write(fd, buf, len);
 	if (ret < 0) {
@@ -561,10 +577,11 @@ void sdt_write(int fd)
 		}
 		printf("\n");
 	}
-//      }
+	// }
 }
 
-void sdt_read(int fd)
+void
+sdt_read(int fd)
 {
 	uint8_t buf[256];
 	int i, ret;
@@ -598,7 +615,8 @@ void sdt_read(int fd)
 	}
 }
 
-int sdt_ioctl(int fd, int cmd, void *arg, int len)
+int
+sdt_ioctl(int fd, int cmd, void *arg, int len)
 {
 	struct strioctl ctl = { cmd, 0, len, arg };
 	int ret;
@@ -612,7 +630,8 @@ int sdt_ioctl(int fd, int cmd, void *arg, int len)
 	return ctl.ic_len;
 }
 
-void do_ioctl(int fd, int cmd, int arg)
+void
+do_ioctl(int fd, int cmd, int arg)
 {
 	int ret;
 	ret = ioctl(fd, cmd, arg);
@@ -624,7 +643,8 @@ void do_ioctl(int fd, int cmd, int arg)
 	}
 }
 
-void sdl_config(int fd)
+void
+sdl_config(int fd)
 {
 	unsigned char buf[256];
 	sdl_config_t *c = (sdl_config_t *) buf;
@@ -656,7 +676,8 @@ void sdl_config(int fd)
 	printf("  rx_state      = %lu\n", s->rx_state);
 }
 
-void sdt_config(int fd)
+void
+sdt_config(int fd)
 {
 	unsigned char buf[256];
 	sdt_config_t *c = (sdt_config_t *) buf;
@@ -694,7 +715,8 @@ void sdt_config(int fd)
 	sdl_config(fd);
 }
 
-void sdl_stats(int fd)
+void
+sdl_stats(int fd)
 {
 	unsigned char buf[256];
 	sdl_stats_t *s = (sdl_stats_t *) buf;
@@ -712,7 +734,8 @@ void sdl_stats(int fd)
 	printf("  carrier_lost......... = %lu\n", s->carrier_lost);
 }
 
-void sdt_stats(int fd)
+void
+sdt_stats(int fd)
 {
 	unsigned char buf[256];
 	sdt_stats_t *s = (sdt_stats_t *) buf;
@@ -748,7 +771,8 @@ void sdt_stats(int fd)
 	sdl_stats(fd);
 }
 
-int main()
+int
+do_tests(void)
 {
 	int i, span, pfd[4];
 	uint16_t ppa;
@@ -874,4 +898,178 @@ int main()
 	fflush(stdout);
 
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+ITU-T RECOMMENDATAION Q.781 - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "qvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "qvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }

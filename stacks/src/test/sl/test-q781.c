@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $
+ @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:26:48 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/02/22 18:14:52 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $"
+#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $"
 
-static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $";
+static char const ident[] =
+    "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -87,6 +88,10 @@ static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9 
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #define SUCCESS       0
 #define FAILURE       1
 #define INCONCLUSIVE -1
@@ -94,7 +99,7 @@ static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9 
 
 #define FFLUSH(stream)
 
-/*
+/* 
  *  -------------------------------------------------------------------------
  *
  *  Configuration
@@ -115,7 +120,7 @@ static struct {
 	sdl_config_t sdl;
 } iutconf;
 
-/*
+/* 
  *  -------------------------------------------------------------------------
  *
  *  Timer Functions
@@ -123,7 +128,7 @@ static struct {
  *  -------------------------------------------------------------------------
  */
 
-/*
+/* 
  *  Timer values for tests: each timer has a low range (minus error margin)
  *  and a high range (plus error margin).
  */
@@ -150,10 +155,11 @@ static timer_range_t timer[tmax] = {
 
 long test_start = 0;
 
-/*
+/* 
  *  Return the current time in milliseconds.
  */
-static long milliseconds(char *t)
+static long
+milliseconds(char *t)
 {
 	long ret;
 	struct timeval now;
@@ -169,13 +175,14 @@ static long milliseconds(char *t)
 	return ret;
 }
 
-/*
+/* 
  *  Check the current time against the beginning time provided as an argnument
  *  and see if the time inverval falls between the low and high values for the
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
  *  the allowable range and FAILURE otherwise.
  */
-static int check_time(const char *t, long beg, long lo, long hi)
+static int
+check_time(const char *t, long beg, long lo, long hi)
 {
 	long i;
 	struct timeval now;
@@ -188,7 +195,8 @@ static int check_time(const char *t, long beg, long lo, long hi)
 	i = (now.tv_sec - test_start) * 1000;
 	i += (now.tv_usec + 500L) / 1000;
 	i -= beg;
-	printf("                 check time:       %4s (%ld <= %ld <= %ld)\n", t, lo - 100, i, hi + 100);
+	printf("                 check time:       %4s (%ld <= %ld <= %ld)\n", t, lo - 100, i,
+	       hi + 100);
 	FFLUSH(stdout);
 	if (lo - 100 <= i && i <= hi + 100)
 		return SUCCESS;
@@ -198,14 +206,16 @@ static int check_time(const char *t, long beg, long lo, long hi)
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
@@ -221,10 +231,11 @@ static int timer_sethandler(void)
 	return SUCCESS;
 }
 
-/*
+/* 
  *  Start an interval timer as the overall test timer.
  */
-static int start_tt(long duration)
+static int
+start_tt(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
@@ -238,7 +249,8 @@ static int start_tt(long duration)
 	return SUCCESS;
 }
 
-static int stop_tt(void)
+static int
+stop_tt(void)
 {
 	struct itimerval setting = { {0, 0}, {0, 0} };
 	sigset_t mask;
@@ -322,7 +334,8 @@ static int stop_tt(void)
 
 #define NO_MSG          -1
 
-static const char *event_string(int e)
+static const char *
+event_string(int e)
 {
 	switch (e) {
 	case SIO:
@@ -489,7 +502,8 @@ static int verbose = 0;
 
 #define send pt_send
 
-static int send(int msg)
+static int
+send(int msg)
 {
 	int ret = SUCCESS;
 	int len;
@@ -502,10 +516,10 @@ static int send(int msg)
 	if (msg != oldmsg || oldpsb != (((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn))) {
 		oldmsg = msg;
 		oldpsb = ((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn);
-//              if ( cntmsg ) {
-//                      printf("    Ct=%d\n", cntmsg+1);
-//                      FFLUSH(stdout);
-//              }
+		// if ( cntmsg ) {
+		// printf(" Ct=%d\n", cntmsg+1);
+		// FFLUSH(stdout);
+		// }
 		cntmsg = 0;
 	} else if (!expand)
 		cntmsg++;
@@ -525,31 +539,38 @@ static int send(int msg)
 		switch (msg) {
 		case SIO:
 			if (!cntmsg || verbose)
-				printf("    SIO  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIO  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIN:
 			if (!cntmsg || verbose)
-				printf("    SIN  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIN  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIE:
 			if (!cntmsg || verbose)
-				printf("    SIE  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIE  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIOS:
 			if (!cntmsg || verbose)
-				printf("    SIOS (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIOS (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIPO:
 			if (!cntmsg || verbose)
-				printf("    SIPO (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIPO (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIB:
 			if (!cntmsg || verbose)
-				printf("    SIB  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIB  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIX:
 			if (!cntmsg || verbose)
-				printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		}
 		FFLUSH(stdout);
@@ -570,31 +591,38 @@ static int send(int msg)
 		switch (msg) {
 		case SIO2:
 			if (!cntmsg || verbose)
-				printf("    SIO  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIO  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIN2:
 			if (!cntmsg || verbose)
-				printf("    SIN  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIN  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIE2:
 			if (!cntmsg || verbose)
-				printf("    SIE  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIE  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIOS2:
 			if (!cntmsg || verbose)
-				printf("    SIOS (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIOS (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIPO2:
 			if (!cntmsg || verbose)
-				printf("    SIPO (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIPO (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIB2:
 			if (!cntmsg || verbose)
-				printf("    SIB  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    SIB  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		case SIX2:
 			if (!cntmsg || verbose)
-				printf("    LSSU (%02x/%02x)[2](corrupt)----->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+				printf("    LSSU (%02x/%02x)[2](corrupt)----->\n", pt_bib | pt_bsn,
+				       pt_fib | pt_fsn);
 			break;
 		}
 		FFLUSH(stdout);
@@ -622,7 +650,8 @@ static int send(int msg)
 		return SUCCESS;
 	case FISU:
 		if (!cntmsg || verbose) {
-			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case FISU_S:
@@ -633,7 +662,8 @@ static int send(int msg)
 		break;
 	case FISU_BAD_FIB:
 		if (!cntmsg || verbose) {
-			printf("    FISU (%02x/%02x) (bad fib)------->\n", pt_bib | pt_bsn, (pt_fib | pt_fsn) ^ 0x80);
+			printf("    FISU (%02x/%02x) (bad fib)------->\n", pt_bib | pt_bsn,
+			       (pt_fib | pt_fsn) ^ 0x80);
 			FFLUSH(stdout);
 		}
 		pt_buf[0] = pt_bib | pt_bsn;
@@ -643,7 +673,8 @@ static int send(int msg)
 		break;
 	case LSSU_CORRUPT:
 		if (!cntmsg || verbose) {
-			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case LSSU_CORRUPT_S:
@@ -655,7 +686,8 @@ static int send(int msg)
 		break;
 	case FISU_CORRUPT:
 		if (!cntmsg || verbose) {
-			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case FISU_CORRUPT_S:
@@ -674,7 +706,8 @@ static int send(int msg)
 		memset(&pt_buf[3], 'B', msu_len);
 		len = msu_len + 3;
 		if (!cntmsg || verbose) {
-			printf("    MSU  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -686,7 +719,8 @@ static int send(int msg)
 		memset(&pt_buf[3], 'A', 280);
 		len = 283;
 		if (!cntmsg || verbose) {
-			printf("    MSU  (%02x/%02x) (too long)------>\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (too long)------>\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -696,7 +730,8 @@ static int send(int msg)
 		pt_buf[1] = pt_fib | pt_fsn;
 		len = 2;
 		if (!cntmsg || verbose) {
-			printf("    MSU  (%02x/%02x) (7 ones)-------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (7 ones)-------->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		return FAILURE;	/* can't do this */
@@ -706,7 +741,8 @@ static int send(int msg)
 		pt_buf[1] = pt_fib | pt_fsn;
 		len = 2;
 		if (!cntmsg || verbose) {
-			printf("    MSU  (%02x/%02x) (too short)----->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (too short)----->\n", pt_bib | pt_bsn,
+			       pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -739,19 +775,23 @@ static int send(int msg)
 		}
 		return FAILURE;	/* can't do this */
 	case FISU_FISU_1FLAG:
-		printf("    FISU (%02x/%02x) ---FISU-F-FISU-->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+		printf("    FISU (%02x/%02x) ---FISU-F-FISU-->\n", pt_bib | pt_bsn,
+		       pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		return FAILURE;	/* can't do this */
 	case FISU_FISU_2FLAG:
-		printf("    FISU (%02x/%02x) --FISU-F-F-FISU->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+		printf("    FISU (%02x/%02x) --FISU-F-F-FISU->\n", pt_bib | pt_bsn,
+		       pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		return FAILURE;	/* can't do this */
 	case MSU_MSU_1FLAG:
-		printf("    MSU  (%02x/%02x) ----MSU-F-MSU--->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+		printf("    MSU  (%02x/%02x) ----MSU-F-MSU--->\n", pt_bib | pt_bsn,
+		       pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		return FAILURE;	/* can't do this */
 	case MSU_MSU_2FLAG:
-		printf("    MSU  (%02x/%02x) ---MSU-F-F-MSU-->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
+		printf("    MSU  (%02x/%02x) ---MSU-F-F-MSU-->\n", pt_bib | pt_bsn,
+		       pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		return FAILURE;	/* can't do this */
 	case POWER_ON:
@@ -814,7 +854,8 @@ static int send(int msg)
 
 #define signal iut_signal
 
-static int signal(int action)
+static int
+signal(int action)
 {
 	int ret;
 	char cbuf[BUFSIZE];
@@ -826,10 +867,10 @@ static int signal(int action)
 	ctrl.buf = cbuf;
 	if (action != oldact) {
 		oldact = action;
-//              if ( cntact ) {
-//                      printf("                                   Ct=%d\n", cntact+1);
-//                      FFLUSH(stdout);
-//              }
+		// if ( cntact ) {
+		// printf(" Ct=%d\n", cntact+1);
+		// FFLUSH(stdout);
+		// }
 		cntact = 0;
 	} else if (!expand)
 		cntact++;
@@ -902,7 +943,8 @@ static int signal(int action)
 	      signal_iut_putmsg:
 		if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 			printf("                                   ****ERROR: putmsg failed!\n");
-			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n",
+			       __FUNCTION__, strerror(errno));
 			return FAILURE;
 		}
 		return SUCCESS;
@@ -935,7 +977,8 @@ static int signal(int action)
 		data.len = msu_len;
 		if ((ret = putmsg(iut_fd, NULL, &data, 0)) < 0) {
 			printf("                                   ****ERROR: putmsg failed!\n");
-			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n",
+			       __FUNCTION__, strerror(errno));
 			return FAILURE;
 		}
 		return SUCCESS;
@@ -951,11 +994,12 @@ static int signal(int action)
 static int show_msus = 1;
 static int show_fisus = 1;
 
-static int pt_decode_data(void)
+static int
+pt_decode_data(void)
 {
 	int ret;
-//      printf("pt decode data:\n"); FFLUSH(stdout);
-//      FFLUSH(stdout);
+	// printf("pt decode data:\n"); FFLUSH(stdout);
+	// FFLUSH(stdout);
 	iut_bib = pt_buf[0] & 0x80;
 	iut_bsn = pt_buf[0] & 0x7f;
 	iut_fib = pt_buf[1] & 0x80;
@@ -1003,18 +1047,18 @@ static int pt_decode_data(void)
 	}
 	if (show_fisus || ret != FISU) {
 		if (ret != oldret || oldisb != (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn))) {
-//                      if (oldisb == (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn)) &&
-//                          ((ret == FISU && oldret == MSU) || (ret == MSU && oldret == FISU))) {
-//                              if (ret == MSU && !expand)
-//                                      cntmsg++;
-//                      } else
-//                              cntret = 0;
+			// if (oldisb == (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn)) &&
+			// ((ret == FISU && oldret == MSU) || (ret == MSU && oldret == FISU))) {
+			// if (ret == MSU && !expand)
+			// cntmsg++;
+			// } else
+			// cntret = 0;
 			oldret = ret;
 			oldisb = ((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn);
-//                      if (cntret) {
-//                              printf("                                   Ct=%d\n", cntret + 1);
-//                              FFLUSH(stdout);
-//                      }
+			// if (cntret) {
+			// printf(" Ct=%d\n", cntret + 1);
+			// FFLUSH(stdout);
+			// }
 			cntret = 0;
 		} else if (!expand)
 			cntret++;
@@ -1024,7 +1068,8 @@ static int pt_decode_data(void)
 		switch (ret) {
 		case FISU:
 			if (show_fisus || verbose) {
-				printf("                 <---------------- FISU (%02x/%02x)\n", iut_bib | iut_bsn, iut_fib | iut_fsn);
+				printf("                 <---------------- FISU (%02x/%02x)\n",
+				       iut_bib | iut_bsn, iut_fib | iut_fsn);
 				FFLUSH(stdout);
 			}
 			break;
@@ -1048,25 +1093,30 @@ static int pt_decode_data(void)
 		      show_lssu:
 			switch (iut_li) {
 			case 1:
-				printf("                 <---------------- %s (%02x/%02x)\n", label, iut_bib | iut_bsn, iut_fib | iut_fsn);
+				printf("                 <---------------- %s (%02x/%02x)\n", label,
+				       iut_bib | iut_bsn, iut_fib | iut_fsn);
 				break;
 			case 2:
-				printf("                 <---------------- %s (%02x/%02x)[%d]\n", label, iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+				printf("                 <---------------- %s (%02x/%02x)[%d]\n",
+				       label, iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 				break;
 			}
 			FFLUSH(stdout);
 			break;
 		case SIX:
-			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n",
+			       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 			FFLUSH(stdout);
 			break;
 		case SIX2:
-			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n",
+			       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 			FFLUSH(stdout);
 			break;
 		case MSU:
 			if (show_msus || verbose) {
-				printf("                 <---------------- MSU  (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_len - 3);
+				printf("                 <---------------- MSU  (%02x/%02x)[%d]\n",
+				       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_len - 3);
 				FFLUSH(stdout);
 			}
 			break;
@@ -1075,7 +1125,8 @@ static int pt_decode_data(void)
 	return ret;
 }
 
-static int pt_decode_msg(unsigned char *buf)
+static int
+pt_decode_msg(unsigned char *buf)
 {
 	union SDT_primitives *p = (union SDT_primitives *) buf;
 	if (verbose) {
@@ -1156,14 +1207,16 @@ static int pt_decode_msg(unsigned char *buf)
 	return UNKNOWN;
 }
 
-static int iut_decode_data(void)
+static int
+iut_decode_data(void)
 {
 	printf("                                  !msu [%d bytes]\n", iut_len);
 	FFLUSH(stdout);
 	return IUT_MSU;
 }
 
-static int iut_decode_msg(unsigned char *buf)
+static int
+iut_decode_msg(unsigned char *buf)
 {
 	char *reason;
 	union SL_primitives *p = (union SL_primitives *) buf;
@@ -1310,7 +1363,8 @@ static int iut_decode_msg(unsigned char *buf)
 static int show_timeout = 0;
 static int pt_event = 0;
 
-static int time_event(int event)
+static int
+time_event(int event)
 {
 	if (verbose) {
 		unsigned long msec;
@@ -1326,7 +1380,8 @@ static int time_event(int event)
 	return (event);
 }
 
-static int wait_event(int wait)
+static int
+wait_event(int wait)
 {
 	while (1) {
 		struct pollfd pfd[] = {
@@ -1343,38 +1398,40 @@ static int wait_event(int wait)
 			pt_event = TIMEOUT;
 			return time_event(TIMEOUT);
 		}
-//              printf("polling:\n");
-//              FFLUSH(stdout);
+		// printf("polling:\n");
+		// FFLUSH(stdout);
 		pfd[0].fd = pt_fd;
-		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
+		pfd[0].events =
+		    POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		pfd[1].fd = iut_fd;
-		pfd[1].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
+		pfd[1].events =
+		    POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
 		pfd[1].revents = 0;
 		switch (poll(pfd, 2, wait)) {
 		case -1:
-//                      printf("                 = = = ERROR = = =\n");
-//                      FFLUSH(stdout);
+			// printf(" = = = ERROR = = =\n");
+			// FFLUSH(stdout);
 			break;
 		case 0:
-//                      printf("                 < + + + + + + + + (nothing)\n");
-//                      FFLUSH(stdout);
+			// printf(" < + + + + + + + + (nothing)\n");
+			// FFLUSH(stdout);
 			pt_event = NO_MSG;
 			return time_event(NO_MSG);
 		case 1:
 		case 2:
-//                      printf("polled:\n");
-//                      FFLUSH(stdout);
+			// printf("polled:\n");
+			// FFLUSH(stdout);
 			if (pfd[0].revents) {
 				int flags = 0;
 				unsigned char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, pt_buf };
-//                              printf("getmsg from pt:\n");
-//                              FFLUSH(stdout);
+				// printf("getmsg from pt:\n");
+				// FFLUSH(stdout);
 				if (getmsg(pt_fd, &ctrl, &data, &flags) == 0) {
-//                                      printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
-//                                      FFLUSH(stdout);
+					// printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
+					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;
 					if (ctrl.len > 0) {
@@ -1391,15 +1448,16 @@ static int wait_event(int wait)
 				unsigned char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, iut_buf };
-//                              printf("getmsg from iut:\n");
-//                              FFLUSH(stdout);
+				// printf("getmsg from iut:\n");
+				// FFLUSH(stdout);
 				if (getmsg(iut_fd, &ctrl, &data, &flags) == 0) {
-//                                      printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-//                                      FFLUSH(stdout);
+					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
+					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;
 					if (ctrl.len > 0) {
-						if ((pt_event = iut_decode_msg(ctrl.buf)) != UNKNOWN)
+						if ((pt_event =
+						     iut_decode_msg(ctrl.buf)) != UNKNOWN)
 							return time_event(pt_event);
 					} else if (data.len > 0) {
 						if ((pt_event = iut_decode_data()) != UNKNOWN)
@@ -1413,12 +1471,14 @@ static int wait_event(int wait)
 	}
 }
 
-static int event(void)
+static int
+event(void)
 {
 	return wait_event(-1);
 }
 
-static int check_snibs(unsigned char bsnib, unsigned char fsnib)
+static int
+check_snibs(unsigned char bsnib, unsigned char fsnib)
 {
 	int ret = FAILURE;
 	if ((iut_bib | iut_bsn) == bsnib && (iut_fib | iut_fsn) == fsnib)
@@ -1428,7 +1488,8 @@ static int check_snibs(unsigned char bsnib, unsigned char fsnib)
 	return ret;
 }
 
-static int test_1_1a(void)
+static int
+test_1_1a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1451,7 +1512,8 @@ static int test_1_1a(void)
 	}
 }
 
-static int test_1_1b(void)
+static int
+test_1_1b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1471,7 +1533,8 @@ static int test_1_1b(void)
 	}
 }
 
-static int test_1_2(void)
+static int
+test_1_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1520,7 +1583,8 @@ static int test_1_2(void)
 	}
 }
 
-static int test_1_3(void)
+static int
+test_1_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1585,7 +1649,8 @@ static int test_1_3(void)
 	}
 }
 
-static int test_1_4(void)
+static int
+test_1_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1657,7 +1722,8 @@ static int test_1_4(void)
 	}
 }
 
-static int test_1_5a(void)
+static int
+test_1_5a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1722,7 +1788,8 @@ static int test_1_5a(void)
 	}
 }
 
-static int test_1_5b(void)
+static int
+test_1_5b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1787,7 +1854,8 @@ static int test_1_5b(void)
 	}
 }
 
-static int test_1_6(void)
+static int
+test_1_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1850,7 +1918,8 @@ static int test_1_6(void)
 	}
 }
 
-static int test_1_7(void)
+static int
+test_1_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1916,7 +1985,8 @@ static int test_1_7(void)
 	}
 }
 
-static int test_1_8a(void)
+static int
+test_1_8a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1984,7 +2054,8 @@ static int test_1_8a(void)
 		}
 	}
 }
-static int test_1_8b(void)
+static int
+test_1_8b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2051,7 +2122,8 @@ static int test_1_8b(void)
 	}
 }
 
-static int test_1_9a(void)
+static int
+test_1_9a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2117,7 +2189,8 @@ static int test_1_9a(void)
 		}
 	}
 }
-static int test_1_9b(void)
+static int
+test_1_9b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2199,7 +2272,8 @@ static int test_1_9b(void)
 	}
 }
 
-static int test_1_10(void)
+static int
+test_1_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2266,7 +2340,8 @@ static int test_1_10(void)
 	}
 }
 
-static int test_1_11(void)
+static int
+test_1_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2333,7 +2408,8 @@ static int test_1_11(void)
 	}
 }
 
-static int test_1_12a(void)
+static int
+test_1_12a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2402,7 +2478,8 @@ static int test_1_12a(void)
 		}
 	}
 }
-static int test_1_12b(void)
+static int
+test_1_12b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2473,7 +2550,8 @@ static int test_1_12b(void)
 	}
 }
 
-static int test_1_13(void)
+static int
+test_1_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2542,7 +2620,8 @@ static int test_1_13(void)
 	}
 }
 
-static int test_1_14(void)
+static int
+test_1_14(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2622,7 +2701,8 @@ static int test_1_14(void)
 	}
 }
 
-static int test_1_15(void)
+static int
+test_1_15(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2732,7 +2812,8 @@ static int test_1_15(void)
 	}
 }
 
-static int test_1_16(void)
+static int
+test_1_16(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2802,7 +2883,8 @@ static int test_1_16(void)
 	return FAILURE;
 }
 
-static int test_1_17(void)
+static int
+test_1_17(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2851,7 +2933,8 @@ static int test_1_17(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi);
+				return check_time("T3,4", beg_time, timer[t4n].lo,
+						  timer[t3].hi + timer[t4n].hi);
 			default:
 				return FAILURE;
 			}
@@ -2862,7 +2945,8 @@ static int test_1_17(void)
 	}
 }
 
-static int test_1_18(void)
+static int
+test_1_18(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2924,7 +3008,8 @@ static int test_1_18(void)
 	}
 }
 
-static int test_1_19(void)
+static int
+test_1_19(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2987,7 +3072,8 @@ static int test_1_19(void)
 	}
 }
 
-static int test_1_20(void)
+static int
+test_1_20(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3061,7 +3147,8 @@ static int test_1_20(void)
 	}
 }
 
-static int test_1_21(void)
+static int
+test_1_21(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3122,7 +3209,8 @@ static int test_1_21(void)
 	}
 }
 
-static int test_1_22(void)
+static int
+test_1_22(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3183,7 +3271,8 @@ static int test_1_22(void)
 	}
 }
 
-static int test_1_23(void)
+static int
+test_1_23(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3258,7 +3347,8 @@ static int test_1_23(void)
 	}
 }
 
-static int test_1_24(void)
+static int
+test_1_24(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3319,7 +3409,8 @@ static int test_1_24(void)
 	}
 }
 
-static int test_1_25(void)
+static int
+test_1_25(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3386,7 +3477,8 @@ static int test_1_25(void)
 	}
 }
 
-static int test_1_26(void)
+static int
+test_1_26(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3449,7 +3541,8 @@ static int test_1_26(void)
 	}
 }
 
-static int test_1_27(void)
+static int
+test_1_27(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3525,7 +3618,8 @@ static int test_1_27(void)
 	}
 }
 
-static int test_1_28(void)
+static int
+test_1_28(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3552,7 +3646,8 @@ static int test_1_28(void)
 	}
 }
 
-static int test_1_29a(void)
+static int
+test_1_29a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3580,7 +3675,8 @@ static int test_1_29a(void)
 	}
 }
 
-static int test_1_29b(void)
+static int
+test_1_29b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3608,7 +3704,8 @@ static int test_1_29b(void)
 	}
 }
 
-static int test_1_30a(void)
+static int
+test_1_30a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3653,7 +3750,8 @@ static int test_1_30a(void)
 	}
 }
 
-static int test_1_30b(void)
+static int
+test_1_30b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3697,7 +3795,8 @@ static int test_1_30b(void)
 	}
 }
 
-static int test_1_31a(void)
+static int
+test_1_31a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3727,7 +3826,8 @@ static int test_1_31a(void)
 	}
 }
 
-static int test_1_31b(void)
+static int
+test_1_31b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3758,7 +3858,8 @@ static int test_1_31b(void)
 	}
 }
 
-static int test_1_32a(void)
+static int
+test_1_32a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3835,7 +3936,8 @@ static int test_1_32a(void)
 	}
 }
 
-static int test_1_32b(void)
+static int
+test_1_32b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3908,7 +4010,8 @@ static int test_1_32b(void)
 	}
 }
 
-static int test_1_33(void)
+static int
+test_1_33(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3982,7 +4085,8 @@ static int test_1_33(void)
 	}
 }
 
-static int test_1_34(void)
+static int
+test_1_34(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4057,7 +4161,8 @@ static int test_1_34(void)
 	}
 }
 
-static int test_1_35(void)
+static int
+test_1_35(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4134,7 +4239,8 @@ static int test_1_35(void)
 	}
 }
 
-static int test_2_1(void)
+static int
+test_2_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4220,7 +4326,8 @@ static int test_2_1(void)
 	}
 }
 
-static int test_2_2(void)
+static int
+test_2_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4304,7 +4411,8 @@ static int test_2_2(void)
 	}
 }
 
-static int test_2_3(void)
+static int
+test_2_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4390,7 +4498,8 @@ static int test_2_3(void)
 	}
 }
 
-static int test_2_4(void)
+static int
+test_2_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4473,7 +4582,8 @@ static int test_2_4(void)
 	}
 }
 
-static int test_2_5(void)
+static int
+test_2_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4555,7 +4665,8 @@ static int test_2_5(void)
 	}
 }
 
-static int test_2_6(void)
+static int
+test_2_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4641,7 +4752,8 @@ static int test_2_6(void)
 	}
 }
 
-static int test_2_7(void)
+static int
+test_2_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4672,7 +4784,8 @@ static int test_2_7(void)
 	}
 }
 
-static int test_2_8(void)
+static int
+test_2_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4719,7 +4832,8 @@ static int test_2_8(void)
 	}
 }
 
-static int test_3_1(void)
+static int
+test_3_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4798,7 +4912,8 @@ static int test_3_1(void)
 	}
 }
 
-static int test_3_2(void)
+static int
+test_3_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4839,7 +4954,8 @@ static int test_3_2(void)
 	}
 }
 
-static int test_3_3(void)
+static int
+test_3_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4919,7 +5035,8 @@ static int test_3_3(void)
 	}
 }
 
-static int test_3_4(void)
+static int
+test_3_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5010,7 +5127,8 @@ static int test_3_4(void)
 	}
 }
 
-static int test_3_5(void)
+static int
+test_3_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5041,7 +5159,8 @@ static int test_3_5(void)
 	}
 }
 
-static int test_3_6(void)
+static int
+test_3_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5082,7 +5201,8 @@ static int test_3_6(void)
 	}
 }
 
-static int test_3_7(void)
+static int
+test_3_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5129,7 +5249,8 @@ static int test_3_7(void)
 	}
 }
 
-static int test_3_8(void)
+static int
+test_3_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5189,7 +5310,8 @@ static int test_3_8(void)
 	}
 }
 
-static int test_4_1(void)
+static int
+test_4_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5298,7 +5420,8 @@ static int test_4_1(void)
 	}
 }
 
-static int test_4_2(void)
+static int
+test_4_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5356,7 +5479,8 @@ static int test_4_2(void)
 	}
 }
 
-static int test_4_3(void)
+static int
+test_4_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5419,7 +5543,8 @@ static int test_4_3(void)
 	}
 }
 
-static int test_5_1(void)
+static int
+test_5_1(void)
 {
 	unsigned char old_bsn = 0x7f;
 	for (;;) {
@@ -5452,7 +5577,8 @@ static int test_5_1(void)
 	}
 }
 
-static int test_5_2(void)
+static int
+test_5_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5484,7 +5610,8 @@ static int test_5_2(void)
 	}
 }
 
-static int test_5_3(void)
+static int
+test_5_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5516,7 +5643,8 @@ static int test_5_3(void)
 	}
 }
 
-static int test_5_4a(void)
+static int
+test_5_4a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5542,7 +5670,8 @@ static int test_5_4a(void)
 	}
 }
 
-static int test_5_4b(void)
+static int
+test_5_4b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5568,7 +5697,8 @@ static int test_5_4b(void)
 	}
 }
 
-static int test_5_5a(void)
+static int
+test_5_5a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5596,7 +5726,8 @@ static int test_5_5a(void)
 	}
 }
 
-static int test_5_5b(void)
+static int
+test_5_5b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5624,7 +5755,8 @@ static int test_5_5b(void)
 	}
 }
 
-static int test_6_1(void)
+static int
+test_6_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5668,7 +5800,8 @@ static int test_6_1(void)
 	}
 }
 
-static int test_6_2(void)
+static int
+test_6_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5716,7 +5849,8 @@ static int test_6_2(void)
 	}
 }
 
-static int test_6_3(void)
+static int
+test_6_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5757,7 +5891,8 @@ static int test_6_3(void)
 	}
 }
 
-static int test_6_4(void)
+static int
+test_6_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5800,7 +5935,8 @@ static int test_6_4(void)
 	}
 }
 
-static int test_7_1(void)
+static int
+test_7_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5895,7 +6031,8 @@ static int test_7_1(void)
 	}
 }
 
-static int test_7_2(void)
+static int
+test_7_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5990,7 +6127,8 @@ static int test_7_2(void)
 	}
 }
 
-static int test_7_3(void)
+static int
+test_7_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6099,7 +6237,8 @@ static int test_7_3(void)
 	}
 }
 
-static int test_7_4(void)
+static int
+test_7_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6181,7 +6320,8 @@ static int test_7_4(void)
 	}
 }
 
-static int test_8_1(void)
+static int
+test_8_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6252,7 +6392,8 @@ static int test_8_1(void)
 	}
 }
 
-static int test_8_2(void)
+static int
+test_8_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6334,7 +6475,8 @@ static int test_8_2(void)
 	}
 }
 
-static int test_8_3(void)
+static int
+test_8_3(void)
 {
 	if (msu_len > 12)
 		msu_len = 12;
@@ -6419,7 +6561,8 @@ static int test_8_3(void)
 	}
 }
 
-static int test_8_4(void)
+static int
+test_8_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6479,7 +6622,8 @@ static int test_8_4(void)
 	}
 }
 
-static int test_8_5(void)
+static int
+test_8_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6551,7 +6695,8 @@ static int test_8_5(void)
 	}
 }
 
-static int test_8_6(void)
+static int
+test_8_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6609,7 +6754,8 @@ static int test_8_6(void)
 	}
 }
 
-static int test_8_7(void)
+static int
+test_8_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6672,7 +6818,8 @@ static int test_8_7(void)
 	}
 }
 
-static int test_8_8(void)
+static int
+test_8_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6722,7 +6869,8 @@ static int test_8_8(void)
 	}
 }
 
-static int test_8_9(void)
+static int
+test_8_9(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6819,7 +6967,8 @@ static int test_8_9(void)
 	}
 }
 
-static int test_8_10(void)
+static int
+test_8_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6894,7 +7043,8 @@ static int test_8_10(void)
 	}
 }
 
-static int test_8_11(void)
+static int
+test_8_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6940,7 +7090,8 @@ static int test_8_11(void)
 	}
 }
 
-static int test_8_12(void)
+static int
+test_8_12(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6993,7 +7144,8 @@ static int test_8_12(void)
 	}
 }
 
-static int test_8_13(void)
+static int
+test_8_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7029,7 +7181,8 @@ static int test_8_13(void)
 	}
 }
 
-static int test_9_1(void)
+static int
+test_9_1(void)
 {
 	if (msu_len > 12)
 		msu_len = 12;
@@ -7102,7 +7255,8 @@ static int test_9_1(void)
 	}
 }
 
-static int test_9_2(void)
+static int
+test_9_2(void)
 {
 	int fsn_lo = 0, fsn_hi = 0, fsn_ex = 0;
 	for (;;) {
@@ -7219,7 +7373,8 @@ static int test_9_2(void)
 	}
 }
 
-static int test_9_3(void)
+static int
+test_9_3(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7309,7 +7464,8 @@ static int test_9_3(void)
 	}
 }
 
-static int test_9_4(void)
+static int
+test_9_4(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7398,7 +7554,8 @@ static int test_9_4(void)
 	}
 }
 
-static int test_9_5(void)
+static int
+test_9_5(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7488,7 +7645,8 @@ static int test_9_5(void)
 	}
 }
 
-static int test_9_6(void)
+static int
+test_9_6(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7553,7 +7711,8 @@ static int test_9_6(void)
 	}
 }
 
-static int test_9_7(void)
+static int
+test_9_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7633,7 +7792,8 @@ static int test_9_7(void)
 	}
 }
 
-static int test_9_8(void)
+static int
+test_9_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7675,7 +7835,8 @@ static int test_9_8(void)
 	}
 }
 
-static int test_9_9(void)
+static int
+test_9_9(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7721,7 +7882,8 @@ static int test_9_9(void)
 	}
 }
 
-static int test_9_10(void)
+static int
+test_9_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7760,7 +7922,8 @@ static int test_9_10(void)
 	}
 }
 
-static int test_9_11(void)
+static int
+test_9_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7808,7 +7971,8 @@ static int test_9_11(void)
 	}
 }
 
-static int test_9_12(void)
+static int
+test_9_12(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7836,7 +8000,8 @@ static int test_9_12(void)
 	}
 }
 
-static int test_9_13(void)
+static int
+test_9_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7864,7 +8029,8 @@ static int test_9_13(void)
 	}
 }
 
-static int test_10_1(void)
+static int
+test_10_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7922,7 +8088,8 @@ static int test_10_1(void)
 	}
 }
 
-static int test_10_2(void)
+static int
+test_10_2(void)
 {
 	int n = (iutconf.sl.t6 - iutconf.sl.t7) / iutconf.sl.t5;
 	for (;;) {
@@ -8001,7 +8168,8 @@ static int test_10_2(void)
 	}
 }
 
-static int test_10_3(void)
+static int
+test_10_3(void)
 {
 	int n = (iutconf.sl.t6 + 20) / iutconf.sl.t5;
 	for (;;) {
@@ -8068,7 +8236,8 @@ typedef struct ppa {
 	struct sockaddr_in rem;
 } ppa_t;
 
-void print_ppa(ppa_t * ppa, int len)
+void
+print_ppa(ppa_t * ppa, int len)
 {
 	if (len >= sizeof(ppa->loc)) {
 		printf("PPA loc Address family = %d\n", ppa->loc.sin_family);
@@ -8086,7 +8255,8 @@ void print_ppa(ppa_t * ppa, int len)
 
 #define PT_SDT_DEVICE "/dev/udp"
 
-static int pt_open(void)
+static int
+pt_open(void)
 {
 	if (verbose) {
 		printf("     :open\n");
@@ -8121,7 +8291,8 @@ static int pt_open(void)
 	return SUCCESS;
 }
 
-static int pt_close(void)
+static int
+pt_close(void)
 {
 	if (verbose) {
 		printf("     :close\n");
@@ -8136,7 +8307,8 @@ static int pt_close(void)
 	return SUCCESS;
 }
 
-static int pt_attach(void)
+static int
+pt_attach(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8183,7 +8355,8 @@ static int pt_attach(void)
 	}
 }
 
-static int pt_detach(void)
+static int
+pt_detach(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8227,7 +8400,8 @@ static int pt_detach(void)
 	}
 }
 
-static int pt_enable(void)
+static int
+pt_enable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8278,7 +8452,8 @@ static int pt_enable(void)
 	return SUCCESS;
 }
 
-static int pt_disable(void)
+static int
+pt_disable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8320,7 +8495,8 @@ static int pt_disable(void)
 	return SUCCESS;
 }
 
-static int pt_config(void)
+static int
+pt_config(void)
 {
 	struct strioctl ctl;
 	if (verbose) {
@@ -8402,7 +8578,8 @@ static int pt_config(void)
 	return SUCCESS;
 }
 
-int pt_power_on(void)
+int
+pt_power_on(void)
 {
 	int ret;
 	char cbuf[BUFSIZE];
@@ -8435,7 +8612,8 @@ int pt_power_on(void)
 	return SUCCESS;
 }
 
-static int pt_start(void)
+static int
+pt_start(void)
 {
 	if (pt_open() != SUCCESS)
 		return FAILURE;
@@ -8450,7 +8628,8 @@ static int pt_start(void)
 	return SUCCESS;
 }
 
-static int pt_end(void)
+static int
+pt_end(void)
 {
 	if (pt_disable() != SUCCESS)
 		return FAILURE;
@@ -8463,7 +8642,8 @@ static int pt_end(void)
 
 #define IUT_SL_DEVICE "/dev/udp"
 
-static int iut_open(void)
+static int
+iut_open(void)
 {
 	if (verbose) {
 		printf("                                  :open\n");
@@ -8471,7 +8651,8 @@ static int iut_open(void)
 	}
 	if ((iut_fd = open(IUT_SL_DEVICE, O_NONBLOCK | O_RDWR)) < 0) {
 		printf("                                   ****ERROR: open failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8481,7 +8662,8 @@ static int iut_open(void)
 	}
 	if (ioctl(iut_fd, I_SRDOPT, RMSGD) < 0) {
 		printf("                                   ****ERROR: ioctl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8491,7 +8673,8 @@ static int iut_open(void)
 	}
 	if (ioctl(iut_fd, I_PUSH, "sdt-tpi") < 0) {
 		printf("                                   ****ERROR: push sdt-tpi failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8501,14 +8684,16 @@ static int iut_open(void)
 	}
 	if (ioctl(iut_fd, I_PUSH, "sl") < 0) {
 		printf("                                   ****ERROR: push sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	return SUCCESS;
 }
 
-static int iut_close(void)
+static int
+iut_close(void)
 {
 	if (verbose) {
 		printf("                                  :close\n");
@@ -8516,14 +8701,16 @@ static int iut_close(void)
 	}
 	if (close(iut_fd) < 0) {
 		printf("                                   ****ERROR: close failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	return SUCCESS;
 }
 
-static int iut_attach(void)
+static int
+iut_attach(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8544,7 +8731,8 @@ static int iut_attach(void)
 	bcopy(&loc, p->attach_req.lmi_ppa, sizeof(loc));
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8558,8 +8746,10 @@ static int iut_attach(void)
 		data.buf = dbuf;
 		if ((ret = getmsg(iut_fd, &ctrl, &data, &flags)) < 0) {
 			if (errno != EAGAIN && errno != EINTR) {
-				printf("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+				printf
+				    ("                                   ****ERROR: getmsg failed\n");
+				printf("                                              %s: %s\n",
+				       __FUNCTION__, strerror(errno));
 				FFLUSH(stdout);
 				return FAILURE;
 			}
@@ -8568,7 +8758,8 @@ static int iut_attach(void)
 		if (p->lmi_primitive != LMI_OK_ACK) {
 			printf("                                   ****ERROR: getmsg failed\n");
 			FFLUSH(stdout);
-			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n",
+			       __FUNCTION__, strerror(errno));
 			iut_showmsg(&ctrl, &data);
 		} else
 			return SUCCESS;
@@ -8576,7 +8767,8 @@ static int iut_attach(void)
 	return SUCCESS;
 }
 
-static int iut_detach(void)
+static int
+iut_detach(void)
 {
 	int ret;
 	char cbuf[BUFSIZE];
@@ -8592,14 +8784,16 @@ static int iut_detach(void)
 	p->detach_req.lmi_primitive = LMI_DETACH_REQ;
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	return SUCCESS;
 }
 
-static int iut_enable(void)
+static int
+iut_enable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8621,7 +8815,8 @@ static int iut_enable(void)
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
 		FFLUSH(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		return FAILURE;
 	}
 	for (;;) {
@@ -8634,8 +8829,10 @@ static int iut_enable(void)
 		data.buf = dbuf;
 		if ((ret = getmsg(iut_fd, &ctrl, &data, &flags)) < 0) {
 			if (errno != EAGAIN && errno != EINTR) {
-				printf("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+				printf
+				    ("                                   ****ERROR: getmsg failed\n");
+				printf("                                              %s: %s\n",
+				       __FUNCTION__, strerror(errno));
 				FFLUSH(stdout);
 				return FAILURE;
 			}
@@ -8644,7 +8841,8 @@ static int iut_enable(void)
 		if (p->lmi_primitive != LMI_ENABLE_CON && p->lmi_primitive != LMI_OK_ACK) {
 			printf("                                   ****ERROR: getmsg failed\n");
 			FFLUSH(stdout);
-			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n",
+			       __FUNCTION__, strerror(errno));
 			iut_showmsg(&ctrl, &data);
 		} else
 			return SUCCESS;
@@ -8652,7 +8850,8 @@ static int iut_enable(void)
 	return SUCCESS;
 }
 
-static int iut_disable(void)
+static int
+iut_disable(void)
 {
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
@@ -8668,14 +8867,16 @@ static int iut_disable(void)
 	ctrl.len = LMI_DISABLE_REQ_SIZE;
 	if (putmsg(iut_fd, &ctrl, NULL, RS_HIPRI) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	return SUCCESS;
 }
 
-static int iut_config(void)
+static int
+iut_config(void)
 {
 	struct strioctl ctl;
 	if (verbose) {
@@ -8695,7 +8896,8 @@ static int iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      option_sdl_failed:
 		printf("                                   ****ERROR: options failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8739,7 +8941,8 @@ static int iut_config(void)
 	      config_sdl_failed:
 		printf("                                   ****ERROR: config sdl failed\n");
 		FFLUSH(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		return FAILURE;
 	}
 	ctl.ic_cmd = SDL_IOCGCONFIG;
@@ -8755,7 +8958,8 @@ static int iut_config(void)
 	    || iutconf.sdl.ifcoding != SDL_CODING_NONE || iutconf.sdl.ifframing != SDL_FRAMING_NONE
 	    || iutconf.sdl.ifleads != 0 || iutconf.sdl.ifleads != 0 || iutconf.sdl.ifalarms != 0
 	    || iutconf.sdl.ifrxlevel != 0 || iutconf.sdl.iftxlevel != 0 || iutconf.sdl.ifsync != 0
-	    || iutconf.sdl.ifsyncsrc[0] != 0 || iutconf.sdl.ifsyncsrc[1] != 0 || iutconf.sdl.ifsyncsrc[2] != 0 || iutconf.sdl.ifsyncsrc[3] != 0)
+	    || iutconf.sdl.ifsyncsrc[0] != 0 || iutconf.sdl.ifsyncsrc[1] != 0
+	    || iutconf.sdl.ifsyncsrc[2] != 0 || iutconf.sdl.ifsyncsrc[3] != 0)
 		goto config_sdl_failed;
 	if (verbose) {
 		printf("                                  :config sdt\n");
@@ -8780,7 +8984,8 @@ static int iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      config_sdt_failed:
 		printf("                                   ****ERROR: config sdt failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8792,7 +8997,8 @@ static int iut_config(void)
 		goto config_sdt_failed;
 	if (iutconf.sdt.N != 16 || iutconf.sdt.m != 272 || iutconf.sdt.t8 != 100 * HZ / 1000
 	    || iutconf.sdt.Tin != 4 || iutconf.sdt.Tie != 1 || iutconf.sdt.T != 64
-	    || iutconf.sdt.D != 256 || iutconf.sdt.Te != 577169 || iutconf.sdt.De != 9308000 || iutconf.sdt.Ue != 144292000 || iutconf.sdt.b != 8 || iutconf.sdt.f != 0)
+	    || iutconf.sdt.D != 256 || iutconf.sdt.Te != 577169 || iutconf.sdt.De != 9308000
+	    || iutconf.sdt.Ue != 144292000 || iutconf.sdt.b != 8 || iutconf.sdt.f != 0)
 		goto config_sdt_failed;
 	if (verbose) {
 		printf("                                  :config sl\n");
@@ -8830,7 +9036,8 @@ static int iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      config_sl_failed:
 		printf("                                   ****ERROR: config sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__,
+		       strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8848,18 +9055,21 @@ static int iut_config(void)
 	    || iutconf.sl.tb_abate_1 != 128 * 272 || iutconf.sl.tb_onset_1 != 256 * 272
 	    || iutconf.sl.tb_discd_1 != 384 * 272 || iutconf.sl.tb_abate_2 != 512 * 272
 	    || iutconf.sl.tb_onset_2 != 640 * 272 || iutconf.sl.tb_discd_2 != 768 * 272
-	    || iutconf.sl.tb_abate_3 != 896 * 272 || iutconf.sl.tb_onset_3 != 1024 * 272 || iutconf.sl.tb_discd_3 != 1152 * 272 || iutconf.sl.N1 != 127 || iutconf.sl.N2 != 8192 || iutconf.sl.M != 5)
+	    || iutconf.sl.tb_abate_3 != 896 * 272 || iutconf.sl.tb_onset_3 != 1024 * 272
+	    || iutconf.sl.tb_discd_3 != 1152 * 272 || iutconf.sl.N1 != 127 || iutconf.sl.N2 != 8192
+	    || iutconf.sl.M != 5)
 		goto config_sl_failed;
 	return SUCCESS;
 }
 
-static int iut_power_off(void)
+static int
+iut_power_off(void)
 {
 	signal(STOP);
 	stop_tt();
 	show_msus = 0;
 	show_fisus = 1;
-	while (wait_event(0) != NO_MSG);
+	while (wait_event(0) != NO_MSG) ;
 	iut_disable();
 	iut_detach();
 	ioctl(iut_fd, I_FLUSH, FLUSHRW);	/* flush IUT */
@@ -8867,7 +9077,8 @@ static int iut_power_off(void)
 	return SUCCESS;
 }
 
-static int link_power_off(void)
+static int
+link_power_off(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -8888,7 +9099,8 @@ static int link_power_off(void)
 	return SUCCESS;
 }
 
-static int link_out_of_service(void)
+static int
+link_out_of_service(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -8911,7 +9123,8 @@ static int link_out_of_service(void)
 	return SUCCESS;
 }
 
-static int link_in_service(void)
+static int
+link_in_service(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -8990,13 +9203,15 @@ static int link_in_service(void)
 	return INCONCLUSIVE;
 }
 
-static int link_in_service_basic(void)
+static int
+link_in_service_basic(void)
 {
 	iut_options = 0;
 	return link_in_service();
 }
 
-static int link_in_service_pcr(void)
+static int
+link_in_service_pcr(void)
 {
 	iut_options = SS7_POPT_PCR;
 	return link_in_service();
@@ -9011,10 +9226,12 @@ typedef struct test_case {
 static test_case_t test_suite[] = {
 #if 0
 	{test_1_1a, link_power_off,
-	 "Q.781/Test 1.1(a)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
+	 "Q.781/Test 1.1(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Initialization (Power-up)\n"}
 	,
 	{test_1_1b, link_out_of_service,
-	 "Q.781/Test 1.1(b)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
+	 "Q.781/Test 1.1(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Initialization (Power-up)\n"}
 	,
 	{test_1_2, link_out_of_service,
 	 "Q.781/Test 1.2\n" "Link State Control - Expected signal units/orders\n" "Timer T2\n"}
@@ -9023,148 +9240,196 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 1.3\n" "Link State Control - Expected signal units/orders\n" "Timer T3\n"}
 	,
 	{test_1_4, link_out_of_service,
-	 "Q.781/Test 1.4\n" "Link State Control - Expected signal units/orders\n" "Timer T1 & Timer T4 (Normal)\n"}
+	 "Q.781/Test 1.4\n" "Link State Control - Expected signal units/orders\n"
+	 "Timer T1 & Timer T4 (Normal)\n"}
 	,
 	{test_1_5a, link_out_of_service,
-	 "Q.781/Test 1.5(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure\n"}
+	 "Q.781/Test 1.5(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure\n"}
 	,
 	{test_1_5b, link_out_of_service,
-	 "Q.781/Test 1.5(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure\n"}
+	 "Q.781/Test 1.5(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure\n"}
 	,
 	{test_1_6, link_out_of_service,
-	 "Q.781/Test 1.6\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure - correct procedure (MSU)\n"}
+	 "Q.781/Test 1.6\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment procedure - correct procedure (MSU)\n"}
 	,
 	{test_1_7, link_out_of_service,
-	 "Q.781/Test 1.7\n" "Link State Control - Expected signal units/orders\n" "SIO received during normal proving period\n"}
+	 "Q.781/Test 1.7\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during normal proving period\n"}
 	,
 	{test_1_8a, link_out_of_service,
-	 "Q.781/Test 1.8(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (FISU)\n"}
+	 "Q.781/Test 1.8(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (FISU)\n"}
 	,
 	{test_1_8b, link_out_of_service,
-	 "Q.781/Test 1.8(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (FISU)\n"}
+	 "Q.781/Test 1.8(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (FISU)\n"}
 	,
 	{test_1_9a, link_out_of_service,
-	 "Q.781/Test 1.9(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (MSU)\n"}
+	 "Q.781/Test 1.9(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (MSU)\n"}
 	,
 	{test_1_9b, link_out_of_service,
-	 "Q.781/Test 1.9(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (MSU)\n"}
+	 "Q.781/Test 1.9(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set (MSU)\n"}
 	,
 	{test_1_10, link_out_of_service,
-	 "Q.781/Test 1.10\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set and cleared\n"}
+	 "Q.781/Test 1.10\n" "Link State Control - Expected signal units/orders\n"
+	 "Normal alignment with PO set and cleared\n"}
 	,
 	{test_1_11, link_out_of_service,
-	 "Q.781/Test 1.11\n" "Link State Control - Expected signal units/orders\n" "Set RPO when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.11\n" "Link State Control - Expected signal units/orders\n"
+	 "Set RPO when \"Aligned not ready\"\n"}
 	,
 	{test_1_12a, link_out_of_service,
-	 "Q.781/Test 1.12(a)\n" "Link State Control - Expected signal units/orders\n" "SIOS received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.12(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIOS received when \"Aligned not ready\"\n"}
 	,
 	{test_1_12b, link_out_of_service,
-	 "Q.781/Test 1.12(b)\n" "Link State Control - Expected signal units/orders\n" "SIOS received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.12(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIOS received when \"Aligned not ready\"\n"}
 	,
 	{test_1_13, link_out_of_service,
-	 "Q.781/Test 1.13\n" "Link State Control - Expected signal units/orders\n" "SIO received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.13\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received when \"Aligned not ready\"\n"}
 	,
 	{test_1_14, link_out_of_service,
-	 "Q.781/Test 1.14\n" "Link State Control - Expected signal units/orders\n" "Set and clear LPO when \"Initial alignment\"\n"}
+	 "Q.781/Test 1.14\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and clear LPO when \"Initial alignment\"\n"}
 	,
 	{test_1_15, link_out_of_service,
-	 "Q.781/Test 1.15\n" "Link State Control - Expected signal units/orders\n" "Set and clear LPO when \"Aligned ready\"\n"}
+	 "Q.781/Test 1.15\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and clear LPO when \"Aligned ready\"\n"}
 	,
 	{test_1_16, link_out_of_service,
-	 "Q.781/Test 1.16\n" "Link State Control - Expected signal units/orders\n" "Timer T1 in \"Aligned not ready\" state\n"}
+	 "Q.781/Test 1.16\n" "Link State Control - Expected signal units/orders\n"
+	 "Timer T1 in \"Aligned not ready\" state\n"}
 	,
 	{test_1_17, link_out_of_service,
-	 "Q.781/Test 1.17\n" "Link State Control - Expected signal units/orders\n" "No SIO sent during normal proving period\n"}
+	 "Q.781/Test 1.17\n" "Link State Control - Expected signal units/orders\n"
+	 "No SIO sent during normal proving period\n"}
 	,
 	{test_1_18, link_out_of_service,
-	 "Q.781/Test 1.18\n" "Link State Control - Expected signal units/orders\n" "Set and cease emergency prior to \"start alignment\"\n"}
+	 "Q.781/Test 1.18\n" "Link State Control - Expected signal units/orders\n"
+	 "Set and cease emergency prior to \"start alignment\"\n"}
 	,
 	{test_1_19, link_out_of_service,
-	 "Q.781/Test 1.19\n" "Link State Control - Expected signal units/orders\n" "Set emergency while in \"not aligned state\"\n"}
+	 "Q.781/Test 1.19\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency while in \"not aligned state\"\n"}
 	,
 	{test_1_20, link_out_of_service,
-	 "Q.781/Test 1.20\n" "Link State Control - Expected signal units/orders\n" "Set emergency when \"aligned\"\n"}
+	 "Q.781/Test 1.20\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency when \"aligned\"\n"}
 	,
 	{test_1_21, link_out_of_service,
-	 "Q.781/Test 1.21\n" "Link State Control - Expected signal units/orders\n" "Both ends set emergency.\n"}
+	 "Q.781/Test 1.21\n" "Link State Control - Expected signal units/orders\n"
+	 "Both ends set emergency.\n"}
 	,
 	{test_1_22, link_out_of_service,
-	 "Q.781/Test 1.22\n" "Link State Control - Expected signal units/orders\n" "Individual end sets emergency\n"}
+	 "Q.781/Test 1.22\n" "Link State Control - Expected signal units/orders\n"
+	 "Individual end sets emergency\n"}
 	,
 	{test_1_23, link_out_of_service,
-	 "Q.781/Test 1.23\n" "Link State Control - Expected signal units/orders\n" "Set emergency during normal proving\n"}
+	 "Q.781/Test 1.23\n" "Link State Control - Expected signal units/orders\n"
+	 "Set emergency during normal proving\n"}
 	,
 	{test_1_24, link_out_of_service,
-	 "Q.781/Test 1.24\n" "Link State Control - Expected signal units/orders\n" "No SIO send during emergency alignment\n"}
+	 "Q.781/Test 1.24\n" "Link State Control - Expected signal units/orders\n"
+	 "No SIO send during emergency alignment\n"}
 	,
 	{test_1_25, link_out_of_service,
-	 "Q.781/Test 1.25\n" "Link State Control - Expected signal units/orders\n" "Deactivation duing intial alignment\n"}
+	 "Q.781/Test 1.25\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation duing intial alignment\n"}
 	,
 	{test_1_26, link_out_of_service,
-	 "Q.781/Test 1.26\n" "Link State Control - Expected signal units/orders\n" "Deactivation during aligned state\n"}
+	 "Q.781/Test 1.26\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during aligned state\n"}
 	,
 	{test_1_27, link_out_of_service,
-	 "Q.781/Test 1.27\n" "Link State Control - Expected signal units/orders\n" "Deactivation during aligned not ready\n"}
+	 "Q.781/Test 1.27\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during aligned not ready\n"}
 	,
 	{test_1_28, link_in_service_basic,
-	 "Q.781/Test 1.28\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
+	 "Q.781/Test 1.28\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
 	,
 	{test_1_29a, link_in_service_basic,
-	 "Q.781/Test 1.29(a)\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
+	 "Q.781/Test 1.29(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
 	,
 	{test_1_29b, link_in_service_basic,
-	 "Q.781/Test 1.29(b)\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
+	 "Q.781/Test 1.29(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received during link in service\n"}
 	,
 	{test_1_30a, link_in_service_basic,
-	 "Q.781/Test 1.30(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
+	 "Q.781/Test 1.30(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during LPO\n"}
 	,
 	{test_1_30b, link_in_service_basic,
-	 "Q.781/Test 1.30(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
+	 "Q.781/Test 1.30(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during LPO\n"}
 	,
 	{test_1_31a, link_in_service_basic,
-	 "Q.781/Test 1.31(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
+	 "Q.781/Test 1.31(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during RPO\n"}
 	,
 	{test_1_31b, link_in_service_basic,
-	 "Q.781/Test 1.31(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
+	 "Q.781/Test 1.31(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during RPO\n"}
 	,
 	{test_1_32a, link_out_of_service,
-	 "Q.781/Test 1.32(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during the proving period\n"}
+	 "Q.781/Test 1.32(a)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during the proving period\n"}
 	,
 	{test_1_32b, link_out_of_service,
-	 "Q.781/Test 1.32(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during the proving period\n"}
+	 "Q.781/Test 1.32(b)\n" "Link State Control - Expected signal units/orders\n"
+	 "Deactivation during the proving period\n"}
 	,
 	{test_1_33, link_out_of_service,
-	 "Q.781/Test 1.33\n" "Link State Control - Expected signal units/orders\n" "SIO received instead of FISUs\n"}
+	 "Q.781/Test 1.33\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received instead of FISUs\n"}
 	,
 	{test_1_34, link_out_of_service,
-	 "Q.781/Test 1.34\n" "Link State Control - Expected signal units/orders\n" "SIO received instead of FISUs\n"}
+	 "Q.781/Test 1.34\n" "Link State Control - Expected signal units/orders\n"
+	 "SIO received instead of FISUs\n"}
 	,
 	{test_1_35, link_out_of_service,
-	 "Q.781/Test 1.35\n" "Link State Control - Expected signal units/orders\n" "SIPO received instead of FISUs\n"}
+	 "Q.781/Test 1.35\n" "Link State Control - Expected signal units/orders\n"
+	 "SIPO received instead of FISUs\n"}
 	,
 	{test_2_1, link_out_of_service,
-	 "Q.781/Test 2.1\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Out of service\" state\n"}
+	 "Q.781/Test 2.1\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Out of service\" state\n"}
 	,
 	{test_2_2, link_out_of_service,
-	 "Q.781/Test 2.2\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Not Aligned\" state\n"}
+	 "Q.781/Test 2.2\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Not Aligned\" state\n"}
 	,
 	{test_2_3, link_out_of_service,
-	 "Q.781/Test 2.3\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned\" state\n"}
+	 "Q.781/Test 2.3\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned\" state\n"}
 	,
 	{test_2_4, link_out_of_service,
-	 "Q.781/Test 2.4\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Proving\" state\n"}
+	 "Q.781/Test 2.4\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Proving\" state\n"}
 	,
 	{test_2_5, link_out_of_service,
-	 "Q.781/Test 2.5\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned Ready\" state\n"}
+	 "Q.781/Test 2.5\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned Ready\" state\n"}
 	,
 	{test_2_6, link_out_of_service,
-	 "Q.781/Test 2.6\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned Not Ready\" state\n"}
+	 "Q.781/Test 2.6\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Aligned Not Ready\" state\n"}
 	,
 	{test_2_7, link_in_service_basic,
-	 "Q.781/Test 2.7\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"In Service\" state\n"}
+	 "Q.781/Test 2.7\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"In Service\" state\n"}
 	,
 	{test_2_8, link_in_service_basic,
-	 "Q.781/Test 2.8\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Processor Outage\" state\n"}
+	 "Q.781/Test 2.8\n" "Link State Control - Unexpected signal units/orders\n"
+	 "Unexpected signal units/orders in \"Processor Outage\" state\n"}
 	,
 	{test_3_1, link_out_of_service,
 	 "Q.781/Test 3.1\n" "Transmission Failure\n" "Link aligned ready (Break Tx path)\n"}
@@ -9176,7 +9441,8 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 3.3\n" "Transmission Failure\n" "Link aligned not ready (Break Tx path)\n"}
 	,
 	{test_3_4, link_out_of_service,
-	 "Q.781/Test 3.4\n" "Transmission Failure\n" "Link aligned not ready (Corrupt FIBs - Basic)\n"}
+	 "Q.781/Test 3.4\n" "Transmission Failure\n"
+	 "Link aligned not ready (Corrupt FIBs - Basic)\n"}
 	,
 	{test_3_5, link_in_service_basic,
 	 "Q.781/Test 3.5\n" "Transmission Failure\n" "Link in service (Break Tx path)\n"}
@@ -9188,7 +9454,8 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 3.7\n" "Transmission Failure\n" "Link in processor outage (Break Tx path)\n"}
 	,
 	{test_3_8, link_in_service_basic,
-	 "Q.781/Test 3.8\n" "Transmission Failure\n" "Link in processor outage (Corrupt FIBs - Basic)\n"}
+	 "Q.781/Test 3.8\n" "Transmission Failure\n"
+	 "Link in processor outage (Corrupt FIBs - Basic)\n"}
 	,
 	{test_4_1, link_in_service_basic,
 	 "Q.781/Test 4.1\n" "Processor Outage Control\n" "Set and clear LPO while link in service\n"}
@@ -9197,28 +9464,36 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 4.2\n" "Processor Outage Control\n" "RPO during LPO\n"}
 	,
 	{test_4_3, link_in_service_basic,
-	 "Q.781/Test 4.3\n" "Processor Outage Control\n" "Clear LPO when \"Both processor outage\"\n"}
+	 "Q.781/Test 4.3\n" "Processor Outage Control\n"
+	 "Clear LPO when \"Both processor outage\"\n"}
 	,
 	{test_5_1, link_in_service_basic,
-	 "Q.781/Test 5.1\n" "SU delimitation, alignment, error detection and correction\n" "More than 7 ones between MSU opening and closing flags\n"}
+	 "Q.781/Test 5.1\n" "SU delimitation, alignment, error detection and correction\n"
+	 "More than 7 ones between MSU opening and closing flags\n"}
 	,
 	{test_5_2, link_in_service_basic,
-	 "Q.781/Test 5.2\n" "SU delimitation, alignment, error detection and correction\n" "Greater than maximum signal unit length\n"}
+	 "Q.781/Test 5.2\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Greater than maximum signal unit length\n"}
 	,
 	{test_5_3, link_in_service_basic,
-	 "Q.781/Test 5.3\n" "SU delimitation, alignment, error detection and correction\n" "Below minimum signal unit length\n"}
+	 "Q.781/Test 5.3\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Below minimum signal unit length\n"}
 	,
 	{test_5_4a, link_in_service_basic,
-	 "Q.781/Test 5.4(a)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between FISUs\n"}
+	 "Q.781/Test 5.4(a)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between FISUs\n"}
 	,
 	{test_5_4b, link_in_service_basic,
-	 "Q.781/Test 5.4(b)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between FISUs\n"}
+	 "Q.781/Test 5.4(b)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between FISUs\n"}
 	,
 	{test_5_5a, link_in_service_basic,
-	 "Q.781/Test 5.5(a)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between MSUs\n"}
+	 "Q.781/Test 5.5(a)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between MSUs\n"}
 	,
 	{test_5_5b, link_in_service_basic,
-	 "Q.781/Test 5.5(b)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between MSUs\n"}
+	 "Q.781/Test 5.5(b)\n" "SU delimitation, alignment, error detection and correction\n"
+	 "Reception of single and multiple flags between MSUs\n"}
 	,
 #endif
 	{test_6_1, link_in_service_basic,
@@ -9247,69 +9522,86 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 7.4\n" "AERM check\n" "Error rate at the emergency threshold\n"}
 	,
 	{test_8_1, link_in_service_basic,
-	 "Q.781/Test 8.1\n" "Transmission and reception control (Basic)\n" "MSU transmission and reception\n"}
+	 "Q.781/Test 8.1\n" "Transmission and reception control (Basic)\n"
+	 "MSU transmission and reception\n"}
 	,
 	{test_8_2, link_in_service_basic,
-	 "Q.781/Test 8.2\n" "Transmission and reception control (Basic)\n" "Negative acknowledgement of an MSU\n"}
+	 "Q.781/Test 8.2\n" "Transmission and reception control (Basic)\n"
+	 "Negative acknowledgement of an MSU\n"}
 	,
 	{test_8_3, link_in_service_basic,
 	 "Q.781/Test 8.3\n" "Transmission and reception control (Basic)\n" "Check RTB full\n"}
 	,
 	{test_8_4, link_in_service_basic,
-	 "Q.781/Test 8.4\n" "Transmission and reception control (Basic)\n" "Single MSU with erroneous FIB\n"}
+	 "Q.781/Test 8.4\n" "Transmission and reception control (Basic)\n"
+	 "Single MSU with erroneous FIB\n"}
 	,
 	{test_8_5, link_in_service_basic,
 	 "Q.781/Test 8.5\n" "Transmission and reception control (Basic)\n" "Duplicated FSN\n"}
 	,
 	{test_8_6, link_in_service_basic,
-	 "Q.781/Test 8.6\n" "Transmission and reception control (Basic)\n" "Erroneous retransmission - Single MSU\n"}
+	 "Q.781/Test 8.6\n" "Transmission and reception control (Basic)\n"
+	 "Erroneous retransmission - Single MSU\n"}
 	,
 	{test_8_7, link_in_service_basic,
-	 "Q.781/Test 8.7\n" "Transmission and reception control (Basic)\n" "Erroneous retransmission - Multiple FISUs\n"}
+	 "Q.781/Test 8.7\n" "Transmission and reception control (Basic)\n"
+	 "Erroneous retransmission - Multiple FISUs\n"}
 	,
 	{test_8_8, link_in_service_basic,
-	 "Q.781/Test 8.8\n" "Transmission and reception control (Basic)\n" "Single FISU with corrupt FIB\n"}
+	 "Q.781/Test 8.8\n" "Transmission and reception control (Basic)\n"
+	 "Single FISU with corrupt FIB\n"}
 	,
 	{test_8_9, link_in_service_basic,
-	 "Q.781/Test 8.9\n" "Transmission and reception control (Basic)\n" "Single FISU prior to RPO being set\n"}
+	 "Q.781/Test 8.9\n" "Transmission and reception control (Basic)\n"
+	 "Single FISU prior to RPO being set\n"}
 	,
 	{test_8_10, link_in_service_basic,
-	 "Q.781/Test 8.10\n" "Transmission and reception control (Basic)\n" "Abnormal BSN - single MSU\n"}
+	 "Q.781/Test 8.10\n" "Transmission and reception control (Basic)\n"
+	 "Abnormal BSN - single MSU\n"}
 	,
 	{test_8_11, link_in_service_basic,
-	 "Q.781/Test 8.11\n" "Transmission and reception control (Basic)\n" "Abnormal BSN - two consecutive FISUs\n"}
+	 "Q.781/Test 8.11\n" "Transmission and reception control (Basic)\n"
+	 "Abnormal BSN - two consecutive FISUs\n"}
 	,
 	{test_8_12, link_in_service_basic,
-	 "Q.781/Test 8.12\n" "Transmission and reception control (Basic)\n" "Excessive delay of acknowledgement\n"}
+	 "Q.781/Test 8.12\n" "Transmission and reception control (Basic)\n"
+	 "Excessive delay of acknowledgement\n"}
 	,
 	{test_8_13, link_in_service_basic,
 	 "Q.781/Test 8.13\n" "Transmission and reception control (Basic)\n" "Level 3 Stop command\n"}
 	,
 	{test_9_1, link_in_service_pcr,
-	 "Q.781/Test 9.1\n" "Transmission and reception control (PCR)\n" "MSU transmission and reception\n"}
+	 "Q.781/Test 9.1\n" "Transmission and reception control (PCR)\n"
+	 "MSU transmission and reception\n"}
 	,
 	{test_9_2, link_in_service_pcr,
 	 "Q.781/Test 9.2\n" "Transmission and reception control (PCR)\n" "Priority control\n"}
 	,
 	{test_9_3, link_in_service_pcr,
-	 "Q.781/Test 9.3\n" "Transmission and reception control (PCR)\n" "Forced retransmission with the value N1\n"}
+	 "Q.781/Test 9.3\n" "Transmission and reception control (PCR)\n"
+	 "Forced retransmission with the value N1\n"}
 	,
 #endif
 	{test_9_4, link_in_service_pcr,
-	 "Q.781/Test 9.4\n" "Transmission and reception control (PCR)\n" "Forced retransmission with the value N2\n"}
+	 "Q.781/Test 9.4\n" "Transmission and reception control (PCR)\n"
+	 "Forced retransmission with the value N2\n"}
 #if 0
 	,
 	{test_9_5, link_in_service_pcr,
-	 "Q.781/Test 9.5\n" "Transmission and reception control (PCR)\n" "Forced retransmission cancel\n"}
+	 "Q.781/Test 9.5\n" "Transmission and reception control (PCR)\n"
+	 "Forced retransmission cancel\n"}
 	,
 	{test_9_6, link_in_service_pcr,
-	 "Q.781/Test 9.6\n" "Transmission and reception control (PCR)\n" "Reception of forced retransmission\n"}
+	 "Q.781/Test 9.6\n" "Transmission and reception control (PCR)\n"
+	 "Reception of forced retransmission\n"}
 	,
 	{test_9_7, link_in_service_pcr,
-	 "Q.781/Test 9.7\n" "Transmission and reception control (PCR)\n" "MSU transmission while RPO set\n"}
+	 "Q.781/Test 9.7\n" "Transmission and reception control (PCR)\n"
+	 "MSU transmission while RPO set\n"}
 	,
 	{test_9_8, link_in_service_pcr,
-	 "Q.781/Test 9.8\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Single MSU\n"}
+	 "Q.781/Test 9.8\n" "Transmission and reception control (PCR)\n"
+	 "Abnormal BSN - Single MSU\n"}
 	,
 	{test_9_9, link_in_service_pcr,
 	 "Q.781/Test 9.9\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Two MSUs\n"}
@@ -9318,10 +9610,12 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 9.10\n" "Transmission and reception control (PCR)\n" "Unexpected FSN\n"}
 	,
 	{test_9_11, link_in_service_pcr,
-	 "Q.781/Test 9.11\n" "Transmission and reception control (PCR)\n" "Excessive delay of acknowledgement\n"}
+	 "Q.781/Test 9.11\n" "Transmission and reception control (PCR)\n"
+	 "Excessive delay of acknowledgement\n"}
 	,
 	{test_9_12, link_in_service_pcr,
-	 "Q.781/Test 9.12\n" "Transmission and reception control (PCR)\n" "FISU with FSN expected for MSU\n"}
+	 "Q.781/Test 9.12\n" "Transmission and reception control (PCR)\n"
+	 "FISU with FSN expected for MSU\n"}
 	,
 	{test_9_13, link_in_service_pcr,
 	 "Q.781/Test 9.13\n" "Transmission and reception control (PCR)\n" "Level 3 Stop command\n"}
@@ -9340,7 +9634,8 @@ static test_case_t test_suite[] = {
 static int failed_state = 0;
 static int failed_event = 0;
 
-static int run_test(test_case_t * tcase)
+static int
+run_test(test_case_t * tcase)
 {
 	int ret = 0;
 	printf(tcase->title);
@@ -9408,7 +9703,8 @@ static int run_test(test_case_t * tcase)
 	return ret;
 }
 
-const char *lmi_strreason(unsigned int reason)
+const char *
+lmi_strreason(unsigned int reason)
 {
 	const char *r;
 	switch (reason) {
@@ -9531,7 +9827,8 @@ const char *lmi_strreason(unsigned int reason)
 	return r;
 }
 
-int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
+int
+iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 {
 	union LMI_primitives *p = (union LMI_primitives *) ctrl->buf;
 	union SL_primitives *l = (union SL_primitives *) ctrl->buf;
@@ -9625,8 +9922,10 @@ int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			{
 				printf("SL_LINK_CONGESTION_CEASED_IND:\n");
 				printf("  timestamp = %lu\n", l->link_cong_ceased_ind.sl_timestamp);
-				printf("  cong stat = %lu\n", l->link_cong_ceased_ind.sl_cong_status);
-				printf("  disc stat = %lu\n", l->link_cong_ceased_ind.sl_disc_status);
+				printf("  cong stat = %lu\n",
+				       l->link_cong_ceased_ind.sl_cong_status);
+				printf("  disc stat = %lu\n",
+				       l->link_cong_ceased_ind.sl_disc_status);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -9679,7 +9978,8 @@ int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			case SL_REMOTE_PROCESSOR_RECOVERED_IND:
 			{
 				printf("SL_REMOTE_PROCESSOR_RECOVERED_IND:\n");
-				printf("  timestamp = %lu\n", l->rem_proc_recovered_ind.sl_timestamp);
+				printf("  timestamp = %lu\n",
+				       l->rem_proc_recovered_ind.sl_timestamp);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -9701,7 +10001,8 @@ int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 	return (0);
 }
 
-int main(void)
+int
+do_tests(void)
 {
 	int i, ret;
 	int failed = 0, passed = 0, inconc = 0, errored = 0;
@@ -9715,7 +10016,8 @@ int main(void)
 		switch (ret) {
 		case FAILURE:
 			failed++;
-			printf("******** FAILURE(%d) - test case failed in state %d event %s.\n", state, failed_state, event_string(failed_event));
+			printf("******** FAILURE(%d) - test case failed in state %d event %s.\n",
+			       state, failed_state, event_string(failed_event));
 			break;
 		case SUCCESS:
 			passed++;
@@ -9723,12 +10025,16 @@ int main(void)
 			break;
 		case INCONCLUSIVE:
 			inconc++;
-			printf("******** INCONCLUSIVE(%d) - test case inconclusive in state %d event %s.\n", failed_state, failed_state, event_string(failed_event));
+			printf
+			    ("******** INCONCLUSIVE(%d) - test case inconclusive in state %d event %s.\n",
+			     failed_state, failed_state, event_string(failed_event));
 			break;
 		case SCRIPTERROR:
 		default:
 			errored++;
-			printf("******** ERROR(%d) - test case completed in error in state %d event %s.\n", failed_state, failed_state, event_string(failed_event));
+			printf
+			    ("******** ERROR(%d) - test case completed in error in state %d event %s.\n",
+			     failed_state, failed_state, event_string(failed_event));
 			break;
 		}
 		printf("********\n\n");
@@ -9743,4 +10049,178 @@ int main(void)
 	printf("\n");
 	FFLUSH(stdout);
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+ITU-T Recommendation Q.781 - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "qvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "qvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }

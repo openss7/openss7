@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $
+ @(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/01/17 08:26:48 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/02/22 18:14:52 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $"
+#ident "@(#) $RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $"
 
 static char const ident[] =
-    "$RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/01/17 08:26:48 $";
+    "$RCSfile: test-q781-pipe.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 18:14:52 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -88,6 +88,10 @@ static char const ident[] =
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
 #define SUCCESS       0
 #define FAILURE       1
 #define INCONCLUSIVE -1
@@ -95,7 +99,7 @@ static char const ident[] =
 
 #define FFLUSH(stream)
 
-/*
+/* 
  *  -------------------------------------------------------------------------
  *
  *  Configuration
@@ -116,7 +120,7 @@ static struct {
 	sdl_config_t sdl;
 } iutconf;
 
-/*
+/* 
  *  -------------------------------------------------------------------------
  *
  *  Timer Functions
@@ -124,7 +128,7 @@ static struct {
  *  -------------------------------------------------------------------------
  */
 
-/*
+/* 
  *  Timer values for tests: each timer has a low range (minus error margin)
  *  and a high range (plus error margin).
  */
@@ -151,10 +155,11 @@ static timer_range_t timer[tmax] = {
 
 long test_start = 0;
 
-/*
+/* 
  *  Return the current time in milliseconds.
  */
-static long milliseconds(char *t)
+static long
+milliseconds(char *t)
 {
 	long ret;
 	struct timeval now;
@@ -170,13 +175,14 @@ static long milliseconds(char *t)
 	return ret;
 }
 
-/*
+/* 
  *  Check the current time against the beginning time provided as an argnument
  *  and see if the time inverval falls between the low and high values for the
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
  *  the allowable range and FAILURE otherwise.
  */
-static int check_time(const char *t, long beg, long lo, long hi)
+static int
+check_time(const char *t, long beg, long lo, long hi)
 {
 	long i;
 	struct timeval now;
@@ -200,14 +206,16 @@ static int check_time(const char *t, long beg, long lo, long hi)
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
@@ -223,10 +231,11 @@ static int timer_sethandler(void)
 	return SUCCESS;
 }
 
-/*
+/* 
  *  Start an interval timer as the overall test timer.
  */
-static int start_tt(long duration)
+static int
+start_tt(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
@@ -240,7 +249,8 @@ static int start_tt(long duration)
 	return SUCCESS;
 }
 
-static int stop_tt(void)
+static int
+stop_tt(void)
 {
 	struct itimerval setting = { {0, 0}, {0, 0} };
 	sigset_t mask;
@@ -324,7 +334,8 @@ static int stop_tt(void)
 
 #define NO_MSG          -1
 
-static const char *event_string(int e)
+static const char *
+event_string(int e)
 {
 	switch (e) {
 	case SIO:
@@ -493,7 +504,8 @@ static int verbose = 1;
 
 #define send pt_send
 
-static int send(int msg)
+static int
+send(int msg)
 {
 	int ret = SUCCESS;
 	int len;
@@ -506,10 +518,10 @@ static int send(int msg)
 	if (msg != oldmsg || oldpsb != (((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn))) {
 		oldmsg = msg;
 		oldpsb = ((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn);
-//              if ( cntmsg ) {
-//                      printf("    Ct=%d\n", cntmsg+1);
-//                      FFLUSH(stdout);
-//              }
+		// if ( cntmsg ) {
+		// printf(" Ct=%d\n", cntmsg+1);
+		// FFLUSH(stdout);
+		// }
 		cntmsg = 0;
 	} else if (!expand)
 		cntmsg++;
@@ -844,7 +856,8 @@ static int send(int msg)
 
 #define signal iut_signal
 
-static int signal(int action)
+static int
+signal(int action)
 {
 	int ret;
 	char cbuf[BUFSIZE];
@@ -856,10 +869,10 @@ static int signal(int action)
 	ctrl.buf = cbuf;
 	if (action != oldact) {
 		oldact = action;
-//              if ( cntact ) {
-//                      printf("                                   Ct=%d\n", cntact+1);
-//                      FFLUSH(stdout);
-//              }
+		// if ( cntact ) {
+		// printf(" Ct=%d\n", cntact+1);
+		// FFLUSH(stdout);
+		// }
 		cntact = 0;
 	} else if (!expand)
 		cntact++;
@@ -983,11 +996,12 @@ static int signal(int action)
 static int show_msus = 1;
 static int show_fisus = 1;
 
-static int pt_decode_data(void)
+static int
+pt_decode_data(void)
 {
 	int ret;
-//      printf("pt decode data:\n"); FFLUSH(stdout);
-//      FFLUSH(stdout);
+	// printf("pt decode data:\n"); FFLUSH(stdout);
+	// FFLUSH(stdout);
 	iut_bib = pt_buf[0] & 0x80;
 	iut_bsn = pt_buf[0] & 0x7f;
 	iut_fib = pt_buf[1] & 0x80;
@@ -1035,18 +1049,18 @@ static int pt_decode_data(void)
 	}
 	if (show_fisus || ret != FISU) {
 		if (ret != oldret || oldisb != (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn))) {
-//                      if (oldisb == (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn)) &&
-//                          ((ret == FISU && oldret == MSU) || (ret == MSU && oldret == FISU))) {
-//                              if (ret == MSU && !expand)
-//                                      cntmsg++;
-//                      } else
-//                              cntret = 0;
+			// if (oldisb == (((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn)) &&
+			// ((ret == FISU && oldret == MSU) || (ret == MSU && oldret == FISU))) {
+			// if (ret == MSU && !expand)
+			// cntmsg++;
+			// } else
+			// cntret = 0;
 			oldret = ret;
 			oldisb = ((iut_bib | iut_bsn) << 8) | (iut_fib | iut_fsn);
-//                      if (cntret) {
-//                              printf("                                   Ct=%d\n", cntret + 1);
-//                              FFLUSH(stdout);
-//                      }
+			// if (cntret) {
+			// printf(" Ct=%d\n", cntret + 1);
+			// FFLUSH(stdout);
+			// }
 			cntret = 0;
 		} else if (!expand)
 			cntret++;
@@ -1113,7 +1127,8 @@ static int pt_decode_data(void)
 	return ret;
 }
 
-static int pt_decode_msg(unsigned char *buf)
+static int
+pt_decode_msg(unsigned char *buf)
 {
 	union SDT_primitives *p = (union SDT_primitives *) buf;
 	if (verbose) {
@@ -1194,7 +1209,8 @@ static int pt_decode_msg(unsigned char *buf)
 	return UNKNOWN;
 }
 
-static int iut_decode_data(void)
+static int
+iut_decode_data(void)
 {
 	printf("                                  !msu [%d bytes]\n", iut_len);
 	if (verbose) {
@@ -1208,7 +1224,8 @@ static int iut_decode_data(void)
 	return IUT_MSU;
 }
 
-static int iut_decode_msg(unsigned char *buf)
+static int
+iut_decode_msg(unsigned char *buf)
 {
 	char *reason;
 	union SL_primitives *p = (union SL_primitives *) buf;
@@ -1355,7 +1372,8 @@ static int iut_decode_msg(unsigned char *buf)
 static int show_timeout = 0;
 static int pt_event = 0;
 
-static int time_event(int event)
+static int
+time_event(int event)
 {
 	if (verbose) {
 		unsigned long msec;
@@ -1371,7 +1389,8 @@ static int time_event(int event)
 	return (event);
 }
 
-static int wait_event(int wait)
+static int
+wait_event(int wait)
 {
 	while (1) {
 		struct pollfd pfd[] = {
@@ -1388,8 +1407,8 @@ static int wait_event(int wait)
 			pt_event = TIMEOUT;
 			return time_event(TIMEOUT);
 		}
-//              printf("polling:\n");
-//              FFLUSH(stdout);
+		// printf("polling:\n");
+		// FFLUSH(stdout);
 		pfd[0].fd = pt_fd;
 		pfd[0].events =
 		    POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
@@ -1400,28 +1419,28 @@ static int wait_event(int wait)
 		pfd[1].revents = 0;
 		switch (poll(pfd, 2, wait)) {
 		case -1:
-//                      printf("                 = = = ERROR = = =\n");
-//                      FFLUSH(stdout);
+			// printf(" = = = ERROR = = =\n");
+			// FFLUSH(stdout);
 			break;
 		case 0:
-//                      printf("                 < + + + + + + + + (nothing)\n");
-//                      FFLUSH(stdout);
+			// printf(" < + + + + + + + + (nothing)\n");
+			// FFLUSH(stdout);
 			pt_event = NO_MSG;
 			return time_event(NO_MSG);
 		case 1:
 		case 2:
-//                      printf("polled:\n");
-//                      FFLUSH(stdout);
+			// printf("polled:\n");
+			// FFLUSH(stdout);
 			if (pfd[0].revents) {
 				int flags = 0;
 				unsigned char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, pt_buf };
-//                              printf("getmsg from pt:\n");
-//                              FFLUSH(stdout);
+				// printf("getmsg from pt:\n");
+				// FFLUSH(stdout);
 				if (getmsg(pt_fd, &ctrl, &data, &flags) == 0) {
-//                                      printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
-//                                      FFLUSH(stdout);
+					// printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
+					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;
 					if (ctrl.len > 0) {
@@ -1438,11 +1457,11 @@ static int wait_event(int wait)
 				unsigned char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, iut_buf };
-//                              printf("getmsg from iut:\n");
-//                              FFLUSH(stdout);
+				// printf("getmsg from iut:\n");
+				// FFLUSH(stdout);
 				if (getmsg(iut_fd, &ctrl, &data, &flags) == 0) {
-//                                      printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
-//                                      FFLUSH(stdout);
+					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
+					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;
 					if (ctrl.len > 0) {
@@ -1461,12 +1480,14 @@ static int wait_event(int wait)
 	}
 }
 
-static int event(void)
+static int
+event(void)
 {
 	return wait_event(-1);
 }
 
-static int check_snibs(unsigned char bsnib, unsigned char fsnib)
+static int
+check_snibs(unsigned char bsnib, unsigned char fsnib)
 {
 	int ret = FAILURE;
 	if ((iut_bib | iut_bsn) == bsnib && (iut_fib | iut_fsn) == fsnib)
@@ -1476,7 +1497,8 @@ static int check_snibs(unsigned char bsnib, unsigned char fsnib)
 	return ret;
 }
 
-static int test_1_1a(void)
+static int
+test_1_1a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1499,7 +1521,8 @@ static int test_1_1a(void)
 	}
 }
 
-static int test_1_1b(void)
+static int
+test_1_1b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1519,7 +1542,8 @@ static int test_1_1b(void)
 	}
 }
 
-static int test_1_2(void)
+static int
+test_1_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1568,7 +1592,8 @@ static int test_1_2(void)
 	}
 }
 
-static int test_1_3(void)
+static int
+test_1_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1633,7 +1658,8 @@ static int test_1_3(void)
 	}
 }
 
-static int test_1_4(void)
+static int
+test_1_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1705,7 +1731,8 @@ static int test_1_4(void)
 	}
 }
 
-static int test_1_5a(void)
+static int
+test_1_5a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1770,7 +1797,8 @@ static int test_1_5a(void)
 	}
 }
 
-static int test_1_5b(void)
+static int
+test_1_5b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1835,7 +1863,8 @@ static int test_1_5b(void)
 	}
 }
 
-static int test_1_6(void)
+static int
+test_1_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1898,7 +1927,8 @@ static int test_1_6(void)
 	}
 }
 
-static int test_1_7(void)
+static int
+test_1_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -1964,7 +1994,8 @@ static int test_1_7(void)
 	}
 }
 
-static int test_1_8a(void)
+static int
+test_1_8a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2032,7 +2063,8 @@ static int test_1_8a(void)
 		}
 	}
 }
-static int test_1_8b(void)
+static int
+test_1_8b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2099,7 +2131,8 @@ static int test_1_8b(void)
 	}
 }
 
-static int test_1_9a(void)
+static int
+test_1_9a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2165,7 +2198,8 @@ static int test_1_9a(void)
 		}
 	}
 }
-static int test_1_9b(void)
+static int
+test_1_9b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2247,7 +2281,8 @@ static int test_1_9b(void)
 	}
 }
 
-static int test_1_10(void)
+static int
+test_1_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2314,7 +2349,8 @@ static int test_1_10(void)
 	}
 }
 
-static int test_1_11(void)
+static int
+test_1_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2381,7 +2417,8 @@ static int test_1_11(void)
 	}
 }
 
-static int test_1_12a(void)
+static int
+test_1_12a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2450,7 +2487,8 @@ static int test_1_12a(void)
 		}
 	}
 }
-static int test_1_12b(void)
+static int
+test_1_12b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2521,7 +2559,8 @@ static int test_1_12b(void)
 	}
 }
 
-static int test_1_13(void)
+static int
+test_1_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2590,7 +2629,8 @@ static int test_1_13(void)
 	}
 }
 
-static int test_1_14(void)
+static int
+test_1_14(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2670,7 +2710,8 @@ static int test_1_14(void)
 	}
 }
 
-static int test_1_15(void)
+static int
+test_1_15(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2780,7 +2821,8 @@ static int test_1_15(void)
 	}
 }
 
-static int test_1_16(void)
+static int
+test_1_16(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2850,7 +2892,8 @@ static int test_1_16(void)
 	return FAILURE;
 }
 
-static int test_1_17(void)
+static int
+test_1_17(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2911,7 +2954,8 @@ static int test_1_17(void)
 	}
 }
 
-static int test_1_18(void)
+static int
+test_1_18(void)
 {
 	for (;;) {
 		switch (state) {
@@ -2973,7 +3017,8 @@ static int test_1_18(void)
 	}
 }
 
-static int test_1_19(void)
+static int
+test_1_19(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3036,7 +3081,8 @@ static int test_1_19(void)
 	}
 }
 
-static int test_1_20(void)
+static int
+test_1_20(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3110,7 +3156,8 @@ static int test_1_20(void)
 	}
 }
 
-static int test_1_21(void)
+static int
+test_1_21(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3171,7 +3218,8 @@ static int test_1_21(void)
 	}
 }
 
-static int test_1_22(void)
+static int
+test_1_22(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3232,7 +3280,8 @@ static int test_1_22(void)
 	}
 }
 
-static int test_1_23(void)
+static int
+test_1_23(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3307,7 +3356,8 @@ static int test_1_23(void)
 	}
 }
 
-static int test_1_24(void)
+static int
+test_1_24(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3368,7 +3418,8 @@ static int test_1_24(void)
 	}
 }
 
-static int test_1_25(void)
+static int
+test_1_25(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3435,7 +3486,8 @@ static int test_1_25(void)
 	}
 }
 
-static int test_1_26(void)
+static int
+test_1_26(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3498,7 +3550,8 @@ static int test_1_26(void)
 	}
 }
 
-static int test_1_27(void)
+static int
+test_1_27(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3574,7 +3627,8 @@ static int test_1_27(void)
 	}
 }
 
-static int test_1_28(void)
+static int
+test_1_28(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3601,7 +3655,8 @@ static int test_1_28(void)
 	}
 }
 
-static int test_1_29a(void)
+static int
+test_1_29a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3629,7 +3684,8 @@ static int test_1_29a(void)
 	}
 }
 
-static int test_1_29b(void)
+static int
+test_1_29b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3657,7 +3713,8 @@ static int test_1_29b(void)
 	}
 }
 
-static int test_1_30a(void)
+static int
+test_1_30a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3702,7 +3759,8 @@ static int test_1_30a(void)
 	}
 }
 
-static int test_1_30b(void)
+static int
+test_1_30b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3746,7 +3804,8 @@ static int test_1_30b(void)
 	}
 }
 
-static int test_1_31a(void)
+static int
+test_1_31a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3776,7 +3835,8 @@ static int test_1_31a(void)
 	}
 }
 
-static int test_1_31b(void)
+static int
+test_1_31b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3807,7 +3867,8 @@ static int test_1_31b(void)
 	}
 }
 
-static int test_1_32a(void)
+static int
+test_1_32a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3884,7 +3945,8 @@ static int test_1_32a(void)
 	}
 }
 
-static int test_1_32b(void)
+static int
+test_1_32b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -3957,7 +4019,8 @@ static int test_1_32b(void)
 	}
 }
 
-static int test_1_33(void)
+static int
+test_1_33(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4031,7 +4094,8 @@ static int test_1_33(void)
 	}
 }
 
-static int test_1_34(void)
+static int
+test_1_34(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4106,7 +4170,8 @@ static int test_1_34(void)
 	}
 }
 
-static int test_1_35(void)
+static int
+test_1_35(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4183,7 +4248,8 @@ static int test_1_35(void)
 	}
 }
 
-static int test_2_1(void)
+static int
+test_2_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4269,7 +4335,8 @@ static int test_2_1(void)
 	}
 }
 
-static int test_2_2(void)
+static int
+test_2_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4353,7 +4420,8 @@ static int test_2_2(void)
 	}
 }
 
-static int test_2_3(void)
+static int
+test_2_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4439,7 +4507,8 @@ static int test_2_3(void)
 	}
 }
 
-static int test_2_4(void)
+static int
+test_2_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4522,7 +4591,8 @@ static int test_2_4(void)
 	}
 }
 
-static int test_2_5(void)
+static int
+test_2_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4604,7 +4674,8 @@ static int test_2_5(void)
 	}
 }
 
-static int test_2_6(void)
+static int
+test_2_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4690,7 +4761,8 @@ static int test_2_6(void)
 	}
 }
 
-static int test_2_7(void)
+static int
+test_2_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4721,7 +4793,8 @@ static int test_2_7(void)
 	}
 }
 
-static int test_2_8(void)
+static int
+test_2_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4768,7 +4841,8 @@ static int test_2_8(void)
 	}
 }
 
-static int test_3_1(void)
+static int
+test_3_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4847,7 +4921,8 @@ static int test_3_1(void)
 	}
 }
 
-static int test_3_2(void)
+static int
+test_3_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4888,7 +4963,8 @@ static int test_3_2(void)
 	}
 }
 
-static int test_3_3(void)
+static int
+test_3_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -4968,7 +5044,8 @@ static int test_3_3(void)
 	}
 }
 
-static int test_3_4(void)
+static int
+test_3_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5059,7 +5136,8 @@ static int test_3_4(void)
 	}
 }
 
-static int test_3_5(void)
+static int
+test_3_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5090,7 +5168,8 @@ static int test_3_5(void)
 	}
 }
 
-static int test_3_6(void)
+static int
+test_3_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5131,7 +5210,8 @@ static int test_3_6(void)
 	}
 }
 
-static int test_3_7(void)
+static int
+test_3_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5178,7 +5258,8 @@ static int test_3_7(void)
 	}
 }
 
-static int test_3_8(void)
+static int
+test_3_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5238,7 +5319,8 @@ static int test_3_8(void)
 	}
 }
 
-static int test_4_1(void)
+static int
+test_4_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5347,7 +5429,8 @@ static int test_4_1(void)
 	}
 }
 
-static int test_4_2(void)
+static int
+test_4_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5405,7 +5488,8 @@ static int test_4_2(void)
 	}
 }
 
-static int test_4_3(void)
+static int
+test_4_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5468,7 +5552,8 @@ static int test_4_3(void)
 	}
 }
 
-static int test_5_1(void)
+static int
+test_5_1(void)
 {
 	unsigned char old_bsn = 0x7f;
 	for (;;) {
@@ -5501,7 +5586,8 @@ static int test_5_1(void)
 	}
 }
 
-static int test_5_2(void)
+static int
+test_5_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5533,7 +5619,8 @@ static int test_5_2(void)
 	}
 }
 
-static int test_5_3(void)
+static int
+test_5_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5565,7 +5652,8 @@ static int test_5_3(void)
 	}
 }
 
-static int test_5_4a(void)
+static int
+test_5_4a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5591,7 +5679,8 @@ static int test_5_4a(void)
 	}
 }
 
-static int test_5_4b(void)
+static int
+test_5_4b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5617,7 +5706,8 @@ static int test_5_4b(void)
 	}
 }
 
-static int test_5_5a(void)
+static int
+test_5_5a(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5645,7 +5735,8 @@ static int test_5_5a(void)
 	}
 }
 
-static int test_5_5b(void)
+static int
+test_5_5b(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5673,7 +5764,8 @@ static int test_5_5b(void)
 	}
 }
 
-static int test_6_1(void)
+static int
+test_6_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5717,7 +5809,8 @@ static int test_6_1(void)
 	}
 }
 
-static int test_6_2(void)
+static int
+test_6_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5765,7 +5858,8 @@ static int test_6_2(void)
 	}
 }
 
-static int test_6_3(void)
+static int
+test_6_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5806,7 +5900,8 @@ static int test_6_3(void)
 	}
 }
 
-static int test_6_4(void)
+static int
+test_6_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5849,7 +5944,8 @@ static int test_6_4(void)
 	}
 }
 
-static int test_7_1(void)
+static int
+test_7_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -5944,7 +6040,8 @@ static int test_7_1(void)
 	}
 }
 
-static int test_7_2(void)
+static int
+test_7_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6039,7 +6136,8 @@ static int test_7_2(void)
 	}
 }
 
-static int test_7_3(void)
+static int
+test_7_3(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6148,7 +6246,8 @@ static int test_7_3(void)
 	}
 }
 
-static int test_7_4(void)
+static int
+test_7_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6230,7 +6329,8 @@ static int test_7_4(void)
 	}
 }
 
-static int test_8_1(void)
+static int
+test_8_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6301,7 +6401,8 @@ static int test_8_1(void)
 	}
 }
 
-static int test_8_2(void)
+static int
+test_8_2(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6383,7 +6484,8 @@ static int test_8_2(void)
 	}
 }
 
-static int test_8_3(void)
+static int
+test_8_3(void)
 {
 	if (msu_len > 12)
 		msu_len = 12;
@@ -6468,7 +6570,8 @@ static int test_8_3(void)
 	}
 }
 
-static int test_8_4(void)
+static int
+test_8_4(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6528,7 +6631,8 @@ static int test_8_4(void)
 	}
 }
 
-static int test_8_5(void)
+static int
+test_8_5(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6600,7 +6704,8 @@ static int test_8_5(void)
 	}
 }
 
-static int test_8_6(void)
+static int
+test_8_6(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6658,7 +6763,8 @@ static int test_8_6(void)
 	}
 }
 
-static int test_8_7(void)
+static int
+test_8_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6721,7 +6827,8 @@ static int test_8_7(void)
 	}
 }
 
-static int test_8_8(void)
+static int
+test_8_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6771,7 +6878,8 @@ static int test_8_8(void)
 	}
 }
 
-static int test_8_9(void)
+static int
+test_8_9(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6868,7 +6976,8 @@ static int test_8_9(void)
 	}
 }
 
-static int test_8_10(void)
+static int
+test_8_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6943,7 +7052,8 @@ static int test_8_10(void)
 	}
 }
 
-static int test_8_11(void)
+static int
+test_8_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -6989,7 +7099,8 @@ static int test_8_11(void)
 	}
 }
 
-static int test_8_12(void)
+static int
+test_8_12(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7042,7 +7153,8 @@ static int test_8_12(void)
 	}
 }
 
-static int test_8_13(void)
+static int
+test_8_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7078,7 +7190,8 @@ static int test_8_13(void)
 	}
 }
 
-static int test_9_1(void)
+static int
+test_9_1(void)
 {
 	if (msu_len > 12)
 		msu_len = 12;
@@ -7151,7 +7264,8 @@ static int test_9_1(void)
 	}
 }
 
-static int test_9_2(void)
+static int
+test_9_2(void)
 {
 	int fsn_lo = 0, fsn_hi = 0, fsn_ex = 0;
 	for (;;) {
@@ -7268,7 +7382,8 @@ static int test_9_2(void)
 	}
 }
 
-static int test_9_3(void)
+static int
+test_9_3(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7358,7 +7473,8 @@ static int test_9_3(void)
 	}
 }
 
-static int test_9_4(void)
+static int
+test_9_4(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7447,7 +7563,8 @@ static int test_9_4(void)
 	}
 }
 
-static int test_9_5(void)
+static int
+test_9_5(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7537,7 +7654,8 @@ static int test_9_5(void)
 	}
 }
 
-static int test_9_6(void)
+static int
+test_9_6(void)
 {
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
@@ -7602,7 +7720,8 @@ static int test_9_6(void)
 	}
 }
 
-static int test_9_7(void)
+static int
+test_9_7(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7682,7 +7801,8 @@ static int test_9_7(void)
 	}
 }
 
-static int test_9_8(void)
+static int
+test_9_8(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7724,7 +7844,8 @@ static int test_9_8(void)
 	}
 }
 
-static int test_9_9(void)
+static int
+test_9_9(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7770,7 +7891,8 @@ static int test_9_9(void)
 	}
 }
 
-static int test_9_10(void)
+static int
+test_9_10(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7809,7 +7931,8 @@ static int test_9_10(void)
 	}
 }
 
-static int test_9_11(void)
+static int
+test_9_11(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7857,7 +7980,8 @@ static int test_9_11(void)
 	}
 }
 
-static int test_9_12(void)
+static int
+test_9_12(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7885,7 +8009,8 @@ static int test_9_12(void)
 	}
 }
 
-static int test_9_13(void)
+static int
+test_9_13(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7913,7 +8038,8 @@ static int test_9_13(void)
 	}
 }
 
-static int test_10_1(void)
+static int
+test_10_1(void)
 {
 	for (;;) {
 		switch (state) {
@@ -7971,7 +8097,8 @@ static int test_10_1(void)
 	}
 }
 
-static int test_10_2(void)
+static int
+test_10_2(void)
 {
 	int n = (iutconf.sl.t6 - iutconf.sl.t7) / iutconf.sl.t5;
 	for (;;) {
@@ -8050,7 +8177,8 @@ static int test_10_2(void)
 	}
 }
 
-static int test_10_3(void)
+static int
+test_10_3(void)
 {
 	int n = (iutconf.sl.t6 + 20) / iutconf.sl.t5;
 	for (;;) {
@@ -8117,7 +8245,8 @@ typedef struct ppa {
 	struct sockaddr_in rem;
 } ppa_t;
 
-void print_ppa(ppa_t * ppa, int len)
+void
+print_ppa(ppa_t * ppa, int len)
 {
 	if (len >= sizeof(ppa->loc)) {
 		printf("PPA loc Address family = %d\n", ppa->loc.sin_family);
@@ -8133,7 +8262,8 @@ void print_ppa(ppa_t * ppa, int len)
 	}
 }
 
-static int pt_open(void)
+static int
+pt_open(void)
 {
 	if (verbose) {
 		printf("     :pipe\n");
@@ -8204,7 +8334,8 @@ static int pt_open(void)
 	return SUCCESS;
 }
 
-static int pt_close(void)
+static int
+pt_close(void)
 {
 	if (verbose) {
 		printf("     :close\n");
@@ -8219,7 +8350,8 @@ static int pt_close(void)
 	return SUCCESS;
 }
 
-static int pt_attach(void)
+static int
+pt_attach(void)
 {
 #if 0
 	int ret, flags = 0;
@@ -8269,7 +8401,8 @@ static int pt_attach(void)
 	return SUCCESS;
 }
 
-static int pt_detach(void)
+static int
+pt_detach(void)
 {
 #if 0
 	int ret, flags = 0;
@@ -8316,7 +8449,8 @@ static int pt_detach(void)
 	return SUCCESS;
 }
 
-static int pt_enable(void)
+static int
+pt_enable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8367,7 +8501,8 @@ static int pt_enable(void)
 	return SUCCESS;
 }
 
-static int pt_disable(void)
+static int
+pt_disable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8409,7 +8544,8 @@ static int pt_disable(void)
 	return SUCCESS;
 }
 
-static int pt_config(void)
+static int
+pt_config(void)
 {
 	struct strioctl ctl;
 	if (verbose) {
@@ -8491,7 +8627,8 @@ static int pt_config(void)
 	return SUCCESS;
 }
 
-int pt_power_on(void)
+int
+pt_power_on(void)
 {
 	int ret;
 	char cbuf[BUFSIZE];
@@ -8524,7 +8661,8 @@ int pt_power_on(void)
 	return SUCCESS;
 }
 
-static int pt_start(void)
+static int
+pt_start(void)
 {
 	if (pt_open() != SUCCESS)
 		return FAILURE;
@@ -8539,7 +8677,8 @@ static int pt_start(void)
 	return SUCCESS;
 }
 
-static int pt_end(void)
+static int
+pt_end(void)
 {
 	if (pt_disable() != SUCCESS)
 		return FAILURE;
@@ -8551,7 +8690,8 @@ static int pt_end(void)
 	return SUCCESS;
 }
 
-static int iut_open(void)
+static int
+iut_open(void)
 {
 	if (verbose) {
 		printf("                                  :fcntl\n");
@@ -8618,7 +8758,8 @@ static int iut_open(void)
 	return SUCCESS;
 }
 
-static int iut_close(void)
+static int
+iut_close(void)
 {
 	if (verbose) {
 		printf("                                  :close\n");
@@ -8634,7 +8775,8 @@ static int iut_close(void)
 	return SUCCESS;
 }
 
-static int iut_attach(void)
+static int
+iut_attach(void)
 {
 #if 0
 	int ret, flags = 0;
@@ -8693,7 +8835,8 @@ static int iut_attach(void)
 	return SUCCESS;
 }
 
-static int iut_detach(void)
+static int
+iut_detach(void)
 {
 #if 0
 	int ret;
@@ -8719,7 +8862,8 @@ static int iut_detach(void)
 	return SUCCESS;
 }
 
-static int iut_enable(void)
+static int
+iut_enable(void)
 {
 	int ret, flags = 0;
 	char cbuf[BUFSIZE];
@@ -8776,7 +8920,8 @@ static int iut_enable(void)
 	return SUCCESS;
 }
 
-static int iut_disable(void)
+static int
+iut_disable(void)
 {
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
@@ -8800,7 +8945,8 @@ static int iut_disable(void)
 	return SUCCESS;
 }
 
-static int iut_config(void)
+static int
+iut_config(void)
 {
 	struct strioctl ctl;
 	if (verbose) {
@@ -8986,13 +9132,14 @@ static int iut_config(void)
 	return SUCCESS;
 }
 
-static int iut_power_off(void)
+static int
+iut_power_off(void)
 {
 	signal(STOP);
 	stop_tt();
 	show_msus = 0;
 	show_fisus = 1;
-	while (wait_event(0) != NO_MSG);
+	while (wait_event(0) != NO_MSG) ;
 	iut_disable();
 	iut_detach();
 	ioctl(iut_fd, I_FLUSH, FLUSHRW);	/* flush IUT */
@@ -9000,7 +9147,8 @@ static int iut_power_off(void)
 	return SUCCESS;
 }
 
-static int link_power_off(void)
+static int
+link_power_off(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -9021,7 +9169,8 @@ static int link_power_off(void)
 	return SUCCESS;
 }
 
-static int link_out_of_service(void)
+static int
+link_out_of_service(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -9044,7 +9193,8 @@ static int link_out_of_service(void)
 	return SUCCESS;
 }
 
-static int link_in_service(void)
+static int
+link_in_service(void)
 {
 	int ret = SUCCESS;
 	show_msus = 1;
@@ -9123,13 +9273,15 @@ static int link_in_service(void)
 	return INCONCLUSIVE;
 }
 
-static int link_in_service_basic(void)
+static int
+link_in_service_basic(void)
 {
 	iut_options = 0;
 	return link_in_service();
 }
 
-static int link_in_service_pcr(void)
+static int
+link_in_service_pcr(void)
 {
 	iut_options = SS7_POPT_PCR;
 	return link_in_service();
@@ -9591,12 +9743,13 @@ static test_case_t test_suite[] = {
 static int failed_state = 0;
 static int failed_event = 0;
 
-static int run_test(test_case_t * tcase)
+static int
+run_test(test_case_t * tcase)
 {
 	int ret = 0;
 	printf(tcase->title);
 	fflush(stdout);
-//      ioctl(pt_fd, I_FLUSH, FLUSHRW); /* flush PT */
+	// ioctl(pt_fd, I_FLUSH, FLUSHRW); /* flush PT */
 	state = 0;
 	count = 0;
 	tries = 0;
@@ -9659,7 +9812,8 @@ static int run_test(test_case_t * tcase)
 	return ret;
 }
 
-const char *lmi_strreason(unsigned int reason)
+const char *
+lmi_strreason(unsigned int reason)
 {
 	const char *r;
 	switch (reason) {
@@ -9782,7 +9936,8 @@ const char *lmi_strreason(unsigned int reason)
 	return r;
 }
 
-int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
+int
+iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 {
 	union LMI_primitives *p = (union LMI_primitives *) ctrl->buf;
 	union SL_primitives *l = (union SL_primitives *) ctrl->buf;
@@ -9955,7 +10110,8 @@ int iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 	return (0);
 }
 
-int main(void)
+int
+do_tests(void)
 {
 	int i, ret;
 	int failed = 0, passed = 0, inconc = 0, errored = 0;
@@ -10002,4 +10158,178 @@ int main(void)
 	printf("\n");
 	FFLUSH(stdout);
 	return (0);
+}
+
+void
+splash(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+ITU-T Recommendation Q.781 - Conformance Test Suite\n\
+\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (verbose < 0)
+		return;
+	fprintf(stdout, "\
+Usage:\n\
+    %1$s [options]\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+Arguments:\n\
+    (none)\n\
+Options:\n\
+    -q, --quiet\n\
+        Suppress normal output (equivalent to --verbose=0)\n\
+    -v, --verbose [LEVEL]\n\
+        Increase verbosity or set to LEVEL [default: 1]\n\
+	This option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        Prints this usage message and exists\n\
+    -V, --version\n\
+        Prints the version and exists\n\
+", argv[0]);
+}
+
+int
+main(int argc, char *argv[])
+{
+	for (;;) {
+		int c, val;
+#if defined _GNU_SOURCE
+		int option_index = 0;
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"?",		no_argument,		NULL, 'h'},
+			{NULL, }
+		};
+		/* *INDENT-ON* */
+		c = getopt_long(argc, argv, "qvhV?", long_options, &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "qvhV?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'v':
+			if (optarg == NULL) {
+				verbose++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			verbose = val;
+			break;
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':
+			version(argc, argv);
+			exit(0);
+		case '?':
+		default:
+		      bad_option:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && verbose) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				while (optind < argc)
+					fprintf(stderr, "%s ", argv[optind++]);
+				fprintf(stderr, "\n");
+				fflush(stderr);
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
+	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
+	if (optind < argc)
+		goto bad_nonopt;
+	splash(argc, argv);
+	do_tests();
+	exit(0);
 }
