@@ -1,12 +1,11 @@
 #!/bin/bash
 
-Configure_version="2.82 01/12/04"
+Configure_version="2.100 10/11/04"
 
-if [ "$1" = "invoked from main makefile" ]; then
-    MAKE_INVOKED=1
-    shift
+if [ -f /proc/kallsyms ]; then
+    KSYMS=/proc/kallsyms
 else
-    MAKE_INVOKED=0
+    KSYMS=/proc/ksyms
 fi
 
 ## DEBUG
@@ -20,7 +19,7 @@ NAME
        Configure -- configure script for Linux Streams.
 
 SYNOPSIS
-       Configure [options] 
+       Configure [options] [<config output file name>]
 
 DESCRIPTION
        Collect Linux streams configuration. Interactively by default or
@@ -28,40 +27,52 @@ DESCRIPTION
 
 OPTIONS
        -h,--help Print out this message
-
-       -m|--onmachine Install on this machine [y|n]
-
+       -m|--onmachine Install on this machine [y|n required]
        -l|--levelrun Configure to run in :
-                     l=kernel,u=serspace,q=QNX
-
-       -n|--nativecompiler Use native C (or cross compiling) [y|n] 
-
-       -r|--onrunning Compile on current running kernel [y|n]
-
+                     l=kernel,u=userspace,q=QNX
+       -n|--nativecompiler Use native C (or cross compiling) [y|n required] 
+       -r|--onrunning Compile on current running kernel [y|n required]
        -s|--ksourcedir Kernel source directory <STRING>
-
        -v|--versionlinux  Kernel version <STRING> (uname -r) 
-
        -M|--loadmodules If answer is no must run 'make modules_install' to
-                        install modules [y|n]
-
+                        install modules [y|n required]
        -L|--moduleslocation  Kernel modules location <STRING>
+       -b|--backcompat [y|N optional]
+                       y =  LiS backward compatible constants 
+                       n =  UnixWare/Solaris compatible constants 
+       -S|--solaris Use Solaris style cmn_err [y|N optional]
+       -g|--sourcedebug Source level debugging [y|n optional]
+       -R|--sharedlibs Use shared libraries [Y|n required]
+       -c|--intcpuflags  "int or unsigned long" type for CPU [y|n required] 
+       -i|--forcenewinode Force new_inode usage (only when not detected)
+                       [y|n optional]
+       -p|--productioncode Performance enhanced production code [y|n required]
+       -I|--inet Attempt to build 'streams-inet' kernel module
+       -D|--devbase  Base major device number [value required]
+       -N|--noprompt  Don't prompt for options; use defaults
+       -t|--comment  Comment text
+       -q|--quiet   No console output
+       -x|--make    Invoked from 'make'
+       -o|--output  Output file name [config.in]
+       --pkgcompile Compile (.c) sources in pkg subdirs
+       --pkgmodules Build compiled objects in pkg subdirs as modules
+       --package	short name of package [LiS]
+       --prefix		generic install directory prefix [/usr]
+       --execprefix	install prefix for executables [/usr]
+       --includedir	where to install gemeric headers [/usr/include]
+       --libdir		where to install generic libraries [/usr/lib]
+       --bindir		where to install user executables [/usr/bin]
+       --sbindir	where to install system executables [/usr/sbin]
+       --sysconfdir	where to install system configuration files [/etc]
+       --datadir	where to install package-specific subdirs [/usr/share]
+       --pkgincludedir	where to install package headers [/usr/include/LiS]
+       --pkglibdir	where to install package libraries [/usr/lib/LiS]
+       --pkgdatadir	where to install package files [/usr/share/LiS]
+       --pkgsrcdir	where to install package sources [/usr/src/LiS]
+       --mandir		where to install man pages [/usr/share/man]
+       --modsubdir	where to install kernel modules [streams]
+       --regparm        0 or 3 for STREAMS regparm interface [0]
 
-       -b|--backcompat [y|n] y =  LiS backward compatible constants 
-                             n =  UnixWare/Solaris compatible constants 
-
-       -S|--solaris Use Solaris style cmn_err [y|N]
-
-       -g|--sourcedebug Source level debugging [y|N]
-
-       -R|--sharedlibs Use shared libraries [Y|n]
-
-       -c|--intcpuflags  "int or unsigned long" type for CPU [y|n] 
-
-       -i|--forcenewinode Force new_inode usage (only when not detected) [y|n]
-
-       -p|--productioncode Performance enhanced production code [y|n]
-       
 EXAMPLE 
 
  ./Configure --onmachine=n --levelrun=l --nativecompiler=y --onrunning=n 
@@ -74,84 +85,132 @@ EXAMPLE
 EOF
 }
 
+setup_opts ()
+{
+    declare -a opts
 
+    save_IFS=$IFS
+    opts=( \
+	"onmachine:" "levelrun:" "nativecompiler:" "onrunning:"		\
+	"ksourcedir:" "versionlinux:" "loadmodules:" "moduleslocation:" \
+	"backcompat::" "solaris::" "sourcedebug::" "sharedlibs:" 	\
+	"intcpuflags:" "forcenewinode::" "productioncode:" "inet" 	\
+	"noprompt" "devicebase:" "output:" "comment:" "make" "quiet" 	\
+	"help" "package:" "prefix:" "execprefix:" "includedir:"		\
+	"libdir:" "bindir:" "sbindir:" "sysconfdir:" "datadir:"		\
+	"pkgincludedir:" "pkglibdir:" "pkgdatadir:" "pkgsrcdir:"	\
+	"mandir:" "modsubdir:" "pkgcompile" "pkgmodules" "regparm:"	\
+    )
+    IFS=","
+    longopts="${opts[*]}"
+    IFS=$save_IFS
+    opts=(\
+	"m:" "l:" "n:" "r:" "s:" "v:" "M:" "L:" "b::" "S::" "g::" "R:" \
+	"c:" "i::" "p:" "I" "N" "D:" "o:" "t:" "x" "q" "h" )
+    IFS=""
+    shortopts="${opts[*]}"
+    IFS=$save_IFS
+}
 
-## CMDLINE parsing to collect all possible values.
-if getopt -u -V >/dev/null 2>&1; then
-    UOP=-u
-fi
-OPT=`getopt $UOP -l"onmachine:,levelrun:,nativecompiler:,onrunning:,ksourcedir:\
-,versionlinux:,loadmodules:,moduleslocation:,backcompat:,solaris:,sourcedebug:,sharedlibs:\
-,intcpuflags:,forcenewinode:,productioncode:,help" \
-       "m:l:n:r:s:v:M:b:S:g:R:c:i:p:h"  "$@" `
+#=======================================================================
+#
+# Parse command line options
+#
 
-if [ $? != 0 ] ;then 
-echo "run $0 -h for details"
-exit 2 
-fi
+# save options passed in as CONFIG_OPTS
+#
+CONFIG_OPTS="${*}"
 
-### This reset the input in order to use normal variables..
-eval set -- "$OPT"
+# setup longopts and shortopts
+#
+setup_opts
 
-# Sets positional parameters to command-line arguments.
-# WARNING -u do have unquoted arguments
-# unset ALL OPT_* for safety
+# let getopt(1) do its thing...  we use args to be able to preserve
+# getopt's exit code.  Thereafter, we convert args to positional parms
+# with 'eval set --'
+#
+args=`getopt -n $(basename $0) -l $longopts -o $shortopts -- "$@"`
+if [ $? != 0 ]; then exit 1; fi
+eval set -- "$args"
 
-unset OPT_ONMACHINE OPT_LEVELRUN OPT_NATIVECOMPILER OPT_ONRUNNINGLNX \
-      OPT_KSOURCEDIR OPT_VERSIONLINUX OPT_LOADMODULES OPT_MODULESLOCATION \
-      OPT_BACKCOMPAT OPT_SOLARISSTYLE OPT_SRCDBG OPT_SHAREDLIBS \
-      OPT_INTCPUFLAGS OPT_FORCENEWINODE OPT_PRODUCTIONCODE CONFIG\
-
-## PARSE OPTIONS AND SET VARIABLES USED in script
-while [ ! -z "$1" ]
-do
+## Set shell variables from parsed options
+##
+while  true ; do
 case "$1" in
-     -m|--onmachine) OPT_ONMACHINE=$2; shift ;;
-     -l|--levelrun) OPT_LEVELRUN=$2; shift ;;
-     -n|--nativecompiler) OPT_NATIVECOMPILER=$2; shift ;;
-     -r|--onrunning) OPT_ONRUNNINGLNX=$2; shift ;;
-     -s|--ksourcedir) OPT_KSOURCEDIR=$2; shift ;;
-     -v|--versionlinux) OPT_VERSIONLINUX=$2; shift ;;
-     -M|--loadmodules) OPT_LOADMODULES=$2; shift ;;
-     -L|--moduleslocation)  OPT_MODULESLOCATION=$2; shift ;;
-     -b|--backcompat) OPT_BACKCOMPAT=$2; shift ;;
-     -S|--solaris) OPT_SOLARISSTYLE=$2; shift ;;
-     -g|--sourcedebug) OPT_SRCDBG=$2; shift ;;
-     -R|--sharedlibs)OPT_SHAREDLIBS=$2; shift ;;
-     -c|--intcpuflags) OPT_INTCPUFLAGS=$2; shift ;;
-     -i|--forcenewinode) OPT_FORCENEWINODE=$2; shift ;;
-     -p|--productioncode) OPT_PRODUCTIONCODE=$2; shift ;;
-     -h|--help) usage ; exit 0;;
-      *) shift ; break;;
+    -m|--onmachine) OPT_ONMACHINE=$2; shift 2;;
+    -l|--levelrun) OPT_LEVELRUN=$2; shift 2;;
+    -n|--nativecompiler) OPT_NATIVECOMPILER=$2; shift 2 ;;
+    -r|--onrunning) OPT_ONRUNNINGLNX=$2; shift 2 ;;
+    -s|--ksourcedir) OPT_KSOURCEDIR=$2; shift 2 ;;
+    -v|--versionlinux) OPT_VERSIONLINUX=$2; shift 2 ;;
+    -M|--loadmodules) OPT_LOADMODULES=$2; shift 2 ;;
+    -L|--moduleslocation) OPT_MODULESLOCATION=$2; shift 2 ;;
+    -b|--backcompat) OPT_BACKCOMPAT=${2:-y}; shift 2 ;;
+    -S|--solaris) OPT_SOLARISSTYLE=${2:-y}; shift 2 ;;
+    -g|--sourcedebug) OPT_SRCDBG=${2:-y}; shift 2 ;;
+    -R|--sharedlibs) OPT_SHAREDLIBS=$2; shift 2 ;;
+    -c|--intcpuflags) OPT_INTCPUFLAGS=$2; shift 2 ;;
+    -i|--forcenewinode) OPT_FORCENEWINODE=${2:-y}; shift 2 ;;
+    -p|--productioncode) OPT_PRODUCTIONCODE=$2; shift 2 ;;
+    -I|--inet) OPT_INET=y; shift ;;
+    -D|--devicebase) OPT_DEVICEBASE=$2; shift 2 ;;
+    -N|--noprompt) OPT_NOPROMPT=y; shift ;;
+    -o|--output) OPT_CONFIG=$2; shift 2 ;;
+    -t|--comment) COMMENT="$COMMENT$2"; shift 2 ;;
+    -x|--make) MAKE_INVOKED=y;  shift ;;
+    -q|--quiet) QUIET=y;  shift ;;
+    -h|--help) usage ; exit 0;;
+    --pkgcompile) OPT_PKGCOMPILE=y; shift ;;
+    --pkgmodules) OPT_PKGMODULES=y; shift ;;
+    --package) package=$2; shift 2 ;;
+    --prefix) prefix=${2:-" "}; shift 2 ;;
+    --execprefix) execprefix=${2:-" "}; shift 2 ;;
+    --includedir) includedir=$2; shift 2 ;;
+    --libdir) libdir=$2; shift 2 ;;
+    --bindir) bindir=$2; shift 2 ;;
+    --sbindir) sbindir=$2; shift 2 ;;
+    --sysconfdir) sysconfdir=$2; shift 2 ;;
+    --datadir) datadir=$2; shift 2 ;;
+    --pkgincludedir) pkgincludedir=$2; shift 2 ;;
+    --pkglibdir) pkglibdir=$2; shift 2 ;;
+    --pkgdatadir) pkgdatadir=$2; shift 2 ;;
+    --pkgsrcdir) pkgsrcdir=${2:-" "}; shift 2 ;;
+    --mandir) mandir=$2; shift 2 ;;
+    --modsubdir) modsubdir=$2; shift 2 ;;
+    --regparm) STREAMS_REGPARM=$2; shift 2 ;;
+    --) shift; break ;;
+    *) echo "$(basename $0): unrecognized option '$1'" >&2; exit 1 ;;
     esac
-    shift
 done
 
-CONFIG=${1:-config.in}
-echo "CONFIG=$CONFIG"
+# we expect zero or one unparsed argument, to be used as the file
+# name for this script's output.  We need to verify this; if there's
+# more than one, the first may be an improperly parsed option or
+# option value.
+#
+if [ $# -gt 1 ]; then
+    echo "error - expected <config output file name>" >&2
+    exit 1
+fi
 
+# set CONFIG - priority to -o|--output <file>, but last arg otherwise;
+# default to 'config.in'.  The reason for this priority is that using
+# -o|--output ensures no mistake in specifying the file name, but still
+# allows optional arguments to be used
 #
-# agument parsing
+CONFIG=${OPT_CONFIG:-${1:-config.in}}
+
+# set qecho/qcat to be used for output controlled by QUIET option
 #
-arg1()
+if [ "$QUIET" = "y" ]; then qecho=: ; qcat=: ; else qecho=echo ; qcat=cat ; fi
+
+#=========================================================================
+
+# argn() usage: argn <n> <args>...
+#
+argn()
 {
-    printf "%s" $1
-}
-arg2()
-{
-    printf "%s" $2
-}
-arg3()
-{
-    printf "%s" $3
-}
-arg4()
-{
-    printf "%s" $4
-}
-arg5()
-{
-    printf "%s" $5
+    n=$1;  shift;  echo -n $(eval "echo -n \$$n")
 }
 
 #
@@ -165,6 +224,11 @@ arg5()
 #
 do_readstring()
 {
+    if [ -n "$OPT_NOPROMPT" ]; then
+	RESULT=$DEFAULT
+	return
+    fi
+
     while true; do
 	echo -en "\n$PROMPT "
 	if [ "$DEFAULT..." != "..." ]; then
@@ -189,6 +253,10 @@ do_readstring()
 #
 do_confirm()
 {
+    if [ -n "$OPT_NOPROMPT" ]; then
+	return
+    fi
+
     PROMPT="$1"
     if [ "$1..." != "..." ]; then
 	PROMPT="$PROMPT  "
@@ -210,17 +278,27 @@ do_confirm()
 #
 do_read_dir()
 {
-    n=4
+    if [ -n "$OPT_NOPROMPT" ]; then
+	[ -d "$ARGVALUE" ] && DEFAULT=$ARGVALUE
+	do_readstring
+	if [ -d "$RESULT" ]; then
+	    return 0
+	else
+	    return 1
+        fi
+    fi
+
+    n=2
     while :; do
-	 if [ "$ARGVVALUE..." = "..." ]; then
-         #interact with user..
-         do_readstring
-         else
-	     RESULT=${ARGVVALUE}
-             # to avoid loops
-	     unset  ARGVVALUE 
-         fi
-	if [ -d $RESULT ]; then
+	if [ "$ARGVVALUE..." = "..." ]; then
+            #interact with user..
+            do_readstring
+        else
+	    RESULT=${ARGVVALUE}
+            # to avoid loops
+	    unset ARGVVALUE 
+        fi
+	if [ -d "$RESULT" ]; then
 	    return 0
 	fi
 	n=`expr $n - 1`
@@ -243,6 +321,11 @@ do_read_dir()
 #
 do_read_choice()
 {
+    if [ -n "$OPT_NOPROMPT" ]; then
+	RESULT=${ARGVVALUE:-$DEFAULT}
+	return
+    fi
+
     # Check that we have valid responses and default
     if [ "$RESPONSE..." = "..." ]; then
 	echo "Internal error."
@@ -292,7 +375,10 @@ do_read_choice()
 #
 default_ksrc()
 {
-    ksrc=/lib/modules/`uname -r`/build
+    kver=${OPT_VERSIONLINUX:-`uname -r`}
+    [ -d /lib/modules/${kver}/build ] || kver=`uname -r`
+    ksrc=/lib/modules/${kver}/build
+
     if [ -L $ksrc ]; then
 	ksrc=`ls -l $ksrc | sed -e 's/^.*-> //' -e 's/\.\.\//\//g'`
         if [ -d "$ksrc" -o -L "$ksrc" ]; then
@@ -316,27 +402,38 @@ default_ksrc()
 #
 check_ksrc()
 {
-    if [ -d $KSRC ]; then
-	return 0				# present
-    fi
+    if [ -n "$KSRC" ]; then
 
-    if [ -L $KSRC ]; then
-	return 0			# symbolic link, presume present
-    fi
+	if [ -d "$KSRC" ]; then
+	    return 0				# present
+	fi
 
-    if [ "$KSRC" != "/usr/src/linux" ]; then
-	return 1				# not present
+	if [ -L "$KSRC" ]; then
+	    (cd $KSRC >/dev/null 2>&1) && return 0 || return 1
+	    # return 0			# symbolic link, presume present
+	fi
+
+	if [ "$KSRC" != "/usr/src/linux" ]; then
+	    # FIXME - why fail if /usr/src/linux is a directory?
+	    return 1				# not present
+	fi
     fi
 
     #
     # pick up version string.  It might be like "2.4.2" or it
     # might be like "2.4.2-21smp".
     #
-    vers=`cat /proc/version`
-    vers=`arg3 $vers`
+    # - the following (now) works, but `uname -r` is easier...
+    #vers=("`cat /proc/version | sed 's:(::g' | sed 's:)::g'`")
+    #vers=`argn 3 ${vers}`
+    #
+    vers=`uname -r`
     trunc_vers=`echo $vers | sed -e 's/-.*//'`
     num_vers=`echo $vers | sed -e 's/[a-zA-Z][a-zA-Z]*//'`
-    if [ -d /usr/src/$vers ]; then
+
+    if [ -d /lib/modules/${vers}/build ]; then
+	KSRC=/lib/modules/${vers}/build
+    elif [ -d /usr/src/$vers ]; then
 	KSRC=/usr/src/$vers
     elif [ -d /usr/src/linux-$vers ]; then
 	KSRC=/usr/src/linux-$vers
@@ -503,12 +600,25 @@ check_kver()
 get_vers_h()
 {
     if [ -f $1 ]; then
-	cc -I$KSRC/include -E -dM \
-	    -include $1 dummy.c >kver
+	cc -I$KSRC/include -E -dM -include $1 dummy.c > kver
 	KVER_H=`grep UTS_RELEASE kver | \
 	     sed -e 's/^.*UTS_RELEASE.//' -e's/"//g' -e's/  *$//'`
 	NKVER_H=`echo $KVER_H | sed -e 's/-.*//'`
     fi
+}
+
+#
+# parse the kernel version identifier into its components
+#
+# $1 is the kernel version string
+#
+parse_kver()
+{
+    KVER_PATCH=`echo $1|sed -e "s/[^\.]\.[^\.]\.//"`
+    KVER_PATCHNO=`echo $KVER_PATCH | sed -e 's/-.*//' -e 's/[^0-9].*//'`
+    KVER_MAJORMINOR=`echo ${KVER}|sed -e "s/\.${KVER_PATCH}//"`
+    KVER_MINOR=`echo ${KVER_MAJORMINOR}|sed -e "s/[^\.]\.//"`
+    KVER_MAJOR=`echo $1|sed -e "s/\.${KVER_MINOR}\.${KVER_PATCH}//"`
 }
 
 #
@@ -519,32 +629,43 @@ get_kver()
 {
     check_kver
     get_vers_h $KSRC/include/linux/version.h
+    if [ -n "$OPT_VERSIONLINUX" ]; then
+	KVER=$OPT_VERSIONLINUX
+    fi
+    if [ -n "$KVER" ]; then
+	$(test "$KVER" = "$(uname -r)") && USE_RUNNING_KERNEL=y
+    fi
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	KVER=`uname -r`
-    elif [ -f $KSRC/include/linux/version.h ]; then
-	KVER=$KVER_H
-    elif [ -f $KSRC/vmlinux ]; then
-	KVDEC=`nm -g $KSRC/vmlinux | grep Version_ | sed -e 's/^.*_//'`
-	KMAJ=`expr $KVDEC / 65536`
-	KMIN=`expr $KVDEC / 256`
-	KMIN=`expr $KMIN % 256`
-	KPCH=`expr $KVDEC % 256`
-	KVER="$KMAJ.$KMIN.$KPCH"
-    elif grep -q "Red Hat" /etc/issue && rh_get_system_map; then
-	KVDEC=`grep Version_ $SMAP | sed -e 's/^.*_//'`
-	KMAJ=`expr $KVDEC / 65536`
-	KMIN=`expr $KVDEC / 256`
-	KMIN=`expr $KMIN % 256`
-	KPCH=`expr $KVDEC % 256`
-	KVER="$KMAJ.$KMIN.$KPCH"
+    elif [ -n "$KSRC" ]; then
+	if [ -f $KSRC/include/linux/version.h ]; then
+	    KVER=$KVER_H
+	elif [ -f $KSRC/vmlinux ]; then
+	    KVDEC=`nm -g $KSRC/vmlinux | grep Version_ | sed -e 's/^.*_//'`
+	    KMAJ=`expr $KVDEC / 65536`
+	    KMIN=`expr $KVDEC / 256`
+	    KMIN=`expr $KMIN % 256`
+	    KPCH=`expr $KVDEC % 256`
+	    KVER="$KMAJ.$KMIN.$KPCH"
+	elif grep -q "Red Hat" /etc/issue && rh_get_system_map; then
+	    KVDEC=`grep Version_ $SMAP | sed -e 's/^.*_//'`
+	    KMAJ=`expr $KVDEC / 65536`
+	    KMIN=`expr $KVDEC / 256`
+	    KMIN=`expr $KMIN % 256`
+	    KPCH=`expr $KVDEC % 256`
+	    KVER="$KMAJ.$KMIN.$KPCH"
+	else
+	    echo "The file $KSRC/include/linux/version.h is not present."
+	    echo "LiS installation cannot proceed without it.  Please fix"
+	    echo "this problem and then try the installation again."
+	    exit 1
+	fi
     else
-        echo "The file $KSRC/include/linux/version.h is not present."
-        echo "LiS installation cannot proceed without it.  Please fix"
-        echo "this problem and then try the installation again."
-        exit 1
+	KVER=`uname -r`
     fi
     # Remove the extra version glarf from the end of kernel version
     NKVER=`echo $KVER | sed -e 's/-.*//'`
+    parse_kver $KVER
 }
 
 
@@ -593,7 +714,7 @@ verify_kver()
 
     if [ "$KVER_H..." = "..." ]; then
 	echo
-	echo "The file $KSRC/include/linux/versin.h is missing"
+	echo "The file $KSRC/include/linux/version.h is missing"
 	echo "LiS needs thie file in order to build properly."
 	echo "This may be an indication that there is no kernel"
 	echo "source on this machine, or only partial kernel source."
@@ -672,7 +793,7 @@ get_smp()
 {
     NEED_KSMP=0				# default is "found"
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
-	if grep -q $SMP_GREP_ID /proc/ksyms; then
+	if grep -q $SMP_GREP_ID $KSYMS; then
 	    KSMP=y
 	else
 	    KSMP=
@@ -695,9 +816,9 @@ get_smp()
     fi
 
     if [ "$KSMP..." = "y..." ]; then
-	echo "Kernel support for SMP detected."
+	$qecho "Kernel support for SMP detected."
     else
-	echo "No kernel support for SMP detected."
+	$qecho "No kernel support for SMP detected."
     fi
 }
 
@@ -717,7 +838,7 @@ rh_get_modules()
     if grep -q init_modules $SMAP; then
 	NEED_KMODULES=0
 	KMODULES=y			# Module support
-	if grep -q unregister_chrdev_R /proc/ksyms; then
+	if grep -q unregister_chrdev_R $KSYMS; then
 	    KMODVERS=y
 	else
 	    KMODVERS=
@@ -737,7 +858,9 @@ get_modules()
     NEED_KMODULES=0				# default is "found"
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	KMODULES=y
-	if grep -q schedule_R /proc/ksyms; then
+	if [ "$KVER_MAJORMINOR" = "2.6" ]; then
+	    KMODVERS=`ac_get_config CONFIG_MODVERSIONS`
+	elif grep -q schedule_R $KSYMS; then
 	    KMODVERS=y
 	else
 	    KMODVERS=
@@ -769,9 +892,14 @@ get_modules()
     fi
 
     if [ "$KMODVERS..." = "y..." ]; then
-	echo "Kernel support for mod-versions detected."
+	if [ "$KVER_MAJORMINOR" = "2.6" ]; then
+	    echo '/* Configure generated dummy file for 2.6 */' \
+	    		>${SRCDIR}/include/sys/modversions.h
+	    LISMODVERS=y
+	fi
+	$qecho "Kernel support for mod-versions detected."
     else
-	echo "No kernel support for mod-versions detected."
+	$qecho "No kernel support for mod-versions detected."
     fi
 }
 
@@ -781,7 +909,7 @@ get_modules()
 get_ipv6()
 {
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
-	if grep -q ipv6_addr_type /proc/ksyms; then
+	if grep -q ipv6_addr_type $KSYMS; then
 	    IPV6=y
 	else
 	    IPV6=
@@ -805,16 +933,16 @@ get_ipv6()
     fi
 
     if [ "$IPV6..." = "y..." ]; then
-	echo "Kernel support for IP version 6 detected."
+	$qecho "Kernel support for IP version 6 detected."
     else
-	echo "No kernel support for IP version 6 detected."
+	$qecho "No kernel support for IP version 6 detected."
     fi
 }
 
 get_ipv6_module()
 {
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
-	if grep -q tcp_openreq_cachep /proc/ksyms; then
+	if grep -q tcp_openreq_cachep $KSYMS; then
 	    IPV6_MODULE=y
 	else
 	    IPV6_MODULE=
@@ -838,10 +966,44 @@ get_ipv6_module()
     fi
 
     if [ "$IPV6_MODULE..." = "y..." ]; then
-	echo "Kernel support for IP version 6 modules detected."
+	$qecho "Kernel support for IP version 6 modules detected."
     else
-	echo "No kernel support for IP version 6 modules detected."
+	$qecho "No kernel support for IP version 6 modules detected."
     fi
+}
+
+#
+# Figure out whether we should be compiled with -mregparm=n for register
+# passing of arguments.
+#
+get_regparm()
+{
+    CCREGPARM=
+    if [ "$TARGET" = "l" ]; then
+	if [ -f $KSRC/drivers/base/firmware_class.ko ] && \
+	     strings $KSRC/drivers/base/firmware_class.ko | grep vermagic | \
+	     grep REGPARM
+	then
+	    CCREGPARM="-mregparm=3"
+	elif [ -f $KSRC/include/linux/autoconf.h ]; then
+	    regparm_defined=`ac_get_config CONFIG_REGPARM`
+	    if [ "$regparm_defined..." = "y..." ]; then
+		CCREGPARM="-mregparm=3"
+	    else
+		CCREGPARM="-Dccregparm=0"
+	    fi
+	else
+	    CCREGPARM="-Dccregparm=0"
+	fi
+	if [ "$CCREGPARM" = "-mregparm=3" ]; then
+	    echo "Kernel compiled using register passing for parameters"
+	else
+	    echo "Kernel compiled using stack passing for parameters"
+	fi
+    elif [ "$TARGET" = "u" ]; then
+	CCREGPARM="-Dccregparm=0"
+    fi
+    export CCREGPARM
 }
 
 
@@ -851,7 +1013,7 @@ get_ipv6_module()
 #
 generate_symbol_names()
 {
-    grep _R /proc/ksyms | sed -e 's/^.........//' -e 's/[ 	].*//' |
+    grep _R $KSYMS | sed -e 's/^.........//' -e 's/[ 	].*//' |
     	sed 's/\(.*\)_R\(.*\)/#define \1 \1_R\2/'
 }
 
@@ -862,9 +1024,7 @@ generate_symbol_names()
 generate_autoconf()
 {
     acf="include/sys/autoconf.h"
-    echo '/* FILE AUTOMATICALLY GENERATED BY LIS CONFIGURE.' >$acf
-    echo ' * DO NOT EDIT BY HAND' >>$acf
-    echo ' */' >>$acf
+    echo '/* THIS FILE WAS GENERATED.  MANUAL CHANGES MAY BE LOST. */' >$acf
 
     if [ "$KSMP" = "y" ]; then
 	echo "#define CONFIG_SMP 1" >>$acf
@@ -890,6 +1050,9 @@ generate_autoconf()
 # Try to find out whether or not the routine that gets an empty inode
 # is still called "get_empty_inode" or "new_inode".
 #
+# we assume this option will be passed a value s; this makes it easier
+# to define the macro conventionally
+#
 # This must be done after it is known whether we are going to install
 # on the running kernel and whether there is kernel source available.
 #
@@ -899,10 +1062,12 @@ get_empty_inode_option()
 	return				# not relevant unless Linux kernel
     fi
 
-    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
-	if grep -q new_inode /proc/ksyms; then
-	    GET_EMPTY_INODE="new_inode(LIS_SB)"
-	elif grep -q get_empty_inode /proc/ksyms; then
+    if [ "$KVER_MAJORMINOR" = "2.6" ]; then
+       GET_EMPTY_INODE="new_inode((LIS_SB))"
+    elif [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	if grep -q new_inode $KSYMS; then
+	    GET_EMPTY_INODE="new_inode((LIS_SB))"
+	elif grep -q get_empty_inode $KSYMS; then
 	    GET_EMPTY_INODE="get_empty_inode()"
 	else
 	    GET_EMPTY_INODE="get_empty_inode()"
@@ -916,7 +1081,7 @@ get_empty_inode_option()
 	return
     elif [ -f $KSRC/kernel/ksyms.c ]; then
 	if grep -q new_inode $KSRC/kernel/ksyms.c; then
-	    GET_EMPTY_INODE="new_inode(LIS_SB)"
+	    GET_EMPTY_INODE="new_inode((LIS_SB))"
 	elif grep -q get_empty_inode $KSRC/kernel/ksyms.c; then
 	    GET_EMPTY_INODE="get_empty_inode()"
 	else
@@ -930,8 +1095,9 @@ get_empty_inode_option()
 	      do_confirm
              else
                  if  [ "$OPT_FORCENEWINODE" = "y" ] ;then
-             	    GET_EMPTY_INODE="new_inode(LIS_SB)" 
-                    echo "***new_inode FORCED***"
+             	    GET_EMPTY_INODE="new_inode((LIS_SB))" 
+                    #echo "***new_inode FORCED***"
+		    NEW_INODE_FORCED=" (forced)"
                 else
            	    GET_EMPTY_INODE="get_empty_inode()" 
                 fi
@@ -952,12 +1118,29 @@ get_empty_inode_option()
             do_confirm
         else
             if  [ "$OPT_FORCENEWINODE" = "y" ] ;then
-                GET_EMPTY_INODE="new_inode(LIS_SB)" 
-                echo "***new_inode FORCED***"
+                GET_EMPTY_INODE="new_inode((LIS_SB))" 
+                #echo "***new_inode FORCED***"
+		NEW_INODE_FORCED=" (forced)"
             else
                 GET_EMPTY_INODE="get_empty_inode()" 
             fi
         fi
+    fi
+
+    $qecho "GET_EMPTY_INODE=${GET_EMPTY_INODE}${NEW_INODE_FORCED}"
+}
+
+set_cpus_allowed_option()
+{
+    if [ "$TARGET" != "l" ]; then
+	return				# not relevant unless Linux kernel
+    fi
+
+    SCHED_H=$KSRC/include/linux/sched.h
+    if grep -q set_cpus_allowed $SCHED_H; then
+	SET_CPUS_ALLOWED=y
+    else
+	SET_CPUS_ALLOWED=n
     fi
 }
 
@@ -1020,13 +1203,110 @@ pick_a_c_compiler()
     return 1
 }
 
+# the 'kbuild' build process originated with 2.5.x kernels.  Prior to
+# 2.6.6, it required '-DKBUILD_MODNAME=...' for modules.  As of 2.6.6,
+# that is no longer necessary, but kernel exported symbols must be
+# passed into kbuild.  We define these conditions via the following
+# function
+#
+check_kbuild()
+{
+    if [ "$TARGET" != "l" ]; then
+	return
+    fi
+    [ ${KVER_MAJOR} -eq 2 -a ${KVER_MINOR} -ge 5 ] && KBUILD=y || KBUILD=n
 
+    [ "${KBUILD}" = "y" -a ${KVER_MINOR} -eq 6 -a ${KVER_PATCHNO} -ge 4 ] && \
+	KBUILD_NEEDS_SYMVERS=y || :
+
+    [ "${KBUILD}" = "y" -a ! "${KBUILD_NEEDS_SYMVERS}" = "y" ] && \
+	KBUILD_NEEDS_MODNAME=y || :
+
+    [ "${KBUILD}" = "y" ] && MODULE_INIT_TOOLS=y || MODUTILS=y
+
+    if [ "$KBUILD_NEEDS_SYMVERS" = "y" ]; then
+	if ls $KSRC/modversions-* >/dev/null 2>/dev/null; then
+	    KSYMVERS=`ls -rt $KSRC/modversions-* 2>/dev/null | tail -1`
+	else			# define it whether present or not
+	    KSYMVERS=$KSRC/Module.symvers
+	fi
+    fi
+}
+
+#=========================================================================
+
+$qecho "LiS Configure script version $Configure_version" "$COMMENT"
+$qecho
+
+# if not set, set SRCDIR to directory where this script lives.  Get the
+# actual directory name, not a symlink.
+#
+SRCDIR=$(cd ${SRCDIR:-$(dirname $0)}; pwd)
+if [ -L $SRCDIR ]; then
+    SRCDIR=`ls -ld $SRCDIR | sed -e 's/^.* //'`
+fi
+
+# set CONFIG to an absolute path name; if prefixed with ./, prefix with
+# pwd; otherwise if relative (no leading /), prefix with SRCDIR
+#
+_config=$(echo -n $CONFIG | sed 's:^\./::')
+if [ "$_config" != "$CONFIG" ]; then
+	CONFIG=$(pwd)/${_config}
+fi
+unset _config
+if [ "$(echo -n $CONFIG | sed 's:^/::')" = "$CONFIG" ]; then
+	CONFIG=${SRCDIR}/${CONFIG}
+fi
+
+# function to convert '//' -> '/' and strip trailing '/'
+#
+cleanup_dir()
+{
+    sed -e "s:\/\/:/:g" | sed -e "s:\/$::"
+}
+
+# set directory defaults
+#
+package=`echo ${package:-LiS} | cleanup_dir`
+prefix=`echo ${prefix:-/usr} | cleanup_dir`
+execprefix=`echo ${execprefix:-${prefix}} | cleanup_dir`
+includedir=`echo ${includedir:-${prefix}/include} | cleanup_dir`
+libdir=`echo ${libdir:-${prefix}/lib} | cleanup_dir`
+bindir=`echo ${bindir:-${execprefix}/bin} | cleanup_dir`
+sbindir=`echo ${sbindir:-${execprefix}/sbin} | cleanup_dir`
+sysconfdir=`echo ${sysconfdir:-/etc} | cleanup_dir`
+datadir=`echo ${datdir:-${prefix}/share} | cleanup_dir`
+pkgincludedir=`echo ${pkgincludedir:-${includedir}/${package}} | cleanup_dir`
+pkglibdir=`echo ${pkglibdir:-${libdir}/${package}} | cleanup_dir`
+pkgdatadir=`echo ${pkgdatadir:-${datadir}/${package}} | cleanup_dir`
+pkgsrcdir=`echo ${pkgsrcdir:-${prefix}/src/${package}} | cleanup_dir`
+mandir=`echo ${mandir:-${datadir}/man} | cleanup_dir`
+modsubdir=`echo ${modsubdir:-misc} | cleanup_dir`
+
+# uncomment the following line to see what OPT_ variables are set
+#set | grep '^OPT_' | $qcat
+$qecho "CONFIG=$CONFIG"
+$qecho
+$qecho "package=${package}"
+$qecho "prefix=${prefix}"
+$qecho "execprefix=${execprefix}"
+$qecho "includedir=${includedir}"
+$qecho "libdir=${libdir}"
+$qecho "bindir=${bindir}"
+$qecho "sbindir=${sbindir}"
+$qecho "sysconfdir=${sysconfdir}"
+$qecho "datadir=${datadir}"
+$qecho "pkgincludedir=${pkgincludedir}"
+$qecho "pkglibdir=${pkglibdir}" 
+$qecho "pkgdatadir=${pkgdatadir}"
+$qecho "pkgsrcdir=${pkgsrcdir}"
+$qecho "mandir=${mandir}"
+$qecho "modsubdir=${modsubdir}"
+$qecho
 
 #
 # Establish defaults
 #
-echo "LiS Configure script version $Configure_version"
-echo
 
 if [ -f $CONFIG ]; then
 . $CONFIG
@@ -1044,52 +1324,16 @@ else
     LIS_SHLIB=y
     MACHINE=`uname -m`
     INT_PSW=y
+    STREAMS_REGPARM=${STREAMS_REGPARM:-0}
 fi
-CONFIG_DEV=n
+unset CONFIG_DEV
 USE_KMEM_CACHE=y
-USE_LINUX_KMEM_TIMER=y
+USE_KMEM_TIMER=y
 
 if [ "$MACHINE" = "s390" -o "$MACHINE" = "s390x" ]; then
   SMP_GREP_ID='smp_num_cpus'
 else
   SMP_GREP_ID='cpu_online_map'
-fi
-
-#
-# LIS_HOME
-#
-# Plant a symbolic link from /usr/src/LiS to whereever this directory is.
-# Remember our directory name as either its real name or as /usr/src/LiS
-# if /usr/src/LiS is symbolically linked to this directory.
-#
-LIS_HOME=`pwd`
-
-if [ -L /usr/src/LiS ]; then
-    usr_src_lis=`ls -l /usr/src/LiS | sed -e 's/^.* //' | sed -e 's/\/$//'`
-else
-    usr_src_lis=
-fi
-if [ "$LIS_HOME" = "$usr_src_lis" ]; then
-    LIS_HOME="/usr/src/LiS"
-elif [ `id -u` -eq 0 ]; then
-    if [ -L /usr/src/LiS ]; then
-	rm /usr/src/LiS
-	if [ $? -ne 0 ]; then
-	    echo "Error removing symbolic link /usr/src/LiS"
-	fi
-    fi
-    if [ "$LIS_HOME" = "/usr/src/LiS" ]; then
-	LIS_HOME=$usr_src_lis
-    fi
-    if [ $LIS_HOME != "/usr/src/LiS" ]; then
-	ln -s $LIS_HOME /usr/src/LiS
-	if [ $? -ne 0 ]; then
-	    echo "Error making symbolic link from /usr/src/LiS to $LIS_HOME."
-	    echo "Please fix this problem and try again."
-	    exit 1
-	fi
-    fi
-    LIS_HOME="/usr/src/LiS"
 fi
 
 #
@@ -1167,9 +1411,9 @@ the currently running kernel?"
 	PROMPT="Enter directory location of your kernel source\n          "
 	DEFAULT=$KSRC
 	if [ "$KSRC..." = "..." ]; then
-	    DEFAULT="/usr/src/linux"
+	    DEFAULT="/lib/modules/`uname -r`/build"
 	fi
-	if [ ! -d $KSRC ]; then
+	if [ ! -d "$KSRC" ]; then
 	    DEFAULT="/usr/src/linux"
 	    check_ksrc
 	fi
@@ -1177,18 +1421,25 @@ the currently running kernel?"
 	if do_read_dir; then
 	    KSRC=$RESULT
 	    NOKSRC=0
+	    KINCL=$KSRC/include
 	else
 	    echo "Cannot locate kernel source."
 	    echo "Will use /usr/include for header files."
 	    KSRC=/usr
+	    KINCL=$KSRC/include
 	    NOKSRC=1
 	fi
     else
 	NOKSRC=0
 	if [ -d $KSRC ]; then
 	    : Retain default setting
+	    KINCL=/lib/modules/$(uname -r)/build/include
+	    if [ ! -d $KINCL ]; then
+		KINCL=$KSRC/include
+	    fi
 	elif [ -d /usr/src/linux ]; then
 	    KSRC=/usr/src/linux
+	    KINCL=$KSRC/include
 	else
 	    echo
 	    echo "No apparent kernel source directory.  LiS compilation"
@@ -1198,6 +1449,7 @@ the currently running kernel?"
 	    echo
 	    do_confirm
 	    KSRC=/usr
+	    KINCL=$KSRC/include
 	    NOKSRC=1		# act as though no kernel source
 	fi
 	echo "Will use $KSRC/include for header files."
@@ -1216,6 +1468,7 @@ the currently running kernel?"
     if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	verify_kver
     fi
+    get_regparm
     if [ $NEED_KSMP -eq 1 -o $NEED_KMODULES -eq 1 ]; then
 	if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
 	    echo "Could not figure out whether or not your running kernel"
@@ -1313,22 +1566,16 @@ Do you want to do that now?"
         else
         KVER=${OPT_VERSIONLINUX}
         fi
-    fi
     
-    KVER_PATCH=`echo ${KVER}|sed -e "s/[^\.]\.[^\.]\.//"`
-    KVER_PATCHNO=`echo $KVER_PATCH | sed -e 's/-.*//' -e 's/[^0-9].*//'`
-    KVER_MAJORMINOR=`echo ${KVER}|sed -e "s/\.${KVER_PATCH}//"`
-    KVER_MINOR=`echo ${KVER_MAJORMINOR}|sed -e "s/[^\.]\.//"`
-    KVER_MAJOR=`echo ${KVER}|sed -e "s/\.${KVER_MINOR}\.${KVER_PATCH}//"`
+	parse_kver $KVER
+    fi
 
-    if [ "$KVER_MAJORMINOR" = "2.0" ]; then
+    if [ $KVER_MAJOR -lt 2 -o $KVER_MINOR -lt 3 ]; then
 	echo
-	echo "LiS no longer supports 2.0 vintage kernels. Try LiS-2.8"
+	echo "LiS is no longer compatible with Linux 1.x/2.0/2.2 kernels."
 	echo
 	exit 1
     fi
-
-    
 
     #
     # CONFIG_STREAMS
@@ -1370,46 +1617,23 @@ Please enter y or n "
     #
     # MOD_INST_DIR
     #
-    PROMPT="Enter location of your kernel module directory\n"
+    # The old logic here was deleted - creating non-temporary directories
+    # is a job for make install targets; our job here is just to choose a
+    # directory name.
+    #
+    PROMPT="Enter desired kernel module directory\n"
     PROMPT="$PROMPT              "
-    if [ "$MOD_INST_DIR..." = "..." ]; then
-	DEFAULT=/lib/modules/$KVER/misc
-	if [ ! -d $DEFAULT ]; then
-	    DEFAULT=/lib/modules/$KVER/misc
-	    if [ ! -d $DEFAULT ]; then
-		DEFAULT=/lib/modules/preferred/misc
-		if [ ! -d $DEFAULT ]; then
-		    if [ `id -u` -eq 0 ]; then
-			DEFAULT=/lib/modules/$KVER/misc
-			if ! mkdir -p $DEFAULT 2>/dev/null; then
-			    DEFAULT=/lib/modules/preferred/misc
-			    if ! mkdir -p $DEFAULT 2>/dev/null; then
-				DEFAULT=
-			    fi
-			fi
-		    else
-		    DEFAULT=
-		    fi
-		fi
-	    fi
+    DEFAULT=${MOD_INST_DIR:-/lib/modules/${KVER}/${modsubdir}}
+    ARGVVALUE=${OPT_MODULESLOCATION:-${DEFAULT}}
+    do_read_dir
+    MOD_INST_DIR=`echo $RESULT | cleanup_dir`
+    if [ ! -d $MOD_INST_DIR ]; then
+	if ! mkdir -p $MOD_INST_DIR; then
+	    echo "Configure aborting"
+	    exit 1
 	fi
-    else
-	DEFAULT=$MOD_INST_DIR
     fi
-    if [ "$USE_RUNNING_KERNEL..." = "y..." -a "$DEFAULT..." != "..." ]; then
-	if [ -d $DEFAULT ]; then
-	    MOD_INST_DIR=$DEFAULT
-	else
-            ARGVVALUE=${OPT_MODULESLOCATION}
-	    do_read_dir
-	    MOD_INST_DIR=$RESULT
-	fi
-    else
-            ARGVVALUE=${OPT_MODULESLOCATION}        
-	do_read_dir
-	MOD_INST_DIR=$RESULT
-    fi
-    echo "Module installation directory is $MOD_INST_DIR"
+    $qecho "Module installation directory will be $MOD_INST_DIR"
 
     #
     # STRMS_QUEUES
@@ -1419,9 +1643,9 @@ Please enter y or n "
     STRMS_QUEUES="t"
 
     if [ $NOKSRC -eq 1 -a "$KMODVERS..." = "y..." ]; then
-	echo "Generating $LIS_HOME/include/sys/modversions.h."
+	echo "Generating ${SRCDIR}/include/sys/modversions.h."
 	rm -f include/sys/modversions.h
-	generate_symbol_names >include/sys/modversions.h
+	generate_symbol_names > ${SRCDIR}/include/sys/modversions.h
 	LISMODVERS=y
     fi
 
@@ -1571,7 +1795,7 @@ INT_PSW=$RESULT
 #                  for performance.
 #
 if [ "$CONFIG_DEV..." = "..." ]; then
-    CONFIG_DEV=n
+    unset CONFIG_DEV
 fi
 PROMPT="\
 When you make STREAMS, do you want LiS to be compiled in production mode?\n\
@@ -1581,8 +1805,8 @@ use faster kernel allocations for messages.\n\
 Responding 'y' is more appropriate for production environments\n\
 Responding 'n' is more appropriate for development environments\n\
 with verified modules/drivers.\n\
-    y = No audit of structures, faster memory handling\n\
-    n = Do audit STREAMs and LiS structures and pointers\n\
+    y = Production mode\n\
+    n = Development mode\n\
 Please enter y or n"
 RESPONSE="y n"
 if [ "$CONFIG_DEV..." = "y..." ]; then
@@ -1593,23 +1817,13 @@ fi
 ARGVVALUE="${OPT_PRODUCTIONCODE}"
 do_read_choice
 if [ "$RESULT..." = "y..." ]; then
-    CONFIG_DEV=n
+    unset CONFIG_DEV
     USE_KMEM_CACHE=y
-    USE_LINUX_KMEM_TIMER=y
+    USE_KMEM_TIMER=y
 else
     CONFIG_DEV=y
-    USE_KMEM_CACHE=n
-    USE_LINUX_KMEM_TIMER=n
-fi
-
-#
-# Some systems don't have a /usr/local/sbin directory.  Make one
-# if necessary.  We keep some LiS utilities in that directory.
-#
-if [ `id -u` -eq 0 ]; then			# must be root to do this
-    if [ ! -d /usr/local/sbin ]; then
-	mkdir -p /usr/local/sbin
-    fi
+    unset USE_KMEM_CACHE
+    unset USE_KMEM_TIMER
 fi
 
 #
@@ -1737,12 +1951,16 @@ if [ "$CC_VERS..." = "3.0.2..." ]; then
     do_confirm
 fi
 
-echo "Using \"$CC_NAME $CC_OPTIMIZE $CC_OPT2\" $CC_VERS as the C compiler"
+$qecho "Using \"$CC_NAME $CC_OPTIMIZE $CC_OPT2\" $CC_VERS as the C compiler"
 
 #
 # Figure out which routine name to use for "get_empty_inode".
 #
 get_empty_inode_option
+#
+# Figure out whether or not set_cpus_allowed is defined in this kernel
+#
+set_cpus_allowed_option
 
 #
 # Some architectures need an additional include directory
@@ -1750,9 +1968,59 @@ get_empty_inode_option
 # and just hope that this stuff got installed even though the rest of the
 # source is not there.
 #
-case $MACHINE in
-i?86)	MACHINE_INCL="-I$KSRC/arch/i386/mach-generic" ;;
-esac
+[ -e ${KSRC}/include/asm/mach-generic ] && \
+    KINCL_MACH_GENERIC="-I${KSRC}/include/asm/mach-generic"
+[ -e ${KSRC}/include/asm/mach-default ] && \
+    KINCL_MACH_DEFAULT="-I${KSRC}/include/asm/mach-default"
+
+# the following checks for post-2.4 kernels by version, but also
+# sets some other related variables
+#
+check_kbuild
+
+
+# identify GENCONF so we can create it here - it's a kosher config-time
+# output (captures config info, lives inside the source tree, and building
+# it from the top Makefile tends to make things circularly dependent)
+#
+GENCONF=${GENCONF:-${SRCDIR}/include/sys/LiS/genconf.h}
+
+# create in each Makefile-containing directory a .config_mk file which can be
+# included locally.  It in turn will include configuration-related make
+# files or variables.  This allows any such directory to be made without
+# starting at the top level (i.e., make -C <subdir>).  The existence of
+# these files also signals that Configure has been run.
+#
+# note that CONFIG isn't additionally path-prefixed here, since we took
+# care of expanding it above to include and absolute path prefix
+
+# delete any old .config_mk files before writing new ones
+#
+find ${SRCDIR} -follow -name \.config_mk -exec rm {} \;
+
+# find the subdirs with Makefile's in them
+#
+MAKE_DIRS=$(find ${SRCDIR} -follow -name Makefile -print | \
+ 	sed "s:^${SRCDIR}/::" | sed "s:/Makefile$::" | sed "s:^Makefile$:.:")
+
+# clean up the list - convert it to the positional parms array, and set it
+# again from that array.  This gets rid of newlines, extra whitespace, etc.
+#
+set -- ${MAKE_DIRS}
+MAKE_DIRS="${@}"
+
+# use the list to write a .config_mk in each directory.  We do this as
+# a top-level file in SRCDIR and symlinks everywhere else
+#
+cat > ${SRCDIR}/.config_mk <<EOF
+include ${CONFIG}
+include ${SRCDIR}/config.mk
+include ${SRCDIR}/quiet.mk
+include ${SRCDIR}/version
+EOF
+for d in $MAKE_DIRS; do
+    [ ! -f ${d}/.config_mk ] && ln -sf ${SRCDIR}/.config_mk ${d}/.config_mk || :
+done
 
 #
 # Finally output configuration file
@@ -1777,15 +2045,18 @@ cfg_out_str()
 }
 
 echo "" >$CONFIG
-echo "# This file is generated from the Configure script" >>$CONFIG
-echo "# Do not edit manually." >>$CONFIG
+echo "# THIS FILE WAS GENERATED.  MANUAL CHANGES MAY BE LOST." >>$CONFIG
 echo "" >>$CONFIG
-cfg_out LIS_HOME $LIS_HOME
+cfg_out_str CONFIG_OPTS "$CONFIG_OPTS"
+cfg_out CONFIG $CONFIG
+cfg_out SRCDIR $SRCDIR
+cfg_out GENCONF $GENCONF
 cfg_out CONFIG_STREAMS $CONFIG_STREAMS
 cfg_out TARGET $TARGET
 if [ "$TARGET" = "l" ]; then
     cfg_out CROSS_COMPILING $CROSS_COMPILING
     cfg_out KSRC $KSRC
+    cfg_out KINCL $KINCL
     cfg_out NOKSRC $NOKSRC
     cfg_out USE_RUNNING_KERNEL $USE_RUNNING_KERNEL
     cfg_out NKVER $NKVER
@@ -1816,22 +2087,66 @@ if [ "$TARGET" = "l" ]; then
     cfg_out CC_VERS $CC_VERS
     cfg_out CC_OPTIMIZE "$CC_OPTIMIZE"
     cfg_out CC_OPT2 "$CC_OPT2"
-    cfg_out MACHINE_INCL $MACHINE_INCL
-    cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE
+    cfg_out KINCL_MACH_GENERIC ${KINCL_MACH_GENERIC}
+    cfg_out KINCL_MACH_DEFAULT ${KINCL_MACH_DEFAULT}
+    cfg_out_str GET_EMPTY_INODE ${GET_EMPTY_INODE}
+    cfg_out SET_CPUS_ALLOWED $SET_CPUS_ALLOWED
     #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
     cfg_out INT_PSW $INT_PSW
     cfg_out CONFIG_DEV $CONFIG_DEV
     cfg_out USE_KMEM_CACHE $USE_KMEM_CACHE
-    cfg_out USE_LINUX_KMEM_TIMER $USE_LINUX_KMEM_TIMER
+    cfg_out USE_KMEM_TIMER $USE_KMEM_TIMER
+    cfg_out LIS_MAJOR_BASE ${OPT_DEVICEBASE:-231}
+    cfg_out CONFIG_INET $OPT_INET
+    cfg_out PKGCOMPILE $OPT_PKGCOMPILE
+    cfg_out PKGMODULES $OPT_PKGMODULES
+    cfg_out SILENT_BUILD y
+    cfg_out KBUILD $KBUILD
+    cfg_out KBUILD_NEEDS_MODNAME $KBUILD_NEEDS_MODNAME
+    cfg_out KBUILD_NEEDS_SYMVERS $KBUILD_NEEDS_SYMVERS
+    cfg_out MODUTILS $MODUTILS
+    cfg_out MODULE_INIT_TOOLS $MODULE_INIT_TOOLS
+    cfg_out KSYMVERS $KSYMVERS
+elif [ "$TARGET" = "u" ]; then
+    cfg_out CONFIG_DEV y
 fi
+cfg_out CCREGPARM "$CCREGPARM"
+cfg_out STREAMS_REGPARM "$STREAMS_REGPARM"
 cfg_out LIS_OLD_CONSTS $LIS_OLD_CONSTS
 cfg_out SOLARIS_STYLE_CMN_ERR $SOLARIS_STYLE_CMN_ERR
 cfg_out DBG_OPT $DBG_OPT
 cfg_out LIS_SHLIB $LIS_SHLIB
+cfg_out package ${package}
+cfg_out prefix ${prefix}
+cfg_out execprefix ${execprefix}
+cfg_out includedir ${includedir}
+cfg_out libdir ${libdir}
+cfg_out bindir ${bindir}
+cfg_out sbindir ${sbindir}
+cfg_out sysconfdir ${sysconfdir}
+cfg_out datadir ${datadir}
+cfg_out pkgincludedir ${pkgincludedir}
+cfg_out pkglibdir ${pkglibdir}
+cfg_out pkgdatadir ${pkgdatadir}
+cfg_out pkgsrcdir ${pkgsrcdir}
+cfg_out mandir ${mandir}
+cfg_out modsubdir ${modsubdir}
+cfg_out_str MAKE_DIRS "$MAKE_DIRS"
 
-if [ "$MAKE_INVOKED" != "1" ]; then
-    echo
-    echo "Warning:"
-    echo "You did not use \"make configure\" to run this configuration."
-    echo "Please do \"make clean && make dep\" first to get a clean build."
+# we know CONFIG now exists - create GENCONF; the script needs SRCDIR &
+# CONFIG, & reads the just-created CONFIG
+#
+SRCDIR=${SRCDIR} CONFIG=${CONFIG} ${SRCDIR}/mkgenconf
+
+if [ "$MAKE_INVOKED" != "y" ]; then
+    $qecho
+    $qecho "Warning:"
+    $qecho \
+"You did not use \"make\" or \"make configure\" to run this configuration"
+    $qecho \
+"script.  You can now just run \"make\" for the the top LiS source" 
+    $qecho \
+"directory, but you should run \"make config\" before directly making any"
+    $qecho \
+"of the LiS subdirectories that have a 'Makefile'."
 fi
