@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2004/04/23 04:02:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2004/04/23 10:05:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/23 04:02:05 $ by $Author: brian $
+# Last Modified $Date: 2004/04/23 10:05:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -211,14 +211,14 @@ $(libLfScompat_a_OBJECTS): $(libLfScompat_a_DEPENDENCIES)
 streams.o: $(libLfSkernel_a_OBJECTS)
 	$(LD) -r -o $@ $^
 
-include am/libraries.am
-
 KERNEL_MODULES			= streams.o $(libLfSdrivers_a_OBJECTS) $(libLfSmodules_a_OBJECTS) $(libLfScompat_a_OBJECTS)
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= streams
 KMODCONF_EXT			= streams
 
 include am/kernel.am
+
+include am/libraries.am
 
 libstreams_la_SOURCES		= \
 				lib/libc/fattach.c \
