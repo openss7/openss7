@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/07/11 08:44:53 $
+ @(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 1.2 $) $Date: 2004/07/13 23:45:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/11 08:44:53 $ by $Author: brian $
+ Last Modified $Date: 2004/07/13 23:45:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/07/11 08:44:53 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 1.2 $) $Date: 2004/07/13 23:45:59 $"
 
 #if 1
 #define DDTRACE          do { printk("%s [%s %d] trace\n",__FUNCTION__,__FILE__, __LINE__); } while(0)
@@ -237,5 +237,62 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #endif
 
 #endif
+
+static inline void my_freemsg(mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("freemsg() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+		return;
+	}
+	freemsg(mp);
+}
+#define freemsg(__mp)	my_freemsg((__mp), __FUNCTION__, __FILE__, __LINE__)
+
+static inline void my_freeb(mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("freeb() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+		return;
+	}
+	freeb(mp);
+}
+#define freeb(__mp)	my_freeb((__mp), __FUNCTION__, __FILE__, __LINE__)
+
+static inline void my_putnext(queue_t *q, mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("putnext() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+	}
+	putnext(q, mp);
+}
+#define putnext(__q, __mp)  my_putnext((__q), (__mp), __FUNCTION__, __FILE__, __LINE__)
+
+static inline int my_putq(queue_t *q, mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("putq() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+	}
+	return putq(q, mp);
+}
+#define putq(__q, __mp)  my_putq((__q), (__mp), __FUNCTION__, __FILE__, __LINE__)
+
+static inline int my_putbq(queue_t *q, mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("putbq() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+	}
+	return putbq(q, mp);
+}
+#define putbq(__q, __mp)  my_putbq((__q), (__mp), __FUNCTION__, __FILE__, __LINE__)
+
+static inline void my_qreply(queue_t *q, mblk_t *mp, const char *func, const char *file, int lineno)
+{
+	if (mp && mp->b_datap->db_ref == 0) {
+		pswerr(("qreply() called on zero reference data block %p from %s: %s, %d\n", mp->b_datap, func, file, lineno));
+	}
+	return qreply(q, mp);
+}
+#define qreply(__q, __mp)  my_qreply((__q), (__mp), __FUNCTION__, __FILE__, __LINE__)
+
 
 #endif				/* __DEBUG_H__ */

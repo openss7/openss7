@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.3 2004/06/27 10:08:31 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.4 2004/07/13 23:47:34 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,13 +53,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/06/27 10:08:31 $ by $Author: brian $
+dnl Last Modified $Date: 2004/07/13 23:47:34 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 m4_include([m4/kernel.m4])
 m4_include([m4/streams.m4])
 m4_include([m4/genksyms.m4])
+m4_include([m4/xopen.m4])
 m4_include([m4/xti.m4])
 m4_include([m4/man.m4])
 m4_include([m4/public.m4])
@@ -81,6 +82,7 @@ AC_DEFUN([AC_INET], [dnl
     USER_CFLAGS="${CFLAGS}"
     _LINUX_KERNEL
     _LINUX_STREAMS
+    _XOPEN
     _XTI
     INET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}${xti_cv_includes:+ -I}${xti_cv_includes}"
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])

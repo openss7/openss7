@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/13 23:47:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/11 08:51:43 $ by $Author: brian $
+ Last Modified $Date: 2004/07/13 23:47:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/13 23:47:36 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/13 23:47:36 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -257,7 +257,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 
 #define SS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/11 08:51:43 $"
+#define SS_REVISION	"LfS $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/07/13 23:47:36 $"
 #define SS_DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS_LICENSE	"GPL"
@@ -13738,14 +13738,15 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   known and the socket is created so that we can accept options management on unbound
 	   sockets. 
 	 */
+	spin_unlock_bh(&ss_lock);
 	if ((err = ss_sock_init(ss)) < 0) {
 		ptrace(("%s: ERROR: from ss_sock_init %d\n", SS_MOD_NAME, -err));
+		spin_lock_bh(&ss_lock);
 		ss_free_priv(q);
 		spin_unlock_bh(&ss_lock);
 		MOD_DEC_USE_COUNT;
 		return (-err);
 	}
-	spin_unlock_bh(&ss_lock);
 	return (0);
 }
 

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/07/04 03:05:04 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.3 2004/07/13 23:46:39 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/07/04 03:05:04 $ by $Author: brian $
+dnl Last Modified $Date: 2004/07/13 23:46:39 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -83,8 +83,6 @@ AC_GNU_SOURCE
 #
 # Checks for programs.
 #
-AM_PROG_AS
-AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -95,7 +93,6 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
@@ -114,49 +111,24 @@ LIBS="$xns_save_LIBS"
 #
 # Checks for header files.
 #
-AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h locale.h netinet/in.h stddef.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h values.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h stdlib.h string.h sys/ioctl.h sys/time.h unistd.h])
 
 # 
 # Checks for typedefs, structures, and compiler characteristics.
 # 
-AC_HEADER_STAT
-AC_HEADER_STDBOOL
 AC_C_CONST
-AC_TYPE_UID_T
-AC_C_INLINE
-AC_TYPE_MODE_T
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-AC_CHECK_MEMBERS([struct stat.st_blksize])
-AC_STRUCT_ST_BLOCKS
-AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
-AC_STRUCT_TM
 AC_C_VOLATILE
-AC_CHECK_TYPES([ptrdiff_t])
 
 # 
 # Checks for library functions.
 # 
-AC_FUNC_ERROR_AT_LINE
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
-AC_FUNC_LSTAT
-AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
-AC_FUNC_MMAP
-AC_FUNC_REALLOC
-AC_FUNC_SELECT_ARGTYPES
-if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
-AC_FUNC_STAT
-AC_FUNC_STRNLEN
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([bzero gettimeofday memset strerror strtol])
+AC_CHECK_FUNCS([alarm gettimeofday inet_ntoa memset strtol strtoul])
 
 AC_XNS
 

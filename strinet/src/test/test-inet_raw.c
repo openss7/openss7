@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:36 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/06/27 10:08:36 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/07/13 23:47:40 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.2  2004/07/13 23:47:40  brian
+ - Locking correction.
+
  Revision 0.9.2.1  2004/06/27 10:08:36  brian
  - Built up separate inet release.
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:36 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/06/27 10:08:36 $";
+    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $";
 
 /* 
  *  Simple test program for INET streams.
@@ -3910,7 +3913,7 @@ do_tests(void)
 				lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "\nTest Case INET-RAW/%s: %s\n", tests[i].numb, tests[i].name);
 				if (verbose > 1)
-					fprintf(stdout, "%s\n", tests[i].numb, tests[i].desc);
+					fprintf(stdout, "%s\n", tests[i].desc);
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
@@ -4179,7 +4182,7 @@ main(int argc, char *argv[])
 				fprintf(stdout, "\n");
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
-						fprintf(stdout, "Test Case INET-UDP/%s: %s\n", t->numb, t->name);
+						fprintf(stdout, "Test Case INET-RAW/%s: %s\n", t->numb, t->name);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
@@ -4197,7 +4200,7 @@ main(int argc, char *argv[])
 			} else {
 				fprintf(stdout, "\n");
 				for (t = tests; t->numb; t++) {
-					fprintf(stdout, "Test Case INET-UDP/%s: %s\n", t->numb, t->name);
+					fprintf(stdout, "Test Case INET-RAW/%s: %s\n", t->numb, t->name);
 					if (verbose > 1)
 						fprintf(stdout, "%s\n\n", t->desc);
 					fflush(stdout);
