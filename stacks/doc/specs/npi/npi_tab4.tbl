@@ -44,7 +44,7 @@ T}:No:No:No
 
 .TS
 center tab(:);
-lw(0.3in)lw(4.7in).
+lw(0.3i)lw(4.7i).
 Yes:T{
 The addition of Object X may prevent further addition of Object Y.
 T}

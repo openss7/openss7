@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/03/12 22:33:10 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/03/14 12:50:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/12 22:33:10 $ by $Author: brian $
+# Last Modified $Date: 2005/03/14 12:50:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,6 +148,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_SYSMAP
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_HEADERS
+    _LINUX_CHECK_KERNEL_COMPILER
     _LINUX_CHECK_KERNEL_MARCH
     _LINUX_CHECK_KERNEL_ARCHDIR
     _LINUX_CHECK_KERNEL_MACHDIR
@@ -645,6 +646,122 @@ dnl
     kincludedir="$linux_cv_k_includes"
     AC_SUBST([kincludedir])dnl
 ])# _LINUX_CHECK_KERNEL_HEADERS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_COMPILER
+# -------------------------------------------------------------------------
+# Ok, here we have headers and can finally check the compiler against the
+# compiler used to compile the kernel.  For a running kernel we can check
+# against /proc/version.  For non-running kernel we need to grab the version
+# out of the header files linux/compile.h
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_COMPILER], [dnl
+    AC_CACHE_CHECK([for kernel compiler], [linux_cv_k_compiler_match], [dnl
+	if test :"$linux_cv_k_running" = :yes
+	then
+	    linux_cv_k_compiler=`cat /proc/version | sed -e 's|^.*(gcc version|gcc version|;s|)[[^)]]*[$]||' 2>/dev/null`
+	else
+dnl
+dnl	    not all distros leave this hanging around
+dnl
+	    eval "linux_file=\"$kincludedir/linux/compile.h\""
+	    if test -e $linux_file
+	    then
+		linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's|^.*gcc version|gcc version|;s|"[[^"]]*[$]||' 2>/dev/null`
+	    else
+		eval "linux_dir=\"$kmoduledir/kernel/arch\""
+		if test -d $linux_dir
+		then
+		    linux_mods=`find $linux_dir -type f -name '*'$kext$kzip 2>/dev/null`
+		    for linux_mod in $linux_mods
+		    do
+			if test -f $linux_mod
+			then
+			    if echo "$linux_mod" | grep '\.gz[$]' >/dev/null 2>&1
+			    then
+				linux_com=`gunzip -dc $linux_mod | strings | grep '^GCC: (GNU) ' | head 1 2>/dev/null`
+			    else
+				linux_com=`cat $linux_mod | strings | grep '^GCC: (GNU) '  | head 1 2>/dev/null`
+			    fi
+			    if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
+			    then
+				linux_cv_k_compiler=`echo "$linux_com" | sed -e 's|^GCC: (GNU) |gcc version |'`
+				break
+			    fi
+			fi
+		    done
+		fi
+	    fi
+	fi
+	linux_cv_compiler=`$CC -v 2>&1 | grep 'gcc version'`
+	if test -z "$linux_cv_k_compiler" -o -z "$linux_cv_compiler"
+	then
+	    linux_cv_k_compiler_match=unknown
+	    linux_cv_k_compiler_vmatch=unknown
+	else
+	    if test "$linux_cv_k_compiler" = "$linux_cv_compiler"
+	    then
+		linux_cv_k_compiler_match=yes
+		linux_cv_k_compiler_vmatch=yes
+	    else
+		linux_cv_k_compiler_match=no
+		linux_c1=`echo "$linux_cv_k_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
+		linux_c2=`echo "$linux_cv_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
+		if test "$linux_c1" = "$linux_c2"
+		then
+		    linux_cv_k_compiler_vmatch=yes
+		else
+		    linux_cv_k_compiler_vmatch=no
+		fi
+	    fi
+	fi
+    ])
+    case :"$linux_cv_k_compiler_match" in
+	:yes)
+	    ;;
+	:no)
+	    case :"$linux_cv_k_compiler_vmatch" in
+		:no)
+	    AC_MSG_ERROR([
+*** 
+*** The kernel compiler was:
+***   \`$linux_cv_k_compiler',
+*** and the current compiler is:
+***   \`$linux_cv_compiler'.
+*** 
+*** These compilers do not match, not even in version.
+*** This will cause real problems later.  Cannot proceed.
+*** ])
+		    ;;
+		:yes)
+	    AC_MSG_WARN([
+*** 
+*** The kernel compiler was:
+***   \`$linux_cv_k_compiler',
+*** and the current compiler is:
+***   \`$linux_cv_compiler'.
+*** 
+*** These compilers do not match.
+*** This will cause problems later.
+*** ])
+		    ;;
+	    esac
+	    ;;
+	:unknown)
+	    AC_MSG_WARN([
+*** 
+*** The kernel compiler was:
+***   \`$linux_cv_k_compiler',
+*** and the current compiler is:
+***   \`$linux_cv_compiler'.
+*** 
+*** Configure cannot determine whether the compilers match or do not match.
+*** This will cause problems later.
+*** ])
+	    ;;
+    esac
+])# _LINUX_CHECK_KERNEL_COMPILER
 # =========================================================================
 
 # =========================================================================

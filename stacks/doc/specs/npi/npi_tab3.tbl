@@ -38,7 +38,7 @@ DISC:N/A:N/A:N/A:N/A:\-
 
 .TS
 center tab(:);
-lw(0.3in)lw(4.7in).
+lw(0.3i)lw(4.7i).
 AA:T{
 Indicates that Object X is defined to be able to advance ahead of preceding Object Y.
 T}
