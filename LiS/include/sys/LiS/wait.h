@@ -35,7 +35,7 @@
 #ifndef _WAIT_H
 #define _WAIT_H 1
 
-#ident "@(#) LiS wait.h 2.3 10/29/02 22:41:29 "
+#ident "@(#) LiS wait.h 2.4 09/03/04 15:41:28 "
 
 #ifdef __KERNEL__
 /*  -------------------------------------------------------------------  */
@@ -70,7 +70,7 @@
  * STATUS: complete(?), untested
  */
 extern int lis_sleep_on_wopen(struct stdata * sd) ;
-extern int lis_sleep_on_wioc(struct stdata * sd) ;
+extern int lis_sleep_on_wioc(struct stdata * sd, char *f,int l) ;
 extern int lis_sleep_on_wwrite(struct stdata * sd);
 extern int lis_sleep_on_wread(struct stdata * sd);
 extern int lis_sleep_on_wiocing(struct stdata * sd);
@@ -83,7 +83,7 @@ extern int lis_sleep_on_read_sem(struct stdata * sd);
 
 #define lis_wait_on_wread(sd)	lis_sleep_on_wread(sd)
 
-#define lis_lock_wioc(sd)	lis_sleep_on_wioc(sd)
+#define lis_lock_wioc(sd)	lis_sleep_on_wioc(sd,__FILE__,__LINE__)
 
 /*  -------------------------------------------------------------------  */
 
