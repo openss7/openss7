@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL  vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: autotest.m4,v 0.9.2.3 2005/01/15 19:34:37 brian Exp $
+dnl @(#) $Id: autotest.m4,v 0.9.2.4 2005/01/19 09:50:35 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/15 19:34:37 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/19 09:50:35 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -72,6 +72,7 @@ AC_DEFUN([_AUTOTEST], [dnl
 # _AUTOTEST_OPTIONS
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
+    AC_MSG_CHECKING([for autotest on installcheck])
     AC_ARG_ENABLE([autotest],
         AC_HELP_STRING([--enable-autotest],
             [enable pre- and post-install testing.  @<:@default=auto@:>@]),
@@ -82,7 +83,6 @@ AC_DEFUN([_AUTOTEST_OPTIONS], [dnl
             else
                 enable_autotest='no'
             fi])
-    AC_MSG_CHECKING([for autotest on check and installcheck])
     AC_MSG_RESULT([${enable_autotest}])
     AM_CONDITIONAL([PERFORM_TESTING], [test :"${enable_autotest:-yes}" = :yes])dnl
 ])# _AUTOTEST_OPTIONS

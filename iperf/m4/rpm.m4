@@ -399,6 +399,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 # _RPM_SPEC_SETUP_EPOCH
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
+    AC_MSG_CHECKING([for rpm epoch])
     AC_ARG_WITH([rpm-epoch],
         AS_HELP_STRING([--with-rpm-epoch=EPOCH],
             [specify the EPOCH for the RPM spec file.  @<:@default=auto@:>@]),
@@ -408,7 +409,6 @@ AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
          then with_rpm_epoch="`cat ${d}.rpmepoch`"
          else with_rpm_epoch=1
          fi])
-    AC_MSG_CHECKING([for rpm epoch])
     AC_MSG_RESULT([${with_rpm_epoch:-1}])
     PACKAGE_EPOCH="${with_rpm_epoch:-1}"
     AC_SUBST([PACKAGE_EPOCH])dnl
@@ -421,6 +421,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_EPOCH], [dnl
 # _RPM_SPEC_SETUP_RELEASE
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
+    AC_MSG_CHECKING([for rpm release])
     AC_ARG_WITH([rpm-release],
         AS_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.  @<:@default=auto@:>@]),
@@ -430,7 +431,6 @@ AC_DEFUN([_RPM_SPEC_SETUP_RELEASE], [dnl
          then with_rpm_release="`cat ${d}.rpmrelease`"
          else with_rpm_release=1
          fi])
-    AC_MSG_CHECKING([for rpm release])
     AC_MSG_RESULT([${with_rpm_release:-1}])
     PACKAGE_RELEASE="${with_rpm_release:-1}"
     AC_SUBST([PACKAGE_RELEASE])dnl
@@ -452,12 +452,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_DATE], [dnl
 # _RPM_SPEC_SETUP_TOOLS
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
+    AC_MSG_CHECKING([for rpm build/install of user packages])
     AC_ARG_ENABLE([tools],
         AS_HELP_STRING([--enable-tools],
             [build and install user packages.  @<:@default=yes@:>@]),
         [enable_tools="$enableval"],
         [enable_tools='yes'])
-    AC_MSG_CHECKING([for rpm build/install of user packages])
     AC_MSG_RESULT([${enable_tools:-yes}])
     AM_CONDITIONAL([RPM_BUILD_USER], [test :"${enable_tools:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_TOOLS
@@ -467,12 +467,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
 # _RPM_SPEC_SETUP_MODULES
 # -------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
+    AC_MSG_CHECKING([for rpm build/install of kernel packages])
     AC_ARG_ENABLE([modules],
         AS_HELP_STRING([--enable-modules],
             [build and install kernel packages.  @<:@default=yes@:>@]),
         [enable_modules="$enableval"],
         [enable_modules='yes'])
-    AC_MSG_CHECKING([for rpm build/install of kernel packages])
     AC_MSG_RESULT([${enable_modules:-yes}])
     AM_CONDITIONAL([RPM_BUILD_KERNEL], [test :"${enable_modules:-yes}" = :yes])dnl
 ])# _RPM_SPEC_SETUP_MODULES
@@ -584,6 +584,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_SIGN], [dnl
         AC_MSG_WARN([Could not find gpg program in PATH.])
     fi
 dnl ---------------------------------------------------------
+    AC_MSG_CHECKING([for gpg user])
     AC_ARG_VAR([GNUPGUSER], [GPG user name])
     AC_ARG_WITH([gpg-user],
         AS_HELP_STRING([--with-gpg-user=USERNAME],
@@ -601,10 +602,10 @@ dnl          if test :"${with_gpg_user:-no}" = :no ; then
 dnl              with_gpg_user="`whoami`"
 dnl          fi
          fi])
-    AC_MSG_CHECKING([for gpg user])
     GNUPGUSER="${with_gpg_user:-`whoami`}"
     AC_MSG_RESULT([${GNUPGUSER:-no}])
 dnl ---------------------------------------------------------
+    AC_MSG_CHECKING([for gpg home])
     AC_ARG_VAR([GNUPGHOME], [GPG home directory])
     AC_ARG_WITH([gpg-home],
         AS_HELP_STRING([--with-gpg-home=HOMEDIR],
@@ -622,7 +623,6 @@ dnl          if test :"${with_gpg_home:-no}" = :no ; then
 dnl              with_gpg_home='~/.gnupg'
 dnl          fi
          fi])
-    AC_MSG_CHECKING([for gpg home])
     GNUPGHOME="${with_gpg_home:-~/.gnupg}"
     AC_MSG_RESULT([${GNUPGHOME:-no}])
 ])# _RPM_SPEC_SETUP_SIGN

@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/01/15 19:34:37 $
+dnl @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/01/19 10:04:45 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,7 +48,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/15 19:34:37 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/19 10:04:45 $ by $Author: brian $
 dnl
 dnl =============================================================================
 
@@ -162,6 +162,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
 # _LINUX_CHECK_KERNEL_RELEASE
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
+    AC_MSG_CHECKING([for kernel release])
     AC_ARG_WITH([k-release],
         AS_HELP_STRING([--with-k-release=UTSRELEASE],
             [specify the UTS release of the linux kernel for which the build
@@ -170,7 +171,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
             @<:@default=`uname -r`@:>@]),
         [with_k_release="$withval"],
         [with_k_release=])
-    AC_MSG_CHECKING([for kernel release])
     linux_cv_k_running='no'
     if test :"${with_k_release:-no}" != :no ; then
         linux_cv_k_release="$with_k_release"
@@ -245,13 +245,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
 # _LINUX_CHECK_KERNEL_LINKAGE
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
+    AC_MSG_CHECKING([for kernel linkage])
     AC_ARG_ENABLE([modules],
         AS_HELP_STRING([--disable-modules],
             [disable kernel modules, prepare object for linking into the
             kernel.  @<:@default=no@:>@]),
         [enable_modules="$enableval"],
         [enable_modules='yes'])
-    AC_MSG_CHECKING([for kernel linkage])
     if test :"${enable_modules:-yes}" != :yes 
     then
         linux_cv_modules='no'
@@ -269,13 +269,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_LINKAGE], [dnl
 # _LINUX_CHECK_KERNEL_PREFIX
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_PREFIX], [dnl
+    AC_MSG_CHECKING([for kernel root prefix])
     AC_ARG_WITH([k-prefix],
         AS_HELP_STRING([--with-k-prefix=DIR],
             [specify the kernel directory prefix for install.
             @<:@default=/@:>@]),
         [with_k_prefix="$withval"],
         [with_k_prefix=])
-    AC_MSG_CHECKING([for kernel root prefix])
     if test :"${with_k_prefix:-no}" != :no
     then
         linux_cv_k_prefix="$with_k_prefix"
@@ -299,6 +299,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_PREFIX], [dnl
 # _LINUX_CHECK_KERNEL_ROOTDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ROOTDIR], [dnl
+    AC_MSG_CHECKING([for kernel root directory])
     AC_ARG_VAR([DESTDIR], [Cross build root directory])
     AC_ARG_WITH([k-rootdir],
         AS_HELP_STRING([--with-k-rootdir=DIR],
@@ -306,7 +307,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ROOTDIR], [dnl
             @<:@default=${DESTDIR:-/}@:>@]),
         [with_k_rootdir="$withval"],
         [with_k_rootdir="$DESTDIR"])
-    AC_MSG_CHECKING([for kernel root directory])
     linux_cv_k_rootdir="$with_k_rootdir"
     AC_MSG_RESULT([${linux_cv_k_rootdir:-no}])
 ])# _LINUX_CHECK_KERNEL_ROOTDIR
@@ -358,13 +358,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 # directory.  Therefore, this directory does not need to exist.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
+    AC_MSG_CHECKING([for kernel modules directory])
     AC_ARG_WITH([k-modules],
         AS_HELP_STRING([--with-k-modules=DIR],
             [specify the directory to which kernel modules will be installed.
             @<:@default=/lib/modules/K-RELEASE/misc@:>@]),
         [with_k_modules="$withval"],
         [with_k_modules=])
-    AC_MSG_CHECKING([for kernel modules directory])
     if test :"${with_k_modules:-no}" != :no
     then
         linux_cv_k_modules="$with_k_modules"
@@ -421,7 +421,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILD], [dnl
             kernel source resides.  @<:@default=K-MODULES-DIR/build@:>@]),
         [with_k_build="$withval"],
         [with_k_build=])
-dnl AC_MSG_CHECKING([for kernel build directory])
     if test :"${with_k_build:-no}" != :no
     then
         linux_cv_k_build="$with_k_build"
@@ -516,7 +515,6 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYSMAP], [dnl
             @<:@default=K-BUILD-DIR/System.map@:>@]),
         [with_k_sysmap="$withval"],
         [with_k_sysmap=])
-dnl AC_MSG_CHECKING([for kernel system map])
     if test :"${with_k_sysmap:-no}" != :no
     then
         linux_cv_k_sysmap="$with_k_sysmap"
@@ -575,13 +573,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KSYMS], [dnl
 # build or for the running kernel.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_HEADERS], [dnl
+    AC_MSG_CHECKING([for kernel headers])
     AC_ARG_WITH([k-includes],
         AS_HELP_STRING([--with-k-includes=DIR],
             [specify the include directory of the kernel for which the build
             is targetted.  @<:@default=K-BUILD-DIR/include@:>@]),
         [with_k_includes="$withval"],
         [with_k_includes=])
-    AC_MSG_CHECKING([for kernel headers])
     if test :"${with_k_includes:-no}" != :no
     then
         linux_cv_k_includes="$with_k_includes"
@@ -903,13 +901,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RHBOOT], [dnl
 # _LINUX_CHECK_KERNEL_ARCHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
+    AC_MSG_CHECKING([for kernel arch directory])
     AC_ARG_WITH([k-archdir],
         AS_HELP_STRING([--with-k-archdir=DIR],
             [specify the kernel source architecture specific directory.
             @<:@default=K-BUILD-DIR/arch@:>@]),
         [with_k_archdir="$withval"],
         [with_k_archdir=])
-    AC_MSG_CHECKING([for kernel arch directory])
     if test :"${with_k_archdir:-no}" != :no
     then
         linux_cv_k_archdir="$with_k_archdir"
@@ -928,13 +926,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_ARCHDIR], [dnl
 # _LINUX_CHECK_KERNEL_MACHDIR
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
+    AC_MSG_CHECKING([for kernel mach directory])
     AC_ARG_WITH([k-machdir],
         AS_HELP_STRING([--with-k-machdir=DIR],
             [specify the kernel source machine specific directory.
             @<:@default=K-ARCHDIR/ARCH@:>@]),
         [with_k_machdir="$withval"],
         [with_k_machdir=])
-    AC_MSG_CHECKING([for kernel mach directory])
     if test :"${with_k_machdir:-no}" != :no
     then
         linux_cv_k_machdir="$with_k_machdir"
@@ -1527,13 +1525,13 @@ dnl AM_CONDITIONAL([KERNEL_VERSIONS], [test x"$linux_cv_k_versions" = xyes])dnl
 # _LINUX_CHECK_KERNEL_MODVERSIONS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
+    AC_MSG_CHECKING([for kernel module symbol versioning])
     AC_ARG_ENABLE([k-modversions],
         AS_HELP_STRING([--enable-k-modversions],
             [specify whether symbol versioning is to be used on symbols
             exported from built modules.  @<:@default=yes@:>@]),
         [enable_k_modversions="$enableval"],
         [enable_k_modversions="$linux_cv_k_versions"])
-    AC_MSG_CHECKING([for kernel module symbol versioning])
     if test :"${enable_k_modversions:-no}" = :yes
     then
         linux_cv_k_modversions='yes'

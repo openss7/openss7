@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/15 22:39:18 $
+dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/19 10:04:24 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,10 +48,16 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/15 22:39:18 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/19 10:04:24 $ by $Author: brian $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl $Log: openss7.m4,v $
+dnl Revision 0.9.2.10  2005/01/19 10:04:24  brian
+dnl - Corrected errors.
+dnl
+dnl Revision 0.9.2.9  2005/01/19 09:50:35  brian
+dnl - Add check and installcheck options.
+dnl
 dnl Revision 0.9.2.8  2005/01/15 22:39:18  brian
 dnl - Export necessary variables to check scripts.
 dnl
@@ -83,6 +89,7 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_SUBST([PACKAGE_TITLE])dnl
     PACKAGE_SHORTTITLE='$1'
     AC_SUBST([PACKAGE_SHORTTITLE])dnl
+    _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_DEBUG
     AC_SUBST([cross_compiling])dnl
@@ -136,6 +143,26 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
         CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Werror"
     fi
 ])# _OPENSS7_DEBUG
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS], [dnl
+    AC_MSG_CHECKING([for preinstall tests on check])
+    AC_ARG_ENABLE([checks],
+        AC_HELP_STRING([--enable-checks],
+            [enable preinstall checks. @<:@default=auto@:>@]),
+        [enable_checks="$enableval"], [dnl
+             if test :"${USE_MAINTAINER_MODE:-no}" != :no
+             then
+                 enable_checks='yes'
+             else
+                 enable_checks='no'
+             fi])
+    AC_MSG_RESULT([$enable_checks])
+    AM_CONDITIONAL([PERFORM_CHECKS], [test :"${enable_checks:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS
 # =============================================================================
 
 # =============================================================================
