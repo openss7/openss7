@@ -51,7 +51,7 @@
  *
  */
 
-#ident "@(#) LiS head.c 2.129 10/9/03 20:07:46 "
+#ident "@(#) LiS head.c 2.130 10/10/03 19:57:37 "
 
 
 /*  -------------------------------------------------------------------  */
@@ -1868,7 +1868,6 @@ copyout_msg( struct file *f, mblk_t *m, strbuf_t *kctl, strbuf_t *kdta,
 void 
 lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 {
-    int		i ;
     lis_flags_t psw ;
     lis_flags_t	psw_rq, psw_wq ;
     int		rslt ;
@@ -1938,27 +1937,34 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
     lis_unlockq(rq) ;
     lis_unlockq(wq) ;
 
-    for (i = 1, q = rq; i <= 2; i++, q = wq)	/* do twice */
+    /*
+     * SVR4 STREAMS manual says to ignore close routine in the wq structure.
+     */
+    if (!LIS_CHECK_Q_MAGIC(rq) || !LIS_CHECK_Q_MAGIC(wq))
+	return ;				/* lose the memory */
+
+
+    if (LIS_DEBUG_CLOSE)
     {
-	if (!LIS_CHECK_Q_MAGIC(q)) return ;	/* lose the memory */
-	if (LIS_DEBUG_CLOSE) name = lis_queue_name(q) ;
+	name = lis_queue_name(q) ;
+	if (name == NULL)
+	    name = "Unknown-Q" ;
+    }
 
-	if (do_close && q->q_qinfo != NULL && q->q_qinfo->qi_qclose != NULL)
-	{
-	    if (LIS_DEBUG_CLOSE && name)
-		printk("lis_qdetach(q@0x%p,?%d,...) \"%s\""
-		       " >> calling close(...)\n",
-		       q, do_close, name);
+    if (do_close && rq->q_qinfo != NULL && rq->q_qinfo->qi_qclose != NULL)
+    {
+	if (LIS_DEBUG_CLOSE)
+	    printk("lis_qdetach(q@0x%p,?%d,...) \"%s\" >> calling close(...)\n",
+		   rq, do_close, name);
 
-	    CP(q,0) ;
-	    CLOCKADD() ;		/* user routine might sleep */
-	    /* call w/queue locked and marked as closing */
-	    lis_atomic_dec(&lis_in_syscall) ;	/* "done" with a system call */
-	    lis_runqueues() ;
-	    (*q->q_qinfo->qi_qclose)(q, (q->q_next ? 0 : flag), creds);
-	    lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
-	    CLOCKON() ;
-	}
+	CP(rq,0) ;
+	CLOCKADD() ;		/* user routine might sleep */
+	/* call w/queue locked and marked as closing */
+	lis_atomic_dec(&lis_in_syscall) ;	/* "done" with a system call */
+	lis_runqueues() ;
+	(*rq->q_qinfo->qi_qclose)(rq, (rq->q_next ? 0 : flag), creds);
+	lis_atomic_inc(&lis_in_syscall) ;	/* processing a system call */
+	CLOCKON() ;
     }
 
     /*
@@ -1967,7 +1973,7 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
      * not in any scheduling list.  If we remove them from the list then
      * they won't be called.
      */
-    deschedule(q) ;			/* uses lis_qhead_lock */
+    deschedule(rq) ;			/* uses lis_qhead_lock */
 
     /*
      * If either queue service procedure is running on another CPU at this very
@@ -2000,7 +2006,7 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 	   && rslt == 0
 	  )
     {
-	CP(hd,q) ;
+	CP(hd,rq) ;
 	F_SET(rq->q_flag, QWAITING) ;
 	F_SET(wq->q_flag, QWAITING) ;
 	LIS_QISRUNLOCK(rq, &psw_rq) ;
@@ -2031,7 +2037,7 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
     if (rslt < 0)
 	printk("lis_qdetach(q@0x%p,...) "
 	       "    >> lis_down(&wakeup_sem) >> <ERROR %d>\n",
-	       q, rslt) ;
+	       rq, rslt) ;
 
     if (hd != NULL)
     {
@@ -2065,13 +2071,13 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 	if (name && LIS_DEBUG_CLOSE)
 	    printk("lis_qdetach(q@0x%p,...) \"%s\""
 		   " >> linking around write queue\n",
-		   q, name);
+		   wq, name);
 	OTHER(next_q)->q_next = prev_q;
     }
     if (prev_q) {
 	if (name && LIS_DEBUG_CLOSE)
 	    printk("lis_qdetach(q@0x%p,...) \"%s\""
-		   " >> linking around read queue\n", q, name);
+		   " >> linking around read queue\n", rq, name);
 	WR(prev_q)->q_next = next_q;
     }
 
@@ -2084,7 +2090,7 @@ lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 
     if (name && LIS_DEBUG_CLOSE)
 	printk("lis_qdetach(q@0x%p,...) \"%s\" >> deallocating queues\n",
-	       q, name);
+	       rq, name);
 
     CP(rq,0) ;
     lis_freeq(rq);			/* frees both sides of the queue */
