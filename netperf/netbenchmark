@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: netbenchmark,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2004/08/10 05:30:29 $
+# @(#) $RCSfile: netbenchmark,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2004/08/11 07:07:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/10 05:30:29 $ by $Author: brian $
+# Last Modified $Date: 2004/08/11 07:07:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,7 +76,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netbenchmark,v $ $Name:  $($Revision: 1.1.2.1 $)'
+ident='$RCSfile: netbenchmark,v $ $Name:  $($Revision: 1.1.2.2 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -129,6 +129,93 @@ command=
 filename=
 debug=0
 verbose=1
+
+default_command=none
+default_port=12865
+default_testime=60
+default_hostname=localhost
+default_headers=0
+
+case "$program" in
+    *_range_script)
+	if test ":$program" = ":sctp_range_script" ; then
+	    # These are for SCTP_STREAM range tests
+	    default_stats='-i 10,2 -I 99,3'
+	    default_bufsizes='32768'
+	    default_sndsizes='1 4 16 64 256 1024 4096 162 8192 16384 65536'
+	    default_nettest=SCTP_STREAM
+	elif test ":$program" = ":tcp_range_script" ; then
+	    # These are for TCP_STREAM range tests
+	    default_stats='-i 10,2 -I 99,3'
+	    default_bufsizes='32768'
+	    default_sndsizes='1 4 16 64 256 1024 4096 162 8192 16384 65536'
+	    default_nettest=TCP_STREAM
+	fi
+	default_rrsizes=''
+	;;
+    *_stream_script)
+	if test ":$program" = ":sctp_stream_script" ; then
+	    # These are for SCTP_STREAM tests
+	    default_stats='-i 10,2 -I 99,5'
+	    default_bufsizes="57344 32768 8192"
+	    default_sndsizes="4096 8192 32768"
+	    default_nettest=SCTP_STREAM
+	elif test ":$program" = ":tcp_stream_script" ; then
+	    # These are for TCP_STREAM tests
+	    default_stats='-i 10,2 -I 99,5'
+	    default_bufsizes="57344 32768 8192"
+	    default_sndsizes="4096 8192 32768"
+	    default_nettest=TCP_STREAM
+	elif test ":$program" = ":udp_stream_script" ; then
+	    # These are for UDP_STREAM tests
+	    default_stats='-i 10,2 -I 99,10'
+	    default_bufsizes="32768"
+	    default_sndsizes="64 1024 1472"
+	    default_nettest=UDP_STREAM
+	fi
+	default_rrsizes=''
+	default_warmtime=
+	;;
+    *_rr_script)
+	if test ":$program" = ":sctp_rr_script" ; then
+	    # These are for SCTP_RR tests
+	    default_stats='-i 10,2 -I 99,5'
+	    default_rrsizes='1,1 64,64 100,200 128,8192'
+	    default_nettest=SCTP_RR
+	elif test ":$program" = ":tcp_rr_script" ; then
+	    # These are for TCP_RR tests
+	    default_stats='-i 10,2 -I 99,5'
+	    default_rrsizes='1,1 64,64 100,200 128,8192'
+	    default_nettest=TCP_RR
+	elif test ":$program" = ":udp_rr_script" ; then
+	    # These are for UDP_RR tests
+	    default_stats='-i 10,2 -I 99,10'
+	    default_rrsizes='1,1 64,64 100,200 1024,1024'
+	    default_nettest=UDP_RR
+	fi
+	default_bufsizes='0'
+	default_sndsizes=''
+	default_warmtime=
+	;;
+    snapshot_script)
+	if test ":$program" = ":snapshot_script" ; then
+	    # These are for snapshot tests
+	    default_stats='-i 10,3 -I 99,5'
+	    default_bufsizes=''
+	    default_sndsizes=''
+	    default_rrsizes=''
+	    default_nettest=''
+	    default_warmtime=20
+	fi
+	;;
+    arr_script)
+	if test ":$program" = ":arr_script" ; then
+	    # These are for arr tesets
+	fi
+	;;
+    *)
+	;;
+esac
 
 function version()
 {
@@ -193,18 +280,18 @@ $ident
 --------------------------------------------------------------------------------
 Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-
+ 
 All Rights Reserved.
 --------------------------------------------------------------------------------
 This program is free software; you can  redistribute  it and/or modify  it under
 the terms  of the GNU General Public License  as  published by the Free Software
 Foundation; either  version  2  of  the  License, or (at  your option) any later
 version.
-
+ 
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY
 WARRANTY; without event  the implied warranty of MECHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
+ 
 You should  have received a copy of the GNU  General  Public License  along with
 this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave.
 Cambridge, MA 02139, USA.
@@ -373,28 +460,78 @@ do
 	    verbose=0
 	    debug=0
 	    ;;
-	--filename | --filenam | --filena | --filen | --file | --fis | --fi | --f | -f)
-	    if test ":$command" = ":config" ; then option_with --filename --config ; fi
-	    if test ":$command" = ":" ; then command=filename ; fi
+	--test-time | --testtime | --testime | --test | --time | --t | -t)
 	    prevopt="$arg"
-	    prev=filename
+	    prev=testtime
 	    ;;
-	--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=* | -f*)
-	    filename="$optarg"
-	    if test ":$command" = ":config" ; then option_with --filename --config ; fi
-	    if test ":$command" = ":" ; then command=filename ; fi
+	--test-time=* | --testtime=* | --testime=* | --time=* | --t=* | -t*)
+	    testtime="$optarg"
 	    ;;
-	--config | --confi | --conf | --con | --co | --c | -c)
-	    if test ":$command" != ":" -a ":$command" != ":config" ; then option_after $arg --$command ; fi
-	    command=config
+	--host-names | --host-name | --hostnames | --hostname | --hosts | --host | --rem-hosts | --rem-host | --remote-hosts | --remote-host | --remhosts | --remhost)
+	    if test ":$program" != ":netbenchmark" -o ":$command" != "arr" ; then option_unrec $arg ; fi
+	    prevopt="$arg"
+	    prev=hostname
 	    ;;
-	--install | --instal | --insta | --inst | --ins | --in | --i | -i)
-	    if test ":$command" != ":" -a ":$command" != ":install" ; then option_after $arg --$command ; fi
-	    command=install
+	--host-names=* | --host-name=* | --hostnames=* | --hostname=* | --hosts=* | --host=* | --rem-hosts=* | --rem-host=* | --remote-hosts=* | --remote-host=* | --remhosts=* | --remhost=*)
+	    if test ":$program" != ":netbenchmark" -o ":$command" != "arr" ; then option_unrec $arg ; fi
+	    hostname="$hostname $optarg"
 	    ;;
-	--delete | --delet | --dele | --del | --de | --d | -d)
-	    if test ":$command" != ":" -a ":$command" != ":delete" ; then option_after $arg --$command ; fi
-	    command=delete
+	--buffer-sizes | --buffers | --bufsize | --bufsizes | --bufs | --b | -b)
+	    prevopt="$arg"
+	    prev=bufsizes
+	    ;;
+	--buffer-sizes=* | --buffers=* | --bufsize=* | --bufsize=* | --bufs=* | --b=* | -b*)
+	    bufsizes="$bufsizes $optarg"
+	    ;;
+	--send-sizes | --send-size | --sndsizes | --sndsizes | --send | --snd | --s | -s)
+	    prevopt="$arg"
+	    prev=sndsizes
+	    ;;
+	--send-sizes=* | --send-size=* | --sndsizes=* | --sndsizes=* | --send=* | --snd=* | --s=* | -s*)
+	    sndsizes="$sndsizes $optarg"
+	    ;;
+	--net-tests | --net-test | --nettests | --nettest | --net-tsts | --net-tst | --nettsts | --nettst | --net | --tests | --test)
+	    prevopt="$arg"
+	    prev=nettest
+	    ;;
+	--net-test=* | --nettest=* | --net-tst=* | --nettst=* | --net=*)
+	    nettest="$nettest $optarg"
+	    ;;
+	--SNAPSHOT | --snapshot | --snapsho | --snapsh | --snap)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --snapshot ; else command=snapshot ; fi
+	    ;;
+	--PACKET_BYTE | --packet_byte | --packet-byte | --packet-byt | --packet)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --packet_byte ; else command=packet_byte ; fi
+	    ;;
+	--SCTP_STREAM | --sctp_stream | --sctpstream | --sctp-stream | --sctp-strea | --sctp-stre | --sctp-str | --sctp-st)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --sctp_stream ; else command=sctp_stream ; fi
+	    ;;
+	--TCP_STREAM | --tcp_stream | --tcpstream | --tcp-stream | --tcp-strea | --tcp-stre | --tcp-str | --tcp-st)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --tcp_stream ; else command=tcp_stream ; fi
+	    ;;
+	--UDP_STREAM | --udp_stream | --udpstream | --udp-stream | --udp-strea | --udp-stre | --udp-str | --udp-st)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --udp_stream ; else command=udp_stream ; fi
+	    ;;
+	--SCTP_RR | --sctp_rr | --sctprr | --sctp-rr)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --sctp_rr ; else command=sctp_rr ; fi
+	    ;;
+	--TCP_RR | --tcp_rr | --tcprr | --tcp-rr)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --tcp_rr ; else command=tcp_rr ; fi
+	    ;;
+	--UDP_RR | --udp_rr | --udprr | --udp-rr)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --udp_rr ; else command=udp_rr ; fi
+	    ;;
+	--ARR | --arr)
+	    if test ":$program" != ":netbenchmark" ; then option_unrec $arg ; fi
+	    if test ":$command" != ":" ; then option_with "--$command" --arr ; else command=arr ; fi
 	    ;;
 	--)
 	    # end of options
@@ -424,19 +561,12 @@ else
     files=
 fi
 
-# assign all defaults
-if test ":$command" = ":" ; then
-    command=
-fi
-if test ":$filename" = ":" ; then
-    for file in `$ECHO -n "$default_filesrch" | $SED -e 's|:| |g'` ; do
-	if test -f $file ; then
-	    default_filename="$file"
-	    break
-	fi
-    done
-    filename="$default_filename"
-fi
+# assign defaults to all unassigned variables
+for def in command port testtime bufsizes sndsizes hostname headers ; do
+    if test :`eval "\$$def"` = : ; then
+	eval "$def=\$default_$def"
+    fi
+done
 
 function none_command()
 {
@@ -454,6 +584,149 @@ function none_command()
 	    copying
 	fi
     fi
+}
+
+function find_netperf()
+{
+    netperf=`which netperf`
+    pname=`$ECHO "$netperf" | $SED -e 's%^.*/%%'`
+    if test ":$pname" != ":netperf" -o !-x $netperf ; then
+	# netperf is not in our path, check elsewhere
+	netperf=`whereis netperf`
+	netperf=`$ECHO "$netperf" | $SED -e 's%^netperf:[[:space:]]*%%;s%[[:space:]].*%%'`
+	pname=`$ECHO "$netperf" | $SED -e 's%^.*/%%'`
+	if test ":$pname" != ":netperf" -o !-x $netperf ; then
+	    if test ${verbose:-0} -gt 0 ; then
+		$ECHO "$program: error -- cannot find netperf executable" >&2
+		( usage ) >&2
+	    fi
+	    exit 1
+	fi
+    fi
+}
+
+function stream_command()
+{
+    find_netperf
+    for bufsize in $bufsizes ; do
+	for sndsize in $sndsizes ; do
+	    $ECHO
+	    $ECHO "------------------------------------"
+	    $ECHO "Testing with the following command line:"
+	    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime ${hostname+-H }$hostname ${1+-t }$1 ${stats} -- -m $sndsize -s $bufsize -S $bufsize"
+	    $ECHO
+#	    $netperf ${port+-p }$port ${testtime+-l }$testtime ${hostname+-H }$hostname ${1+-t }$1 ${stats} -- -m $sndsize -s $bufsize -S $bufsize
+	    $ECHO
+	done
+    done
+    cat <<EOF
+If you wish to submit these results to the netperf database at
+http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+datapoint individually. Individual datapoints are separated by
+lines of dashes. 
+EOF
+}
+
+function rr_command()
+{
+    find_netperf
+}
+
+function range_command()
+{
+    stream_command $1
+}
+
+function snapshot_command()
+{
+    find_netperf
+    if test $verbose -gt 1 ; then
+	$ECHO "Performing warm-up test `date`"
+	$ECHO "$netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 4096"
+    fi
+#   $netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 4096 2>&1 >/dev/null
+    if test $verbose -gt 1 ; then
+	$ECHO "$netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m   96"
+    fi
+#   $netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m   96 2>&1 >/dev/null
+    if test $verbose -gt 1 ; then
+	$ECHO "$netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_RR     ${hostname+-H }$hostname -- -r 1,1                   "
+    fi
+#   $netperf ${port+-p }$port ${warmtime+-l }$warmtime -t TCP_RR     ${hostname+-H }$hostname -- -r 1,1                    2>&1 >/dev/null
+    if test $verbose -gt 1 ; then
+	$ECHO "Warm-up tests complete `date`"
+    fi
+    $ECHO "Starting 56x4  TCP_STREAM tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_STREAM ${hostname+-H }$hostname -- -s 57344 -S 57344 -m 4096"
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_STREAM ${hostname+-H }$hostname -- -s 57344 -S 57344 -m 4096 2>&1
+    $ECHO
+    $ECHO
+    $ECHO "Starting 32x4  TCP_STREAM tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 4096"
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 4096 2>&1
+    $ECHO
+    $ECHO
+    $ECHO "Starting 1,1   TCP_RR     tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_RR     ${hostname+-H }$hostname -- -r 1,1                   "
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t TCP_RR     ${hostname+-H }$hostname -- -r 1,1                   
+    $ECHO
+    $ECHO
+    $ECHO "Starting 1,1   UDP_RR     tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_RR     ${hostname+-H }$hostname -- -r 1,1                   "
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_RR     ${hostname+-H }$hostname -- -r 1,1                   
+    $ECHO
+    $ECHO
+    $ECHO "Starting 512,4 UDP_RR     tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_RR     ${hostname+-H }$hostname -- -r 516,4                 "
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_RR     ${hostname+-H }$hostname -- -r 516,4                 
+    $ECHO
+    $ECHO
+    $ECHO "Starting 32x4  UDP_STREAM tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 4096"
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_STREAM ${hostname+-H }$hostname -- -r s 32768 -S 32768 -m 4096
+    $ECHO
+    $ECHO
+    $ECHO "Starting 32x1  UDP_STREAM tests at `date`"
+    $ECHO
+    $ECHO "------------------------------------"
+    $ECHO "Testing with the following command line:"
+    $ECHO "$netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_STREAM ${hostname+-H }$hostname -- -s 32768 -S 32768 -m 1024"
+    $ECHO
+#   $netperf ${port+-p }$port ${testtime+-l }$testtime $stats -t UDP_STREAM ${hostname+-H }$hostname -- -r s 32768 -S 32768 -m 1024
+    $ECHO
+    $ECHO
+    $ECHO "Tests completed at `date`"
+    $ECHO
+    cat <<EOF
+If you wish to submit these results to the netperf database at
+http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+datapoint individually. Individual datapoints are separated by
+lines of dashes. 
+EOF
 }
 
 case "$program" in
