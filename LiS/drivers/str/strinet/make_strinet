@@ -6,7 +6,7 @@
 # clean		Do a make clean in strinet
 # realclean	Remove the subdirectory, leave the archive
 #
-#ident "@(#) LiS make_strinet 1.2 4/15/03"
+#ident "@(#) LiS make_strinet 1.3 4/23/03"
 
 if [ ! -f /usr/src/LiS/config.in ]; then
     echo "/usr/src/LiS/config.in missing.  Cannot make strinet"
@@ -15,18 +15,8 @@ fi
 
 . /usr/src/LiS/config.in
 
-if [ ! -f $KSRC/.config ]; then
-    echo "$KSRC/.config is not present.  Cannot make strinet"
-    exit 0
-fi
-
 archive=`ls *.tgz`
 dir=`echo $archive | sed -e 's/\.tgz//'`
-
-if [ ! -f /usr/lib/libLiS.so -o ! -f /usr/lib/libLiS.a ]; then
-    echo "Cannot do make in strinet until after make install in LiS"
-    exit 0
-fi
 
 if [ "$1..." = "realclean..." ]; then
     if [ -d $dir ]; then
@@ -35,8 +25,8 @@ if [ "$1..." = "realclean..." ]; then
     fi
 fi
 
-if [ "$1..." = "uninstall..." ]; then
-    echo '*** No uninstall target for strinet ***'
+if [ ! -f /usr/lib/libLiS.so -o ! -f /usr/lib/libLiS.a ]; then
+    echo "Cannot do make in strinet until after make install in LiS"
     exit 0
 fi
 
