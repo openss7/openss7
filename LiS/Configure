@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Configure_version="2.58 4/12/03"
+Configure_version="2.68 6/2/03"
 
 if [ "$1" = "invoked from main makefile" ]; then
     MAKE_INVOKED=1
@@ -1161,11 +1161,11 @@ if [ "$TARGET" = "l" ]; then
 	if grep -q 'sigmask_lock' $KSRC/include/linux/sched.h; then
 	    SIGMASKLOCK=y
 	fi
-    elif [ $KVER_MAJORMINOR = "2.4" -a $KVER_PATCH -ge 20 ]; then
+    elif [ "$KVER_MAJORMINOR" = "2.4" -a $KVER_PATCHNO -ge 20 ]; then
 	    SIGMASKLOCK=y
-    elif [ $KVER_MAJORMINOR = "2.5" ]; then
+    elif [ "$KVER_MAJORMINOR" = "2.5" ]; then
 	    SIGMASKLOCK=y
-    elif [ $KVER_MAJORMINOR = "2.6" ]; then
+    elif [ "$KVER_MAJORMINOR" = "2.6" ]; then
 	    SIGMASKLOCK=y
     fi
 fi
@@ -1267,6 +1267,15 @@ cfg_out()
     fi
 }
 
+cfg_out_str()
+{
+    if [ $# = 2 ]; then
+        echo "$1=\"$2\"" >>$CONFIG
+    else
+        echo "# $1 is not set" >>$CONFIG
+    fi
+}
+
 echo "" >$CONFIG
 echo "# This file is generated from the Configure script" >>$CONFIG
 echo "# Do not edit manually." >>$CONFIG
@@ -1284,6 +1293,7 @@ if [ "$TARGET" = "l" ]; then
     cfg_out KVER_MAJOR $KVER_MAJOR
     cfg_out KVER_MINOR $KVER_MINOR
     cfg_out KVER_PATCH $KVER_PATCH
+    cfg_out KVER_PATCHNO $KVER_PATCHNO
     cfg_out KVER_MAJORMINOR $KVER_MAJORMINOR
     cfg_out KSMP $KSMP
     cfg_out KMODULES $KMODULES
@@ -1302,7 +1312,7 @@ if [ "$TARGET" = "l" ]; then
     cfg_out GCC_VERS $GCC_VERS
     cfg_out CC_OPTIMIZE $CC_OPTIMIZE
     cfg_out MACHINE_INCL $MACHINE_INCL
-    #cfg_out GET_EMPTY_INODE $GET_EMPTY_INODE 
+    cfg_out_str GET_EMPTY_INODE $GET_EMPTY_INODE 
     #cfg_out REGISTER_SYSCALLS $REGISTER_SYSCALLS
     cfg_out INT_PSW $INT_PSW
 fi
