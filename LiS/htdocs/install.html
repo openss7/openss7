@@ -185,63 +185,41 @@ function MM_swapImage() { //v3.0
   </tr>
 
   <tr> 
-
     <td width="599" height="100%" align="left" valign="top"> 
       <p>Installation of LiS is performed using a configuration script and then 
-
         running &quot;make&quot;. If you run &quot;make&quot; with no configuration 
-
         file present, the makefile will run the configuration script automatically. 
-
       </p>
-
       <p>For the installation to proceed to its conclusion you must be logged 
-
         in as &quot;root&quot;. However, you can install LiS using a non-privileged 
-
         user id. In this case the compilation of LiS will proceed but the installation 
-
         of the resulting module will likely fail due to permission problems. </p>
-
       <p>The easiest way to install LiS is to proceed as follows. </p>
-
       <blockquote> 
-
         <p><font size="2" face="Courier New">cd /usr/src/LiS-2.16</font> <font size="2">(Or 
           wherever you installed the files)</font><br>
-
           <font size="2" face="Courier New">make</font><br>
-
           <font size="2" face="Courier New">make install</font></p>
-
       </blockquote>
-
       <p>The version number in the above example is used for illustrative purposes 
-
         only. Use the version number of the package that you downloaded. </p>
-
       <p>The makefile will automatically run the LiS <font face="Courier New, Courier, mono">Configure</font> 
         script. You will be asked a series of questions by the configuration script 
         and then the build will proceed. If your intent is to install and run 
         LiS on your currently running Linux kernel then you are safe in answering 
         all questions by hitting the Enter key, that is, using default answers.</p>
-
       <p>The configuration script will make a symbolic link from <font face="Courier New, Courier, mono">/usr/src/LiS</font> 
         to whatever directory the <font face="Courier New, Courier, mono">Configure</font> 
         script was run from. This makes it easy to refer to the directory containing 
         the latest installed version of LiS. This symbolic link will only be made 
         if the <font face="Courier New, Courier, mono">Configure</font> script 
         (or initial &quot;make&quot;) is run under &quot;root&quot;. </p>
-
       <p>Once the &quot;make&quot; is complete, enter <font
 
         size="2" face="Courier New">make install</font><font
 
         size="2"> </font>to install the LiS utility programs in their proper places 
-
         on your system. </p>
-
-      		   
       <p>If you want to uninstall LiS, enter <font size="2"
 
         face="Courier New">make very-clean</font>. When it completes you can then 
@@ -252,45 +230,32 @@ function MM_swapImage() { //v3.0
         click <a
 
         href="removal.html">here</a>. </p>
-
       <h2><font size="4">Configuration</font> </h2>
-
       <p>The configuration is extremely simple for the most common case of using 
         LiS. This case occurs when you intend to run LiS as a loadable module 
         installed in the directory <font face="Courier New, Courier, mono">/lib/modules/<i>kernel-version</i>/misc</font> 
         and your kernel source resides in the directory <font face="Courier New, Courier, mono">/usr/src/linux</font>. 
         For this case you can simply hit Enter/Return to select the default answer 
         for each question and proceed quickly to the compilation phase. </p>
-
       <p>If at any time you think that the configuration process has taken a wrong 
         turn, you can terminate it by typing <font face="Courier New, Courier, mono">Ctrl-C</font> 
         (or your equivalent &quot;intr&quot; character). You can then start over 
         from the beginning. </p>
-
       <h2><font size="4">Re-Configuration</font> </h2>
-
       <p>You can re-configure LiS by running the <font face="Courier New, Courier, mono">Configure</font> 
         script again at any time. The defaults for a re-configuration are the 
         settings arrived at by the most recent previous run of <font face="Courier New, Courier, mono">Configure</font>. 
       </p>
-
       <p>If you get your configuration hopelessly out of whack, just remove the 
         file <font face="Courier New, Courier, mono">config.in</font> and run 
         <font face="Courier New, Courier, mono">Configure</font> (or make). This 
         will start over just as for a fresh installation. </p>
-
       <p>When you change the configuration parameters it is a good idea to do 
-
         a &quot;make clean&quot; before doing a &quot;make&quot;. </p>
-
       <h2><font size="4">Making LiS</font> </h2>
-
       <p>You can make LiS by typing &quot;make; make install&quot; in the LiS 
-
         installation directory. </p>
-
       <p>The following make targets are defined. </p>
-
       <table border="1" cellpadding="7" cellspacing="1">
         <tr valign="top"> 
           <td width="30%" height="8">Default target</td>
@@ -336,86 +301,53 @@ function MM_swapImage() { //v3.0
             root login.</td>
         </tr>
       </table>
-
       <h2 align="center"><font size="4">Utility Programs Made</font> </h2>
-
       <p>In addition to the file <font face="Courier New, Courier, mono">streams.o</font>, 
         which contains LiS and any STREAMS drivers linked with it, the build procedure 
         also makes the following utility programs. These programs are copied to 
         the indicated directory if the &quot;make&quot; uses the default make 
         target and if you are logged in as &quot;root&quot;. These programs are 
         documented <a href="cmds.html">separately</a>. </p>
-
       <table border="1" cellpadding="7" cellspacing="1">
-
         <tr> 
-
           <td width="30%" height="8">/usr/sbin/streams</td>
-
           <td width="70%" height="8">Prints out statistics from running LiS. Sets 
-
             debug mask for LiS.</td>
-
         </tr>
-
         <tr> 
-
           <td width="30%" height="8">/usr/sbin/strconf</td>
-
           <td width="70%" height="8">Interprets STREAMS driver Config file and 
-
             generates corresponding config.h and makenodes.c files.</td>
-
         </tr>
-
         <tr> 
-
           <td width="30%" height="8">/usr/sbin/strmakenodes</td>
-
           <td width="70%" height="8">Program to make /dev entries for STREAMS 
-
             drivers. The result of compiling makenodes.c.</td>
-
         </tr>
-
         <tr> 
-
           <td width="30%" height="8">/usr/local/bin/strtst</td>
-
           <td width="70%" height="8">A comprehensive test program for STREAMS.</td>
-
         </tr>
-
         <tr> 
-
           <td width="30%" height="8">/usr/local/bin/timetst</td>
-
           <td width="70%" height="8">Times round-trip delay from user application 
-
             to STREAMS loopback driver.</td>
-
         </tr>
-
       </table>
-
       <p>Of these programs, only <font face="Courier New, Courier, mono">strmakenodes</font> 
         and <font face="Courier New, Courier, mono">strconf</font> are essential 
         to the operation of LiS. <font face="Courier New, Courier, mono">Strmakenodes</font> 
         must be run prior to attempting to use any STREAMS application programs 
         to make the proper entries in the <font face="Courier New, Courier, mono">/dev</font> 
         directory for STREAMS files. </p>
-
       <p>The <font face="Courier New, Courier, mono">strconf</font> program is 
         needed for the build of LiS itself. However, the LiS build executes the 
         program from the local LiS installation directory. Thus it is not necessary 
         to copy this program to <font face="Courier New, Courier, mono">/usr/sbin</font> 
         in order to make <font face="Courier New, Courier, mono">streams.o</font>. 
       </p>
-
       <hr>
-
       <h1><font size="5"><b>Configuration Procedure</b></font> </h1>
-
       <p>The following sections describe the steps of the <font face="Courier New, Courier, mono">Configure</font> 
         script. </p>
       <h2><font size="4">User or Kernel</font></h2>
@@ -424,9 +356,7 @@ function MM_swapImage() { //v3.0
         to build LiS to run in the Linux kernel. You can also build a user-space 
         version of LiS that can be used for &quot;laboratory&quot; testing. The 
         QNX alternative is not useful.</p>
-
       <h2><font size="4"><b>Kernel Source Location</b> </font></h2>
-
       <p><font face="Courier New, Courier, mono">Configure</font> asks you for 
         the location of your kernel source tree. The default is <font face="Courier New, Courier, mono">/usr/src/linux</font> 
         and likely suffices for the vast majority of cases. Once <font face="Courier New, Courier, mono">Configure</font> 
@@ -435,23 +365,18 @@ function MM_swapImage() { //v3.0
       <p>Kernel version 2.0.x is no longer supported and the LiS installation 
         will fail if <font face="Courier New, Courier, mono">Configure</font> 
         detects this kernel version.</p>
-
       <p>If your kernel source has not had &quot;menuconfig&quot; run on it yet, 
         <font face="Courier New, Courier, mono">Configure</font> will propose 
         doing so at this time automatically. </p>
-
       <p>Likewise, if you have not done a &quot;make dep&quot; on your kernel 
         source yet, <font face="Courier New, Courier, mono">Configure</font> will 
         propose doing so at this time automatically. </p>
-
       <h2><font size="4"><b>Kernel Version Verification</b> </font></h2>
-
       <p>The LiS <font face="Courier New, Courier, mono">Configure</font> script 
         discovers the version of your kernel by looking in several places in your 
         kernel source directory. If it cannot determine your kernel version the 
         LiS configuration will terminate. The <font face="Courier New, Courier, mono">Configure</font> 
         script cannot proceed without this information. </p>
-
       <p>The <font face="Courier New, Courier, mono">Configure</font> script then 
         asks for your verification of the kernel version for which LiS is to be 
         compiled. Note, that the kernel for which you are compiling LiS does not 
@@ -460,13 +385,11 @@ function MM_swapImage() { //v3.0
         to your intended kernel source version in the previous step this could 
         be a different kernel version than the one that is running on your machine. 
       </p>
-
       <p>You can also enter a kernel version other than the one found in version.h 
         at this time. However, entering such a version may cause the subsequent 
         &quot;make&quot; to make unverified assumptions about your kernel version. 
         So be careful about answering this question with anything other than an 
         Enter/Return. </p>
-
       <p>If the kernel version displayed does not match your idea of the version 
         of the kernel that resides at the indicated location on disk, it is probably 
         best to terminate the <font face="Courier New, Courier, mono">Configure</font> 
@@ -498,37 +421,79 @@ function MM_swapImage() { //v3.0
         in <font face="Courier New, Courier, mono">/etc/lilo.conf</font>. In this 
         case you may think that you have successfully compiled and booted a new 
         kernel when, in fact, you are running on your old kernel.</p>
-
       <h2><font size="4"><b>LiS Module Location</b></font> </h2>
-
       <p>You will be asked whether or not you wish the &quot;make&quot; to copy 
         the resulting <font face="Courier New, Courier, mono">streams.o</font> 
         file to the modules directory associated with your selected kernel version. 
         The alternative is to have &quot;make&quot; build <font face="Courier New, Courier, mono">streams.o</font> 
         in the LiS directory and simply leave it there for manual copying later. 
       </p>
-
       <p>If you are intending to run LiS on the machine that you are using for 
-
         the compilation you will probably want to answer this question with a 
-
         &quot;y&quot;. If you are intending to compile on this machine and copy 
-
         the result to another machine for testing, then &quot;n&quot; is the appropriate 
-
         answer here. </p>
-
       <h2><font size="4"><b>Debugging</b> </font></h2>
-
       <p>If you intend to link LiS directly into the kernel and use GDB for kernel 
         level debugging then you will likely want LiS to be compiled using the 
         <font face="Courier New, Courier, mono">-g</font> option. <font face="Courier New, Courier, mono">Configure</font> 
         asks you about this so that you can control whether to compile using <font face="Courier New, Courier, mono">-g</font> 
         or not. </p>
-
-      <p>&nbsp; </p>
-
-      </td>
+      <h2><font size="4"><a name="parampassing"></a>Parameter Passing Conventions</font></h2>
+      <p>The 2.6 Linux kernel can be compiled in a manner that causes parameters 
+        to subroutines to be passed in registers instead of the stack. Some distributions 
+        built around 2.6 are compiled this way by default.</p>
+      <p>If your driver calls kernel routines directly it must be compiled in 
+        the same manner as the kernel, either register parameters or stack parameters. 
+        A mismatch will almost certainly lead to system crashes.</p>
+      <p>When the kernel is compiled for register passing the C compiler command 
+        line option &quot;-mregparm=3&quot; is included by the kernel makefiles. 
+        Omitting this option yields the default stack passing code.</p>
+      <p>When the LiS <font face="Courier New, Courier, mono">Configure</font> 
+        script is run, usually implicitly via the initial &quot;make&quot;, it 
+        senses how the kernel was compiled and sets up the LiS compilation to 
+        include the <font face="Courier New, Courier, mono">regparm</font> option, 
+        or not.</p>
+      <p>In order to preserve STREAMS driver interface compatibility across different 
+        versions of the Linux kernel, LiS declares all functions that are called 
+        across the LiS/driver interface to use either stack parameter passing 
+        (the default) or register passing (see below) irrespective of the conventions 
+        used by the kernel.</p>
+      <p>Thus, to take the default case, the kernel can use register parameters 
+        but LiS will have all of its driver interface routines compiled so as 
+        to use stack parameters. This means that your STREAMS driver can be compiled 
+        for stack passing and can run with either convention in the kernel, without 
+        recompiling your driver.</p>
+      <p>You can use register passing conventions in your driver as well, if you 
+        like. As of this writing this feature is untesed. To do so, run the <font face="Courier New, Courier, mono">Configure</font> 
+        script and pass the following option:</p>
+      <p><font face="Courier New, Courier, mono">Configure --regparm=3</font></p>
+      <p>This sets the LiS/STREAMS-driver parameter passing interface independently 
+        of that used by the kernel. If you do this, be sure to compile your STREAMS 
+        driver using &quot;-mregparm=3&quot;.</p>
+      <p>The STREAMS driver interface routines that are called by LiS are:</p>
+      <ul>
+        <li>open, close, put and service routines called via the queue structures.</li>
+        <li>timeout and bufcall call-back routines.</li>
+        <li>driver initialization and termination routines.</li>
+        <li>driver interrupt service routines registered via LiS.</li>
+      </ul>
+      <p>The functions in LiS that are called by STREAMS drivers, and which also 
+        conform to the selected parameter passing convention, are all enumerated 
+        in the LiS file <font face="Courier New, Courier, mono">exports.c</font>.</p>
+      <h2><font size="4"><a name="choiceofcompiler"></a>Choice of Compiler</font></h2>
+      <p>The LiS <font face="Courier New, Courier, mono">Configure</font> script 
+        checks to see which compiler version was used to compile your kernel. 
+        It then attempts to locate a C compiler of the same version to use for 
+        compiling LiS. The script will print a message if it cannot find such 
+        a compiler.</p>
+      <p>A common situation, during the transition to the 2.6 kernel, is to run 
+        a 2.6 kernel on top of a 2.4 distribution such as Red Hat 9. The 2.6 kernel 
+        needs gcc version 3.3.3 to comple it and that compiler is not part of 
+        the RH9 distribution. Thus, in order to properly compile the 2.6 kernel 
+        you also need to download the correct C compiler, compile and install 
+        it on your system.</p>
+    </td>
 
   </tr>
 

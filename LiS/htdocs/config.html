@@ -288,9 +288,16 @@ function MM_swapImage() { //v3.0
           </td>
         </tr>
         <tr> 
+          <td>
+            <blockquote>
+              <p><a href="#tunable_params">Tunable Parameter Specification</a>&nbsp;</p>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
           <td> 
             <blockquote> 
-              <p><a href="#tunable_params">Tunable Parameter Specification</a>&nbsp;</p>
+              <p><a href="#QueueLockingSpecification">Queue Locking Specification</a></p>
             </blockquote>
           </td>
         </tr>
@@ -871,6 +878,64 @@ node /dev/loop_clone c * clone-drvr loop-around</tt></pre>
         <p><tt>#define MAX_PORTS 16</tt></p>
       </blockquote>
       <p><a href="#contents">Back to Contents</a></p>
+      <h3><a name="QueueLockingSpecification"></a><font size="+0">Queue Locking 
+        Specification</font></h3>
+      <p><font face="Courier New, Courier, mono">qlock</font> [<font face="Courier New, Courier, mono">driver</font> 
+        | <font face="Courier New, Courier, mono">module</font>] <i>driver-name</i> 
+        [<font face="Courier New, Courier, mono">0</font>|<font face="Courier New, Courier, mono">1</font>|<font face="Courier New, Courier, mono">2</font>|<font face="Courier New, Courier, mono">3</font>] 
+      </p>
+      <p>This statement specifies the locking style to be used for the named driver 
+        or module (pushable). There are four different styles of locking specified 
+        numerically from 0 through 3.</p>
+      <p>The locking that is performed involves the acquisition of a semaphore 
+        prior to calling the driver's put or service procedure. Thus, it controls 
+        entry into the driver.</p>
+      <p>The locking styles are as follows.</p>
+      <table width="97%" border="1">
+        <tr align="left"> 
+          <td width="41%">Value</td>
+          <td width="59%">Description</td>
+        </tr>
+        <tr valign="top" align="left"> 
+          <td width="41%" align="left">0 (LIS_QLOCK_NONE)</td>
+          <td width="59%">No locking is performed. If the driver needs protection 
+            from multiple simultaneous entries of its put and service procedures 
+            it must provide the protection itself.</td>
+        </tr>
+        <tr valign="top" align="left"> 
+          <td width="41%" align="left">1 (LIS_QLOCK_QUEUE)</td>
+          <td width="59%">The read and write halves of the queue are locked separately. 
+            Thus a read function (put/srv) can be entered simultaneously with 
+            a write function (put/srv). This is the default and is the way that 
+            LiS operated prior to the introduction of this option.</td>
+        </tr>
+        <tr valign="top" align="left"> 
+          <td width="41%" align="left">2 (LIS_QLOCK_QUEUE_PAIR)</td>
+          <td width="59%">The read and write halves of the queue are locked together. 
+            Thus only one of read/write put/srv procedures can be entered at a 
+            time. </td>
+        </tr>
+        <tr valign="top" align="left"> 
+          <td width="41%" align="left">3 (LIS_QLOCK_GLOBAL)</td>
+          <td width="59%">A global semaphore is used to lock both halves of the 
+            queue. The same global lock is used for all drivers and all streams. 
+            Thus any collection of drivers using this style of locking will be 
+            mutually single threaded.</td>
+        </tr>
+      </table>
+      <p>The utility of using locking style 0 has to do with achieving higher 
+        throughput in multiple CPU environments. If all put and service procedures 
+        can be entered simultaneously then the put procedure can be calling putq() 
+        on one CPU while the service procedure is calling getq() and processing 
+        messages on another, setting up a pipeline execution effect. Experiments 
+        have shown significant throughput improvements when this style of locking 
+        can be used.</p>
+      <p>In such a circumstance the driver service procedure needs to maintain 
+        some kind of a &quot;running&quot; flag, manipulated under spin lock control, 
+        to assure single threaded execution of the messages removed from the queue. 
+        Such flag manipulation is good practice even though LiS will not naturally 
+        tend to enter a driver's service procedure for the same queue on multiple 
+        CPUs simultaneously.</p>
       <h3> <font size=+0><b><a name="space.c"></a>The Space.c File</b>&nbsp;</font></h3>
       <p>The <i>Space.c</i> file plays a role in LiS configuration similar to 
         the file of the same name in Unix SVR4. It is a file associated with each 

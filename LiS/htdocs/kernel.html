@@ -187,6 +187,104 @@ function MM_swapImage() { //v3.0
 
   <tr> 
     <td width="600" height="100%" align="left" valign="top"> 
+      <h2><font color="#000000" size="+0">LiS-2.18 Kernel and Driver Compatibility</font></h2>
+      <p>LiS-2.18 contains a number of changes from LiS-2.16. LiS-2.17 was pretty 
+        much an experimental version. Documented here are the principle changes 
+        between 2.16 and 2.18.</p>
+      <p><font color="#FF0033">NOTE</font>: STREAMS drivers must be recompiled 
+        against LiS-2.18 header files in order to utilize LiS-2.18. Do NOT attempt 
+        to install LiS-2.18 &quot;underneath&quot; drivers compiled against LiS-2.16 
+        or LiS-2.17.</p>
+      <p>Here are the principal changes. I am not documenting all the little bug 
+        fixes, just the main changes that users may find visible.</p>
+      <ul>
+        <li>OpenSS7 inet driver in, then out, then in, then out of LiS distribution. 
+          Currently &quot;out&quot;. Download separately from openss7.org.</li>
+        <li>Discontinue support for 2.2 kernels.</li>
+        <li>More sophisticated choosing of version of C compiler to use when building 
+          LiS.</li>
+        <li>Several iterations of timeout/untimeout implementation ending with 
+          a blend of the original, plus hash table for lookup speed, plus use 
+          of kernel cache blocks to allocate structures.</li>
+        <li>Organize so as not to hold any spin locks when entering STREAMS driver 
+          functions. This means that queue locking now uses a semaphore instead 
+          of a spin lock. This means, in turn that you really cannot call putnext() 
+          from interrupt context.</li>
+        <li>Some contributions for LiS on S/390, PPC, IA64 and SPARC.</li>
+        <li>Eliminate poll() routine from libLiS. You should be using the standard 
+          libc version.</li>
+        <li>Some contributed fixes for fattach, pipes and fifos.</li>
+        <li>Reworking of open routine for races involving open vs open and open 
+          vs close.</li>
+        <li>Eliminate use of special LiS system calls to kernel. Getpmsg uses 
+          the read function and putpmsg uses the write function.</li>
+        <li>Some contributions to make rpm building easier.</li>
+        <li>A contribution for performance enhancement mainly involving use of 
+          kernel caches.</li>
+        <li>More performance enhancements involving minimizing of <a href="dki.html#lock-contention">lock 
+          contention</a>, and an LiS mechanism to track lock contention.</li>
+        <li>Tracking code for <a href="dki.html#lock-contention">queue contention</a> 
+          to assist users in optimizing.</li>
+        <li>Code to build a histogram of <a href="cmds.html#semaphorelatency">semaphore 
+          wakeup latency</a> and print out the table.</li>
+        <li><a href="#lis2.6kernel">Compatibility with 2.6 kernel</a>.</li>
+        <li>Revision of <a href="dki.html#majorminordev_t">internal LiS definition 
+          of dev_t</a> to incorporate 12 bits of major device number and 20 bits 
+          of minor device number.</li>
+        <li>A contribution for quieter makes with 2.6 style progress messages. 
+          Use &quot;make V=1&quot; for verbose make output.</li>
+        <li>A new file &lt;sys/LiS/module.h&gt; for loadable drivers to include 
+          as the first include file to get include file ordering involving &lt;linux/module.h&gt; 
+          correct portably for both 2.4 and 2.6 kernels.</li>
+        <li>Improved queue scheduling, which is responsible for more performance 
+          improvements, especially on multiple CPU systems.</li>
+        <li>A contribution to renumber message types for compatibility with other 
+          STREAMS implementations.</li>
+        <li>Queues are no longer run on user threads. They are only run from the 
+          LiS queue scheduler threads.</li>
+        <li>Add <a href="dki.html#lis_down_nosig">lis_down_nosig()</a> function 
+          to do a &quot;down&quot; with signals blocked. Useful in close routines 
+          that must sleep.</li>
+        <li>Streams command option &quot;-L&quot; to print out lock contention 
+          tracking.</li>
+        <li><a href="config.html#QueueLockingSpecification">Qlock command for 
+          strconf</a> to control queue locking style.</li>
+        <li><a href="demand.html#QueueLocking">Qlock registration routine</a> 
+          for loadable modules to specify their queue locking style.</li>
+        <li>Putnext() et al no longer free the message upon failure as per SVR4 
+          specs.</li>
+        <li>Improved errno reporting in strtst.</li>
+        <li>Implement a message deferred list in each queue and use it for puts 
+          to queues that are in a &quot;<a href="dki.html#qprocsoffon">qprocsoff</a>&quot; 
+          state.</li>
+        <li>Implement <a href="dki.html#freezeunfreeze">freezestr()</a> and defer 
+          message processing while stream is frozen.</li>
+        <li>Use of freezestr() in close and module pop code.</li>
+        <li>Greatly reduce the number of exported symbols.</li>
+      </ul>
+      <h4><a name="lis2.6kernel"></a>Compatibility of LiS-2.18 with 2.6 Kernel</h4>
+      <p>There are several issues that needed to be addressed for compatibility 
+        with the 2.6 Linux kernel. You are encouraged to follow the links in the 
+        paragraphs below to see more detailed information on each of these topics.</p>
+      <ol>
+        <li>The 2.6 kernel redefined the size of the dev_t structure. LiS has 
+          extended its internal dev_t structure to be compatible with the 2.6 
+          method for some time. For more information <a href="dki.html#majorminordev_t">click 
+          here</a>.</li>
+        <li>The 2.6 kernel changed the approach to building and installing loadable 
+          modules. This affects LiS as a whole and also affects how you install 
+          separate loadable STREAMS drivers. LiS provides a <a href="demand.html#kernelversiondiffs">mechanism</a> 
+          that allows STREAMS drivers and modules to be easily installed.</li>
+        <li>The 2.6 kernel offers an option to compile the kernel using machine 
+          registers to <a href="install.html#parampassing">pass parameters</a> 
+          to functions. LiS takes this into account.</li>
+        <li>The 2.6 kernel needs GCC version 3.3.3 to be <a href="install.html#choiceofcompiler">compiled 
+          properly</a>. LiS needs to be compiled using this same version of the 
+          compiler when running with the 2.6 kernel.</li>
+        <li>You may have to edit the file /etc/rc.d/rc.sysinit in order to get 
+          demand loadable modules to work correctly. This is especially true when 
+          hosting a 2.6 kernel on a 2.4 distribution.</li>
+      </ol>
       <h2><font color="#000000" size="+0">LiS-2.16 Kernel and Driver Compatibility</font></h2>
       <p>LiS-2.16 is a small change from LiS-2.15. The change is that it no longer 
         uses Linux system calls to implement getpmsg and putpmsg. Instead it overloads 

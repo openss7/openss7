@@ -899,10 +899,10 @@ function MM_swapImage() { //v3.0
         </tr>
         <tr NOSAVE> 
           <td></td>
-          <td valign=TOP NOSAVE>
+          <td valign=TOP NOSAVE> 
             <p><tt><font face="Courier New, Courier, mono">-D</font></tt><i>mask</i></p>
           </td>
-          <td>
+          <td> 
             <p>Set an additional debug mask for LiS.&nbsp; See below for details.</p>
           </td>
         </tr>
@@ -913,6 +913,16 @@ function MM_swapImage() { //v3.0
           </td>
           <td> 
             <p>Print STREAMS memory usage statistics.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-L</font></p>
+          </td>
+          <td> 
+            <p>Print out lock contention statistics. Use debug bit <font face="Courier New, Courier, mono">DEBUG_LOCK_CONTENTION</font> 
+              to enable the lock contention statistics gathering.</p>
           </td>
         </tr>
         <tr NOSAVE> 
@@ -954,11 +964,32 @@ function MM_swapImage() { //v3.0
         <tr NOSAVE> 
           <td></td>
           <td valign=TOP NOSAVE> 
+            <p><font face="Courier New, Courier, mono">-S</font></p>
+          </td>
+          <td> 
+            <p>Print out STREAMS queue-runner thread statistics.</p>
+          </td>
+        </tr>
+        <tr NOSAVE> 
+          <td></td>
+          <td valign=TOP NOSAVE> 
             <p><font face="Courier New, Courier, mono">-t</font></p>
           </td>
           <td> 
             <p>Print STREAMS timing statistics.&nbsp; Used inconjunction with 
-              the DEBUG_MEAS_TIME debug option.</p>
+              the <font face="Courier New, Courier, mono">DEBUG_MEAS_TIME</font> 
+              debug option.</p>
+          </td>
+        </tr>
+        <tr> 
+          <td></td>
+          <td>
+            <p><font face="Courier New, Courier, mono">-T</font></p>
+          </td>
+          <td> 
+            <p><a name="semaphorelatency"></a>Print the LiS semaphore latency 
+              histogram. Use debug bit <font face="Courier New, Courier, mono">DEBUG_SEMTIME</font> 
+              to enable the statistics collection.</p>
           </td>
         </tr>
         <tr> 
@@ -1146,8 +1177,34 @@ function MM_swapImage() { //v3.0
         </tr>
         <tr NOSAVE> 
           <td width="5%" NOSAVE></td>
-          <td valign=TOP width="10%" NOSAVE> <font face="Courier New, Courier, mono">DEBUG_SNDFD</font></td>
-          <td width="60%" NOSAVE> <font face="Courier New, Courier, mono">0x00000001</font></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_SNDFD</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000001</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono"> 
+            DEBUG_CP</font></td>
+          <td width="60%" NOSAVE> <font face="Courier New, Courier, mono">0x00000002</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_CACHE</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000004</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_LOCK_CONTENTION</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000008</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_REFCNTS</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000010</font></td>
+        </tr>
+        <tr NOSAVE> 
+          <td width="5%" NOSAVE></td>
+          <td valign=TOP width="10%" NOSAVE><font face="Courier New, Courier, mono">DEBUG_SEMTIME</font></td>
+          <td width="60%" NOSAVE><font face="Courier New, Courier, mono">0x00000020</font></td>
         </tr>
       </table>
       <p>Most of these options are intuitive as to their operation from the mnemonics. 

@@ -186,73 +186,58 @@ function MM_swapImage() { //v3.0
   </tr>
 
   <tr> 
-
     <td width="600" height="100%" align="left" valign="top"> 
-
       <p align="left">The LiS demand load system supports both the old kerneld 
-
         and the new kmod mechanisms for demand loading kernel modules. </p>
-
       <p>The convention for LiS kernel loadable object files is: </p>
-
       <ul>
-
         <li>Their name start with <tt>&quot;<font face="Courier New, Courier, mono">streams-</font>&quot;</tt>.</li>
-
         <li>They are placed in <tt><font face="Courier New, Courier, mono">/lib/modules/</font></tt><b><tt>&lt;kver&gt;</tt></b><tt><font face="Courier New, Courier, mono">/misc/</font></tt>, 
           where <b><tt>&lt;kver&gt;</tt></b> is the kernel version.</li>
-
       </ul>
-
-      <h2><font size="4">Unconfigured drivers and modules</font></h2>
-
+      <h2><font size="4"><a name="kernelversiondiffs"></a>Kernel Version Diffrences</font></h2>
+      <p>For 2.4 kernels you can install your loadable module simply by copying 
+        the &quot;.o&quot; file for our module to the directory <tt><font face="Courier New, Courier, mono">/lib/modules/</font></tt><b><tt>&lt;kver&gt;</tt></b><tt><font face="Courier New, Courier, mono">/misc/</font></tt>.</p>
+      <p>For 2.6 the procedure involves an additional step. Loadable modules in 
+        2.6 are &quot;.ko&quot; files instead of &quot;.o&quot; files. The mechanism 
+        to turn a driver.o into a driver.ko is non-trivial. To do this, copy your 
+        driver.o file to <font face="Courier New, Courier, mono">/usr/src/LiS/modules</font>. 
+        Then do a &quot;make install&quot; in the LiS directory. LiS will turn 
+        all &quot;.o&quot; files in its <font face="Courier New, Courier, mono">modules</font> 
+        subdirectory into &quot;.ko&quot; files and copy the resultant files to 
+        the proper subdirectory of <font face="Courier New, Courier, mono">/lib/modues</font>.</p>
+      <h2><font size="4">Unconfig</font><font size="4">ured drivers and modules</font></h2>
       <p>An unconfigured driver or module is a driver or module that LiS does 
-
         not have any special information about. Even in this case, you can take 
-
         advantage of demand loading. </p>
-
       <h4>Modules</h4>
-
       <p>Module demand loading is simple. When a user does an <font face="Courier New, Courier, mono">I_PUSH 
         </font>requesting that module <tt><font face="Courier New, Courier, mono">mymod</font></tt> 
         be pushed onto a stream, LiS will check if <tt><font face="Courier New, Courier, mono">mymod</font></tt> 
         is already registered. If not, LiS asks the kernel to load <tt>streams-<font face="Courier New, Courier, mono">mymod</font></tt>. 
       </p>
-
       <p>A security related implication of this is that any user capable of doing 
         an <font face="Courier New, Courier, mono">I_PUSH</font> can provoke loading 
         of any module that has the <tt>streams-</tt> prefix. </p>
-
       <p>Demand loading also works when autopushing modules, but you should be 
         aware that when a module is unloaded, it is silently removed from all 
         autopush lists. </p>
-
       <p>You can have more than one module in a single kernel loadable module, 
-
         but for demand loading to work with modules whose object names are not 
-
         derived from the module name, you have to set up <tt>alias</tt> lines 
-
         in <tt>/etc/conf.modules</tt>. <br>
         For example, if you have modules <tt><font face="Courier New, Courier, mono">mymod</font></tt> 
         and <tt><font face="Courier New, Courier, mono">mymod2</font></tt> in 
         the kernel loadable object file <tt>streams-mymod.o</tt>, you have to 
         add the line </p>
-
       <blockquote> 
-
         <p><tt>alias streams-<font face="Courier New, Courier, mono">mymod2</font> 
           streams-<font face="Courier New, Courier, mono">mymod</font></tt></p>
-
       </blockquote>
-
       <p>in your <tt>/etc/conf.modules</tt> for demand loading to work properly 
         when pushing <tt><font face="Courier New, Courier, mono">mymod2</font></tt>. 
       </p>
-
       <h4>Drivers</h4>
-
       <p>Demand loading drivers is slightly more complicated. When a device special 
         node with major device number <b><tt>major</tt></b> is opened, the kernel 
         checks if device <b><tt>major</tt></b> is registered in the kernel. If 
@@ -269,41 +254,25 @@ function MM_swapImage() { //v3.0
         If your driver has major device number <tt>123</tt> and is in the kernel 
         loadable object file <tt>streams-mydriver.o</tt>, you should have the 
         line </p>
-
       <blockquote> 
-
         <p><tt>alias char-major-123 streams-mydriver</tt></p>
-
       </blockquote>
-
       <p>in your <tt>/etc/conf.modules</tt>. </p>
       <p><br>
         If you also have the line </p>
-
       <blockquote> 
-
         <p><tt>alias char-major-240 streams</tt></p>
-
       </blockquote>
-
       <p>in your <tt>/etc/conf.modules</tt> and the clone driver major is 240, 
         both LiS and your driver will be demand loaded when you do a clone open 
         of your driver. </p>
-
       <p>You can configure autopush on an unconfigured driver, but you should 
-
         be aware that when the driver is unloaded, all its autopush lists are 
-
         silently removed. </p>
-
       <p>You can have more than one driver in a single kernel loadable module, 
-
         but you should set up a separate <tt>alias</tt> line for each driver. 
-
       </p>
-
       <h2><font size="4">Configured drivers and modules</font></h2>
-
       <p>When drivers and modules are added to the <a href="config.html#config_files">LiS 
         configuration files</a>, you can specify the object name that will be 
         used for requesting a demand load of the driver or module. If demand loading 
@@ -315,29 +284,21 @@ function MM_swapImage() { //v3.0
         Also, the autopush configuration is not changed when a configured driver 
         or module is unloaded. </p>
       <h2><font size="4">Writing kernel loadable modules for LiS</font></h2>
-
       <p>It takes little extra effort to make LiS modules and drivers loadable. 
-
         In most cases, all you have to do is to add the special Linux module functions 
-
         <tt>init_module()</tt> and <tt>cleanup_module()</tt> and some lines to 
-
         maintain the usage count of the loadable module. </p>
-
       <p>The <tt>init_module()</tt> function id used for initializing the loadable 
         module, and can be as simple as: <tt>&nbsp;&nbsp;&nbsp; </tt></p>
-
       <pre><tt>  int init_module(void)</tt>   
  <tt> {</tt> <tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt>   
     <tt>return lis_register_strmod(&amp;mymod_info, &quot;mymod&quot;);</tt>  
   <tt>}</tt>        </pre>
       <p>for a module, or <tt>&nbsp;&nbsp;&nbsp; </tt></p>
-
       <pre><tt>  int init_module(void)
   {</tt>
     <tt>return lis_register_strdev(123,&amp;mydrv_info,</tt> <tt>10, &quot;mydrv&quot;);
   }</tt></pre>
-
       <p>for a driver.</p>
       <p>In this example, the driver's major device number is assumed to be 123. 
         You must know this major device number ahead of time so that you can make 
@@ -345,7 +306,6 @@ function MM_swapImage() { //v3.0
         that will cause your driver to autoload. The major number in your <font face="Courier New, Courier, mono">/dev</font> 
         entry and in your call to <font face="Courier New, Courier, mono"><tt>lis_register_strdev</tt></font> 
         must match.</p>
-
       <p>The <tt>cleanup_module()</tt> function is called by the kernel just before 
         a loadable module is unloaded. This function has to unregister the drivers 
         and/or modules registered in the <tt>init_module()</tt> function.</p>
@@ -367,13 +327,39 @@ function MM_swapImage() { //v3.0
         <tt>MOD_INC_USE_COUNT</tt> and <tt>MOD_DEC_USE_COUNT</tt>. <tt>MOD_INC_USE_COUNT</tt> 
         is used in the open routines, but be careful not to call it if your open 
         fails. <tt>MOD_DEC_USE_COUNT</tt> is used in the close routines. </p>
-
       <p>For a complete example, see the <a href="drvrs.html#link-drvr"><font face="Courier New, Courier, mono">ldl</font></a> 
         driver in <tt>drivers/str/linux/ldl.c</tt>. </p>
-
-      <p>&nbsp; </p>
-
-      </td>
+      <h3><a name="QueueLocking"></a>Queue Locking in Loadable Modules</h3>
+      <p>Declared modules can use the <a href="config.html#QueueLockingSpecification">strconf 
+        qlock option</a> to control the locking style for entering the driver's 
+        put and service procedures. A loadable module can call one of the following 
+        routines, most likely at module load time.</p>
+      <pre>int lis_register_driver_qlock_option(major_t major, int qlock_option);
+int lis_register_module_qlock_option(modID_t id, int qlock_option);        </pre>
+      <p>The parameters <i>major</i> and <i>id</i> are obtained from the driver 
+        and module registration functions described above.</p>
+      <p>The <i>qlock_option</i> parameter is one of the following:</p>
+      <table width="45%">
+        <tr> 
+          <td width="11%">&nbsp;</td>
+          <td width="89%">LIS_QLOCK_NONE</td>
+        </tr>
+        <tr> 
+          <td width="11%">&nbsp;</td>
+          <td width="89%">LIS_QLOCK_QUEUE</td>
+        </tr>
+        <tr> 
+          <td width="11%">&nbsp;</td>
+          <td width="89%">LIS_QLOCK_QUEUE_PAIR</td>
+        </tr>
+        <tr> 
+          <td width="11%">&nbsp;</td>
+          <td width="89%">LIS_QLOCK_GLOBAL</td>
+        </tr>
+      </table>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+    </td>
 
   </tr>
 

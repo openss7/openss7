@@ -422,6 +422,30 @@ function MM_swapImage() { //v3.0
         </tr>
         <tr> 
           <td> 
+            <blockquote><a href="#freezingstreams">Freezing Streams- freezestr 
+              and qprocsoff</a></blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote>
+              <blockquote>
+                <p><a href="#freezeunfreeze">Freezestr and Unfreezestr</a></p>
+              </blockquote>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
+            <blockquote>
+              <blockquote>
+                <p><a href="#qprocsoffon">Qprocsoff and Qprocson</a></p>
+              </blockquote>
+            </blockquote>
+          </td>
+        </tr>
+        <tr> 
+          <td> 
             <blockquote> 
               <p><a href="#utility-prototypes">Utility Prototypes</a></p>
             </blockquote>
@@ -660,6 +684,8 @@ function MM_swapImage() { //v3.0
       <p><br>
         These are the routines that are used to allocate a main-board old-style 
         DMA channel for use by your driver.&nbsp; These are not much used anymore. 
+        See <a href="#LiSPCIDMARoutines">below</a> for a more elaborate abstraction 
+        of DMA routines.
       <blockquote> 
         <pre><tt>int&nbsp; request_dma(unsigned int dma_nr, const char *device_id)          ;</tt> 
 <tt>void free_dma(unsigned int dma_nr) ;</tt></pre>
@@ -826,40 +852,35 @@ int   lis_thread_stop(pid_t pid) ;
       <hr size=1 width="60%">
       <h3><font face="Times New Roman,Times"><a name="majorminordev_t"></a>Major/Minor 
         Device Numbering (dev_t)</font></h3>
+      <p>Please note that LiS-2.17 changed the internal representation of the 
+        major and minor device numbers within the 32 bit dev_t &quot;structure.&quot; 
+        The following documents the new format and usage conventions.</p>
       <p>In STREAMS the <font face="Courier New, Courier, mono">dev_t</font> structure 
         is used to combine a major device number and a minor device number into 
         a single integer length quantity. The Linux kernel restricts these numbers 
         to the range 0 to 255 (8-bit values).</p>
       <p>LiS provides a typedef for <font face="Courier New, Courier, mono">dev_t</font> 
-        that results in an unsigned integer quantity.</p>
-      <p>The Linux kernel, on the other hand, defines a structure of type <font face="Courier New, Courier, mono">kdev_t</font> 
-        that it uses internally for this same purpose. The <font face="Courier New, Courier, mono">kdev_t</font> 
-        type is an actual structure, and not an integer. Furthermore, the kernel 
-        defines a routine named makedevice that generates one of these structures, 
-        given the major and minor numbers as integers. It appears that eventually 
-        the kernel will use this structure exclusively and will expand the numbering 
-        space for both major and minor device numbers.</p>
-      <p>This has caused LiS to use non-standard nomenclature for handling its 
-        <font face="Courier New, Courier, mono">dev_t</font> structures, since 
-        the routine makedevice is not compatible with the LiS <font face="Courier New, Courier, mono">dev_t</font> 
-        structure.</p>
-      <p>LiS now provides the following operations on <font face="Courier New, Courier, mono">dev_t</font> 
-        structures. Most of these functions are provided by macros, so the following 
-        are &quot;virtual&quot; prototypes. </p>
+        that results in an unsigned integer quantity. Internally within LiS the 
+        high order 12 bits are used for major device number and the low order 
+        20 bits are used for minor device number.</p>
+      <p>STREAMS drivers include the file &lt;sys/stream.h&gt; which causes the 
+        view of dev_t to change from the kernel's 8/8 view to the LiS 12/20 view. 
+        In order to ensure proper operation STREAMS drivers should use the following 
+        functions to manipulate dev_t variables. These functions are SVR4 compatible.</p>
       <table width="98%" border="1">
         <tr> 
           <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
-            MAJOR(dev_t dev)</font></td>
+            getmanor(dev_t dev)</font></td>
           <td width="56%">Extracts the major device number</td>
         </tr>
         <tr> 
           <td width="44%"><font face="Courier New, Courier, mono" size="-1">int 
-            MINOR(dev_t dev)</font></td>
+            getminor(dev_t dev)</font></td>
           <td width="56%">Extracts the minor device number</td>
         </tr>
         <tr> 
           <td width="44%"><font face="Courier New, Courier, mono" size="-1">dev_t 
-            MKDEV(int maj, int min)</font></td>
+            makedevice(int maj, int min)</font></td>
           <td width="56%">Combines a major and minor device number into a dev_t</td>
         </tr>
         <tr> 
@@ -875,6 +896,11 @@ int   lis_thread_stop(pid_t pid) ;
       </table>
       <p>The sample drivers that come with LiS now use these constructs to manipulate 
         device structures and can serve as examples for their usage.</p>
+      <p>Within a STREAMS driver it is occasionally necessary to make a dev_t 
+        value in the external 8/8 format. This is required, for example, when 
+        a driver is using the lis_mknod() function to create a device node at 
+        driver initialization time. LiS provides the function UMKDEV(major, minor) 
+        for this purpose.</p>
       <p><a href="#Contents">Back to Contents</a> </p>
       <p> 
       <hr width="100%">
@@ -1222,8 +1248,12 @@ ptr = lis_free_mem(ptr) ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
                         size_t          size,
                         lis_dma_addr_t *dma_handle,
                         int             direction);
-
 void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle);
+
+int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+                                     int nents, int direction);
+void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
+                                        int nents, int direction);
 </pre>
       <p>The direction indicators are as follows:</p>
       <blockquote>
@@ -1239,12 +1269,17 @@ LIS_SYNC_FOR_BOTH
       <pre>void lis_pci_dma_sync_single(lis_dma_addr_t     *dma_handle,
                              size_t              size,
                              int                 direction);
+void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
+                           struct scatterlist *sg, int nelems, int direction);
 </pre>
       <p>The following routines can be used at driver initialization time to discover 
         and control the addressing boundary restrictions of a device.</p>
       <pre>int lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
 int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 </pre>
+      <p>Please consult the file &lt;sys/osif.h&gt; for additional routines that 
+        may be present for DMA support.<br>
+      </p>
       <p><a href="#Contents">Back to Contents</a> </p>
       <p> 
       <hr width="100%">
@@ -1313,7 +1348,9 @@ int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
         in the STREAMS queues, one in the read queue and one in the write queue.&nbsp; 
         In this case, the STREAMS driver code would need to use spin locks to 
         protect data structures shared between the read and write "put" or "service" 
-        procedures. 
+        procedures. See the <a href="config.html#QueueLockingSpecification">qlock 
+        option</a> for strconf for more information about LiS' implicit use of 
+        locks to protect put and service procedure entries.
       <p><a href="#Contents">Back to Contents</a> 
       <p> 
       <hr size=1 width="60%">
@@ -1669,6 +1706,7 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
       <p>The following two routines are used to acquire and release a semaphore. 
       <blockquote> 
         <pre><tt>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lis_down(lis_semaphore_t *sem) ;</tt>
+void     lis_down_nosig(lis_semaphore_t *lsem) ;
 <tt>void&nbsp;&nbsp;&nbsp;&nbsp; lis_up(lis_semaphore_t *sem) ;</tt></pre>
       </blockquote>
       <p>The routine <font face="Courier New, Courier, mono">lis_down</font> returns 
@@ -1677,6 +1715,16 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
       <p>One reason for a negative return could be that the calling task was signalled 
         while waiting for the semaphore to become available.&nbsp; If this has 
         occurred the return code will be set to -EINTR. 
+      <p><a name="lis_down_nosig"></a>The function <font face="Courier New, Courier, mono">lis_down_nosig</font> 
+        waits for the semaphore with signals blocked. It is useful in driver close 
+        routines that must use a semaphore to control access to structures that 
+        need to be deallocated. It is common for the driver close routine to be 
+        called from a process that has been signalled -- for example a process 
+        that was killed with a &quot;Ctrl-C&quot; from the keyboard. In this case, 
+        <font face="Courier New, Courier, mono">lis_down</font> will return immediately 
+        with -EINTR, an undesireable situation. Using <font face="Courier New, Courier, mono">lis_down_nosig</font> 
+        in this situation blocks signals so that the close routine can wait on 
+        the semaphore even if the process has been signalled.
       <p>Semaphores cannot be used in nested fashion.&nbsp; Care must be exercised 
         that a single thread only performs one "down" operation on a given semaphore. 
       <p>When multiple threads use multiple semaphores to protect multiple resources, 
@@ -1899,6 +1947,20 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
         resulting output can be found in <font face="Courier New, Courier, mono">/var/log/messages</font> 
         (typically). However, in practice the system is usually hung when you 
         need this information so you end up printing it from within the debugger.</p>
+      <h4><a name="lock-contention"></a>Lock, Semaphore and Queue Contention</h4>
+      <p>The streams command can be used to enable the tracking of contention 
+        for locks, semaphores and STREAMS queues. Use the command &quot;streams 
+        -D0x08&quot; to enable the contention tracking. The command &quot;streams 
+        -L&quot; then causes the contention tables to be printed out.</p>
+      <p>Locks and semaphores are in contention when a thread goes to spin on 
+        a lock or perform a &quot;down&quot; function on a semaphore, and the 
+        thread has to wait because the lock or semaphore is owned by another thread. 
+        LiS counts such occurrances on a per lock basis and reports the results 
+        via the &quot;streams -L&quot; command.</p>
+      <p>Queues are in contention when the semaphore that controls access to the 
+        queue is in contention. However, there are options that affect which semaphore 
+        is used to control access to a queue and these options will also have 
+        an effect on the reporting of queue contention.</p>
       <p><a href="#Contents">Back to Contents</a> </p>
       <hr size=1 width="60%">
       <h3>Debugging Semaphores<a name="Debugging_Semaphores"></a></h3>
@@ -2044,6 +2106,62 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
         messages. </p>
       <p><a href="#Contents">Back to Contents</a><br>
       </p>
+      <h3>Freezing Streams<a name="freezingstreams"></a></h3>
+      <p>There are two sets of routines that can be used to &quot;freeze&quot; 
+        a stream. They are used in slightly different ways and have slightly different 
+        semantics. One set uses the routines freezestr() and unfreezestr(); the 
+        other set uses the routines qprocsoff() and qprocson().</p>
+      <h4>Freezestr and Unfreezestr<a name="freezeunfreeze"></a></h4>
+      <pre>void freezestr(queue_t *q) ; 
+void unfreezestr(queue_t *q) ; </pre>
+      <p>These routines operate on the entire stream of which the queue is a member. 
+        The stream is found by traversing the chain of queues in both directions 
+        until encountering a queue that is not linked to another queue. As a simple 
+        example it includes all queues from the stream head down through any pushed 
+        modules to the driver queue in which one of those queues is the one passed 
+        as the parameter to either of these routines.</p>
+      <p>The process of freezing the stream is to place it into a state such that 
+        messages will not flow up and down the stream. That is, &quot;put&quot; 
+        and &quot;service&quot; procedures will not be called. If putnext() is 
+        called on a queue within a frozen stream the passed message is placed 
+        into a special &quot;deferred message list&quot;. Messages are removed 
+        from this list and passed to the put procedure when the stream is later 
+        unfrozen.</p>
+      <p>Drivers that have frozen a stream should refrain from performing queuing 
+        operations on queues within the stream, such as getq and putq. LiS does 
+        not enforce this so one must exercise some care when using these routines.</p>
+      <p>SVR4 STREAMS specification says that the driver's close routine will 
+        not be called if the stream is frozen. LiS does not implement this rule 
+        and will close a frozen stream.</p>
+      <p>LiS uses these routines internally at stream close time to stop message 
+        flow when the stream is being dismantled. It also uses them during I_PUSH 
+        and I_POP processing to inhibit message flow while replumbing the stream.</p>
+      <p>Drivers should use these routines with some caution. Because the stream 
+        is frozen the driver cannot receive any messages from above or below, 
+        including M_IOCTL. This may make it tricky deciding when to unfreeze the 
+        stream. </p>
+      <h4>Qprocsoff and Qprocson<a name="qprocsoffon"></a></h4>
+      <pre>void qprocson(queue_t *rdq) ; 
+void qprocsoff(queue_t *rdq) ;   <tt>     </tt> </pre>
+      <p>These routines are conventionally used in a driver open (qprocson) and 
+        close (qprocsoff) routine. In some STREAMS implementations qprocson must 
+        be called in order to enable messages to flow into the queue once open 
+        processing has completed. This is not necessary in LiS.</p>
+      <p>In LiS it does no harm to call qprocson in the driver open routine and 
+        qprocsoff in the driver close routine, though it is not necessary to do 
+        so.</p>
+      <p>The effect of qprocsoff is similar to that of freezestr except that it 
+        applies just the the single queue rather than to the entire stream. One 
+        significant difference is that if a pushable module is in a qprocsoff 
+        condition and a message flows into the module, STREAMS will route the 
+        message to the next module or driver in the chain of queues, looking for 
+        one that is enabled. If no such module or driver exists the message will 
+        be placed into the &quot;deferred message list&quot; of the queue at the 
+        far end of the chain of queues. The messages will be presented to the 
+        driver put routine when qprocson is called.</p>
+      <p>It is best to use these routines only at open and close time since that 
+        seems to have been the intent of the STREAMS designers.</p>
+      <p><a href="#Contents">Back to Contents</a> </p>
       <h3>Utility Prototypes<a name="utility-prototypes"></a></h3>
       <p><a href="#A-D">A-D</a> <a href="#E-K">E-K</a> <a href="#L-P">L-P</a> 
         <a href="#Q-S">Q-S</a> <a href="#T-Z">T-Z</a></p>
@@ -2078,7 +2196,9 @@ lis_rw_lock_t *lis_rw_lock_free(lis_rw_lock_t *lock, const char *name) ; </pre>
       <pre><tt>void    <a href="#flush_band"><font face="Courier New, Courier, mono">flushband</font></a>(queue_t *q, unsigned char band, int flag);
 void    <a href="#flush_band"><font face="Courier New, Courier, mono">flushq</font></a>(queue_t *q, int flag);
 void    freeb(mblk_t *bp);
-void    freemsg(mblk_t *mp);</tt></pre>
+void    freemsg(mblk_t *mp);
+void    <a href="#freezeunfreeze">freezestr</a>(queue_t *q) ;
+void    <a href="#freezeunfreeze">unfreezestr</a>(queue_t *q) ;</tt></pre>
       <hr size=1 width="60%">
       <pre>
 <tt>int&nbsp;&nbsp;&nbsp;&nbsp; getmajor(dev_t dev) ;</tt> 
@@ -2126,8 +2246,8 @@ void    kmem_free(void *ptr,int siz);</tt></pre>
 <tt>void qenable(queue_t *q);</tt> 
 <tt>void qreply(queue_t *q, mblk_t *mp);</tt> 
 <tt>int&nbsp; qsize(queue_t *q);</tt> 
-<tt>void qprocsoff(queue_t *rdq) ;</tt> 
-<tt>void qprocson(queue_t *rdq) ;</tt> 
+<tt>void <a href="#qprocsoffon">qprocsoff</a>(queue_t *rdq) ;</tt> 
+<tt>void <a href="#qprocsoffon">qprocson</a>(queue_t *rdq) ;</tt> 
 </pre>
       <hr size=1 width="60%">
       <pre>
