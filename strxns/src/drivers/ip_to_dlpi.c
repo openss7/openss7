@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/10 20:55:24 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $";
 
 #include "compat.h"
 
@@ -73,7 +73,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/01/10 20:55:24 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/01/22 14:31:29 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -864,7 +864,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 			break;
 
 		default:
-			printk("ip2xinet_lrput: bad prim=0x%x", dp->dl_primitive);
+			printk("ip2xinet_lrput: bad prim=0x%lx", dp->dl_primitive);
 			freemsg(mp);
 			break;
 		}

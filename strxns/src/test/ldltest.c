@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 14:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,10 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/16 00:47:50 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: ldltest.c,v $
+ Revision 0.9.2.4  2005/01/22 14:31:29  brian
+ - Fixed compiler warnings.
+
  Revision 0.9.2.3  2004/08/16 00:47:50  brian
  - Updated GNU long options and copying info.
 
@@ -66,10 +69,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 14:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/16 00:47:50 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 14:31:29 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -134,7 +137,11 @@ static char const ident[] =
 #include <getopt.h>
 #endif
 
+#ifdef LFS
+#include <stropts.h>
+#else
 #include <sys/stropts.h>
+#endif
 #include <sys/dlpi.h>
 #include <sys/ldl.h>
 
@@ -2585,7 +2592,6 @@ Options:\n\
 int main(int argc, char *argv[])
 {
       char           *endp;
-      long            l;
 
       int             fd;
       int             i;

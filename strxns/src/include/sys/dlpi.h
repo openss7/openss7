@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.1 2004/07/04 01:47:56 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.2 2005/01/22 14:31:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/04 01:47:56 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/07/04 01:47:56 $"
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 14:31:29 $"
 
+#ifdef __LP64__
 typedef int32_t dl_long;
 typedef u_int32_t dl_ulong;
 typedef u_int16_t dl_ushort;
+#else
+typedef long dl_long;
+typedef ulong dl_ulong;
+typedef ushort dl_ushort;
+#endif
 
 /*
    DLPI revision definition history 

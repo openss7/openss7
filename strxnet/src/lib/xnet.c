@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/22 14:32:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/10/07 07:28:57 $ by $Author: brian $
+ Last Modified $Date: 2005/01/22 14:32:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/22 14:32:06 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/10/07 07:28:57 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/22 14:32:06 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -87,10 +87,14 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $
 
 #define NEED_T_USCALAR_T 1
 
+#include <stdlib.h>
+
 #include "gettext.h"
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/stropts.h>
 #include <sys/poll.h>
+#include <fcntl.h>
 
 #if 0
 #pragma weak getpmsg
@@ -110,10 +114,15 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.6 $
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <stropts.h>
 #include <pthread.h>
 #include <linux/limits.h>
 #include <values.h>
+
+#ifndef __P
+#define __P(__prototype) __prototype
+#endif
 
 #include <xti.h>
 #include <tihdr.h>
@@ -294,6 +303,7 @@ pthread_setcanceltype(int type, int *oldtype)
 		return __pthread_setcanceltype(type, oldtype);
 	if (oldtype)
 		*oldtype = type;
+	return (0);
 }
 
 int
@@ -344,7 +354,7 @@ pthread_rwlock_destroy(pthread_rwlock_t * rwlock)
 	return (0);
 }
 
-int t_errno;
+int __xnet_t_errno;
 
 extern int *__h_errno_location(void);
 #pragma weak __h_errno_location
@@ -355,7 +365,7 @@ __t_errno_location(void)
 {
 	if (__h_errno_location != 0)
 		return __h_errno_location();
-	return &t_errno;
+	return &__xnet_t_errno;
 }
 
 int *
@@ -946,9 +956,6 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 	while (ret != -1 && (ret & (MORECTL | MOREDATA)))
 		ret = __xnet_t_getmsg(fd, &user->ctrl, &user->data, &flag);
 	goto tsync;
-      getmsg_error:
-	t_errno = TSYSERR;
-	goto error;
       tlook:
 	t_errno = TLOOK;
 	goto error;
@@ -1036,9 +1043,6 @@ __xnet_t_getevent(int fd)
 	while (ret != -1 && (ret & (MORECTL | MOREDATA)))
 		ret = __xnet_t_getmsg(fd, &user->ctrl, &user->data, &flag);
 	goto tsync;
-      getmsg_error:
-	t_errno = TSYSERR;
-	goto error;
       tsync:
 	__xnet_u_reset_event(user);	/* discard current event */
 	user->flags |= TUF_SYNC_REQUIRED;
@@ -1084,11 +1088,13 @@ __xnet_list_unlock(void *ignore)
 	return __xnet_lock_unlock(&__xnet_fd_lock);
 }
 
+#if 0
 static int
 __xnet_user_rdlock(struct _t_user *user)
 {
 	return __xnet_lock_rdlock(&user->lock);
 }
+#endif
 static int
 __xnet_user_wrlock(struct _t_user *user)
 {
@@ -1894,9 +1900,6 @@ __xnet_t_alloc(int fd, int type, int fields)
       badalloc:
 	t_errno = TSYSERR;
 	goto error;
-      tbadf:
-	t_errno = TBADF;
-	goto error;
       error:
 	return ((char *) NULL);
 }
@@ -2199,6 +2202,7 @@ int
 __xnet_t_error(const char *errmsg)
 {
 	fprintf(stderr, "%s: %s\n", errmsg, __xnet_t_strerror(t_errno));
+	return (0);
 }
 
 int
@@ -2823,9 +2827,6 @@ __xnet_t_look(int fd)
 	return (user->event);
       tsync:
 	user->flags |= TUF_SYNC_REQUIRED;
-      tproto:
-	t_errno = TPROTO;
-	goto error;
       error:
 	return (-1);
 }
@@ -2998,12 +2999,6 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 	goto error;
       enomem:
 	errno = ENOMEM;
-	goto error;
-      tbadf:
-	t_errno = TBADF;
-	goto error;
-      put_tproto:
-	t_errno = TPROTO;
 	goto error;
       error:
 	return (-1);
@@ -3560,12 +3555,6 @@ __xnet_t_rcvrel(int fd)
       tlook:
 	t_errno = TLOOK;
 	goto error;
-      tsync:
-	user->flags |= TUF_SYNC_REQUIRED;
-	goto tproto;
-      tproto:
-	t_errno = TPROTO;
-	goto error;
       tnorel:
 	t_errno = TNOREL;
 	goto error;
@@ -3790,9 +3779,6 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
       tbufovflw:
 	__xnet_u_reset_event(user);	/* consume event */
 	t_errno = TBUFOVFLW;
-	goto error;
-      tnotsupport:
-	t_errno = TNOTSUPPORT;
 	goto error;
       error:
 	if (!copied)
@@ -4455,9 +4441,6 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
       tbaddata:
 	t_errno = TBADDATA;
 	goto error;
-      t_outstate:
-	t_errno = TOUTSTATE;
-	goto error;
       tlook:
 	t_errno = TLOOK;
 	goto error;
@@ -4501,9 +4484,6 @@ int
 __xnet_t_snddis(int fd, const struct t_call *call)
 {
 	struct _t_user *user;
-	int ret;
-	struct strbuf ctrl, data, *data_ptr;
-	struct T_discon_req prim;
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
 				      TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
@@ -4822,9 +4802,6 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
       tbaddata:
 	t_errno = TBADDATA;
 	goto error;
-      t_outstate:
-	t_errno = TOUTSTATE;
-	goto error;
       error:
 	if (!written)
 		return (-1);
@@ -5022,9 +4999,6 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 			goto error;
 		return (0);
 	}
-      toutstate:
-	t_errno = TOUTSTATE;
-	goto error;
 #ifdef DEBUG
       einval:
 	errno = EINVAL;
@@ -5041,9 +5015,6 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	goto error;
       tbadaddr:
 	t_errno = TBADADDR;
-	goto error;
-      tnotsuport:
-	t_errno = TNOTSUPPORT;
 	goto error;
       tlook:
 	t_errno = TLOOK;
@@ -5919,10 +5890,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.6 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.7 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.6 $)
- * @date \$Date: 2004/10/07 07:28:57 $
+ * @version \$Name:  $(\$Revision: 0.9.2.7 $)
+ * @date \$Date: 2005/01/22 14:32:06 $
  *
  * @}
  */
