@@ -1,0 +1,26 @@
+Name                	 Email				Working on
+------------------------------------------------------------------------------ 
+David Grothe		 "dave@gcom.com"		(Finished Head)
+							(Current Maintainer)
+Ole Husgaard		 "sparre@login.dknet.dk"	(LDL, loadable modules)
+							(XTI lib)
+Ed Pendzik		 "edp@eznet.net"		(Alpha version)
+Francisco J. Ballesteros "nemo@gsyc.escet.urjc.es"	(Stream-Head original)
+
+Graham Wheeler		 "gram@aztec.co.za"	        (Drivers)
+Denis Froschauer         "100741.1151@compuserve.com"   (Head/Kernel interface)
+
+Lars Dahl-Hansen         "ldh@imada.ou.dk"		(strlog driver )
+Rodney Thayer            "rodney@sabletech.com"		(strlog driver)
+Roland Dunkerley	 "rolandd@swn.com		(Stream-Head)
+Dennis Henriksen         "duke@diku.dk"			
+Tim G. Boerresen         "tgrube@diku.dk"		
+ISOLA Jean-Marc		 "root@devnet.fr"		(beta-tester)
+Christian Herkt		 "macbett@cs.tu-berlin.de"	(beta-tester)    
+Shyan Katru          	 "shyam@jove.acs.unt.edu" 	(driver)
+Gautham Ghantasala   	 "unknown@jove.acs.unt.edu" 	(driver)
+
+John A. Boyd Jr.	 "jaboydjr@netwalk.com"		(FIFOs and pipes)
+							(fattach/fdetach)
+							(FD passing)
+							(STREAMS VFS)
