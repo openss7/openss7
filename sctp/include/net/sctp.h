@@ -240,9 +240,15 @@ extern atomic_t sctp_socket_count;
 /*
  *  Private struct macros
  */
+#ifdef HAVE_STRUCT_SOCK_TP_PINFO_AF_SCTP
 #define __sp_offset ((unsigned int)&(((struct sock *)(0))->tp_pinfo.af_sctp))
-#define SCTP_PROT(__sk) ((struct sctp_opt *)&(__sk)->tp_pinfo.af_sctp)
+#define SCTP_PROT(__sk) (&(__sk)->tp_pinfo.af_sctp)
 #define SCTP_SOCK(__sp) ((struct sock *)(((uint8_t *)(__sp)) - __sp_offset))
+#else
+#define __sp_offset ((unsigned int)&(((struct sock *)(0))->tp_pinfo.af_tcp))
+#define SCTP_PROT(__sk) ((struct sctp_opt *)&(__sk)->tp_pinfo.af_tcp)
+#define SCTP_SOCK(__sp) ((struct sock *)(((uint8_t *)(__sp)) - __sp_offset))
+#endif
 
 /*
  *  Capabilities
