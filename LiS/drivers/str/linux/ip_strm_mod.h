@@ -29,17 +29,9 @@
  * that 2.3.x means the newer style.  So if you have problems with
  * this with a 2.2.35-ish kernel, download a newer kernel source.
  */
-#ifdef KERNEL_2_3		/* 2.3, 2.4 kernel or beyond */
 #define	ism_dev		net_device
 #ifndef enet_statistics
 #define enet_statistics	net_device_stats
-#endif
-#else				/* 2.0 - 2.2 kernel */
-#define	ism_dev		device
-#define netif_start_queue(dev)	(dev)->tbusy = 0
-#define netif_stop_queue(dev)	(dev)->tbusy = 1
-#define netif_wake_queue(dev)	mark_bh(NET_BH)
-#define netif_queue_stopped(dev) ((dev)->tbusy)
 #endif
 
 typedef struct ip_to_streams
