@@ -1,0 +1,189 @@
+# *****************************************************************************
+# 
+# $Id: INSTALL,v 0.9.2.2 2001/05/15 18:44:30 brian Exp $
+# 
+# *****************************************************************************
+# 
+# Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+# 
+# All Rights Reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+# 
+# *****************************************************************************
+# 
+# Last Modified $Date: 2001/05/15 18:44:30 $ by $Author: brian $
+# 
+# *****************************************************************************
+
+
+This is the linux-sctp-0.1 prerelease.  It can be obtained from the
+download area of http://www.openss7.org as linux-sctp-0.1.tgz.
+
+The tarball linux-sctp-0.1.tgz unpacks with the command
+
+        tar -xzvf linux-sctp-0.1.tgz
+
+into the following files and directories under linux-sctp-0.1:
+
+        COPYING     - Original Linux GNU license
+        INSTALL     - Installation instructions
+        LICENSE     - GNU Public License
+        README      - This file
+        doc         - Miscellaneous documentation
+        man         - sctp.7 man page for Linux
+        patch-0.1   - patch file to patch RH 2.2.12-20 kernel sources
+        test        - Test files and Ethereal dumps from ETSI bakeoff.
+
+The patch for a RedHat 2.2.12-20 kernel are in the file patch-0.1  This patch
+may work with other kernel sources with some manual manipulation.  Start with
+a full copy of kernel sources in a separate directory in case anything goes
+wrong during the patching process.
+
+If you kernel sources are in the directory /usr/src/linux-2.2.12-20 and the
+patch file is in ~/linux-sctp-0.1 use the patch command as follows to patch
+the linux kernel sources in /usr/src/linux-2.2.12-20:
+
+        cd /usr/src/linux-2.2.12-20-sctp
+        gzip -dc ~/linux-sctp-0.1/patch-0.1.gz | patch -p1
+
+Note: make sure that you do not have the environment variable POSIXLY_CORRECT
+set or this patch will not apply correctly.  For csh do:
+
+        unsetenv POSIXLY_CORRECT
+
+before applying the patch.
+
+Once the kernel sources are compiled, you can configure, compile and install
+the kernel as usual.  The kernel will install as vmlinuz-2.2.12-20-sctp and
+the sctp modules will be installed in /lib/modules/2.2.12-20-sctp so that
+they can be kept separate from other kernel versions.
+
+The kernel sources compile nicely on RH6.2 and RH7.0 systems.
+
+When configuring the kernel, there are a number of new configuration options
+for SCTP under networking options.  They are:
+
++ Stream Control Transmission Protocol (SCTP)
++ CONFIG_SCTP
++    This provides support for the Stream Control Transmission Protocol
++    (SCTP) RFC 2960 operation.  Those requiring use of the SCTP should
++    say Y here.  See "linux/Documentation/sctp.txt" for more information.
++    This is EXPERIMENTAL code which could break TCP/IP in mysterious ways.
++    If unsure, just say N.
++ 
++ Slow Verification
++ CONFIG_SCTP_SLOW_VERIFICATION
++    When a message comes from an SCTP endpoint with the correct verification
++    tag, it is not necessary to check whether it is from a correct source
++    address to identify the SCTP association to which it belongs.  When you
++    say N here, source addresses are not checked and it is up to firewall
++    implementations to thwart attackers of the verification tag.  When you
++    say Y here, you get RFC 2960 compliant operation, but at a great cost to
++    SCTP performance.
++ 
++ Throttle Heartbeats
++ CONFIG_SCTP_THROTTLE_HEARTBEATS
++    Special feature of Linux SCTP which is not mentioned in RFC 2960.
++    When you say Y here, SCTP will throttle the rate at which it responds
++    to heartbeats to the system control heartbeat_interval.  This makes
++    SCTP more resilient to implementations which flood heartbeat messages.
++    For RFC 2960 compliant operation, say N here.
++ 
++ Discard Out of the Blue Packets
++ CONFIG_SCTP_DISCARD_OOTB
++    RFC 2960 permits the implementation to discard all OOTB packets
++    (packets for which no SCTP association exists).  It say that the
++    implementation SHOULD send ABORT to some packets.  Sending ABORT
++    chunks to unverified source addresses with the T bit set opens
++    SCTP to blind masquerade attacks.  Not sending them may lead to
++    delays at the peer endpoint aborting associations where our ABORT
++    has been lost and the socket is already closed (SCTP does not 
++    have the TIME_WAIT state of TCP).  If you say Y here, SCTP will
++    discard all OOTB packets (higher security).  If you say N here,
++    SCTP will reply with ABORT to OOTB packets defined in Section 8.4
++    of RFC 2960 with the exception of SHUTDOWN ACK.  If in doubt,
++    say Y here.  If a peer implementation experiences difficulties
++    aborting associations, try saying N.
++ 
++ TCP Compatible Streams
++ CONFIG_SCTP_TCP_COMPATIBLE
++    draft-stewart-sigtran-sctpsocket-01.txt describes some ways to
++    permit SCTP sockets to be TCP compatible.  If you say Y here, then
++    you can open a SOCK_STREAM socket with IPPROTO_SCTP which will
++    be compatible at the socket level with TCP.  If you say N here,
++    this feature is disabled.  If in doubt, say Y.
++ 
++ Extended IP Support for SCTP
++ CONFIG_SCTP_EXTENDED_IP_SUPPORT
++    This provides extended IP support for SCTP for things like IP
++    Transparent Proxy and IP Masquerading.  This is experimental
++    stuff.  If in doubt, say N.
++ 
++ SCTP HMAC Algorithm SHA-1
++ CONFIG_SCTP_HMAC_SHA1
++    This provides the ability to use the FIPS 180-1 (SHA-1) message
++    authentication code in SCTP cookies.  If you say Y here, when the
++    appropriate sysctl is set, SCTP will use the SHA-1 HMAC when signing
++    cookies in the INIT ACK chunk.  If you say N here, the SHA-1 HMAC
++    will be unavailable for use with SCTP.  If in doubt, say N.
++ 
++ SCTP HMAC Algorithm MD5
++ CONFIG_SCTP_HMAC_MD5
++    This provides the ability to use the MD5 (RFC 1321) message
++    authentication code in SCTP cookies.  If you say Y here, when the
++    appropriate sysctl is set, SCTP will use the MD5 HMAC when signing
++    cookies in the INIT ACK chunk.  If you say N here, the MD5 HMAC will
++    be unavailable for use with SCTP.  If in doubt, say Y.
++ 
++ Throttle Passive Opens
++ CONFIG_SCTP_THROTTLE_PASSIVEOPENS
++    Special feature of Linux SCTP mentioned in RFC 2960.  When secure
++    algorithms are used for signing cookies, the implementation becomes
++    vulnerable to INIT and COOKIE ECHO flooding.  If you say Y here,
++    SCTP will only allow one INIT and one COOKE ECHO to be processed
++    in each interval corresponding to the sysctl throttle_itvl.  Setting
++    throttle_itvl to 0 defeats this function.  If you say N here, each
++    INIT and COOKIE ECHO will be processed.
++ 
+
+I set these as follows:
+
+        #undef  CONFIG_SCTP
+        #define CONFIG_SCTP_MODULE 1
+        #undef  CONFIG_SCTP_SLOW_VERIFICATION
+        #undef  CONFIG_SCTP_THROTTLE_HEARTBEATS
+        #undef  CONFIG_SCTP_DISCARD_OOTB
+        #undef  CONFIG_SCTP_TCP_COMPATIBLE
+        #undef  CONFIG_SCTP_EXTENDED_IP_SUPPORT
+        #undef  CONFIG_SCTP_HMAC_SHA1
+        #undef  CONFIG_SCTP_HMAC_MD5
+        #undef  CONFIG_THROTTLE_PASSIVEOPENS
+
+Once you compile install and reboot on the new kernel, you will be able
+to open SCTP sockets.  If you configure SCTP as a module (as I do), the
+module will be loaded on demand when an SCTP socket is opened.
+
+Read the SCTP man page (in man/sctp.7) and look at the test programs
+under the test directory.
+
+To compile the test programs just change to the test program directory
+and type make:
+
+        cd ~/linux-sctp-0.1/test
+        make
+
+
+
