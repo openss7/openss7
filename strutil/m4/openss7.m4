@@ -2,7 +2,7 @@ dnl ============================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =============================================================================
 dnl 
-dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/19 10:04:24 $
+dnl @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/17 11:37:27 $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
@@ -48,10 +48,16 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -----------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/01/19 10:04:24 $ by $Author: brian $
+dnl Last Modified $Date: 2005/02/17 11:37:27 $ by $Author: brian $
 dnl
 dnl -----------------------------------------------------------------------------
 dnl $Log: openss7.m4,v $
+dnl Revision 0.9.2.12  2005/02/17 11:37:27  brian
+dnl - Substitute upper and lower case package names.
+dnl
+dnl Revision 0.9.2.11  2005/02/17 09:03:17  brian
+dnl - Fixed up oldincludedir which has no prefix.
+dnl
 dnl Revision 0.9.2.10  2005/01/19 10:04:24  brian
 dnl - Corrected errors.
 dnl
@@ -89,11 +95,49 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_SUBST([PACKAGE_TITLE])dnl
     PACKAGE_SHORTTITLE='$1'
     AC_SUBST([PACKAGE_SHORTTITLE])dnl
+    upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    lower='abcdefghijklmnopqrstuvwxyz'
+    PACKAGE_LCNAME=`echo "$PACKAGE_NAME" | sed -e y/$upper/$lower/`
+    AC_SUBST([PACKAGE_LCNAME])dnl
+    PACKAGE_UCNAME=`echo "$PACKAGE_NAME" | sed -e y/$lower/$upper/`
+    unset upper lower
+    AC_SUBST([PACKAGE_UCNAME])dnl
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_DEBUG
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_DIRCHANGE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_DIRCHANGE], [dnl
+    ac_default_prefix='/usr'
+dnl
+dnl Find the real root of the install tree
+dnl
+    if test :"$prefix" = :NONE ; then
+        newprefix="$ac_default_prefix"
+    else
+        newprefix="$prefix"
+    fi
+    rootdir=`echo $newprefix | sed -e 's|/local$||;s|/usr$||'`
+dnl
+dnl Need to adjust directories if default
+dnl
+    if test :"$sysconfdir" = :'${prefix}/etc' ; then sysconfdir='${rootdir}/etc' ; fi
+    if test :"$localstatedir" = :'${prefix}/var' ; then localstatdir='${rootdir}/var' ; fi
+    if test :"${newprefix#$rootdir}" = : ; then
+        if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/usr/share/info' ; fi
+        if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/usr/share/man' ; fi
+    fi
+    if test :"${newprefix#$rootdir}" = :/usr ; then
+        if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; fi
+        if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
+    fi
+    AC_SUBST([rootdir])
+])# _OPENSS7_DIRCHANGE
 # =============================================================================
 
 # =============================================================================
