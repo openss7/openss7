@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/24 03:40:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $"
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $";
 
 #define __NO_VERSION__
 
@@ -101,6 +101,7 @@ static int snprintf(char *buf, ssize_t size, const char *fmt, ...)
 	return (count);
 }
 
+#if 0
 /* called by proc file system to list the registered STREAMS devices */
 static int get_streams_drivers_list(char *page, char **start, off_t offset, int length)
 {
@@ -172,6 +173,7 @@ static int get_streams_modules_list(char *page, char **start, off_t offset, int 
 		len = 0;
 	return (len);
 }
+#endif
 
 static int get_streams_module_info_hdr(char *page, ssize_t maxlen)
 {
@@ -1343,12 +1345,19 @@ int strprocfs_init(void)
 	proc_str = proc_mkdir("streams", NULL);
 	if (!proc_str)
 		return (-ENOMEM);
+#if 0
 	create_proc_info_entry("drivers", 0444, proc_str, get_streams_drivers_list);
 	create_proc_info_entry("modules", 0444, proc_str, get_streams_modules_list);
-	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
-#ifdef CONFIG_STREAMS_DEBUG
+#else
 	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
 	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
+#endif
+	create_proc_info_entry("strinfo", 0444, proc_str, get_streams_strinfo_list);
+#ifdef CONFIG_STREAMS_DEBUG
+#if 0
+	create_proc_info_entry("cdevsw", 0444, proc_str, get_streams_cdevsw_list);
+	create_proc_info_entry("fmodsw", 0444, proc_str, get_streams_fmodsw_list);
+#endif
 	create_proc_info_entry("stdata", 0444, proc_str, get_streams_shinfo_list);
 	create_proc_info_entry("queue", 0444, proc_str, get_streams_queinfo_list);
 	create_proc_info_entry("msgb", 0444, proc_str, get_streams_mbinfo_list);
@@ -1365,12 +1374,19 @@ int strprocfs_init(void)
 void strprocfs_exit(void)
 {
 #ifdef CONFIG_PROC_FS
+#if 0
 	remove_proc_entry("drivers", proc_str);
 	remove_proc_entry("modules", proc_str);
-	remove_proc_entry("strinfo", proc_str);
-#ifdef CONFIG_STREAMS_DEBUG
+#else
 	remove_proc_entry("cdevsw", proc_str);
 	remove_proc_entry("fmodsw", proc_str);
+#endif
+	remove_proc_entry("strinfo", proc_str);
+#ifdef CONFIG_STREAMS_DEBUG
+#if 0
+	remove_proc_entry("cdevsw", proc_str);
+	remove_proc_entry("fmodsw", proc_str);
+#endif
 	remove_proc_entry("stdata", proc_str);
 	remove_proc_entry("queue", proc_str);
 	remove_proc_entry("msgb", proc_str);
