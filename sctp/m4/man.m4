@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9.2.6 2005/01/19 10:04:45 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.8 2005/01/20 00:52:50 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/19 10:04:45 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/20 00:52:50 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -110,9 +110,21 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
         AC_MSG_RESULT([no])
     else
         AC_MSG_RESULT([yes])
-        AC_ARG_VAR([GZIP], [Manpages compression commands])
-        AC_PATH_PROGS([GZIP], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usrs/bin:/bin])
+        AC_ARG_VAR([GZIP], [Gzip default compression options @<:@default=--best@:>@])
+        if test -z "$GZIP"; then
+            GZIP='-f9v'
+        fi
+        AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
+        AC_PATH_PROGS([GZIP_CMD], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usr/bin:/bin])
+        AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=@:>@])
+        if test -z "$BZIP2"; then
+            BZIP2='-f9v'
+        fi
+        AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
+        AC_PATH_PROGS([BZIP2_CMD], [bzip2], [/usr/bin/bzip2], [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
+    AC_ARG_VAR([MAKEWHATIS], [Makewhatis command])
+    AC_PATH_PROGS([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis], [$PATH:/usr/local/sbin:/usr/sbin:/sbin])
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
 
