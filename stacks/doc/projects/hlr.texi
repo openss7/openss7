@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: hlr.texi,v 0.9.2.5 2005/03/15 00:56:51 brian Exp $
+% @(#) $Id: hlr.texi,v 0.9.2.6 2005/03/15 13:40:45 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:51 $ by $Author: brian $
+% Last Modified $Date: 2005/03/15 13:40:45 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -426,6 +426,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: hlr.texi,v $
+Revision 0.9.2.6  2005/03/15 13:40:45  brian
+- minor corrections
+
 Revision 0.9.2.5  2005/03/15 00:56:51  brian
 - Updated version numbering in texinfo files.
 
@@ -901,7 +904,9 @@ the updating SGSN.
 
 For the purpose of GPRS testing, the HLR is required to initiate this procedure.
 
+@node Purge Transaction Flow
 @subsection Purge Transaction Flow
+@cindex Purge transaction flow
 
 The Purge function allows an SGSN to inform the HLR that it has deleted the MM and PDP contexts of a
 detached MS.  The SGSN may, as an implementation option, delete the MM and PDP contexts of an MS

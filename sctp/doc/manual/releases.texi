@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.3 2005/02/17 20:00:06 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.4 2005/03/15 13:40:03 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 @c Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -54,23 +54,22 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/02/17 20:00:06 $ by $Author: brian $
+@c Last Modified $Date: 2005/03/15 13:40:03 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @c ----------------------------------------------------------------------------
 
-This is the OpenSS7 Release of the @value{PACKAGE_TITLE} tools, drivers and
-modules used with the @cite{Linux Fast-STREAMS} or @cite{Linux STREAMS} SVR
-4.2 STREAMS utility for Linux.  The purpose of providing a separate release of
-this package was to separate the @value{PACKAGE_TITLE} tools, headers, drivers
-and modules from the @cite{Linux STREAMS} package for use with both @cite{Linux
-STREAMS} and @cite{Linux Fast-STREAMS} in preparation for replacement of the
-former by the later.
+This is the OpenSS7 Release of the @value{PACKAGE_TITLE} tools, drivers and modules
+used with the @cite{Linux Fast-STREAMS} or @cite{Linux STREAMS} SVR 4.2 STREAMS utility for Linux.
+The purpose of providing a separate release of this package was to separate the
+@value{PACKAGE_TITLE} tools, headers, drivers and modules from the @cite{Linux STREAMS} package for
+use with both @cite{Linux STREAMS} and @cite{Linux Fast-STREAMS} in preparation for replacement of
+the former by the later.
 
-The following sections provide information on @value{PACKAGE_TITLE} releases as
-well as compatibility information of OpenSS7 release to the original GCOM
-releases of these modules and drivers, as well as Linux kernel compatibility.
+The following sections provide information on @value{PACKAGE_TITLE} releases as well as
+compatibility information of OpenSS7 release to the original GCOM releases of these modules and
+drivers, as well as Linux kernel compatibility.
 
 @menu
 * Prerequisites::		Prerequisite packages
@@ -78,77 +77,164 @@ releases of these modules and drivers, as well as Linux kernel compatibility.
 * Release Notes::		Release Notes
 * Bugs::			Known Bugs
 * Schedule::			Development and Bug Fix Schedule
+* History::			Project History
 @end menu
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Prerequisites, Compatibility, , Releases
+@node Prerequisites
 @section Prerequisites
 @cindex prerequisites
 
+Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
+
+@itemize @bullet
+@item A fairly LSB compliant GNU/Linux distribution.
+@footnote{@xref{GNU/Linux Distributions}, for more information.}
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.10)
+@item glibc2 or better.
+@item GNU info (for info files).
+@item GNU groff (for man pages).
+@footnote{If you are using a Debian release, please make sure to install the groff extension package
+(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
+including references in the manual pages.}
+@end itemize
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Compatibility, Release Notes, Prerequisites, Releases
+@node Compatibility
 @section Compatibility
 @cindex compatibility
 
+This section discusses compatibility with major prerequisites.
+
 @menu
-* Linux Kernel::
-* Linux STREAMS::
-* Linux Fast-STREAMS::
+* GNU/Linux Distributions::	Compatibility to GNU/Linux Distributions
+* Linux Kernel::		Compatibility to Linux Kernels
+* Linux STREAMS::		Compatibility to LiS
+* Linux Fast-STREAMS::		Compatibility to LfS
 @end menu
 
 @c ----------------------------------------------------------------------------
 
-@node Linux Kernel, Linux STREAMS, , Compatibility
+@node GNU/Linux Distributions
+@subsection GNU/Linux Distributions
+@cindex GNU/Linux Distributions
+
+@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux} distributions:
+
+@itemize @bullet
+@item RedHat Linux 7.2 (RH7)
+@item RedHat Linux 7.3 (RH7)
+@item Performance Technlogies @dfn{NexusWare24}
+@item RedHat Linux 8.0 (RH8)
+@item RedHat Linux 9 (RH9)
+@item SuSE 8.0 Professional
+@item Fedora Core 1 (FC1)
+@item Debian 3.0r2 Woody
+@item Mandrakelinux 9.2 (MDK92)
+@item RedHat Enterprise Linux 3 (EL3)
+@item WhiteBox Enterprise Linux 3 (WBEL3)
+@item Fedora Core 2 (FC2)
+@item SuSE 9.1 Personal
+@item Mandrakelinux 10.0 (MDK100)
+@item SuSE 9.2 Professional
+@item Mandrakelinux 11.0 (MDK110)
+@item RedHat Enterprise Linux 4 (EL4)
+@item Fedora Core 3 (FC3)
+@end itemize
+
+When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
+compatible with a  much broader array of distributions than those listed above.  These are the
+distributions against which the current maintainer creates builds.
+
+@node Linux Kernel
 @subsection Kernel
 @cindex Kernel
 
-@node Linux STREAMS, Linux Fast-STREAMS, Linux Kernel, Compatibility
+@dfn{@value{PACKAGE_TITLE}} compiles as a @dfn{Linux} kernel module.  It is not ncessary to patch the
+@dfn{Linux} kernel to use the package.  At a later date, it is possible to move this package into the
+kernel.
+
+@dfn{@value{PACKAGE_TITLE}} is compatible with 2.4 kernel series after 2.4.10.  It has been tested
+up to and including 2.6.10.
+
+@node Linux STREAMS
 @subsection Linux STREAMS
 @cindex Linux STREAMS
 
-@node Linux Fast-STREAMS, , Linux STREAMS, Compatibility
+@node Linux Fast-STREAMS
 @subsection Linux Fast-STREAMS
 @cindex Linux Fast-STREAMS
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Release Notes, Bugs, Compatibility, Releases
+@node Release Notes
 @section Release Notes
 @cindex release notes
 
-The sections that follow provide information on OpenSS7 releases of the
+The sections that follow provide information on OpenSS7 releases of the @*
 @value{PACKAGE_TITLE} package.
 
+@ifnothtml
 @menu
-* sctp-0.2.20-1::			Release 1
+* Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release sctp-0.2.20-1::		Release 1
 @end menu
+@end ifnothtml
 
 @c ----------------------------------------------------------------------------
 
-@node sctp-0.2.20-1, , , Release Notes
+@node Release @value{PACKAGE}-@value{VERSION}
+@subsection Release @value{PACKAGE}-@value{VERSION}
+@cindex release @value{PACKAGE}-@value{VERSION}
+
+Updated version numbering.  Improved build process.
+
+@c ----------------------------------------------------------------------------
+
+@node sctp-0.2.20-1
 @subsection sctp-0.2.20-1
 @cindex sctp-0.2.20-1
 
-Initial autoconf/RPM packaging of the OpenSS7 @command{@value{PACKAGE_TARNAME}} release.
+Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+
+Not publicly released.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Bugs, Schedule, Release Notes, Releases
+@node Bugs
 @section Bugs
 @cindex bugs
 
+@dfn{@value{PACKAGE_TITLE}} has many known bugs.  These are alpha releases.  Use at your own risk.
+Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANY} under @ref{Copying}.}
+
+@b{This software is @i{alpha} software.  As such, it will likely crash your kernel.  Installation
+of the software may irreparably mangle your header files or Linux distribution in such a way as to
+make it unusable.  Crashes will likely lock your system and rebooting the system might not repair the
+problem.  You can loose all the data on your system.  Because this software can crash your kernel,
+the resulting unstable system could destroy computer hardware or peripherals making them unusable.
+You will likely void the warranty on any system on which you run this software. YOU HAVE BEEN
+WARNED.}
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Schedule, , Bugs, Releases
+@node Schedule
 @section Schedule
 @cindex schedule
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node History
+@section History
+@cindex history
 
 @c ----------------------------------------------------------------------------
 
