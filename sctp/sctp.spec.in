@@ -1,7 +1,7 @@
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/12/20 10:18:07 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/12/21 12:23:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/20 10:18:07 $ by $Author: brian $
+# Last Modified $Date: 2004/12/21 12:23:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -213,6 +213,7 @@ fi
 %endif
 
 %define cache_file ../%{_target_platform}-%{kernel_version}-LiS.cache
+%define csite_file ../config.site
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
@@ -226,6 +227,7 @@ fi
     CXX="${CXX:-$CC}" \
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
     CXXCPP="${CXXCPP:-$CPP}" \
+    CONFIG_SITE="%{csite_file}" \
     --cache-file=%{cache_file} \
     --build=%{_build} \
     --host=%{_target_platform} \
@@ -324,14 +326,14 @@ ln -sf %{name}-%{version}-%{fullrelease} $RPM_BUILD_ROOT%{_usrsrc}/%{name}
 
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
-Prefix:         /%{_lib}/modules/%{kernel_version}
+Prefix:         /%{_lib}/modules/%{kernel_version}/kernel/net
 Requires:       kernel = %{kernel_version}
 Conflicts:      %{_conflict}-%{core_name}
 Prereq:         /sbin/depmod
 Prereq:         /sbin/lsmod
 Prereq:         /sbin/insmod
 Prereq:         /sbin/modprobe
-Prereq:         /usr/sbin/lsof
+Prereq:         /sbin/netstat
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
 Icon:           %{_xpm}
@@ -360,17 +362,15 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   modules running, kick the stack
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
-    fdetach -a 2>/dev/null
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
-                eval "kill -HUP $tokens[1]"
-            fi
-        fi
+    /sbin/netstat -p 2>/dev/null | grep '^sctp' | while read -a tokens ; do
+        case :"${tokens[6]}" in
+            :[0-9]+) eval "kill -HUP $token" ;;
+            :-) ;; # this is ssh hiding the pid
+        esac
     done
+    /sbin/sleep 5 # wait for processes to die and close sockets
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
     echo 'Cannot install or upgrade with sctp modules running.' >&2
@@ -381,34 +381,9 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
-#   Check that our line is in the modules.%{base} file
-    conf_old=/etc/modules.conf
-    if ( grep -q 'include.*modules.%{base}' $conf_old ) ; then :; else
-        streams_dir=/%{_lib}/modules/%{kernel_version}/misc
-        streams_prf=/%{_lib}/modules/preferred/misc
-        conf_new=%{_tmppath}/modules.conf.new.$$
-        cp -f $conf_old $conf_new
-#       if not, check for an old non-rpm LiS
-        if ( grep -q 'BEGIN LiS' $conf_old ) ; then
-            conf_tmp=%{_tmppath}/modules.conf.tmp.$$
-            list=`find /%{_lib}/modules/%{kernel_version}/%{base} -name "*.o"`
-            for p in $list ; do
-                m="`echo $p | sed -e 's|^.*/||;s|\.o||'`"
-#               Remove references to our modules from old installation.
-                sed -e '/alias.*\<'$m'\>/d' $conf_new > $conf_tmp
-                mv -f $conf_tmp $conf_new
-#               Remove conflicting modules.
-                rm -f $streams_dir/$m.o
-                rm -f $streams_prf/$m.o
-            done
-        fi
-        echo 'prune modules.%{base}' >> $conf_new
-        echo 'if -f /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
-        echo 'include /lib/modules/`uname -r`/modules.%{base}' >> $conf_new
-        echo 'endif' >> $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -fb --suffix=.rpmsave $conf_new $conf_old
-        rm -f $conf_new
+    k=/%{_lib}/modules/%{kernel_version}/kernel/net/sctp
+    if [ -e $k/sctp.o ] ; then
+        mv -f $k/sctp.o $k/sctp_deprecated.o
     fi
 fi
 if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -429,17 +404,15 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
 #   modules running, kick the stack
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
-    fdetach -a
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
-                eval "kill -KILL $tokens[1]"
-            fi
-        fi
+    /sbin/netstat -p 2>/dev/null | grep '^sctp' | while read -a tokens ; do
+        case :"${tokens[6]}" in
+            :[0-9]+) eval "kill -HUP $token" ;;
+            :-) ;; # this is ssh hiding the pid
+        esac
     done
+    /sbin/sleep 5 # wait for processes to die and close sockets
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
     echo "Cannot uninstall with sctp modules running." >&2
@@ -450,20 +423,10 @@ fi
 # ---------------------------------------------------------------------------
 
 if [ $1 = 0 ]; then
-#   this is the last stage of a removal we are going away: we need to see if
-#   we need to remove our line from modules.conf and remove our devices
-    remove_line=yes
-    for file in /lib/modules/*/modules.%{base} ; do
-        if [ -f $file ] ; then
-            remove_line=no
-            break
-        fi
-    done
-    if [ ":$remove_line" = :yes ] ; then
-        sed -e '/prune modules.%{base}/,/endif/d' /etc/modules.conf > %{_tmppath}/modules.conf.tmp.$$
-        chmod --reference=/etc/modules.conf %{_tmppath}/modules.conf.tmp.$$
-        cp -fb --suffix=.rpmorig %{_tmppath}/modules.conf.tmp.$$ /etc/modules.conf
-        rm -f %{_tmppath}/modules.conf.tmp.$$
+#   this is the last stage of a removal we are going away
+    k=/%{_lib}/modules/%{kernel_version}/kernel/net/sctp
+    if [ -e $k/sctp_deprecated.o ] ; then
+        mv -f $k/sctp_deprecated.o $k/sctp.o
     fi
 fi
 if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -481,24 +444,23 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
 #   modules running, kick the stack
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
-    fdetach -a
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
     /sbin/insmod -ar sctp
-    /usr/sbin/lsof | while read -a tokens; do
-        if [ :"$tokens[4]" = :"CHR" ]; then
-            major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge %{majbase} ]; then
+    /sbin/netstat -p 2>/dev/null | grep '^sctp' | while read -a tokens ; do
+        case :"${tokens[6]}" in
+            :[0-9]+)
                 if [ $1 = 0 ] ; then
 #                   extreme prejudice for removal
-                    eval "kill -KILL $tokens[1]"
+                    eval "kill -KILL ${tokens[6]}"
                 else
-#                   try to get them to reload for 
-                    eval "kill -HUP $tokens[1]"
-                fi
-            fi
-        fi
+#                   try to get them to reload for upgrade
+                    eval "kill -HUP ${tokens[6]}"
+                fi ;;
+            :-) ;; # this is ssh hiding the pid
+        esac
     done
+    /sbin/sleep 5 # wait for processes to die and close sockets
     /sbin/modprobe -r `/sbin/lsmod | grep '^sctp' | cut -f1 '-d '`
     ( /sbin/lsmod | grep -q '^sctp' ) || exit 0
     echo "Error: modules may be still loaded" >&2
@@ -511,9 +473,7 @@ fi
 %files %{core_name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir /%{_lib}/modules/%{kernel_version}/%{base}
-%attr(644,root,root) /%{_lib}/modules/%{kernel_version}/modules.%{base}
-/%{_lib}/modules/%{kernel_version}/%{base}/*
+/%{_lib}/modules/%{kernel_version}/kernel/net/*
 %endif
 
 # ===========================================================================
@@ -873,8 +833,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.1  2004/12/20 10:18:07  brian
-# - Big start on autoconf release of Linux Native SCTP.
+# Revision 0.9.2.2  2004/12/21 12:23:52  brian
+# - Proper install scriplets for SCTP package.
+#
+# Revision 1.2  2004/12/21 12:23:52  brian
+# - Proper install scriplets for SCTP package.
 #
 # Revision 1.1  2004/12/20 10:18:07  brian
 # - Big start on autoconf release of Linux Native SCTP.
@@ -884,4 +847,4 @@ fi
 - Begain this RPM build for Linux Native SCTP.
 - Borrowed heavily from the OpenSS7 STREAMS builds.
 
-# vim: ft=spec sw=4 et
+# vim: ft=spec sw=4 et tw=78
