@@ -16,7 +16,7 @@
  * MA 02139, USA.
  * 
  */
-#ident "@(#) LiS streams.c 2.14 4/24/03 16:54:13 "
+#ident "@(#) LiS streams.c 2.16 6/26/03 17:06:48 "
 #include <sys/types.h>
 #undef GCOM_OPEN
 #include <sys/stropts.h>
@@ -205,6 +205,8 @@ void print_debug_bits(void)
     printf("DEBUG_DMP_MBLK      0x02000000\n");
     printf("DEBUG_DMP_DBLK      0x04000000\n");
     printf("DEBUG_DMP_STRHD     0x08000000\n");
+    printf("DEBUG_VOPEN         0x10000000\n");
+    printf("DEBUG_VCLOSE        0x20000000\n");
     printf("DEBUG_ADDRS         0x80000000\n");
     printf("-D<debug-bits -- \n") ;
     printf("DEBUG_SNDFD         0x00000001\n");
