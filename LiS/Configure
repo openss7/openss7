@@ -365,7 +365,9 @@ check_kver()
 get_kver()
 {
     check_kver
-    if [ -f $KSRC/include/linux/version.h ]; then
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	KVER=`uname -r`
+    elif [ -f $KSRC/include/linux/version.h ]; then
 	cc -I$KSRC/include -E -dM \
 	    -include $KSRC/include/linux/version.h dummy.c >kver
 	KVER=`grep UTS_RELEASE kver | \
@@ -421,19 +423,27 @@ rh_get_smp()
 get_smp()
 {
     NEED_KSMP=0				# default is "found"
-    KSMP=`ac_get_config CONFIG_SMP`	# check autoconf.h
-    if [ $? -eq 0 ]; then		# found
-	: OK
-    elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
-	if nm -g $KSRC/vmlinux |grep -w -q cpu_online_map; then
-	    KSMP=y			# SMP kernel
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	if grep -q cpu_online_map /proc/ksyms; then
+	    KSMP=y
 	else
-	    KSMP=			# non-SMP kernel
+	    KSMP=
 	fi
-    elif [ -f $KSRC/.config ]; then	# kernel .config file?
-	KSMP=`dc_get_config "CONFIG_SMP=y"`
     else
-	NEED_KSMP=1			# still need the option
+	KSMP=`ac_get_config CONFIG_SMP`	# check autoconf.h
+	if [ $? -eq 0 ]; then		# found
+	    : OK
+	elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	    if nm -g $KSRC/vmlinux |grep -w -q cpu_online_map; then
+		KSMP=y			# SMP kernel
+	    else
+		KSMP=			# non-SMP kernel
+	    fi
+	elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	    KSMP=`dc_get_config "CONFIG_SMP=y"`
+	else
+	    NEED_KSMP=1			# still need the option
+	fi
     fi
 
     if [ "$KSMP..." = "y..." ]; then
@@ -477,27 +487,37 @@ rh_get_modules()
 get_modules()
 {
     NEED_KMODULES=0				# default is "found"
-    KMODULES=`ac_get_config CONFIG_MODULES`	# check autoconf.h
-    if [ $? -eq 0 ]; then		# found
-	KMODVERS=`ac_get_config CONFIG_MODVERSIONS`
-    elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
-	if nm -g $KSRC/vmlinux |grep -w -q init_modules; then
-	    KMODULES=y			# module support
-	    if strings $KSRC/vmlinux |grep -q Using_Versions; then
-		KMODVERS=y
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	KMODULES=y
+	if grep -q schedule_R /proc/ksyms; then
+	    KMODVERS=y
+	else
+	    KMODVERS=
+	fi
+
+    else
+	KMODULES=`ac_get_config CONFIG_MODULES`	# check autoconf.h
+	if [ $? -eq 0 ]; then		# found
+	    KMODVERS=`ac_get_config CONFIG_MODVERSIONS`
+	elif [ -f $KSRC/vmlinux ]; then	# compiled kernel?
+	    if nm -g $KSRC/vmlinux |grep -w -q init_modules; then
+		KMODULES=y			# module support
+		if strings $KSRC/vmlinux |grep -q Using_Versions; then
+		    KMODVERS=y
+		else
+		    KMODVERS=
+		fi
 	    else
-		KMODVERS=
+		KMODULES=			# non-module support
+	    fi
+	elif [ -f $KSRC/.config ]; then	# kernel .config file?
+	    KMODULES=`dc_get_config "CONFIG_MODULES=y"`
+	    if [ "$KMODULES..." = "y..." ]; then
+		KMODVERS=`dc_get_config "CONFIG_MODVERSIONS=y"`
 	    fi
 	else
-	    KMODULES=			# non-module support
+	    NEED_KMODULES=1			# still need the option
 	fi
-    elif [ -f $KSRC/.config ]; then	# kernel .config file?
-	KMODULES=`dc_get_config "CONFIG_MODULES=y"`
-	if [ "$KMODULES..." = "y..." ]; then
-	    KMODVERS=`dc_get_config "CONFIG_MODVERSIONS=y"`
-	fi
-    else
-	NEED_KMODULES=1			# still need the option
     fi
 
     if [ "$KMODVERS..." = "y..." ]; then
@@ -507,215 +527,7 @@ get_modules()
     fi
 }
 
-#
-# Having dug out the SMP setting from the kernel source info, now
-# verify that the currently running kernel has the same settings.
-#
-smp_error()
-{
-    echo
-    echo "Your kernel source indicates SMP=$XKSMP, but your running"
-    echo "kernel appears to have SMP=$NKSMP.  This is a good indication"
-    echo "that you are not running on the kernel represented"
-    echo "by the kernel source.  Please make the running kernel"
-    echo "the same as the one in kernel source and then install"
-    echo "LiS again."
-    echo
-    do_confirm
-    exit 1
-}
 
-verify_smp()
-{
-    if [ "$KSMP..." = "y..." ]; then		# compute "not" SMP
-	XKSMP=y
-	NKSMP=n
-    else
-	XKSMP=n
-	NKSMP=y
-    fi
-
-    export NKSMP XKSMP
-    if [ ! -f /proc/ksyms ]; then
-	echo
-	echo "The kernel SMP option cannot be verified because there"
-	echo "is no /proc/ksyms present on the system.  If you experience"
-	echo "problems on multi-CPU systems, or unresolved externals"
-	echo "when loading LiS it may be because LiS was compiled with"
-	echo "SMP=$XKSMP while your running kernel has SMP=$NKSMP."
-	echo
-	do_confirm
-	return
-    fi
-
-    if grep -q cpu_online_map /proc/ksyms; then
-	# running kernel has SMP set
-	if [ $XKSMP = "n" ]; then	# kernel source does not
-	    smp_error
-	fi
-    else
-					# running kernel does not have SMP set
-	if [ $XKSMP = "y" -a "$MACHINE..." != "s390..." ]
-	then				# kernel source does
-	    smp_error
-	fi
-    fi
-    echo "SMP option verified between kernel source and running kernel"
-}
-
-#
-# Having dug out the kernel version from the kernel source info, now
-# verify that the currently running kernel has the same settings.
-#
-verify_kver()
-{
-    if [ ! -f /proc/sys/kernel/osrelease ]; then
-	echo
-	echo "The kernel version cannot be verified because there"
-	echo "is no /proc/sys/kernel/osrelease present on the system."
-	echo "Chances are that you will experience some kind of problem in"
-	echo "loading or running LiS.  This problem really should"
-	echo "be rectified before continuing with the installation."
-	echo
-	do_confirm
-	return
-    fi
-
-    PKVER=`cat /proc/sys/kernel/osrelease`
-    NPKVER=`echo $PKVER | sed -e 's/-.*//'`
-    if [ "$NKVER" != "$NPKVER" ]; then
-	echo
-	echo "Your kernel source is for kernel version $NKVER, but"
-	echo "your running kernel is version $NPKVER.  This is a"
-	echo "good indication that you are not running on the kernel"
-	echo "represented by the kernel source.  Please make the"
-	echo "running kernel the same as the one in kernel source and"
-	echo "then install LiS again."
-	echo
-	do_confirm
-	exit 1
-    fi
-    echo "Kernel version verified between kernel source and running kernel"
-}
-
-#
-# Having dug out the mod-versions option from the kernel source info, now
-# verify that the currently running kernel has the same settings.
-#
-modver_error()
-{
-    echo
-    echo "Your kernel source indicates MODVERSIONS=$XKMODVERS, but your running"
-    echo "kernel appears to have MODVERSIONS=$NKMODVERS.  This is a good indication"
-    echo "that you are not running on the kernel represented"
-    echo "by the kernel source."
-    PROMPT="Do you want to continue with the installation anyway? (y/n) "
-    RESPONSE="y n"
-    do_read_choice
-    case $RESULT in
-	y)
-		if [ "$XKMODVERS" = "y" ]; then
-		    return			# modversions.h exists
-		fi
-		if [ ! -f $KSRC/include/linux/modversions.h ]; then
-		    PROMPT="Would you like to try to make modversions.h? (y/n) "
-		    RESPONSE="y n"
-		    do_read_choice
-		    if [ "$RESULT..." = "y..." ]; then
-			(cd $KSRC; make depend)
-			if [ -f $KSRC/include/linux/modversions.h ]; then
-			    echo
-			    echo "Succeeded in making modversions.h."
-			    echo "Installation will proceed."
-			    echo
-			    do_confirm
-			else
-			    echo
-			    echo "Could not make modversions.h."
-			    echo "LiS compilation will fail."
-			    echo "Please make the running kernel the"
-			    echo "same as the one in the kernel source"
-			    echo "and then install LiS again."
-			    echo
-			    do_confirm
-			    exit 1
-			fi
-		    fi
-		fi
-		;;
-	n)
-		echo "Please make the running kernel the same as the one"
-		echo "in the kernel source and then install LiS again."
-		echo
-		do_confirm
-		exit 1
-		;;
-    esac
-}
-
-verify_modver()
-{
-    if [ "$KMODVERS..." = "y..." ]; then		# compute "not" SMP
-	XKMODVERS=y
-	NKMODVERS=n
-    else
-	XKMODVERS=n
-	NKMODVERS=y
-    fi
-
-    export NKMODVERS XKMODVERS
-    if [ ! -f /proc/ksyms ]; then
-	echo
-	echo "The kernel module versions option cannot be verified because"
-	echo "there is no /proc/ksyms present on the system.  If you experience"
-	echo "problems with unresolved externals when loading LiS it may be "
-	echo "because LiS was compiled with mod-versions = \"$XKMODVERS\""
-	echo "while your running kernel has mod-versions = \"$NKMODVERS\""
-	echo
-	do_confirm
-	return
-    fi
-
-    if grep -q schedule_R /proc/ksyms; then
-	# running kernel has mod-versions set
-	NKMODVERS=y
-	if [ $XKMODVERS = "n" ]; then	# kernel source does not
-	    modver_error
-	fi
-    else
-	# running kernel does not have mod-versions set
-	NKMODVERS=n
-	if [ $XKMODVERS = "y" ]; then	# kernel source does
-	    modver_error
-	fi
-    fi
-
-    if [ $NOKSRC -eq 0 ]; then
-	if [ -f $KSRC/include/linux/modversions.h -a \
-	     -f $KSRC/include/linux/modules/ksyms.ver ]; then
-	    # kernel source is set up for mod versions in compiles
-	    XKMODVERS=y
-	    if [ $NKMODVERS = "n" ]; then
-		modver_error
-	    fi
-	elif [ -f $KSRC/include/linux/modversions.h -a \
-	       -f $KSRC/include/linux/modules/kernel/ksyms.ver ]; then
-	    # kernel source is set up for mod versions in compiles
-	    XKMODVERS=y
-	    if [ $NKMODVERS = "n" ]; then
-		modver_error
-	    fi
-	else
-	    # kernel source is not set up for mod versions in compiles
-	    XKMODVERS=n
-	    if [ $NKMODVERS = "y" ]; then
-		modver_error
-	    fi
-	fi
-    fi
-
-    echo "MODVERS option verified between kernel source and running kernel"
-}
 
 #
 # From /proc/ksyms, generate a C header file with defines for all
@@ -840,9 +652,6 @@ echo
 
 if [ -f $CONFIG ]; then
 . $CONFIG
-    if [ "$KERN_TARGET..." = "..." ]; then
-	KERN_TARGET=bzImage
-    fi
 else
     USING_DEFAULTS=y
     CROSS_COMPILING=n
@@ -852,20 +661,11 @@ else
     KSRC=`default_ksrc`
     check_ksrc
     CONFIG_MK_KERNEL=n
-    KERN_TARGET=bzImage
     STRMS_QUEUES=t
     DBG_OPT=D
     LIS_SHLIB=y
     MACHINE=`uname -m`
 fi
-
-case $KERN_TARGET in
-    zImage)	KTARG=1;;
-    zlilo)	KTARG=2;;
-    bzImage)	KTARG=3;;
-    bzlilo)	KTARG=4;;
-    *)		KTARG=3;;
-esac
 
 #
 # LIS_HOME
@@ -955,25 +755,60 @@ Native C (y) or cross-compile (n)?"
     fi
 
     #
+    # Verify kernel version, SMP and mod versions against the running
+    # kernel if the user says that he/she intends to install on the
+    # running kernel.
+    #
+    PROMPT="\
+Do you intend to run LiS on this machine with\n\
+the currently running kernel?"
+    RESPONSE="y n"
+    do_read_choice
+    case $RESULT in
+	y) USE_RUNNING_KERNEL=y ;;
+	n) USE_RUNNING_KERNEL= ;;
+    esac
+
+    #
     # Kernel source location
     #
-    PROMPT="Enter directory location of your kernel source\n          "
-    DEFAULT=$KSRC
-    if [ "$KSRC..." = "..." ]; then
-        DEFAULT="/usr/src/linux"
-    fi
-    if [ ! -d $KSRC ]; then
-        DEFAULT="/usr/src/linux"
-	check_ksrc
-    fi
-    if do_read_dir; then
-	KSRC=$RESULT
-	NOKSRC=0
+    if [ "$USE_RUNNING_KERNEL..." = "..." ]; then
+	PROMPT="Enter directory location of your kernel source\n          "
+	DEFAULT=$KSRC
+	if [ "$KSRC..." = "..." ]; then
+	    DEFAULT="/usr/src/linux"
+	fi
+	if [ ! -d $KSRC ]; then
+	    DEFAULT="/usr/src/linux"
+	    check_ksrc
+	fi
+	if do_read_dir; then
+	    KSRC=$RESULT
+	    NOKSRC=0
+	else
+	    echo "Cannot locate kernel source."
+	    echo "Will use /usr/include for header files."
+	    KSRC=/usr
+	    NOKSRC=1
+	fi
     else
-	echo "Cannot locate kernel source."
-	echo "Will use /usr/include for header files."
-	KSRC=/usr
-	NOKSRC=1
+	NOKSRC=0
+	if [ -d $KSRC ]; then
+	    : Retain default setting
+	elif [ -d /usr/src/linux ]; then
+	    KSRC=/usr/src/linux
+	else
+	    echo
+	    echo "No apparent kernel source directory.  LiS compilation"
+	    echo "may very well fail.  If this should happen, load your"
+	    echo "kernel source, or reinstall your kernel with source"
+	    echo "and install LiS again."
+	    echo
+	    do_confirm
+	    KSRC=/usr
+	    NOKSRC=1		# act as though no kernel source
+	fi
+	echo "Will use $KSRC/include for header files."
     fi
 
     #
@@ -985,6 +820,11 @@ Native C (y) or cross-compile (n)?"
     get_smp
     get_modules
     if [ $NEED_KSMP -eq 1 -o $NEED_KMODULES -eq 1 ]; then
+	if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	    echo "Could not figure out whether or not your running kernel"
+	    echo "was compiled with SMP or MODULES set.  Installation aborted."
+	    exit 1
+	fi
 	NEED_KCONFIG=1		# couldn't access kernel binary
     else
 	NEED_KCONFIG=0		# have info from kernel binary
@@ -1061,10 +901,14 @@ Do you want to do that now?"
     #
     # Kernel version
     #
-    DEFAULT=$KVER
-    PROMPT="Which version of the kernel are you building for?"
-    do_readstring
-    KVER=$RESULT
+    if [ "$USE_RUNNING_KERNEL..." = "y..." ]; then
+	echo "Running kernel is version $KVER"
+    else
+	DEFAULT=$KVER
+	PROMPT="Which version of the kernel are you building for?"
+	do_readstring
+	KVER=$RESULT
+    fi
     
     KVER_PATCH=`echo ${KVER}|sed -e "s/[^\.]\.[^\.]\.//"`
     KVER_PATCHNO=`echo $KVER_PATCH | sed -e 's/-.*//' -e 's/[^0-9].*//'`
@@ -1080,28 +924,6 @@ Do you want to do that now?"
     fi
 
     
-    #
-    # Verify kernel version, SMP and mod versions against the running
-    # kernel if the user says that he/she intends to install on the
-    # running kernel.
-    #
-    PROMPT="\
-Do you intend to run LiS on this machine with\n\
-the currently running kernel?"
-    RESPONSE="y n"
-    do_read_choice
-    case $RESULT in
-	y)
-		USE_RUNNING_KERNEL=y
-		verify_kver
-		verify_smp
-		verify_modver
-		;;
-	n)
-		USE_RUNNING_KERNEL=
-		echo "Bypassing kernel parameter consistency checks"
-		;;
-    esac
 
     #
     # CONFIG_STREAMS
@@ -1122,7 +944,6 @@ the currently running kernel?"
     fi
 
     CONFIG_STREAMS=m
-    echo "# KERN_TARGET not set" >>$CONFIG
 
     #
     # See if the user wants STREAMS kernel loadable modules installed for
@@ -1169,8 +990,13 @@ Please enter y or n "
     else
 	DEFAULT=$MOD_INST_DIR
     fi
-    do_read_dir
-    MOD_INST_DIR=$RESULT
+    if [ "$USE_RUNNING_KERNEL..." = "y..." -a -d $DEFAULT ]; then
+	MOD_INST_DIR=$DEFAULT
+    else
+	do_read_dir
+	MOD_INST_DIR=$RESULT
+    fi
+    echo "Module installation directory is $MOD_INST_DIR"
 
     #
     # STRMS_QUEUES
@@ -1180,7 +1006,7 @@ Please enter y or n "
     STRMS_QUEUES="t"
 
     if [ $NOKSRC -eq 1 -a "$KMODVERS..." = "y..." ]; then
-	echo "No kernel symbols. Generating $LIS_HOME/include/sys/modversions.h."
+	echo "Generating $LIS_HOME/include/sys/modversions.h."
 	rm -f include/sys/modversions.h
 	generate_symbol_names >include/sys/modversions.h
 	LISMODVERS=y
@@ -1192,7 +1018,6 @@ else # Not a Linux kernel target
     KSRC=
     KVER=
     CONFIG_MK_KERNEL=
-    KERN_TARGET=
     STRMS_QUEUES=
     MOD_INST_DIR=
     MOD_INSTALL=
@@ -1315,8 +1140,10 @@ fi
 # Red Hat 7.1 needs a kludge related to including highmem.h from vmalloc.h.
 #
 if [ "$TARGET" = "l" ]; then
-    if grep -q 'highmem\.h' $KSRC/include/linux/vmalloc.h; then
-	RH_71_KLUDGE=y
+    if [ -f $KSRC/include/linux/vmalloc.h ]; then
+	if grep -q 'highmem\.h' $KSRC/include/linux/vmalloc.h; then
+	    RH_71_KLUDGE=y
+	fi
     fi
 fi
 
@@ -1324,8 +1151,16 @@ fi
 # 2.4.20 (or thereabouts) changed the location of the signal mask lock
 #
 if [ "$TARGET" = "l" ]; then
-    if grep -q 'sigmask_lock' $KSRC/include/linux/sched.h; then
-	SIGMASKLOCK=y
+    if [ -f $KSRC/include/linux/sched.h ]; then
+	if grep -q 'sigmask_lock' $KSRC/include/linux/sched.h; then
+	    SIGMASKLOCK=y
+	fi
+    elif [ $KVER_MAJORMINOR = "2.4" -a $KVER_PATCH -ge 20 ]; then
+	    SIGMASKLOCK=y
+    elif [ $KVER_MAJORMINOR = "2.5" ]; then
+	    SIGMASKLOCK=y
+    elif [ $KVER_MAJORMINOR = "2.6" ]; then
+	    SIGMASKLOCK=y
     fi
 fi
 
@@ -1333,8 +1168,15 @@ fi
 # Red Hat changed the number of arguments in recalc_sigpending
 #
 if [ "$TARGET" = "l" ]; then
-    if grep -q 'recalc_sigpending(void)' $KSRC/include/linux/sched.h; then
-	RCVOID=y
+    if [ -f $KSRC/include/linux/sched.h ]; then
+	if grep -q 'recalc_sigpending(void)' $KSRC/include/linux/sched.h; then
+	    RCVOID=y
+	fi
+    elif [ -f /usr/src/linux/include/linux/sched.h ]; then
+	if grep -q 'recalc_sigpending(void)' \
+		/usr/src/linux/include/linux/sched.h; then
+	    RCVOID=y
+	fi
     fi
 fi
 
@@ -1378,6 +1220,9 @@ get_empty_inode_option
 
 #
 # Some architectures need an additional include directory
+# When installing with no kernel source we will use /usr/src/linux anyway
+# and just hope that this stuff got installed even though the rest of the
+# source is not there.
 #
 case $MACHINE in
 i?86)	MACHINE_INCL="-I$KSRC/arch/i386/mach-generic" ;;
@@ -1421,7 +1266,6 @@ if [ "$TARGET" = "l" ]; then
     cfg_out LISMODVERS $LISMODVERS
     cfg_out LISAUTOCONF $LISAUTOCONF
     cfg_out CONFIG_MK_KERNEL $CONFIG_MK_KERNEL 
-    cfg_out KERN_TARGET $KERN_TARGET
     cfg_out STRMS_QUEUES $STRMS_QUEUES
     cfg_out MOD_INST_DIR $MOD_INST_DIR
     cfg_out MOD_INSTALL $MOD_INSTALL
