@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb_physreq.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: allocb_physreq.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ALLOCB_PHYSREQ 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH ALLOCB_PHYSREQ 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B allocb_physreq
 \- allocate a \fISTREAMS\fR message and data block
@@ -80,6 +80,18 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "mblk_t *" mp " = allocb_physreq(int " size ", unsigned int " priority ", void *" physreq_ptr );
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+the size of the message buffer to allocate.
+.TP
+.I priority
+the priority of the allocation request.
+.TP
+.I physreq_ptr
+a pointer to a physical request structure describing the extra characteristics requested for the
+allocated buffer.
 .SH DESCRIPTION
 .PP
 .BR allocb_physreq ()

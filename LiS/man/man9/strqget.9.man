@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 1.1.4.2 2005/03/12 13:06:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRQGET 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH STRQGET 9 "$Date: 2005/03/12 13:06:50 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B strqget, lis_strqget
 \- gets information about a \fISTREAMS\fR message queue
@@ -80,6 +80,20 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = strqget(queue_t *" q ", qfields_t " what ", unsigned char " band ", long *" val );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue from which to get information.
+.TP
+.I what
+what information to get.
+.TP
+.I band
+what band (if applicable).
+.TP
+.I val
+a pointer into which to place the value.
 .SH DESCRIPTION
 .PP
 .BR strqget ()

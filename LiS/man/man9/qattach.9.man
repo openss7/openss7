@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qattach.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\" @(#) $Id: qattach.9.man,v 1.1.4.2 2005/03/12 13:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QATTACH 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH QATTACH 9 "$Date: 2005/03/12 13:06:49 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B qattach, lis_qattach
 \- attach a module onto a \fISTREAMS\fR file.
@@ -80,6 +80,20 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = lis_qattach(stdata_t *" head ", struct streamtab *" info ", dev_t *" devp ", cred_t *" credp );
+.SH ARGUMENTS
+.PP
+.TP
+.I head
+the stream head to attach.
+.TP
+.I info
+the stream table describing the module to attach to the stream head.
+.TP
+.I devp
+a pointer to the device number to be passed to the module's qopen procedure.
+.TP
+.I credp
+the credentials of the caller.
 .SH DESCRIPTION
 .PP
 .BR qattach ()
@@ -167,6 +181,9 @@ first appeared in SVR 3.
 .[
 svr3
 .]
+.PP
+.BR lis_qattach ()
+is no longer an exported function as of LiS-2.18.0.
 .\"
 .\"
 .XX

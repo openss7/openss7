@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: appq.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH APPQ 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH APPQ 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -84,6 +84,19 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI int " retval " "= appq(queue_t *" q ", mblk_t *" mp1 ", mblk_t *" mp2 );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue to which to append the message.
+.TP
+.I mp1
+the message after which to append the message.
+.TP
+.I mp2
+the message to append.
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgdsize.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\" @(#) $Id: msgdsize.9.man,v 1.1.4.2 2005/03/12 13:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MSGDSIZE 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH MSGDSIZE 9 "$Date: 2005/03/12 13:06:49 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B msgdsize, lis_msgdsize
 \- calculate the size of the data in a \fISTREAMS\fR message
@@ -80,6 +80,11 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = msgdsize(struct msgb *" mp );
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+the message chain for which to calculate the data size.
 .SH DESCRIPTION
 .PP
 .BR msgdsize ()

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datamsg.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\" @(#) $Id: datamsg.9.man,v 1.1.4.2 2005/03/12 13:06:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DATAMSG 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH DATAMSG 9 "$Date: 2005/03/12 13:06:43 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B datamsg
 \- tests a \fISTREAMS\fR message type for data
@@ -80,6 +80,11 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = datamsg(int " type );
+.SH ARGUMENTS
+.PP
+.TP
+.I type
+the message block type to test for being a data message.
 .SH DESCRIPTION
 .PP
 .BR datamsg ()

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 1.1.4.2 2005/03/12 13:06:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TIMEOUT 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH TIMEOUT 9 "$Date: 2005/03/12 13:06:50 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B timeout, lis_timeout
 \- start a timer
@@ -82,6 +82,17 @@ sort-adjacent-labels
 .B #include <sys/dki.h>
 .HP 8
 .BI "toid_t " tid " = timeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks );
+.SH ARGUMENTS
+.PP
+.TP
+.I timo_fcn
+the timeout function to call.
+.TP
+.I arg
+the argument to pass to the timeout function.
+.TP
+.I ticks
+the number of clock ticks to wait.
 .SH DESCRIPTION
 .PP
 .BR timeout ()

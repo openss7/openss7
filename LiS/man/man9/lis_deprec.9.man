@@ -1,0 +1,299 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: lis_deprec.9.man,v 1.1.2.1 2005/03/12 13:06:45 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/03/12 13:06:45 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LIS_DEPREC 9 "$Date: 2005/03/12 13:06:45 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.SH NAME
+.B lis_deprec
+\- deprecated LiS symbols
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBdeprecated_symbol\fR()
+.SH DESCRIPTION
+.PP
+.hy 6
+These are deprecated LiS symbols:
+.TP
+.BR lis_add_timer ,
+.PD 0
+.TP
+.BR lis_allocq ,
+.TP
+.BR lis_apushm ,
+.TP
+.BR lis_basename ,
+.TP
+.BR lis_bprintf ,
+.TP
+.BR lis_can_unload ,
+.TP
+.BR lis_check_guard ,
+.TP
+.BR lis_check_mem ,
+.TP
+.BR lis_check_q_magic ,
+.TP
+.BR lis_check_region ,
+.TP
+.BR lis_check_mem_region ,
+.TP
+.BR lis_check_umem ,
+.TP
+.BR lis_copyin ,
+.TP
+.BR lis_copyout ,
+.TP
+.BR lis_dec_mod_cnt_fcn ,
+.TP
+.BR lis_del_timer ,
+.TP
+.BR lis_dobufcall ,
+.TP
+.BR lis_doclose ,
+.TP
+.BR lis_enable_intr ,
+.TP
+.BR lis_fattach ,
+.TP
+.BR lis_fdetach ,
+.TP
+.BR lis_fdetach_all ,
+.TP
+.BR lis_fdetach_stream ,
+.TP
+.BR lis_fifo_close_sync ,
+.TP
+.BR lis_fifo_open_sync ,
+.TP
+.BR lis_fifo_write_sync ,
+.TP
+.BR lis_file_inode ,
+.TP
+.BR lis_file_str ,
+.TP
+.BR lis_find_strdev ,
+.TP
+.BR lis_flush_print_buffer ,
+.TP
+.BR lis_fmod_sw ,
+.TP
+.BR lis_freedb ,
+.TP
+.BR lis_free_passfp ,
+.TP
+.BR lis_freeq ,
+.TP
+.BR lis_fstr_sw ,
+.TP
+.BR lis_get_fifo ,
+.TP
+.BR lis_get_passfp ,
+.TP
+.BR lis_get_pipe ,
+.TP
+.BR lis_inc_mod_cnt_fcn ,
+.TP
+.BR lis_init_bufcall ,
+.TP
+.BR lis_in_syscall ,
+.TP
+.BR lis_ioc_fattach ,
+.TP
+.BR lis_ioc_fdetach ,
+.TP
+.BR lis_ioc_pipe ,
+.TP
+.BR lis__kfree ,
+.TP
+.BR lis_kill_pg ,
+.TP
+.BR lis_kill_proc ,
+.TP
+.BR lis__kmalloc ,
+.TP
+.BR lis_loadable_load ,
+.TP
+.BR lis_maj_min_name ,
+.TP
+.BR lis_mark_mem ,
+.TP
+.BR lis_max_mem ,
+.TP
+.BR lis_old_inode ,
+.TP
+.BR lis_open_cnt ,
+.TP
+.BR lis_pci_cleanup ,
+.TP
+.BR lis_pipe ,
+.TP
+.BR lis_poll_2_1 ,
+.TP
+.BR lis_poll_bits ,
+.TP
+.BR lis_poll_events ,
+.TP
+.BR lis_poll_file ,
+.TP
+.BR lis_print_queues ,
+.TP
+.BR lis_print_spl_track ,
+.TP
+.BR lis_print_stream ,
+.TP
+.BR lis_qdetach ,
+.TP
+.BR lis_queuerun_cnts ,
+.TP
+.BR lis_queues_running ,
+.TP
+.BR lis_recvfd ,
+.TP
+.BR lis_release_mem_region ,
+.TP
+.BR lis_request_mem_region ,
+.TP
+.BR lis_runq_cnts ,
+.TP
+.BR lis_runq_req_cnt ,
+.TP
+.BR lis_sendfd ,
+.TP
+.BR lis_seq_cntr ,
+.TP
+.BR lis_set_file_str ,
+.TP
+.BR lis_setq ,
+.TP
+.BR lis_setqsched ,
+.TP
+.BR lis_setqsched_cnts ,
+.TP
+.BR lis_setqsched_isr_cnts ,
+.TP
+.BR lis_stdata_cnt ,
+.TP
+.BR lis_strclose ,
+.TP
+.BR lis_strcount ,
+.TP
+.BR lis_strgetpmsg ,
+.TP
+.BR lis_strioctl ,
+.TP
+.BR lis_stropen ,
+.TP
+.BR lis_strputpmsg ,
+.TP
+.BR lis_strread ,
+.TP
+.BR lis_strstats ,
+.TP
+.BR lis_strwrite ,
+.TP
+.BR lis_umount2 ,
+.TP
+.BR lis_valid_mod_list .
+.PD
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+Note that most of these symbols were undocumented in LiS-2.18.19.
+.\"
+.\"
+.SH "HISTORY"
+.PP
+These symbols appeared in LiS-2.16.19 but were deprecated in LiS-2.18.0.  These symbols are also
+deprecated in LiS.
+.[
+LiS
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+svr42
+.]
+.[
+svr4
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_mount.9.man,v 1.1.4.1 2005/03/09 23:14:05 brian Exp $
+.\" @(#) $Id: lis_mount.9.man,v 1.1.4.2 2005/03/12 13:06:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MOUNT 9 "$Date: 2005/03/09 23:14:05 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH MOUNT 9 "$Date: 2005/03/12 13:06:46 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B mount, lis_mount
 \- mount a file system
@@ -82,6 +82,23 @@ sort-adjacent-labels
 .B #include <sys/dki.h>
 .HP 8
 .BI "int " retval " = lis_mount(char *" specialfile ", char *" dir ", char *" filesystemtype ", unsigned long " mountflags ", void *" data );
+.SH ARGUMENTS
+.PP
+.TP
+.I specialfile
+special device file to mount.
+.TP
+.I dir
+directory in the filesystem upon which to mount.
+.TP
+.I filesystemtype
+the type of the filesystem to mount.
+.TP
+.I mountflags
+how to mount the filesystem.
+.TP
+.I data
+filesystem specific data.
 .SH DESCRIPTION
 .PP
 .BR mount ()

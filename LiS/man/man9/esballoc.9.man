@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 1.1.4.2 2005/03/12 13:06:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ESBALLOC 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH ESBALLOC 9 "$Date: 2005/03/12 13:06:43 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B esballoc
 \- allocate a \fISTREAMS\fR message and data block with a caller supplied data buffer
@@ -80,6 +80,20 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "mblk_t *" mp " = esballoc(unsigned char *" base ", int " size, ", int " priority ", frtn_t *" freeinfo );
+.SH ARGUMENTS
+.PP
+.TP
+.I base
+a pointer to the buffer area for which to allocate a message header.
+.TP
+.I size
+the size of the buffer area.
+.TP
+.I priority
+the priority of the message header request.
+.TP
+.I freeinfo
+a pointer to a structure describing the function and argument to pass to free the buffer.
 .SH DESCRIPTION
 .PP
 .B ESBALLOC

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: OTHERQ.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: OTHERQ.9.man,v 1.1.4.2 2005/03/12 13:06:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH OTHER 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH OTHER 9 "$Date: 2005/03/12 13:06:41 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B OTHER, OTHERQ
 \- return the other queue of a \fISTREAMS\fR queue pair
@@ -82,6 +82,11 @@ sort-adjacent-labels
 .BI "queue_t *" oq " = OTHER(" q );
 .HP 8
 .BI "queue_t *" oq " = OTHERQ(" q );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue for which to find the other queue in the queue pair.
 .SH DESCRIPTION
 .PP
 .BR OTHERQ ()

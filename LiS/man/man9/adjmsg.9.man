@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ADJMSG 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH ADJMSG 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B adjmsg
 \- trim bytes from the front or back of a \fISTREAMS\fR message
@@ -80,6 +80,14 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .IB retval " = adjmsg(mblk_t *" mp ", int " length );
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+a pointer to the message to adjust.
+.TP
+.I length
+the length to which to adjust the message.
 .SH DESCRIPTION
 .PP
 .BR adjmsg ()

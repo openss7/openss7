@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmn_err.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\" @(#) $Id: cmn_err.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH CMN_ERR 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH CMN_ERR 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B cmn_err
 \- print a kernel command error
@@ -80,6 +80,19 @@ sort-adjacent-labels
 .B #include <sys/cmn_err.h>
 .HP 8
 .BI "cmn_err(int " err_lvl ", char *" fmt ", " ... );
+.SH ARGUMENTS
+.PP
+.TP
+.I err_lvl
+the error level to report.
+.TP
+.I fmt
+a
+.BR printf (3)
+format string.
+.TP
+.I ...
+the arguments to complete the format string.
 .SH DESCRIPTION
 .PP
 .BR cmn_err ()

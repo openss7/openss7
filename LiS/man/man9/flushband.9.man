@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 1.1.4.1 2005/03/09 23:14:00 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 1.1.4.2 2005/03/12 13:06:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:00 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH FLUSHBAND 9 "$Date: 2005/03/09 23:14:00 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH FLUSHBAND 9 "$Date: 2005/03/12 13:06:43 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B flushband
 \- flushes band \fISTREAMS\fR messages from a message queue
@@ -80,6 +80,17 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "flushband(queue_t *" q ", unsigned char " band ", int " flag );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue to flush.
+.TP
+.I band
+the queue band in the queue to flush.
+.TP
+.I flag
+how to flush the queue band.
 .SH DESCRIPTION
 .PP
 .BR flushband ()

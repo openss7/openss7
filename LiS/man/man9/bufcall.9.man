@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bufcall.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: bufcall.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BUFCALL 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH BUFCALL 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B bufcall
 \- install a \fISTREAMS\fR buffer callback
@@ -80,6 +80,17 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = bufcall(unsigned " size ", int " priority ", void (*" function ")(long), long " arg );
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+the size of buffer requested.
+.TP
+.I priority
+the priority the the buffer request.
+.TP
+.I function
+the callback to function when a buffer of an appropriate size becomes available.
 .SH DESCRIPTION
 .PP
 When allocation of a buffer fails as a result of a failed call to

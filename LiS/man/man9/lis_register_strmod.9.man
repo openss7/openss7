@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_register_strmod.9.man,v 1.1.4.1 2005/03/09 23:14:09 brian Exp $
+.\" @(#) $Id: lis_register_strmod.9.man,v 1.1.4.2 2005/03/12 13:06:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:09 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LIS_REGISTER_STRMOD 9 "$Date: 2005/03/09 23:14:09 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH LIS_REGISTER_STRMOD 9 "$Date: 2005/03/12 13:06:47 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B lis_register_strmod
 \- register a \fISTREAMS\fR module
@@ -80,7 +80,15 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "modID_t " modid " = lis_register_strmod(struct streamtab *" strtab ", const char *" name );
+.SH ARGUMENTS
+.PP
 .SH DESCRIPTION
+.TP
+.I strtab
+the \fISTREAMS\fR stream table entry to register.
+.TP
+.I name
+the name of the \fISTREAMS\fR module
 .PP
 .BR lis_register_strmod ()
 registers a new

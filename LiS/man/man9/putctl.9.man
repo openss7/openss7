@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\" @(#) $Id: putctl.9.man,v 1.1.4.2 2005/03/12 13:06:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH PUTCTL 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH PUTCTL 9 "$Date: 2005/03/12 13:06:49 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B putctl, lis_putctl
 \- puts a control message on a \fISTREAMS\fR message queue
@@ -80,6 +80,14 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = putctl(queue_t *" q ", int " type );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue to which to put the control message.
+.TP
+.I type
+the type of the control message.
 .SH DESCRIPTION
 .PP
 .BR putctl ()

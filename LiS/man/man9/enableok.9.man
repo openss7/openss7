@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableok.9.man,v 1.1.4.1 2005/03/09 23:13:59 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 1.1.4.2 2005/03/12 13:06:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:59 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ENABLEOK 9 "$Date: 2005/03/09 23:13:59 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH ENABLEOK 9 "$Date: 2005/03/12 13:06:43 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B enableok
 \- allows a \fISTREAMS\fR message queue to be scheduled
@@ -80,6 +80,11 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "enableok(queue_t *" q );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue to permit to be enabled.
 .SH DESCRIPTION
 .PP
 .BR enableok ()

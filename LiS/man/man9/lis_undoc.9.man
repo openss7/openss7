@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.1 2005/03/09 23:14:12 brian Exp $
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.2 2005/03/12 13:06:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LIS_UNDOC 9 "$Date: 2005/03/09 23:14:12 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH LIS_UNDOC 9 "$Date: 2005/03/12 13:06:48 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B lis_undoc
 \- undocumented LiS symbols
@@ -84,8 +84,34 @@ sort-adjacent-labels
 .hy 6
 These are undocumented LiS symbols:
 .TP
-.BR lis_add_timer ,
+.BR __wrap_memcmp ,
 .PD 0
+.TP
+.BR __wrap_memcpy ,
+.TP
+.BR __wrap_memset ,
+.TP
+.BR __wrap_strcat ,
+.TP
+.BR __wrap_strchr ,
+.TP
+.BR __wrap_strcmp ,
+.TP
+.BR __wrap_strcpy ,
+.TP
+.BR __wrap_strlen ,
+.TP
+.BR __wrap_strncat ,
+.TP
+.BR __wrap_strncmp ,
+.TP
+.BR __wrap_strncpy ,
+.TP
+.BR __wrap_strnicmp ,
+.TP
+.BR __wrap_strrchr ,
+.TP
+.BR __wrap_strstr ,
 .TP
 .BR lis_alloc_atomic_fcn ,
 .TP
@@ -94,8 +120,6 @@ These are undocumented LiS symbols:
 .BR lis_alloc_kernel_fcn ,
 .TP
 .BR lis_apush_get ,
-.TP
-.BR lis_apushm ,
 .TP
 .BR lis_apush_set ,
 .TP
@@ -117,79 +141,25 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_backq_fcn ,
 .TP
-.BR lis_basename ,
-.TP
 .BR lis_bcanputnext_anyband ,
-.TP
-.BR lis_bprintf ,
-.TP
-.BR lis_can_unload ,
-.TP
-.BR lis_check_guard ,
-.TP
-.BR lis_check_mem ,
-.TP
-.BR lis_check_mem_region ,
-.TP
-.BR lis_check_q_magic ,
-.TP
-.BR lis_check_region ,
-.TP
-.BR lis_check_umem ,
 .TP
 .BR lis_clone_major ,
 .TP
-.BR lis_copyin ,
-.TP
-.BR lis_copyout ,
+.BR lis_debug_mask ,
 .TP
 .BR lis_debug_mask2 ,
 .TP
-.BR lis_debug_mask ,
-.TP
-.BR lis_dec_mod_cnt_fcn ,
-.TP
-.BR lis_del_timer ,
-.TP
 .BR lis_disable_irq ,
-.TP
-.BR lis_dobufcall ,
-.TP
-.BR lis_doclose ,
 .TP
 .BR lis_down_fcn ,
 .TP
-.BR lis_dsecs ,
+.BR lis_down_nosig_fcn ,
 .TP
-.BR lis_enable_intr ,
+.BR lis_dsecs ,
 .TP
 .BR lis_enable_irq ,
 .TP
-.BR lis_fattach ,
-.TP
-.BR lis_fdetach ,
-.TP
-.BR lis_fdetach_all ,
-.TP
-.BR lis_fdetach_stream ,
-.TP
-.BR lis_fifo_close_sync ,
-.TP
-.BR lis_fifo_open_sync ,
-.TP
-.BR lis_fifo_write_sync ,
-.TP
-.BR lis_file_inode ,
-.TP
-.BR lis_file_str ,
-.TP
-.BR lis_flush_print_buffer ,
-.TP
-.BR lis_fmod_sw ,
-.TP
 .BR lis_free ,
-.TP
-.BR lis_freedb ,
 .TP
 .BR lis_free_dma ,
 .TP
@@ -199,11 +169,7 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_free_pages_fcn ,
 .TP
-.BR lis_free_passfp ,
-.TP
-.BR lis_fstr_sw ,
-.TP
-.BR lis_get_fifo ,
+.BR lis_freezestr ,
 .TP
 .BR lis_get_free_pages_atomic_fcn ,
 .TP
@@ -213,33 +179,29 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_getint ,
 .TP
-.BR lis_get_passfp ,
+.BR lis_getmajor ,
 .TP
-.BR lis_get_pipe ,
+.BR lis_getminor ,
 .TP
 .BR lis_gettimeofday ,
 .TP
 .BR lis_hitime ,
 .TP
-.BR lis_inc_mod_cnt_fcn ,
-.TP
-.BR lis_init_bufcall ,
-.TP
-.BR lis_in_syscall ,
+.BR lis_in_interrupt ,
 .TP
 .BR lis_interruptible_sleep_on ,
 .TP
-.BR lis_ioc_fattach ,
-.TP
-.BR lis_ioc_fdetach ,
-.TP
-.BR lis_ioc_pipe ,
+.BR lis_interruptible_sleep_on_timeout ,
 .TP
 .BR lis_ioremap ,
 .TP
 .BR lis_ioremap_nocache ,
 .TP
 .BR lis_iounmap ,
+.TP
+.BR lis_irqreturn_handled ,
+.TP
+.BR lis_irqreturn_not_handled ,
 .TP
 .BR lis_jiffies ,
 .TP
@@ -249,27 +211,17 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_kernel_version ,
 .TP
-.BR lis__kfree ,
-.TP
 .BR lis_kfree ,
-.TP
-.BR lis_kill_pg ,
-.TP
-.BR lis_kill_proc ,
-.TP
-.BR lis__kmalloc ,
 .TP
 .BR lis_kmalloc ,
 .TP
-.BR lis_loadable_load ,
-.TP
-.BR lis_maj_min_name ,
-.TP
 .BR lis_major ,
+.TP
+.BR lis_makedevice ,
 .TP
 .BR lis_malloc ,
 .TP
-.BR lis_max_mem ,
+.BR lis_mark_mem_fcn ,
 .TP
 .BR lis_membar ,
 .TP
@@ -280,10 +232,6 @@ These are undocumented LiS symbols:
 .BR lis_msg_type_name ,
 .TP
 .BR lis_num_cpus ,
-.TP
-.BR lis_old_inode ,
-.TP
-.BR lis_open_cnt ,
 .TP
 .BR lis_osif_cli ,
 .TP
@@ -365,30 +313,6 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_pci_alloc_consistent ,
 .TP
-.BR lis_pcibios_find_class ,
-.TP
-.BR lis_pcibios_find_device ,
-.TP
-.BR lis_pcibios_init ,
-.TP
-.BR lis_pcibios_present ,
-.TP
-.BR lis_pcibios_read_config_byte ,
-.TP
-.BR lis_pcibios_read_config_dword ,
-.TP
-.BR lis_pcibios_read_config_word ,
-.TP
-.BR lis_pcibios_strerror ,
-.TP
-.BR lis_pcibios_write_config_byte ,
-.TP
-.BR lis_pcibios_write_config_dword ,
-.TP
-.BR lis_pcibios_write_config_word ,
-.TP
-.BR lis_pci_cleanup ,
-.TP
 .BR lis_pci_disable_device ,
 .TP
 .BR lis_pci_dma_handle_to_32 ,
@@ -429,23 +353,33 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_pci_write_config_word ,
 .TP
+.BR lis_pcibios_find_class ,
+.TP
+.BR lis_pcibios_find_device ,
+.TP
+.BR lis_pcibios_init ,
+.TP
+.BR lis_pcibios_present ,
+.TP
+.BR lis_pcibios_read_config_byte ,
+.TP
+.BR lis_pcibios_read_config_dword ,
+.TP
+.BR lis_pcibios_read_config_word ,
+.TP
+.BR lis_pcibios_strerror ,
+.TP
+.BR lis_pcibios_write_config_byte ,
+.TP
+.BR lis_pcibios_write_config_dword ,
+.TP
+.BR lis_pcibios_write_config_word ,
+.TP
 .BR lis_phys_to_virt ,
-.TP
-.BR lis_pipe ,
-.TP
-.BR lis_poll_2_1 ,
-.TP
-.BR lis_poll_bits ,
-.TP
-.BR lis_poll_events ,
-.TP
-.BR lis_poll_file ,
 .TP
 .BR lis_print_block ,
 .TP
 .BR lis_print_data ,
-.TP
-.BR lis_printk ,
 .TP
 .BR lis_print_mem ,
 .TP
@@ -453,25 +387,21 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_print_queue ,
 .TP
-.BR lis_print_queues ,
+.BR lis_printk ,
 .TP
-.BR lis_print_spl_track ,
-.TP
-.BR lis_print_stream ,
+.BR lis_putbqf ,
 .TP
 .BR lis_putbyte ,
+.TP
+.BR lis_putqf ,
 .TP
 .BR lis_qcountstrm ,
 .TP
 .BR lis_queue_name ,
 .TP
-.BR lis_queuerun_cnts ,
+.BR lis_register_driver_qlock_option ,
 .TP
-.BR lis_queues_running ,
-.TP
-.BR lis_recvfd ,
-.TP
-.BR lis_release_mem_region ,
+.BR lis_register_module_qlock_option ,
 .TP
 .BR lis_release_region ,
 .TP
@@ -479,13 +409,7 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_request_irq ,
 .TP
-.BR lis_request_mem_region ,
-.TP
 .BR lis_request_region ,
-.TP
-.BR lis_runq_cnts ,
-.TP
-.BR lis_runq_req_cnt ,
 .TP
 .BR lis_rw_lock_alloc_fcn ,
 .TP
@@ -527,21 +451,9 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_sem_init ,
 .TP
-.BR lis_sendfd ,
-.TP
-.BR lis_seq_cntr ,
-.TP
-.BR lis_set_file_str ,
-.TP
-.BR lis_setq ,
-.TP
-.BR lis_setqsched ,
-.TP
-.BR lis_setqsched_cnts ,
-.TP
-.BR lis_setqsched_isr_cnts ,
-.TP
 .BR lis_sleep_on ,
+.TP
+.BR lis_sleep_on_timeout ,
 .TP
 .BR lis_spin_is_locked_fcn ,
 .TP
@@ -573,31 +485,11 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_sprintf ,
 .TP
-.BR lis_stdata_cnt ,
-.TP
-.BR lis_strclose ,
-.TP
-.BR lis_strcount ,
-.TP
-.BR lis_strgetpmsg ,
-.TP
-.BR lis_strioctl ,
-.TP
 .BR lis_strm_name ,
 .TP
 .BR lis_strm_name_from_queue ,
 .TP
-.BR lis_stropen ,
-.TP
 .BR lis_stropts_file ,
-.TP
-.BR lis_strputpmsg ,
-.TP
-.BR lis_strread ,
-.TP
-.BR lis_strstats ,
-.TP
-.BR lis_strwrite ,
 .TP
 .BR lis_thread_start ,
 .TP
@@ -607,13 +499,13 @@ These are undocumented LiS symbols:
 .TP
 .BR lis_udelay ,
 .TP
+.BR lis_unfreezestr ,
+.TP
 .BR lis_up_fcn ,
 .TP
 .BR lis_usecs ,
 .TP
 .BR lis_usectohz ,
-.TP
-.BR lis_valid_mod_list ,
 .TP
 .BR lis_vfree ,
 .TP
@@ -624,6 +516,10 @@ These are undocumented LiS symbols:
 .BR lis_vremap ,
 .TP
 .BR lis_vsprintf ,
+.TP
+.BR lis_wait_event ,
+.TP
+.BR lis_wait_event_interruptible ,
 .TP
 .BR lis_wake_up ,
 .TP

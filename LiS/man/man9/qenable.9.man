@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 1.1.4.1 2005/03/09 23:14:13 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 1.1.4.2 2005/03/12 13:06:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QENABLE 9 "$Date: 2005/03/09 23:14:13 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH QENABLE 9 "$Date: 2005/03/12 13:06:50 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B qenable, lis_qenable
 \- schedules a \fISTREAMS\fR message queue service routine
@@ -80,6 +80,11 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "qenable(queue_t *" q );
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue to enable.
 .SH DESCRIPTION
 .PP
 .BR qenable ()

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 1.1.4.1 2005/03/09 23:14:00 brian Exp $
+.\" @(#) $Id: insq.9.man,v 1.1.4.2 2005/03/12 13:06:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:00 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:44 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH INSQ 9 "$Date: 2005/03/09 23:14:00 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH INSQ 9 "$Date: 2005/03/12 13:06:44 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .\"
 .\"
 .SH NAME
@@ -84,6 +84,19 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "int " retval " = insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I q
+the queue into which to insert the message.
+.TP
+.I emp
+the message on the queue before which to insert the message.
+.TP
+.I mp
+the message to insert.
 .\"
 .\"
 .SH DESCRIPTION

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 1.1.4.2 2005/03/12 13:06:41 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:41 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH LiS 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH LiS 9 "$Date: 2005/03/12 13:06:41 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B LiS
 \- introduction to \fISTREAMS\fR kernel functions
@@ -86,6 +86,8 @@ sort-adjacent-labels
 .br
 .B #include <sys/dki.h>
 .SH DESCRIPTION
+.PP
+.SH OVERVIEW
 .PP
 .SS "Header Files"
 .HP

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocson.9.man,v 1.1.4.1 2005/03/09 23:14:14 brian Exp $
+.\" @(#) $Id: qprocson.9.man,v 1.1.4.2 2005/03/12 13:06:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:14:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH QPROCSON 9 "$Date: 2005/03/09 23:14:14 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH QPROCSON 9 "$Date: 2005/03/12 13:06:50 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B qprocson, lis_qprocson
 \- enables a \fISTREAMS\fR message queue for multi-processing
@@ -80,6 +80,11 @@ sort-adjacent-labels
 .B #include <sys/stream.h>
 .HP 8
 .BI "qprocson(queue_t *" rq );
+.SH ARGUMENTS
+.PP
+.TP
+.I rq
+the read queue of the queue pair for which to turn on queue procedures.
 .SH DESCRIPTION
 .PP
 .BR qprocson ()

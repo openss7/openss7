@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bzero.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: bzero.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH BZERO 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH BZERO 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH "NAME"
 .B bzero
 \- zero a byte string
@@ -80,6 +80,14 @@ sort-adjacent-labels
 .B #include <string.h>
 .HP 8
 .BI "void *" retval " = bzero(const void *" str ", size_t " len );
+.SH "ARGUMENTS"
+.PP
+.TP
+.I str
+the start of the memory region to zero.
+.TP
+.I len
+the size of the memory region to zero.
 .SH "DESCRIPTION"
 .PP
 .BR bzero ()

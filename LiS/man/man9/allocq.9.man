@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 1.1.4.1 2005/03/09 23:13:58 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 1.1.4.2 2005/03/12 13:06:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/03/12 13:06:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH ALLOCQ 9 "$Date: 2005/03/09 23:13:58 $" "$Name:  $" "Linux STREAMS DDI/DKI"
+.TH ALLOCQ 9 "$Date: 2005/03/12 13:06:42 $" "$Name:  $" "Linux STREAMS DDI/DKI"
 .SH NAME
 .B alloq
 \- allocate a \fISTREAMS\fR queue pair
@@ -82,6 +82,11 @@ sort-adjacent-labels
 .BI "queue_t *" q " = allocq();
 .HP 8
 .BI "queue_t *" q " = lis_allocq(const char *" name );
+.SH ARGUMENTS
+.PP
+.TP
+.I name
+the name of the queue to allocate.
 .SH DESCRIPTION
 .PP
 Allocate a new
@@ -139,6 +144,9 @@ appears in the SVR 4 STREAMS
 svr4
 .]
 documentation.
+.PP
+.BR lis_allocq ()
+is no longer an exported function as of LiS-2.18.0.
 .SH VERSIONS
 .PP
 This manpage was written for
