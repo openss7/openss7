@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/14 08:02:59 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/25 05:55:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/14 08:02:59 $ by $Author: brian $
+# Last Modified $Date: 2004/04/25 05:55:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,10 +92,6 @@ install-exec-local: install-modules
 # have a usable system map file and an executable depmod, we perform the depmod.
 # Finally we invoke installation of any necessary devices.
 #
-# Note that if there is an older LiS autoconf installation that included these
-# drivers and modules, we remove references to them from the modules.streams
-# file and remove the modules from the streams subdirectory.
-#
 post-modules:
 	@conf_fil='$(DESTDIR)$(krootdir)/etc/modules.conf' ; \
 	if test -r $$conf_fil ; then \
@@ -104,28 +100,10 @@ post-modules:
 			cp -f $$conf_fil $$conf_new ; \
 			if ( grep -q 'BEGIN LiS' $$conf_fil ) ; then \
 				conf_tmp='$(DESTDIR)$(krootdir)/etc/modules.conf.tmp.$$$$' ; \
-				list='$(KERNEL_MODULES)'; for p in $$list; do \
-					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\.o||'`" ; \
-					sed -e '/alias.*\<'$$m'\>/d' $$conf_new > $$conf_tmp ; \
-					mv -f $$conf_tmp $$conf_new ; \
-					rm -f $(DESTDIR)$(kmoduledir)/misc/$$m.o ; \
-				done ; \
-			fi ; \
-			streams_dir='$(DESTDIR)$(kmoduledir)/streams' ; \
-			streams_old='$(DESTDIR)$(kmoduledir)/modules.streams' ; \
-			if test -f $$streams_old -a -d $$streams_dir ; then \
-				streams_new='$(DESTDIR)$(kmoduledir)/modules.streams.new.$$$$' ; \
-				streams_tmp='$(DESTDIR)$(kmoduledir)/modules.streams.tmp.$$$$' ; \
-				cp -f $$streams_old $$streams_new ; \
-				list='$(KERNEL_MODULES)'; for p in $$list; do \
-					m="`echo $$p | sed -e 's|^.*/||;s|lib.*_a|streams|;s|\.o||'`" ; \
-					sed -e '/alias.*\<'$$m'\>/d' $$streams_new > $$streams_tmp ; \
-					mv -f $$streams_tmp $$streams_new ; \
-					rm -f $$streams_dir/$$m.o ; \
-				done ; \
-				chmod --reference=$$streams_old $$streams_new ; \
-				cp -fb --suffix=.$(KMODCONF_EXT).bak $$streams_new $$streams_old ; \
-				rm -f $$streams_new ; \
+				sed -e '/# BEGIN LiS/,/# END LiS/d;/#BEGIN LiS/,/#END LiS/d;/alias.*streams-/d' $$conf_new > $$conf_tmp ; \
+				mv -f $$conf_tmp $$conf_new ; \
+				rm -f $(DESTDIR)$(kmoduledir)/misc/streams*.o ; \
+				rmdir --ignore-fail-on-non-empty $(DESTDIR)$(kmoduledir)/misc ; \
 			fi ; \
 			echo 'prune modules.$(KMODCONF_EXT)' >> $$conf_new ; \
 			echo 'if -f /lib/modules/`uname -r`/modules.$(KMODCONF_EXT)' >> $$conf_new ; \
@@ -135,10 +113,12 @@ post-modules:
 			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
 			rm -f $$conf_new ; \
 		fi ; \
-		sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
-		if test -r $$sysmap -a -x /sbin/depmod ; then \
-			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
-			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
+		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
+			sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
+			if test -r $$sysmap ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
+			fi ; \
 		fi ; \
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) install-devices ; \
 	fi
@@ -195,10 +175,12 @@ postun-modules:
 			cp -fb --suffix=.$(KMODCONF_EXT).bak $$conf_new $$conf_fil ; \
 			rm -f $$conf_new ; \
 		fi ; \
-		sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
-		if test -r $$sysmap -a -x /sbin/depmod ; then \
-			echo "UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
-			UNAME_MACHINE=$(target_cpu) /sbin/depmod -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
+		if test -n "$(DEPMOD)" -a -x "$(DEPMOD)"; then \
+			sysmap='$(DESTDIR)$(krootdir)/boot/System.map-$(kversion)' ; \
+			if test -r $$sysmap ; then \
+				echo "UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion)" ; \
+				UNAME_MACHINE=$(target_cpu) $(DEPMOD) -ae -b $(DESTDIR)$(krootdir)/ -C $$conf_fil -F $$sysmap $(kversion) ; \
+			fi ; \
 		fi ; \
 		$(MAKE) $(AM_MAKEFLAGS) DESTDIR=$(DESTDIR) uninstall-devices ; \
 	fi

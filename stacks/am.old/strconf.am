@@ -1,7 +1,6 @@
-# vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: lisconf.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/15 10:17:27 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/25 05:53:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,52 +46,62 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/15 10:17:27 $ by $Author: brian $
+# Last Modified $Date: 2004/04/25 05:53:42 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   Automake makefile fragment for including LiS (Linux STREAMS) configuration
-#   targets and scripts.  This was previously part of the Makefile.am proper,
-#   but was removed here to accomodate configuring both for LiS (Linux
-#   STREAMS) and LfS (Linux Fast-STREAMS).
-#
+$(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+	$(STRCONF) --hconfig=$(STRCONF_CONFIG) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-STRCONF_SCRIPT	    = $(auxdir)/strconf-sh
-STRCONF		    = $(SHELL) $(STRCONF_SCRIPT) -b$(STR_BASE_MAJOR)
-STRMAKENODES	    = ss7makenodes
+$(STRCONF_MKNODES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+	$(STRCONF) --makenodes=$(STRCONF_MKNODES) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-Config.master: $(strconf_FILES)
-	cat /dev/null > Config.master
-	@list='$(strconf_FILES)' ; cat /dev/null > Config.master ; for f in $$list ; do \
-		if test -f "$$f" ; then d= ; else d="$(srcdir)/" ; fi ; \
-		echo "cat $$d$$f >> Config.master" ; \
-		cat $$d$$f >> Config.master ; \
-	done
+$(STRCONF_CONFMOD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+	$(STRCONF) --confmodules=$(STRCONF_CONFMOD) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-conf.modules: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --confmodules=$@ $<
+$(STRCONF_MAKEDEV): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+	$(STRCONF) --strmknods=$(STRCONF_MAKEDEV) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-strconf.h: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --hconfig=$@ $<
+#$(STRCONF_MODCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+#	$(STRCONF) --modconf=$(STRCONF_MODCONF) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-devices.lst: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --strmknods=$@ $<
+#$(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+#	$(STRCONF) --driverconf=$(STRCONF_DRVCONF) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
 
-$(STRMAKENODES).c: Config.master $(STRCONF_SCRIPT)
-	$(STRCONF) --makenodes=$@ $<
+#$(STRCONF_STSETUP): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+#	$(STRCONF) --strsetup=$(STRCONF_STSETUP) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+
+#$(STRCONF_STRLOAD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+#	$(STRCONF) --strload=$(STRCONF_STRLOAD) -b$(STRCONF_MAJBASE) $(STRCONF_INPUT)
+
+$(STRCONF_INPUT): $(STRCONF_CONFIGS)
+	@if test -n "$(STRCONF_CONFIGS)" ; then \
+		echo "cat $(STRCONF_CONFIGS) > $(STRCONF_INPUT) < /dev/null" ; \
+		cat $(STRCONF_CONFIGS) > $(STRCONF_INPUT) < /dev/null ; \
+	else exit 1 ; fi ;
+
+EXTRA_DIST += $(STRCONF_CONFIGS)
 
 clean-devices:
-	rm -f Config.master conf.modules strconf.h devices.lst $(STRMAKENODES).c
-
-all-am: conf.modules strconf.h devices.lst
+	rm -f $(STRCONF_INPUT)
+	rm -f $(STRCONF_CONFIG)
+	rm -f $(STRCONF_MKNODES)
+	rm -f $(STRCONF_CONFMOD)
+	rm -f $(STRCONF_MAKEDEV)
+#	rm -f $(STRCONF_MODCONF)
+#	rm -f $(STRCONF_DRVCONF)
+#	rm -f $(STRCONF_STSETUP)
+#	rm -f $(STRCONF_STRLOAD)
 
 clean-local: clean-devices
 
 install-devices: $(STRMAKENODES)
 	$(STRMAKENODES)
 
-uninstall-devices: $(STRMAKENODES)
+uninstall-devices:
 	$(STRMAKENODES) --remove
+
+dist_noinst_SCRIPTS += $(STRCONF_SCRIPT)
+EXTRA_SCRIPTS += scripts/strconf-sh
 
 # vim: ft=automake

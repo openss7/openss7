@@ -79,7 +79,7 @@ AC_DEFUN([AC_LINUX_KERNEL], [
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_OPTIONS], [
     AC_ARG_WITH([k-release],
-                AC_HELP_STRING([--with-k-release=UTSRELEASE],
+                AS_HELP_STRING([--with-k-release=UTSRELEASE],
                                [specify the UTS release of the linux kernel for
                                 which the build is targetted.  If this option is
                                 not set, the build will be targetted at the
@@ -88,64 +88,64 @@ AC_DEFUN([_LINUX_KERNEL_OPTIONS], [
                 [with_k_release=$withval],
                 [with_k_release=''])
     AC_ARG_WITH([k-modules],
-                AC_HELP_STRING([--with-k-modules=DIR],
+                AS_HELP_STRING([--with-k-modules=DIR],
                                [specify the directory to which kernel modules
                                 will be installed.
                                 @<:@default=/lib/modules/K-RELEASE/misc@:>@]),
                 [with_k_modules=$withval],
                 [with_k_modules=''])
     AC_ARG_WITH([k-build],
-                AC_HELP_STRING([--with-k-build=DIR],
+                AS_HELP_STRING([--with-k-build=DIR],
                                [specify the base kernel build directory in which
                                 configured kernel source resides.
                                 @<:@default=K-MODULES-DIR/build@:>@]),
                 [with_k_build=$withval],
                 [with_k_build=''])
     AC_ARG_WITH([k-includes],
-                AC_HELP_STRING([--with-k-includes=DIR],
+                AS_HELP_STRING([--with-k-includes=DIR],
                                [specify the include directory of the kernel for
                                 which the build is targetted.
                                 @<:@default=K-BUILD-DIR/include@:>@]),
                 [with_k_includes=$withval],
                 [with_k_includes=''])
     AC_ARG_WITH([k-archdir],
-                AC_HELP_STRING([--with-k-archdir=DIR],
+                AS_HELP_STRING([--with-k-archdir=DIR],
                                [specify the kernel source architecture specific
                                 directory.  @<:@default=K-BUILD-DIR/arch@:>@]),
                 [with_k_archdir=$withval],
                 [with_k_archdir=''])
     AC_ARG_WITH([k-machdir],
-                AC_HELP_STRING([--with-k-machdir=DIR],
+                AS_HELP_STRING([--with-k-machdir=DIR],
                                [specify the kernel source machine specific
                                 directory.  @<:@default=K-ARCHDIR/ARCH@:>@]),
                 [with_k_machdir=$withval],
                 [with_k_machdir=''])
     AC_ARG_WITH([k-sysmap],
-                AC_HELP_STRING([--with-k-sysmap=MAP],
+                AS_HELP_STRING([--with-k-sysmap=MAP],
                                [specify the kernel system map file.
                                 @<:@default=K-BUILD-DIR/System.map@:>@]),
                 [with_k_sysmap=$withval],
                 [with_k_sysmap=''])
     AC_ARG_ENABLE([k-debug],
-                  AC_HELP_STRING([--enable-k-debug],
+                  AS_HELP_STRING([--enable-k-debug],
                                  [enable kernel module run-time debugging.
                                  @<:@default=no@:>@]),
                   [enable_k_debug=$enableval],
                   [enable_k_debug=''])
     AC_ARG_ENABLE([k-test],
-                  AC_HELP_STRING([--enable-k-test],
+                  AS_HELP_STRING([--enable-k-test],
                                  [enable kernel module run-time testing.
                                  @<:@default=no@:>@]),
                   [enable_k_test=$enableval],
                   [enable_k_test=''])
     AC_ARG_ENABLE([k-safe],
-                  AC_HELP_STRING([--enable-k-safe],
+                  AS_HELP_STRING([--enable-k-safe],
                                  [enable kernel module run-time safety checks.
                                  @<:@default=yes@:>@]),
                   [enable_k_safe=$enableval],
                   [enable_k_safe=''])
     AC_ARG_ENABLE([k-install],
-                  AC_HELP_STRING([--enable-k-install],
+                  AS_HELP_STRING([--enable-k-install],
                                  [specify whether kernel modules will be
                                  installed.  @<:@default=yes@:>@]),
                   [enable_k_install=$enableval],
@@ -338,6 +338,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [
     kmoduledir="${linux_cv_k_modules}"
     AC_SUBST(krootdir)
     AC_SUBST(kmoduledir)
+    AC_ARG_VAR([DEPMOD], [Build kernel module dependencies command])
+    AC_PATH_TOOL([DEPMOD], [depmod], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${DEPMOD:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find depmod program in PATH.
+***
+        ])
+    fi
 ])# _LINUX_CHECK_KERNEL_MODULES
 # =========================================================================
 
@@ -813,20 +822,24 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [
     fi
     case "$linux_tmp" in
         _DEBUG)
+            linux_cv_debug='_DEBUG'
             AC_DEFINE_UNQUOTED([_DEBUG], [], [Define for kernel symbol
             debugging.  This has the effect of defeating inlines, making
             static declarations global, and activating all debugging macros.])
             ;;
         _TEST)
+            linux_cv_debug='_TEST'
             AC_DEFINE_UNQUOTED([_TEST], [], [Define for kernel testing.  This
             has the same effect as _DEBUG for now.])
             ;;
         _SAFE)
+            linux_cv_debug='_SAFE'
             AC_DEFINE_UNQUOTED([_SAFE], [], [Define for kernel safety.  This
             has the effect of enabling safety debugging macros.  This is the
             default.])
             ;;
         *)
+            linux_cv_debug='_NONE'
             AC_DEFINE_UNQUOTED([_NONE], [], [Define for maximum performance
             and minimum size.  This has the effect of disabling all safety
             debugging macros.])
@@ -857,6 +870,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
     AC_SUBST([KERNEL_MODFLAGS])
     KERNEL_NOVERSION="-D__NO_VERSION__"
     AC_SUBST([KERNEL_NOVERSION])
+    AM_CONDITIONAL(KERNEL_VERSIONS, test x"$linux_cv_k_versions" = xyes)
 ])# _LINUX_CHECK_KERNEL_VERSIONS
 # =========================================================================
 

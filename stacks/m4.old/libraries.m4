@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/04/25 08:49:16 brian Exp $
+dnl @(#) rpm.m4,v 1.1.2.1 2004/01/13 16:11:35 brian Exp
 dnl
 dnl =========================================================================
 dnl
@@ -53,74 +53,48 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/25 08:49:16 $ by $Author: brian $
+dnl Last Modified 2004/01/13 16:11:35 by brian
 dnl 
 dnl =========================================================================
 
-m4_include([m4/streams.m4])
-m4_include([m4/kernel.m4])
-m4_include([m4/genksyms.m4])
-m4_include([m4/man.m4])
-m4_include([m4/public.m4])
-m4_include([m4/rpm.m4])
-m4_include([m4/libraries.m4])
-m4_include([m4/strconf.m4])
-
 # =========================================================================
-# AC_SS7
+# AC_LDCONFIG
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_SS7], [
-    ac_default_prefix='/usr'
-    _SS7_OPTIONS
-    AC_MAN_CONVERSION
-    AC_PUBLIC_RELEASE
-    AC_RPM_SPEC
-    AC_LDCONFIG
-    AC_STRCONF
-    # user CPPFLAGS and CFLAGS
-    USER_CPPFLAGS="${CPPFLAGS}"
-    USER_CFLAGS="${CFLAGS}"
-    AC_LINUX_KERNEL
-    AC_LINUX_STREAMS
-    SS7_INCLUDES="-I- -imacros ./config.h ${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I./src/include -I${srcdir}/src/include"
-    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $SS7_INCLUDES])
-    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
-    AC_SUBST([USER_CPPFLAGS])
-    AC_SUBST([USER_CFLAGS])
-    AC_SUBST([SS7_INCLUDES])
-    CPPFLAGS=
-    CFLAGS=
-])# AC_SS7
+AC_DEFUN([AC_LDCONFIG], [
+    _LDCONFIG_SPEC_OPTIONS
+    _LDCONFIG_SPEC_SETUP
+    _LDCONFIG_SPEC_OUTPUT
+])# AC_LDCONFIG
 # =========================================================================
 
 # =========================================================================
-# _SS7_OPTIONS
+# _LDCONFIG_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_OPTIONS], [
-    AC_ARG_ENABLE([inet],
-                  AS_HELP_STRING([--enable-inet],
-                                 [enable inet package. @<:@default=no@:>@]),
-                  [enable_inet=$enableval],
-                  [enable_inet=''])
-    AC_ARG_ENABLE([sctp2],
-                  AS_HELP_STRING([--enable-sctp2],
-                                 [enable sctp2 package. @<:@default=no@:>@]),
-                  [enable_sctp2=$enableval],
-                  [enable_sctp2=''])
-])# _SS7_OPTIONS
+AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [
+])# _LDCONFIG_SPEC_OPTIONS
 # =========================================================================
 
 # =========================================================================
-# _SS7_
+# _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_SS7_], [
-])# _SS7_
+AC_DEFUN([_LDCONFIG_SPEC_SETUP], [
+    AC_ARG_VAR([LDCONFIG], [Configure loader command])
+    AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${LDCONFIG:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find ldconfig program in PATH.
+***
+        ])
+    fi
+])# _LDCONFIG_SPEC_SETUP
+# =========================================================================
+
+# =========================================================================
+# _LDCONFIG_SPEC_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [
+])# _LDCONFIG_SPEC_OUTPUT
 # =========================================================================
 
 dnl =========================================================================

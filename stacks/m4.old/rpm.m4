@@ -63,8 +63,7 @@ dnl =========================================================================
 # Common things that need to be done in setting up an RPM spec file from an
 # RPM.spec.in file.
 # -------------------------------------------------------------------------
-AC_DEFUN(AC_RPM_SPEC,
-[
+AC_DEFUN([AC_RPM_SPEC], [
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
     _RPM_SPEC_OUTPUT
@@ -74,16 +73,15 @@ AC_DEFUN(AC_RPM_SPEC,
 # =========================================================================
 # _RPM_SPEC_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OPTIONS,
-[
+AC_DEFUN([_RPM_SPEC_OPTIONS], [
     AC_ARG_WITH([rpm-epoch],
-        AC_HELP_STRING([--with-rpm-epoch=EPOCH],
+        AS_HELP_STRING([--with-rpm-epoch=EPOCH],
             [specify the EPOCH for the RPM spec file.
             @<:@default=1@:>@]),
         [with_rpm_epoch=$withval],
         [with_rpm_epoch=1])
     AC_ARG_WITH([rpm-release],
-        AC_HELP_STRING([--with-rpm-release=RELEASE],
+        AS_HELP_STRING([--with-rpm-release=RELEASE],
             [specify the RELEASE for the RPM spec file.
             @<:@default=Custom@:>@]),
         [with_rpm_release=$withval],
@@ -94,8 +92,7 @@ AC_DEFUN(_RPM_SPEC_OPTIONS,
 # =========================================================================
 # _RPM_SPEC_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_SETUP,
-[
+AC_DEFUN([_RPM_SPEC_SETUP], [
     # two extra subsitutions for the RPM spec file
     PACKAGE_EPOCH="${with_rpm_epoch:-1}"
     AC_SUBST(PACKAGE_EPOCH)
@@ -116,14 +113,22 @@ AC_DEFUN(_RPM_SPEC_SETUP,
         fi
     done
     AC_SUBST(PACKAGE_OPTIONS)
+    AC_ARG_VAR([RPMBUILD], [Build rpms command])
+    AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${RPMBUILD:-no}" = :no ; then
+        AC_MSG_WARN([
+***
+*** Could not find rpmbuild program in PATH.
+***
+        ])
+    fi
 ])# _RPM_SPEC_SETUP
 # =========================================================================
 
 # =========================================================================
 # _RPM_SPEC_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN(_RPM_SPEC_OUTPUT,
-[
+AC_DEFUN([_RPM_SPEC_OUTPUT], [
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_NAME],[AC_PACKAGE_NAME]).spec)
 ])# _RPM_SPEC_OUTPUT
 # =========================================================================

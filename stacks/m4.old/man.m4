@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 0.9 2004/04/14 05:10:36 brian Exp $
+dnl @(#) $Id: man.m4,v 0.9.2.2 2004/04/25 08:49:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/14 05:10:36 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/25 08:49:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -75,7 +75,7 @@ AC_DEFUN([AC_MAN_CONVERSION],
 AC_DEFUN([_MAN_CONVERSION_OPTIONS],
 [
     AC_ARG_WITH([cooked-manpages],
-        AC_HELP_STRING([--with-cooked-manpages],
+        AS_HELP_STRING([--with-cooked-manpages],
             [convert manual pages to remove macro dependencies and grefer
             references.
             @<:@default=NO@:>@]),
@@ -89,6 +89,14 @@ AC_DEFUN([_MAN_CONVERSION_OPTIONS],
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION_SETUP],
 [
+    AC_ARG_VAR([SOELIM], [Roff source elminiation command])
+    AC_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([REFER], [Roff references command])
+    AC_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([TBL], [Roff table command])
+    AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
+    AC_ARG_VAR([PIC], [Roff picture command])
+    AC_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$PATH:/usr/local/bin:/usr/bin:/bin])
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
 

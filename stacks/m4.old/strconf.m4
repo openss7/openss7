@@ -1,13 +1,12 @@
 dnl =========================================================================
-dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
+dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: strconf.m4,v 0.9 2004/04/15 10:17:32 brian Exp $
+dnl @(#) $Id: strconf.m4,v 0.9.2.2 2004/04/25 08:49:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
-dnl Copyright (c) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
-dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
 dnl
 dnl All Rights Reserved.
 dnl
@@ -54,9 +53,160 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/15 10:17:32 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/25 08:49:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
+
+# =========================================================================
+# AC_STRCONF
+# -------------------------------------------------------------------------
+AC_DEFUN([AC_STRCONF], [
+    _STRCONF_OPTIONS
+    _STRCONF_SETUP
+    _STRCONF_OUTPUT
+])# AC_STRCONF
+# =========================================================================
+
+# =========================================================================
+# _STRCONF_OPTIONS
+# -------------------------------------------------------------------------
+AC_DEFUN([_STRCONF_OPTIONS], [
+    AC_ARG_WITH([base-major],
+        AS_HELP_STRING([--with-base-major=MAJOR],
+            [specify the base major device number from which to start
+            numbering major devices @<:@default=180@:>@]),
+        [with_base_major=$withval],
+        [with_base_major=''])
+    AC_ARG_WITH([strconf-master],
+        AS_HELP_STRING([--with-strconf-master=FILENAME],
+            [specify the file name to which the configuration master
+            file is written @<:@default=Config.master@:>@]),
+        [with_strconf_master="$withval"],
+        [with_strconf_master=''])
+])# _STRCONF_OPTIONS
+# =========================================================================
+
+# =========================================================================
+# _STRCONF_SETUP
+# -------------------------------------------------------------------------
+AC_DEFUN([_STRCONF_SETUP], [
+    STRCONF_CONFIGS=
+    for strconf_tmp in `find $builddir $srcdir -type f -name "lis.conf"`
+    do
+        if test -r "$strconf_tmp" ; then
+            STRCONF_CONFIGS="${STRCONF_CONFIGS}${STRCONF_CONFIGS:+ }$strconf_tmp"
+        fi
+    done
+    STRMAKENODES='ss7makenodes'
+    STRCONF_SCRIPT="$ac_aux_dir/strconf-sh"
+    STRCONF="$SHELL $STRCONF_SCRIPT"
+    STRCONF_INPUT='Config.master'
+    STRCONF_MAJBASE=180
+    STRCONF_CONFIG='strconf.h'
+    STRCONF_MKNODES='ss7makenodes.c'
+    STRCONF_CONFMOD='conf.modules'
+    STRCONF_MAKEDEV='devices.lst'
+dnl STRCONF_MODCONF='modconf.h'
+dnl STRCONF_DRVCONF='drvrconf.mk'
+dnl STRCONF_STSETUP='strsetup.conf'
+dnl STRCONF_STRLOAD='strload.conf'
+    if test :"${with_base_major:-no}" != :no ; then
+        STRCONF_MAJBASE="$with_base_major"
+    fi
+    if test :"${with_strconf_master:-no}" != :no ; then
+        STRCONF_INPUT="$with_strconf_master"
+    fi
+])# _STRCONF_SETUP
+# =========================================================================
+
+# =========================================================================
+# _STRCONF_OUTPUT_CONFIG_COMMANDS
+# -------------------------------------------------------------------------
+AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [
+    if test -n "${STRCONF_CONFIGS}" -a -n "${STRCONF_INPUT}"; then
+        AC_MSG_NOTICE([creating $STRCONF_INPUT from $STRCONF_CONFIGS])
+        cat $STRCONF_CONFIGS > $STRCONF_INPUT
+        if test :"${STRCONF_CONFIG:+set}" = :set; then
+            AC_MSG_NOTICE([creating $STRCONF_CONFIG from $STRCONF_INPUT])
+            eval "$STRCONF -b${STRCONF_MAJBASE} --hconfig=$STRCONF_CONFIG $STRCONF_INPUT"
+        fi
+        if test :"${STRCONF_MKNODES:+set}" = :set; then
+            AC_MSG_NOTICE([creating $STRCONF_MKNODES from $STRCONF_INPUT])
+            eval "$STRCONF -b${STRCONF_MAJBASE} --makenodes=$STRCONF_MKNODES $STRCONF_INPUT"
+        fi
+        if test :"${STRCONF_CONFMOD:+set}" = :set; then
+            AC_MSG_NOTICE([creating $STRCONF_CONFMOD from $STRCONF_INPUT])
+            eval "$STRCONF -b${STRCONF_MAJBASE} --confmodules=$STRCONF_CONFMOD $STRCONF_INPUT"
+        fi
+        if test :"${STRCONF_MAKEDEV:+set}" = :set; then
+            AC_MSG_NOTICE([creating $STRCONF_MAKEDEV from $STRCONF_INPUT])
+            eval "$STRCONF -b${STRCONF_MAJBASE} --strmknods=$STRCONF_MAKEDEV $STRCONF_INPUT"
+        fi
+dnl     if test :"${STRCONF_MODCONF:+set}" = :set; then
+dnl         AC_MSG_NOTICE([creating $STRCONF_MODCONF from $STRCONF_INPUT])
+dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --modconf=$STRCONF_MODCONF $STRCONF_INPUT"
+dnl     fi
+dnl     if test :"${STRCONF_DRVCONF:+set}" = :set; then
+dnl         AC_MSG_NOTICE([creating $STRCONF_DRVCONF from $STRCONF_INPUT])
+dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --driverconf=$STRCONF_DRVCONF $STRCONF_INPUT"
+dnl     fi
+dnl     if test :"${STRCONF_STSETUP:+set}" = :set; then
+dnl         AC_MSG_NOTICE([creating $STRCONF_STSETUP from $STRCONF_INPUT])
+dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --strsetup=$STRCONF_STSETUP $STRCONF_INPUT"
+dnl     fi
+dnl     if test :"${STRCONF_STRLOAD:+set}" = :set; then
+dnl         AC_MSG_NOTICE([creating $STRCONF_STRLOAD from $STRCONF_INPUT])
+dnl         eval "$STRCONF -b${STRCONF_MAJBASE} --strload=$STRCONF_STRLOAD $STRCONF_INPUT"
+dnl     fi
+    fi
+])# _STRCONF_OUTPUT_CONFIG_COMMANDS
+# =========================================================================
+
+# =========================================================================
+# _STRCONF_OUTPUT_CONFIG
+# -------------------------------------------------------------------------
+AC_DEFUN([_STRCONF_OUTPUT_CONFIG], [
+    AC_CONFIG_COMMANDS([strconf],
+        [_STRCONF_OUTPUT_CONFIG_COMMANDS],
+        [ac_aux_dir="$ac_aux_dir" \
+        STRCONF="$STRCONF" \
+        STRCONF_SCRIPT="$STRCONF_SCRIPT" \
+        STRCONF_INPUT="$STRCONF_INPUT" \
+        STRCONF_CONFIGS="$STRCONF_CONFIGS" \
+        STRCONF_MAJBASE="$STRCONF_MAJBASE" \
+        STRCONF_CONFIG="$STRCONF_CONFIG" \
+        STRCONF_MKNODES="$STRCONF_MKNODES" \
+        STRCONF_CONFMOD="$STRCONF_CONFMOD" \
+        STRCONF_MAKEDEV="$STRCONF_MAKEDEV" \
+dnl     STRCONF_MODCONF="$STRCONF_MODCONF" \
+dnl     STRCONF_DRVCONF="$STRCONF_DRVCONF" \
+dnl     STRCONF_STSETUP="$STRCONF_STSETUP" \
+dnl     STRCONF_STRLOAD="$STRCONF_STRLOAD" \
+        ])
+])# _STRCONF_OUTPUT_CONFIG
+# =========================================================================
+
+# =========================================================================
+# _STRCONF_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_STRCONF_OUTPUT], [
+        AC_SUBST([STRMAKENODES])
+        AC_SUBST([STRCONF])
+        AC_SUBST([STRCONF_SCRIPT])
+        AC_SUBST([STRCONF_INPUT])
+        AC_SUBST([STRCONF_CONFIGS])
+        AC_SUBST([STRCONF_MAJBASE])
+        AC_SUBST([STRCONF_CONFIG])
+        AC_SUBST([STRCONF_MKNODES])
+        AC_SUBST([STRCONF_CONFMOD])
+        AC_SUBST([STRCONF_MAKEDEV])
+dnl     AC_SUBST([STRCONF_MODCONF])
+dnl     AC_SUBST([STRCONF_DRVCONF])
+dnl     AC_SUBST([STRCONF_STSETUP])
+dnl     AC_SUBST([STRCONF_STRLOAD])
+        _STRCONF_OUTPUT_CONFIG
+])# _STRCONF_OUTPUT
+# =========================================================================
 
 dnl =========================================================================
 dnl 
@@ -64,5 +214,5 @@ dnl Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl 
 dnl =========================================================================
-dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
+dnl ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================

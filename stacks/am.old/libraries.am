@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/14 08:02:59 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/04/25 05:55:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/14 08:02:59 $ by $Author: brian $
+# Last Modified $Date: 2004/04/25 05:55:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,9 +65,9 @@
 # "finish" action ourselves.
 #
 post-libraries:
-	@if test -r $(DESTDIR)$(krootdir)/etc/ld.so.conf -a -r $(DESTDIR)$(krootdir)/etc/ld.so.cache -a -x /sbin/ldconfig ; then \
-		echo "/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir)" ; \
-		/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir) ; \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
+		echo "$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
 #
@@ -86,9 +86,9 @@ install-exec-hook: post-libraries
 # "unfinish" action ourselves.
 #
 postun-libraries:
-	@if test -r $(DESTDIR)$(krootdir)/etc/ld.so.conf -a -r $(DESTDIR)$(krootdir)/etc/ld.so.cache -a -x /sbin/ldconfig ; then \
-		echo "/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir)" ; \
-		/sbin/ldconfig -n -r $(DESTDIR)$(krootdir)/ -f $(DESTDIR)$(krootdir)/etc/ld.so.conf -C $(DESTDIR)$(krootdir)/etc/ld.so.cache $(libdir) ; \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
+		echo "$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(krootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
 	fi
 
 #

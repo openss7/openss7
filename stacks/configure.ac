@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.2 2004/04/15 10:18:45 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/04/25 07:29:32 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,18 +51,19 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/15 10:18:45 $ by $Author: brian $
+dnl Last Modified $Date: 2004/04/25 07:29:32 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.57)
+AC_PREREQ(2.59)
 AC_INIT([openss7],[0.9a],[bugs@openss7.org])
 AC_CONFIG_SRCDIR([src/modules/ss7ip/sdt_tpi.c])
 AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_AUX_DIR([scripts])
+AC_CONFIG_MACRO_DIR([m4])
 
 auxdir="$ac_aux_dir"
 AC_SUBST(auxdir)
@@ -77,10 +78,10 @@ AC_GNU_SOURCE
 # Checks for programs.
 AM_PROG_AS
 AC_PROG_AWK
+AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CC_C_O
-
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_PROG_LN_S
@@ -89,9 +90,12 @@ AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
 # Checks for libraries.
+AC_CHECK_LIB([LiS], [putpmsg])
 
 # Checks for header files.
+AC_HEADER_STDC
 AC_HEADER_MAJOR
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netdb.h netinet/in.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -101,15 +105,24 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_HEADER_TIME
 AC_C_VOLATILE
 
 # Checks for library functions.
-AC_HEADER_STDC
+if test :"${cross_compiling:-no}" != :yes ; then : AC_FUNC_FORK fi
+AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
-AC_CHECK_FUNCS([bzero])
+AC_TYPE_SIGNAL
+AC_FUNC_STRNLEN
+AC_CHECK_FUNCS([bzero gethostbyname gettimeofday inet_ntoa memset socket strerror strtol])
 
 AC_SS7
 
-AC_CONFIG_FILES([Makefile doc/Makefile doc/manual/Makefile])
+AC_CONFIG_FILES([Makefile
+		 src/Makefile
+		 src/include/Makefile
+		 doc/Makefile
+		 doc/man/Makefile
+		 doc/manual/Makefile])
 
 AC_OUTPUT
