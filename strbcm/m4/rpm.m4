@@ -289,7 +289,17 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     ])
     PACKAGE_RPMDIST="${rpm_cv_dist_vendor:-Unknown Linux} ${rpm_cv_dist_release:-Unknown}"
     case $rpm_cv_dist_flavor in
-        Fedora?Core)
+        White?Box*)
+            case $rpm_cv_dist_release in
+                3.0)
+                    PACKAGE_RPMEXTRA=".E3"
+                    ;;
+                4.0)
+                    PACKAGE_RPMEXTRA=".E4"
+                    ;;
+            esac
+            ;;
+        Fedora?Core*)
             case $rpm_cv_dist_release in
                 1)
                     PACKAGE_RPMEXTRA=".FC1"
@@ -302,25 +312,37 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
                     ;;
             esac
             ;;
-        Red?Hat)
+        Red?Hat*)
             case $rpm_cv_dist_release in
                 7.0|7.1|7.2|7.3)
                     PACKAGE_RPMEXTRA=".7.x"
                     ;;
+                8.0)
+                    PACKAGE_RPMEXTRA=".8"
+                    ;;
                 9)
                     PACKAGE_RPMEXTRA=".9"
                     ;;
+                2|2.?)
+                    PACKAGE_RPMEXTRA=".EL"
+                    ;;
+                3|3.0)
+                    PACKAGE_RPMEXTRA=".E3"
+                    ;;
+                4|4.0)
+                    PACKAGE_RPMEXTRA=".E4"
+                    ;;
             esac
             ;;
-        Mandrake)
+        Mandrake*)
             PACKAGE_RPMEXTRA="mdk"
             ;;
-        SuSE)
-            PACKAGE_RPMEXTRA=".1"
+        SuSE*)
+            PACKAGE_RPMEXTRA=""
             ;;
     esac
-    AC_SUBST([PACKAGE_RPMEXTRA])dnl
     AC_SUBST([PACKAGE_RPMDIST])dnl
+    AC_SUBST([PACKAGE_RPMEXTRA])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
         defaults to none.])
 ])# _RPM_SPEC_SETUP_DIST
