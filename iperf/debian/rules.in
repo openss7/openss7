@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/03/24 02:09:13 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2005/03/26 04:06:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 02:09:13 $ by $Author: brian $
+## Last Modified $Date: 2005/03/26 04:06:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -237,7 +237,13 @@ binary-indep: build install
 binary-arch: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
 
-binary: binary-indep binary-arch
+binary:
+	$(MAKE) -f debian/rules binary-indep
+	$(MAKE) -f debian/rules binary-arch
+
+binary-lis:
+
+binary-lfs:
 
 binary-%: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
@@ -245,10 +251,13 @@ binary-%: build install
 get-orig-source:
 	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install binary-lis binary-lfs
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.7  2005/03/26 04:06:22  brian
+# - corrections to multiple targets
+#
 # Revision 1.1.2.6  2005/03/24 02:09:13  brian
 # - improved debian build
 #

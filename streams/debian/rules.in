@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/24 14:05:27 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/26 04:06:23 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/24 14:05:27 $ by $Author: brian $
+## Last Modified $Date: 2005/03/26 04:06:23 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -329,9 +329,15 @@ binary-indep: build install
 binary-arch: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
 
-binary: binary-indep binary-arch
+binary:
+	$(MAKE) -f debian/rules binary-indep
+	$(MAKE) -f debian/rules binary-arch
 
-binary-lfs: binary
+binary-lis:
+
+binary-lfs:
+	$(MAKE) -f debian/rules binary-indep
+	$(MAKE) -f debian/rules binary-arch
 
 binary-%: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
@@ -339,10 +345,13 @@ binary-%: build install
 get-orig-source:
 	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install binary-lis binary-lfs
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.9  2005/03/26 04:06:23  brian
+# - corrections to multiple targets
+#
 # Revision 0.9.2.8  2005/03/24 14:05:27  brian
 # - improved master build
 #
