@@ -1,10 +1,10 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: iperf.macros,v 1.1.2.2 2004/12/29 06:38:03 brian Exp $
+.\" @(#) $Id: iperf.macros,v 1.1.2.3 2005/01/25 11:45:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/12/29 06:38:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 11:45:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -145,7 +145,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -207,7 +207,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation.
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -295,9 +295,9 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 .PP
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -308,11 +308,11 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -323,11 +323,11 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright \(co 2001-2004 OpenSS7 Corporation
+\f(HRCopyright \(co 2001-2005 OpenSS7 Corporation
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -338,9 +338,9 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 .PP
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -351,11 +351,11 @@ All Rights Reserved.
 .de I5
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 .PP
-\f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
 .br
-\f(HRCopyright \(co 1997-2004 OpenSS7 Corporation
+\f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -366,7 +366,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/12/29 06:38:03 $.
+OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
 ..
 .de AU
 .SH "AUTHOR"
