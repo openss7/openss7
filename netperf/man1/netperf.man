@@ -84,7 +84,7 @@ sort-adjacent-labels
 .HP 12
 \fBnetperf\fR [\fB-t\fR\ \fITESTNAME\fR] [\fIglobal-test-options\fR] [-- [\fItest-specific-options\fR]]
 .HP 12
-\fBnetperf\fR \fB-h\fR
+\fBnetperf\fR \fB-h\fR,\ \fB--help\fR
 .HP 12
 \fBnetperf\fR [\fB-t\fR\ \fITESTNAME\fR]
 [\fB-a\fR\ [\fILOC-SND-ALIGN\fR][\fB,\fR][\fILOC-RCV-ALIGN\fR]]
@@ -116,7 +116,7 @@ sort-adjacent-labels
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
 [\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]]
 [\fB-P\fR\ [\fILOC-PORTNUM\fR][\fB,\fR][\fIREM-PORTNUM\fR]]
-[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
 [\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
 [\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
 [\fB-w\fR\ \fIRCV-WIDTH\fR]
@@ -130,7 +130,7 @@ sort-adjacent-labels
 [\fB-I\fR\ [\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]]
 [\fB-m\fR\ \fILOC-MSG-SIZE\fR]
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
-[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
 [\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
 [\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
 [\fB-w\fR\ \fIRCV-WIDTH\fR]
@@ -146,7 +146,7 @@ sort-adjacent-labels
 [\fB-m\fR\ \fILOC-MSG-SIZE\fR]
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
 [\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]]
-[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
 [\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
 [\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
 [\fB-w\fR\ \fIRCV-WIDTH\fR]
@@ -161,7 +161,7 @@ sort-adjacent-labels
 [\fB-p\fR\ \fIPATH\fR]
 [\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]]
 [\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]]
-[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
 ]
 .HP 12
 \fBnetperf\fR \fB-t\fR\ \fIdlpi-test\fR [\fIglobal-test-options\fR]
@@ -171,7 +171,7 @@ sort-adjacent-labels
 [\fB-m\fR\ \fILOC-MSG-SIZE\fR]
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
 [\fB-p\fR\ [\fILOC-PPA\fR][\fB,\fR][\fIREM-PPA\fR]]
-[\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]]
+[\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
 [\fB-s\fR\ \fISAP\fR]
 [\fB-w\fR\ [\fILOC-SND-WINDOW\fR][\fB,\fR][\fILOC-RCV-WINDOW\fR]]
 [\fB-W\fR\ [\fIREM-SND-WINDOW\fR][\fB,\fR][\fIREM-RCV-WINDOW\fR]]
@@ -457,19 +457,19 @@ Blocking and non-blocking Request/Response tests support the following common
 test specific options:
 .\" -------------------------------------------------------------------------
 .TP
-\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
-Specifies the local
-.RI [ LOC-RR-SIZE ]
-(or remote
-.RI [ REM-RR-SIZE ])
-request (or response) sizes.
+\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
+Specifies the request
+.RI [ REQ-SIZE ]
+(or response
+.RI [ RSP-SIZE ])
+sizes.
 At least one of 
-.I LOC-RR-SIZE
+.I REQ-SIZE
 or
-.I REM-RR-SIZE
+.I RSP-SIZE
 must be specified.
 If there is no comma (`,') in the option argument, then the specified size
-applies to both the local and remote request/response size.
+applies to both the request and response size.
 .\" -------------------------------------------------------------------------
 .TP
 .BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
@@ -652,7 +652,7 @@ protocols on the XTI API.
 .PP
 .\" -------------------------------------------------------------------------
 .TP
-[\ \fB-t\fR\ \fITESTNAME\fR\ ]
+[\ \fB-t\fR,\ \fB--testname=\fITESTNAME\fR\ ]
 Specify the test to perform.
 Valid testnames are (but not always compiled-in):
 .RS
@@ -706,7 +706,7 @@ Valid testnames are (but not always compiled-in):
 .RE
 .\" -------------------------------------------------------------------------
 .TP
-\fB-h\fR
+\fB-h\fR,\ \fB--help\fR
 Display a usage string, and exit.
 
 .\" =========================================================================
@@ -719,7 +719,15 @@ The global test options are as follows:
 
 .\" -------------------------------------------------------------------------
 .TP
-\fB-a\fR\ [\fILOC-SND-ALIGN\fR][\fB,\fR][\fILOC-RCV-ALIGN\fR]
+\fB-4\fR,\ \fB--ipv4\fR
+Use IPv4 for the control socket (the default).
+.\" -------------------------------------------------------------------------
+.TP
+\fB-6\fR,\ \fB--ipv6\fR
+Use IPv6 instead of IPv4 for the control socket.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-a\fR,\ \fB--loc-align=\fR[\fILOC-SND-ALIGN\fR][\fB,\fR][\fILOC-RCV-ALIGN\fR]
 Alter the send and receive buffer alignments on the local system.
 At least one of
 .I LOC-SND-ALIGN
@@ -731,7 +739,7 @@ to both the send and receive.
 This defaults to 8 bytes.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-A\fR\ [\fIREM-SND-ALIGN\fR][\fB,\fR][\fIREM-RCV-ALIGN\fR]
+\fB-A\fR,\ \fB--rem-align=\fR[\fIREM-SND-ALIGN\fR][\fB,\fR][\fIREM-RCV-ALIGN\fR]
 As -a, but for the remote system.
 At least one of
 .I LOC-SND-ALIGN
@@ -742,28 +750,36 @@ If there is no comma (`,') in the option argument, the specified value applies
 to both the send and receive.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-c\fR\ [\fILOC-RATE\fR]
+\fB-b\fR,\ \fB--burst=\fIBURST\fR
+Number of burst packets per interval.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-c\fR,\ \fB--loc-cpu=\fR[\fILOC-RATE\fR]
 Request CPU utilization and service demand calculations for the
 local system. If the optional rate parameter is specified,
 .B netperf
 will use that instead of calculating the rate itself.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-C\fR\ [\fIREM-RATE\fR]
+\fB-C\fR,\ \fB--rem-cpu=\fR[\fIREM-RATE\fR]
 As -c, but for the remote system.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-d\fR
+\fB-d\fR,\ \fB--debug\fR
 Increase the quantity of debugging output displayed during
 a test (possibly at the expense of performance).
 .\" -------------------------------------------------------------------------
 .TP
-\fB-f\fR\ {\ \fBG\fR\ |\ \fBM\fR\ |\ \fBK\fR\ |\ \fBg\fR\ |\ \fBm\fR\ |\ \fBk\fR\ }
+\fB-D\fR,\ \fB--demo\fR
+Demo mode: not supported on Linux.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-f\fR,\ \fB--format=\fR{\fBG\fR|\fBM\fR|\fBK\fR|\fBg\fR|\fBm\fR|\fBk\fR}
 Change the units of measure for *_STREAM tests. Capital letters are
 powers of two, lowercase are powers of ten.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-F\fR\ \fIFILL-FILE\fR
+\fB-F\fR,\ \fB--filefile=\fIFILL-FILE\fR
 Pre-fill the send buffers with data from the named file. This is
 intended to provide a means for avoiding buffers that are filled with
 data which is trivially easy to compress. A good choice for a file
@@ -771,32 +787,38 @@ that should be present on any system is this manpage - netperf.man.
 Other files may be provided as part of the distribution.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-H\fR\ \fIREMOTE-HOST\fR
+\fB-H\fR,\ \fB--host\fR=\fIREMOTE-HOST\fR
 Set the hostname (or IP address) of the remote system.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-i\fR\ \fIMAX\fB,\fIMIN\fR
+\fB-i\fR,\ \fB--iterations=\fIMAX\fB,\fIMIN\fR
 Set the maximum and minimum number of iterations when trying to reach
 certain confidence levels.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-I\fR\ \fILEVEL\fR[\fB,\fIWIDTH\fR]
+\fB-I\fR,\ \fB--interval=\fILEVEL\fR[\fB,\fIWIDTH\fR]
 Specify the confidence level (either 95 or 99 - 99 is the default) and
 the width of the confidence interval as a percentage (default 10)
 .\" -------------------------------------------------------------------------
 .TP
-\fB-l\fR\ \fITESTLEN\fR
+\fB-K\fR,\ \fB--rem-count=\fR[\fIREM-DIRTY\fR][\fB,\fR][\fIREM-CLEAN\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-k\fR,\ \fB--loc-count=\fR[\fILOC-DIRTY\fR][\fB,\fR][\fILOC-CLEAN\fR]
+.\" -------------------------------------------------------------------------
+.TP
+\fB-l\fR,\ \fB--length=\fITESTLEN\fR
 Specify the length of the test (default 10 seconds).
 A negative value sets the number of request/response transactions,
 or the number of bytes for a stream test.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-n\fR\ \fINUM-CPUS\fR
+\fB-n\fR,\ \fB--numcpus=\fINUM-CPUS\fR
 Specify the number of CPU's in the system on those systems for which
 netperf has no way to find the number of CPU's programatically. 
 .\" -------------------------------------------------------------------------
 .TP
-\fB-o\fR\ [\fILOC-SND-OFFSET\fR][\fB,\fR][\fILOC-RCV-OFFSET\fR]
+\fB-o\fR,\ \fB--loc-offset=\fR[\fILOC-SND-OFFSET\fR][\fB,\fR][\fILOC-RCV-OFFSET\fR]
 Set an offset from the alignment specified with -a.
 At least one of
 .I LOC-SND-OFFSET
@@ -807,7 +829,7 @@ If there is no comma (`,') in the option argument, the specified offset
 applies to both the local and remote system.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-O\fR\ [\fIREM-SND-OFFSET\fR][\fB,\fR][\fIREM-RCV-OFFSET\fR]
+\fB-O\fR,\ \fB--rem-offset=\fR[\fIREM-SND-OFFSET\fR][\fB,\fR][\fIREM-RCV-OFFSET\fR]
 As -o, but for the remote system.
 At least one of
 .I LOC-RCV-OFFSET
@@ -818,29 +840,40 @@ If there is no comma (`,') in the option argument, the specified offset
 applies to both the local and remote system.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-p\fR\ \fIPORTNUM\fR
+\fB-p\fR,\ \fB--port=\fIPORTNUM\fR
 Connect to a
 .C netsetver
 listening on the specified port, rather than using /etc/services.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-P\fR\ {\ \fB0\fR\ |\ \fB1\fR\ }
+\fB-P\fR,\ \fB--print=\fR{\fB0\fR|\fB1\fR}
 Show (1) or suppress (0) the test banner.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-v\fR\ \fIVERBOSITY\fR
-.B \-v verbosity
+\fB-v\fR,\ \fB--verbose=\fIVERBOSITY\fR
 Set the verbosity level for the test (only with -P).
 .\" -------------------------------------------------------------------------
 .TP
-.B \-V
-Enable the copy-avoidance features (HP-UX 9.0 and later only).
+\fB-V\fR,\ \fB--version\fR
+Prints version information and exits.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-w\fR,\ \fB--rate=\fIRATE\fR
+Send packets at \fIRATE\fR packets per millisecond.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-W\fR,\ \fB--width=\fIWIDTH\fR
+Width of the user space data buffer ring.
+.\" -------------------------------------------------------------------------
+.TP
+\fB--copying\fR
+Prints copying permissions and exists.
 
 .SS TEST SPECIFIC OPTIONS
 
 .\" -------------------------------------------------------------------------
 .TP
-.B \-h
+\fB-h\fR,\ \fB--help\fR
 Display a usage string based on the test name set with -t, and exit.
 
 Please consult the netperf manual
@@ -860,7 +893,7 @@ tests as follows:
 .BI UDP_ *\fR.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-t\fR\ \fISOCKET-TEST\fR
+\fB-t\fR,\ \fB--testname=\fISOCKET-TEST\fR
 Tests available for the POSIX/BSD Sockets Interface consist of the following:
 .BR SCTP_STREAM ,
 .BR SCTP_MAERTS ,
@@ -892,15 +925,15 @@ tests.
 The BSD/POSIX Sockets API test specific options and arguments are as follows:
 .\" -------------------------------------------------------------------------
 .TP
-.B -h
+\fB-h\fR,\ \fB--help\fR
 Prints a usage statement for the specified (or default) test and exits.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -b " BURST-SIZE"
+\fB-b\fR,\ \fB--burst=\fIBURST-SIZE\fR
 specifies the initial request burst size.
 .\" -------------------------------------------------------------------------
 .TP
-.B -C
+\fB-C\fR,\ \fB--cork\fR
 use option
 .IR TCP_CORK ", " SCTP_CORK ", " T_TCP_CORK " or " T_SCTP_CORK
 to cork the socket or stream when preparing to send for the
@@ -908,13 +941,14 @@ to cork the socket or stream when preparing to send for the
 tests.
 .\" -------------------------------------------------------------------------
 .TP
+\fB-D\fR,\ \fB--nodelay\fR
 .B -D
 use option
 .IR TCP_NODELAY " or " SCTP_NODELAY
 to suppress the Nagle algorithm with (or without) Minshall modifications.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -I " \fR[\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]
+\fB-I\fR,\ \fB--ipaddr=\fR[\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]
 Specify the IP address of the local
 .RI ( LOC-IP-ADDR )
 or remote
@@ -936,7 +970,7 @@ The default is
 for both the local and remote addresses.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -m " LOC-MSG-SIZE"
+\fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR
 Specifies the amount of data sent in an individual
 .BR send (2)
 operation.  This also affects the data sent with a
@@ -944,13 +978,13 @@ operation.  This also affects the data sent with a
 call in the request response tests.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -M " REM-MSG-SIZE"
+\fB-M\fR,\ \fB--rem-msgsize=\fIREM-MSG-SIZE\fR
 Specifies the amount of data received in an individual
 .BR recv (2)
 call.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -p " \fR[\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
+\fB-p\fR,\ \fB--portrange=\fR[\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
 Specify the minimum and maximum port numbers used for the
 .IB * _CRR
 and
@@ -965,7 +999,7 @@ If there is no comma (`,') in the option argument, then the specified port
 number applies to both the minimum and maximum.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -P " \fR[\fILOC-PORTNUM\fR][\fB,\fR][\fIREM-PORTNUM\fR]
+\fB-P\fR,\ \fB--portnum=\fR[\fILOC-PORTNUM\fR][\fB,\fR][\fIREM-PORTNUM\fR]
 Specify the local
 .RI ( LOC-PORTNUM )
 and remote
@@ -980,22 +1014,22 @@ must be specified.  If no comma (`,') is specified in the option argument,
 then the port number specified applies to both the local and remote port.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -r " \fR[\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
-Specifies the local
-.RI ( LOC-RR-SIZE )
-or remote
-.RI ( REM-RR-SIZE )
-request/response size.
+\fB-r\fR,\ \fB--rrsize=\fR[\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
+Specifies the request
+.RI ( REQ-SIZE )
+or response
+.RI ( RSP-SIZE )
+size.
 At least one of
-.I LOC-RR-SIZE
+.I REQ-SIZE
 or
-.I REM-RR-SIZE
+.I RSP-SIZE
 must be specified.
 If there is no comma (`,') in the option argument, then the specified size
-applies to both the local and remote request/response size.
+applies to both the requset and response size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+\fB-s\fR,\ \fB--loc-bufsize=\fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
 Sets the local send
 .RI ( LOC-SNDBUF )
 and receive
@@ -1011,7 +1045,7 @@ buffer size applies to both the local send buffer size as well as the local
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -S " \fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+\fB-S\fR,\ \fB--rem-bufsize=\fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
 Sets the remote send
 .RI ( REM-SNDBUF )
 and receive
@@ -1027,8 +1061,9 @@ buffer size applies to both the remote send buffer size as well as the remote
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -V
-Specify send and receive copy avoidance.  This sets the socket options
+\fB-V\fR,\ \fB--copyavoid\fR
+Specify send and receive copy avoidance (HP-UX 9.0 and later only).  This sets
+the socket options
 .B SO_SND_COPYAVOID
 and
 .B SO_RCV_COPYAVOID
@@ -1036,11 +1071,11 @@ on the socket if these options are available available locally and will
 attempt to set them remotely.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -w " RCV-WIDTH"
+\fB-w\fR,\ \fB--rcv-width=\fIRCV-WIDTH\fR
 Ignored.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -W " SND-WIDTH"
+\fB-W\fR,\ \fB--snd-width=\fISND-WIDTH\fR
 Sets the
 .I SND-WIDTH
 of the user space data buffer.  This will be the number of send sized buffers
@@ -1056,7 +1091,7 @@ and
 tests.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -z
+\fB-z\fR,\ \fB--dummy\fR
 Ignored.
 
 .\" =========================================================================
@@ -1070,7 +1105,7 @@ tests as follows:
 .BI XTI_UDP_ *\fR.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-t\fR\ \fIXTI-TEST\fR
+\fB-t\fR,\ \fB--testname=\fIXTI-TEST\fR
 Tests available for the X/Open Transport Interface (XTI/TLI)
 .[
 xti
@@ -1099,17 +1134,17 @@ first double-dash (`--').  Not all XTI options are applicable to all tests.
 The STREAMS XTI API test specific options and arguments are as follows:
 .\" -------------------------------------------------------------------------
 .TP
-.BI -h
+\fB-h\fR,\ \fB--help\fR
 Prints a usage statement for the specified test and exits.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -D
+\fB-D\fR,\ \fB--nodelay\fR
 use option
 .IR T_TCP_NODELAY " or " T_SCTP_NODELAY
 to suppress the Nagle algorithm with (or without) Minshall modifications.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -m " LOC-MSG-SIZE
+\fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR
 Specifies the amount of data sent in an individual
 .BR t_send (2)
 operation.  This also affects the data sent with a
@@ -1119,7 +1154,7 @@ or
 call in the request response tests.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -M " REM-MSG-SIZE
+\fB-M\fR,\ \fB--rem-msgsize=\fIREM-MSG-SIZE\fR
 Specifies the amount of data received in an individual
 .BR t_rcv (3),
 .BR t_listen (3),
@@ -1129,22 +1164,22 @@ or
 call.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -r " \fR[\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
-Specifies the local
-.RI ( LOC-RR-SIZE )
-or remote
-.RI ( REM-RR-SIZE )
-request/response size.
+\fB-r\fR,\ \fB--rrsize=\fR[\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
+Specifies the request
+.RI ( REQ-SIZE )
+or response
+.RI ( RSP-SIZE )
+size.
 At least one of
-.I LOC-RR-SIZE
+.I REQ-SIZE
 or
-.I REM-RR-SIZE
+.I RSP-SIZE
 must be specified.
 If there is no comma (`,') in the option argument, then the specified size
-applies to both the local and remote request/response size.
+applies to both the request and response size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -s " \fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+\fB-s\fR,\ \fB--loc-bufsize=\fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
 Sets the local send
 .RI ( LOC-SNDBUF )
 and receive
@@ -1160,7 +1195,7 @@ buffer size applies to both the local send buffer size as well as the local
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -S " \fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+\fB-S\fR,\ \fB--rem-bufsize=\fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
 Sets the remote send
 .RI ( REM-SNDBUF )
 and receive
@@ -1176,18 +1211,18 @@ buffer size applies to both the remote send buffer size as well as the remote
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -V
+\fB-V\fR,\ \fB--copyavoid\fR
 Ignored.
 Specify send and receive copy avoidance.  This feature is not implemented for
 .BI XTI_ *
 tests.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -w " RCV-WIDTH
+\fB-w\fR,\ \fB--rcv-width=\fIRCV-WIDTH\fR
 Ignored.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -W " SND-WIDTH
+\fB-W\fR,\ \fB--snd-width=\fISND-WIDTH\fR
 Sets the
 .I SND-WIDTH
 of the user space data buffer.  This will be the number of send sized buffers
@@ -1203,7 +1238,7 @@ and
 tests.
 .\" -------------------------------------------------------------------------
 .TP
-.BI -X " \fR[\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
+\fB-X\fR,\ \fB--devices=\fR[\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
 Specifies the local
 .RI ( LOC-DEVICE )
 or remote
@@ -1248,7 +1283,7 @@ tests as follows:
 .BI UDPIPV6_ *\fR.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-t\fR\ \fIIPV6-TEST\fR
+\fB-t\fR,\ \fB--testname=\fIIPV6-TEST\fR
 Tests available for the POSIX/BSD IPV6 Sockets Interface consist of the following:
 .BR SCTPIPV6_STREAM ", "
 .BR SCTPIPV6_RR
@@ -1269,18 +1304,11 @@ tests.
 The BSD/POSIX IPv6 Sockets API test specific options and arguments are as follows:
 .\" -------------------------------------------------------------------------
 .TP
-\fB-h\fR
+\fB-h\fR,\ \fB--help\fR
 Prints a usage statement for the specified test and exits.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-H\fR\ \fIHOSTNAME\fR
-Specify the remote
-.IR HOSTNAME ;
-this is separate from the global test option that controls the hostname for the
-control connection.
-.\" -------------------------------------------------------------------------
-.TP
-\fB-D\fR
+\fB-D\fR,\ \fB--nodelay\fR
 Use option
 .I TCP_NODELAY
 or
@@ -1288,7 +1316,14 @@ or
 to suppress the Nagle algorithm with (or without) Minshal modifications.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-m\fR\ \fILOC-MSG-SIZE\fR
+\fB-H\fR,\ \fB--hostname=\fIHOSTNAME\fR
+Specify the remote
+.IR HOSTNAME ;
+this is separate from the global test option that controls the hostname for the
+control connection.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR
 Specifies the amount of data sent in an individual
 .BR send (2)
 operation.  This also affects the data sent with a
@@ -1296,13 +1331,13 @@ operation.  This also affects the data sent with a
 call in the request response tests.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-M\fR\ \fIREM-MSG-SIZE\fR
+\fB-M\fR,\ \fB--rem-msgsize=\fIREM-MSG-SIZE\fR
 Specifies the amount of data received in an individual
 .BR recv (2)
 call.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
+\fB-p\fR,\ \fB--portrange=\fR[\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]
 Specify the minimum and maximum port numbers used for the
 .IB * _CRR
 and
@@ -1317,7 +1352,22 @@ If there is no comma (`,') in the option argument, then the specified port
 number applies to both the minimum and maximum.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+\fB-r\fR,\ \fB--rrsize=\fR[\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
+Sets the request
+.RI ( REQ-SIZE )
+and response
+.RI ( RSP-SIZE )
+sizes.
+One of
+.I REQ-SIZE
+and
+.I RSP-SIZE
+must be specified.
+If there is no comma (`,') in the option argument, then the specified size
+applies to both the request and response size.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-s\fR,\ \fB--loc-bufsize=\fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
 Sets the local send
 .RI ( LOC-SNDBUF )
 and receive
@@ -1333,23 +1383,7 @@ buffer size applies to both the local send buffer size as well as the local
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
-Sets the local send
-.RI ( LOC-SNDBUF )
-and receive
-.RI ( LOC-RCVBUF )
-buffer sizes.
-One of
-.I LOC-SNDBUF
-and
-.I LOC-RCVBUF
-must be specified.
-If no comman (`,') is present in the option argument, then the specified
-buffer size applies to both the local send buffer size as well as the local
-receive buffer size.
-.\" -------------------------------------------------------------------------
-.TP
-\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+\fB-S\fR,\ \fB--rem-bufsize=\fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
 Sets the remote send
 .RI ( REM-SNDBUF )
 and receive
@@ -1365,8 +1399,9 @@ buffer size applies to both the remote send buffer size as well as the remote
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-V\fR
-Specify send and receive copy avoidance.  This sets the socket options
+\fB-V\fR,\ \fB--copyavoid\fR
+Specify send and receive copy avoidance (HP-UX 9.0 and later only).  This sets
+the socket options
 .B SO_SND_COPYAVOID
 and
 .B SO_RCV_COPYAVOID
@@ -1374,11 +1409,11 @@ on the socket if these options are available available locally and will
 attempt to set them remotely.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-w\fR\ \fIRCV-WIDTH\fR
+\fB-w\fR,\ \fB--rcv-width=\fIRCV-WIDTH\fR
 Ignored.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-W\fR\ \fISND-WIDTH\fR
+\fB-W\fR,\ \fB--snd-width=\fISND-WIDTH\fR
 Sets the
 .I SND-WIDTH
 of the user space data buffer.  This will be the number of send sized buffers
@@ -1405,7 +1440,7 @@ tests as follows:
 .BI LWPDG_ *\fR.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-t\fR\ \fIUNIX-TEST\fR
+\fB-t\fR,\ \fB--testname=\fIUNIX-TEST\fR
 Tests available for the POSIX/BSD Unix Domain Sockets Interface consist of the following:
 .BR STREAM_STREAM ,
 .BR STREAM_RR ,
@@ -1424,26 +1459,67 @@ tests.
 The BSD/POSIX Unix Domain Sockets API test specific options and arguments are as follows:
 .\" -------------------------------------------------------------------------
 .TP
-\fB-h\fR
+\fB-h\fR,\ \fB--help\fR
 .\" -------------------------------------------------------------------------
 .TP
-\fB-m\fR\ \fILOC-MSG-SIZE\fR
+\fB-m\fR,\ \fB--loc-msgsize\fILOC-MSG-SIZE\fR
+Specifies the amount of data (in bytes) send in an individual
+.BR send (2)
+operation.  This also affects the data sent with a
+.BR sendto (2)
+call int he request/response tests.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-M\fR\ \fIREM-MSG-SIZE\fR
+\fB-M\fR,\ \fB--rem-msgsize\fIREM-MSG-SIZE\fR
+.\" -------------------------------------------------------------------------
+Sepcifies the amount of data received (in bytes) in an individual
+.BR recv (2)
+call.
+.TP
+\fB-p\fR,\ \fB--path=\fIPATH\fR
+Specifies the path to the directory where temporary files are created.
+.RI [ Default:
+see
+.BR tempnam (3)]
 .\" -------------------------------------------------------------------------
 .TP
-\fB-p\fR\ \fIPATH\fR
+\fB-s\fR,\ \fB--loc-bufsize\fR[\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+Sets the local send
+.RI ( LOC-SNDBUF )
+and receive
+.RI ( LOC-RCVBUF )
+buffer sizes.  One of
+.IR LOC-RCVBUF " and " LOC-SNDBUF
+must be specified.  If no comma (`,') is present in the option argument,
+then the specified buffer size applies to both the local send buffer size as
+well as the local receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-s\fR\ [\fILOC-SNDBUF\fR][\fB,\fR][\fILOC-RCVBUF\fR]
+\fB-S\fR,\ \fB--rem-bufsize\fR[\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
+Sets the remote send
+.RI ( REM-SNDBUF )
+and receive
+.RI ( REM-RCVBUF )
+buffer sizes.  One of
+.IR REM-RCVBUF " and " REM-SNDBUF
+must be specified.  If no comma (`,') is present in the option argument,
+then the specified buffer size applies to both the remote send buffer size as
+well as the remote receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-S\fR\ [\fIREM-SNDBUF\fR][\fB,\fR][\fIREM-RCVBUF\fR]
-.\" -------------------------------------------------------------------------
-.TP
-\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
-
+\fB-r\fR,\ \fB--rrsize\fR[\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
+Specifies the request
+.RI ( REQ-SIZE )
+or response
+.RI ( RSP-SIZE )
+size.
+At least one of
+.I REQ-SIZE
+or
+.I RSP-SIZE
+must be specified.
+If there is no comma (`,') in the option argument, then the specified size
+applies to both the request and response size.
 
 .\" =========================================================================
 .SS DLPI OPTIONS
@@ -1455,7 +1531,7 @@ tests as follows:
 .BI DLCL_ *\fR.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-t\fR\ \fIDLPI-TEST\fR
+\fB-t\fR,\ \fB--testname=\fIDLPI-TEST\fR
 Tests available for the DLPI Interface
 .[
 dlpi
@@ -1476,11 +1552,11 @@ first double-dash (`--').  Not all DLPI options are applicable to all tests.
 The DLPI API test specific options are as follows:
 .\" -------------------------------------------------------------------------
 .TP
-\fB-h\fR
+\fB-h\fR,\ \fB--help\fR
 Prints a usage statement for the specified test and exits.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-D\fR\ [\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
+\fB-D\fR,\ \fB--devices=\fR[\fILOC-DEVICE\fR][\fB,\fR][\fIREM-DEVICE\fR]
 Specifies the local
 .RI ( LOC-DEVICE )
 or remote
@@ -1509,7 +1585,7 @@ DLPI-CL:/dev/dlpi_cl
 .TE
 .\" -------------------------------------------------------------------------
 .TP
-\fB-m\fR\ \fILOC-MSG-SIZE\fR
+\fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR
 Specifies the amount of data sent in an individual
 .BR send (2)
 operation.  This also affects the data sent with a
@@ -1517,16 +1593,16 @@ operation.  This also affects the data sent with a
 call in the request response tests.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-M\fR\ \fIREM-MSG-SIZE\fR
+\fB-M\fR,\ \fB--rem-msgsize=\fIREM-MSG-SIZE\fR
 Specifies the amount of data received in an individual
 .BR recv (2)
 call.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-p\fR\ [\fILOC-PPA\fR][\fB,\fR][\fIREM-PPA\fR]
+\fB-p\fR,\ \fB--ppas=\fR[\fILOC-PPA\fR][\fB,\fR][\fIREM-PPA\fR]
 .\" -------------------------------------------------------------------------
 .TP
-\fB-r\fR\ [\fILOC-RR-SIZE\fR][\fB,\fR][\fIREM-RR-SIZE\fR]
+\fB-r\fR,\ \fB--rrsize=\fR[\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]
 Sets the local send
 .RI ( LOC-SNDBUF )
 and receive
@@ -1542,13 +1618,13 @@ buffer size applies to both the local send buffer size as well as the local
 receive buffer size.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-s\fR\ \fISAP\fR
+\fB-s\fR,\ \fB--sap=\fISAP\fR
 .\" -------------------------------------------------------------------------
 .TP
-\fB-w\fR\ [\fILOC-SND-WINDOW\fR][\fB,\fR][\fILOC-RCV-WINDOW\fR]
+\fB-w\fR,\ \fB--loc-window=\fR[\fILOC-SND-WINDOW\fR][\fB,\fR][\fILOC-RCV-WINDOW\fR]
 .\" -------------------------------------------------------------------------
 .TP
-\fB-W\fR\ [\fIREM-SND-WINDOW\fR][\fB,\fR][\fIREM-RCV-WINDOW\fR]
+\fB-W\fR,\ \fB--rem-window=\fR[\fIREM-SND-WINDOW\fR][\fB,\fR][\fIREM-RCV-WINDOW\fR]
 
 .\" =========================================================================
 .SS ATM OPTIONS
@@ -1566,15 +1642,17 @@ receive buffer size.
 .BI DNS_ *
 .\" -------------------------------------------------------------------------
 .TP
-\fB-h\fR
+\fB-h\fR,\ \fB--help\fR
 .\" -------------------------------------------------------------------------
 .TP
-\fB-f\fR\ \fIFILENAME\fR
+\fB-f\fR,\ \fB--filename=\fIFILENAME\fR
 .\" -------------------------------------------------------------------------
 .TP
-\fB-H\fR\ \fIHOSTNAME\fR
+\fB-H\fR,\ \fB--hostname=\fIHOSTNAME\fR
 
 .\" =========================================================================
+.SS TEST CATEGORIES
+.PP
 .\" -------------------------------------------------------------------------
 .TP
 \fI*\fB_STREAM\fR \- \fIUnidirectional Stream Tests\fR

@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 1.1.2.7 2004/08/12 01:05:53 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 1.1.2.8 2004/08/12 08:56:58 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/12 01:05:53 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/12 08:56:58 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -143,7 +143,7 @@ AC_DEFUN([AC_NETPERF], [dnl
             ])
         fi
     fi
-    CPPFLAGS="-I- -imacros ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
+    CPPFLAGS="-I- -include ./config.h${sctp_cv_includes:+ -I}${sctp_cv_includes}${inet_cv_includes:+ -I}${inet_cv_includes}${xti_cv_includes:+ -I}${xti_cv_includes}${xns_cv_includes:+ -I}${xns_cv_includes}${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     LDADD="$STREAMS_LDADD"
     AC_SUBST([LDADD])
     _NETPERF_OUTPUT
@@ -335,7 +335,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
     fi
     AC_MSG_RESULT([${netperf_cv_intervals:-no}])
     AC_MSG_CHECKING([for netperf do dlpi])
-    if test :"${xns_cvs_includes:-no}" = :no ; then
+    if test :"${xns_cv_includes:-no}" = :no ; then
         netperf_cv_do_dlpi=no
     fi
     if test :"${netperf_cv_do_dlpi:-no}" = :yes ; then

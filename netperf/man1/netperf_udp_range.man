@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: netperf_udp_range.man,v 1.1.2.1 2004/08/12 01:05:54 brian Exp $
+.\" @(#) $Id: netperf_udp_range.man,v 1.1.2.2 2004/08/12 09:08:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/12 01:05:54 $ by $Author: brian $
+.\" Last Modified $Date: 2004/08/12 09:08:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so netperf.macros
@@ -71,15 +71,17 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NETPERF_UDP_RANGE 1 "$Date: 2004/08/12 01:05:54 $" "$Name:  $" "User Commands"
+.TH NETPERF_UDP_RANGE 1 "$Date: 2004/08/12 09:08:38 $" "$Name:  $" "User Commands"
 .\"
 .\"
 .SH NAME
-.B netperf_udp_range
+.B netperf_udp_range, udp_range_script
 \- perform scripted netperf UDP bulk transfer benchmark tests
 .\"
 .\"
 .SH SYNOPSIS
+.HP 8
+\fBudp_range_script\fR\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
 .HP 8
 \fBnetperf_udp_range\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
 .HP 8

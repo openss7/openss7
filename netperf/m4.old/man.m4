@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: man.m4,v 1.1.2.2 2004/08/12 01:05:57 brian Exp $
+dnl @(#) $Id: man.m4,v 1.1.2.3 2004/08/12 08:38:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/08/12 01:05:57 $ by $Author: brian $
+dnl Last Modified $Date: 2004/08/12 08:38:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -82,9 +82,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_ARG_WITH([cooked-manpages],
         AS_HELP_STRING([--with-cooked-manpages],
             [convert manual pages to remove macro dependencies and grefer
-            references.  @<:@default=yes@:>@]),
+            references.  @<:@default=no@:>@]),
         [with_cooked_manpages="$withval"],
-        [with_cooked_manpages='yes'])
+        [with_cooked_manpages='no'])
     AC_MSG_CHECKING([for manpage conversion])
     if test :"${with_cooked_manpages:-no}" != :no ; then
         AC_MSG_RESULT([yes])

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2004/08/12 01:05:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2004/08/12 09:10:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/08/12 01:05:53 $ by $Author: brian $
+# Last Modified $Date: 2004/08/12 09:10:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,7 +118,7 @@ netserver_DEPENDENCIES		= libnetperf.la ./config.h
 EXTRA_DIST			= ACKNWLDGMNTS COPYRIGHT netperf.ps README.ovms Release_Notes
 dist_noinst_SCRIPTS		= configure.nexusware
 
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS) $(sbin_PROGRAMS)
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = $(dist_sbin_SCRIPTS)
 
 man1_MANS			= \
 				  netperf.1 \
@@ -176,6 +176,8 @@ dist_noinst_MANS		= \
 				  netperf_udp_stream.man \
 				  netserver.man
 
+MANMACRO_PFX			= netperf
+
 include am/man.am
 
 info_TEXINFOS			= netperf.texi
@@ -185,7 +187,7 @@ PDFS				= netperf.pdf
 HTMLS				= netperf.html
 INFO_DEPS			= $(srcdir)/netperf.info
 
-MAKINFOHTML			= $(MAKEINFO) --html --no-split
+MAKEINFOHTML			= $(MAKEINFO) --html --no-split
 
 EXTRA_DIST			+= gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
