@@ -1,11 +1,12 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi.7.man,v 0.9.2.1 2004/04/17 23:05:36 brian Exp $
+.\" @(#) $Id: tpi.7.man,v 0.9.2.2 2004/05/12 10:15:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 1992  UNIX International Inc.
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -29,31 +30,9 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
-.\"
-.\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:05:36 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +50,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TPI 7 "$Date: 2004/04/17 23:05:36 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH TPI 7 "$Date: 2004/05/12 10:15:04 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B tpi
 \- Transport Provider Interface
@@ -94,14 +73,14 @@ sort-adjacent-labels
 .\"
 .PP
 To support a framework for providing networking products in the
-.IR UNIX \(rg
+.BR UNIX \(rg
 system, an effort is underway to define service interfaces that map to
 strategic levels of the Open Systems Interconnection (OSI) Reference Model.
 These service interfaces hide implementation details of a particular service
 from the consumer of the service.  This enables system programmers to develop
 software independent of the particular protocol that provides a specific
 service.  The interfaces being specified for
-.IR UNIX \(rg
+.BR UNIX \(rg
 System V are defined within the
 .IR STREAMS (4)
 environment.  This document specifies a kernel-level interface that supports
@@ -116,7 +95,7 @@ implemented under
 (It is assumed that the reader of this document is familiar with the concept
 .IR STREAMS (4).)
 This version of the transport provider interface supports the XPG4 version of
-the X/Open Transport Interface (XTI).  A user communicates to a transport
+the X/Open Transport Interface (XTI/TLI).  A user communicates to a transport
 provider via a full duplex path known as a stream.  This stream provides a
 mechanism in which messages may be passed to the transport provider from the
 transport user and vice versa.
@@ -433,17 +412,17 @@ orderly fashion.
 .BR T_UNBIND_REQ (7),
 .BR T_UNITDATA_IND (7),
 .BR T_UNITDATA_REQ (7).
-.SH "CONFORMING TO"
-.PP
-This interface conforms to TPI Version 2, Draft 2.
-.[
-TPI Revision 2.0.0
-.]
-.SH "HISTORY"
+.SH HISTORY
 .PP
 The Transport Provider Interface first appeared in SVR 4.
 .[
 svr4
+.]
+.SH CONFORMANCE
+.PP
+This interface conforms to TPI Version 2, Draft 2.
+.[
+TPI Revision 2.0.0
 .]
 .XX
 .[
@@ -455,4 +434,4 @@ advprog
 .[
 $LIST$
 .]
-.T2
+.TI

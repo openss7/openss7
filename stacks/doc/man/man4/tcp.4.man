@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tcp.4.man,v 0.9.2.1 2004/04/17 21:38:40 brian Exp $
+.\" @(#) $Id: tcp.4.man,v 0.9.2.2 2004/05/12 10:14:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -47,13 +47,8 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
-.\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:38:40 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:14:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,14 +66,10 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TCP 4 "$Date: 2004/04/17 21:38:40 $" "$Name:  $" "OpenSS7 INET Devices"
-.\"
-.\"
+.TH TCP 4 "$Date: 2004/05/12 10:14:54 $" "$Name:  $" "OpenSS7 INET Devices"
 .SH NAME
 .B tcp
 \- Transmission Control Protocol (TCP)
-.\"
-.\"
 .SH SYNOPSIS
 .PP
 .PP
@@ -95,8 +86,6 @@ sort-adjacent-labels
 .BI "int " tcp_xtistr " = t_open(" \fR/dev/tcp\fI ", " flags );
 .HP
 .BI "int " tcp_socket " = socket(" \fRPF_INET\fI ", " \fRSOCK_STREAM\fI ", " \fRIPPROTO_TCP\fI );
-.\"
-.\"
 .SH DESCRIPTION
 .PP
 .PP
@@ -145,7 +134,7 @@ sockets into TPI
 .[
 TPI Revision 2.0.0
 .]
-transport provider streams suitable for use with XTI,
+transport provider streams suitable for use with XTI/TLI,
 .[
 XTI
 .]
@@ -179,7 +168,7 @@ or
 .BR xti (3)
 library and provides
 .B TCP
-interface using XTI
+interface using XTI/TLI
 .[
 XTI
 .]
@@ -231,15 +220,13 @@ For additional information, see
 .BR socksys (4)
 and
 .BR protosw (5).
-.\"
-.\"
 .SH IOCTLS
 .PP
 .PP
 All interfaces support a set of management IO controls using
 .BR ioctl (2)
 and
-.BR streamio (7)
+.BR streamio (2)
 .I I_STR
 system calls on the
 .IR tcp_stream ", " tcp_xtistr " or " tcp_socket .
@@ -248,9 +235,7 @@ These management controls are described in
 See also
 .BR tcp (7)
 for sockets.
-.\"
-.\"
-.SH NOTICES
+.SH CAVEATS
 .PP
 .B TCP
 has several implementations.  This manpage is for the
@@ -261,8 +246,6 @@ access to the Linux NET4 version of
 .BR TCP .
 For more information on the Linux NET4 version, see
 .BR tcp (7).
-.\"
-.\"
 .SH FILES
 .PP
 .PP
@@ -274,15 +257,11 @@ For more information on the Linux NET4 version, see
 .BR <sys/xti.h> ,
 .BR <sys/xti_ip.h> ,
 .BR <sys/xti_tcp.h> .
-.\"
-.\"
 .SH DEVICES
 .PP
 .PP
 .IR /dev/tcp ,
 .IR /dev/inet/tcp .
-.\"
-.\"
 .SH "SEE ALSO"
 .PP
 .PP
@@ -312,4 +291,4 @@ For more information on the Linux NET4 version, see
 .[
 $LIST$
 .]
-.TI
+.T4

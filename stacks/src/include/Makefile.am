@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9 $) $Date: 2004/04/25 05:53:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 10:15:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,67 +46,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/04/25 05:53:43 $ by $Author: brian $
+# Last Modified $Date: 2004/05/12 10:15:05 $ by $Author: brian $
 #
 # =============================================================================
 
 nobase_pkginclude_HEADERS = \
-	sys/cdi_daed.h \
-	sys/cdi.h \
-	sys/cdi_hdlc.h \
-	sys/dlpi_dua.h \
-	sys/dlpi_gr303.h \
-	sys/dlpi_gr303ua.h \
-	sys/dlpi_gsma.h \
-	sys/dlpi_h225.h \
-	sys/dlpi_isdn.h \
-	sys/dlpi_iua.h \
-	sys/dlpi_lapb.h \
-	sys/dlpi_lapd.h \
-	sys/dlpi_lapf.h \
-	sys/dlpi_m2ua.h \
-	sys/dlpi_mtp2.h \
-	sys/dlpi_v52.h \
-	sys/dlpi_v5ua.h \
-	sys/npi.h \
-	sys/npi_ip.h \
-	sys/npi_mtp.h \
-	sys/npi_sccp.h \
-	sys/npi_sctp.h \
-	sys/npi_ss7.h \
-	sys/npi_sscop.h \
-	sys/npi_tcp.h \
-	sys/npi_udp.h \
-	sys/sockmod.h \
-	sys/timod.h \
-	sys/tpi.h \
-	sys/tpi_inet.h \
-	sys/tpi_ip.h \
-	sys/tpi_mtp.h \
-	sys/tpi_sccp.h \
-	sys/tpi_sctp.h \
-	sys/tpi_sl.h \
-	sys/tpi_ss7.h \
-	sys/tpi_sscop.h \
-	sys/tpi_tcap.h \
-	sys/tpi_tcp.h \
-	sys/tpi_udp.h \
-	sys/xti.h \
-	sys/xti_inet.h \
-	sys/xti_ip.h \
-	sys/xti_mosi.h \
-	sys/xti_mtp.h \
-	sys/xti_osi.h \
-	sys/xti_sccp.h \
-	sys/xti_sctp.h \
-	sys/xti_sl.h \
-	sys/xti_ss7.h \
-	sys/xti_sscop.h \
-	sys/xti_tcap.h \
-	sys/xti_tcp.h \
-	sys/xti_udp.h
-
-nobase_include_HEADERS = \
 	ss7/capi.h \
 	ss7/capi_ioctl.h \
 	ss7/cci.h \
@@ -180,15 +124,89 @@ nobase_include_HEADERS = \
 	ss7/ua_lm.h \
 	ss7/ua_lm_ioctl.h \
 	ss7/v52_ioctl.h \
-	ss7/v5ua_ioctl.h
+	ss7/v5ua_ioctl.h \
+	sys/cdi_daed.h \
+	sys/cdi.h \
+	sys/cdi_hdlc.h \
+	sys/dlpi_dua.h \
+	sys/dlpi_gr303.h \
+	sys/dlpi_gr303ua.h \
+	sys/dlpi_gsma.h \
+	sys/dlpi.h \
+	sys/dlpi_h225.h \
+	sys/dlpi_isdn.h \
+	sys/dlpi_iua.h \
+	sys/dlpi_lapb.h \
+	sys/dlpi_lapd.h \
+	sys/dlpi_lapf.h \
+	sys/dlpi_m2ua.h \
+	sys/dlpi_mtp2.h \
+	sys/dlpi_v52.h \
+	sys/dlpi_v5ua.h \
+	sys/npi.h \
+	sys/npi_ip.h \
+	sys/npi_mtp.h \
+	sys/npi_sccp.h \
+	sys/npi_sctp.h \
+	sys/npi_ss7.h \
+	sys/npi_sscop.h \
+	sys/npi_tcp.h \
+	sys/npi_udp.h \
+	sys/sockmod.h \
+	sys/ticlts.h \
+	sys/ticots.h \
+	sys/ticotsord.h \
+	sys/tihdr.h \
+	sys/timod.h \
+	sys/tirdwr.h \
+	sys/tiuser.h \
+	sys/tli.h \
+	sys/tpi.h \
+	sys/tpi_inet.h \
+	sys/tpi_ip.h \
+	sys/tpi_mtp.h \
+	sys/tpi_sccp.h \
+	sys/tpi_sctp.h \
+	sys/tpi_sl.h \
+	sys/tpi_ss7.h \
+	sys/tpi_sscop.h \
+	sys/tpi_tcap.h \
+	sys/tpi_tcp.h \
+	sys/tpi_udp.h \
+	sys/xti_atm.h \
+	sys/xti.h \
+	sys/xti_inet.h \
+	sys/xti_ip.h \
+	sys/xti_local.h \
+	sys/xti_mosi.h \
+	sys/xti_mtp.h \
+	sys/xti_osi.h \
+	sys/xti_sccp.h \
+	sys/xti_sctp.h \
+	sys/xti_sl.h \
+	sys/xti_ss7.h \
+	sys/xti_sscop.h \
+	sys/xti_tcap.h \
+	sys/xti_tcp.h \
+	sys/xti_udp.h \
+	sys/xti_xti.h \
+	ticlts.h \
+	ticots.h \
+	ticotsord.h \
+	tihdr.h \
+	timod.h \
+	tirdwr.h \
+	tiuser.h \
+	xti.h \
+	xti_inet.h
 
-#	os7/allocb.h \
-#	os7/bufpool.h \
-#	os7/bufq.h \
-#	os7/debug.h \
-#	os7/lock.h \
-#	os7/priv.h \
-#	os7/queue.h \
+#	os7/allocb.h
+#	os7/bufpool.h
+#	os7/bufq.h
+#	os7/debug.h
+#	os7/lock.h
+#	os7/priv.h
+#	os7/queue.h
 #	os7/timer.h
 
 # vim: ft=automake

@@ -1,7 +1,7 @@
 '\" rt
-.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: ticots.4.man,v 0.9.2.1 2004/04/17 21:38:40 brian Exp $
+.\" @(#) $Id: ticots.4.man,v 0.9.2.2 2004/05/12 10:14:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:38:40 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/12 10:14:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +71,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH TICOTS 4 "$Date: 2004/04/17 21:38:40 $" "$Name:  $" "Linux Fast-STREAMS Devices"
+.TH TICOTS 4 "$Date: 2004/05/12 10:14:54 $" "$Name:  $" "OpenSS7 UNIX Devices"
 .SH NAME
 .B ticots, tlcots
 \- connection oriented loopback provider
@@ -205,4 +205,4 @@ svr4
 .[
 $LIST$
 .]
-.TI
+.T4

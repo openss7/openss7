@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.1 2004/04/17 23:05:36 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.2 2004/05/12 10:15:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -29,31 +29,9 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
-.\"
-.\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:05:36 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,14 +49,10 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMIO 7 "$Date: 2004/04/17 23:05:36 $" "$Name:  $" "Linux Fast-STREAMS"
-.\"
-.\"
+.TH STREAMIO 7 "$Date: 2004/05/12 10:15:04 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B streamio
 \- STREAMS ioctl commands 
-.\"
-.\"
 .SH SYNOPSIS   
 .PP
 .B #include <sys/types.h>
@@ -86,9 +60,8 @@ sort-adjacent-labels
 .B #include <stropts.h>
 .HP
 .BI "int " retval " = ioctl (int " fd ", int " command " , ... /* " arg " */);"
-.\"
-.\"
 .SH DESCRIPTION
+.PP
 .PP
 STREAMS I/O control commands are ioctl commands that are defined to operate on
 all STREAMS character special devices.  All of these commands are interpreted
@@ -97,26 +70,23 @@ by the stream head.  Some commands are passed to the STREAMS module or driver.
 STREAMS I/O control commands are invoked using the normal
 .BR ioctl (2)
 system call, but are defined only for STREAMS character special files.
-.TP 12
+.PP
 .I fd
 is an open file descriptor for a STREAMS character special file.
-.TP 12
+.PP
 .I command
 is the STREAMS I/O control function that the caller requests be performed.
-.TP 12
+.PP
 .I arg
 provides additional information required by the particular I/O
 .IR command .
 Specific
 .IR command " and " arg
 are described below.
-.\"
-.\"
 .SH IOCTLS
 .PP
-.\"
-.\"
 .SS I_ATMARK
+.PP
 .PP
 Checks whether the next messages on the stream head read queue is marked.
 .I arg
@@ -142,28 +112,19 @@ mark criteria, or (1) to indicate that it meets the mark criteria.
 Upon failure,
 .I I_ATMARK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EINVAL ]
 .I arg
 is invalid.
-.\"
-.\"
 .SS I_CANPUT
+.PP
 .PP
 Checks whether messages can be written to the queue band specified by
 .IR arg .
 .I arg
 is an integer which contains the queue band to test for flow control.
-.B Linux Fast-STREAMS
-adds the extension that
-.I arg
-can also be one of the following values:
-.TP 12
-.B ANYBAND
-instead of testing a specified band, tests whether any (existing) band is writable.
-.PP
 Upon success,
 .I retval
 is false (0) if the queue band
@@ -173,29 +134,17 @@ true (1) if the queue band is not flow controlled.
 Upon failure,
 .I retval
 is -1 and
-.IR errno (3)
+.I errno
 is set to one of the following errors numbers:
 .TP 12
 .RB [ EINVAL ]
+integer
 .I arg
 is outside the range 0 to 255 and does not represent a valid priority band.
-.PP
-Any of the errors returned by
-.BR putpmsg (2)
-may be returned in
-.IR errno .
-Any error received in an
-.B M_ERROR
-message indicating a write error for the stream will be returned in
-.IR errno .
-(See also
-.RI \(lq ERRORS \(rq
-below.)
-.\"
-.\"
 .SS I_CKBAND
 .PP
-Checks whether messages can be read from the queue band specified by
+.PP
+Checks whether messages cna be read from the queue band specified by
 .IR arg .
 .I arg
 is an integer which contains the queue band to test for an available message.
@@ -210,29 +159,19 @@ is available to be read with
 Upon failure,
 .B I_CKBAND
 returns -1 and
-.IR errno (3)
+.I errno
 is set to one of the following error numbers:
 .TP 12
 .RB [ EINVAL ]
 .I arg
 contains a priority band outside the range 0 - 255.
-.\"
-.\"
-.PP
-Any of the errors returned by
-.BR getpmsg (2)
-may be returned in
-.IR errno .
-Any error received in an
-.B M_ERROR
-message indicating a read error for the stream will be returned in
-.IR errno .
-(See also
-.RI \(lq ERRORS \(rq
+.TP 12
+.RB [ EINVAL ]
+the priority band does not exist.  (See
+.IR "\*(lqBUGS\*(rq" ,
 below.)
-.\"
-.\"
 .SS I_FDINSERT
+.PP
 .PP
 This command performs similar to
 .BR putmsg (2),
@@ -258,7 +197,7 @@ struct strfdinsert {
 };
 \s+1\fR
 .fi
-.TP 12
+.PP
 .I ctlbuf
 describes the control part of the message, and is formated the same as the
 .B strbuf
@@ -274,7 +213,7 @@ structure must be large enough to accept the translated file descriptor.
 Unlike
 .BR putmsg (2)
 this message must contain a control part.
-.TP 12
+.PP
 .I databuf
 describes the data part of the message, formatted the same as the
 .B strbuf
@@ -295,17 +234,17 @@ message.
 a
 .I len
 field of zero (0) would indicate to send a zero-length data part message.)
-.TP 12
+.PP
 .I flags
 provides the options flags formatted the same as the
 .I flags
 argument to
 .BR putmsg (2).
-.TP 12
+.PP
 .I fildes
 is the file descriptor of a stream to be translated to a read queue pointer and
 placed into the control part of the message.
-.TP 12
+.PP
 .I offset
 is the offset into the control part to place the read queue pointer associated
 with
@@ -316,23 +255,21 @@ must leave sufficient room in the control part of the message to permit the
 read queue pointer to be overwritten without exceeding the bounds of the
 control part.
 .PP
-Upon success,
+Upon succes,
 .B I_FDINSERT
 returns zero (0).
 Upon failure,
 .B I_FDINSERT
 returns -1 and sets
-.IR errno (3)
+.I errno
 to one of the following error numbers:
-.\"
-.\"
+.TP 12
+.RB [ ENOSR ]
+a buffer for the resulting message could not be allocated.
 .TP 12
 .RB [ EFAULT ]
 .IR arg ", " ctlbuf ", " databuf ", " ctlbuf.buf " or " databuf.buf
 points outside the caller's valid address space.
-.TP 12
-.RB [ ENOSR ]
-a buffer for the resulting message could not be allocated.
 .TP 12
 .RB [ EINVAL ]
 .I fildes
@@ -341,23 +278,49 @@ is invalid, or
 is invalid, or
 .I flags
 is invalid.
-.\"
-.\"
-.PP
-Any of the errors returned by
-.BR putpmsg (2)
-may be returned in
-.IR errno .
-Any error received in an
-.B M_ERROR
-message indicating a write error for the stream will be returned in
-.IR errno .
-(See also
-.RI \(lq ERRORS \(rq
+(See
+.IR "\*(lqBUGS\*(rq" ,
 below.)
-.\"
-.\"
+.TP 12
+.RB [ EINTR ]
+interrupted by a signal.
+.TP 12
+.RB [ ENXIO ]
+.I fd
+received a hangup or is closing.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
+.TP 12
+.RB [ ERANGE ]
+The
+.I len
+of the data part of the message is outside the range
+.I q_minpsz
+to
+.I q_maxpsz
+inclusive for the topmost STREAMS module or driver under the stream head, or,
+the
+.I len
+of the control or data part is larger than the maximum sized control or data
+message for the STREAMS subsystem.
+.TP 12
+.RB [ EAGAIN ]
+the stream head is set for asynchronous operation
+.BR "" ( O_NONBLOCK " or " O_NDELAY
+was set using
+.BR open "(2) or " fcntl (2)),
+the stream head was flow controlled and
+.I flags
+indicated a normal priority message.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
+.PP
+In addition, any error received in an error message will be returned in
+.IR errno .
 .SS I_FIND
+.PP
 .PP
 Checks whether the specified module is currently present in the stream
 specified by
@@ -374,76 +337,35 @@ and returns false (0) if the module is not present in the stream.
 Upon failure,
 .B I_FIND
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 points to a string which exceeds the callers valid address space.
-.\"
-.\"
-.SS I_FLUSHBAND
-.PP
-Flushes the stream for a specified band.
-.I arg
-points to a
-.B bandinfo
-structure formatted as follows:
-.sp
-.nf
-\fC\s-1\
-struct bandinfo {
-	unsigned char bi_pri;
-	int bi_flag;
-};
-\fR\s+1
-.fi
-.PP
-.I bi_pri
-specifies the priority of the band to flush.
-.I bi_flag
-specifies which queues to flush and has one of the following values:
-.TP 12
-.B FLUSHR
-flush the read queues.
-.TP 12
-.B FLUSHW
-flush the write queues.
-.TP 12
-.B FLUSHRW
-flush the read and write queues.
-.PP
-Upon success,
-.B I_FLUSHBAND
-returns zero (0).
-Upon failure,
-.B I_FLUSHBAND
-returns -1 and sets
-.IR errno (3)
-to an appropriate error number as follows:
-.TP 12
-.RB [ EFAULT ]
-.I arg
-points outside the caller's valid address space.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
 .TP 12
 .RB [ EINVAL ]
-.I bi_flag
-contains invalid flags other than
-.BR FLUSHR ", " FLUSHW " or " FLUSHRW .
+.I arg
+points to an invalid module name.
 .TP 12
-.RB [ ENOSR ]
-the
-.B M_FLUSH
-message could not be allocated.
-.\"
-.\"
-.PP
-(See also
-.RI \(lq ERRORS \(rq
+.RB [ ENOMEM ]
+memory could not be allocated to
+hold the string pointed to by
+.IR arg .
+(See
+.IR "\*(lqBUGS\*(rq" ,
 below.)
-.\"
-.\"
+.TP 12
+.RB [ ENAMETOOLONG ]
+.I arg
+contains a string that is greater than
+.B (FMNAMESZ + 1)
+in length.
 .SS I_FLUSH
+.PP
 .PP
 Flushes the stream.
 .PP
@@ -465,27 +387,101 @@ returns zero (0).
 Upon failure,
 .B I_FLUSH
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
+.TP 12
+.RB [ ENXIO ]
+the stream head specified by
+.I fd
+is closing or has received a hangup.
 .TP 12
 .RB [ EINVAL ]
 .I arg
 contains invalid flags other than
 .BR FLUSHR ", " FLUSHW " or " FLUSHRW .
 .TP 12
-.RB [ ENOSR ]
+.RB [ ENOMEM ]
 the
 .B M_FLUSH
 message could not be allocated.
-.\"
-.\"
-.PP
-(See also
-.RI \(lq ERRORS \(rq
+(See
+.IR "\*(lqBUGS\*(rq" ,
 below.)
-.\"
-.\"
+.PP
+In addition,
+.B I_FLUSH
+can fail silently.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
+.SS I_FLUSHBAND
+.PP
+.PP
+Flushes the stream for a specified band.
+.I arg
+is a
+.B bandinfo
+structure formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct bandinfo {
+	unsigned char bi_pri;
+	int bi_flag;
+};
+\fR\s+1
+.fi
+.PP
+.I bi_pri
+specifies the priority of the band to flush.
+.PP
+.I bi_flag
+specifies which queues to flush and has one of the following values:
+.TP 12
+.B FLUSHR
+flush the read queues.
+.TP 12
+.B FLUSHW
+flush the write queues.
+.TP 12
+.B FLUSHRW
+flush the read and write queues.
+.PP
+Upon success,
+.B I_FLUSHBAND
+returns zero (0).
+Upon failure,
+.B I_FLUSHBAND
+returns -1 and sets
+.I errno
+to an appropriate error number as follows:
+.TP 12
+.RB [ ENXIO ]
+the stream head specified by
+.I fd
+is closing or has received a hangup.
+.TP 12
+.RB [ EINVAL ]
+.I bi_flag
+contains invalid flags other than
+.BR FLUSHR ", " FLUSHW " or " FLUSHRW .
+.TP 12
+.RB [ ENOMEM ]
+the
+.B M_FLUSH
+message could not be allocated.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
+.PP
+In addition,
+.B I_FLUSHBAND
+can fail silently.
+(See
+.IR "\*(lqBUGS\*(rq" ,
+below.)
 .SS I_GETBAND
+.PP
 .PP
 Gets the priority band associated with the next message on the stream head read queue.
 .I arg
@@ -498,7 +494,7 @@ head read queue into the integer pointed to by
 Upon failure,
 .B I_GETBAND
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -507,28 +503,16 @@ points outside the caller's valid address space.
 .TP 12
 .RB [ ENODATA ]
 there is no message on the stream head read queue.
-.\"
-.\"
-.PP
-Any of the errors returned by
-.BR getpmsg (2)
-may be returned in
-.IR errno .
-Any error received in an
-.B M_ERROR
-message indicating a read error for the stream will be returned in
-.IR errno .
-(See also
-.RI \(lq ERRORS \(rq
-below.)
-.\"
-.\"
 .SS I_GETCLTIME
+.PP
 .PP
 Gets the close delay time (in milliseconds) associated with the stream head.
 .I arg
 points to a
 .B long
+(see
+.IR "\*(lqBUGS\*(rq" ,
+below)
 to receive the delay.
 .PP
 Upon success,
@@ -540,15 +524,14 @@ pointed to by
 Upon failure,
 .B I_GETCLTIME
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 points outside the caller's valid address space.
-.\"
-.\"
 .SS I_GETSIG
+.PP
 .PP
 Gets a bitmask of the events for which the calling process is registered
 to be sent a
@@ -609,7 +592,7 @@ returns (0) and the event bitmask in the integer pointed to by
 Upon failure,
 .B I_GETSIG
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -620,116 +603,8 @@ points outside the caller's valid address space.
 the calling process is not registered to receive a
 .B SIGPOLL
 signal.
-.\"
-.\"
-.SS I_SRDOPT
-.PP
-Sets the
-.BR read (2)
-options flags for the stream head.
-These flags alter the behavior of the
-.BR read (2)
-call when called for
-.IR fd .
-.I arg
-is an integer value containing the read options flags which may be one flag
-from the mode group as follows:
-.TP 12
-.B RNORM
-byte-stream mode.  This is the default read mode.
-This is the normal byte-stream mode where message boundaries are ignored.
-.BR read (2)
-and
-.BR readv (2)
-returns data until the read count has been satisfied or a zero length message
-is received.
-.TP 12
-.B RMSGN
-message non-discard mode.
-The
-.BR read (2)
-or
-.BR readv (2)
-will return when either the count is satisfied, a zero length message is
-received, or a message boundary is encountered.  If there is any data left in
-a message after the read count has been satisfied, the message is placed back
-on the stream head read queue.  The data will be read on a subsequent
-.BR read (2)
-or
-.BR readv (2)
-call.
-.TP 12
-.B RMSGD
-message discard mode.
-Similar to
-.B RMSGN
-mode, above, but data that remains in a message after the read count has been
-satisfied is discarded.
-.TP 12
-.B RFILL
-message fill mode.
-Similar to
-.B RNORM
-but requests that the stream head fill a buffer completely before returning to
-the application.  This is used in conjunction with a cooperating module and
-.BR M_READ (9)
-messages.
-.PP
-bitwise OR'ed with one flag from the protocol group as follows:
-.TP 12
-.B RPROTNORM
-fail read when control part present.
-Fail
-.BR read (2)
-with
-.RB [ EBADMSG ]
-if a message containing a control part is at the front of the stream head
-read queue.
-Otherwise, the message is read as normal.  This is the default setting for new
-stream heads.  This setting is used with the
-.BR timod (4)
-module requiring the use of the
-.BR tirdwr (4)
-module for use with the
-.BR xti (3)
-library.
-.[
-magic
-%P 525
-.]
-.TP 12
-.B RPROTDAT
-deliver control part of a message as data.
-The control part of the message is prepended to the data part.
-This may be useful for specialized libraries or at the user's option with
-.BR timod (4)
-or
-.BR sockmod (4)
-modules.
-.TP 12
-.B RPROTDIS
-discard control part of message, delivering any data part.
-The control part of the message is discarded and the data part is processed.
-This setting is used with the
-.BR sockmod (4)
-module, or at the user's option with other modules or drivers.
-.PP
-.BR Note :
-Although all modes terminate the read on a zero-length message, POSIX requires
-that zero only be returned from read when the requested length is zero or an
-end of file
-.RB ( M_HANGUP )
-has occured.  Therefore,
-.B LfS
-.[
-LfS
-.]
-only returns on a zero-length message if some data has been read already.
-.\"
-.\"
-.\"
-.\"
 .SS I_GRDOPT
+.PP
 .PP
 Gets the read options flags for the stream head.
 .I arg
@@ -741,19 +616,21 @@ will return one flag from the following mode flags:
 .B RNORM
 byte-stream mode.  This is the default read mode.
 .TP 12
-.B RMSGN
-message non-discard mode.
-.TP 12
 .B RMSGD
 message discard mode.
 .TP 12
-.B RFILL
-message fill mode.
+.B RMSGN
+message non-discard mode.
 .PP
 bitwise OR'ed with one flag from the following protocol flags:
 .TP 12
 .B RPROTNORM
-fail read when control part present.
+fail
+.BR read (2)
+with
+.RB [ EBADMSG ]
+if a message containing a control part is at the front of the stream head
+read queue.
 .TP 12
 .B RPROTDAT
 deliver control part of a message as data.
@@ -768,47 +645,14 @@ returns zero (0) and the read options flags in the integer pointed to by
 Upon failure,
 .B I_GRDOPT
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 points outside the caller's valid address space.
-.\"
-.\"
-.SS I_SWROPT
-.PP
-Sets the
-.BR write (2)
-options flags for the stream head.
-These flags alter the behavior of the
-.BR write "(2) and " putmsg (2)
-calls when called for
-.IR fd .
-.I arg
-is an integer value containing the write options flags which may be one or
-more flags from the following:
-.TP 12
-.B SNDZERO
-send a zero-length message downstream when a write of zero bytes occurs.
-.TP 12
-.B SNDPIPE
-send
-.B SIGPIPE
-on
-.BR write (2)
-and
-.BR putmsg (2)
-if the stream head has received a write error
-.BR "" ( M_ERROR )
-message.
-.TP 12
-.B SNDHOLD
-hold messages briefly in an attempt to coallese smaller transmissions into
-larger ones.
-.\"
-.\"
 .SS I_GWROPT
+.PP
 .PP
 Gets the write options flags for the stream head.
 .I arg
@@ -833,10 +677,6 @@ and
 if the stream head has received a write error
 .BR "" ( M_ERROR )
 message.
-.TP 12
-.B SNDHOLD
-hold messages briefly in an attempt to coallese smaller transmissions into
-larger ones.
 .PP
 Upon success,
 .B I_GWROPT
@@ -845,118 +685,14 @@ returns zero (0) and the write options flags in the integer pointed to by
 Upon failure,
 .B I_GWROPT
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 pointed outside the caller's valid address space.
-.\"
-.\"
-.SS I_SERROPT
-.PP
-Sets the error options flags for the stream head.  These flags alter the
-behavior of system calls in response to the receipt of an
-.B M_ERROR
-message at the stream head when called for
-.IR fd .
-.I arg
-is an integer value containing the error option flags which may be one flag
-controlling the read error beahvior
-from the following:
-.TP 12
-.B RERRNORM
-specifies that read errors are treated as normal and persist until they are
-cleared with a subsequent
-.B M_ERROR
-message indicating a read error of zero (0), or until the stream is closed.
-This is the default.
-.TP 12
-.B RERRNONPERSIST
-specifies that read errors are treated as non-persistent.  Once the read
-errror is delivered to a system call, it is cleared automatically.
-.PP
-and one flag controlling the write error behavior from the following:
-.TP 12
-.B WERRNORM
-specifies that write errors are treated as normal and persist until they are
-cleared with a subsequent
-.B M_ERROR
-message indicating a write error of zero (0), or until the stream is closed.
-This is the default.
-.TP 12
-.B WERRNONPERSIST
-specifies that write errors are treated as non-persistent.  Once the write
-errror is delivered to a system call, it is cleared automatically.
-.PP
-Upon success,
-.B I_SERROPT
-returns zero (0) and the error options flags are set according to the value in
-.IR arg .
-Upon failure,
-.B I_SERROPT
-returns -1 and sets
-.IR errno (3)
-to an appropriate error number as follows:
-.TP 12
-.RB [ EINVAL ]
-the flags specified in
-.I arg
-are invalid.
-.\"
-.\"
-.SS I_GERROPT
-.PP
-Gets ther error options flags for the stream head.
-.I arg
-is a pointer to an integer to receive the stream head error options.  The
-integer pointed to by
-.I arg
-will return one flag fromt he following flags:
-(These flags alter the operations of read errors in return to system calls.)
-.TP 12
-.B RERRNORM
-indicates that read errors are treated as normal and persist until they are
-cleared with a subsequent
-.B M_ERROR
-message indicating a read error of zero (0), or until the stream is closed.
-This is the default.
-.TP 12
-.B RERRNONPERSIST
-indicates that read errors are treated as non-persistent.  Once the read
-errror is delivered to a system call, it is cleared automatically.
-.PP
-and one flag from the following flags:
-(These flags alter the operations of the write errors in return to system
-calls.)
-.TP 12
-.B WERRNORM
-indicates that write errors are treated as normal and persist until they are
-cleared with a subsequent
-.B M_ERROR
-message indicating a write error of zero (0), or until the stream is closed.
-This is the default.
-.TP 12
-.B WERRNONPERSIST
-indicates that write errors are treated as non-persistent.  Once the write
-errror is delivered to a system call, it is cleared automatically.
-.PP
-Upon success,
-.B I_GERROPT
-returns the error options flags in the integer pointed to by
-.IR arg .
-Upon failure,
-.B I_GERROPT
-returns -1 and sets
-.IR errno (3)
-to an appropriate error number as follows:
-.TP 12
-.RB [ EFAULT ]
-.I arg
-points outside the user's valid address space.
-.\"
-.\"
 .SS I_LINK
+.PP
 .PP
 Links on stream under the multiplexing driver on stream
 .IR fd .
@@ -984,7 +720,7 @@ command.
 Upon failure,
 .B I_LINK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .PP
 .TP 12
@@ -1002,15 +738,9 @@ a buffer for the ioctl message could not be allocated.
 .I fd
 received an error message.
 .TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
-.TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 .I fd
@@ -1026,9 +756,8 @@ In addition, any error received in an error message will be returned in
 Also, any error returned by the module or driver in an ioctl positive or
 negative acknowledgement message will also be returned in
 .IR errno .
-.\"
-.\"
 .SS I_LIST
+.PP
 .PP
 List all of the modules pushed on the stream specified by
 .IR fd .
@@ -1102,7 +831,7 @@ the stream
 Upon failure,
 .B I_LIST
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -1115,9 +844,12 @@ is less than 1, or,
 .I str_mlist
 is
 .BR NULL .
-.\"
-.\"
+.PP
+See
+.IR "\*(lqBUGS\*(rq" ,
+below.
 .SS I_LOOK
+.PP
 .PP
 Gets the name of the first module beneath the stream head.
 .I arg
@@ -1134,7 +866,7 @@ by
 Upon failure,
 .B I_LOOK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -1143,9 +875,8 @@ pointed outside the caller's valid address space.
 .TP 12
 .RB [ EINVAL ]
 there is no module beneath the stream head.
-.\"
-.\"
 .SS I_NREAD
+.PP
 .PP
 Gets the number of unread data bytes contained in
 .B M_DATA
@@ -1160,15 +891,23 @@ the stream head read queue.
 Upon failure,
 .B I_NREAD
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 points outside the caller's valid address space.
-.\"
-.\"
+.HP 12
+.B Note:
+.B LiS
+.[
+LiS
+.]
+uses
+.BR qsize "(9) and " msgdsize (9)
+to provide this command.
 .SS I_PEEK
+.PP
 .PP
 Peeks at the next message on the stream head read queue without removing the
 message from the queue.
@@ -1186,7 +925,7 @@ struct strpeek {
 };
 \fR\s+1
 .fi
-.TP 12
+.PP
 .I ctlbuf
 describes the control part of the message, and is formatted the same as the
 .B strbuf
@@ -1200,7 +939,6 @@ the
 field of this
 .B strbuf
 should be zero (0).
-.TP 12
 .I databuf
 describes the data part of the message, and is formatted the same as the
 .B strbuf
@@ -1214,7 +952,7 @@ the
 field of this
 .B strbuf
 should be zero (0).
-.TP 12
+.PP
 .I flags
 provides the read flags and is formatted the same as the
 .I flags
@@ -1231,7 +969,7 @@ if there was a message on the stream head read queue.
 Upon failure,
 .B I_PEEK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error message as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -1241,14 +979,13 @@ point outside the caller's valid address space.
 In addition,
 .B I_PEEK
 can return any
-.IR errno (3)
+.I errno
 returned by
 .BR getmsg (2).
 See
 .BR getmsg (2).
-.\"
-.\"
 .SS I_PLINK
+.PP
 .PP
 Links on stream under the multiplexing driver on stream
 .IR fd .
@@ -1276,7 +1013,7 @@ command.
 Upon failure,
 .B I_PLINK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .PP
 .TP 12
@@ -1294,15 +1031,9 @@ a buffer for the ioctl message could not be allocated.
 .I fd
 received an error message.
 .TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
-.TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 .I fd
@@ -1319,9 +1050,8 @@ Also, any error returned by the module or driver in an ioctl positive or
 negative acknowledgement message will also be returned in
 .IR errno .
 .PP
-.\"
-.\"
 .SS I_POP
+.PP
 .PP
 Pops the STREAMS module just beneath the stream head from
 .IR fd .
@@ -1337,34 +1067,21 @@ returns (0).
 Upon failure,
 .B I_POP
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
-.TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 there was no module beneath the stream head.
-.TP
-.RB [ EPERM ]
-an anchor was placed with
-.B I_ANCHOR
-and an attempt is being made by a non-privideged process to pop beneath the
-anchor position.
 .PP
 See
 .BR qdetach (9)
 for more information.
-.\"
-.\"
 .SS I_PUNLINK
+.PP
 .PP
 Unlink a stream from under a multiplexing driver that was previously linked
 with
@@ -1373,12 +1090,6 @@ with
 is the multiplexor identifier of the linked stream, or,
 .B MUXID_ALL
 indicating that all linked streams are requested to be unlinked.
-.PP
-When
-.B MUXID_ALL
-is specified, all streams previously linked under the multiplexing driver with
-.B I_PLINK
-will be unlinked.
 .PP
 This call is passed as an
 .B I_STR
@@ -1397,18 +1108,12 @@ returns zero (0) and unlinks the specified stream(s).
 Upon failure,
 .B I_PUNLINK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
-.TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 .I arg
@@ -1417,11 +1122,8 @@ is invalid.
 .RB [ ETIME ]
 the call timed out waiting for a response from the driver.
 .TP 12
-.RB [ ERESTARTSYS ]
-a signal arrived before the operation could begin.
-.TP 12
 .RB [ EINTR ]
-a signal arrived before the operation could complete.
+the call was interrupted by a signal.
 .TP 12
 .RB [ ENOSR "], [" EAGAIN ]
 could not allocate the buffer for the ioctl message.
@@ -1431,9 +1133,8 @@ in
 .IR errno .
 Also, any error returned by the module or driver in a ioctl positive or
 negative acknowledgement message will also be returned in
-.\"
-.\"
 .SS I_PUSH
+.PP
 .PP
 Pushes a STREAMS module by name on the stream specified by
 .IR fd .
@@ -1446,22 +1147,17 @@ pushes the named module and returns zero (0).
 Upon failure,
 .B I_PUSH
 returns -1 and sets
-.IR errno (3)
+.T errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
 .I arg
 points outside the caller's valid address space.
 .TP 12
-.RB [ EIO ]
+.RB [ EXNXIO ]
 the stream specified by
 .I fd
-is closing.
-.TP 12
-.RB [ ENXIO ]
-the stream specified by
-.I fd
-received a hangup.
+has received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 the module name pointed to by
@@ -1488,35 +1184,8 @@ See
 and
 .BR qopen (9)
 for more information.
-.\"
-.\"
-.SS I_ANCHOR
-.PP
-Requests that an anchor be placed at the position beneath the stream head.
-When an anchor is placed, modules beneath the anchor point can no longer be
-popped from the stream by non-privileged processing using
-.BR I_POP .
-Modules can still be pushed and popped above the anchor by non-privileged
-processes.
-If an anchor already exists, the anchor is moved.
-.I arg
-is ignored and should be set to zero (0).
-.PP
-Upon success,
-.B I_ANCHOR
-places the anchor and returns zero.
-Upon failure,
-.B I_ANCHOR
-returns -1 and sets
-.IR errno (3)
-to an appropriate error number as follows:
-.TP 12
-.RB [ EINVAL ]
-.I fd
-specifies a pipe.
-.\"
-.\"
 .SS I_RECVFD
+.PP
 .PP
 .I arg
 is a pointer to a
@@ -1550,7 +1219,7 @@ structure.
 Upon failure,
 .B I_RECVFD
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .PP
 .TP 12
@@ -1558,17 +1227,9 @@ to an appropriate error number as follows:
 .I arg
 points outside the caller's valid address space.
 .TP 12
-.RB [ EPIPE ]
-.I fd
-refers to a pipe and the other end of the pipe is closed.
-.TP 12
-.RB [ EIO ]
-.I fd
-is a valid, open, file descriptor, but the stream is closing.
-.TP 12
 .RB [ ENXIO ]
 .I fd
-refers to a stream that has received a hangup.
+received a hangup message or is closing.
 .TP 12
 .RB [ EBADF ]
 .I fd
@@ -1587,9 +1248,8 @@ the message on the top of the stream head read queue is not a passed file
 descriptor
 .BR "" ( M_PASSFD )
 message.
-.\"
-.\"
 .SS I_SENDFD
+.PP
 .PP
 Sends a file descriptor to the other end of a pipe.
 .I arg
@@ -1601,37 +1261,22 @@ returns (0).
 Upon failure,
 .B I_SENDFD
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
-.TP 12
-.RB [ EINVAL ]
-.I fd
-is not a STREAMS based pipe.
-.TP 12
-.RB [ EIO ]
-.I fd
-is a valid, open, file descriptor, but the stream is closing.
-.TP 12
-.RB [ ENXIO ]
-.I fd
-refers to a stream that has received a hangup.
-.TP 12
-.RB [ EPIPE ]
-.I fd
-refers to a pipe, but the other end of the pipe is closed.
 .TP 12
 .RB [ EBADF ]
 .I arg
 is not a valid file descriptor.
 .TP 12
+.RB [ EPIPE ]
+.TP 12
 .RB [ ENOSR ]
 a buffer could not be allocated to send the file descriptor.
 .TP 12
-.RB [ EAGAIN ]
-the read queue at the other end of the pipe is full.
-.\"
-.\"
+.RB [ ENOMEM ]
+a file descriptor could not be allocated for the receiving end.
 .SS I_SETCLTIME
+.PP
 .PP
 Sets the closing delay time for the stream head.
 .I arg
@@ -1646,15 +1291,14 @@ returns zero (0) and sets the close delay time for
 Upon failure,
 .B I_SETTLTIME
 returns -1 and sets
-.IR errno (3)
+.T errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EINVAL ]
 .I arg
 is outside the valid range 0 to 300,000 milliseconds.
-.\"
-.\"
 .SS I_SETSIG
+.PP
 .PP
 Sets the mask of events for which the stream head will send the calling
 process a
@@ -1706,9 +1350,46 @@ instead of
 .TP 12
 .B S_ALL
 all flags.
-.\"
-.\"
+.SS I_SRDOPT
+.PP
+.PP
+Sets the
+.BR read (2)
+options flags for the stream head.
+These flags alter the behavior of the
+.BR read (2)
+call when called for
+.IR fd .
+.I arg
+is an integer value containing the read options flags which may be one flag
+from the mode group as follows:
+.TP 12
+.B RNORM
+byte-stream mode.  This is the default read mode.
+.TP 12
+.B RMSGD
+message discard mode.
+.TP 12
+.B RMSGN
+message non-discard mode.
+.PP
+bitwise OR'ed with one flag from the protocol group as follows:
+.TP 12
+.B RPROTNORM
+fail
+.BR read (2)
+with
+.RB [ EBADMSG ]
+if a message containing a control part is at the front of the stream head
+read queue.
+.TP 12
+.B RPROTDAT
+deliver control part of a message as data.
+.TP 12
+.B RPROTDIS
+discard control part of message, delivering any data part.
 .SS I_STR
+.PP
 .PP
 Generates an internal STREAMS ioctl message and places it on the stream head's
 write queue for processing by the module or driver and returns the response.
@@ -1727,22 +1408,19 @@ struct strioctl {
 };
 \s+1\fR
 .fi
-.TP 12
+.PP
 .I ic_cmd
 is the command to issue.  The command can by any of the commands listed here
 that are handled by the module or driver (e.g.
 .BR I_LINK )
 or any other ioctl command understood by a module or driver on the stream
 .IR fd .
-.TP 12
 .I ic_timout
 is the period of time to wait for an acknowledgement in milliseconds, or
 -1 indicating that there is no timeout.
-.TP 12
 .I ic_len
 is the length of the argument data pointed to by
 .IR ic_dp .
-.TP 12
 .I ic_dp
 is a pointer to the argument data of length
 .I ic_len
@@ -1763,7 +1441,7 @@ message.
 Upon failure,
 .B I_STR
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
 .RB [ EFAULT ]
@@ -1785,21 +1463,12 @@ is less than -1.
 .RB [ ETIME "], [" EAGAIN ]
 the operation timed out waiting for an acknowledgement.
 .TP 12
-.RB [ ERESTARTSYS ]
-a signal arrived before the operation could begin.
-.TP 12
 .RB [ EINTR ]
-a signal arrived before the operation could complete.
-.TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
+the oepration was interrupted by a signal.
 .TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ ENOSR ]
 a buffer for the ioctl message could not be allocated.
@@ -1807,13 +1476,39 @@ a buffer for the ioctl message could not be allocated.
 In addition,
 .B I_STR
 can return any
-.IR errno (3)
+.I errno
 placed in an error message received by the stream head, or
 placed in the positive or negative acknowledgement message by the module or
 driver.
-.\"
-.\"
+.SS I_SWROPT
+.PP
+.PP
+Sets the
+.BR write (2)
+options flags for the strem head.
+These flags alter the behavior of the
+.BR write "(2) and " putmsg (2)
+calls when called for
+.IR fd .
+.I arg
+is an integer value containing the write options flags which may be one or
+more flags from the following:
+.TP 12
+.B SNDZERO
+send a zero-length message downstream when a write of zero bytes occurs.
+.TP 12
+.B SNDPIPE
+send
+.B SIGPIPE
+on
+.BR write (2)
+and
+.BR putmsg (2)
+if the stream head has received a write error
+.BR "" ( M_ERROR )
+message.
 .SS I_UNLINK
+.PP
 .PP
 Unlink a stream from under a multiplexing driver that was previously linked
 with
@@ -1822,14 +1517,6 @@ with
 is the multiplexor identifier of the linked stream, or,
 .B MUXID_ALL
 indicating that all linked streams are requested to be unlinked.
-.PP
-When
-.B MUXID_ALL
-is specified, all streams previously linked under the multiplexing driver with
-.B I_LINK
-for the specified control stream,
-.IR fd ,
-will be unlinked.
 .PP
 This call is passed as an
 .B I_STR
@@ -1848,18 +1535,12 @@ returns zero (0) and unlinks the specified stream(s).
 Upon failure,
 .B I_UNLINK
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number as follows:
 .TP 12
-.RB [ EIO ]
-the stream specified by
-.I fd
-is closing.
-.TP 12
 .RB [ ENXIO ]
-the stream specified by
 .I fd
-received a hangup.
+received a hangup or is closing.
 .TP 12
 .RB [ EINVAL ]
 .I arg
@@ -1870,11 +1551,8 @@ is a pipe or FIFO.
 .RB [ ETIME ]
 the call timed out waiting for a response from the driver.
 .TP 12
-.RB [ ERESTARTSYS ]
-a signal arrived before the operation could begin.
-.TP 12
 .RB [ EINTR ]
-a signal arrived before the operation could complete.
+the call was interrupted by a signal.
 .TP 12
 .RB [ ENOSR "], [" EAGAIN ]
 could not allocate the buffer for the ioctl message.
@@ -1885,9 +1563,8 @@ in
 Also, any error returned by the module or driver in a ioctl positive or
 negative acknowledgement message will also be returned in
 .IR errno .
-.\"
-.\"
 .SH "RETURN VALUE"
+.PP
 .PP
 Upon success,
 .B ioctl()
@@ -1895,17 +1572,20 @@ returns zero (0) or a positive integer.
 Upon failure,
 .B ioctl()
 returns -1 and sets
-.IR errno (3)
+.I errno
 to an appropriate error number.
-.\"
-.\"
 .SH ERRORS
+.PP
 .PP
 When
 .B ioctl()
 fails, it returns -1 and sets
-.IR errno (3)
+.I errno
 to one of the following errors:
+.TP 12
+.RB [ ENXIO ]
+.I fd
+has received a hangup or is closing.
 .TP 12
 .RB [ EFAULT ]
 .I arg
@@ -1917,84 +1597,375 @@ points to an address that is outside the caller's valid address space.
 .IR fd ", " command ", " arg " or a member of " arg
 is invalid.
 .TP 12
-.RB [ EBADF ]
-.I fd
-is not a valid open file descriptor.
+.RB [ ENOSR ]
+a buffer could not be allocated for the call.
 .TP 12
-.RB [ ENOSTR ]
-.I fd
-is not a stream special character device.
-.TP 12
-.RB [ EOPNOTSUPP ]
-.I fd
-does not support the requested operation.
-.TP 12
-.RB [ EIO ]
-.I fd
-refers to stream that is closing.
-.TP 12
-.RB [ ENXIO ]
-.I fd
-refers to stream that has received a hangup.
-.TP 12
-.RB [ EPIPE ]
-.I fd
-refers to a pipe and the other end of the pipe is closed.
-.TP 12
-.RB [ ESTRPIPE ]
-.I fd
-refers to a STREAMS-based pipe and a write operation was attempted with no
-readers at the other end, or a read operation was attempted, the pipe is
-empty, and there are no readers at the other end.
-.TP 12
-.RB [ EINVAL ]
-.I fd
-refers to a stream that is linked under a multiplexing driver.
-.TP 12
-.RB [ ERESTARTSYS ]
-a signal was received before the operation could begin.
+.RB [ ETIME "], [" EAGAIN ]
+timed out waiting for an acknowledgment.
 .TP 12
 .RB [ EINTR ]
-a signal was recevied before the operation could complete.
-.TP 12
-.RB [ EAGAIN "], [" EWOULDBLOCK ]
-the file is set for asynchronous I/O and the operation would block.
-.TP
-.RB [ ETIME ]
-the operation timed out awaiting an acknowledgement or response from the
-driver.
-.TP
-.RB [ ENOSR ]
-a message block could not be allocated during the operation and the operation
-is not permitted to block.
+interrupted by a signal.
 .PP
-Any error delivered to the stream head in an
-.B M_ERROR
-message can be returned in
-.IR errno (3).
-.PP
+In addition, any error delivered to the stream head in an error message can be
+returned in
+.IR errno .
 Where the command is passed to the module or driver, or the command results in
 the call to a module or driver open or close procedures, or link or unlink
 procedures, the error number returned by the module or driver can be returned
 in
-.IR errno (3).
+.IR errno .
+.SH CAVEATS
 .PP
-Any error retuend in an
-.B M_IOCNAK
-message from the driver in response to a
-.I I_STR
-ioctl can be returned in
-.IR errno (3).
-.\"
-.\"
-.SH NOTICES
 .PP
 STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
 areas of behavior.  Not all bugs are bugs and not all features are features.
-.\"
-.\"
+.SH BUGS
+.PP
+.SS I_ATMARK
+.PP
+.PP
+.B LiS
+fails silently (returns success) if there is no queue associated with the
+stream head.
+.SS I_CANPUT
+.PP
+.PP
+.B LiS
+uses
+.BR bcanput (9)
+to test for flow control once
+.I arg
+is validated.
+.BR bcanput (9)
+has the problem that it will return false (0) when an internal error occurs.
+See the
+.BR bcanput (9)
+man page for more information.
+.SS I_CKBAND
+.PP
+.B LiS
+uses
+.BR strqget (9)
+to get the
+.B QCOUNT
+associated with the band specified by
+.IR arg .
+.BR strqget (9)
+returns
+.RB [ EINVAL ]
+when the specified priority band does not exist.  Therefore,
+.B I_CKBAND
+will return
+.RB [ EINVAL ]
+when it should return false (0) indicating that there is no message for the
+band.  See
+.B QCOUNT
+description in the
+.BR strqget (9)
+man page for more information.
+.SS I_FDINSERT
+.PP
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENODEV ]
+instead of
+.RB [ ENXIO ]
+when
+.I fd
+is linked under a multiplexor.
+.PP
+.B LiS
+incorrectly returns
+.RB [ EAGAIN ]
+when
+.B RS_HIPRI
+is set in
+.IR flags ,
+and the stream is flow controlled.
+It should deliver the message in this case.
+.PP
+.B LiS
+incorrectly returns
+.RB [ EINVAL ]
+when
+.I fd
+or
+.I fildes
+has received an error message.  It should return the write error of the error
+message in the case of
+.IR fd .
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENOSR ]
+instead of
+.RB [ ENODEV ]
+when there is no queue under the stream head.
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENOSTR ]
+instead of
+.RB [ EINVAL ]
+when
+.I fildes
+is not a STREAMS character special file.
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENODEV ]
+instead of
+.RB [ ENXIO ]
+when a hangup was received on
+.I fd
+or
+.I fd
+is closing.
+.PP
+.B LiS
+does not check whether
+.I fildes
+has received a hangup or is closing.  It should return return
+.RB [ ENXIO ]
+in that case.
+.SS I_FIND
+.PP
+.PP
+.B LiS
+verifies read on
+.I arg
+for a string sized
+.BR "(FNNAMESZ + 1)" .
+If the name string pointed to by
+.I arg
+is shorter than
+.B FNAMESZ
+and terminates on a page boundary,
+.B I_FIND
+will fail with error number
+.RB [ EFAULT ]
+even though the provided module name is valid and resides completely within
+the caller's address space.  A workaround for this is for the caller to
+always allocate
+.B (FNAMESZ + 1)
+sized buffers to hold the module name.  There is no excuse for this bug as
+.B Linux
+provides one byte look-ahead verify on the kernel function
+.BR strncpy_from_user ()
+which is in fact called by
+.B LiS
+when processing
+.BR I_FIND .
+.PP
+.B LiS
+allocates memory to hold the passed in string.  The maximum size of this
+string is 8 or 16 bytes.  This is not too much to place on the stack.
+.B LiS
+should not allocate memory for this and should never return
+.RB [ ENOMEM ]
+in response to
+.BR I_FIND .
+.SS I_FLUSH
+.PP
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENOMEM ]
+when it cannot allocate a message block for
+the
+.B M_FLUSH
+message.  The correct error number is
+.RB [ ENOSR ].
+.PP
+.B LiS
+uses
+.BR putnext (9)
+internally to send the
+.B M_FLUSH
+message.
+.BR putnext (9)
+can fail silently
+under a number of conditions detailed in the
+.BR putnext (9)
+man page.  One of
+those conditions is that
+.BR qprocsoff (9)
+has been called on the stream.
+.SS I_FLUSHBAND
+.PP
+.PP
+Rather than returning
+.RB [ EINVAL "], " LiS
+masks
+.I bi_flag
+with
+.B FLUSHRW
+to force validity.  This is a bug.   For example,
+.B I_FLUSHBAND
+can be called with
+.I bi_flag
+=
+.B 0xffffffff
+and
+.B LiS
+would threat this as
+.BR FLUSHRW .
+.PP
+Rather than returning
+.RB [ EINVAL "], " LiS
+masks
+.I bi_pri
+with
+.B 0xff
+to force validity.  This is a bug.  For example,
+.B I_FLUSHBAND
+can be called with
+.I bi_pri
+=
+.B 257
+and
+.B LiS
+would flush band
+.BR 1 .
+.PP
+.B LiS
+incorrectly returns
+.RB [ ENOMEM ]
+when it cannot allocate a message block for the
+.B M_FLUSH
+message.   The correct error number is
+.RB [ ENOSR ].
+.PP
+.B LiS
+usesc 
+.BR putnext (9)
+to send the
+.B M_FLUSH
+message.
+.BR putnext (9)
+can fail silently under a number of con- ditions detailed in the
+.BR putnext (9)
+man page.  One of those conditions is that
+.BR qprocsoff (9)
+has been called on the stream.
+.SS I_GETCLTIME
+.PP
+.PP
+UN*X documentation shows that
+.I arg
+is a pointer to a
+.BR long .
+In
+.B LiS
+.I arg
+is a pointer to an
+.BR int .
+This has an impact on architectures where a
+.B long
+is not the same as an
+.BR int .
+.SS I_RECVFD
+.PP
+.PP
+.B LiS
+does not block waiting for a passed file descriptor message to appear on the
+stream head read queue if the stream indicated by
+.I fd
+is set for blocking operation.  It should.
+.PP
+.B LiS
+will return
+.RB [ EAGAIN ]
+where it should return
+.RB [ EBADMSG ].
+.PP
+.B LiS
+does not check for hangup on the pipe.
+.SS I_SETCLTIME
+.PP
+.PP
+UN*X documentation shows that
+.I arg
+is a pointer to a
+.BR long .
+In
+.B LiS
+.I arg
+is a pointer to an
+.BR int .
+This has an impact on architectures where a
+.B long
+is not the same as an
+.BR int .
+.SS I_LINK
+.PP
+.PP
+.B LiS
+returns
+.RB [ ENOMEM ]
+instead of
+.RB [ ENOSR "] or [" EAGAIN ]
+when it cannot allocate a buffer for the call.
+.SS I_LIST
+.PP
+.PP
+.B LiS I_LIST
+fails silently (returns zero (0)) if there is no queue associated
+with the stream head.
+.SS I_LOOK
+.PP
+.PP
+.B LiS
+verifies write on
+.I arg
+for a string sized
+.BR (FNAMESZ + 1) .
+If the name string of the module under the stream head is shorter than
+.B (FNAMESZ + 1)
+and
+.I arg
+terminates on a page boundary,
+.B I_LOOK
+will return with error number
+.RB [ EFAULT ]
+even though the provided buffer is valid and resides as far as is necessary
+completely within the caller's address space.  A workaround for this is for
+the caller to always allocate
+.B (FNAMESZ + 1)
+sized buffers to hold the module name.  There is no excuse for this bug as
+.B Linux
+provides one byte look-ahead verify on the kernel function
+.BR strncpy_to_user ()
+which is in fact called by
+.B LiS
+when processing
+.BR I_LOOK .
+.SS I_PLINK
+.PP
+.PP
+.B LiS
+returns
+.RB [ ENOMEM ]
+instead of
+.RB [ ENOSR "] or [" EAGAIN ]
+when it cannot allocate a buffer for the call.
+.SS I_PUNLINK
+.PP
+.PP
+.B LiS
+returns
+.RB [ ENOMEM "] instead of [" ENOSR "] or [" EAGAIN ]
+when it cannot allocate a buffer for the call.
+.SS I_UNLINK
+.PP
+.PP
+.B LiS
+returns
+.RB [ ENOMEM "] instead of [" ENOSR "] or [" EAGAIN ]
+when it cannot allocate a buffer for the call.
 .SH "SEE ALSO"
 .PP
 .BR close (2),
@@ -2007,93 +1978,27 @@ areas of behavior.  Not all bugs are bugs and not all features are features.
 .BR putmsg (2),
 .BR read (2),
 .BR signal (2),
-.BR signal (5),
+.BR signal (2),
 .BR write (2),
 .BR qopen (9),
 .BR qclose (9),
 .BR qattach (9),
 .BR qdetach (9).
-.\"
-.\"
-.SH BUGS
+.SH VERSIONS
 .PP
-.B streamio
-has no known bugs.
 .PP
-STREAMS
-.B ioctl()
-calls are complex and there is much conflicting documentation in specific
-areas of behavior.  Not all bugs are bugs and not all features are features.
-.\"
-.\"
-.SH COMPATIBILITY
-.PP
-.B streamio
-is compatible with
-.IR "SVR 4.2" ,
-.[
-svr42
-.]
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.BR LiS ,
+This manpage was written for
+.B LiS\c
+.
 .[
 LiS
 .]
-with the following portability considerations:
-.IP \(em 4
-.B Linux Fast-STREAMS
-supports the
-.B RFILL
-read mode.  This read mode is
-.IR AIX \(rg
-.[
-aixcpc
-%O "Differences Between Portable Streams Environment and V.4 STREAMS"
-.]
-specific.
-.PP
-.B Linux Fast-STREAMS
-provides ioctls that are used to implement this system call.  In addition,
-.B Linux Fast-STREAMS
-regcognizes some
-.IR Solaris \(rg-specific
-and
-.BR LiS -specific
-IO control numbers for compatibility.
-.\"
-.\"
-.SH CONFORMANCE
-.PP
-SVID,
-.[
-svid
-.]
-XID,
-.[
-xbd5
-.]
-SUSv2,
-.[
-susv2
-.]
-SUSv3,
-.[
-susv3
-.]
-POSIX.
-.\"
-.\"
-.SH "HISTORY"
 .PP
 .B ioctl()
-for STREAMS first appeared in SVR 3.
+for STREAMS first appeared in SVR 3.0.
 .[
 svr3
 .]
-.\"
-.\"
 .[
 $LIST$
 .]

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_snddis.3.man,v 0.9.2.1 2004/04/17 21:26:01 brian Exp $
+.\" @(#) $Id: t_snddis.3.man,v 0.9.2.2 2004/05/12 10:14:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:26:01 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/12 10:14:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SNDDIS 3 "$Date: 2004/04/17 21:26:01 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_SNDDIS 3 "$Date: 2004/05/12 10:14:52 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .SH NAME
 .B t_snddis
 \- send abortive disconnect
@@ -243,7 +243,7 @@ An asynchronous event occured before the call could complete.  See
 for more information.
 .TP
 .RB [ TNOTSUPPORT ]
-The call requires the use of a TPI primitive not supported by the underlying transport provider.
+The call requires the use of a TLI primitive not supported by the underlying transport provider.
 .TP
 .RB [ TOUTSTATE ]
 The call was issued with the interface in an incorrect state.

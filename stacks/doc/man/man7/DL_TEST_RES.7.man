@@ -1,11 +1,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: DL_TEST_RES.7.man,v 0.9.2.1 2004/04/17 23:05:15 brian Exp $
+.\" @(#) $Id: DL_TEST_RES.7.man,v 0.9.2.2 2004/05/12 10:14:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -29,31 +29,9 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
-.\"
-.\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:05:15 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:14:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH DL_TEST_RES 7 "$Date: 2004/04/17 23:05:15 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH DL_TEST_RES 7 "$Date: 2004/05/12 10:14:58 $" "$Name:  $" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_TEST_RES (dl_test_res_t)
 \- conveys the TEST response DLSDU from the DLS User to the DLS Provider in
@@ -154,17 +132,17 @@ Previous bind request specified automatic handling of TEST responses.
 .TP
 .B DL_UNSUPPORTED
 Requested service not supplied by provider.
-.SH "CONFORMING TO"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
 .PP
 This interface conforms to DLPI Revision 2.
 .[
 dlpi
-.]
-.SH "HISTORY"
-.PP
-The Data Link Provider Interface first appeared in SVR4.
-.[
-svr4
 .]
 .XX
 .[

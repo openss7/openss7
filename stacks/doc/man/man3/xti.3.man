@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti.3.man,v 0.9.2.1 2004/04/17 21:26:02 brian Exp $
+.\" @(#) $Id: xti.3.man,v 0.9.2.2 2004/05/12 10:14:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:26:02 $ by $Author: brian $
+.\" Last Modified $Date: 2004/05/12 10:14:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH XNET 3 "$Date: 2004/04/17 21:26:02 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH XNET 3 "$Date: 2004/05/12 10:14:53 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -87,6 +87,7 @@ sort-adjacent-labels
 .B #include <sys/xti.h>
 .HP 8
 .BI "int t_accept(int " fd ", int " connfd ", struct t_call *" call );
+.PD 0
 .HP 8
 .BI "void *t_alloc(int " fd ", int " type ", int " fields );
 .HP 8
@@ -149,6 +150,7 @@ sort-adjacent-labels
 .BI "int t_sync(int " fd );
 .HP 8
 .BI "int t_unbind(int " fd );
+.PD
 .\"
 .\"
 .SH DESCRIPTION

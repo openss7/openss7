@@ -1,11 +1,11 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: npi.7.man,v 0.9.2.1 2004/04/17 23:05:34 brian Exp $
+.\" @(#) $Id: npi.7.man,v 0.9.2.2 2004/05/12 10:15:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -29,31 +29,9 @@
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
-.\" -------------------------------------------------------------------------
-.\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
-.\"
-.\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 23:05:34 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:15:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +49,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH NPI 7 "$Date: 2004/04/17 23:05:34 $" "$Name:  $" "Linux Fast-STREAMS"
+.TH NPI 7 "$Date: 2004/05/12 10:15:04 $" "$Name:  $" "Linux STREAMS"
 .SH NAME
 .B NPI
 \- Network Provider Interface
@@ -580,7 +558,7 @@ queue model objects.
 .B Connection Establishment Phase
 A pair of queues is associated with an NC between two network addresses when
 the NS provider receives an
-.BR N_CONNECT_REQ (7)
+.BR N_CONN_REQ (7)
 primitive at one of the network
 addresses resulting in a connect object being entered into the queue.  The
 queues will remain associated with the NC until a
@@ -663,9 +641,9 @@ This primitive indicates to the NS user that this message
 unit contains expedited data.
 .PP
 The sequence of primitives may remain incomplete if a
-.BR N_RESET (7)
+.B N_RESET
 or
-.BR N_DISCON (7)
+.B N_DISCON
 primitive occurs.
 .PP
 A NS user must not issue an
@@ -722,43 +700,43 @@ the originating NS user and (B) with the peer NS user.
 The
 .BR N_RESET_REQ (7)
 acts as a synchronization mark in the flow of
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives transmitted by the issuing NS user; the
 .BR N_RESET_IND (7)
 acts as a synchronization mark in the flow of
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives received by the receiving NS user.  Similarly,
 .BR N_RESET_RES (7)
 acts as a
 synchronization mark in the flow of
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives
 transmitted by the responding NS user, while the
 .BR N_RESET_CON (7)
 acts as a
 synchronization mark in the flow of
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives
 received by the NS user that originally issued the reset.  The resynchronizing
 properties of the reset service are the following:
 .IP i. 4
 All
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives issued before issuing
 the
 .BR N_RESET_REQ (7)/ N_RESET_RES (7)
@@ -769,10 +747,10 @@ are issued by the NS provider,should be
 discarded by the NS provider.
 .IP ii. 4
 Any
-.BR N_DATA (7),
-.BR N_EXDATA (7),
+.BR N_DATA ,
+.BR N_EXDATA ,
 and
-.BR N_DATACK (7)
+.B N_DATACK
 primitives issued after the synchronization
 mark will not be delivered to the other NS user before the synchronization
 mark is received.
@@ -798,7 +776,7 @@ This primitive indicates to the NS user that the reset request
 has been confirmed.
 .PP
 The sequence of primitives may remain incomplete if a
-.BR N_DISCON (7)
+.B N_DISCON
 primitive occurs.
 .PP
 .B Connection Termination Phase
@@ -837,7 +815,7 @@ for connection has been denied or an existing connection has been terminated.
 A NS user may reject an NC establishment attempt by issuing a
 .BR N_DISCON_REQ (7).
 The originator parameter in the
-.BR N_DISCON (7)
+.B N_DISCON
 primitives will indicate NS user invoked release.
 .PP
 If the NS provider is unable to establish an NC, it indicates this to the
@@ -1015,17 +993,17 @@ Provides indication that a network connection has been released.
 .BR N_UNBIND_REQ (7),
 .BR N_UNITDATA_IND (7),
 .BR N_UNITDATA_REQ (7).
-.SH "CONFORMING TO"
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.SH CONFORMANCE
 .PP
 This interface conforms to NPI Revision 2.
 .[
 npi
-.]
-.SH "HISTORY"
-.PP
-The Network Provider Interface first appeared in SVR4.
-.[
-svr4
 .]
 .XX
 .[

@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: INET.4.man,v 0.9.2.1 2004/04/17 21:38:33 brian Exp $
+.\" @(#) $Id: INET.4.man,v 0.9.2.2 2004/05/12 10:14:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -47,13 +47,8 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
-.\" Commercial licensing and support of this software is available from
-.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
-.\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/04/17 21:38:33 $ by $Author: brian $
+.\" Modified $Date: 2004/05/12 10:14:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so openss7.macros
@@ -71,7 +66,7 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH INET 4 "$Date: 2004/04/17 21:38:33 $" "$Name:  $" "OpenSS7 INET Devices"
+.TH INET 4 "$Date: 2004/05/12 10:14:53 $" "$Name:  $" "OpenSS7 INET Devices"
 .SH NAME
 .B INET
 \- OpenSS7 INET Devices
@@ -130,13 +125,13 @@ device drivers:
 .PP
 .SH VERSIONS
 .PP
-This manpage was updated $Date: 2004/04/17 21:38:33 $ for
+This manpage was updated $Date: 2004/05/12 10:14:53 $ for
 .B strinet
-release $Name:  $($Revision: 0.9.2.1 $).
+release $Name:  $($Revision: 0.9.2.2 $).
 .PP
 Most of the devices and modules listed here do not appear until
 .BR strss7-0.8.4 .
 .[
 $LIST$
 .]
-.TI
+.T4
