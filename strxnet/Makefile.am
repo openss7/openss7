@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/16 02:35:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/16 19:19:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 02:35:32 $ by $Author: brian $
+# Last Modified $Date: 2004/05/16 19:19:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -311,8 +311,8 @@ dist_noinst_SCRIPTS		=
 EXTRA_SCRIPTS			=
 
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
-KERNEL_SUBDIR			= strxnet
-KMODCONF_EXT			= strxnet
+KMODCONF_EXT			= @PACKAGE_TARNAME@
+KERNEL_SUBDIR			= @PACKAGE_TARNAME@
 
 include am/kernel.am
 

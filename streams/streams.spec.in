@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2004/05/14 12:14:27 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2004/05/16 19:18:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/14 12:14:27 $ by $Author: brian $
+# Last Modified $Date: 2004/05/16 19:18:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -566,52 +566,22 @@ development of STREAMS applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/STREAMS.info ; then
-        /sbin/install-info %{_infodir}/STREAMS.info %{_infodir}/dir
-    elif test -f %{_infodir}/STREAMS.info.gz ; then
-        /sbin/install-info %{_infodir}/STREAMS.info.gz %{_infodir}/dir
-    fi
-    if test -f %{_infodir}/SPG.info ; then
-        /sbin/install-info %{_infodir}/SPG.info %{_infodir}/dir
-    elif test -f %{_infodir}/SPG.info.gz ; then
-        /sbin/install-info %{_infodir}/SPG.info.gz %{_infodir}/dir
-    fi
-    if test -f %{_infodir}/porting.info ; then
-        /sbin/install-info %{_infodir}/porting.info %{_infodir}/dir
-    elif test -f %{_infodir}/porting.info.gz ; then
-        /sbin/install-info %{_infodir}/porting.info.gz %{_infodir}/dir
-    fi
-@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
-@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info %{_infodir}/dir
-@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
-@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info.gz %{_infodir}/dir
-@WITH_XNET_TRUE@    fi
+    for n in %{name} STREAMS SPG porting libxnet ; do
+        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} $n
+        fi
+    done
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/STREAMS.info ; then
-        /sbin/install-info %{_infodir}/STREAMS.info %{_infodir}/dir
-    elif test -f %{_infodir}/STREAMS.info.gz ; then
-        /sbin/install-info %{_infodir}/STREAMS.info.gz %{_infodir}/dir
-    fi
-    if test -f %{_infodir}/SPG.info ; then
-        /sbin/install-info %{_infodir}/SPG.info %{_infodir}/dir
-    elif test -f %{_infodir}/SPG.info.gz ; then
-        /sbin/install-info %{_infodir}/SPG.info.gz %{_infodir}/dir
-    fi
-    if test -f %{_infodir}/porting.info ; then
-        /sbin/install-info --delete %{_infodir}/porting.info %{_infodir}/dir
-    elif test -f %{_infodir}/porting.info.gz ; then
-        /sbin/install-info --delete %{_infodir}/porting.info.gz %{_infodir}/dir
-    fi
-@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
-@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info %{_infodir}/dir
-@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
-@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info.gz %{_infodir}/dir
-@WITH_XNET_TRUE@    fi
+    for n in %{name} STREAMS SPG porting libxnet ; do
+        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} $n
+        fi
+    done
 fi
 
 %postun doc
@@ -813,15 +783,20 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.17  2004/05/14 12:14:27  brian
-# - corrected logic for including test files
+# Revision 0.9.2.18  2004/05/16 19:18:47  brian
+# - Updated info install.
 #
-# Revision 1.17  2004/05/14 12:14:27  brian
-# - corrected logic for including test files
+# Revision 1.18  2004/05/16 19:18:47  brian
+# - Updated info install.
 #
-# Revision 1.16  2004/05/14 07:59:48  brian
-# - Updated xns, tli, inet, xnet and documentation.
-#
+
+* Fri May 14 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.17  2004/05/14 12:14:27  brian
+- corrected logic for including test files
+
+* Fri May 14 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.16  2004/05/14 07:59:48  brian
+- Updated xns, tli, inet, xnet and documentation.
 
 * Wed May  5 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.15  2004/05/08 19:21:12  brian

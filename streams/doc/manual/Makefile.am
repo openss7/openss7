@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/05/14 08:00:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/05/16 19:18:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/14 08:00:00 $ by $Author: brian $
+# Last Modified $Date: 2004/05/16 19:18:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,10 +68,8 @@ INFO_DEPS	+= $(srcdir)/libxnet.info
 
 endif
 
-EXTRA_DIST = gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) # $(HTMLS)
+MAKEINFOHTML	= $(MAKEINFO) --html --no-split
 
-$(PSS): ps
-$(PDFS): pdf $(PSS)
-$(HTMLS): html
+EXTRA_DIST = gpl.texi lesser.texi fdl.texi $(PSS) $(PDFS) $(HTMLS)
 
 # vim: ft=automake

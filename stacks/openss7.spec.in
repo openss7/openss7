@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2004/05/16 02:41:18 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2004/05/16 19:18:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/16 02:41:18 $ by $Author: brian $
+# Last Modified $Date: 2004/05/16 19:18:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -335,7 +335,7 @@ if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 eval "kill -HUP $tokens[1]"
             fi
         fi
@@ -351,9 +351,8 @@ fi
 if [ $1 = 1 ] ; then
 #   This is the end of a fresh install.
 #   Check that our line is in the modules.ss7 file
-    if ( grep -q 'include.*modules.ss7' /etc/modules.conf ) ; then
-        :
-    else
+    conf_fil='/etc/modules.conf'
+    if ( grep -q 'include.*modules.ss7' /etc/modules.conf ) ; then :; else
         cp -f /etc/modules.conf /etc/modules.conf.tmp.$$
         echo 'prune modules.ss7' >> /etc/modules.conf.tmp.$$
         echo 'if -f /lib/modules/`uname -r`/modules.ss7' >> /etc/modules.conf.tmp.$$
@@ -388,7 +387,7 @@ if [ $1 = 0 -a ":%{kernel_version}" = ":`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 eval "kill -KILL $tokens[1]"
             fi
         fi
@@ -441,7 +440,7 @@ if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
     lsof | while read -a tokens; do
         if [ :"$tokens[4]" = :"CHR" ]; then
             major=`echo "$tokens[5]" | sed -e 's|,.*||'`
-            if [ $major -ge 230 ]; then
+            if [ $major -ge @STRCONF_MAJBASE@ ]; then
                 if [ $1 = 0 ] ; then
 #                   extreme prejudice for removal
                     eval "kill -KILL $tokens[1]"
@@ -577,32 +576,22 @@ development of OpenSS7 applications, modules and drivers.
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir
-    fi
+    for n in %{name} libxnet ; do
+        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --info-dir=%{_infodir} $n
+        fi
+    done
 fi
-@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
-@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info %{_infodir}/dir
-@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
-@WITH_XNET_TRUE@        /sbin/install-info %{_infodir}/libxnet.info.gz %{_infodir}/dir
-@WITH_XNET_TRUE@    fi
 
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     # older rpm versions do not compress info files
-    if test -f %{_infodir}/%{name}.info ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir
-    elif test -f %{_infodir}/%{name}.info.gz ; then
-        /sbin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir
-    fi
-@WITH_XNET_TRUE@    if test -f %{_infodir}/libxnet.info ; then
-@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info %{_infodir}/dir
-@WITH_XNET_TRUE@    elif test -f %{_infodir}/libxnet.info.gz ; then
-@WITH_XNET_TRUE@        /sbin/install-info --delete %{_infodir}/libxnet.info.gz %{_infodir}/dir
-@WITH_XNET_TRUE@    fi
+    for n in %{name} libxnet ; do
+        if [ -f %{_infodir}/$n.info -o -f %{_infodir}/$n.info.gz ] ; then
+            /sbin/install-info --delete --info-dir=%{_infodir} $n
+        fi
+    done
 fi
 
 %postun doc
@@ -778,9 +767,13 @@ test utilities and commands associated with the OpenSS7 package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.14  2004/05/16 02:41:18  brian
-# - Updated for lis/lfs build.
+# Revision 0.9.2.15  2004/05/16 19:18:02  brian
+# - Updated info install.
 #
+
+* Sun May 16 2004 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.14  2004/05/16 02:41:18  brian
+- Updated for lis/lfs build.
 
 * Sat May 15 2004 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.13  2004/05/15 07:09:28  brian
