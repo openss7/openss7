@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 10:07:36 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/07/13 23:47:40 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2004/09/02 10:07:36 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.3  2004/09/02 10:07:36  brian
+ - Updates for LFS compile.
+
  Revision 0.9.2.2  2004/07/13 23:47:40  brian
  - Locking correction.
 
@@ -97,12 +100,11 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 10:07:36 $"
 
-static char const ident[] =
-    "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/07/13 23:47:40 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/09/02 10:07:36 $";
 
-/* 
+/*
  *  Simple test program for INET streams.
  */
 #include <stropts.h>
@@ -478,124 +480,203 @@ stop_tt(void)
 /* 
  *  Options
  */
-/* 
+/*
  * data options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed)); t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed));
+	t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed));
+	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed));
+	t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr __attribute__ ((packed));
+	t_scalar_t csm_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed));
+	t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed));
+	t_scalar_t sid_val __attribute__ ((packed));
 } opt_data = {
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS} , 0x0
-	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS} , 64
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS} , 10
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS} , 0
-};
+	{
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
+	, 10, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
+, 0};
 
-/* 
+/*
  * receive data options 
  */
 typedef struct rdat_opt {
-	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr ssn_hdr __attribute__ ((packed)); t_scalar_t ssn_val __attribute__ ((packed));
-	struct t_opthdr tsn_hdr __attribute__ ((packed)); t_scalar_t tsn_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed));
+	t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed));
+	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed));
+	t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed));
+	t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr ssn_hdr __attribute__ ((packed));
+	t_scalar_t ssn_val __attribute__ ((packed));
+	struct t_opthdr tsn_hdr __attribute__ ((packed));
+	t_scalar_t tsn_val __attribute__ ((packed));
 } rdat_opt_t;
-/* 
+/*
  * connect options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed)); t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed)); t_scalar_t reu_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed)); t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed)); t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed));
+	t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed));
+	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed));
+	t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr bca_hdr __attribute__ ((packed));
+	t_scalar_t bca_val __attribute__ ((packed));
+	struct t_opthdr reu_hdr __attribute__ ((packed));
+	t_scalar_t reu_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr __attribute__ ((packed));
+	t_scalar_t ist_val __attribute__ ((packed));
+	struct t_opthdr ost_hdr __attribute__ ((packed));
+	t_scalar_t ost_val __attribute__ ((packed));
 } opt_conn = {
 	{
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS} , 0x0
-	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS} , 64
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS} , 1
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS} , 1
-};
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
+	, 1, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
+, 1};
 
-/* 
+/*
  * management options 
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed)); t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed)); t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed)); t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed)); t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed)); t_scalar_t reu_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr __attribute__ ((packed));
+	t_scalar_t tos_val __attribute__ ((packed));
+	struct t_opthdr ttl_hdr __attribute__ ((packed));
+	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr __attribute__ ((packed));
+	t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr bca_hdr __attribute__ ((packed));
+	t_scalar_t bca_val __attribute__ ((packed));
+	struct t_opthdr reu_hdr __attribute__ ((packed));
+	t_scalar_t reu_val __attribute__ ((packed));
 #if 0
-	struct t_opthdr ndl_hdr __attribute__ ((packed)); t_scalar_t ndl_val __attribute__ ((packed));
-	struct t_opthdr mxs_hdr __attribute__ ((packed)); t_scalar_t mxs_val __attribute__ ((packed));
-	struct t_opthdr kpa_hdr __attribute__ ((packed)); t_scalar_t kpa_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed)); t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr nod_hdr __attribute__ ((packed)); t_scalar_t nod_val __attribute__ ((packed));
-	struct t_opthdr crk_hdr __attribute__ ((packed)); t_scalar_t crk_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed)); t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed)); t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr rcv_hdr __attribute__ ((packed)); t_scalar_t rcv_val __attribute__ ((packed));
-	struct t_opthdr ckl_hdr __attribute__ ((packed)); t_scalar_t ckl_val __attribute__ ((packed));
-	struct t_opthdr skd_hdr __attribute__ ((packed)); t_scalar_t skd_val __attribute__ ((packed));
-	struct t_opthdr prt_hdr __attribute__ ((packed)); t_scalar_t prt_val __attribute__ ((packed));
-	struct t_opthdr art_hdr __attribute__ ((packed)); t_scalar_t art_val __attribute__ ((packed));
-	struct t_opthdr irt_hdr __attribute__ ((packed)); t_scalar_t irt_val __attribute__ ((packed));
-	struct t_opthdr hbi_hdr __attribute__ ((packed)); t_scalar_t hbi_val __attribute__ ((packed));
-	struct t_opthdr rin_hdr __attribute__ ((packed)); t_scalar_t rin_val __attribute__ ((packed));
-	struct t_opthdr rmn_hdr __attribute__ ((packed)); t_scalar_t rmn_val __attribute__ ((packed));
-	struct t_opthdr rmx_hdr __attribute__ ((packed)); t_scalar_t rmx_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed)); t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed)); t_scalar_t ost_val __attribute__ ((packed));
-	struct t_opthdr cin_hdr __attribute__ ((packed)); t_scalar_t cin_val __attribute__ ((packed));
-	struct t_opthdr tin_hdr __attribute__ ((packed)); t_scalar_t tin_val __attribute__ ((packed));
-	struct t_opthdr mac_hdr __attribute__ ((packed)); t_scalar_t mac_val __attribute__ ((packed));
-	struct t_opthdr dbg_hdr __attribute__ ((packed)); t_scalar_t dbg_val __attribute__ ((packed));
+	struct t_opthdr ndl_hdr __attribute__ ((packed));
+	t_scalar_t ndl_val __attribute__ ((packed));
+	struct t_opthdr mxs_hdr __attribute__ ((packed));
+	t_scalar_t mxs_val __attribute__ ((packed));
+	struct t_opthdr kpa_hdr __attribute__ ((packed));
+	t_scalar_t kpa_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr __attribute__ ((packed));
+	t_scalar_t csm_val __attribute__ ((packed));
+	struct t_opthdr nod_hdr __attribute__ ((packed));
+	t_scalar_t nod_val __attribute__ ((packed));
+	struct t_opthdr crk_hdr __attribute__ ((packed));
+	t_scalar_t crk_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr __attribute__ ((packed));
+	t_scalar_t ppi_val __attribute__ ((packed));
+	struct t_opthdr sid_hdr __attribute__ ((packed));
+	t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr rcv_hdr __attribute__ ((packed));
+	t_scalar_t rcv_val __attribute__ ((packed));
+	struct t_opthdr ckl_hdr __attribute__ ((packed));
+	t_scalar_t ckl_val __attribute__ ((packed));
+	struct t_opthdr skd_hdr __attribute__ ((packed));
+	t_scalar_t skd_val __attribute__ ((packed));
+	struct t_opthdr prt_hdr __attribute__ ((packed));
+	t_scalar_t prt_val __attribute__ ((packed));
+	struct t_opthdr art_hdr __attribute__ ((packed));
+	t_scalar_t art_val __attribute__ ((packed));
+	struct t_opthdr irt_hdr __attribute__ ((packed));
+	t_scalar_t irt_val __attribute__ ((packed));
+	struct t_opthdr hbi_hdr __attribute__ ((packed));
+	t_scalar_t hbi_val __attribute__ ((packed));
+	struct t_opthdr rin_hdr __attribute__ ((packed));
+	t_scalar_t rin_val __attribute__ ((packed));
+	struct t_opthdr rmn_hdr __attribute__ ((packed));
+	t_scalar_t rmn_val __attribute__ ((packed));
+	struct t_opthdr rmx_hdr __attribute__ ((packed));
+	t_scalar_t rmx_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr __attribute__ ((packed));
+	t_scalar_t ist_val __attribute__ ((packed));
+	struct t_opthdr ost_hdr __attribute__ ((packed));
+	t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr cin_hdr __attribute__ ((packed));
+	t_scalar_t cin_val __attribute__ ((packed));
+	struct t_opthdr tin_hdr __attribute__ ((packed));
+	t_scalar_t tin_val __attribute__ ((packed));
+	struct t_opthdr mac_hdr __attribute__ ((packed));
+	t_scalar_t mac_val __attribute__ ((packed));
+	struct t_opthdr dbg_hdr __attribute__ ((packed));
+	t_scalar_t dbg_val __attribute__ ((packed));
 #endif
 } opt_optm = {
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
-	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
-	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	{
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
+	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 #if 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS} , 576
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS} , T_YES
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS} , T_YES
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS} , 10
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS} , T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS} , 60000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS} , 12
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS} , 12
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS} , 200
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS} , 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS} , 1
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS} , 1
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS} , 1000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS} , 50
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS} , T_SCTP_HMAC_NONE
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS} , 0
+	    , {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}
+	, 576, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}
+	, T_YES, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}
+	, T_YES, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
+	, 10, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}
+	, T_NO, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}
+	, 60000, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}
+	, 12, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}
+	, 12, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}
+	, 200, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}
+	, 0, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
+	, 1, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
+	, 1, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS}
+	, 1000, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS}
+	, 50, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}
+	, T_SCTP_HMAC_NONE, {
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
+	, 0
 #endif
 };
 
@@ -1079,8 +1160,9 @@ addr_string(char *add_ptr, size_t add_len)
 	if (add_len) {
 		if (add_len != sizeof(*a))
 			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
-		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d",
-				(a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+		len +=
+		    snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff,
+			     (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
 	snprintf(buf + len, sizeof(buf) - len, "\0");
@@ -1471,7 +1553,6 @@ value_string(struct t_opthdr *oh)
 	return ("(unknown value)");
 }
 
-
 void
 print_options(int fd, char *opt_ptr, size_t opt_len)
 {
@@ -1570,8 +1651,6 @@ print_mgmtflag(int fd, t_uscalar_t flag)
 		fprintf(stdout, "                    |                               |  |     %-15s\n", mgmtflag_string(flag));
 	}
 }
-
-
 
 char *
 size_string(ulong size)
@@ -1702,22 +1781,20 @@ print_event_conn(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03lu:-U-)- / [%010lu]  |  |                    [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					state);
 			else
 				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03lu:-U-)- / [%010lu]  |  |                    [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
+					state);
 		} else {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "T_OPTDATA_IND+<-----|<- -(%03lu:%03lu)- / [%010lu]  |  |                    [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
 			else
 				fprintf(stdout, "T_OPTDATA_IND <-----|<- -(%03lu:%03lu)- / [%010lu]  |  |                    [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
@@ -1861,22 +1938,20 @@ print_event_resp(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:-U-) +->|---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					state);
 			else
 				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:-U-) +->|---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					state);
 		} else {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:%03lu) +->|---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
 			else
 				fprintf(stdout, "                    |  [%010lu] \\ - - (%03lu:%03lu) +->|---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
@@ -2020,22 +2095,20 @@ print_event_list(int fd, int event)
 		if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_EX) {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:-U-)->|--+---> T_OPTDATA_IND+ [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					state);
 			else
 				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:-U-)->|--+---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val, state);
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					state);
 		} else {
 			if (cmd.tpi.optdata_ind.DATA_flag & T_ODF_MORE)
 				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:%03lu)->|--+---> T_OPTDATA_IND+ [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
 			else
 				fprintf(stdout, "                    |  [%010lu] \\ - -(%03lu:%03lu)->|--+---> T_OPTDATA_IND  [%d]\n",
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val,
-					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
+					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->tsn_val, (ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->sid_val,
 					(ulong) ((rdat_opt_t *) (cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset))->ssn_val, state);
 		}
 		print_options(fd, cmd.cbuf + cmd.tpi.optdata_ind.OPT_offset, cmd.tpi.optdata_ind.OPT_length);
@@ -2917,7 +2990,7 @@ postamble_1e(int fd)
 	return (__RESULT_FAILURE);
 }
 
-/* 
+/*
  *  =========================================================================
  *
  *  The Test Cases...
@@ -2925,7 +2998,7 @@ postamble_1e(int fd)
  *  =========================================================================
  */
 
-/* 
+/*
  *  Open and Close 3 streams.
  */
 #define name_case_1_1 "Open and close 3 streams"
@@ -3864,21 +3937,78 @@ struct test_case {
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 } tests[] = {
-	{ "1.1", name_case_1_1, desc_case_1_1, { &preamble_0, &test_case_1_1_conn, &postamble_0}, { &preamble_0, &test_case_1_1_resp, &postamble_0}, { &preamble_0, &test_case_1_1_list, &postamble_0}, 0, 0}
-	, { "1.2", name_case_1_2, desc_case_1_2, { &preamble_0, &test_case_1_2_conn, &postamble_0}, { &preamble_0, &test_case_1_2_resp, &postamble_0}, { &preamble_0, &test_case_1_2_list, &postamble_0}, 0, 0}
-	, { "1.3", name_case_1_3, desc_case_1_3, { &preamble_0, &test_case_1_3_conn, &postamble_0}, { &preamble_0, &test_case_1_3_resp, &postamble_0}, { &preamble_0, &test_case_1_3_list, &postamble_0}, 0, 0}
-	, { "1.4", name_case_1_4, desc_case_1_4, { &preamble_0, &test_case_1_4_conn, &postamble_0}, { &preamble_0, &test_case_1_4_resp, &postamble_0}, { &preamble_0, &test_case_1_4_list, &postamble_0}, 0, 0}
-	, { "2.1", name_case_2_1, desc_case_2_1, { &preamble_0, &test_case_2_1_conn, &postamble_0}, { &preamble_0, &test_case_2_1_resp, &postamble_0}, { &preamble_0, &test_case_2_1_list, &postamble_0}, 0, 0}
-	, { "2.2", name_case_2_2, desc_case_2_2, { &preamble_0, &test_case_2_2_conn, &postamble_0}, { &preamble_0, &test_case_2_2_resp, &postamble_0}, { &preamble_0, &test_case_2_2_list, &postamble_0}, 0, 0}
-	, { "3.1", name_case_3_1, desc_case_3_1, { &preamble_1s, &test_case_3_1_conn, &postamble_1}, { &preamble_1s, &test_case_3_1_resp, &postamble_1}, { &preamble_1s, &test_case_3_1_list, &postamble_1}, 0, 0}
-	, { "4.1", name_case_4_1, desc_case_4_1, { &preamble_1, &test_case_4_1_conn, &postamble_1}, { &preamble_1, &test_case_4_1_resp, &postamble_1}, { &preamble_1, &test_case_4_1_list, &postamble_1}, 0, 0}
-	, { "4.2", name_case_4_2, desc_case_4_2, { &preamble_1, &test_case_4_2_conn, &postamble_1}, { &preamble_1, &test_case_4_2_resp, &postamble_1}, { &preamble_1, &test_case_4_2_list, &postamble_1}, 0, 0}
-	, { "4.3", name_case_4_3, desc_case_4_3, { &preamble_1, &test_case_4_3_conn, &postamble_1}, { &preamble_1, &test_case_4_3_resp, &postamble_1}, { &preamble_1, &test_case_4_3_list, &postamble_1}, 0, 0}
-	, { "4.4", name_case_4_4, desc_case_4_4, { &preamble_1, &test_case_4_4_conn, &postamble_1e}, { &preamble_1, &test_case_4_4_resp, &postamble_1e}, { &preamble_1, &test_case_4_4_list, &postamble_1e}, 0, 0}
-	, { "4.5", name_case_4_5, desc_case_4_5, { &preamble_1, &test_case_4_5_conn, &postamble_1e}, { &preamble_1, &test_case_4_5_resp, &postamble_1e}, { &preamble_1, &test_case_4_5_list, &postamble_1e}, 0, 0}
-	, { "4.6", name_case_4_6, desc_case_4_6, { &preamble_1, &test_case_4_6_conn, &postamble_1e}, { &preamble_1, &test_case_4_6_resp, &postamble_1e}, { &preamble_1, &test_case_4_6_list, &postamble_1e}, 0, 0}
-	, { "4.7", name_case_4_7, desc_case_4_7, { &preamble_1, &test_case_4_7_conn, &postamble_1e}, { &preamble_1, &test_case_4_7_resp, &postamble_1e}, { &preamble_1, &test_case_4_7_list, &postamble_1e}, 0, 0}
-	, { NULL,}
+	{
+		"1.1", name_case_1_1, desc_case_1_1, {
+		&preamble_0, &test_case_1_1_conn, &postamble_0}, {
+		&preamble_0, &test_case_1_1_resp, &postamble_0}, {
+	&preamble_0, &test_case_1_1_list, &postamble_0}, 0, 0}
+	, {
+		"1.2", name_case_1_2, desc_case_1_2, {
+		&preamble_0, &test_case_1_2_conn, &postamble_0}, {
+		&preamble_0, &test_case_1_2_resp, &postamble_0}, {
+	&preamble_0, &test_case_1_2_list, &postamble_0}, 0, 0}
+	, {
+		"1.3", name_case_1_3, desc_case_1_3, {
+		&preamble_0, &test_case_1_3_conn, &postamble_0}, {
+		&preamble_0, &test_case_1_3_resp, &postamble_0}, {
+	&preamble_0, &test_case_1_3_list, &postamble_0}, 0, 0}
+	, {
+		"1.4", name_case_1_4, desc_case_1_4, {
+		&preamble_0, &test_case_1_4_conn, &postamble_0}, {
+		&preamble_0, &test_case_1_4_resp, &postamble_0}, {
+	&preamble_0, &test_case_1_4_list, &postamble_0}, 0, 0}
+	, {
+		"2.1", name_case_2_1, desc_case_2_1, {
+		&preamble_0, &test_case_2_1_conn, &postamble_0}, {
+		&preamble_0, &test_case_2_1_resp, &postamble_0}, {
+	&preamble_0, &test_case_2_1_list, &postamble_0}, 0, 0}
+	, {
+		"2.2", name_case_2_2, desc_case_2_2, {
+		&preamble_0, &test_case_2_2_conn, &postamble_0}, {
+		&preamble_0, &test_case_2_2_resp, &postamble_0}, {
+	&preamble_0, &test_case_2_2_list, &postamble_0}, 0, 0}
+	, {
+		"3.1", name_case_3_1, desc_case_3_1, {
+		&preamble_1s, &test_case_3_1_conn, &postamble_1}, {
+		&preamble_1s, &test_case_3_1_resp, &postamble_1}, {
+	&preamble_1s, &test_case_3_1_list, &postamble_1}, 0, 0}
+	, {
+		"4.1", name_case_4_1, desc_case_4_1, {
+		&preamble_1, &test_case_4_1_conn, &postamble_1}, {
+		&preamble_1, &test_case_4_1_resp, &postamble_1}, {
+	&preamble_1, &test_case_4_1_list, &postamble_1}, 0, 0}
+	, {
+		"4.2", name_case_4_2, desc_case_4_2, {
+		&preamble_1, &test_case_4_2_conn, &postamble_1}, {
+		&preamble_1, &test_case_4_2_resp, &postamble_1}, {
+	&preamble_1, &test_case_4_2_list, &postamble_1}, 0, 0}
+	, {
+		"4.3", name_case_4_3, desc_case_4_3, {
+		&preamble_1, &test_case_4_3_conn, &postamble_1}, {
+		&preamble_1, &test_case_4_3_resp, &postamble_1}, {
+	&preamble_1, &test_case_4_3_list, &postamble_1}, 0, 0}
+	, {
+		"4.4", name_case_4_4, desc_case_4_4, {
+		&preamble_1, &test_case_4_4_conn, &postamble_1e}, {
+		&preamble_1, &test_case_4_4_resp, &postamble_1e}, {
+	&preamble_1, &test_case_4_4_list, &postamble_1e}, 0, 0}
+	, {
+		"4.5", name_case_4_5, desc_case_4_5, {
+		&preamble_1, &test_case_4_5_conn, &postamble_1e}, {
+		&preamble_1, &test_case_4_5_resp, &postamble_1e}, {
+	&preamble_1, &test_case_4_5_list, &postamble_1e}, 0, 0}
+	, {
+		"4.6", name_case_4_6, desc_case_4_6, {
+		&preamble_1, &test_case_4_6_conn, &postamble_1e}, {
+		&preamble_1, &test_case_4_6_resp, &postamble_1e}, {
+	&preamble_1, &test_case_4_6_list, &postamble_1e}, 0, 0}
+	, {
+		"4.7", name_case_4_7, desc_case_4_7, {
+		&preamble_1, &test_case_4_7_conn, &postamble_1e}, {
+		&preamble_1, &test_case_4_7_resp, &postamble_1e}, {
+	&preamble_1, &test_case_4_7_list, &postamble_1e}, 0, 0}
+	, {
+	NULL,}
 };
 
 static int summary = 0;
@@ -4156,20 +4286,21 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
-			{"list",	optional_argument,	NULL, 'l'},
-			{"fast",	optional_argument,	NULL, 'f'},
-			{"summary",	no_argument,		NULL, 's'},
-			{"onetest",	required_argument,	NULL, 'o'},
-			{"tests",	required_argument,	NULL, 't'},
-			{"messages",	no_argument,		NULL, 'm'},
-			{"quiet",	no_argument,		NULL, 'q'},
-			{"verbose",	optional_argument,	NULL, 'v'},
-			{"help",	no_argument,		NULL, 'h'},
-			{"version",	no_argument,		NULL, 'V'},
-			{"?",		no_argument,		NULL, 'h'},
+			{ "list",	optional_argument,	NULL, 'l'},
+			{ "fast",	optional_argument,	NULL, 'f'},
+			{ "summary",	no_argument,		NULL, 's'},
+			{ "onetest",	required_argument,	NULL, 'o'},
+			{ "tests",	required_argument,	NULL, 't'},
+			{ "messages",	no_argument,		NULL, 'm'},
+			{ "quiet",	no_argument,		NULL, 'q'},
+			{ "verbose",	optional_argument,	NULL, 'v'},
+			{ "help",	no_argument,		NULL, 'h'},
+			{ "version",	no_argument,		NULL, 'V'},
+			{ "?",		no_argument,		NULL, 'h'},
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "l::f::so:t:mqvhV?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "l::f::so:t:mqvhV?");
 #endif				/* defined _GNU_SOURCE */
