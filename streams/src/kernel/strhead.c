@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $"
 
-static char const ident[] = "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] =
+    "$RCSfile: strhead.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2004/04/28 01:30:33 $";
 
 #define __NO_VERSION__
 
@@ -1096,7 +1097,7 @@ static int str_i_xlink(struct file *file, struct stdata *sd, unsigned int cmd, u
 		goto resetq_error;
 	l->l_qtop = qtop;
 	l->l_qbot = qbot;
-	sdp = (cmd = I_LINK) ?  &sd->sd_links : &sd->sd_cdevsw->d_plinks;
+	sdp = (cmd == I_LINK) ? &sd->sd_links : &sd->sd_cdevsw->d_plinks;
 	sd2->sd_linkblk = l;
 	sd2->sd_link_next = xchg(sdp, sd2);
 	/* simulate an open */
@@ -1142,7 +1143,7 @@ static int str_i_xunlink(struct file *file, struct stdata *sd, unsigned int cmd,
 	long index = arg;
 	if ((err = check_stream_io(file, sd)) < 0)
 		goto error;
-	sdp = (cmd == I_UNLINK) ?  &sd->sd_links : &sd->sd_cdevsw->d_plinks;
+	sdp = (cmd == I_UNLINK) ? &sd->sd_links : &sd->sd_cdevsw->d_plinks;
 	if (index != MUXID_ALL) {
 		queue_t *qtop, *qbot;
 		struct stdata *sd2;
@@ -1669,7 +1670,7 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
 			dev_t dev;
 			if (api->api_sap.sap_list[k][0] == 0)
 				break;
-			if (!(fmod = smod_get(api->api_sap.sap_list[k]))) {
+			if (!(fmod = smod_find(api->api_sap.sap_list[k]))) {
 				err = -EIO;
 				goto abort_autopush;
 			}
@@ -1713,7 +1714,7 @@ int stropen(struct inode *inode, struct file *file)
 		if (sd)		/* put away old one */
 			sd_put(sd);
 		/* we don't have a stream yet (or want a new one), so allocate one */
-		if (!(cdev = sdev_get(argp->dev)))
+		if (!(cdev = sdev_get(getmajor(argp->dev))))
 			return (-ENXIO);
 		if (!(q = allocq())) {
 			sdev_put(cdev);
@@ -2991,7 +2992,7 @@ static int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				struct streamtab *st_old = st;
 				if ((cd = cdget(dev)) == NULL)
 					goto done_check;
-				if ((sdev = sdev_get(dev)) == NULL)
+				if ((sdev = sdev_get(getmajor(dev))) == NULL)
 					goto done_check;
 				if (sdev == sdev_old)
 					goto put_done_check;
@@ -3036,20 +3037,20 @@ static int str_close(queue_t *q, int oflag, cred_t *crp)
 static int open_strm(struct inode *inode, struct file *file)
 {
 	struct str_args args = {
-	      file:file,
-	      dev:kdev_t_to_nr(inode->i_rdev),
-	      oflag:make_oflag(file),
-	      sflag:DRVOPEN,
-	      crp:current_creds,
-	      name:{args.buf, 0, 0},
+		file:file,
+		dev:kdev_t_to_nr(inode->i_rdev),
+		oflag:make_oflag(file),
+		sflag:DRVOPEN,
+		crp:current_creds,
+		name:{args.buf, 0, 0},
 	};
 	file->f_op = &strm_f_ops;	/* fops_get already done */
 	return sdev_open(inode, file, specfs_mnt, &args);
 }
 
 static struct file_operations strm_ops ____cacheline_aligned = {
-      owner:THIS_MODULE,
-      open:open_strm,
+	owner:THIS_MODULE,
+	open:open_strm,
 };
 #endif
 

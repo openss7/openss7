@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:20:01 $
+ @(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:20:01 $"
+#ident "@(#) $RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:20:01 $";
+static char const ident[] =
+    "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $";
 
 /*
  * AIX Utility: Loads and configures STREAMS.
@@ -80,8 +81,7 @@ static char const ident[] = "$RCSfile: strload.c,v $ $Name:  $($Revision: 0.9.2.
 int debug = 0;
 int verbose = 1;
 
-void
-version(int argc, char *argv[])
+void version(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -93,8 +93,7 @@ version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void
-usage(int argc, char *argv[])
+void usage(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -108,8 +107,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-void
-help(int argc, char *argv[])
+void help(int argc, char *argv[])
 {
 	if (verbose < 0)
 		return;
@@ -147,8 +145,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (verbose < 1 && !debug)
 		return;
@@ -199,8 +196,7 @@ enum { CMD_NONE, CMD_LOAD, CMD_UNLOAD, CMD_QUERY, };
 int command = CMD_NONE;
 int flen = 0, dlen = 0, mlen = 0;
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;

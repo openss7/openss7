@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/24 03:40:14 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:33 $"
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/24 03:40:14 $";
+static char const ident[] =
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:33 $";
 
 #define __NO_VERSION__
 
@@ -274,12 +275,12 @@ static int get_streams_streamtab_drv_hdr(char *page, ssize_t maxlen)
 	len += snprintf(page + len, maxlen - len, "st");
 	len += snprintf(page + len, maxlen - len, ", st_rdinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
-//	len += snprintf(page + len, maxlen - len, " }, st_wrinit { ");
-//	len += get_streams_qinit_hdr(page + len, maxlen - len);
+//      len += snprintf(page + len, maxlen - len, " }, st_wrinit { ");
+//      len += get_streams_qinit_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }, st_muxrinit { ");
 	len += get_streams_qinit_hdr(page + len, maxlen - len);
-//	len += snprintf(page + len, maxlen - len, " }, st_muxwinit { ");
-//	len += get_streams_qinit_hdr(page + len, maxlen - len);
+//      len += snprintf(page + len, maxlen - len, " }, st_muxwinit { ");
+//      len += get_streams_qinit_hdr(page + len, maxlen - len);
 	len += snprintf(page + len, maxlen - len, " }");
 	return (len);
 }
@@ -291,12 +292,12 @@ static int get_streams_streamtab_drv(char *page, ssize_t maxlen, struct streamta
 		goto done;
 	len += snprintf(page + len, maxlen - len, ", %p { ", st->st_rdinit);
 	len += get_streams_qinit(page + len, maxlen - len, st->st_rdinit);
-//	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_wrinit);
-//	len += get_streams_qinit(page + len, maxlen - len, st->st_wrinit);
+//      len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_wrinit);
+//      len += get_streams_qinit(page + len, maxlen - len, st->st_wrinit);
 	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxrinit);
 	len += get_streams_qinit(page + len, maxlen - len, st->st_muxrinit);
-//	len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxwinit);
-//	len += get_streams_qinit(page + len, maxlen - len, st->st_muxwinit);
+//      len += snprintf(page + len, maxlen - len, " }, %p { ", st->st_muxwinit);
+//      len += get_streams_qinit(page + len, maxlen - len, st->st_muxwinit);
 	len += snprintf(page + len, maxlen - len, " }");
       done:
 	return (len);

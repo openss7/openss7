@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:33 $"
 
-static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] =
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/04/28 01:30:33 $";
 
 #define __NO_VERSION__
 
@@ -73,7 +74,7 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.8
 #include <linux/poll.h>
 #include <linux/fs.h>
 
-#ifndef __GENKSYMS__ 
+#ifndef __GENKSYMS__
 #include <sys/modversions.h>
 #endif
 
@@ -118,9 +119,16 @@ int fmod_count = 0;
  *
  *  -------------------------------------------------------------------------
  */
-struct cdevsw *sdev_grab(struct cdevsw *sdev, dev_t dev)
+
+/**
+ *  sdev_get - get a reference to a STREAMS device
+ *  @major:major device number of the STREAMS device
+ *
+ */
+struct cdevsw *sdev_get(major_t major)
 {
-	if (sdev) {
+	struct cdevsw *sdev;
+	if ((sdev = cdevsw[major])) {
 		int retry;
 		for (retry = 0; retry < 2; retry++) {
 			if (sdev->d_str && try_inc_mod_count(sdev->d_kmod))
@@ -128,8 +136,7 @@ struct cdevsw *sdev_grab(struct cdevsw *sdev, dev_t dev)
 #ifdef CONFIG_KMOD
 			if (!retry) {
 				char devname[64];
-				snprintf(devname, 64, "streams-major-%d-minor-%d", getmajor(dev),
-					 getminor(dev));
+				snprintf(devname, 64, "streams-major-%d", major);
 				request_module(devname);
 				continue;
 			}
@@ -138,24 +145,6 @@ struct cdevsw *sdev_grab(struct cdevsw *sdev, dev_t dev)
 		}
 	}
 	return (NULL);
-}
-
-/**
- *  sdev_get - get a reference to a STREAMS device
- *  @dev:device number of the STREAMS device
- *
- */
-struct cdevsw *sdev_get(dev_t dev)
-{
-	struct cdevsw *sdev = NULL;
-	struct char_device *cd;
-	if ((cd = cdget(dev))) {
-		// sdev = cd->data;
-		cdput(cd);
-	}
-	if (!sdev)
-		sdev = cdevsw[getmajor(dev)];
-	return sdev_grab(sdev, dev);
 }
 
 /**
@@ -170,21 +159,79 @@ void sdev_put(struct cdevsw *sdev)
 }
 
 /**
+ *  smod_get - get a reference to a STREAMS module
+ *  @modid:module id number of the STREAMS module
+ *
+ */
+struct cdevsw *smod_get(modID_t modid)
+{
+	struct fmodsw *fmod;
+	if ((fmod = fmodsw[modid])) {
+		int retry;
+		for (retry = 0; retry < 2; retry++) {
+			if (fmod->f_str && try_inc_mod_count(fmod->f_kmod))
+				return (fmod);
+#ifdef CONFIG_KMOD
+			if (!retry) {
+				char modname[64];
+				snprintf(modname, 64, "streams-modid-%d", modid);
+				request_module(modname);
+				continue;
+			}
+#endif
+			break;
+		}
+	}
+	return (NULL);
+}
+
+/**
+ *  smod_put - put a reference to a STREAMS module
+ *  @smod:STREAMS module structure pointer to put
+ *
+ */
+void smod_put(struct fmodsw *smod)
+{
+	if (smod)
+		__MOD_DEC_USE_COUNT(smod->f_kmod);
+}
+
+/**
  *  sdev_find - find a STREAMS device by its name
  *  @name - the name to find
+ *
+ *  DESCRIPTION:Attempt to find a STREAMS device by name.  If the device
+ *  cannot be found by name, attempt to load the kernel module streams-%s
+ *  where %s is the name requested and check again.
+ *
+ *  RETURN VALUE:A pointer to the STREAMS device, with use count incremented,
+ *  or NULL if not found and could not be loaded.
  */
 struct cdevsw *sdev_find(const char *name)
 {
-	struct list_head *pos;
 	size_t len = strnlen(name, FMNAMESZ + 1);
+	struct list_head *pos;
+	int try = 0;
+      try_again:
+	try++;
 	read_lock(&cdevsw_lock);
 	list_for_each(pos, &cdevsw_list) {
 		struct cdevsw *cdev = list_entry(pos, struct cdevsw, d_list);
-		if (strnlen(cdev->d_name, FMNAMESZ + 1) != len)
+		if (strncmp(cdev->d_name, name, FMNAMESZ + 1))
 			continue;
-		if (memcmp(name, cdev->d_name, len))
-			continue;
-		sdev_grab(cdev, makedevice(cdev->d_index, 0));
+		if (!try_inc_mod_count(cdev->d_kmod)) {
+			if (try < 2) {
+				char devname[32 + FMNAMESZ + 1];
+				read_unlock(&cdevsw_lock);
+				snprintf(modname, 32 + FMNAMESZ + 1, "streams-%s", name);
+#ifdef CONFIG_KMOD
+				request_module(devname);
+#endif
+				goto try_again;
+			}
+			read_unlock(&cdevsw_lock);
+			return (NULL);
+		}
 		read_unlock(&cdevsw_lock);
 		return (cdev);
 	}
@@ -193,10 +240,17 @@ struct cdevsw *sdev_find(const char *name)
 }
 
 /**
- *  smod_get - get a reference to a STREAMS module
+ *  smod_find - get a reference to a STREAMS module
  *  @name:name of the module
+ *
+ *  DESCRIPTION:Attempt to find a STREAMS module by name.  If the module
+ *  cannot be found by name, attempt to load the kernel module streams-%s
+ *  where %s is the name requested and check again.
+ *
+ *  RETURN VALUE:A pointer to the STREAMS module, with use count incremented,
+ *  or NULL if not found and could not be loaded.
  */
-struct fmodsw *smod_get(const char *name)
+struct fmodsw *smod_find(const char *name)
 {
 	struct list_head *pos;
 	int try = 0;
@@ -225,17 +279,6 @@ struct fmodsw *smod_get(const char *name)
 	}
 	read_unlock(&fmodsw_lock);
 	return (NULL);
-}
-
-/**
- *  smod_put - put a reference to a STREAMS module
- *  @smod:STREAMS module structure pointer to put
- *
- */
-void smod_put(struct fmodsw *smod)
-{
-	if (smod)
-		__MOD_DEC_USE_COUNT(smod->f_kmod);
 }
 
 /* 
@@ -299,7 +342,7 @@ static void _file_move(struct file *file, struct list_head *list)
 void file_swap_put(struct file *f1, struct file *f2)
 {
 #ifdef HAVE_FILE_MOVE_ADDR
-	typeof(&file_move) _file_move = (typeof(_file_move))HAVE_FILE_MOVE_ADDR;
+	typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
 #endif
 	f1->f_op = xchg(&f2->f_op, f1->f_op);
 	f1->f_dentry = xchg(&f2->f_dentry, f1->f_dentry);
@@ -407,7 +450,7 @@ static int spec_open(struct inode *inode, struct file *file)
 	if (!(cd = inode->i_cdev) && !(cd = inode->i_cdev = cdget(args.dev)))
 		return (-ENOMEM);	/* memory problem */
 	/* autoload and determine cloning right now */
-	if (!(cdev = sdev_get(args.dev)))
+	if (!(cdev = sdev_get(getmajor(args.dev))))
 		return (-ENXIO);
 	args.sflag = (cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN;
 	err = sdev_open(inode, file, specfs_mnt, &args);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:34 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:34 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:34 $";
+static char const ident[] =
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -86,7 +87,7 @@ static char const ident[] = "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.4 $) 
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:34 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -115,12 +116,12 @@ MODULE_PARM(modid, "b");
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 
 static struct module_info sc_minfo = {
-      mi_idnum:CONFIG_STREAMS_SC_MODID,
-      mi_idname:CONFIG_STREAMS_SC_NAME,
-      mi_minpsz:0,
-      mi_maxpsz:INFPSZ,
-      mi_hiwat:STRHIGH,
-      mi_lowat:STRLOW,
+	mi_idnum:CONFIG_STREAMS_SC_MODID,
+	mi_idname:CONFIG_STREAMS_SC_NAME,
+	mi_minpsz:0,
+	mi_maxpsz:INFPSZ,
+	mi_hiwat:STRHIGH,
+	mi_lowat:STRLOW,
 };
 
 /* 
@@ -143,8 +144,7 @@ struct sc {
  *  
  *  -------------------------------------------------------------------------
  */
-static int
-sc_wput(queue_t *q, mblk_t *mp)
+static int sc_wput(queue_t *q, mblk_t *mp)
 {
 	struct sc *sc = q->q_ptr;
 	union ioctypes *ioc;
@@ -299,8 +299,7 @@ sc_wput(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
-static int
-sc_rput(queue_t *q, mblk_t *mp)
+static int sc_rput(queue_t *q, mblk_t *mp)
 {
 	putnext(q, mp);
 	return (0);
@@ -313,8 +312,7 @@ sc_rput(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
-sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+static int sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	if (q->q_ptr)
 		return (0);	/* already open */
@@ -331,8 +329,7 @@ sc_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	return (-EIO);		/* can't be opened as driver */
 }
-static int
-sc_close(queue_t *q, int oflag, cred_t *crp)
+static int sc_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sc *sc = q->q_ptr;
 	(void) oflag;
@@ -355,31 +352,30 @@ sc_close(queue_t *q, int oflag, cred_t *crp)
  */
 
 static struct qinit sc_rqinit = {
-      qi_putp:sc_rput,
-      qi_qopen:sc_open,
-      qi_qclose:sc_close,
-      qi_minfo:&sc_minfo,
+	qi_putp:sc_rput,
+	qi_qopen:sc_open,
+	qi_qclose:sc_close,
+	qi_minfo:&sc_minfo,
 };
 
 static struct qinit sc_wqinit = {
-      qi_putp:sc_wput,
-      qi_minfo:&sc_minfo,
+	qi_putp:sc_wput,
+	qi_minfo:&sc_minfo,
 };
 
 static struct streamtab sc_info = {
-      st_rdinit:&sc_rqinit,
-      st_wrinit:&sc_wqinit,
+	st_rdinit:&sc_rqinit,
+	st_wrinit:&sc_wqinit,
 };
 
 static struct fmodsw sc_fmod = {
-      f_name:CONFIG_STREAMS_SC_NAME,
-      f_str:&sc_info,
-      f_flag:0,
-      f_kmod:THIS_MODULE,
+	f_name:CONFIG_STREAMS_SC_NAME,
+	f_str:&sc_info,
+	f_flag:0,
+	f_kmod:THIS_MODULE,
 };
 
-static int __init
-sc_init(void)
+static int __init sc_init(void)
 {
 	int err;
 #ifdef MODULE
@@ -394,8 +390,7 @@ sc_init(void)
 	return (0);
 };
 
-static void __exit
-sc_exit(void)
+static void __exit sc_exit(void)
 {
 	int err;
 	if ((err = unregister_strmod(modid, &sc_fmod)))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:46:46 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:46:46 $";
+static char const ident[] =
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
 
 /* 
  *  autopush(8)

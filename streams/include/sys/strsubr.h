@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.4 2004/03/07 23:53:43 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.5 2004/04/28 01:30:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:53:43 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:32 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/07 23:53:43 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:32 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -508,9 +508,11 @@ extern struct qband *allocqb(void);
 extern void freeqb(qband_t *qb);
 
 /* from strreg.c */
-extern struct cdevsw *sdev_get(dev_t dev);
+extern struct cdevsw *sdev_get(major_t major);
 extern void sdev_put(struct cdevsw *sdev);
-extern struct fmodsw *smod_get(const char *name);
+extern struct cdevsw *sdev_find(const char *name);
+extern struct fmodsw *smod_get(modID_t modid);
 extern void smod_put(struct fmodsw *smod);
+extern struct fmodsw *smod_find(const char *name);
 
 #endif				/* __SYS_STRSUBR_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/07 23:39:10 $
+ @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/04/28 01:30:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/07 23:39:10 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:32 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -159,13 +159,13 @@ extern int lis_apush_set(struct lis_strapush *ap);
 extern int lis_apushm(dev_t dev, const char *mods[]);
 extern void lis_assert_fail(const char *expr, const char *objname, const char *file,
 			    unsigned int line);
-extern void lis_atomic_add(lis_atomic_t * atomic_addr, int amt);
-extern void lis_atomic_dec(lis_atomic_t * atomic_addr);
-extern int lis_atomic_dec_and_test(lis_atomic_t * atomic_addr);
-extern void lis_atomic_inc(lis_atomic_t * atomic_addr);
-extern int lis_atomic_read(lis_atomic_t * atomic_addr);
-extern void lis_atomic_set(lis_atomic_t * atomic_addr, int valu);
-extern void lis_atomic_sub(lis_atomic_t * atomic_addr, int amt);
+extern void lis_atomic_add(lis_atomic_t *atomic_addr, int amt);
+extern void lis_atomic_dec(lis_atomic_t *atomic_addr);
+extern int lis_atomic_dec_and_test(lis_atomic_t *atomic_addr);
+extern void lis_atomic_inc(lis_atomic_t *atomic_addr);
+extern int lis_atomic_read(lis_atomic_t *atomic_addr);
+extern void lis_atomic_set(lis_atomic_t *atomic_addr, int valu);
+extern void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt);
 extern queue_t *lis_backq(queue_t *q);
 extern queue_t *lis_backq_fcn(queue_t *q, char *f, int l);
 extern int lis_bcanput(queue_t *q, unsigned char band);
@@ -192,8 +192,8 @@ extern void lis_dec_mod_cnt_fcn(const char *file, int line);
 extern int lis_del_timer(struct timer_list *timer);
 extern void lis_disable_irq(unsigned int irq);
 extern void lis_dobufcall(int cpu_id);
-extern int lis_doclose(struct inode *i, struct file *f, stdata_t * head, cred_t *creds);
-extern int lis_down_fcn(lis_semaphore_t * lsem, char *file, int line);
+extern int lis_doclose(struct inode *i, struct file *f, stdata_t *head, cred_t *creds);
+extern int lis_down_fcn(lis_semaphore_t *lsem, char *file, int line);
 extern unsigned long lis_dsecs(void);
 extern mblk_t *lis_dupb(mblk_t *mp);
 extern mblk_t *lis_dupmsg(mblk_t *mp);
@@ -205,7 +205,7 @@ extern int lis_esbbcall(int priority, void (*function) (long), long arg);
 extern int lis_fattach(struct file *f, const char *path);
 extern int lis_fdetach(const char *path);
 extern void lis_fdetach_all(void);
-extern void lis_fdetach_stream(stdata_t * head);
+extern void lis_fdetach_stream(stdata_t *head);
 extern void lis_fifo_close_sync(struct inode *i, struct file *f);
 extern int lis_fifo_open_sync(struct inode *i, struct file *f);
 extern int lis_fifo_write_sync(struct inode *i, int written);
@@ -258,7 +258,7 @@ extern int lis_kill_proc(int pid, int sig, int priv);
 extern void *lis_kmalloc(size_t nbytes, int type);
 extern void lis_linkb(mblk_t *mp1, mblk_t *mp2);
 extern int lis_loadable_load(const char *name);
-extern const char *lis_maj_min_name(stdata_t * head);
+extern const char *lis_maj_min_name(stdata_t *head);
 extern int lis_major;
 extern void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
 extern void lis_mark_mem(void *ptr, const char *file_name, int line_nr);
@@ -279,7 +279,7 @@ extern void lis_osif_cli(void);
 extern void lis_osif_do_gettimeofday(struct timeval *tp);
 extern void lis_osif_do_settimeofday(struct timeval *tp);
 extern void *lis_osif_pci_alloc_consistent(struct pci_dev *hwdev, size_t size,
-					   dma_addr_t * dma_handle);
+					   dma_addr_t *dma_handle);
 extern int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask);
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev, dma64_addr_t dma_addr,
 					     size_t len, int direction);
@@ -328,19 +328,19 @@ extern size_t lis_osif_sg_dma_len(struct scatterlist *sg);
 extern void lis_osif_sti(void);
 extern int lis_own_spl(void);
 extern void lis_pci_cleanup(void);
-extern void lis_pci_disable_device(lis_pci_dev_t * dev);
-extern int lis_pci_enable_device(lis_pci_dev_t * dev);
-extern lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t * previous_struct);
+extern void lis_pci_disable_device(lis_pci_dev_t *dev);
+extern int lis_pci_enable_device(lis_pci_dev_t *dev);
+extern lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct);
 extern lis_pci_dev_t *lis_pci_find_device(unsigned vendor, unsigned device,
-					  lis_pci_dev_t * previous_struct);
+					  lis_pci_dev_t *previous_struct);
 extern lis_pci_dev_t *lis_pci_find_slot(unsigned bus, unsigned dev_fcn);
-extern int lis_pci_read_config_byte(lis_pci_dev_t * dev, unsigned index, unsigned char *rtn_val);
-extern int lis_pci_read_config_dword(lis_pci_dev_t * dev, unsigned index, unsigned long *rtn_val);
-extern int lis_pci_read_config_word(lis_pci_dev_t * dev, unsigned index, unsigned short *rtn_val);
-extern void lis_pci_set_master(lis_pci_dev_t * dev);
-extern int lis_pci_write_config_byte(lis_pci_dev_t * dev, unsigned index, unsigned char val);
-extern int lis_pci_write_config_dword(lis_pci_dev_t * dev, unsigned index, unsigned long val);
-extern int lis_pci_write_config_word(lis_pci_dev_t * dev, unsigned index, unsigned short val);
+extern int lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val);
+extern int lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val);
+extern int lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val);
+extern void lis_pci_set_master(lis_pci_dev_t *dev);
+extern int lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val);
+extern int lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val);
+extern int lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val);
 extern int lis_pcibios_find_class(unsigned int class_code, unsigned short index, unsigned char *bus,
 				  unsigned char *dev_fn);
 extern int lis_pcibios_find_device(unsigned short vendor, unsigned short dev_id,
@@ -363,7 +363,7 @@ extern int lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn
 extern void *lis_phys_to_virt(unsigned long addr);
 extern int lis_pipe(unsigned int *fd);
 extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
-extern unsigned lis_poll_bits(stdata_t * hd);
+extern unsigned lis_poll_bits(stdata_t *hd);
 extern char *lis_poll_events(short events);
 extern char *lis_poll_file;
 extern void lis_print_block(void *ptr);
@@ -373,7 +373,7 @@ extern void lis_print_msg(mblk_t *mp, const char *prefix, int opt);
 extern void lis_print_queue(queue_t *q);
 extern void lis_print_queues(void);
 extern void lis_print_spl_track(void);
-extern void lis_print_stream(stdata_t * hd);
+extern void lis_print_stream(stdata_t *hd);
 extern int lis_printk(const char *fmt, ...);
 extern int lis_pullupmsg(mblk_t *mp, int length);
 extern int lis_putbq(queue_t *q, mblk_t *mp);
@@ -392,7 +392,7 @@ extern int lis_qsize(queue_t *q);
 extern const char *lis_queue_name(queue_t *q);
 extern volatile unsigned long lis_queuerun_cnts[];
 extern lis_atomic_t lis_queues_running;
-extern int lis_recvfd(stdata_t * recvhd, strrecvfd_t * recv, struct file *fp);
+extern int lis_recvfd(stdata_t *recvhd, strrecvfd_t * recv, struct file *fp);
 extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
 			       const char *name);
 extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
@@ -406,22 +406,22 @@ extern void lis_rmvq(queue_t *q, mblk_t *mp);
 extern volatile unsigned long lis_runq_cnts[];
 extern lis_atomic_t lis_runq_req_cnt;
 extern lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, char *file, int line);
-extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t * lock, const char *name, char *file,
+extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file,
 					   int line);
-extern void lis_rw_lock_init_fcn(lis_rw_lock_t * lock, const char *name, char *file, int line);
-extern void lis_rw_read_lock_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_read_lock_irq_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t * lock, int *flags, char *file, int line);
-extern void lis_rw_read_unlock_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_read_unlock_irq_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t * lock, int *flags, char *file,
+extern void lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, char *file, int line);
+extern void lis_rw_read_lock_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, char *file, int line);
+extern void lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, char *file,
 					      int line);
-extern void lis_rw_write_lock_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_write_lock_irq_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t * lock, int *flags, char *file, int line);
-extern void lis_rw_write_unlock_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_write_unlock_irq_fcn(lis_rw_lock_t * lock, char *file, int line);
-extern void lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t * lock, int *flags, char *file,
+extern void lis_rw_write_lock_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, int *flags, char *file, int line);
+extern void lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, char *file, int line);
+extern void lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, int *flags, char *file,
 					       int line);
 extern queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l);
 extern queue_t *lis_safe_RD(queue_t *q, char *f, int l);
@@ -435,27 +435,26 @@ extern void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l);
 extern void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l);
 extern unsigned long lis_secs(void);
 extern lis_semaphore_t *lis_sem_alloc(int count);
-extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t * lsem);
-extern void lis_sem_init(lis_semaphore_t * lsem, int count);
-extern int lis_sendfd(stdata_t * sendhd, unsigned int fd, struct file *fp);
+extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem);
+extern void lis_sem_init(lis_semaphore_t *lsem, int count);
+extern int lis_sendfd(stdata_t *sendhd, unsigned int fd, struct file *fp);
 extern void lis_set_file_str(struct file *f, struct stdata *s);
 extern void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 extern void lis_setqsched(int can_call);
 extern volatile unsigned long lis_setqsched_cnts[];
 extern volatile unsigned long lis_setqsched_isr_cnts[];
 extern void lis_sleep_on(wait_queue_head_t *wq);
-extern int lis_spin_is_locked_fcn(lis_spin_lock_t * lock, char *file, int line);
+extern int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line);
 extern lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file, int line);
-extern void lis_spin_lock_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern void lis_spin_lock_init_fcn(lis_spin_lock_t * lock, const char *name, char *file, int line);
-extern void lis_spin_lock_irq_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern void lis_spin_lock_irqsave_fcn(lis_spin_lock_t * lock, int *flags, char *file, int line);
-extern int lis_spin_trylock_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern void lis_spin_unlock_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern void lis_spin_unlock_irq_fcn(lis_spin_lock_t * lock, char *file, int line);
-extern void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t * lock, int *flags, char *file,
-					   int line);
+extern void lis_spin_lock_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern void lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, char *file, int line);
+extern void lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern void lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, int *flags, char *file, int line);
+extern int lis_spin_trylock_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern void lis_spin_unlock_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern void lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, char *file, int line);
+extern void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, int *flags, char *file, int line);
 extern void lis_spl0_fcn(char *file, int line);
 extern int lis_splstr_fcn(char *file, int line);
 extern void lis_splx_fcn(int x, char *file, int line);
@@ -466,7 +465,7 @@ extern lis_atomic_t lis_strcount;
 extern int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
 			  int *flagsp, int doit);
 extern int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg);
-extern const char *lis_strm_name(stdata_t * head);
+extern const char *lis_strm_name(stdata_t *head);
 extern const char *lis_strm_name_from_queue(queue_t *q);
 extern int lis_stropen(struct inode *i, struct file *f);
 extern char *lis_stropts_file;
@@ -479,7 +478,7 @@ extern ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, lof
 extern int lis_testb(int size, unsigned int priority);
 extern pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name);
 extern int lis_thread_stop(pid_t pid);
-extern toid_t lis_timeout_fcn(timo_fcn_t * timo_fcn, caddr_t arg, long ticks, char *file_name,
+extern toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name,
 			      int line_nr);
 extern void lis_udelay(long micro_secs);
 extern int lis_umount2(char *path, int flags);
@@ -489,7 +488,7 @@ extern mblk_t *lis_unlinkb(mblk_t *mp);
 extern int lis_unregister_strdev(major_t major);
 extern int lis_unregister_strmod(struct streamtab *strtab);
 extern toid_t lis_untimeout(toid_t id);
-extern void lis_up_fcn(lis_semaphore_t * lsem, char *file, int line);
+extern void lis_up_fcn(lis_semaphore_t *lsem, char *file, int line);
 extern unsigned long lis_usecs(void);
 extern unsigned lis_usectohz(unsigned usec);
 extern int lis_valid_mod_list(struct str_list ml);

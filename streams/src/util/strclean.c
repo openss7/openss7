@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $
+ @(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 10:19:59 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $"
+#ident "@(#) $RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 10:19:59 $";
+static char const ident[] =
+    "$RCSfile: strclean.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $";
 
 /*
  *  AIX Utility: strclean - Cleans up the STREAMS error logger.
@@ -83,8 +84,7 @@ char errfile[256] = "";
 char outpath[256] = "";
 char errpath[256] = "";
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -96,8 +96,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -110,8 +109,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -145,8 +143,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -192,8 +189,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-void
-strclean(int argc, char *argv[])
+void strclean(int argc, char *argv[])
 {
 	if (basname[0] == '\0') {
 		snprintf(basname, sizeof(basname), "%s", "strvf");
@@ -216,8 +212,7 @@ strclean(int argc, char *argv[])
 	}
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
@@ -332,5 +327,3 @@ main(int argc, char *argv[])
 	strclean(argc, argv);
 	exit(0);
 }
-
-

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $
+ @(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/09 21:36:43 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $"
+#ident "@(#) $RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/09 21:36:43 $";
+static char const ident[] =
+    "$RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -72,8 +73,7 @@ static char const ident[] = "$RCSfile: strsetup.c,v $ $Name:  $($Revision: 0.9.2
 static int output = 1;
 static int debug = 0;
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -85,8 +85,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -99,8 +98,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -126,8 +124,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -178,8 +175,7 @@ enum { CMN_NONE, CMN_CONFIG, CMN_INSTALL, CMN_FILE, CMN_DELETE, } command = CMN_
 int devices = 0;
 int modules = 0;
 
-void
-printit(struct sc_mlist *l)
+void printit(struct sc_mlist *l)
 {
 	if (output <= 0 || l->major == -1)
 		return;
@@ -197,13 +193,11 @@ printit(struct sc_mlist *l)
 	fprintf(stdout, "\n");
 }
 
-void
-strsetup(int argc, char *argv[])
+void strsetup(int argc, char *argv[])
 {
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
@@ -234,24 +228,24 @@ main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
-		case 'c': /* -c, --config */
+		case 'c':	/* -c, --config */
 			if (command != CMN_NONE)
 				goto bad_option;
 			command = CMN_CONFIG;
 			break;
-		case 'i': /* -i, --install */
+		case 'i':	/* -i, --install */
 			if (command != CMN_NONE && command != CMN_FILE)
 				goto bad_option;
 			if (command == CMN_NONE)
 				command = CMN_INSTALL;
 			break;
-		case 'f': /* -f, --filename FILENAME */
+		case 'f':	/* -f, --filename FILENAME */
 			if (command != CMN_NONE && command != CMN_INSTALL)
 				goto bad_option;
 			strncpy(filename, sizeof(filename), optarg);
 			command = CMN_FILE;
 			break;
-		case 'd': /* -d, --delete */
+		case 'd':	/* -d, --delete */
 			if (command != CMN_NONE)
 				goto bad_option;
 			command = CMN_DELETE;
@@ -328,4 +322,3 @@ main(int argc, char *argv[])
 	strsetup(argc, argv);
 	exit(0);
 }
-

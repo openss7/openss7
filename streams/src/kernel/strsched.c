@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $"
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] =
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:33 $";
 
 #define __NO_VERSION__
 
@@ -911,7 +912,7 @@ void sq_put(struct syncq **sqp)
 			list_del_init((struct list_head *) &sq->sq_next);
 			write_unlock_irqrestore(&si->si_rwlock, flags);
 			/* clean it up before puting it back in the cache */
-			// sq_put(&sq->sq_other);	/* recurse once */
+			// sq_put(&sq->sq_other); /* recurse once */
 			if (!spin_trylock(&sq->sq_lock))
 				pswerr(("breaking syncq lock\n"));
 			spin_lock_init(&sq->sq_lock);
@@ -1359,7 +1360,7 @@ static void sq_stream(struct strevent *se)
 static void sq_bufcall(struct strevent *se)
 {
 	queue_t *q = se->x.b.queue;
-	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq; /* XXX */
+	syncq_t *isq = q ? q->q_syncq : NULL, *osq = isq ? isq->sq_outer : isq;	/* XXX */
 	unsigned long flags;
 	if (enter_shared(osq, &flags)) {
 		if (enter_exclus(isq, &flags)) {
@@ -2063,53 +2064,6 @@ void sd_put(struct stdata *sd)
 /* 
  *  -------------------------------------------------------------------------
  *
- *  Mountable Special Filesystem Interface
- *
- *  -------------------------------------------------------------------------
- */
-#ifdef CONFIG_STREAMS_MNTSPECFS
- /* In case we are mounted and someone ls's us... */
-static int spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
-{
-	struct inode *inode = file->f_dentry->d_inode;
-	struct strinfo *si = &Strinfo[DYN_STREAM];
-	struct stdata *sd;
-	struct list_head *pos, *tmp;
-	char buf[64];
-	off_t nr;
-	nr = file->f_pos;
-	switch (nr) {
-	case 0:
-		if (filldir(dirent, ".", 1, nr, inode->i_ino, DT_DIR) < 0)
-			return (0);
-		file->f_pos = ++nr;
-	case 1:
-		if (filldir(dirent, "..", 2, nr, inode->i_ino, DT_DIR) < 0)
-			return (0);
-		file->f_pos = ++nr;
-	default:
-	list_for_each_safe(pos, tmp, &si->si_head) {
-		sd = (struct stdata *) list_entry(pos, struct shinfo, sh_next);
-		if (!(inode = sd->sd_inode))
-			continue;
-		snprintf(buf, 64, "[%ld]", inode->i_ino);
-		if (filldir(dirent, buf, strnlen(buf, 64), nr, inode->i_ino, DT_CHR) < 0)
-			return (0);
-		file->f_pos = ++nr;
-	}
-		break;
-	}
-	return (0);
-}
-struct file_operations spec_root_f_ops = {
-	read:generic_read_dir,
-	readdir:spec_root_readdir,
-};
-#endif
-
-/* 
- *  -------------------------------------------------------------------------
- *
  *  Kernel Memory Cache Initialization and Termination
  *
  *  -------------------------------------------------------------------------
@@ -2187,10 +2141,9 @@ static int str_init_caches(void)
 	return (0);
 }
 
-static typeof(&open_softirq) _open_softirq
-	= (typeof(_open_softirq))HAVE_OPEN_SOFTIRQ_ADDR;
+static typeof(&open_softirq) _open_softirq = (typeof(_open_softirq)) HAVE_OPEN_SOFTIRQ_ADDR;
 
-int strsched_init(void)
+	int strsched_init(void)
 {
 	int result, i;
 	if ((result = str_init_caches()) < 0)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/03/08 00:20:01 $";
+static char const ident[] =
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:34 $";
 
 /* 
  *  SVR 4.2: fdetach(8)
@@ -82,8 +83,7 @@ static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.
 static int debug = 0;
 static int output = 1;
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -95,8 +95,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -109,8 +108,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -139,8 +137,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -186,8 +183,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	while (1) {
 		int c, val;

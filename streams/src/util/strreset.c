@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $
+ @(#) $RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:38:56 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $"
+#ident "@(#) $RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/03/08 00:38:56 $";
+static char const ident[] =
+    "$RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:35 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -72,8 +73,7 @@ static char const ident[] = "$RCSfile: strreset.c,v $ $Name:  $($Revision: 0.9.2
 static int output = 1;
 static int debug = 0;
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -85,8 +85,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -99,8 +98,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -126,8 +124,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -173,13 +170,11 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-void
-strreset(int argc, char *argv[])
+void strreset(int argc, char *argv[])
 {
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
@@ -278,4 +273,3 @@ main(int argc, char *argv[])
 	strreset(argc, argv);
 	exit(0);
 }
-

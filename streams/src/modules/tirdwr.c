@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $";
+static char const ident[] =
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
 
 /* 
  *  This is TIRDWR an TLI read/write module for TPI Version 2 transport
@@ -85,7 +86,7 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.6
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
+#define TIRDWR_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -232,7 +233,7 @@ static void tirdwr_buffer(long arg)
 	mblk_t *mp;
 	spin_lock_irqsave(&tirdwr->lock, flags);
 	while ((mp = getq(q))
-			&& !do_w_data(q, mp, &flags)) ;
+	       && !do_w_data(q, mp, &flags)) ;
 	spin_unlock_irqrestore(&tirdwr->lock, flags);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:20:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/03/08 00:20:01 $";
+static char const ident[] =
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/28 01:30:34 $";
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -75,8 +76,7 @@ static char const ident[] = "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.
 
 int output = 1;
 
-void
-version(int argc, char *argv[])
+void version(int argc, char *argv[])
 {
 	if (!output)
 		return;
@@ -88,8 +88,7 @@ version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void
-usage(int argc, char *argv[])
+void usage(int argc, char *argv[])
 {
 	if (!output)
 		return;
@@ -103,8 +102,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-void
-help(int argc, char *argv[])
+void help(int argc, char *argv[])
 {
 	if (!output)
 		return;
@@ -147,8 +145,7 @@ Options:\n\
 #define PATH_MAX 4096
 #endif
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	char path[PATH_MAX];
 	int fd[2];

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] =
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
 
 #define __NO_VERSION__
 
@@ -185,8 +186,8 @@ int strsysctl_init(void)
 {
 	sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
 	sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
-	sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
-	sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
+	sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
+	sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
 	if ((streams_sysctl_handle = register_sysctl_table(streams_root_table, 1)))
 		return (0);
 	return (-EIO);

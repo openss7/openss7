@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $
+ @(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 10:19:59 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $"
+#ident "@(#) $RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 10:19:59 $";
+static char const ident[] =
+    "$RCSfile: strvf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -89,8 +90,7 @@ char basname[256] = "";
 char outpdir[256] = "/var/log/streams";
 char devname[256] = "";
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -102,8 +102,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -116,8 +115,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -155,8 +153,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -202,8 +199,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
-void
-strvf_exit(int retval)
+void strvf_exit(int retval)
 {
 	if (retval) {
 		fprintf(stderr, "--------------------------------------------------\n");
@@ -218,8 +214,7 @@ strvf_exit(int retval)
 	exit(retval);
 }
 
-void
-strvf(int argc, char *argv[])
+void strvf(int argc, char *argv[])
 {
 	int fd;
 	if (basname[0] == '\0')
@@ -334,8 +329,7 @@ strvf(int argc, char *argv[])
 	strvf_exit(0);
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
@@ -358,7 +352,8 @@ main(int argc, char *argv[])
 			{"?",		no_argument,		NULL, 'H'},
 		};
 		/* *INDENT-ON* */
-		c = getopt_long_only(argc, argv, "n:b:O:o:e:D:qdvhVC?", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "n:b:O:o:e:D:qdvhVC?", long_options,
+				     &option_index);
 #else
 		c = getopt(argc, argv, "n:b:O:o:e:D:qdvhVC?");
 #endif
@@ -368,7 +363,7 @@ main(int argc, char *argv[])
 			break;
 		}
 		switch (c) {
-		case 'n': /* -n, --nologging */
+		case 'n':	/* -n, --nologging */
 			logging = 0;
 			break;
 		case 'b':
@@ -458,4 +453,3 @@ main(int argc, char *argv[])
 	strvf(argc, argv);
 	exit(0);
 }
-

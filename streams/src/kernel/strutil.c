@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/22 12:08:34 $";
+static char const ident[] =
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:34 $";
 
 #define __NO_VERSION__
 
@@ -78,7 +79,7 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/kmem.h>		/* for kmem_alloc */
 
 #include <sys/stropts.h>	/* streams definitions */
-#include <sys/stream.h>	/* streams definitions */
+#include <sys/stream.h>		/* streams definitions */
 #include <sys/strsubr.h>	/* for implementation definitions */
 #include <sys/strconf.h>	/* for syscontrols */
 #include <sys/ddi.h>
@@ -1506,7 +1507,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 		/* magic garden */
 		/* this just doesn't work with locking.... FIXME */
 		if (getmajor(odev) != getmajor(*devp)) {
-			if (!(sdev = sdev_get(*devp)))
+			if (!(sdev = sdev_get(getmajor(*devp))))
 				goto enoent;
 			if (!(st = sdev->d_str))
 				goto put_noent;
@@ -1606,7 +1607,7 @@ void qdelete(queue_t *q)
 int qdetach(queue_t *q, int flags, cred_t *crp)
 {
 	int err = qclose(q, flags, crp);
-	qprocsoff(q); /* in case qi_qclose procedure forgot */
+	qprocsoff(q);		/* in case qi_qclose procedure forgot */
 	qdelete(q);
 	return (err);
 }
@@ -1689,8 +1690,8 @@ void qprocsoff(queue_t *q)
 	assert(current_context() <= CTX_STREAMS);
 	if (!test_and_set_bit(QHLIST_BIT, &rq->q_flag)) {
 		set_bit(QHLIST_BIT, &wq->q_flag);
-		set_bit(QNOENB_BIT, &rq->q_flag); /* XXX */
-		set_bit(QNOENB_BIT, &wq->q_flag); /* XXX */
+		set_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
+		set_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		/* spin here until put or srv procedures exit */
 		hwlock(rq, &flags);
 		/* bypass this module: works for FIFOs and PIPEs too */
@@ -1736,8 +1737,8 @@ void qprocson(queue_t *q)
 	assert(current_context() <= CTX_STREAMS);
 	if (test_and_clear_bit(QHLIST_BIT, &rq->q_flag)) {
 		clear_bit(QHLIST_BIT, &wq->q_flag);
-		clear_bit(QNOENB_BIT, &rq->q_flag); /* XXX */
-		clear_bit(QNOENB_BIT, &wq->q_flag); /* XXX */
+		clear_bit(QNOENB_BIT, &rq->q_flag);	/* XXX */
+		clear_bit(QNOENB_BIT, &wq->q_flag);	/* XXX */
 		hwlock(rq, &flags);
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq))) {
@@ -1784,7 +1785,7 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
 	struct fmodsw *fmod;
 	if (sd->sd_pushcnt >= sysctl_str_nstrpush)
 		goto enosr;
-	if (!(fmod = smod_get(name)))
+	if (!(fmod = smod_find(name)))
 		goto einval;
 	if ((err = qattach(sd, fmod, devp, oflag, MODOPEN, crp)) != 0)
 		goto error;

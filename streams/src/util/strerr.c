@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 03:59:01 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 03:59:01 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 03:59:01 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/03/08 03:59:01 $";
+static char const ident[] =
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/04/28 01:30:35 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -98,8 +99,7 @@ char outpdir[256] = "/var/log/streams";
 char devname[256] = "";
 char mailuid[256] = "";
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -111,8 +111,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -125,8 +124,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -166,8 +164,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -224,8 +221,7 @@ enum {
 	STRERR_FAILURE = -1,
 };
 
-int
-sig_register(int signum, RETSIGTYPE(*handler) (int))
+int sig_register(int signum, RETSIGTYPE(*handler) (int))
 {
 	sigset_t mask;
 	struct sigaction act;
@@ -244,53 +240,45 @@ int alm_signal = 0;
 int hup_signal = 0;
 int trm_signal = 0;
 
-RETSIGTYPE
-alm_handler(int signum)
+RETSIGTYPE alm_handler(int signum)
 {
 	alm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int
-alm_catch(void)
+int alm_catch(void)
 {
 	sig_register(SIGALRM, &alm_handler);
 }
 
-int
-alm_block(void)
+int alm_block(void)
 {
 	sig_register(SIGALRM, NULL);
 }
 
-int
-alm_action(void)
+int alm_action(void)
 {
 	alm_signal = 0;
 	return (0);
 }
 
-RETSIGTYPE
-hup_handler(int signum)
+RETSIGTYPE hup_handler(int signum)
 {
 	hup_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int
-hup_catch(void)
+int hup_catch(void)
 {
 	sig_register(SIGALRM, &hup_handler);
 }
 
-int
-hup_block(void)
+int hup_block(void)
 {
 	sig_register(SIGALRM, NULL);
 }
 
-int
-hup_action(void)
+int hup_action(void)
 {
 	hup_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGHUP, reopening files.");
@@ -303,7 +291,7 @@ hup_action(void)
 			syslog(LOG_ERR, "%m");
 			syslog(LOG_ERR, "Could not reopen stdout file %s", outpath);
 		}
-		//output_header(void);
+		// output_header(void);
 	}
 	if (output > 1)
 		syslog(LOG_NOTICE, "Reopening error file %s", errpath);
@@ -318,53 +306,46 @@ hup_action(void)
 	return (0);
 }
 
-RETSIGTYPE
-trm_handler(int signum)
+RETSIGTYPE trm_handler(int signum)
 {
 	trm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int
-trm_catch(void)
+int trm_catch(void)
 {
 	sig_register(SIGALRM, &trm_handler);
 }
 
-int
-trm_block(void)
+int trm_block(void)
 {
 	sig_register(SIGALRM, NULL);
 }
 
 void strerr_exit(int retval);
 
-int
-trm_action(void)
+int trm_action(void)
 {
 	trm_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGTERM, shutting down");
 	strerr_exit(0);
 }
 
-void
-sig_catch(void)
+void sig_catch(void)
 {
 	alm_catch();
 	hup_catch();
 	trm_catch();
 }
 
-void
-sig_block(void)
+void sig_block(void)
 {
 	alm_block();
 	hup_block();
 	trm_block();
 }
 
-int
-start_timer(long duration)
+int start_timer(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
@@ -380,20 +361,18 @@ start_timer(long duration)
 
 int sterr_stop(void);
 
-void
-strerr_exit(int retval)
+void strerr_exit(int retval)
 {
 	syslog(LOG_NOTICE, "Exiting %d", retval);
 	fflush(stdout);
 	fflush(stderr);
-	//strerr_stop();
+	// strerr_stop();
 	sig_block();
 	closelog();
 	exit(retval);
 }
 
-void
-strerr_enter(int argc, char *argv[])
+void strerr_enter(int argc, char *argv[])
 {
 	if (nomead) {
 		pid_t pid;
@@ -429,7 +408,8 @@ strerr_enter(int argc, char *argv[])
 		localtime_r(&curtime, &tm);
 		/* initialize default filename */
 		if (outfile[0] == '\0')
-			snprintf(outfile, sizeof(outfile), "%s.%02d-%02d", basname, tm.tm_mon, tm.tm_mday);
+			snprintf(outfile, sizeof(outfile), "%s.%02d-%02d", basname, tm.tm_mon,
+				 tm.tm_mday);
 		snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
 		if (output > 1)
 			syslog(LOG_NOTICE, "Redirecting stdout to file %s", outpath);
@@ -455,12 +435,11 @@ strerr_enter(int argc, char *argv[])
 		}
 	}
 	sig_catch();
-	//output_header();
+	// output_header();
 	syslog(LOG_NOTICE, "Startup complete.");
 }
 
-void
-strerr_open(void)
+void strerr_open(void)
 {
 	struct strioctl ioc;
 	/* open log device */
@@ -490,15 +469,13 @@ strerr_open(void)
 		strerr_exit(1);
 	}
 }
-void
-strerr_close(void)
+void strerr_close(void)
 {
 	if (close(strlog_fd) < 0)
 		perror(__FUNCTION__);
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	while (1) {
 		int c, val;

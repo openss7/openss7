@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:34 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 
-static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $";
+static char const ident[] =
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $";
 
 /* 
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -90,7 +91,7 @@ static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.6 
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/22 12:08:34 $"
+#define TIMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:34 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

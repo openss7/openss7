@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/08 00:38:56 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $"
 
-static char const ident[] = "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/03/08 00:38:56 $";
+static char const ident[] =
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/04/28 01:30:35 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -79,8 +80,7 @@ static char const ident[] = "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.6 $
 static int debug = 0;
 static int output = 1;
 
-static void
-version(int argc, char **argv)
+static void version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -92,8 +92,7 @@ version(int argc, char **argv)
 ", argv[0], ident);
 }
 
-static void
-usage(int argc, char **argv)
+static void usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -106,8 +105,7 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void
-help(int argc, char **argv)
+static void help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -137,8 +135,7 @@ Options:\n\
 ", argv[0]);
 }
 
-static void
-copying(int argc, char *argv[])
+static void copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -186,8 +183,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 
 enum { CMN_NONE, CMN_NAMES, CMN_LONG, CMN_COUNT, } command = CMN_NONE;
 
-void
-printit(struct sc_mlist *l, int cmd)
+void printit(struct sc_mlist *l, int cmd)
 {
 	if (output <= 0 || l->major == -1)
 		return;
@@ -217,8 +213,7 @@ printit(struct sc_mlist *l, int cmd)
 	fprintf(stdout, "\n");
 };
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	int i, fd, count;
 	struct sc_list *list;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:33 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $"
 
-static char const ident[] = "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/22 12:08:33 $";
+static char const ident[] =
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/04/28 01:30:33 $";
 
 #define __NO_VERSION__
 
@@ -133,7 +134,7 @@ struct strapush *autopush_find(dev_t dev)
 	unsigned long flags;
 	struct cdevsw *cdev;
 	struct apinfo *api = NULL;
-	if ((cdev = sdev_get(dev)) == NULL)
+	if ((cdev = sdev_get(getmajor(dev))) == NULL)
 		goto notfound;
 	spin_lock_irqsave(&apush_lock, flags);
 	if ((api = __autopush_find(cdev, getminor(dev))) != NULL)
@@ -174,7 +175,7 @@ int autopush_add(struct strapush *sap)
 			goto error;
 	}
 	err = -ENOSTR;
-	if ((cdev = sdev_get(makedevice(sap->sap_major, sap->sap_minor))) == NULL)
+	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
@@ -193,7 +194,7 @@ int autopush_del(struct strapush *sap)
 	if (sap->sap_major >= MAX_CHRDEV)
 		goto error;
 	err = -ENODEV;
-	if ((cdev = sdev_get(makedevice(sap->sap_major, sap->sap_minor))) == NULL)
+	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
@@ -212,7 +213,7 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 		len = strnlen(smp->l_name, FMNAMESZ + 1);
 		if (len == 0 || len == FMNAMESZ + 1)
 			goto einval;
-		if ((fmod = smod_get(smp->l_name)) != NULL)
+		if ((fmod = smod_find(smp->l_name)) != NULL)
 			smod_put(fmod);
 		else
 			rtn = 1;

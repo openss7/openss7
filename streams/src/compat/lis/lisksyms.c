@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:32 $
+ @(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/04/22 12:08:32 $ by $Author: brian $
+ Last Modified $Date: 2004/04/28 01:30:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:32 $"
+#ident "@(#) $RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:32 $"
 
-static char const ident[] = "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/04/22 12:08:32 $";
+static char const ident[] =
+    "$RCSfile: lisksyms.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/04/28 01:30:32 $";
 
 #define __NO_VERSION__
 
@@ -412,4 +413,3 @@ EXPORT_SYMBOL_GPL(lis_pcibios_write_config_byte);
 EXPORT_SYMBOL_GPL(lis_pcibios_write_config_dword);
 EXPORT_SYMBOL_GPL(lis_pcibios_write_config_word);
 #endif
-
