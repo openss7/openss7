@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/03/08 11:55:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/03/09 09:25:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 11:55:52 $ by $Author: brian $
+# Last Modified $Date: 2005/03/09 09:25:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -215,7 +215,6 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
-				  src/modules/inet/inet.c \
 				  src/modules/m2pa/m2pa_sl.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
@@ -228,10 +227,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
 				  src/modules/ss7sctp/sdl_sctp.c \
-				  src/modules/ti/timod.c \
-				  src/include/timod.h \
-				  src/modules/ti/tirdwr.c \
-				  src/include/tirdwr.h \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/x400pfw.h \
@@ -497,7 +492,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/dl/dl_v52.c \
 				  src/modules/dl/dl_v5ua.c \
 				  src/modules/hdlc/hdlc.c \
-				  src/modules/inet/inet.c \
 				  src/modules/isdn/isdn.c \
 				  src/modules/isup/isup.c \
 				  src/modules/lm/lm.c \
@@ -520,10 +514,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
 				  src/modules/ss7sctp/sdl_sctp.c \
-				  src/modules/ti/timod.c \
-				  src/include/timod.h \
-				  src/modules/ti/tirdwr.c \
-				  src/include/tirdwr.h \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \
@@ -997,7 +987,7 @@ include am/archive.am
 ## Rules for making rpms
 ##
 AM_RPMFLAGS			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS			=
+AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 

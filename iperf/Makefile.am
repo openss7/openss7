@@ -74,7 +74,7 @@ include am/archive.am
 #   Rules for making rpms
 #
 AM_RPMFLAGS			=
-AM_SRPMFLAGS			=
+AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 

@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/03/09 06:51:29 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/03/09 11:10:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/09 06:51:29 $ by $Author: brian $
+## Last Modified $Date: 2005/03/09 11:10:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -241,7 +241,7 @@ $(sourcedir)/$(PACKAGE)-$(VERSION).xpm::
 # distribution.
 ##
 
-srpm		= $(srcrpmdir)/$(PACKAGE)-$(VERSION).src.rpm
+srpm		= $(srcrpmdir)/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE).src.rpm
 
 $(srpm): $(rpm_spec_file) $(rpm_source_files) $(rpm_directories)
 	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
@@ -383,6 +383,9 @@ EXTRA_DIST	+= \
 		.pkgrelease
 
 ALL_RECURSIVE_TARGETS += all-srpm all-rpms all-sign all-rebuild all-resign
+
+RELEASE		+= rebuild
+RELEASE_SIGN	+= resign
 
 endif
 
