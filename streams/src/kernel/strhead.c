@@ -85,6 +85,8 @@ static char const ident[] = "strhead.c,v (0.9.2.19) 2003/10/27 12:23:15";
 #include "strutil.h"		/* for q locking and puts and gets */
 #include "strattach.h"		/* for do_fattach/do_fdetach */
 
+#include "sys/config.h"
+
 #define QR_DONE		0
 #define QR_ABSORBED	1
 #define QR_TRIMMED	2
@@ -2446,7 +2448,11 @@ static int str_i_getpmsg(struct file *file, struct stdata *sd, unsigned int cmd,
 }
 static int strfattach(struct file *file, const char *path)
 {
+#if defined HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fattach(file, path);
+#else
+	return (-ENOSYS);
+#endif
 }
 static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {
@@ -2462,7 +2468,11 @@ static int str_i_fattach(struct file *file, struct stdata *sd, unsigned int cmd,
 }
 static int strfdetach(const char *path)
 {
+#if defined HAVE_KERNEL_FATTACH_SUPPORT
 	return do_fdetach(path);
+#else
+	return (-ENOSYS);
+#endif
 }
 static int str_i_fdetach(struct file *file, struct stdata *sd, unsigned int cmd, unsigned long arg)
 {

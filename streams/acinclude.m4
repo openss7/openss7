@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.5 2004/03/01 11:32:21 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.7 2004/03/02 05:33:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/03/01 11:32:21 $ by $Author: brian $
+dnl Last Modified $Date: 2004/03/02 05:33:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -256,67 +256,67 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [
         if test :"$enable_compat_lis" != :no  ; then lfs_cv_lis=yes  ; else lfs_cv_lis=no  ; fi
     ])
     if test :"$lfs_cv_svr4" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the UNIX(R) SVR
-                4.2 MP docs so that STREAMS drivers and modules written to
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the UNIX(R)
+                SVR 4.2 MP docs so that STREAMS drivers and modules written to
                 UNIX(R) SVR 4.2 MP specs will compile with Linux Fast STREAMS.
-                When undefined, STREAMS drivers and modules writter for
+                When undefined, STREAMS drivers and modules written for
                 UNIX(R) SVR 4.2 MP will require porting in more respects.])
     fi
     if test :"$lfs_cv_sol8" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the Solaris(R) 8
-                release so that STREAMS drivers and modules written for
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the Solaris(R)
+                8 release so that STREAMS drivers and modules written for
                 Solaris(R) 8 will compile with Linux Fast STREAMS.  When
-                undefined, STREAMS drivers and modules writter for Solaris(R)
+                undefined, STREAMS drivers and modules written for Solaris(R)
                 8 will require porting in more respects.])
     fi
     if test :"$lfs_cv_uw7" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the UnixWare(R) 7
-                release so that STREAMS drivers and modules written for
-                UnixWare(R) 7 will compile with Linux Fast STREAMS.  When
-                undefined, STREAMS drivers and modules writter for UnixWare(R)
-                7 will require porting in more respects.])
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the
+                UnixWare(R) 7 release so that STREAMS drivers and modules
+                written for UnixWare(R) 7 will compile with Linux Fast
+                STREAMS.  When undefined, STREAMS drivers and modules written
+                for UnixWare(R) 7 will require porting in more respects.])
     fi
     if test :"$lfs_cv_osf" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the OSF(R)/1.2
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the OSF(R)/1.2
                 release so that STREAMS drivers and modules written for
                 OSF(R)/1.2 will compile with Linux Fast STREAMS.  When
-                undefined, STREAMS drivers and modules writter for OSF(R)/1.2
+                undefined, STREAMS drivers and modules written for OSF(R)/1.2
                 will require porting in more respects.])
     fi
     if test :"$lfs_cv_aix" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the AIX(R) 5L
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the AIX(R) 5L
                 Version 5.1 release so that STREAMS drivers and modules
                 written for AIX(R) 5L Version 5.1 will compile with Linux Fast
-                STREAMS.  When undefined, STREAMS drivers and modules writter
+                STREAMS.  When undefined, STREAMS drivers and modules written
                 for AIX(R) 5L Version 5.1 will require porting in more
                 respects.])
     fi
     if test :"$lfs_cv_hpux" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the HPUX(R)
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the HPUX(R)
                 release so that STREAMS drivers and modules written for
                 HPUX(R) will compile with Linux Fast STREAMS.  When undefined,
-                STREAMS drivers and modules writter for HPUX(R) will require
+                STREAMS drivers and modules written for HPUX(R) will require
                 porting in more respects.])
     fi
     if test :"$lfs_cv_lis" = :yes ; then
-        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined,
-                Linux Fast STREAMS will attempt to be as compatible as
-                possible (without replicating any bugs) with the LiS release
-                so that STREAMS drivers and modules written for LiS will
-                compile with Linux Fast STREAMS.  When undefined, STREAMS
-                drivers and modules writter for LiS will require porting in
+        AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS_MODULE], [], [When
+                defined, Linux Fast STREAMS will attempt to be as compatible
+                as possible (without replicating any bugs) with the LiS
+                release so that STREAMS drivers and modules written for LiS
+                will compile with Linux Fast STREAMS.  When undefined, STREAMS
+                drivers and modules written for LiS will require porting in
                 more respects.])
     fi
 ])# _LFS_SETUP_COMPAT
@@ -357,8 +357,7 @@ AC_DEFUN([_LFS_GET_STRCONF], [
     lfs_configs=
     for lfs_config in `find $srcdir -type f -name "Config"`
     do
-        if test -r "$lfs_config"
-        then
+        if test -r "$lfs_config" ; then
             lfs_configs="$lfs_configs $lfs_config"
         fi
     done
@@ -370,8 +369,7 @@ AC_DEFUN([_LFS_GET_STRCONF], [
 # _LFS_OUTPUT_CONFIG_MASTER
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_OUTPUT_CONFIG_MASTER], [
-    if test -n "$lfs_configs"
-    then
+    if test -n "$lfs_configs" ; then
 dnl     Note that we never generate Config.master in the makefiles, we generate
 dnl     it once here.
         cat $lfs_configs > Config.master
@@ -414,52 +412,315 @@ AC_DEFUN([_LFS_OUTPUT_CONFIG], [
 # _LFS_CHECK_KERNEL
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CHECK_KERNEL], [
-    # ---------------
-    # symbols to check:
-    # -----------------
-    # register_protosw
-    # unregister_protosw
-    # do_fattach
-    # do_fdetach
-    # ---------------
-    # symbols to rip:
-    # ---------------
-    # pcibios_init          <-- extern, can be ripped, declared in <linux/pci.h>
-    # sys_unlink            <-- extern, can be ripped, not declared
-    # sys_mknod             <-- extern, can be ripped, not declared
-    # sys_umount            <-- extern, can be ripped, not declared
-    # sys_mount             <-- extern, can be ripped, not declared
-    # file_move             <-- extern, can be ripped, declared in <linux/fs.h>
-    # open_softirq          <-- extern, can be ripped, declared in <linux/interrupt.h>
-    # sock_readv_writev     <-- extern, can be ripped, declared in <linux/net.h>
-    #
-    #   register_protosw
-    #   unregister_protosw
-    #   sock_f_ops
-    #   sock_p_ops
-    #   socksys_create
-    # 
-    # ---------------
-    # symbols to implement fattach
-    # ---------------
-    # path_init             <--- exported
-    # path_walk             <--- exported
-    # path_release          <--- exported
-    # getname               <--- exported
-    # d_mountpoint          <--- inline, declared in <linux/dcache.h>
-    # mntput                <--- inline, declared in <linux/mount.h>
-    # clone_mnt             <=== static, can be ripped
-    # check_mnt             <=== static, can be ripped
-    # graft_tree            <=== static, can be ripped
-    # 
-    # ---------------
-    # symbols to implement fdetach
-    # ---------------
-    # path_init     <--- exported
-    # path_release  <--- exported
-    # check_mnt     <=== static, can be ripped
-
+    _LFS_CONFIG_INET
+    _LFS_CONFIG_FATTACH
+    _LFS_CONFIG_LIS
+    _LFS_CONFIG_LFS
 ])# _LFS_CHECK_KERNEL
+# =========================================================================
+
+# =========================================================================
+# _LFS_CONFIG_INET
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG_INET], [
+    AC_CACHE_CHECK([for tcp_openreq_cachep support], [lfs_cv_tcp_openreq_cachep], [dnl
+        tmp_cppflags="$CPPFLAGS"
+        CPPFLAGS="$KERNEL_CPPFLAGS"
+        AC_EGREP_CPP([\<yes_we_have_the_required_support\>], [
+#include <linux/config.h>
+#include <linux/version.h>
+#ifdef CONFIG_MODVERSIONS
+#include <linux/modversion.h>
+#endif
+#include <linux/types.h>
+#include <linux/fs.h>
+#ifdef CONFIG_IPV6_MODULE
+    yes_we_have_the_required_support
+#endif
+        ], [lfs_cv_tcp_openreq_cachep=yes], [lfs_cv_tcp_openreq_cachep=no])
+        CPPFLAGS="$tmp_cppflags"
+    ])
+    if test :"$lfs_cv_tcp_openreq_cachep" = :no ; then
+        AC_MSG_CHECKING([usable tcp_openreq_cachep address])
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_tcp_openreq_cachep_addr=`($EGREP '\<tcp_openreq_cachep' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+            lfs_cv_tcp_openreq_cachep_addr="${lfs_cv_tcp_openreq_cachep_addr:+0x}$lfs_cv_tcp_openreq_cachep_addr"
+        fi
+        if test -n "$lfs_cv_tcp_openreq_cachep_addr" ; then
+            lfs_cv_tcp_openreq_cachep=yes
+            AC_DEFINE_UNQUOTED([HAVE_TCP_OPENREQ_CACHEP_ADDR], [$lfs_cv_tcp_openreq_cachep_addr],
+            [If the symbol tcp_openreq_cachep is not exported by your kernel,
+            then define this to the address of the tcp_openreq_cachep in the
+            kernel system map so that the INET driver can find the cache point
+            to properly allocate and deallocate requests.])
+            AC_MSG_RESULT([$lfs_cv_openreq_cachep_addr])
+        else
+            :
+            AC_MSG_RESULT([no])
+        fi
+    fi
+    if test :"$lfs_cv_tcp_openreq_cachep" = :yes ; then
+        AC_DEFINE([HAVE_TCP_OPENREQ_CACHEP], [1], [Define if your kernel
+        exports symbol tcp_openreq_cachep.  This symbol is needed by the INET
+        driver to properly accept connection indications.])
+    fi
+])# _LFS_CONFIG_INET
+# =========================================================================
+
+# =========================================================================
+# _LFS_CONFIG_FATTACH
+# -------------------------------------------------------------------------
+# 
+# symbols to implement fattach
+# -------------------------------------------------------------------------
+# path_init             <--- exported
+# path_walk             <--- exported
+# path_release          <--- exported
+# getname               <--- exported
+# d_mountpoint          <--- inline, declared in <linux/dcache.h>
+# mntput                <--- inline, declared in <linux/mount.h>
+# clone_mnt             <=== static, can be ripped
+# check_mnt             <=== static, can be ripped
+# graft_tree            <=== static, can be ripped
+# 
+# symbols to implement fdetach
+# -------------------------------------------------------------------------
+# path_init             <--- exported
+# path_release          <--- exported
+# check_mnt             <=== static, can be ripped
+# 
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG_FATTACH], [
+    AC_CACHE_CHECK([for usable mount_sem address], [lfs_cv_mount_sem_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_mount_sem_addr=`($EGREP '\<mount_sem' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_mount_sem_addr="${lfs_cv_mount_sem_addr:+0x}$lfs_cv_mount_sem_addr"
+        lfs_cv_mount_sem_addr="${lfs_cv_mount_sem_addr:-no}"
+    ])
+    if test :${lfs_cv_mount_sem_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_MOUNT_SEM_ADDR], [$lfs_cv_mount_sem_addr],
+        [The symbol mount_sem is not exported by most kernels.  Define this to
+        the address of the mount_sem in the kernel system map so that
+        fattach/fdetach can be properly supported.])
+    else
+        AC_DEFINE_UNQUOTED([HAVE_TASK_NAMESPACE_SEM], [1],
+        [Some recent 2.4 RH kernel place the mount semaphore into the task
+        structure rather than using the static global mount_sem semaphore.
+        Define this if you have a modified kernel.])
+    fi
+    AC_CACHE_CHECK([for usable clone_mnt address], [lfs_cv_clone_mnt_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_clone_mnt_addr=`($EGREP '\<clone_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_clone_mnt_addr="${lfs_cv_clone_mnt_addr:+0x}$lfs_cv_clone_mnt_addr"
+        lfs_cv_clone_mnt_addr="${lfs_cv_clone_mnt_addr:-no}"
+    ])
+    if test :${lfs_cv_clone_mnt_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_CLONE_MNT_ADDR], [$lfs_cv_clone_mnt_addr],
+        [The symbol clone_mnt is not exported by most kernels.  Define this to
+        the address of clone_mnt in the kernel system map so that
+        fattach/fdetach can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable check_mnt address], [lfs_cv_check_mnt_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_check_mnt_addr=`($EGREP '\<check_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_check_mnt_addr="${lfs_cv_check_mnt_addr:+0x}$lfs_cv_check_mnt_addr"
+        lfs_cv_check_mnt_addr="${lfs_cv_check_mnt_addr:-no}"
+    ])
+    if test :${lfs_cv_check_mnt_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_CHECK_MNT_ADDR], [$lfs_cv_check_mnt_addr],
+        [The symbol check_mnt is not exported by most kernels.  Define this to
+        the address of check_mnt in the kernel system map so that
+        fattach/fdetach can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable graft_tree address], [lfs_cv_graft_tree_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_graft_tree_addr=`($EGREP '\<graft_tree' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_graft_tree_addr="${lfs_cv_graft_tree_addr:+0x}$lfs_cv_graft_tree_addr"
+        lfs_cv_graft_tree_addr="${lfs_cv_graft_tree_addr:-no}"
+    ])
+    if test :${lfs_cv_graft_tree_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_GRAFT_TREE_ADDR], [$lfs_cv_graft_tree_addr],
+        [The symbol graft_tree is not exported by most kernels.  Define this to
+        the address of graft_tree in the kernel system map so that
+        fattach/fdetach can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable do_umount address], [lfs_cv_do_umount_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_do_umount_addr=`($EGREP '\<do_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_do_umount_addr="${lfs_cv_do_umount_addr:+0x}$lfs_cv_do_umount_addr"
+        lfs_cv_do_umount_addr="${lfs_cv_do_umount_addr:-no}"
+    ])
+    if test :${lfs_cv_do_umount_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_DO_UMOUNT_ADDR], [$lfs_cv_do_umount_addr],
+        [The symbol do_umount is not exported by most kernels.  Define this to
+        the address of do_umount in the kernel system map so that
+        fattach/fdetach can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for ability to support fattach/fdetach], [lfs_cv_fattach], [dnl
+        case "$lfs_cv_clone_mnt_addr:$lfs_cv_check_mnt_addr:$lfs_cv_graft_tree_addr:$lfs_cv_do_umount_addr" in
+            no:*:*:* | *:no:*:* | *:*:no:* | *:*:*:no)
+                lfs_cv_fattach=no
+                ;;
+            *)
+                lfs_cv_fattach=yes
+                ;;
+        esac
+    ])
+    if test :${lfs_cv_fattach:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_KERNEL_FATTACH_SUPPORT], [1],
+        [If the addresses for the necessary symbols above are defined, then
+        define this to include fattach/fdetach support.])
+    fi
+])# _LFS_CONFIG_FATTACH
+# =========================================================================
+
+# =========================================================================
+_LFS_CONFIG_LIS
+# -------------------------------------------------------------------------
+# symbols to rip for LiS support (without system call generation)
+# -------------------------------------------------------------------------
+# sys_unlink            <-- extern, not declared
+# sys_mknod             <-- extern, not declared
+# sys_umount            <-- extern, not declared
+# sys_mount             <-- extern, not declared
+# pcibios_init          <-- extern, declared in <linux/pci.h>
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG_LIS], [dnl
+    AC_CACHE_CHECK([for usable sys_unlink address], [lfs_cv_sys_unlink_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_sys_unlink_addr=`($EGREP '\<sys_unlink' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_sys_unlink_addr="${lfs_cv_sys_unlink_addr:+0x}$lfs_cv_sys_unlink_addr"
+        lfs_cv_sys_unlink_addr="${lfs_cv_sys_unlink_addr:-no}"
+    ])
+    if test :${lfs_cv_sys_unlink_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_UNLINK_ADDR], [$lfs_cv_sys_unlink_addr],
+        [The symbol sys_unlink is not exported by most kernels.  Define this
+        to the address of sys_unlink in the kernel system map so that LiS
+        compatibility can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable sys_mknod address], [lfs_cv_sys_mknod_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_sys_mknod_addr=`($EGREP '\<sys_mknod' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_sys_mknod_addr="${lfs_cv_sys_mknod_addr:+0x}$lfs_cv_sys_mknod_addr"
+        lfs_cv_sys_mknod_addr="${lfs_cv_sys_mknod_addr:-no}"
+    ])
+    if test :${lfs_cv_sys_mknod_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_MKNOD_ADDR], [$lfs_cv_sys_mknod_addr],
+        [The symbol sys_mknod is not exported by most kernels.  Define this to
+        the address of sys_mknod in the kernel system map so that LiS
+        compatibility can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable sys_umount address], [lfs_cv_sys_umount_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_sys_umount_addr=`($EGREP '\<sys_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_sys_umount_addr="${lfs_cv_sys_umount_addr:+0x}$lfs_cv_sys_umount_addr"
+        lfs_cv_sys_umount_addr="${lfs_cv_sys_umount_addr:-no}"
+    ])
+    if test :${lfs_cv_sys_umount_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_UMOUNT_ADDR], [$lfs_cv_sys_umount_addr],
+        [The symbol sys_umount is not exported by most kernels.  Define this
+        to the address of sys_umount in the kernel system map so that LiS
+        compatibility can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable sys_mount address], [lfs_cv_sys_mount_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_sys_mount_addr=`($EGREP '\<sys_mount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_sys_mount_addr="${lfs_cv_sys_mount_addr:+0x}$lfs_cv_sys_mount_addr"
+        lfs_cv_sys_mount_addr="${lfs_cv_sys_mount_addr:-no}"
+    ])
+    if test :${lfs_cv_sys_mount_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_MOUNT_ADDR], [$lfs_cv_sys_mount_addr],
+        [The symbol sys_mount is not exported by most kernels.  Define this to
+        the address of sys_mount in the kernel system map so that LiS
+        compatibility can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable pcibios_init address], [lfs_cv_pcibios_init_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_pcibios_init_addr=`($EGREP '\<pcibios_init' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_pcibios_init_addr="${lfs_cv_pcibios_init_addr:+0x}$lfs_cv_pcibios_init_addr"
+        lfs_cv_pcibios_init_addr="${lfs_cv_pcibios_init_addr:-no}"
+    ])
+    if test :${lfs_cv_pcibios_init_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_PCIBIOS_INIT_ADDR], [$lfs_cv_pcibios_init_addr],
+        [The symbol pcibios_init is not exported by most kernels.  Define this
+        to the address of pcibios_init in the kernel system map so that LiS
+        compatibility can be properly supported.])
+    fi
+])# _LFS_CONFIG_LIS
+# =========================================================================
+
+# =========================================================================
+_LFS_CONFIG_LFS
+# -------------------------------------------------------------------------
+# symbols to rip for Linux Fast STREAMS
+# -------------------------------------------------------------------------
+# file_move             <-- extern, declared in <linux/fs.h>
+# open_softirq          <-- extern, declared in <linux/interrupt.h>
+# sock_readv_writev     <-- extern, declared in <linux/net.h>
+# -------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG_LFS], [dnl
+    AC_CACHE_CHECK([for usable file_move address], [lfs_cv_file_move_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_file_move_addr=`($EGREP '\<file_move' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_file_move_addr="${lfs_cv_file_move_addr:+0x}$lfs_cv_file_move_addr"
+        lfs_cv_file_move_addr="${lfs_cv_file_move_addr:-no}"
+    ])
+    if test :${lfs_cv_file_move_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_FILE_MOVE_ADDR], [$lfs_cv_file_move_addr],
+        [The symbol file_move is not exported by most kernels.  Define this to
+        the address of file_move in the kernel system map so that Linux
+        Fast-STREAMS can be properly supported.])
+    fi
+    AC_CACHE_CHECK([for usable open_softirq address], [lfs_cv_open_softirq_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_open_softirq_addr=`($EGREP '\<open_softirq' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_open_softirq_addr="${lfs_cv_open_softirq_addr:+0x}$lfs_cv_open_softirq_addr"
+        lfs_cv_open_softirq_addr="${lfs_cv_open_softirq_addr:-no}"
+    ])
+    if test :${lfs_cv_open_softirq_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_OPEN_SOFTIRQ_ADDR], [$lfs_cv_open_softirq_addr],
+        [The symbol open_softirq is not exported by most kernels.  Define this to
+        the address of open_softirq in the kernel system map so that Linux
+        Fast-STREAMS can be properly supported.])
+    else
+        AC_MSG_ERROR([
+*** 
+*** Compiling Linux Fast STREAMS requires the availability of the kernel
+*** symbol open_softirq so that the necessary software IRQs can be
+*** established.  This symbol is not normally exported from the kernel.
+*** I have looked in "${linux_cv_k_sysmap:-(no sysmap)}" for the symbol
+*** and cannot find it.  This problem needs to be corrected or workaround
+*** found before you can compile Linux Fast STREAMS for the system for
+*** which it is being configured.
+*** 
+        ])
+    fi
+    AC_CACHE_CHECK([for usable sock_readv_writev address], [lfs_cv_sock_readv_writev_addr], [dnl
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            lfs_cv_sock_readv_writev_addr=`($EGREP '\<sock_readv_writev' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+        fi
+        lfs_cv_sock_readv_writev_addr="${lfs_cv_sock_readv_writev_addr:+0x}$lfs_cv_sock_readv_writev_addr"
+        lfs_cv_sock_readv_writev_addr="${lfs_cv_sock_readv_writev_addr:-no}"
+    ])
+    if test :${lfs_cv_sock_readv_writev_addr:-no} != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SOCK_READV_WRITEV_ADDR], [$lfs_cv_sock_readv_writev_addr],
+        [The symbol sock_readv_writev is not exported by most kernels.  Define this to
+        the address of sock_readv_writev in the kernel system map so that Linux
+        Fast-STREAMS can be properly supported.])
+    fi
+])# _LFS_CONFIG_LFS
 # =========================================================================
 
 dnl =========================================================================

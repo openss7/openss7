@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/01 00:08:40 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/02 00:47:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 00:08:40 $ by $Author: brian $
+ Last Modified $Date: 2004/03/02 00:47:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/01 00:08:40 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/02 00:47:23 $"
 
-static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/03/01 00:08:40 $";
+static char const ident[] =
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/03/02 00:47:23 $";
 
 #define __NO_VERSION__
 
@@ -79,11 +80,34 @@ static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.
 
 #include "strattach.h"
 
-long do_fattach(const struct file *file, const char *file_name)
+#if defined HAVE_KERNEL_FATTACH_SUPPORT
+
+#if defined HAVE_MOUNT_SEM_ADDR
+#define mount_sem (*((struct semaphore *)HAVE_MOUNT_SEM_ADDR))
+#endif
+
+#if defined HAVE_CLONE_MNT_ADDR
+static struct vfsmount *(*clone_mnt) (struct vfsmount * old, struct dentry * root)
+    = (typeof(clone_mnt)) HAVE_CLONE_MNT_ADDR;
+#endif
+#if defined HAVE_CHECK_MNT_ADDR
+static int (*check_mnt) (struct vfsmount * mnt)
+    = (typeof(check_mnt)) HAVE_CHECK_MNT_ADDR;
+#endif
+#if defined HAVE_GRAFT_TREE_ADDR
+static int (*graft_tree) (struct vfsmount * mnt, struct nameidata * nd)
+    = (typeof(graft_tree)) HAVE_GRAFT_TREE_ADDR;
+#endif
+#if defined HAVE_DO_UMOUNT_ADDR
+static int (*do_umount) (struct vfsmount * mnt, int flags)
+    = (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
+#endif
+
+long
+do_fattach(const struct file *file, const char *file_name)
 {
-	/* very much like do_add_mount() but with different permissions and
-	   clone_mnt() of the file instead of do_kern_mount() of the filesystem 
-	   root */
+	/* very much like do_add_mount() but with different permissions and clone_mnt() of the file 
+	   instead of do_kern_mount() of the filesystem root */
 	struct nameidata nd;
 	struct vfsmount *mnt;
 	int err;
@@ -101,8 +125,7 @@ long do_fattach(const struct file *file, const char *file_name)
 
 	err = -EPERM;
 	/* the owner of the file is permitted to fattach */
-	if (!capable(CAP_SYS_ADMIN) &&
-	    current->uid != file->f_dentry->d_inode->i_uid)
+	if (!capable(CAP_SYS_ADMIN) && current->uid != file->f_dentry->d_inode->i_uid)
 		goto release;
 
 	err = -ENOMEM;
@@ -110,11 +133,12 @@ long do_fattach(const struct file *file, const char *file_name)
 	if (!mnt)
 		goto release;
 
-#ifdef HAVE_TASK_NAMESPACE_SEM
-	down(&current->namespace->sem);
+#if defined HAVE_TASK_NAMESPACE_SEM
+	down_write(&current->namespace->sem);
 #else
 	down(&mount_sem);
 #endif
+
 	/* Something was mounted here while we slept */
 	while (d_mountpoint(nd.dentry) && follow_down(&nd.mnt, &nd.dentry)) ;
 
@@ -130,20 +154,21 @@ long do_fattach(const struct file *file, const char *file_name)
 	mnt->mnt_flags = 0;
 	err = graft_tree(mnt, &nd);
 
-unlock:
-#ifdef HAVE_TASK_NAMESPACE_SEM
-	up(&current->namespace->sem);
+      unlock:
+#if defined HAVE_TASK_NAMESPACE_SEM
+	up_write(&current->namespace->sem);
 #else
 	up(&mount_sem);
 #endif
 	mntput(mnt);
-release:
+      release:
 	path_release(&nd);
-out:
+      out:
 	return err;
 }
 
-long do_fdetach(const char *file_name)
+long
+do_fdetach(const char *file_name)
 {
 	/* pretty much the same as sys_umount() with different permissions */
 	struct nameidata nd;
@@ -168,14 +193,15 @@ long do_fdetach(const char *file_name)
 
 	err = -EPERM;
 	/* the owner of the (real) file is permitted to fdetach */
-	if (!capable(CAP_SYS_ADMIN) &&
-	    current->uid != nd.mnt->mnt_mountpoint->d_inode->i_uid)
+	if (!capable(CAP_SYS_ADMIN) && current->uid != nd.mnt->mnt_mountpoint->d_inode->i_uid)
 		goto release;
 
 	err = do_umount(nd.mnt, MNT_DETACH);
 
-release:
+      release:
 	path_release(&nd);
-out:
+      out:
 	return err;
 }
+
+#endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */

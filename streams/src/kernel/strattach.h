@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strattach.h,v 0.9.2.1 2004/03/01 00:08:40 brian Exp $
+ @(#) $Id: strattach.h,v 0.9.2.2 2004/03/02 00:47:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,25 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/03/01 00:08:40 $ by $Author: brian $
+ Last Modified $Date: 2004/03/02 00:47:23 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRATTACH_H__
 #define __LOCAL_STRATTACH_H__
 
-/*
-   The following symbols have to be ripped.
- */
-#ifndef HAVE_TASK_NAMESPACE_SEM
-extern struct semaphore mount_sem;
-#endif
-struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root);
-int check_mnt(struct vfsmount *mnt);
-int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
-int do_umount(struct vfsmount *mnt, int flags);
-
+#if defined HAVE_KERNEL_FATTACH_SUPPORT
 long do_fattach(const struct file *file, const char *file_name);
 long do_fdetach(const char *file_name);
+#endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */
 
 #endif				/* __LOCAL_STRATTACH_H__ */
