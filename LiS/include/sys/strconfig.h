@@ -34,7 +34,7 @@
 #ifndef _LIS_CONFIG_H
 #define _LIS_CONFIG_H 1
 
-#ident "@(#) LiS strconfig.h 2.3 02/08/01 21:24:53 "
+#ident "@(#) LiS strconfig.h 2.4 01/13/04 09:29:50 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -97,8 +97,13 @@
 #endif
 #define	LIS_NAMESZ	64	/* LiS internal name length */
 
+#ifdef KERNEL_2_5		/* 2.5/2.6 kernel */
+#define MAX_STRDEV	1024	/*Max # of stream devices */
+#define MAX_STRMOD	256	 /* Max # of stream modules */
+#else
 #define MAX_STRDEV	MAX_CHRDEV /*Max # of stream devices */
 #define MAX_STRMOD	MAX_CHRDEV /* Max # of stream modules */
+#endif
 #define MAX_STRAMOD	8	/* max # of autopushed mods per str */
 #define MAX_APUSH       8	/* max # of autopushed mods */
 #ifdef __KERNEL__
