@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.4 $) $Date: 2005/03/22 02:28:23 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2005/03/22 12:41:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/22 02:28:23 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 12:41:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,6 +61,7 @@ mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
 
 rootdir = @rootdir@
 kversion = @kversion@
+krelease = @krelease@
 kmoduledir = @kmoduledir@
 
 prefix = @prefix@
@@ -93,8 +94,8 @@ name = $(PACKAGE)
 kernel_version=@kversion@
 kernel_number=$(shell echo $(kversion) | sed -e s'|-.*$||')
 kernel_release=$(shell echo $(kversion) | sed -e s'|-|.|g')
-core_name = core-$(kversion)
-info_name = info-$(kversion)
+core_name = core-$(kversion)-$(krelease)
+info_name = info-$(kversion)-$(krelease)
 epoch = @PACKAGE_RPMEPOCH@
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
@@ -118,28 +119,28 @@ have_preloads = 0
 
 pkg_control_files =
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install
+pkg_control_files += debian/$(PACKAGE_LCNAME)-$(core_name).install
 
-debian/$(PACKAGE_LCNAME)-core-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-$(core_name).install:
 	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install
+@WITH_KO_MODULES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-$(info_name).install
 
-debian/$(PACKAGE_LCNAME)-info-$(kversion)-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-$(info_name).install:
 	( echo '$(mytmpdir)$(pkgincludedir)/$(kversion)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install
+pkg_control_files += debian/$(PACKAGE_LCNAME)-lib.install
 
-debian/$(PACKAGE_LCNAME)-lib-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-lib.install:
 	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
 	  echo '$(mytmpdir)$(libdir)/*.la' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.docs
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs:
+debian/$(PACKAGE_LCNAME)-doc.docs:
 	( echo "AUTHORS" ; \
 	  echo "ChangeLog" ; \
 	  echo "COPYING" ; \
@@ -150,39 +151,39 @@ debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs:
 	  echo "manual" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.manpages
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages:
+debian/$(PACKAGE_LCNAME)-doc.manpages:
 	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
-@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install
+@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.install
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.info
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info:
+debian/$(PACKAGE_LCNAME)-doc.info:
 	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install
+pkg_control_files += debian/$(PACKAGE_LCNAME)-devel.install
 
-debian/$(PACKAGE_LCNAME)-devel-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-devel.install:
 	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
 	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-#pkg_control_files += debian/$(PACKAGE_LCNAME)-source-$(VERSION).install
+#pkg_control_files += debian/$(PACKAGE_LCNAME)-source.install
 
-#debian/$(PACKAGE_LCNAME)-source-$(VERSION).install:
+#debian/$(PACKAGE_LCNAME)-source.install:
 #	( echo '$(mytmpdir)/usr/src/*' ) \
 #	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-util-$(VERSION).install
+pkg_control_files += debian/$(PACKAGE_LCNAME)-util.install
 
-debian/$(PACKAGE_LCNAME)-util-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-util.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ; \
 	  echo '$(mytmpdir)$(libexecdir)/*' ) \
@@ -224,7 +225,7 @@ build-stamp:
 		--mandir=$(mandir) \
 		--infodir=$(infodir) \
 		--disable-maintainer-mode \
-		--enable-dependency-tracking \
+		--disable-dependency-tracking \
 		--with-gnu-ld \
 		--with-k-release=$(kversion) \
 		--with-k-modules=$(kmoduledir) \
@@ -299,6 +300,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.5  2005/03/22 12:41:42  brian
+# - good debian builds with dependencies
+#
 # Revision 1.1.4.4  2005/03/22 02:28:23  brian
 # - a workable set of debian rules
 #

@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/03/17 14:26:46 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/03/22 12:38:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/17 14:26:46 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 12:38:10 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,18 +81,18 @@ if BUILD_DPKG
 # number onto the upstream version, but with a period instead of a dash to suppress warnings from
 # dpkg-source.
 ##
-debianpkg		= $(PACKAGE_LCNAME)-$(VERSION)_$(PACKAGE_DEBRELEASE)
-debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)-$(PACKAGE_DEBRELEASE)
-debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE_LCNAME)-$(VERSION)-$(PACKAGE_DEBRELEASE)
+debianpkg		= $(PACKAGE_LCNAME)_$(VERSION)-$(PACKAGE_DEBRELEASE)
+debian_dir		= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)
+debian_dir_stamp	= $(PACKAGE_DEBTOPDIR)/stamp-$(PACKAGE_LCNAME)-$(VERSION)
 debian_dsc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc
 debian_sig_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).dsc.sig
 debian_chg_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes
 debian_asc_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg)_%.changes.asc
 debian_tar_file		= $(PACKAGE_DEBTOPDIR)/$(debianpkg).tar.gz
 debian_source_files	= $(debian_dsc_file) $(debian_tar_file) $(debian_sig_file)
-debian_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(PACKAGE_DEBRELEASE)_*.deb
-debian_change_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)_*.changes \
-			  $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-$(VERSION)_*.changes.asc
+debian_binary_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*.deb
+debian_change_files	= $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes \
+			  $(PACKAGE_DEBTOPDIR)/$(PACKAGE_LCNAME)_$(VERSION)-*.changes.asc
 
 RELEASE_DIRECTORIES	+= $(PACKAGE_DEBTOPDIR)
 
@@ -108,7 +108,10 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(PACKAGE_D
 	rm -rf $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir)
 	$(mkdir_p) $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)
 	$(GZIP_CMD) -dc $< | tar xf - -C $(PACKAGE_DEBTOPDIR)
-	mv -f $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir)
+	@if test "$(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION)" != "$(debian_dir)" ; then \
+		$(ECHO) "mv -f $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir)" ; \
+		mv -f $(PACKAGE_DEBTOPDIR)/$(PACKAGE)-$(VERSION) $(debian_dir) ; \
+	fi
 	touch $(debian_dir_stamp)
 
 ##

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/03/22 02:28:26 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/03/22 12:41:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/22 02:28:26 $ by $Author: brian $
+## Last Modified $Date: 2005/03/22 12:41:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -100,54 +100,54 @@ pkg_lfs_control_files =
 
 pkg_control_files =
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.docs
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).docs:
-	( echo "ACKNWLDGMNTS" ; \
-	  echo "AUTHORS" ; \
+debian/$(PACKAGE_LCNAME)-doc.docs:
+	( echo "AUTHORS" ; \
 	  echo "ChangeLog" ; \
 	  echo "COPYING" ; \
-	  echo "COPYRIGHT" ; \
 	  echo "INSTALL" ; \
-	  echo "netperf_hp.ps" ; \
 	  echo "NEWS" ; \
 	  echo "README" ; \
+	  echo "THANKS" ; \
+	  echo "ACKNWLDGMNTS" ; \
+	  echo "COPYRIGHT" ; \
+	  echo "netperf_hp.ps" ; \
 	  echo "README.ovms" ; \
 	  echo "Release_Notes" ; \
-	  echo "THANKS" ; \
 	  echo "netperf.pdf" ; \
 	  echo "netperf.html" ; \
 	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.manpages
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).manpages:
+debian/$(PACKAGE_LCNAME)-doc.manpages:
 	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
-@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install
+@COOKED_MANPAGES_FALSE@pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.install
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-doc.install:
 	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
 	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_lis_control_files += debian/$(PACKAGE_LCNAME)-lis-$(VERSION).install
+pkg_lis_control_files += debian/$(PACKAGE_LCNAME)-lis.install
 
-debian/$(PACKAGE_LCNAME)-lis-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-lis.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_lfs_control_files += debian/$(PACKAGE_LCNAME)-streams-$(VERSION).install
+pkg_lfs_control_files += debian/$(PACKAGE_LCNAME)-streams.install
 
-debian/$(PACKAGE_LCNAME)-streams-$(VERSION).install:
+debian/$(PACKAGE_LCNAME)-streams.install:
 	( echo '$(mytmpdir)$(bindir)/*' ; \
 	  echo '$(mytmpdir)$(sbindir)/*' ) \
 	| sed -r -e 's|^($(mytmpdir)/(.*))$$|\1 \2|;s|/[^/]*$$|/|' > $@
 
-pkg_control_files += debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info
+pkg_control_files += debian/$(PACKAGE_LCNAME)-doc.info
 
-debian/$(PACKAGE_LCNAME)-doc-$(VERSION).info:
+debian/$(PACKAGE_LCNAME)-doc.info:
 	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
 
 cache_file=$(PACKAGE_DEBTOPDIR)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
@@ -354,10 +354,10 @@ binary-indep: build install
 
 # Build architecture-dependent files here.
 binary-lis: build-lis install-lis
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis binary-common
 
 binary-lfs: build-lfs install-lfs
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(VERSION) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams binary-common
 
 binary-arch: binary-lis binary-lfs
 
@@ -373,6 +373,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.2.5  2005/03/22 12:41:45  brian
+# - good debian builds with dependencies
+#
 # Revision 1.1.2.4  2005/03/22 02:28:26  brian
 # - a workable set of debian rules
 #

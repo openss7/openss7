@@ -1,41 +1,48 @@
-Source: @PACKAGE_LCNAME@-@VERSION@
+Source: @PACKAGE_LCNAME@
 Section: devel
 Priority: optional
 Maintainer: Brian Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
+Build-Depends: kernel-source-@knumber@ (>= @krelease@), kernel-headers-@kversion@ (= @krelease@), modutils (>= 2.4.12), gcc (>= 2.95.3),
+ groff (>= 1.17.2), groff-base (>= 1.17.2), gzip (>= 1.3.2), texinfo (>= 4.0),
+ tetex-base (>=1.0), tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-core-@kversion@-@VERSION@
+Package: @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@, @PACKAGE_LCNAME@-core-@kversion@-@VERSION@
+Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@
+Depends: kernel-image-@kversion@ (= @krelease@)
+Pre-Depends: kernel-image-@kversion@ (= @krelease@)
 Description: Core kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_TITLE@ Linux/BSD NET4
  protocol modules.
  These binaries are heavily tied to the kernel for which they were compiled:
  applies to kernel version @kversion@.
 
-Package: @PACKAGE_LCNAME@-util-@VERSION@
+Package: @PACKAGE_LCNAME@-util
 Architecture: any
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-util
+Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-0)
 Description: Utitlity and test programs for @PACKAGE_TITLE@
  Adminstration and configuration test utilities and commands for
  @PACKAGE_TITLE@; also init scripts and configuration files.
 
-Package: @PACKAGE_LCNAME@-devel-@VERSION@
+Package: @PACKAGE_LCNAME@-devel
 Architecture: any
 Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-devel
+Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-0)
 Description: C headers and static libraries for @PACKAGE_TITLE@
  Static libraries and kernel headers to develop @PACKAGE_TITLE@ modules and
  drivers; user-space headers and static libraries required to compile
  @PACKAGE_TITLE@ applications programs;  all @PACKAGE_TITLE@ manual pages and
  info files for both kernel and user-space functions.
 
-Package: @PACKAGE_LCNAME@-doc-@VERSION@
+Package: @PACKAGE_LCNAME@-doc
 Architecture: all
 Section: doc
 Priority: optional
@@ -44,7 +51,7 @@ Description: Documentation and man pages for @PACKAGE_TITLE@
  Pdf and html documentation for installation and the development of
  @PACKAGE_TITLE@ applications, modules and drivers.
 
-Package: @PACKAGE_LCNAME@-source-@VERSION@
+Package: @PACKAGE_LCNAME@-source
 Architecture: all
 Section: devel
 Priority: optional

@@ -1,4 +1,4 @@
-lis-2.18.1 (0) experimental; urgency=low
+lis (2.18.1-0) experimental; urgency=low
 
   * Changed to lower case names to satisfy debian policy.
 
