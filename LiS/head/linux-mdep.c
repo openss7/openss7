@@ -43,7 +43,7 @@
  *    also reworked, for same purpose.
  */
 
-#ident "@(#) LiS linux-mdep.c 2.99 3/10/03 16:28:24 "
+#ident "@(#) LiS linux-mdep.c 2.101 3/20/03 19:47:24 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -3885,7 +3885,7 @@ int	lis_thread_func(void *argp)
  * Start the thread with "fcn(arg)" as the entry point.  Return the pid for the
  * new process, or < 0 for error.
  */
-int	lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
+pid_t	lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
 {
     arg_t	*argp ;
 
@@ -3903,6 +3903,13 @@ int	lis_thread_start(int (*fcn)(void *), void *arg, const char *name)
 
     return(kernel_thread(lis_thread_func, (void *) argp, 0)) ;
 }
+
+int
+lis_thread_stop(pid_t pid)
+{
+    return(kill_proc(pid, SIGTERM, 1));
+}
+
 
 /************************************************************************
 *                       Queue Running                                   *

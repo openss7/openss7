@@ -26,7 +26,7 @@
  * 
  */
 
-#ident "@(#) LiS exports.c 1.9 3/10/03"
+#ident "@(#) LiS exports.c 1.10 3/20/03"
 
 #ifdef MODVERSIONS
 # ifdef LISMODVERS
@@ -384,6 +384,7 @@ EXPORT_SYMBOL(lis_strstats);
 EXPORT_SYMBOL(lis_strwrite);
 EXPORT_SYMBOL(lis_testb);
 EXPORT_SYMBOL(lis_thread_start);
+EXPORT_SYMBOL(lis_thread_stop);
 EXPORT_SYMBOL(lis_timeout_fcn);
 EXPORT_SYMBOL(lis_udelay);
 EXPORT_SYMBOL(lis_umount2);

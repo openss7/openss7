@@ -37,7 +37,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) LiS linux-mdep.h 2.50 12/18/02 20:36:11 "
+#ident "@(#) LiS linux-mdep.h 2.52 3/20/03 19:47:36 "
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -479,7 +479,8 @@ extern int	lis_kill_pg (int pgrp, int sig, int priv) ;
  * this returned value.  It particular, it is not visible to the thread that
  * started the new thread.
  */
-int     lis_thread_start(int (*fcn)(void *), void *arg, const char *name) ;
+pid_t   lis_thread_start(int (*fcn)(void *), void *arg, const char *name) ;
+int	lis_thread_stop(pid_t pid) ;
 
 #else				/* __KERNEL__ */
 

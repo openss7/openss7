@@ -435,7 +435,7 @@ function MM_swapImage() { //v3.0
       <blockquote>&nbsp;</blockquote>
       <hr width="100%">
       <h2> <a name="Introduction"></a><font face="Times New Roman,Times">Introduction</font></h2>
-      <p><br>
+      <p> <br>
         Linux STREAMS (LiS) provides for an interface between STREAMS drivers 
         and the surrounding kernel environment.&nbsp; This interface has grown 
         over time and is likely to expand in the future. 
@@ -749,7 +749,9 @@ void do_settimeofday( struct timeval *tp ) ; </pre>
         code.</p>
       <h4>Prototype</h4>
       <blockquote> 
-        <pre>int lis_thread_start(int (*fcn)(void *), void *arg, const char *name) ;</pre>
+        <pre>pid_t lis_thread_start(int (*fcn)(void *), void *arg, const char *name) ;
+int   lis_thread_stop(pid_t pid) ;
+</pre>
       </blockquote>
       <h4>Arguments</h4>
       <table width="75%">
@@ -807,6 +809,12 @@ void do_settimeofday( struct timeval *tp ) ; </pre>
         not clear that anything actually pays any attention to this returned value. 
         It particular, it is not visible to the thread that started the new thread. 
       </p>
+      <p><font face="Courier New, Courier, mono">lis_thread_start</font> itself 
+        returns the process id of the new thread, or a negative error number. 
+        This value can be used to kill the thread.</p>
+      <p><font face="Courier New, Courier, mono">lis_thread_stop</font> kills 
+        a thread started by <font face="Courier New, Courier, mono">lis_thread_start</font>. 
+        It returns 0 for success or a negative error number for failure.</p>
       <p><a href="#Contents">Back to Contents</a> </p>
       <hr size=1 width="60%">
       <h3><font face="Times New Roman,Times"><a name="majorminordev_t"></a>Major/Minor 
