@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.2 2004/08/30 06:19:38 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.3 2004/10/12 05:54:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 06:19:38 $ by $Author: brian $
+ Last Modified $Date: 2004/10/12 05:54:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
 
 /*
  *  Primitive definitions for TC-Users and TC-Providers.
@@ -340,7 +340,7 @@ typedef struct TC_begin_req TC_query_req;
  *  Also T_QUERY_IND for ANSI.
  */
 typedef struct TC_begin_ind {
-	ulong PRIM_type;		/* Always TC_BEGIN_REQ */
+	ulong PRIM_type;		/* Always TC_BEGIN_IND */
 	ulong SRC_length;		/* Source address length */
 	ulong SRC_offset;		/* Source address offset */
 	ulong DEST_length;		/* Destination address length */
