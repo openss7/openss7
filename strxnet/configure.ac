@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.4 2004/05/18 07:20:56 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.5 2004/05/19 20:07:57 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/18 07:20:56 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/19 20:07:57 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -77,13 +77,9 @@ AC_GNU_SOURCE
 dnl
 dnl Checks for programs.
 dnl
-AM_PROG_AS
-AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_CC_C_O
-AM_PROG_CC_STDC
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_PROG_LN_S
@@ -109,29 +105,18 @@ LIBS="$xnet_save_LIBS"
 dnl
 dnl Checks for header files.
 dnl
-AC_FUNC_ALLOCA
 AC_HEADER_STDC
-AC_HEADER_MAJOR
-AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h netinet/in.h memory.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h wchar.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h locale.h netinet/in.h stddef.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h values.h])
 
 dnl 
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl 
-AC_HEADER_STDBOOL
-AC_HEADER_STAT
 AC_C_CONST
-AC_TYPE_UID_T
 AC_C_INLINE
 AC_TYPE_MODE_T
-AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_CHECK_MEMBERS([struct stat.st_blksize])
-AC_STRUCT_ST_BLOCKS
-AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
-AC_C_VOLATILE
-AC_CHECK_TYPES([ptrdiff_t])
 
 dnl 
 dnl Checks for library functions.
@@ -142,18 +127,8 @@ AC_PROG_GCC_TRADITIONAL
 if test :"${cross_compiling-no}" != :yes ; then
 	AC_FUNC_MALLOC
 fi
-AC_FUNC_MMAP
-AC_FUNC_MEMCMP
-AC_FUNC_REALLOC
-AC_FUNC_SELECT_ARGTYPES
-if test :"${cross_compiling-no}" != :yes ; then
-	AC_FUNC_SETPGRP
-fi
-AC_TYPE_SIGNAL
-AC_FUNC_STAT
 AC_FUNC_STRNLEN
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo select setlocale stpcpy strcasecmp strchr strcspn strdup strerror strstr strrchr strtol strtoul])
+AC_CHECK_FUNCS([bzero gettimeofday memset strerror strtol])
 
 AC_XNET
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/19 20:10:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/18 07:14:12 $ by $Author: brian $
+ Last Modified $Date: 2004/05/19 20:10:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/19 20:10:17 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/19 20:10:17 $";
+
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
 
 #if !defined _LIS_SOURCE && !defined _LFS_SOURCE
 #   error ****
@@ -65,25 +69,50 @@ static char const ident[] =
 #ifdef LINUX
 #   include <linux/config.h>
 #   include <linux/version.h>
-#   ifdef MODVERSIONS
-#	include <linux/modversions.h>
-#   endif
-#   include <linux/module.h>
-#   include <linux/modversions.h>
-#   include <linux/init.h>
-#   ifndef __GENKSYMS__
-#	if defined HAVE_SYS_LIS_MOVERSIONS_H
-#	    include <sys/LiS/modversions.h>
-#	elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
-#	    include <sys/streams/modversions.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
 #	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
+#   endif
+#endif
+
+#ifdef LINUX
+#   include <linux/config.h>
+#   include <linux/version.h>
+#   ifndef HAVE_SYS_LIS_MODULE_H
+#	ifdef MODVERSIONS
+#	    include <linux/modversions.h>
+#	endif
+#	include <linux/module.h>
+#	include <linux/modversions.h>
+#	ifndef __GENKSYMS__
+#	    if defined HAVE_SYS_LIS_MOVERSIONS_H
+#		include <sys/LiS/modversions.h>
+#	    elif defined HAVE_SYS_STREAMS_MODVERSIONS_H
+#		include <sys/streams/modversions.h>
+#	    endif
+#	endif
+#	include <linux/init.h>
+#   else
+#	include <sys/LiS/module.h>
 #   endif
 #endif
 
 #include <sys/kmem.h>
 #include <sys/cmn_err.h>
 
-#include <sys/stropts.h>
 #include <sys/stream.h>
 
 #ifdef _LFS_SOURCE
@@ -106,7 +135,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/05/18 07:14:12 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/05/19 20:10:17 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

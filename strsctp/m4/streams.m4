@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.5 2004/05/18 07:14:09 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.7 2004/05/20 00:01:24 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/18 07:14:09 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/20 00:01:24 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -157,20 +157,33 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [
 *** 
         ])
     fi
+    AC_MSG_RESULT([${streams_cv_includes:-no}])
     # need to add arguments for LiS or LfS so they will be passed to rpm
+    AC_MSG_CHECKING([for added configure arguments])
     case "$streams_cv_package" in
         LiS)
             if test -z "$with_lis" ; then
-                ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
+                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lis"
+dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
             fi
+            AC_MSG_RESULT([--with-lis])
             ;;
         LfS)
             if test -z "$with_lfs" ; then
-                ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
+                PACKAGE_OPTIONS="${PACKAGE_OPTIONS}${PACKAGE_OPTIONS:+ }--with lfs"
+dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
             fi
+            AC_MSG_RESULT([--with-lis])
+            ;;
+        *)
+            AC_MSG_ERROR([
+***
+*** Configure script error.  Try specifying --with-lis or --with-lfs and
+*** run configure again.
+***
+            ])
             ;;
     esac
-    AC_MSG_RESULT([${streams_cv_includes:-no}])
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
     AM_CONDITIONAL([WITH_LIS], test :"${streams_cv_package:-LiS}" = :LiS)
@@ -233,8 +246,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
         streams_cv_xti_includes="$streams_dir"
     fi
     AC_MSG_RESULT([${streams_cv_xti_includes:-no}])
-    AC_CACHE_CHECK([for sys/LiS/modversions.h], [streams_cv_lis_modversions],
-    [
+    AC_CACHE_CHECK([for sys/LiS/modversions.h], [streams_cv_lis_modversions], [
         if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/sys/LiS/modversions.h" ; then
             streams_cv_lis_modversions='yes'
         else
@@ -245,6 +257,18 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
         AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [], [Define when the
             LiS release supports module versions such as the OpenSS7 autoconf
             release of LiS.])
+    fi
+    AC_CACHE_CHECK([for sys/LiS/module.h], [streams_cv_lis_module], [
+        if test -n "$streams_cv_lis_includes" -a -f "$streams_cv_lis_includes/sys/LiS/module.h" ; then
+            streams_cv_lis_module='yes'
+        else
+            streams_cv_lis_module='no'
+        fi
+    ])
+    if test :"${streams_cv_lis_module:-no}" != :no ; then
+        AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [], [Define when the LiS
+            release provides its own module.h file such as 2.17 GCOM LiS
+            releases.])
     fi
 ])# _LINUX_STREAMS_LIS_CHECK_HEADERS
 # =========================================================================
