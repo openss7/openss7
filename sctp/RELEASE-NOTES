@@ -1,6 +1,6 @@
 # *****************************************************************************
 # 
-# $Id: RELEASE-NOTES,v 0.9.2.8 2004/01/26 13:56:10 brian Exp $
+# $Id: RELEASE-NOTES,v 0.9.2.9 2004/02/09 21:24:13 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -45,9 +45,23 @@
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2004/01/26 13:56:10 $ by $Author: brian $
+# Last Modified $Date: 2004/02/09 21:24:13 $ by $Author: brian $
 # 
 # *****************************************************************************
+
+Release linux-sctp-0.2.19 (Prerelease2-19)
+
+	Bug fixes.  Corrected sendmsg waitloop hang.
+
+	Significant enhancements for performance, including:
+
+	- Send windowing rework.
+	- Update routes and choose best route reworked to weighting system.
+	- Correction to some minor TCP compatibility in sendmsg.
+	- Performance tested to theoretical maixmums on switched network.
+	- Reworked checksome somewhat and added missing checksum sysctl.
+	- Added gap logic to ingore gaps for fast-recovery when a preceding
+	  gap is closing. (Better mis-ordered packet handling.)
 
 Release linux-sctp-0.2.18 (Prerelease2-18)
 
