@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.14 2004/12/23 12:32:16 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.16 2004/12/24 12:13:16 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/12/23 12:32:16 $ by $Author: brian $
+dnl Last Modified $Date: 2004/12/24 12:13:16 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -240,8 +240,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/protocol.h>
 #include <net/inet_common.h>
     ])
-    _LINUX_CHECK_TYPES([struct sockaddr_storage,
-                        struct sctp_mib], [], [], [
+    _LINUX_CHECK_TYPES([struct sockaddr_storage], [], [], [
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -251,7 +250,6 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/sock.h>
 #include <net/udp.h>
 #include <net/tcp.h>
-#include <net/snmp.h>
     ])
     _LINUX_CHECK_MEMBERS([struct inet_protocol.protocol,
                           struct inet_protocol.no_policy,
@@ -274,7 +272,8 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/dst.h>
 #endif
     ])
-    _LINUX_KERNEL_SYMBOLS([icmp_err_convert,
+    _LINUX_KERNEL_SYMBOLS([afinet_get_info,
+                           icmp_err_convert,
                            icmp_statistics,
                            inet_bind,
                            inet_getname,
@@ -289,8 +288,19 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
                            ip_rt_update_pmtu,
                            ipsec_sk_policy,
                            ip_setsockopt,
+                           snmp_get_info,
+                           socket_get_info,
                            sysctl_ip_dynaddr,
                            sysctl_ip_nonlocal_bind,
+                           tcp_prot,
+                           udp_prot,
+                           raw_prot,
+                           tcp_memory_allocated,
+                           tcp_orphan_count,
+                           tcp_sockets_allocated,
+                           tcp_tw_count,
+                           ip_frag_nqueues,
+                           ip_frag_mem,
                            __xfrm_policy_check,
                            xfrm_policy_delete,
                            __xfrm_sk_clone_policy])
@@ -440,127 +450,87 @@ if (sizeof(((struct sock *)(0))->protinfo) < sizeof(((struct sock *)(0))->protin
 **** ])
             ;;
     esac
-    if test :$linux_cv_type_struct_sctp_mib = :yes ; then
-        _LINUX_CHECK_MEMBERS([struct sctp_mib.SctpRtoAlgorithm,
-                              struct sctp_mib.SctpRtoMin,
-                              struct sctp_mib.SctpRtoMax,
-                              struct sctp_mib.SctpRtoInitial,
-                              struct sctp_mib.SctpMaxAssoc,
-                              struct sctp_mib.SctpValCookieLife,
-                              struct sctp_mib.SctpMaxInitRetr,
-                              struct sctp_mib.SctpCurrEstab,
-                              struct sctp_mib.SctpActiveEstabs,
-                              struct sctp_mib.SctpPassiveEstabs,
-                              struct sctp_mib.SctpAborteds,
-                              struct sctp_mib.SctpShutdowns,
-                              struct sctp_mib.SctpOutOfBlues,
-                              struct sctp_mib.SctpChecksumErrors,
-                              struct sctp_mib.SctpOutCtrlChunks,
-                              struct sctp_mib.SctpOutOrderChunks,
-                              struct sctp_mib.SctpOutUnorderChunks,
-                              struct sctp_mib.SctpInCtrlChunks,
-                              struct sctp_mib.SctpInOrderChunks,
-                              struct sctp_mib.SctpInUnorderChunks,
-                              struct sctp_mib.SctpFragUsrMsgs,
-                              struct sctp_mib.SctpReasmUsrMsgs,
-                              struct sctp_mib.SctpOutSCTPPacks,
-                              struct sctp_mib.SctpInSCTPPacks,
-                              struct sctp_mib.SctpDiscontinuityTime], [], [], [
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/types.h>
-#include <linux/net.h>
-#include <linux/in.h>
-#include <linux/ip.h>
-#include <net/sock.h>
-#include <net/udp.h>
-#include <net/tcp.h>
-#include <net/snmp.h>
-                              ])
-    fi
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([add_wait_queue_exclusive])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([alloc_skb])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([create_proc_entry])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([del_timer])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([dev_base])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([do_softirq])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([free_pages])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__generic_copy_to_user])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__get_free_pages])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__get_user_4])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([icmp_err_convert])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_accept])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_add_protocol])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_addr_type])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_bind])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_del_protocol])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_family_ops])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_getname])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_getsockopt])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_ioctl])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_recvmsg])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_register_protosw])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_release])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_sendmsg])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_setsockopt])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_shutdown])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_stream_connect])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([inet_unregister_protosw])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_cmsg_recv])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_fragment])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_getsockopt])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_key])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__ip_select_ident])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_send_check])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_setsockopt])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([irq_stat])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([jiffies])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kfree])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__kfree_skb])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kill_pg])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kill_proc])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kmem_cache_alloc])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kmem_cache_create])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kmem_cache_free])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([kmem_find_general_cachep])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__lock_sock])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([mod_timer])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([net_statistics])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([nf_hooks])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([nf_hook_slow])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([num_physpages])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__out_of_line_bug])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([panic])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__pollwait])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([printk])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([proc_net])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([___pskb_trim])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([put_cmsg])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__release_sock])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([remove_proc_entry])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([remove_wait_queue])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([schedule_timeout])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([send_sig])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sk_alloc])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_clone])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_copy_datagram_iovec])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_linearize])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_over_panic])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_realloc_headroom])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([skb_under_panic])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sk_free])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sk_run_filter])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_mmap])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_sendpage])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_no_socketpair])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_wake_async])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sock_wfree])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sprintf])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([__wake_up])
+    _LINUX_KERNEL_EXPORTS([
+            add_wait_queue,
+            add_wait_queue_exclusive,
+            alloc_skb,
+            create_proc_entry,
+            del_timer,
+            dev_base,
+            do_softirq,
+            free_pages,
+            __generic_copy_to_user,
+            __get_free_pages,
+            __get_user_4,
+            inet_accept,
+            inet_add_protocol,
+            inet_addr_type,
+            inet_del_protocol,
+            inet_family_ops,
+            inet_getsockopt,
+            inet_recvmsg,
+            inet_register_protosw,
+            inet_release,
+            inet_sendmsg,
+            inet_setsockopt,
+            inet_shutdown,
+            inet_stream_connect,
+            inet_unregister_protosw,
+            ip_cmsg_recv,
+            ip_fragment,
+            ip_route_output_key,
+            __ip_select_ident,
+            ip_send_check,
+            irq_stat,
+            jiffies,
+            kfree,
+            __kfree_skb,
+            kill_pg,
+            kill_proc,
+            kmem_cache_alloc,
+            kmem_cache_create,
+            kmem_cache_free,
+            kmem_find_general_cachep,
+            __lock_sock,
+            mod_timer,
+            net_statistics,
+            nf_hooks,
+            nf_hook_slow,
+            num_physpages,
+            __out_of_line_bug,
+            panic,
+            __pollwait,
+            printk,
+            proc_net,
+            ___pskb_trim,
+            put_cmsg,
+            __release_sock,
+            remove_proc_entry,
+            remove_wait_queue,
+            schedule_timeout,
+            secure_tcp_sequence_number,
+            send_sig,
+            sk_alloc,
+            skb_clone,
+            skb_copy_datagram_iovec,
+            skb_linearize,
+            skb_over_panic,
+            skb_realloc_headroom,
+            skb_under_panic,
+            sk_free,
+            sk_run_filter,
+            sock_no_mmap,
+            sock_no_sendpage,
+            sock_no_socketpair,
+            sock_wake_async,
+            sock_wfree,
+            sprintf,
+            __wake_up], [], [dnl
+            AC_MSG_WARN([
+**** 
+**** Linux kernel symbol ']LK_Export[' should be exported but it
+**** isn't.  This could cause problems later.
+**** ])])
 ])# _SCTP_CHECK_KERNEL
 # =========================================================================
 

@@ -18,6 +18,11 @@ Things to do to convert to autoconf:
   It is lucky it is really in the wrong place: it should be in netinet/sctp.h
   for user programs.  That is where we install the header file.
 
+  *done*
+
+    Our header installs in netinet/sctp.h and has namespace polution
+    protection.
+
 - we need to override the struct sk_buff definition from linux/skbuff.h to
   include the sctphdr in the h (transport header) union.  We are in real
   trouble if the size of sctphdr exceeds the existing union.
@@ -74,14 +79,19 @@ Things to do to convert to autoconf:
 
   *done*
 
-    Instead of overriding, we just use as much of the defined mib as possible.
-    If no other mib is defined, we use our own from net/net_snmp.h
+    We override the mib definition with our own from net/net_snmp.h
 
 - we need to override struct sock in net/sock.h to include sctp_opt for
   af_sctp  On earlier kernels we can simply override the struct but must check
   that the tp_pinfo union has sufficient size for our definitions.  On latter
   kernels, lksctp includes there own definition here, but perhaps we can pull
   some "define" tricks when CONFIG_IP_SCTP_MODULE was set to override them.
+
+  *done*
+
+    tp_pinfo is too small, so I defined our sctp_opt structure to span both
+    tp_pinfo and protinfo private fields.  Configure checks that the spanning
+    is correct and that there is sufficient room in the overlaid structure.
 
 - unexported netsyms: we will have to rip the following symbols if not
   exported:
@@ -129,12 +139,26 @@ Things to do to convert to autoconf:
         EXPORT_SYMBOL(xfrm_policy_delete);
         EXPORT_SYMBOL(__xfrm_sk_clone_policy);
 
+	( even a longer list now... )
+
 - we need to figure out what to do net/ipv4/af_inet.c to get sctp to autoload
   correctly.  Also, we need to override any other loaded sctp.
+
+  *done*
+
+    We override lksctp by moving it out of the way to sctp_deprecated.  As far
+    as autoloading is concerned we will have to load it manually to begin
+    with.
+
 
 - lksctp doesn't adjust the ext_header_len in net/ipv4/ip_sockglue when IP
   options are set on the socket.  We might have to find some way to intercept
   socket option IP_OPTIONS.
+
+  *addressed*
+
+    IP layer will just have to pull up the sk_buff if there is not enough
+    headroom.
 
 - reporting snmp statistics.  lksctp doesn't do this right (i.e. netstat
   broken.)  Although we can generate our own sctp_get_info, we need to wrapper
@@ -144,9 +168,20 @@ Things to do to convert to autoconf:
   print our SCTP info first and then call the wrappered function for both
   snmp_get_info and afinet_get_info.
 
+  *done*
+
+    I wrappered both snmp_get_info and afinet_get_info and reload the new
+    version in the right place on module load and unload them afterward.
+    sctp_get_info is defined and loaded under /proc/net/sctp.
+
 - for sysctl we used to just add our entries to /proc/sys/net/ipv4 in the
   kernel  We might be able to just jam the ipv4_table pointer in net_table
   to point to a new table which includes the SCTP entries.
+
+  *done*
+
+    Entries added as before.  Indexes start at 200 to avoid conflict with
+    other entries at that level.
 
 ... And that's it.  Just add compile our sctp.c file with our headers.  The
     loading step might be the toughest.

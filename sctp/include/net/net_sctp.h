@@ -389,7 +389,7 @@ extern unsigned int __os7_sctp_poll(struct file *file, struct socket *sock, poll
 extern int __os7_sctp_listen(struct socket *sock, int backlog);
 
 extern struct proto *__os7_sctp_prot_hook;
-extern struct sctp_mib __os7_sctp_statistics[NR_CPUS * 2];
+extern struct __os7_sctp_mib __os7_sctp_statistics[NR_CPUS * 2];
 
 #define SCTP_INC_STATS(field)		SNMP_INC_STATS(__os7_sctp_statistics, field)
 #define SCTP_INC_STATS_BH(field)	SNMP_INC_STATS_BH(__os7_sctp_statistics, field)

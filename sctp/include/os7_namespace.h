@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: os7_namespace.h,v 0.9.2.1 2004/12/22 11:27:41 brian Exp $
+ @(#) $Id: os7_namespace.h,v 0.9.2.2 2004/12/24 12:04:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,37 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/22 11:27:41 $ by $Author: brian $
+ Last Modified $Date: 2004/12/24 12:04:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_OS7_NAMESPACE_H__
 #define __OS7_OS7_NAMESPACE_H__
 
-#ident "@(#) $RCSfile: os7_namespace.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: os7_namespace.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+
+#undef NET_SCTP_ADAPTATION_LAYER_INFO
+#undef NET_SCTP_ASSOC_MAX_RETRANS
+#undef NET_SCTP_COOKIE_INC
+#undef NET_SCTP_CSUM_TYPE
+#undef NET_SCTP_ECN
+#undef NET_SCTP_HEARTBEAT_ITVL
+#undef NET_SCTP_INIT_RETRIES
+#undef NET_SCTP_MAC_TYPE
+#undef NET_SCTP_MAX_BURST
+#undef NET_SCTP_MAX_ISTREAMS
+#undef NET_SCTP_MAX_SACK_DELAY
+#undef NET_SCTP_MEM
+#undef NET_SCTP_PARTIAL_RELIABILITY
+#undef NET_SCTP_PATH_MAX_RETRANS
+#undef NET_SCTP_REQ_OSTREAMS
+#undef NET_SCTP_RMEM
+#undef NET_SCTP_RTO_INITIAL
+#undef NET_SCTP_RTO_MAX
+#undef NET_SCTP_RTO_MIN
+#undef NET_SCTP_THROTTLE_ITVL
+#undef NET_SCTP_VALID_COOKIE_LIFE
+#undef NET_SCTP_WMEM
 
 #undef sctp_abort
 #undef sctp_add_ip
@@ -357,6 +380,29 @@
 #undef sctp_v4_err
 #undef sctp_v4_rcv
 
+#define NET_SCTP_ADAPTATION_LAYER_INFO	__OS7_NET_SCTP_ADAPTATION_LAYER_INFO
+#define NET_SCTP_ASSOC_MAX_RETRANS	__OS7_NET_SCTP_ASSOC_MAX_RETRANS
+#define NET_SCTP_COOKIE_INC		__OS7_NET_SCTP_COOKIE_INC
+#define NET_SCTP_CSUM_TYPE		__OS7_NET_SCTP_CSUM_TYPE
+#define NET_SCTP_ECN			__OS7_NET_SCTP_ECN
+#define NET_SCTP_HEARTBEAT_ITVL		__OS7_NET_SCTP_HEARTBEAT_ITVL
+#define NET_SCTP_INIT_RETRIES		__OS7_NET_SCTP_INIT_RETRIES
+#define NET_SCTP_MAC_TYPE		__OS7_NET_SCTP_MAC_TYPE
+#define NET_SCTP_MAX_BURST		__OS7_NET_SCTP_MAX_BURST
+#define NET_SCTP_MAX_ISTREAMS		__OS7_NET_SCTP_MAX_ISTREAMS
+#define NET_SCTP_MAX_SACK_DELAY		__OS7_NET_SCTP_MAX_SACK_DELAY
+#define NET_SCTP_MEM			__OS7_NET_SCTP_MEM
+#define NET_SCTP_PARTIAL_RELIABILITY	__OS7_NET_SCTP_PARTIAL_RELIABILITY
+#define NET_SCTP_PATH_MAX_RETRANS	__OS7_NET_SCTP_PATH_MAX_RETRANS
+#define NET_SCTP_REQ_OSTREAMS		__OS7_NET_SCTP_REQ_OSTREAMS
+#define NET_SCTP_RMEM			__OS7_NET_SCTP_RMEM
+#define NET_SCTP_RTO_INITIAL		__OS7_NET_SCTP_RTO_INITIAL
+#define NET_SCTP_RTO_MAX		__OS7_NET_SCTP_RTO_MAX
+#define NET_SCTP_RTO_MIN		__OS7_NET_SCTP_RTO_MIN
+#define NET_SCTP_THROTTLE_ITVL		__OS7_NET_SCTP_THROTTLE_ITVL
+#define NET_SCTP_VALID_COOKIE_LIFE	__OS7_NET_SCTP_VALID_COOKIE_LIFE
+#define NET_SCTP_WMEM			__OS7_NET_SCTP_WMEM
+
 #define sctp_abort			__os7_sctp_abort
 #define sctp_add_ip			__os7_sctp_add_ip
 #define SCTP_ADD_IP			__OS7_SCTP_ADD_IP
@@ -546,6 +592,7 @@
 #define SCTP_MAX_INIT_RETRIES		__OS7_SCTP_MAX_INIT_RETRIES
 #define SCTP_MAXSEG			__OS7_SCTP_MAXSEG
 #define SCTP_MAX_STATES			__OS7_SCTP_MAX_STATES
+#define sctp_mib			__os7_sctp_mib
 #define sctp_msg			__os7_sctp_msg
 #define SCTP_NODELAY			__OS7_SCTP_NODELAY
 #define sctp_no_mparm			__os7_sctp_no_mparm

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2004/12/22 11:26:11 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2004/12/24 12:04:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/22 11:26:11 $ by $Author: brian $
+# Last Modified $Date: 2004/12/24 12:04:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1458,16 +1458,15 @@ $2
 # =============================================================================
 
 # =============================================================================
-# _LINUX_KERNEL_SYMBOL_EXPORT(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
+# _LINUX_KERNEL_EXPORT_ONLY(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
 # -----------------------------------------------------------------------------
 # This checks for exported symbols before attempting to rip symbols from the
 # system maps.  The checks are made to try to find appropriate symbols first.
 # If we are configured for the running kernel and /proc/ksyms can be read, it
 # contains exported symbols and is used.  Otherwise, if a system map was located
-# it will be used.  Otherwise, header files will be checked.  If the symbol is
-# not exported, an attempt will be made to rip it from the system maps.
+# it will be used.  Otherwise, header files will be checked.
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
+AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
     AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])dnl
     AC_CACHE_CHECK([for kernel symbol $1 export], linux_symbol_export, [dnl
@@ -1507,10 +1506,31 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
             is exported by your kernel so that kernel modules can be supported
             properly.])
 $3
-    else :; _LINUX_KERNEL_SYMBOL_ADDR([$1], [$2], [$3])
+    else :;
+$2
     fi
     AS_VAR_POPDEF([linux_symbol_export])dnl
+])# _LINUX_KERNEL_EXPORT_ONLY
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_SYMBOL_EXPORT(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
+# -----------------------------------------------------------------------------
+# If the symbol is not exported, an attempt will be made to rip it from the
+# system maps.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_SYMBOL_EXPORT], [dnl
+    _LINUX_KERNEL_EXPORT_ONLY([$1], [_LINUX_KERNEL_SYMBOL_ADDR([$1], [$2], [$3])], [$3])
 ])# _LINUX_KERNEL_SYMBOL_EXPORT
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_EXPORTS(SYMBOLS, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_EXPORTS], [dnl
+    m4_foreach([LK_Export], [$1], [dnl
+        _LINUX_KERNEL_EXPORT_ONLY(LK_Export, [$3], [$2])])
+])# _LINUX_KERNEL_EXPORTS
 # =============================================================================
 
 # =============================================================================

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/12/24 12:56:24 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/12/24 18:30:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/12/24 12:56:24 $ by $Author: brian $
+# Last Modified $Date: 2004/12/24 18:30:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -168,13 +168,12 @@ Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
-The %{name} package includes kernel modules, libraries, utilities and
-development environment for the development and execution of System V Release
-4.2 MP STREAMS modules and drivers developed for Linux.  In addition (source)
-compatibility modules are provided for AIX, HP-UX, LiS, OSF, Solaris, SVR 4
-and UnixWare 7.  This distribution is only currently applicable to 2.4 kernels
-and was targetted at ix86 and ppc architectures, but should build and install
-for other architectures as well.
+The %{name} package includes kernel module, utilities, development environment
+and documentation for the development and execution of Stream Control
+Transmission Protocol (SCTP) socket programs developed for Linux.  This
+distribution is only currently applicable to 2.4 kernels and was targetted at
+ix86 and ppc architectures, but should build and install for other
+architectures as well.
 
 %prep
 # ---------------------------------------------------------------------------
@@ -341,11 +340,10 @@ Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{core_name}
-The %{name}-%{core_name} package contains the kernel modules that provide the
-Linux kernel SVR 4.2 MP STREAMS facility.  This also includes assorted basic
-STREAMS drivers and modules such as pipes, fifos, echo, etc.  This package is
-heavily tied to the kernel for which it was compiled.  This package applies to
-kernel version %{kernel_version}.
+The %{name}-%{core_name} package contains the kernel module that provides the
+Stream Control Transmission Protocol (SCTP) facility.  This package is heavily
+tied to the kernel for which it was compiled.  This package applies to kernel
+version %{kernel_version}.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
@@ -631,8 +629,11 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.6  2004/12/24 12:56:24  brian
-# - Get a few things in the right places.
+# Revision 0.9.2.7  2004/12/24 18:30:12  brian
+# - Updated descriptions.
+#
+# Revision 1.7  2004/12/24 18:30:12  brian
+# - Updated descriptions.
 #
 # Revision 1.6  2004/12/24 12:56:24  brian
 # - Get a few things in the right places.

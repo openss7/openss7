@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,15 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/23 12:21:07 $ by $Author: brian $
+ Last Modified $Date: 2004/12/24 12:25:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2004/12/23 12:21:07 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2004/12/24 12:25:42 $";
 
 #include <linux/config.h>
+#include <linux/version.h>
+#ifdef MODVERSIONS
+#   include <linux/modversions.h>
+#endif
+#include <linux/module.h>
+#include <linux/modversions.h>
 #include <linux/sysctl.h>
 #include <linux/types.h>
 #include <linux/fcntl.h>
@@ -100,12 +106,13 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $
 #include <linux/netfilter_ipv4.h>
 
 #include "include/linux/hooks.h"
+#include "include/linux/linux_sysctl.h"
 #include "include/net/net_sctp.h"
 #include "include/net/net_sock.h"
 #include "include/net/net_snmp.h"
 #include "include/os7_namespace.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.9 $)" "\n" \
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.11 $)" "\n" \
 			"Part of the OpenSS7 Stack for Linux."
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
@@ -3471,9 +3478,7 @@ STATIC void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, struct sk_buff *skb)
 			sh->check = 0;
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum_generate(sh, plen));
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 			SCTP_INC_STATS(SctpOutSCTPPacks);
-#endif
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev,
 				sctp_queue_xmit);
 			return;
@@ -3548,9 +3553,7 @@ STATIC void sctp_xmit_msg(uint32_t saddr, uint32_t daddr, struct sk_buff *skb,
 			sh->check = 0;
 			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 				sh->check = htonl(cksum(sk, sh, plen));
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 			SCTP_INC_STATS(SctpOutSCTPPacks);
-#endif
 			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev,
 				sctp_queue_xmit);
 			return;
@@ -3705,9 +3708,7 @@ STATIC void sctp_send_msg(struct sock *sk, struct sctp_daddr *sd,
 		sh->check = 0;
 		if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
 			sh->check = htonl(cksum(sk, sh, plen));
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS
 		SCTP_INC_STATS(SctpOutSCTPPacks);
-#endif
 		NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, sctp_queue_xmit);
 		/* Whenever we transmit something, we expect a reply to our v_tag, so we put
 		   ourselves in the 1st level vtag caches expecting a quick reply. */
@@ -3949,9 +3950,7 @@ sctp_bundle_sack(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***s
 			e->ch.flags = 0;
 			e->ch.len = __constant_htons(sizeof(*e));
 			e->l_tsn = htonl(sp->l_lsn);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 			SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 		}
 #endif
 		sp->sackf &= ~SCTP_SACKF_ANY;
@@ -3961,9 +3960,7 @@ sctp_bundle_sack(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***s
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 		return (0);
 	}
       outstate:
@@ -4051,9 +4048,7 @@ STATIC INLINE int sctp_bundle_fsn(struct sock *sk, struct sctp_daddr *sd,
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 		return (0);
 	}
       outstate:
@@ -4097,9 +4092,7 @@ sctp_bundle_cwr(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***sp
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 		return (0);
 	}
       outstate:
@@ -4130,9 +4123,7 @@ sctp_bundle_error(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb ***
 		**spp = cb;
 		*spp = &cb->next;
 		cb->next = NULL;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 		SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -4221,9 +4212,7 @@ sctp_bundle_urgent(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb **
 		ensure(sk->wmem_queued > 0, sk->wmem_queued = 0);
 		skb_get(skb);
 		__skb_queue_tail(&sp->rtxq, skb);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTUNORDERCHUNKS
 		SCTP_INC_STATS(SctpOutUnorderChunks);
-#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -4270,9 +4259,7 @@ sctp_bundle_normal(struct sock *sk, struct sctp_daddr *sd, struct sctp_skb_cb **
 		ensure(sk->wmem_queued >= 0, sk->wmem_queued = 0);
 		skb_get(skb);
 		__skb_queue_tail(&sp->rtxq, skb);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTORDERCHUNKS
 		SCTP_INC_STATS(SctpOutOrderChunks);
-#endif
 	}
 	return (0);
       wait_for_next_packet:
@@ -5491,9 +5478,7 @@ STATIC int sctp_send_init(struct sock *sk)
 		pr->ph.len = __constant_htons(sizeof(*pr));
 	}
 #endif
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_mod_timer(&sp->timer_init, sd->rto);
 	abnormal(sp->retry);
 	sctp_change_state(sk, SCTP_COOKIE_WAIT);
@@ -5646,9 +5631,7 @@ sctp_send_init_ack(struct sock *sk, uint32_t saddr, uint32_t daddr,
 		up->ph.len = __constant_htons(ulen);
 		memcpy((up + 1), unrec->data, unrec->len);
 	}
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
 }
@@ -5675,9 +5658,7 @@ STATIC int sctp_send_cookie_echo(struct sock *sk, caddr_t kptr, size_t klen)
 	m->ch.flags = 0;
 	m->ch.len = htons(clen);
 	memcpy(skb_put(skb, PADC(klen)), kptr, klen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_change_state(sk, SCTP_COOKIE_ECHOED);
 	sctp_mod_timer(&sp->timer_cookie, sd->rto);
 	sctp_bundle_more(sk, sd, skb, 1);	/* don't nagle */
@@ -5715,9 +5696,7 @@ STATIC void sctp_send_cookie_ack(struct sock *sk, struct sk_buff *cp)
 	m->ch.type = SCTP_CTYPE_COOKIE_ACK;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	/* process data bundled with cookie echo on new socket */
 	if (sctp_return_more(cp) > 0) {
 		sctp_recv_msg(sk, skb_get(cp));
@@ -5767,9 +5746,7 @@ STATIC void sctp_send_heartbeat(struct sock *sk, struct sctp_daddr *sd)
 	h->hb_info.daddr = sd->daddr;
 	h->hb_info.mtu = sd->mtu;
 	memset(skb_put(skb, PADC(fill)), 0, fill);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
@@ -5799,9 +5776,7 @@ STATIC void sctp_send_heartbeat_ack(struct sock *sk, caddr_t hptr, size_t hlen)
 	m->ch.flags = 0;
 	m->ch.len = htons(clen);
 	memcpy(skb_put(skb, PADC(hlen)), hptr, hlen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
 	return;
@@ -5836,18 +5811,14 @@ STATIC void sctp_send_abort(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
       noroute:
 	if (sk->state != SCTP_LISTEN) {
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPABORTEDS
 		if (sk->state != SCTP_CLOSED)
 			SCTP_INC_STATS(SctpAborteds);
-#endif
 		sctp_change_state(sk, SCTP_CLOSED);
 	}
       notneeded:
@@ -5885,18 +5856,14 @@ STATIC void sctp_send_abort_error(struct sock *sk, int errn, void *aptr, size_t 
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
       enobufs:
       noroute:
 	if (sk->state != SCTP_LISTEN) {
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPABORTEDS
 		if (sk->state != SCTP_CLOSED)
 			SCTP_INC_STATS(SctpAborteds);
-#endif
 		sctp_change_state(sk, SCTP_CLOSED);
 	}
 	return;
@@ -5942,9 +5909,7 @@ STATIC int sctp_send_shutdown(struct sock *sk)
 	if (timer_pending(&sp->timer_asconf))
 		del_timer(&sp->timer_asconf);
 #endif
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_mod_timer(&sp->timer_shutdown, sd->rto);
 	/* SCTP IG 2.12 says 5 * RTO.Max but we do 5 * RTO */
 	if (sk->state != SCTP_SHUTDOWN_SENT)
@@ -5994,9 +5959,7 @@ STATIC int sctp_send_shutdown_ack(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_ACK;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	if (timer_pending(&sp->timer_sack))
 		del_timer(&sp->timer_sack);
 #ifdef CONFIG_SCTP_ADD_IP
@@ -6043,9 +6006,7 @@ STATIC void sctp_send_shutdown_complete(struct sock *sk)
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_COMPLETE;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_send_msg(sk, sd, skb);
 	freechunks(skb);
 	return;
@@ -6220,9 +6181,7 @@ STATIC void sctp_send_asconf(struct sock *sk)
 		}
 	}
 	sp->sackf &= ~SCTP_SACKF_ASC;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_bundle_more(sk, sd, skb, 1);
 	/* ADD-IP 4.1 (A4) */
 	sctp_mod_timer(&sp->timer_asconf, sd->rto);
@@ -6259,9 +6218,7 @@ STATIC void sctp_send_asconf_ack(struct sock *sk, caddr_t rptr, size_t rlen)
 	m->ch.len = htons(clen);
 	m->asn = ntohl(sp->p_asn++);
 	memcpy(m + 1, rptr, rlen);	/* copy in response TLVs */
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_bundle_more(sk, sd, skb, 1);
 	sctp_send_msg(sk, sd, skb);
 	freechunks(xchg(&sp->reply, skb));
@@ -6318,9 +6275,7 @@ void sctp_send_abort_ootb(uint32_t daddr, uint32_t saddr, struct sctphdr *sh)
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 1;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       noroute:
@@ -6355,9 +6310,7 @@ sctp_send_abort_error_ootb(uint32_t daddr, uint32_t saddr,
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       noerror:
@@ -6393,9 +6346,7 @@ void sctp_send_abort_init(struct sock *sk, uint32_t daddr, uint32_t saddr,
 	m->ch.type = SCTP_CTYPE_ABORT;
 	m->ch.flags = 0;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
       noroute:
@@ -6432,9 +6383,7 @@ STATIC void sctp_send_abort_error_init(struct sock *sk, uint32_t daddr,
 	eh->code = htons(errn);
 	eh->len = htons(elen);
 	memcpy(skb_put(skb, PADC(alen)), aptr, alen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_msg(saddr, daddr, skb, sk);
 	return;
       noerror:
@@ -6463,9 +6412,7 @@ STATIC void sctp_send_shutdown_complete_ootb(uint32_t daddr, uint32_t saddr,
 	m->ch.type = SCTP_CTYPE_SHUTDOWN_COMPLETE;
 	m->ch.flags = 1;
 	m->ch.len = __constant_htons(clen);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS
 	SCTP_INC_STATS(SctpOutCtrlChunks);
-#endif
 	sctp_xmit_ootb(daddr, saddr, skb);
 	return;
       enobufs:
@@ -6851,9 +6798,7 @@ STATIC void sctp_deliver_data(struct sock *sk, struct sk_buff *skb)
 						st->ssn = cb->ssn;
 					} else
 						st->n.more |= SCTP_STRMF_MORE;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINORDERCHUNKS
 					SCTP_INC_STATS(SctpInOrderChunks);
-#endif
 				} else {
 					__skb_queue_tail(&sp->expq, skp);
 					sctp_exdata_ind(sk, cb->dlen);
@@ -6861,9 +6806,7 @@ STATIC void sctp_deliver_data(struct sock *sk, struct sk_buff *skb)
 						st->x.more &= ~SCTP_STRMF_MORE;
 					else
 						st->x.more |= SCTP_STRMF_MORE;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINUNORDERCHUNKS
 					SCTP_INC_STATS(SctpInUnorderChunks);
-#endif
 				}
 				sp->nunds--;
 			} else {
@@ -7009,9 +6952,7 @@ STATIC int sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 					st->ssn = cb->ssn;
 				} else
 					st->n.more |= SCTP_STRMF_MORE;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINORDERCHUNKS
 				SCTP_INC_STATS(SctpInOrderChunks);
-#endif
 			} else {
 				__skb_queue_tail(&sp->expq, skd);
 				sctp_exdata_ind(sk, dlen);
@@ -7019,9 +6960,7 @@ STATIC int sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 					st->x.more &= ~SCTP_STRMF_MORE;
 				else
 					st->x.more |= SCTP_STRMF_MORE;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINUNORDERCHUNKS
 				SCTP_INC_STATS(SctpInUnorderChunks);
-#endif
 			}
 			sp->r_ack++;
 #ifdef CONFIG_SCTP_PARTIAL_RELIABILITY
@@ -8503,9 +8442,7 @@ STATIC int sctp_recv_cookie_ack(struct sock *sk, struct sk_buff *skb)
 	/* RFC 2960 5.1 (E) */
 	sctp_change_state(sk, SCTP_ESTABLISHED);
 	sctp_ack_calc(sk, &sp->timer_cookie);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPACTIVEESTABS
 	SCTP_INC_STATS_BH(SctpActiveEstabs);
-#endif
 	/* start idle timers */
 	usual(sp->daddr);
 	for (sd = sp->daddr; sd; sd = sd->next)
@@ -8715,9 +8652,7 @@ STATIC int sctp_recv_shutdown_ack(struct sock *sk, struct sk_buff *skb)
 	case SCTP_SHUTDOWN_ACK_SENT:
 //              sctp_ack_calc(sk, &SCTP_PROT(sk)->timer_shutdown);     /* WHY? */
 		sctp_send_shutdown_complete(sk);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPSHUTDOWNS
 		SCTP_INC_STATS_BH(SctpShutdowns);
-#endif
 		sctp_discon_ind(sk, 0);
 		break;
 	default:
@@ -8752,9 +8687,7 @@ STATIC int sctp_recv_shutdown_complete(struct sock *sk, struct sk_buff *skb)
 	switch (sk->state) {
 	case SCTP_SHUTDOWN_ACK_SENT:
 //              sctp_ack_calc(sk, &SCTP_PROT(sk)->timer_shutdown); /* WHY? */
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPSHUTDOWNS
 		SCTP_INC_STATS_BH(SctpShutdowns);
-#endif
 		sctp_discon_ind(sk, 0);
 		break;
 	default:
@@ -9295,9 +9228,7 @@ STATIC int sctp_recv_msg(struct sock *sk, struct sk_buff *skb)
 		case SCTP_CTYPE_COOKIE_ECHO:
 			break;
 		default:
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 			SCTP_INC_STATS_BH(SctpOutOfBlues);
-#endif
 			return sctp_rcv_ootb(skb);
 		}
 	}
@@ -9307,9 +9238,7 @@ STATIC int sctp_recv_msg(struct sock *sk, struct sk_buff *skb)
 		if ((type = ch->type) == SCTP_CTYPE_DATA) {
 			err = sctp_recv_data(sk, skb);
 		} else {
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINCTRLCHUNKS
 			SCTP_INC_STATS(SctpInCtrlChunks);
-#endif
 			switch (type) {
 			case SCTP_CTYPE_INIT:
 				err = sctp_recv_init(sk, skb);
@@ -10191,9 +10120,7 @@ STATIC struct sock *sctp_conn_res(struct sock *lsk, struct sk_buff *skb, int *er
 		atomic_read(&sctp_socket_count)));
 	sk->use_write_queue = 0;
 	sctp_send_cookie_ack(sk, skb);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPPASSIVEESTABS
 	SCTP_INC_STATS_USER(SctpPassiveEstabs);
-#endif
 	bh_unlock_sock(sk);
 	return sk;
       error:
@@ -11478,9 +11405,7 @@ STATIC int sctp_sendmsg(struct sock *sk, struct msghdr *msg, int len)
 				} else if (skb->len >= amps) {
 					*head = NULL;
 					sk->wmem_queued += PADC(skb->len);
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPFRAGUSRMSGS
 					SCTP_INC_STATS_USER(SctpFragUsrMsgs);
-#endif
 				}
 				continue;
 			} else {
@@ -11703,12 +11628,10 @@ STATIC int sctp_recvmsg(struct sock *sk, struct msghdr *msg, int len,
 #ifdef CONFIG_SCTP_TCP_COMPATIBLE
 					}
 #endif
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPREASMUSRMSGS
 				if (!(flags & MSG_CONFIRM))
 					if (!(cb)->flags & SCTPCB_FLAG_FIRST_FRAG)
 						SCTP_INC_STATS_USER
 						    (SctpReasmUsrMsgs);
-#endif
 			}
 #ifdef CONFIG_SCTP_TCP_COMPATIBLE
 			if (sk->type != SOCK_STREAM) {
@@ -11929,9 +11852,7 @@ STATIC int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 			bh_unlock_sock(nsk);
 			return (0);
 		}
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 		SCTP_INC_STATS_BH(SctpOutOfBlues);
-#endif
 #ifndef CONFIG_SCTP_DISCARD_OOTB
 		return sctp_rcv_ootb(skb);
 #endif
@@ -12512,9 +12433,7 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 	struct sctpchdr *ch = (typeof(ch)) skb_pull(skb, sizeof(*sh));
 	if (skb->pkt_type != PACKET_HOST)
 		goto bad_pkt_type;
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPINSCTPPACKS
 	SCTP_INC_STATS_BH(SctpInSCTPPacks);
-#endif
 	if (skb_is_nonlinear(skb) && skb_linearize(skb, GFP_ATOMIC) != 0)
 		goto linear_fail;
 	if (skb->len & 0x3)
@@ -12579,9 +12498,7 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: Chunk length incorrect\n"));
 	goto discard_it;
       bad_checksum:
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPCHECKSUMERRORS
 	SCTP_INC_STATS_BH(SctpChecksumErrors);
-#endif
 	ptrace(("ERROR: Bad checksum\n"));
 	goto discard_it;
       no_sctp_socket:
@@ -12596,9 +12513,7 @@ __SCTP_STATIC int sctp_v4_rcv(struct sk_buff *skb)
 		sh->check = htonl(skb->csum);
 	}
 	ptrace(("ERROR: Received OOTB packet\n"));
-#ifdef HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES
 	SCTP_INC_STATS_BH(SctpOutOfBlues);
-#endif
 #if defined HAVE___XFRM_POLICY_CHECK_EXPORT || defined HAVE___XFRM_POLICY_CHECK_ADDR
 	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb))
 		goto discard_it;
@@ -12838,6 +12753,83 @@ STATIC void get_sctp_sock(struct sock *sk, char *tmpbuf, int i)
 		atomic_read(&sk->refcnt), sk);
 }
 
+/*
+ *  Use this as a replacement for afinet_get_info.
+ */
+static int fold_prot_inuse(struct proto *proto)
+{
+	int res = 0;
+	int cpu;
+	for (cpu=0; cpu<smp_num_cpus; cpu++)
+		res += proto->stats[cpu_logical_map(cpu)].inuse;
+	return res;
+}
+__SCTP_STATIC int __os7_afinet_get_info(char *buffer, char **start, off_t offset, int length)
+{
+	int len = socket_get_info(buffer, start, offset, length);
+	len += sprintf(buffer+len,"SCTP: inuse %d orphan %d alloc %d\n",
+			fold_prot_inuse(&sctp_prot),
+			atomic_read(&sctp_orphan_count),
+			atomic_read(&sctp_socket_count));
+	len += sprintf(buffer+len,"TCP: inuse %d orphan %d tw %d alloc %d mem %d\n",
+		       fold_prot_inuse(&tcp_prot),
+		       atomic_read(&tcp_orphan_count), tcp_tw_count,
+		       atomic_read(&tcp_sockets_allocated),
+		       atomic_read(&tcp_memory_allocated));
+	len += sprintf(buffer+len,"UDP: inuse %d\n",
+		       fold_prot_inuse(&udp_prot));
+	len += sprintf(buffer+len,"RAW: inuse %d\n",
+		       fold_prot_inuse(&raw_prot));
+	len += sprintf(buffer+len, "FRAG: inuse %d memory %d\n",
+		       ip_frag_nqueues, atomic_read(&ip_frag_mem));
+	if (offset >= len)
+	{
+		*start = buffer;
+		return 0;
+	}
+	*start = buffer + offset;
+	len -= offset;
+	if (len > length)
+		len = length;
+	if (len < 0)
+		len = 0;
+	return len;
+}
+
+static unsigned long fold_field(unsigned long *begin, int sz, int nr)
+{
+	unsigned long res = 0;
+	int i;
+	sz /= sizeof(unsigned long);
+	for (i=0; i<smp_num_cpus; i++) {
+		res += begin[2*cpu_logical_map(i)*sz + nr];
+		res += begin[(2*cpu_logical_map(i)+1)*sz + nr];
+	}
+	return res;
+}
+__SCTP_STATIC int __os7_snmp_get_info(char *buffer, char **start, off_t offset, int length)
+{
+	int len = snmp_get_info(buffer, start, offset, length), i;
+	len += sprintf (buffer + len,
+		"Sctp: RtoAlgorithm RtoMin RtoMax RtoInitial MaxAssoc ValCookieLife MaxInitRetr CurrEstab ActiveEstabs PassiveEstabs Aborteds Shutdowns OutOfBlues ChecksumErrors OutCtrlChunks OutOrderChunks OutUnorderChunks InCtrlChunks InOrderChunks InUnorderChunks FragUsrMsgs ReasmUserMsgs OutSCTPPacks InSCTPPacks DiscontinuityTime\n"
+		  "Sctp:");
+	for (i=0; i<offsetof(struct sctp_mib, __pad)/sizeof(unsigned long); i++)
+		len += sprintf(buffer+len, " %lu", fold_field((unsigned long*)sctp_statistics, sizeof(struct sctp_mib), i));
+	len += sprintf (buffer + len, "\n");
+	if (offset >= len)
+	{
+		*start = buffer;
+		return 0;
+	}
+	*start = buffer + offset;
+	len -= offset;
+	if (len > length)
+		len = length;
+	if (len < 0)
+		len = 0; 
+	return len;
+}
+
 #define TMPSZ 150
 __SCTP_STATIC int sctp_get_info(char *buffer, char **start, off_t offset, int length)
 {
@@ -12901,6 +12893,82 @@ __SCTP_STATIC int sctp_get_info(char *buffer, char **start, off_t offset, int le
 	return len;
 }
 #endif				/* CONFIG_PROC_FS */
+
+#ifdef CONFIG_SYSCTL
+static struct sctp_sysctl_table
+{
+	struct ctl_table_header *sysctl_header;
+	ctl_table sctp_vars[23];
+	ctl_table sctp_proto_dir[2];
+	ctl_table sctp_root_dir[2];
+} sctp_sysctl = {
+	NULL,
+	{{NET_SCTP_RTO_INITIAL, "sctp_rto_initial",
+	 &sysctl_sctp_rto_initial, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 &sysctl_sctp_rto_min, &sysctl_sctp_rto_max},
+	{NET_SCTP_RTO_MIN, "sctp_rto_min",
+	 &sysctl_sctp_rto_min, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 NULL, &sysctl_sctp_rto_max},
+	{NET_SCTP_RTO_MAX, "sctp_rto_max",
+	 &sysctl_sctp_rto_max, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 &sysctl_sctp_rto_min, NULL},
+	{NET_SCTP_HEARTBEAT_ITVL, "sctp_heartbeat_itvl",
+	 &sysctl_sctp_heartbeat_itvl, sizeof(int), 0644, NULL,
+	 &proc_dointvec_jiffies, &sysctl_jiffies},
+	{NET_SCTP_INIT_RETRIES, "sctp_init_retries",
+	 &sysctl_sctp_max_init_retries, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_VALID_COOKIE_LIFE, "sctp_valid_cookie_life",
+	 &sysctl_sctp_valid_cookie_life, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 NULL, NULL},
+	{NET_SCTP_MAX_SACK_DELAY, "sctp_max_sack_delay",
+	 &sysctl_sctp_max_sack_delay, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 NULL, NULL},
+	{NET_SCTP_PATH_MAX_RETRANS, "sctp_path_max_retrans",
+	 &sysctl_sctp_path_max_retrans, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_ASSOC_MAX_RETRANS, "sctp_assoc_max_retrans",
+	 &sysctl_sctp_assoc_max_retrans, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_MAC_TYPE, "sctp_mac_type",
+	 &sysctl_sctp_mac_type, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_CSUM_TYPE, "sctp_csum_type",
+	 &sysctl_sctp_csum_type, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_COOKIE_INC, "sctp_cookie_inc",
+	 &sysctl_sctp_cookie_inc, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax, &sysctl_intvec, NULL,
+	 NULL, NULL},
+	{NET_SCTP_THROTTLE_ITVL, "sctp_throttle_itvl",
+	 &sysctl_sctp_throttle_itvl, sizeof(int), 0644, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax},
+	{NET_SCTP_MEM, "sctp_mem",
+	 &sysctl_sctp_mem, sizeof(sysctl_sctp_mem), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_WMEM, "sctp_wmem",
+	 &sysctl_sctp_wmem, sizeof(sysctl_sctp_wmem), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_RMEM, "sctp_rmem",
+	 &sysctl_sctp_rmem, sizeof(sysctl_sctp_rmem), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_MAX_ISTREAMS, "sctp_max_istreams",
+	 &sysctl_sctp_max_istreams, sizeof(int), 0644, NULL, &proc_dointvec_minmax,
+	 &sysctl_intvec, NULL, &min_sctp_max_istreams, NULL },
+	{NET_SCTP_REQ_OSTREAMS, "sctp_req_ostreams",
+	 &sysctl_sctp_req_ostreams, sizeof(int), 0644, NULL, &proc_dointvec_minmax,
+	 &sysctl_intvec, NULL, &min_sctp_req_ostreams, NULL },
+	{NET_SCTP_ECN, "sctp_ecn",
+	 &sysctl_sctp_ecn, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_ADAPTATION_LAYER_INFO, "sctp_adaptation_layer_info",
+	 &sysctl_sctp_adaptation_layer_info, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_PARTIAL_RELIABILITY, "sctp_partial_reliability",
+	 &sysctl_sctp_partial_reliability, sizeof(int), 0644, NULL, &proc_dointvec},
+	{NET_SCTP_MAX_BURST, "sctp_max_burst",
+	 &sysctl_sctp_max_burst, sizeof(int), 0644, NULL, &proc_dointvec_minmax,
+	 &sysctl_intvec, NULL, &min_sctp_max_burst, NULL},
+ 	{0}},
+	{{NET_IPV4, "ipv4", NULL, 0, 0555, sctp_sysctl.sctp_vars}, {0}},
+	{{CTL_NET, "net", NULL, 0, 0555, sctp_sysctl.sctp_proto_dir}, {0}}
+};
+#endif
 
 #ifdef CONFIG_SCTP_MODULE
 STATIC void sctp_v4_cleanup(void)
@@ -13042,8 +13110,15 @@ int init_module(void)
 		inet_register_protosw(s);
 	sctp_v4_init(&inet_family_ops);
 	sctp_init();
+#ifdef CONFIG_SYSCTL
+	sctp_sysctl.sysctl_header = register_sysctl_table(sctp_sysctl.sctp_root_dir, 0);
+#endif
 #ifdef CONFIG_PROC_FS
 	proc_net_create("sctp", 0, sctp_get_info);
+	proc_net_remove("snmp");
+	proc_net_create("snmp", 0, __os7_snmp_get_info);
+	proc_net_remove("sockstat");
+	proc_net_create("sockstat", 0, __os7_afinet_get_info);
 #endif
 	printk(KERN_INFO SCTP_BANNER);
 	return 0;
@@ -13054,6 +13129,13 @@ void cleanup_module(void)
 	struct inet_protosw *s;
 #ifdef CONFIG_PROC_FS
 	proc_net_remove("sctp");
+	proc_net_remove("snmp");
+	proc_net_create("snmp", 0, snmp_get_info);
+	proc_net_remove("sockstat");
+	proc_net_create("sockstat", 0, afinet_get_info);
+#endif
+#ifdef CONFIG_SYSCTL
+	unregister_sysctl_table(sctp_sysctl.sysctl_header);
 #endif
 	sctp_cleanup();
 	sctp_v4_cleanup();

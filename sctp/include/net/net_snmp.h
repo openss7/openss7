@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: net_snmp.h,v 0.9.2.4 2004/12/22 11:27:48 brian Exp $
+ @(#) $Id: net_snmp.h,v 0.9.2.5 2004/12/24 12:05:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,74 +45,45 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/12/22 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2004/12/24 12:05:16 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_NET_NET_SNMP_H__
 #define __OS7_NET_NET_SNMP_H__
 
-#ident "@(#) $RCSfile: net_snmp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: net_snmp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-#ifndef HAVE_STRUCT_SCTP_MIB
-#define HAVE_STRUCT_SCTP_MIB 1
 /*
  *  In accordance with draft-ietf-sigtran-sctp-mib-07
  */
-struct sctp_mib {
+struct __os7_sctp_mib {
 	unsigned long SctpRtoAlgorithm;
-#define HAVE_STRUCT_SCTP_MIB_SCTPRTOALGORITHM 1
 	unsigned long SctpRtoMin;
-#define HAVE_STRUCT_SCTP_MIB_SCTPRTOMIN 1
 	unsigned long SctpRtoMax;
-#define HAVE_STRUCT_SCTP_MIB_SCTPRTOMAX 1
 	unsigned long SctpRtoInitial;
-#define HAVE_STRUCT_SCTP_MIB_SCTPRTOINITIAL 1
 	unsigned long SctpMaxAssoc;
-#define HAVE_STRUCT_SCTP_MIB_SCTPMAXASSOC 1
 	unsigned long SctpValCookieLife;
-#define HAVE_STRUCT_SCTP_MIB_SCTPVALCOOKIELIFE 1
 	unsigned long SctpMaxInitRetr;
-#define HAVE_STRUCT_SCTP_MIB_SCTPMAXINITRETR 1
 	unsigned long SctpCurrEstab;
-#define HAVE_STRUCT_SCTP_MIB_SCTPCURRESTAB 1
 	unsigned long SctpActiveEstabs;
-#define HAVE_STRUCT_SCTP_MIB_SCTPACTIVEESTABS 1
 	unsigned long SctpPassiveEstabs;
-#define HAVE_STRUCT_SCTP_MIB_SCTPPASSIVEESTABS 1
 	unsigned long SctpAborteds;
-#define HAVE_STRUCT_SCTP_MIB_SCTPABORTEDS 1
 	unsigned long SctpShutdowns;
-#define HAVE_STRUCT_SCTP_MIB_SCTPSHUTDOWNS 1
 	unsigned long SctpOutOfBlues;
-#define HAVE_STRUCT_SCTP_MIB_SCTPOUTOFBLUES 1
 	unsigned long SctpChecksumErrors;
-#define HAVE_STRUCT_SCTP_MIB_SCTPCHECKSUMERRORS 1
 	unsigned long SctpOutCtrlChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPOUTCTRLCHUNKS 1
 	unsigned long SctpOutOrderChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPOUTORDERCHUNKS 1
 	unsigned long SctpOutUnorderChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPOUTUNORDERCHUNKS 1
 	unsigned long SctpInCtrlChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPINCTRLCHUNKS 1
 	unsigned long SctpInOrderChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPINORDERCHUNKS 1
 	unsigned long SctpInUnorderChunks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPINUNORDERCHUNKS 1
 	unsigned long SctpFragUsrMsgs;
-#define HAVE_STRUCT_SCTP_MIB_SCTPFRAGUSRMSGS 1
 	unsigned long SctpReasmUsrMsgs;
-#define HAVE_STRUCT_SCTP_MIB_SCTPREASMUSRMSGS 1
 	unsigned long SctpOutSCTPPacks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPOUTSCTPPACKS 1
 	unsigned long SctpInSCTPPacks;
-#define HAVE_STRUCT_SCTP_MIB_SCTPINSCTPPACKS 1
 	unsigned long SctpDiscontinuityTime;
-#define HAVE_STRUCT_SCTP_MIB_SCTPDISCONTINUITYTIME 1
 	unsigned long __pad[0];
 } ____cacheline_aligned;
-
-#endif				/* HAVE_STRUCT_SCTP_MIB */
 
 #endif				/* __OS7_NET_NET_SNMP_H__ */
