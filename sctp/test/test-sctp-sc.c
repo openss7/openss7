@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/10/16 11:55:24 $
+@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2003/03/20 10:02:13 $
 
 -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@ Corporation at a fee.  See http://www.openss7.com/
 
 -----------------------------------------------------------------------------
 
-Last Modified $Date: 2002/10/16 11:55:24 $ by <bidulock@openss7.org>
+Last Modified $Date: 2003/03/20 10:02:13 $ by <bidulock@openss7.org>
 
 *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/10/16 11:55:24 $"
+#ident "@(#) $RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2003/03/20 10:02:13 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2002/10/16 11:55:24 $";
+    "$RCSfile: test-sctp-sc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2003/03/20 10:02:13 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -87,13 +87,11 @@ void usage(void)
 	fprintf(stderr, "Usage:  test-sctpc [options]\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
-	fprintf(stderr, "      port specifies both the local and remote port number\n");
+	fprintf(stderr, "      port specifies the remote port number\n");
 	fprintf(stderr, "  -l, --loc_host loc_host   (default: 0.0.0.0)\n");
-	fprintf(stderr, "      loc_host specifies the local (bind) host for the SCTP\n");
-	fprintf(stderr, "      socket with optional local port number\n");
-	fprintf(stderr, "  -r, --rem_host rem_host   (default: 127.0.0.2)\n");
-	fprintf(stderr, "      rem_host specifies the remote (sendto) address for the SCTP\n");
-	fprintf(stderr, "      socket with optional remote port number\n");
+	fprintf(stderr, "      loc_host specifies the local (bind) host for the SCTP socket\n");
+	fprintf(stderr, "  -r, --rem_host rem_host   (default: 127.0.0.1)\n");
+	fprintf(stderr, "      rem_host specifies the remote (sendto) address for the SCTP socket\n");
 	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
 	fprintf(stderr, "      time give the time in seconds between reports\n");
 	fprintf(stderr, "  -w, --length              (default: %d)\n", MSG_LEN);
@@ -435,7 +433,7 @@ int main(int argc, char **argv)
 {
 	int c;
 	char *hostl = "0.0.0.0";
-	char *hostr = "127.0.0.2";
+	char *hostr = "127.0.0.1";
 	char hostbufl[HOST_BUF_LEN];
 	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;

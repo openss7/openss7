@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $
+ @(#) $RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2003/03/20 10:02:14 $
 
  -----------------------------------------------------------------------------
 
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2002/10/16 11:55:52 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2003/03/20 10:02:14 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $"
+#ident "@(#) $RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2003/03/20 10:02:14 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2002/10/16 11:55:52 $";
+    "$RCSfile: test-sctps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2003/03/20 10:02:14 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -85,10 +85,9 @@ void usage(void)
 	fprintf(stderr, "Usage:  test-sctps [options]\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "  -p, --port port           (default: 10000)\n");
-	fprintf(stderr, "      port specifies both the local and remote port number\n");
+	fprintf(stderr, "      port specifies the local port number\n");
 	fprintf(stderr, "  -l, --loc_host loc_host   (default: 0.0.0.0)\n");
-	fprintf(stderr, "      loc_host specifies the local (bind) host for the SCTP\n");
-	fprintf(stderr, "      socket with optional local port number\n");
+	fprintf(stderr, "      loc_host specifies the local (bind) host for the SCTP socket\n");
 	fprintf(stderr, "  -t, --rep_time time       (default: 1 second)\n");
 	fprintf(stderr, "      time give the time in seconds between reports\n");
 	fprintf(stderr, "  -w, --length              (default: %d)\n", MSG_LEN);
