@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2004/05/23 07:24:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/23 21:32:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2004/05/23 07:24:24 $ by $Author: brian $
+# Last Modified $Date: 2004/08/23 21:32:27 $ by $Author: brian $
 #
 # =============================================================================
 
 MANMACRO_PFX = openss7
 
-man_MANS = \
+ss7_man_MANS = \
 	man3/cframe.3 \
 	man3/soon.3 \
 	man3/xti_mtp.3 \
@@ -79,10 +79,7 @@ man_MANS = \
 	man4/dpnss.4 \
 	man4/dua.4 \
 	man4/dua_ioctl.4 \
-	man4/egp.4 \
-	man4/eth.4 \
 	man4/fr.4 \
-	man4/ggp.4 \
 	man4/gr303.4 \
 	man4/gr303_ioctl.4 \
 	man4/gr303ua.4 \
@@ -95,10 +92,7 @@ man_MANS = \
 	man4/h248_ioctl.4 \
 	man4/hdlc.4 \
 	man4/hdlc_ioctl.4 \
-	man4/icmp.4 \
 	man4/idlc.4 \
-	man4/idp.4 \
-	man4/ipip.4 \
 	man4/isdn.4 \
 	man4/ISDN.4 \
 	man4/isdn_ioctl.4 \
@@ -134,16 +128,12 @@ man_MANS = \
 	man4/OpenSS7.4 \
 	man4/openss7_soon.4 \
 	man4/pca200e.4 \
-	man4/pup.4 \
 	man4/q921.4 \
 	man4/q922.4 \
 	man4/q931.4 \
-	man4/rawip.4 \
 	man4/rtp.4 \
 	man4/sccp.4 \
 	man4/sccp_ioctl.4 \
-	man4/sctp.4 \
-	man4/sctp_ioctl.4 \
 	man4/sdl.4 \
 	man4/sdl_eth.4 \
 	man4/sdl_ioctl.4 \
@@ -159,7 +149,6 @@ man_MANS = \
 	man4/sipt_ioctl.4 \
 	man4/sl.4 \
 	man4/sl_ioctl.4 \
-	man4/soon.4 \
 	man4/SS7.4 \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
@@ -562,7 +551,6 @@ man_MANS = \
 	man7/devi.7 \
 	man7/dlpi_dass.7 \
 	man7/dlpi_dua.7 \
-	man7/dlpi_eth.7 \
 	man7/dlpi_gr303.7 \
 	man7/dlpi_gr303ua.7 \
 	man7/dlpi_iua.7 \
@@ -752,7 +740,6 @@ man_MANS = \
 	man7/npi_mtp.7 \
 	man7/npi_q933.7 \
 	man7/npi_sccp.7 \
-	man7/npi_sctp.7 \
 	man7/npi_sscop.7 \
 	man7/rudp.7 \
 	man7/saal_sscop.7 \
@@ -773,7 +760,6 @@ man_MANS = \
 	man7/tci.7 \
 	man7/tpi_mtp.7 \
 	man7/tpi_sccp.7 \
-	man7/tpi_sctp.7 \
 	man7/tpi_ss7.7 \
 	man7/tpi_sscop.7 \
 	man7/tpi_tcap.7 \
@@ -797,7 +783,6 @@ man_MANS = \
 	man8/mgconfd.8 \
 	man8/mtp.8 \
 	man8/sccp.8 \
-	man8/sctp.8 \
 	man8/sdl.8 \
 	man8/sdl_udp.8 \
 	man8/sdl_xxx.8 \
@@ -818,8 +803,7 @@ man_MANS = \
 	man8/uaconfd.8 \
 	man8/voipconfd.8
 
-if WITH_XNET
-man_MANS += \
+xnet_man_MANS = \
 	man3/t_accept.3 \
 	man3/t_addleaf.3 \
 	man3/t_alloc.3 \
@@ -862,16 +846,21 @@ man_MANS += \
 	man3/t_unbind.3 \
 	man3/xti.3 \
 	man3/xti_ip.3 \
-	man3/xti_sctp.3 \
 	man3/xti_tcp.3 \
 	man3/xti_udp.3
-endif
 
-if WITH_INET
-man_MANS += \
+inet_man_MANS = \
+	man4/egp.4 \
+	man4/eth.4 \
+	man4/ggp.4 \
+	man4/icmp.4 \
+	man4/idp.4 \
 	man4/inet.4 \
 	man4/INET.4 \
 	man4/ip.4 \
+	man4/ipip.4 \
+	man4/pup.4 \
+	man4/rawip.4 \
 	man4/tcp.4 \
 	man4/tcp_ioctl.4 \
 	man4/ticlts.4 \
@@ -880,12 +869,16 @@ man_MANS += \
 	man4/udp.4 \
 	man4/udp_ioctl.4 \
 	man4/xtios.4
-endif
 
-if WITH_TLI
-man_MANS += \
-	man4/timod.4 \
-	man4/tirdwr.4 \
+sctp_man_MANS = \
+	man3/xti_sctp.3 \
+	man4/sctp.4 \
+	man4/sctp_ioctl.4 \
+	man7/npi_sctp.7 \
+	man7/tpi_sctp.7 \
+	man8/sctp.8
+
+xns_man_MANS = \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
 	man7/CD_ALLOW_INPUT_REQ.7 \
@@ -983,6 +976,7 @@ man_MANS += \
 	man7/DL_PHYS_ADDR_REQ.7 \
 	man7/dl_phys_addr_req_t.7 \
 	man7/dlpi.7 \
+	man7/dlpi_eth.7 \
 	man7/DL_PROMISCOFF_REQ.7 \
 	man7/dl_promiscoff_req_t.7 \
 	man7/DL_PROMISCON_REQ.7 \
@@ -1101,7 +1095,11 @@ man_MANS += \
 	man7/N_UNITDATA_IND.7 \
 	man7/N_unitdata_ind_t.7 \
 	man7/N_UNITDATA_REQ.7 \
-	man7/N_unitdata_req_t.7 \
+	man7/N_unitdata_req_t.7
+
+tli_man_MANS = \
+	man4/timod.4 \
+	man4/tirdwr.4 \
 	man7/T_addr_ack.7 \
 	man7/T_ADDR_ACK.7 \
 	man7/T_addr_req.7 \
@@ -1166,9 +1164,36 @@ man_MANS += \
 	man7/T_UNITDATA_IND.7 \
 	man7/T_unitdata_req.7 \
 	man7/T_UNITDATA_REQ.7
+
+sock_man_MANS	=
+
+extra_man_MANS	= \
+	man4/soon.4
+
+man_MANS	= $(ss7_man_MANS)
+if WITH_XNET
+man_MANS	+= $(xnet_man_MANS)
+endif
+if WITH_INET
+man_MANS	+= $(inet_man_MANS)
+endif
+if WITH_SCTP
+man_MANS	+= $(sctp_man_MANS)
+endif
+if WITH_SCTP2
+man_MANS	+= $(sctp_man_MANS)
+endif
+if WITH_XNS
+man_MANS	+= $(xns_man_MANS)
+endif
+if WITH_TLI
+man_MANS	+= $(tli_man_MANS)
+endif
+if WITH_SOCK
+man_MANS	+= $(sock_man_MANS)
 endif
 
-dist_noinst_MANS = \
+ss7_dist_noinst_MANS = \
 	man3/cframe.3.man \
 	man3/soon.3.man \
 	man3/xti_mtp.3.man \
@@ -1195,10 +1220,7 @@ dist_noinst_MANS = \
 	man4/dpnss.4.man \
 	man4/dua.4.man \
 	man4/dua_ioctl.4.man \
-	man4/egp.4.man \
-	man4/eth.4.man \
 	man4/fr.4.man \
-	man4/ggp.4.man \
 	man4/gr303.4.man \
 	man4/gr303_ioctl.4.man \
 	man4/gr303ua.4.man \
@@ -1211,10 +1233,7 @@ dist_noinst_MANS = \
 	man4/h248_ioctl.4.man \
 	man4/hdlc.4.man \
 	man4/hdlc_ioctl.4.man \
-	man4/icmp.4.man \
 	man4/idlc.4.man \
-	man4/idp.4.man \
-	man4/ipip.4.man \
 	man4/isdn.4.man \
 	man4/ISDN.4.man \
 	man4/isdn_ioctl.4.man \
@@ -1250,16 +1269,12 @@ dist_noinst_MANS = \
 	man4/OpenSS7.4.man \
 	man4/openss7_soon.4.man \
 	man4/pca200e.4.man \
-	man4/pup.4.man \
 	man4/q921.4.man \
 	man4/q922.4.man \
 	man4/q931.4.man \
-	man4/rawip.4.man \
 	man4/rtp.4.man \
 	man4/sccp.4.man \
 	man4/sccp_ioctl.4.man \
-	man4/sctp.4.man \
-	man4/sctp_ioctl.4.man \
 	man4/sdl.4.man \
 	man4/sdl_eth.4.man \
 	man4/sdl_ioctl.4.man \
@@ -1275,7 +1290,6 @@ dist_noinst_MANS = \
 	man4/sipt_ioctl.4.man \
 	man4/sl.4.man \
 	man4/sl_ioctl.4.man \
-	man4/soon.4.man \
 	man4/SS7.4.man \
 	man4/sscop.4.man \
 	man4/sscop_ioctl.4.man \
@@ -1678,7 +1692,6 @@ dist_noinst_MANS = \
 	man7/devi.7.man \
 	man7/dlpi_dass.7.man \
 	man7/dlpi_dua.7.man \
-	man7/dlpi_eth.7.man \
 	man7/dlpi_gr303.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \
@@ -1868,7 +1881,6 @@ dist_noinst_MANS = \
 	man7/npi_mtp.7.man \
 	man7/npi_q933.7.man \
 	man7/npi_sccp.7.man \
-	man7/npi_sctp.7.man \
 	man7/npi_sscop.7.man \
 	man7/rudp.7.man \
 	man7/saal_sscop.7.man \
@@ -1889,7 +1901,6 @@ dist_noinst_MANS = \
 	man7/tci.7.man \
 	man7/tpi_mtp.7.man \
 	man7/tpi_sccp.7.man \
-	man7/tpi_sctp.7.man \
 	man7/tpi_ss7.7.man \
 	man7/tpi_sscop.7.man \
 	man7/tpi_tcap.7.man \
@@ -1913,7 +1924,6 @@ dist_noinst_MANS = \
 	man8/mgconfd.8.man \
 	man8/mtp.8.man \
 	man8/sccp.8.man \
-	man8/sctp.8.man \
 	man8/sdl.8.man \
 	man8/sdl_udp.8.man \
 	man8/sdl_xxx.8.man \
@@ -1934,8 +1944,7 @@ dist_noinst_MANS = \
 	man8/uaconfd.8.man \
 	man8/voipconfd.8.man
 
-if WITH_XNET
-dist_noinst_MANS += \
+xnet_dist_noinst_MANS = \
 	man3/t_accept.3.man \
 	man3/t_addleaf.3.man \
 	man3/t_alloc.3.man \
@@ -1978,16 +1987,21 @@ dist_noinst_MANS += \
 	man3/t_unbind.3.man \
 	man3/xti.3.man \
 	man3/xti_ip.3.man \
-	man3/xti_sctp.3.man \
 	man3/xti_tcp.3.man \
 	man3/xti_udp.3.man
-endif
 
-if WITH_INET
-dist_noinst_MANS += \
+inet_dist_noinst_MANS = \
+	man4/egp.4.man \
+	man4/eth.4.man \
+	man4/ggp.4.man \
+	man4/icmp.4.man \
+	man4/idp.4.man \
 	man4/inet.4.man \
 	man4/INET.4.man \
 	man4/ip.4.man \
+	man4/ipip.4.man \
+	man4/pup.4.man \
+	man4/rawip.4.man \
 	man4/tcp.4.man \
 	man4/tcp_ioctl.4.man \
 	man4/ticlts.4.man \
@@ -1996,12 +2010,16 @@ dist_noinst_MANS += \
 	man4/udp.4.man \
 	man4/udp_ioctl.4.man \
 	man4/xtios.4.man
-endif
 
-if WITH_TLI
-dist_noinst_MANS += \
-	man4/timod.4.man \
-	man4/tirdwr.4.man \
+sctp_dist_noinst_MANS = \
+	man3/xti_sctp.3.man \
+	man4/sctp.4.man \
+	man4/sctp_ioctl.4.man \
+	man7/npi_sctp.7.man \
+	man7/tpi_sctp.7.man \
+	man8/sctp.8.man
+
+xns_dist_noinst_MANS = \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
 	man7/CD_ALLOW_INPUT_REQ.7.man \
@@ -2099,6 +2117,7 @@ dist_noinst_MANS += \
 	man7/DL_PHYS_ADDR_REQ.7.man \
 	man7/dl_phys_addr_req_t.7.man \
 	man7/dlpi.7.man \
+	man7/dlpi_eth.7.man \
 	man7/DL_PROMISCOFF_REQ.7.man \
 	man7/dl_promiscoff_req_t.7.man \
 	man7/DL_PROMISCON_REQ.7.man \
@@ -2217,7 +2236,11 @@ dist_noinst_MANS += \
 	man7/N_UNITDATA_IND.7.man \
 	man7/N_unitdata_ind_t.7.man \
 	man7/N_UNITDATA_REQ.7.man \
-	man7/N_unitdata_req_t.7.man \
+	man7/N_unitdata_req_t.7.man
+
+tli_dist_noinst_MANS = \
+	man4/timod.4.man \
+	man4/tirdwr.4.man \
 	man7/T_addr_ack.7.man \
 	man7/T_ADDR_ACK.7.man \
 	man7/T_addr_req.7.man \
@@ -2282,7 +2305,20 @@ dist_noinst_MANS += \
 	man7/T_UNITDATA_IND.7.man \
 	man7/T_unitdata_req.7.man \
 	man7/T_UNITDATA_REQ.7.man
-endif
+
+sock_dist_noinst_MANS	=
+
+extra_dist_noinst_MANS	= \
+	man4/soon.4.man
+
+dist_noinst_MANS = \
+	$(ss7_dist_noinst_MANS) \
+	$(xnet_dist_noinst_MANS) \
+	$(inet_dist_noinst_MANS) \
+	$(sctp_dist_noinst_MANS) \
+	$(xns_dist_noinst_MANS) \
+	$(tli_dist_noinst_MANS) \
+	$(sock_dist_noinst_MANS)
 
 include ../../am/man.am
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/24 18:29:45 $ by $Author: brian $
+ Last Modified $Date: 2004/08/23 21:32:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $";
 
-#if defined(_LIS_SOURCE) && !defined(MODULE)
+#if defined LIS && !defined _LIS_SOURCE
+#define _LIS_SOURCE
+#endif
+
+#if defined LFS && !defined _LFS_SOURCE
+#define _LFS_SOURCE
+#endif
+
+#if defined(LIS) && !defined(MODULE)
 #   error ****
 #   error ****  tirdwr can only compile as a module under LiS.
 #   error ****  This is normally because LiS has been grossly misconfigured.
@@ -88,7 +96,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/05/24 18:29:45 $"
+#define TIRDWR_REVISION		"LfS $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/23 21:32:28 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -403,14 +411,14 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	mblk_t *bp = NULL;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		/*
@@ -553,14 +561,14 @@ tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	tirdwr_t *priv = (typeof(priv)) q->q_ptr;
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
-#if defined _LIS_SOURCE
+#if defined LIS
 	if (q->q_next == NULL || OTHER(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with null q->q_next pointer.",
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		freemsg(mp);
 		return (0);
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		if (!(priv->flags & (TIRDWR_EPROTO | TIRDWR_HANGUP))) {
@@ -785,7 +793,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 {
 	(void) oflag;
 	(void) crp;
-#if defined _LIS_SOURCE
+#if defined LIS
 	/*
 	   protect against some LiS bugs 
 	 */
@@ -799,7 +807,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
 			TIRDWR_MOD_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
-#endif				/* defined _LIS_SOURCE */
+#endif				/* defined LIS */
 	tirdwr_pop(q);
 	goto skip_pop;
       skip_pop:
@@ -819,7 +827,7 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  *  =========================================================================
  */
 
-#if defined _LFS_SOURCE
+#if defined LFS
 
 static struct fmodsw tirdwr_fmod = {
 	f_name:TIRDWR_MOD_NAME,
@@ -844,7 +852,7 @@ tirdwr_unregister_module(void)
 	return (void) unregister_strmod(modid, &tirdwr_fmod);
 }
 
-#elif defined _LIS_SOURCE
+#elif defined LIS
 
 static int
 tirdwr_register_module(void)
@@ -871,7 +879,7 @@ tirdwr_unregister_module(void)
 
 #else
 #   error ****
-#   error ****  One of _LFS_SOURCE or _LIS_SOURCE must be defined
+#   error ****  One of LFS or LIS must be defined
 #   error ****  to compile the tirdwr module.
 #   error ****
 #endif
