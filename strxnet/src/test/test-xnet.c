@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 14:32:07 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:08:17 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 14:32:07 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:08:17 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 14:32:07 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:08:17 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 14:32:07 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:08:17 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -143,7 +143,10 @@ static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/wait.h>
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>

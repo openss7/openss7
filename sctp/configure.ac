@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.7 2005/01/24 11:59:27 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.8 2005/01/25 16:07:12 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,16 +51,16 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 11:59:27 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 16:07:12 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
 dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.7 2005/01/24 11:59:27 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.8 2005/01/25 16:07:12 brian Exp $])
 AC_PREREQ(2.59)
-AC_INIT([OpenSS7 Linux Native SCTP], [0.2.20], [bugs@openss7.org], [sctp])
+AC_INIT([SCTP], [0.2.20], [bugs@openss7.org], [sctp])
 
 # Need to adjust directories if default
 ac_default_prefix='/usr'
@@ -91,6 +91,8 @@ AC_GNU_SOURCE
 #
 # Checks for programs.
 #
+AM_PROG_AS
+AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -101,6 +103,7 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
@@ -115,6 +118,7 @@ LIBS="$sctp_save_LIBS"
 #
 # Checks for header files.
 #
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h unistd.h])
@@ -123,12 +127,9 @@ AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h netdb.h netinet/in.h stdlib.h stri
 # Checks for typedefs, structures, and compiler characteristics.
 #
 AC_C_CONST
-AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
-AC_STRUCT_TM
-AC_C_VOLATILE
 
 #
 # Checks for library functions.

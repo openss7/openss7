@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/24 12:03:27 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/25 16:07:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/24 12:03:27 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 16:07:12 $ by $Author: brian $
 #
 # =============================================================================
 
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_REVISION([$Id: configure.ac,v 0.9.2.6 2005/01/24 12:03:27 brian Exp $])
+AC_REVISION([$Id: configure.ac,v 0.9.2.7 2005/01/25 16:07:12 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([OpenSS7], [0.9.2], [bugs@openss7.org], [openss7])
 
@@ -124,7 +124,7 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h termios.h unistd.h values.h wchar.h])
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/mount.h sys/socket.h sys/time.h syslog.h termios.h unistd.h values.h wchar.h])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -149,7 +149,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl
 dnl Checks for library functions.
 dnl
-#AM_GNU_GETTEXT
+AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL

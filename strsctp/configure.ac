@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.8 2005/01/24 11:59:28 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.9 2005/01/25 16:07:13 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 11:59:28 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 16:07:13 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -89,6 +89,8 @@ AC_GNU_SOURCE
 #
 # Checks for programs.
 #
+AM_PROG_AS
+AC_PROG_AWK
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
@@ -98,6 +100,7 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 
@@ -107,8 +110,8 @@ AC_SUBST([LIBTOOL_DEPS])
 ss7_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([LiS], [putpmsg])
-AC_CHECK_LIB([streams], [putpmsg])
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
 LIBS="$ss7_save_LIBS"
@@ -116,7 +119,10 @@ LIBS="$ss7_save_LIBS"
 #
 # Checks for header files.
 #
+AC_FUNC_ALLOCA
 AC_HEADER_STDC
+AC_HEADER_MAJOR
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
 
 #

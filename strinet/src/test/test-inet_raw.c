@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:38:21 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:09:58 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 16:38:21 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:09:58 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.5  2005/01/25 16:09:58  brian
+ - Add check for <sys/wait.h>.
+
  Revision 0.9.2.4  2005/01/22 16:38:21  brian
  - Fixed compiler warnings.
 
@@ -71,41 +74,41 @@
  Revision 0.9.2.1  2004/05/16 04:12:35  brian
  - Updating strxnet release.
 
- Revision 0.9.4.7  2004/04/13 12:12:54  brian
+ Revision 1.1.4.7  2004/04/13 12:12:54  brian
  - Rearranged header files.
 
- Revision 0.9.4.6  2004/04/13 06:04:03  brian
+ Revision 1.1.4.6  2004/04/13 06:04:03  brian
  - INET driver works pretty good now.
 
- Revision 0.9.4.5  2004/04/12 20:50:03  brian
+ Revision 1.1.4.5  2004/04/12 20:50:03  brian
  - Added ability to list test cases.
 
- Revision 0.9.4.4  2004/04/12 20:18:00  brian
+ Revision 1.1.4.4  2004/04/12 20:18:00  brian
  - Test cases pass.
 
- Revision 0.9.4.3  2004/03/31 09:00:50  brian
+ Revision 1.1.4.3  2004/03/31 09:00:50  brian
  - Working up new inet driver and documentation.
 
- Revision 0.9.4.2  2004/03/28 17:30:19  brian
+ Revision 1.1.4.2  2004/03/28 17:30:19  brian
  - First clean compile of inet updates.
 
- Revision 0.9.4.1  2004/01/12 23:33:17  brian
+ Revision 1.1.4.1  2004/01/12 23:33:17  brian
  - Updated LiS-2.16.18 gcom release to autoconf.
 
- Revision 0.9.2.3  2004/01/07 11:34:53  brian
+ Revision 1.1.2.3  2004/01/07 11:34:53  brian
  - Updated copyright dates.
 
- Revision 0.9.2.2  2004/01/04 11:31:23  brian
+ Revision 1.1.2.2  2004/01/04 11:31:23  brian
  - Corrected xti include.
 
- Revision 0.9.2.1  2003/12/23 11:12:23  brian
+ Revision 1.1.2.1  2003/12/23 11:12:23  brian
  - Added INET streams test programs.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:38:21 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:09:58 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/22 16:38:21 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:09:58 $";
 
 /*
  *  Simple test program for INET streams.
@@ -123,7 +126,10 @@ static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/wait.h>
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>

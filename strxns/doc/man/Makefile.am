@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/22 16:44:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/01/25 15:45:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/22 16:44:28 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 15:45:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -266,10 +266,6 @@ man_MANS = \
 	man7/N_reset_req_t.7 \
 	man7/N_RESET_RES.7 \
 	man7/N_reset_res_t.7 \
-	man7/N_TOKEN_ACK.7 \
-	man7/N_token_ack_t.7 \
-	man7/N_TOKEN_REQ.7 \
-	man7/N_token_req_t.7 \
 	man7/N_UDERROR_IND.7 \
 	man7/N_uderror_ind_t.7 \
 	man7/N_UNBIND_REQ.7 \
@@ -495,10 +491,6 @@ dist_noinst_MANS = \
 	man7/N_reset_req_t.7.man \
 	man7/N_RESET_RES.7.man \
 	man7/N_reset_res_t.7.man \
-	man7/N_TOKEN_ACK.7.man \
-	man7/N_token_ack_t.7.man \
-	man7/N_TOKEN_REQ.7.man \
-	man7/N_token_req_t.7.man \
 	man7/N_UDERROR_IND.7.man \
 	man7/N_uderror_ind_t.7.man \
 	man7/N_UNBIND_REQ.7.man \

@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.16 2005/01/24 11:59:27 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.17 2005/01/25 16:07:12 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 11:59:27 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 16:07:12 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -112,8 +112,8 @@ AM_GNU_GETTEXT_VERSION(0.14.1)
 ss7_save_LIBS="$LIBS"
 AC_CHECK_LIB([c], [open])
 AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([LiS], [putpmsg])
-AC_CHECK_LIB([streams], [putpmsg])
+AC_CHECK_LIB([LiS], [fattach])
+AC_CHECK_LIB([streams], [fattach])
 AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
 LIBS="$ss7_save_LIBS"
@@ -124,6 +124,7 @@ LIBS="$ss7_save_LIBS"
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h wchar.h])
 
 #

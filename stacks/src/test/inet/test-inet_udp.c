@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:02 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:11 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/24 07:49:02 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:13:11 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.5  2005/01/25 16:13:11  brian
+ - Add check for <sys/wait.h>.
+
  Revision 0.9.2.4  2005/01/24 07:49:02  brian
  - Removed compiler warnings.
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:02 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:11 $"
 
 static char const ident[] =
-    "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:02 $";
+    "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:11 $";
 
 /*
  *  Simple test program for INET streams.
@@ -103,7 +106,10 @@ static char const ident[] =
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/wait.h>
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>

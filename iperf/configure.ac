@@ -109,9 +109,9 @@ dnl Checks for programs
 dnl ===================================================================
 
 AC_PROG_CXX
-CXXFLAGS=`echo " $CXXFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
+dnl CXXFLAGS=`echo " $CXXFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
 AC_PROG_CC
-CFLAGS=`echo " $CFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
+dnl CFLAGS=`echo " $CFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
 dnl AC_ISC_POSIX
 dnl AC_PROG_INSTALL
 dnl AC_PROG_MAKE_SET

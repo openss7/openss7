@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:09:59 $
 
  -----------------------------------------------------------------------------
 
@@ -52,10 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 16:38:22 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:09:59 $ by <bidulock@openss7.org>
 
  -----------------------------------------------------------------------------
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.4  2005/01/25 16:09:59  brian
+ - Add check for <sys/wait.h>.
+
  Revision 0.9.2.3  2005/01/22 16:38:22  brian
  - Fixed compiler warnings.
 
@@ -68,53 +71,53 @@
  Revision 0.9.2.1  2004/05/16 04:12:36  brian
  - Updating strxnet release.
 
- Revision 0.9.4.11  2004/04/13 12:12:57  brian
+ Revision 1.1.4.11  2004/04/13 12:12:57  brian
  - Rearranged header files.
 
- Revision 0.9.4.10  2004/04/13 06:04:05  brian
+ Revision 1.1.4.10  2004/04/13 06:04:05  brian
  - INET driver works pretty good now.
 
- Revision 0.9.4.9  2004/04/12 20:50:05  brian
+ Revision 1.1.4.9  2004/04/12 20:50:05  brian
  - Added ability to list test cases.
 
- Revision 0.9.4.8  2004/04/12 20:17:59  brian
+ Revision 1.1.4.8  2004/04/12 20:17:59  brian
  - Test cases pass.
 
- Revision 0.9.4.7  2004/04/12 11:34:31  brian
+ Revision 1.1.4.7  2004/04/12 11:34:31  brian
  - INET driver working better now for UDP.
 
- Revision 0.9.4.6  2004/04/09 11:24:57  brian
+ Revision 1.1.4.6  2004/04/09 11:24:57  brian
  - Cleaned up printouts and verbosity.
 
- Revision 0.9.4.5  2004/04/08 14:53:59  brian
+ Revision 1.1.4.5  2004/04/08 14:53:59  brian
  - Added more test cases.
 
- Revision 0.9.4.4  2004/04/08 13:14:33  brian
+ Revision 1.1.4.4  2004/04/08 13:14:33  brian
  - Updated INET-UDP test program.
 
- Revision 0.9.4.3  2004/03/31 09:00:53  brian
+ Revision 1.1.4.3  2004/03/31 09:00:53  brian
  - Working up new inet driver and documentation.
 
- Revision 0.9.4.2  2004/03/28 17:30:21  brian
+ Revision 1.1.4.2  2004/03/28 17:30:21  brian
  - First clean compile of inet updates.
 
- Revision 0.9.4.1  2004/01/12 23:33:19  brian
+ Revision 1.1.4.1  2004/01/12 23:33:19  brian
  - Updated LiS-2.16.18 gcom release to autoconf.
 
- Revision 0.9.2.3  2004/01/07 11:34:54  brian
+ Revision 1.1.2.3  2004/01/07 11:34:54  brian
  - Updated copyright dates.
 
- Revision 0.9.2.2  2004/01/04 11:31:24  brian
+ Revision 1.1.2.2  2004/01/04 11:31:24  brian
  - Corrected xti include.
 
- Revision 0.9.2.1  2003/12/23 11:12:24  brian
+ Revision 1.1.2.1  2003/12/23 11:12:24  brian
  - Added INET streams test programs.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:09:59 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/22 16:38:22 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:09:59 $";
 
 /*
  *  Simple test program for INET streams.
@@ -132,7 +135,10 @@ static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/wait.h>
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>

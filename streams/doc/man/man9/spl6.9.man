@@ -1,1 +1,1 @@
-.so soon.9.man
+.so undoc.9.man

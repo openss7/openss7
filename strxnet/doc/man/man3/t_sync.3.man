@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sync.3.man,v 0.9.2.2 2004/05/16 02:35:38 brian Exp $
+.\" @(#) $Id: t_sync.3.man,v 0.9.2.3 2005/01/25 16:06:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/05/16 02:35:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/01/25 16:06:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -73,7 +73,7 @@ sort-adjacent-labels
 .\"
 .\"
 .\"
-.TH T_SYNC 3 "$Date: 2004/05/16 02:35:38 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
+.TH T_SYNC 3 "$Date: 2005/01/25 16:06:32 $" "$Name:  $" "OpenSS7 XTI/TLI Library"
 .\"
 .\"
 .SH NAME
@@ -186,6 +186,23 @@ has been tested for the described behavior using the
 conformance test program.
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+The XTI/TLI library functions are compatible with 
+SVR4.2,
+.[
+svr42
+.]
+XNS 5.2,
+.[
+xns
+.]
+SUSv2.
+.[
+susv2
+.]
+.\"
+.\"
 .SH "CONFORMING TO"
 .PP
 XTI/TLI,
@@ -205,6 +222,20 @@ SUSv2.
 .[
 susv2
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B t_sync
+first appeared in SVR4.2.
+.[
+svr42
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for the OpenSS7 XTI/TLI Library.
 .\"
 .\"
 .[

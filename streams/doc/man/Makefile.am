@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/01/20 07:28:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/01/25 15:36:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/20 07:28:16 $ by $Author: brian $
+# Last Modified $Date: 2005/01/25 15:36:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -732,7 +732,6 @@ man_MANS = \
 	man9/SLEEP_TRYLOCK.9 \
 	man9/SLEEP_UNLOCK.9 \
 	man9/__smod_search.9 \
-	man9/soon.9 \
 	man9/spec_open.9 \
 	man9/SPG.9 \
 	man9/spl0.9 \
@@ -806,7 +805,8 @@ man_MANS = \
 	man9/wantmsg.9 \
 	man9/weldq.9 \
 	man9/WR.9 \
-	man9/xmsgsize.9
+	man9/xmsgsize.9 \
+	man9/undoc.9
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
@@ -1486,7 +1486,6 @@ dist_noinst_MANS = \
 	man9/SLEEP_TRYLOCK.9.man \
 	man9/SLEEP_UNLOCK.9.man \
 	man9/__smod_search.9.man \
-	man9/soon.9.man \
 	man9/spec_open.9.man \
 	man9/SPG.9.man \
 	man9/spl0.9.man \
@@ -1560,7 +1559,8 @@ dist_noinst_MANS = \
 	man9/wantmsg.9.man \
 	man9/weldq.9.man \
 	man9/WR.9.man \
-	man9/xmsgsize.9.man
+	man9/xmsgsize.9.man \
+	man9/undoc.9.man
 
 EXTRA_DIST = 
 

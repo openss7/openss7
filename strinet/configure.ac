@@ -1,6 +1,6 @@
 dnl =========================================================================
 dnl
-dnl @(#) $Id: configure.ac,v 0.9.2.11 2005/01/24 11:59:28 brian Exp $
+dnl @(#) $Id: configure.ac,v 0.9.2.12 2005/01/25 16:07:13 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -51,7 +51,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/01/24 11:59:28 $ by $Author: brian $
+dnl Last Modified $Date: 2005/01/25 16:07:13 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -123,6 +123,7 @@ LIBS="$inet_save_LIBS"
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h libintl.h locale.h netinet/in.h stddef.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h values.h])
 
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $
 
  -----------------------------------------------------------------------------
 
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/24 07:49:34 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:13:12 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/24 07:49:34 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/25 16:13:12 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -77,8 +77,6 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <stdint.h>
 #include <sys/types.h>
 #include <asm/byteorder.h>
-
-#include <netinet/in.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>

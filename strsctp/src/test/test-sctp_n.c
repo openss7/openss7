@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 16:57:38 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/01/25 16:11:31 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/01/22 16:57:38 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/01/25 16:11:31 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -72,7 +72,10 @@ static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/wait.h>
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
