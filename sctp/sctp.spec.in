@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/03/22 19:44:14 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/03/24 05:18:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/22 19:44:14 $ by $Author: brian $
+# Last Modified $Date: 2005/03/24 05:18:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,7 +86,6 @@
 #global initfiles
 
 %global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
-%global have_initfiles %{?initfiles:1}%{!?initfiles:0}
 %global have_libraries %{?libraries:1}%{!?libraries:0}
 %global have_preloads %{?preloads:1}%{!?preloads:0}
 
@@ -801,9 +800,7 @@ Group:          Development/System
 #Prefix:         %{_bindir}
 #Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
-%if %{have_initfiles}
 Prefix:         %{_sysconfdir}
-%endif
 Obsoletes:      %{name}-utils
 Autoreq:        true
 %if %{?_xpm: 1}%{!?_xpm: 0}
@@ -840,7 +837,6 @@ else
 #   upgrade, let rpm do its job
 fi
 
-%if %{have_initfiles}
 %post util
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then
@@ -862,7 +858,6 @@ if [ $1 = 0 ] ; then
         done
     fi
 fi
-%endif
 
 %if %{BUILD_tools}
 %files util
@@ -871,17 +866,18 @@ fi
 #%{_bindir}/*
 #%{_sbindir}/*
 %{_libexecdir}/*test*
-%if %{have_initfiles}
 %config %{_sysconfdir}/*
-%endif
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.41  2005/03/22 19:44:14  brian
-# - do not need symbolic link in prep anymore
+# Revision 0.9.2.42  2005/03/24 05:18:53  brian
+# - always include sysconfdir in util package
+#
+# Revision 1.42  2005/03/24 05:18:53  brian
+# - always include sysconfdir in util package
 #
 # Revision 1.41  2005/03/22 19:44:14  brian
 # - do not need symbolic link in prep anymore
