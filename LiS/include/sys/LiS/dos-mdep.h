@@ -58,7 +58,7 @@
 #define INLINE
 #define LOG(f,l,s)		printf("%s (line %d of file %s)\n", s, l, f)
 #define PANIC(msg)		( printf("PANIC: %s\n", msg), exit(0) )
-#define ASSERT(e)		assert(e)
+#define LISASSERT(e)		assert(e)
 
 #define splx(s)		((void)s)
 #define splstr()	0
