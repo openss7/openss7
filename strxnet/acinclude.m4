@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.1 2004/04/05 12:39:05 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.2 2004/05/15 07:35:17 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,51 +53,57 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/15 07:35:17 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
-m4_include([m4/public.m4])
 m4_include([m4/kernel.m4])
 m4_include([m4/streams.m4])
+m4_include([m4/genksyms.m4])
 m4_include([m4/man.m4])
+m4_include([m4/public.m4])
 m4_include([m4/rpm.m4])
+m4_include([m4/libraries.m4])
+m4_include([m4/strconf.m4])
 
 # =========================================================================
 # AC_XNET
 # -------------------------------------------------------------------------
-AC_DEFUN(AC_XNET,
-[
+AC_DEFUN([AC_XNET], [
     ac_default_prefix='/usr'
     _XNET_OPTIONS
-    AC_MAN_CONVERSION
-    AC_PUBLIC_RELEASE
+    _MAN_CONVERSION
+    _PUBLIC_RELEASE
+    _RPM_SPEC
+    _LDCONFIG
     # user CPPFLAGS and CFLAGS
     USER_CPPFLAGS="${CPPFLAGS}"
     USER_CFLAGS="${CFLAGS}"
-    _XNET_SETUP
+    _LINUX_KERNEL
+    _LINUX_STREAMS
     XNET_INCLUDES="-I- -imacros ./config.h -I./src/include -I${srcdir}/src/include${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
-    AC_MSG_NOTICE([final user CPPFLAGS  = $USER_CPPFLAGS])
-    AC_MSG_NOTICE([final user CFLAGS    = $USER_CFLAGS])
-    AC_MSG_NOTICE([final user INCLUDES  = $XNET_INCLUDES])
-    AC_MSG_NOTICE([final kernel MODFLAGS  = $KERNEL_MODFLAGS])
-    AC_MSG_NOTICE([final kernel NOVERSION = $KERNEL_NOVERSION])
-    AC_MSG_NOTICE([final kernel CPPFLAGS  = $KERNEL_CPPFLAGS])
-    AC_MSG_NOTICE([final kernel CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
+    AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
+    AC_MSG_NOTICE([final user    INCLUDES  = $XNET_INCLUDES])
+    AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
+    AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
+    AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
+    AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
+    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
     AC_SUBST([USER_CPPFLAGS])
     AC_SUBST([USER_CFLAGS])
     AC_SUBST([XNET_INCLUDES])
     CPPFLAGS=
     CFLAGS=
-    AC_RPM_SPEC
+    _XNET_SETUP
+    _XNET_OUTPUT
 ])# AC_XNET
 # =========================================================================
 
 # =========================================================================
 # _XNET_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN(_XNET_OPTIONS,
-[
+AC_DEFUN([_XNET_OPTIONS], [
     AC_ARG_ENABLE([inet],
                   AC_HELP_STRING([--enable-inet],
                                  [enable inet package. @<:@default=no@:>@]),
@@ -114,20 +120,361 @@ AC_DEFUN(_XNET_OPTIONS,
 # =========================================================================
 # _XNET_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN(_XNET_SETUP,
-[
-    AC_LINUX_KERNEL
-    AC_LINUX_STREAMS
-    # here we have our flags set and can perform preprocessor and compiler
-    # checks on the kernel and LiS
+AC_DEFUN([_XNET_SETUP], [
+    _XNET_CHECK_SCTP
+    _XNET_CHECK_XNS
+    _XNET_CHECK_TLI
+    _XNET_CHECK_INET
+    _XNET_CHECK_XNET
+    _XNET_CHECK_SOCK
 ])# _XNET_SETUP
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_SCTP
+# -------------------------------------------------------------------------
+# Check if the kernel supports OpenSS7 SCTP.  This is from an OpenSS7 kernel
+# patch on the kernel.  If the kernel supports OpenSS7 Linux Native Sockets
+# SCTP, then support will be configured for the SCTP in the kernel.
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_SCTP], [
+    AC_CACHE_CHECK([for sctp kernel], [xnet_cv_have_sctp], [
+        xnet_cv_have_sctp=no
+    ])
+    AC_ARG_WITH([sctp],
+        AS_HELP_STRING([--with-sctp],
+            [include sctp kernel.  @<:@default=DETECTED@:>@]),
+        [with_sctp="$enableval"],
+        [with_sctp=''])
+    AC_MSG_CHECKING([for package sctp kernel])
+    case :"$with_sctp" in
+        :yes)   xnet_cv_need_sctp=yes ;;
+        :no)    xnet_cv_need_sctp=no  ;;
+        :*) if test :"$sctp_cv_have_sctp" = :yes
+            then xnet_cv_need_sctp=no
+            else xnet_cv_need_sctp=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_sctp])
+    if test :"$xnet_cv_need_sctp" = :yes ; then :;
+        _XNET_SETUP_SCTP
+    fi
+    AM_CONDITIONAL([WITH_SCTP], test :"$xnet_cv_need_sctp" = :yes )
+])# _XNET_CHECK_SCTP
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_XNS
+# -------------------------------------------------------------------------
+# Check if there are usable (recent OpenSS7) OSI header files.  These would be
+# from a previous OpenSS7 installation.  If they are not usable, they will be
+# replaced with local installed copies.  Also, this decides whether to install
+# manual pages as well.
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_XNS], [
+    AC_CACHE_CHECK([for xns headers], [xnet_cv_have_xns], [
+        xnet_cv_have_xns=no
+    ])
+    AC_ARG_WITH([xns],
+        AS_HELP_STRING([--with-xns],
+            [include xns headers.  @<:@default=DETECTED@:>@]),
+        [with_xns="$enableval"],
+        [with_xns=''])
+    AC_MSG_CHECKING([for package xns headers])
+    case :"$with_xns" in
+        :yes)   xnet_cv_need_xns=yes ;;
+        :no)    xnet_cv_need_xns=no  ;;
+        :*) if test :"$xns_cv_have_xns" = :yes
+            then xnet_cv_need_xns=no
+            else xnet_cv_need_xns=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_xns])
+    if test :"$xnet_cv_need_xns" = :yes ; then :;
+        _XNET_SETUP_XNS
+    fi
+    AM_CONDITIONAL([WITH_XNS], test :"$xnet_cv_need_xns" = :yes )
+])# _XNET_CHECK_XNS
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_TLI
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_TLI], [
+    AC_CACHE_CHECK([for tli modules], [xnet_cv_have_tli], [
+        xnet_cv_have_tli=no
+    ])
+    AC_ARG_WITH([tli],
+        AS_HELP_STRING([--with-tli],
+            [include tli modules.  @<:@default=DETECTED@:>@]),
+        [with_tli="$enableval"],
+        [with_tli=''])
+    AC_MSG_CHECKING([for package tli modules])
+    case :"$with_tli" in
+        :yes)   xnet_cv_need_tli=yes ;;
+        :no)    xnet_cv_need_tli=no  ;;
+        :*) if test :"$tli_cv_have_tli" = :yes
+            then xnet_cv_need_tli=no
+            else xnet_cv_need_tli=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_tli])
+    if test :"$xnet_cv_need_tli" = :yes ; then :;
+        _XNET_SETUP_TLI
+    fi
+    AM_CONDITIONAL([WITH_TLI], test :"$xnet_cv_need_tli" = :yes )
+])# _XNET_CHECK_TLI
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_INET
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_INET], [
+    AC_CACHE_CHECK([for inet driver], [xnet_cv_have_inet], [
+        xnet_cv_have_inet=no
+    ])
+    AC_ARG_WITH([inet],
+        AS_HELP_STRING([--with-inet],
+            [include inet driver.  @<:@default=DETECTED@:>@]),
+        [with_inet="$enableval"],
+        [with_inet=''])
+    AC_MSG_CHECKING([for package inet driver])
+    case :"$with_inet" in
+        :yes)   xnet_cv_need_inet=yes ;;
+        :no)    xnet_cv_need_inet=no  ;;
+        :*) if test :"$inet_cv_have_inet" = :yes
+            then xnet_cv_need_inet=no
+            else xnet_cv_need_inet=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_inet])
+    if test :"$xnet_cv_need_inet" = :yes ; then :;
+        _XNET_SETUP_INET
+    fi
+    AM_CONDITIONAL([WITH_INET], test :"$xnet_cv_need_inet" = :yes )
+])# _XNET_CHECK_INET
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_XNET
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_XNET], [
+    AC_CACHE_CHECK([for xnet library], [xnet_cv_have_xnet], [
+        xnet_cv_have_xnet=no
+    ])
+    AC_ARG_WITH([xnet],
+        AS_HELP_STRING([--with-xnet],
+            [include xnet library.  @<:@default=DETECTED@:>@]),
+        [with_xnet="$enableval"],
+        [with_xnet=''])
+    AC_MSG_CHECKING([for package xnet library])
+    case :"$with_xnet" in
+        :yes)   xnet_cv_need_xnet=yes ;;
+        :no)    xnet_cv_need_xnet=no  ;;
+        :*) if test :"$xnet_cv_have_xnet" = :yes
+            then xnet_cv_need_xnet=no
+            else xnet_cv_need_xnet=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_xnet])
+    if test :"$xnet_cv_need_xnet" = :yes ; then :;
+        _XNET_SETUP_XNET
+    fi
+    AM_CONDITIONAL([WITH_XNET], test :"$xnet_cv_need_xnet" = :yes )
+])# _XNET_CHECK_XNET
+# =========================================================================
+
+# =========================================================================
+# _XNET_CHECK_SOCK
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_CHECK_SOCK], [
+    AC_CACHE_CHECK([for socket library], [xnet_cv_have_sock], [
+        xnet_cv_have_sock=no
+    ])
+    AC_ARG_WITH([sock],
+        AS_HELP_STRING([--with-sock],
+            [include socket library.  @<:@default=DETECTED@:>@]),
+        [with_sock="$enableval"],
+        [with_sock=''])
+    AC_MSG_CHECKING([for package socket library])
+    case :"$with_sock" in
+        :yes)   xnet_cv_need_sock=yes ;;
+        :no)    xnet_cv_need_sock=no  ;;
+        :*) if test :"$sock_cv_have_sock" = :yes
+            then xnet_cv_need_sock=no
+            else xnet_cv_need_sock=yes
+            fi ;;
+    esac
+    AC_MSG_RESULT([$xnet_cv_need_sock])
+    if test :"$xnet_cv_need_sock" = :yes ; then :;
+        _XNET_SETUP_SOCK
+    fi
+    AM_CONDITIONAL([WITH_SOCK], test :"$xnet_cv_need_sock" = :yes )
+])# _XNET_CHECK_SOCK
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_SCTP
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_SCTP], [
+    AC_CACHE_CHECK([for OpenSS7 Kernel SCTP], [lfs_cv_openss7_sctp], [
+        _LINUX_KERNEL_ENV([
+            AC_EGREP_CPP([\<yes_we_have_openss7_kernel_sctp\>], [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <net/sctp.h>
+#ifdef SCTPCB_FLAG_CONF
+    yes_we_have_openss7_kernel_sctp
+#endif
+            ], [lfs_cv_openss7_sctp=yes], [lfs_cv_openss7_sctp=no])
+        ])
+    ])
+    if test :"${lfs_cv_openss7_sctp:-no}" = :yes ; then
+        AC_DEFINE([HAVE_OPENSS7_SCTP], [1],
+        [Define if your kernel supports the OpenSS7 Linux Kernel Sockets SCTP
+        patches.  This enables support in the INET driver for STREAMS on top
+        of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
+    fi
+])# _XNET_SETUP_SCTP
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_XNS
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_XNS], [
+])# _XNET_SETUP_XNS
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_TLI
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_TLI], [
+])# _XNET_SETUP_TLI
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_INET
+# -------------------------------------------------------------------------
+# tcp_openreq_cachep            <-- extern, declared in <net/tcp.h>
+# tcp_set_keepalive             <-- extern, declared in <net/tcp.h>
+# ip_tos2prio                   <-- extern, declared in <net/route.h>
+# sysctl_rmem_default           <-- extern, declared in net/core/sock.c
+# sysctl_wmem_default           <-- extern, declared in net/core/sock.c
+# sysctl_tcp_fin_timeout        <-- extern, declared in net/ipv4/tcp.c
+# -----------------------------------------------------------------------------
+# New ones: (All only exported with IPv6 as module.)
+# tcp_sync_mss                  <-- extern, declared in <net/tcp.h>
+# tcp_write_xmit                <-- extern, declared in <net/tcp.h>
+# tcp_cwnd_application_limited  <-- extern, declared in <net/tcp.h>
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_INET], [
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_openreq_cachep])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_set_keepalive])
+    _LINUX_KERNEL_SYMBOL_ADDR([ip_tos2prio])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_rmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_wmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_tcp_fin_timeout])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_sync_mss])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_write_xmit])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_cwnd_application_limited])
+    _LINUX_KERNEL_ENV([
+        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
+            [lfs_cv_af_inet_ttl_member_name='ttl'],
+            [:],
+            [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+            ])
+        AC_CHECK_MEMBER([struct sock.protinfo.af_inet.uc_ttl],
+            [lfs_cv_af_inet_ttl_member_name='uc_ttl'],
+            [:],
+            [
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>
+            ])
+        ])
+    if test :"${lfs_cv_af_inet_ttl_member_name:+set}" = :set ; then
+        AC_DEFINE_UNQUOTED([USING_AF_INET_TTL_MEMBER_NAME], [$lfs_cv_af_inet_ttl_member_name], [Most
+        kernels call the time-to-live member of the af_inet structure ttl.  For some reason
+        (probably because the old ttl member as 'int' and the new uc_ttl member is 'unsigned char')
+        reported by Bala Viswanathan <balav@lsil.com> to the linux-streams mailing lfst, EL3 renames
+        the member to uc_ttl on some kernels.  Define this to the member name used (ttl or uc_ttl)
+        so that the inet driver can be properly supported.  If this is not defined, 'ttl' will be
+        used as a default.])
+    else
+        AC_MSG_WARN([
+***
+*** You have really mangled kernel header files with regards to the 'sock'
+*** structure.  The 'sock' structure on Linux 2.4 should have an af_inet.ttl
+*** member (used in stock kernels) or an af_inet.uc_ttl member (used on some RH
+*** kernels).  Your kernel headers are so bad that <net/sock.h> has neither
+*** member defined.  Winging it with 'ttl' as the member name.
+***
+        ])
+    fi
+])# _XNET_SETUP_INET
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_XNET
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_XNET], [
+])# _XNET_SETUP_XNET
+# =========================================================================
+
+# =========================================================================
+# _XNET_SETUP_SOCK
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_SOCK], [
+])# _XNET_SETUP_SOCK
+# =========================================================================
+
+# =========================================================================
+# _XNET_OUTPUT
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_OUTPUT], [
+    _XNET_STRCONF
+])# _XNET_OUTPUT
+# =========================================================================
+
+# =========================================================================
+# _XNET_STRCONF
+# -------------------------------------------------------------------------
+AC_DEFUN([_XNET_STRCONF], [
+    strconf_cv_stem='xnet.conf'
+dnl strconf_cv_input='Config.master'
+    strconf_cv_majbase=245
+    strconf_cv_config='strconf.h'
+    strconf_cv_modconf='modconf.h'
+    strconf_cv_drvconf='drvconf.mk'
+    strconf_cv_confmod='confg.modules'
+    strconf_cv_makedev='devices.lst'
+    strconf_cv_mknodes='xnetmakenodes.c'
+    strconf_cv_strsetup='xnetsetup.conf'
+    strconf_cv_strload='xnetload.conf'
+    _STRCONF
+])# _XNET_STRCONF
 # =========================================================================
 
 # =========================================================================
 # _XNET_
 # -------------------------------------------------------------------------
-AC_DEFUN(_XNET_,
-[
+AC_DEFUN([_XNET_], [
 ])# _XNET_
 # =========================================================================
 

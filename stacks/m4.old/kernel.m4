@@ -965,6 +965,34 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VERSIONS], [
 # =========================================================================
 
 # =============================================================================
+# _LINUX_KERNEL_SYMBOL_ADDR(SYMBOLNAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [
+    AS_VAR_PUSHDEF([linux_symbol_addr], [linux_cv_$1_addr])
+    AC_CACHE_CHECK([for kernel symbol $1 address], linux_symbol_addr, [
+        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
+            AS_VAR_SET([linux_symbol_addr], [`($EGREP '\<$1' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`])
+        fi
+        linux_tmp=AS_VAR_GET([linux_symbol_addr]);
+        AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:+0x}$linux_tmp"])
+        linux_tmp=AS_VAR_GET([linux_symbol_addr]);
+        AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:-no}"])
+    ])
+    linux_tmp=AS_VAR_GET([linux_symbol_addr])
+    if test :"${linux_tmp:-no}" != :no ; then
+        AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1_ADDR), AS_VAR_GET([linux_symbol_addr]),
+            [The symbol $1 is not exported by most kernels.  Define this to
+            the address of $1 in the kernel system map so that kernel modules
+            can be properly supported.])
+        $2
+    else :;
+        $3
+    fi
+    AS_VAR_POPDEF([linux_symbol_addr])
+])# _LINUX_KERNEL_SYMBOL_ADDR
+# =============================================================================
+
+# =============================================================================
 # _LINUX_KERNEL_
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL_], [

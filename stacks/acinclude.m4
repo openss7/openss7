@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.8 2004/05/14 20:40:17 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.9 2004/05/15 07:09:27 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/14 20:40:17 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/15 07:09:27 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -153,14 +153,14 @@ AC_DEFUN([_SS7_CHECK_XNS], [
     ])
     AC_ARG_WITH([xns],
         AS_HELP_STRING([--with-xns],
-            [include xns headers. @<:@default=DETECTED@:@>]),
+            [include xns headers. @<:@default=DETECTED@:>@]),
         [with_xns="$enableval"],
         [with_xns=''])
     AC_MSG_CHECKING([for package need xns headers])
     case :"$with_xns" in
         :yes)   ss7_cv_need_xns=yes ;;
         :no)    ss7_cv_need_xns=no  ;;
-        :*) if test :"$ss7_cv_need_xns" = :yes
+        :*) if test :"$ss7_cv_have_xns" = :yes
             then ss7_cv_need_xns=no
             else ss7_cv_need_xns=yes
             fi ;;
@@ -387,124 +387,15 @@ AC_DEFUN([_SS7_SETUP_INET], [
             enables support in the INET driver for STREAMS on top of the OpenSS7 Linux Kernel
             Sockets SCTP implementation.])
     fi
-    AC_CACHE_CHECK([for symbol usable tcp_openreq_cachep address], [ss7_cv_tcp_openreq_cachep_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_tcp_openreq_cachep_addr=`($EGREP '\<tcp_openreq_cachep' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_tcp_openreq_cachep_addr="${ss7_cv_tcp_openreq_cachep_addr:+0x}$ss7_cv_tcp_openreq_cachep_addr"
-            ss7_cv_tcp_openreq_cachep_addr="${ss7_cv_tcp_openreq_cachep_addr:-no}"
-    ])
-    if test :${ss7_cv_tcp_openreq_cachep_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_OPENREQ_CACHEP_ADDR], [$ss7_cv_tcp_openreq_cachep_addr],
-            [The symbol tcp_openreq_cachep is not exported by most kernels.  Define this to the
-            address of tcp_openreq_cachep in the kernel system map so that the inet driver can be
-            properly supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable tcp_set_keepalive address], [ss7_cv_tcp_set_keepalive_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_tcp_set_keepalive_addr=`($EGREP '\<tcp_set_keepalive' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_tcp_set_keepalive_addr="${ss7_cv_tcp_set_keepalive_addr:+0x}$ss7_cv_tcp_set_keepalive_addr"
-            ss7_cv_tcp_set_keepalive_addr="${ss7_cv_tcp_set_keepalive_addr:-no}"
-    ])
-    if test :${ss7_cv_tcp_set_keepalive_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_SET_KEEPALIVE_ADDR], [$ss7_cv_tcp_set_keepalive_addr],
-            [The symbol tcp_set_keepalive is not exported by most kernels.  Define this to the
-            address of tcp_set_keepalive in the kernel system map so that the inet driver can be
-            properly supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable ip_tos2prio address], [ss7_cv_ip_tos2prio_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_ip_tos2prio_addr=`($EGREP '\<ip_tos2prio' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_ip_tos2prio_addr="${ss7_cv_ip_tos2prio_addr:+0x}$ss7_cv_ip_tos2prio_addr"
-            ss7_cv_ip_tos2prio_addr="${ss7_cv_ip_tos2prio_addr:-no}"
-    ])
-    if test :${ss7_cv_ip_tos2prio_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_IP_TOS2PRIO_ADDR], [$ss7_cv_ip_tos2prio_addr],
-            [The symbol ip_tos2prio is not exported by most kernels.  Define this to the address of
-            ip_tos2prio in the kernel system map so that the inet driver can be properly
-            supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable sysctl_rmem_default address], [ss7_cv_sysctl_rmem_default_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_sysctl_rmem_default_addr=`($EGREP '\<sysctl_rmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_sysctl_rmem_default_addr="${ss7_cv_sysctl_rmem_default_addr:+0x}$ss7_cv_sysctl_rmem_default_addr"
-            ss7_cv_sysctl_rmem_default_addr="${ss7_cv_sysctl_rmem_default_addr:-no}"
-    ])
-    if test :${ss7_cv_sysctl_rmem_default_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_RMEM_DEFAULT_ADDR], [$ss7_cv_sysctl_rmem_default_addr],
-            [The symbol sysctl_rmem_default is not exported by most kernels.  Define this to the
-            address of sysctl_rmem_default in the kernel system map so that the inet driver can be
-            properly supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable sysctl_wmem_default address], [ss7_cv_sysctl_wmem_default_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_sysctl_wmem_default_addr=`($EGREP '\<sysctl_wmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_sysctl_wmem_default_addr="${ss7_cv_sysctl_wmem_default_addr:+0x}$ss7_cv_sysctl_wmem_default_addr"
-            ss7_cv_sysctl_wmem_default_addr="${ss7_cv_sysctl_wmem_default_addr:-no}"
-    ])
-    if test :${ss7_cv_sysctl_wmem_default_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_WMEM_DEFAULT_ADDR], [$ss7_cv_sysctl_wmem_default_addr],
-            [The symbol sysctl_wmem_default is not exported by most kernels.  Define this to the
-            address of sysctl_wmem_default in the kernel system map so that the inet driver can be
-            properly supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable sysctl_tcp_fin_timeout address], [ss7_cv_sysctl_tcp_fin_timeout_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_sysctl_tcp_fin_timeout_addr=`($EGREP '\<sysctl_tcp_fin_timeout' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_sysctl_tcp_fin_timeout_addr="${ss7_cv_sysctl_tcp_fin_timeout_addr:+0x}$ss7_cv_sysctl_tcp_fin_timeout_addr"
-            ss7_cv_sysctl_tcp_fin_timeout_addr="${ss7_cv_sysctl_tcp_fin_timeout_addr:-no}"
-    ])
-    if test :${ss7_cv_sysctl_tcp_fin_timeout_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR], [$ss7_cv_sysctl_tcp_fin_timeout_addr],
-            [The symbol sysctl_tcp_fin_timeout is not exported by most kernels.  Define this to the
-            address of sysctl_tcp_fin_timeout in the kernel system map so that the inet driver can
-            be properly supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable tcp_sync_mss address], [ss7_cv_tcp_sync_mss_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_tcp_sync_mss_addr=`($EGREP '\<tcp_sync_mss' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_tcp_sync_mss_addr="${ss7_cv_tcp_sync_mss_addr:+0x}$ss7_cv_tcp_sync_mss_addr"
-            ss7_cv_tcp_sync_mss_addr="${ss7_cv_tcp_sync_mss_addr:-no}"
-    ])
-    if test :${ss7_cv_tcp_sync_mss_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_SYNC_MSS_ADDR], [$ss7_cv_tcp_sync_mss_addr],
-            [The symbol tcp_sync_mss is not exported by most kernels.  Define this to the address of
-            tcp_sync_mss in the kernel system map so that the inet driver can be properly
-            supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable tcp_write_xmit address], [ss7_cv_tcp_write_xmit_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_tcp_write_xmit_addr=`($EGREP '\<tcp_write_xmit' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_tcp_write_xmit_addr="${ss7_cv_tcp_write_xmit_addr:+0x}$ss7_cv_tcp_write_xmit_addr"
-            ss7_cv_tcp_write_xmit_addr="${ss7_cv_tcp_write_xmit_addr:-no}"
-    ])
-    if test :${ss7_cv_tcp_write_xmit_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_WRITE_XMIT_ADDR], [$ss7_cv_tcp_write_xmit_addr],
-            [The symbol tcp_write_xmit is not exported by most kernels.  Define this to the address
-            of tcp_write_xmit in the kernel system map so that the inet driver can be properly
-            supported.])
-    fi
-    AC_CACHE_CHECK([for symbol usable tcp_cwnd_application_limited address],
-            [ss7_cv_tcp_cwnd_application_limited_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                ss7_cv_tcp_cwnd_application_limited_addr=`($EGREP '\<tcp_cwnd_application_limited' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            ss7_cv_tcp_cwnd_application_limited_addr="${ss7_cv_tcp_cwnd_application_limited_addr:+0x}$ss7_cv_tcp_cwnd_application_limited_addr"
-            ss7_cv_tcp_cwnd_application_limited_addr="${ss7_cv_tcp_cwnd_application_limited_addr:-no}"
-    ])
-    if test :${ss7_cv_tcp_cwnd_application_limited_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR], [$ss7_cv_tcp_cwnd_application_limited_addr],
-            [The symbol tcp_cwnd_application_limited is not exported by most kernels.  Define this
-            to the address of tcp_cwnd_application_limited in the kernel system map so that the inet
-            driver can be properly supported.])
-    fi
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_openreq_cachep])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_set_keepalive])
+    _LINUX_KERNEL_SYMBOL_ADDR([ip_tos2prio])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_rmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_wmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_tcp_fin_timeout])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_sync_mss])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_write_xmit])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_cwnd_application_limited])
     _LINUX_KERNEL_ENV([
         AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
             [ss7_cv_af_inet_ttl_member_name='ttl'],

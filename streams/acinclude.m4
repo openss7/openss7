@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et
 dnl =========================================================================
 dnl
-dnl @(#) $Id: acinclude.m4,v 0.9.2.21 2004/05/14 12:15:09 brian Exp $
+dnl @(#) $Id: acinclude.m4,v 0.9.2.22 2004/05/15 07:09:45 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -53,7 +53,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/05/14 12:15:09 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/15 07:09:45 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -463,124 +463,15 @@ AC_DEFUN([_LFS_CONFIG_INET], [
         patches.  This enables support in the INET driver for STREAMS on top
         of the OpenSS7 Linux Kernel Sockets SCTP implementation.])
     fi
-    AC_CACHE_CHECK([for usable tcp_openreq_cachep address], [lfs_cv_tcp_openreq_cachep_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_tcp_openreq_cachep_addr=`($EGREP '\<tcp_openreq_cachep' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_tcp_openreq_cachep_addr="${lfs_cv_tcp_openreq_cachep_addr:+0x}$lfs_cv_tcp_openreq_cachep_addr"
-            lfs_cv_tcp_openreq_cachep_addr="${lfs_cv_tcp_openreq_cachep_addr:-no}"
-    ])
-    if test :${lfs_cv_tcp_openreq_cachep_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_OPENREQ_CACHEP_ADDR], [$lfs_cv_tcp_openreq_cachep_addr],
-        [The symbol tcp_openreq_cachep is not exported by most kernels.  Define
-        this to the address of tcp_openreq_cachep in the kernel system map so
-        that the inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable tcp_set_keepalive address], [lfs_cv_tcp_set_keepalive_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_tcp_set_keepalive_addr=`($EGREP '\<tcp_set_keepalive' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_tcp_set_keepalive_addr="${lfs_cv_tcp_set_keepalive_addr:+0x}$lfs_cv_tcp_set_keepalive_addr"
-            lfs_cv_tcp_set_keepalive_addr="${lfs_cv_tcp_set_keepalive_addr:-no}"
-    ])
-    if test :${lfs_cv_tcp_set_keepalive_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_SET_KEEPALIVE_ADDR], [$lfs_cv_tcp_set_keepalive_addr],
-        [The symbol tcp_set_keepalive is not exported by most kernels.  Define
-        this to the address of tcp_set_keepalive in the kernel system map so
-        that the inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable ip_tos2prio address], [lfs_cv_ip_tos2prio_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_ip_tos2prio_addr=`($EGREP '\<ip_tos2prio' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_ip_tos2prio_addr="${lfs_cv_ip_tos2prio_addr:+0x}$lfs_cv_ip_tos2prio_addr"
-            lfs_cv_ip_tos2prio_addr="${lfs_cv_ip_tos2prio_addr:-no}"
-    ])
-    if test :${lfs_cv_ip_tos2prio_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_IP_TOS2PRIO_ADDR], [$lfs_cv_ip_tos2prio_addr],
-        [The symbol ip_tos2prio is not exported by most kernels.  Define this
-        to the address of ip_tos2prio in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sysctl_rmem_default address], [lfs_cv_sysctl_rmem_default_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_sysctl_rmem_default_addr=`($EGREP '\<sysctl_rmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_sysctl_rmem_default_addr="${lfs_cv_sysctl_rmem_default_addr:+0x}$lfs_cv_sysctl_rmem_default_addr"
-            lfs_cv_sysctl_rmem_default_addr="${lfs_cv_sysctl_rmem_default_addr:-no}"
-    ])
-    if test :${lfs_cv_sysctl_rmem_default_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_RMEM_DEFAULT_ADDR], [$lfs_cv_sysctl_rmem_default_addr],
-        [The symbol sysctl_rmem_default is not exported by most kernels.  Define this
-        to the address of sysctl_rmem_default in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sysctl_wmem_default address], [lfs_cv_sysctl_wmem_default_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_sysctl_wmem_default_addr=`($EGREP '\<sysctl_wmem_default' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_sysctl_wmem_default_addr="${lfs_cv_sysctl_wmem_default_addr:+0x}$lfs_cv_sysctl_wmem_default_addr"
-            lfs_cv_sysctl_wmem_default_addr="${lfs_cv_sysctl_wmem_default_addr:-no}"
-    ])
-    if test :${lfs_cv_sysctl_wmem_default_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_WMEM_DEFAULT_ADDR], [$lfs_cv_sysctl_wmem_default_addr],
-        [The symbol sysctl_wmem_default is not exported by most kernels.  Define this
-        to the address of sysctl_wmem_default in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sysctl_tcp_fin_timeout address], [lfs_cv_sysctl_tcp_fin_timeout_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_sysctl_tcp_fin_timeout_addr=`($EGREP '\<sysctl_tcp_fin_timeout' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_sysctl_tcp_fin_timeout_addr="${lfs_cv_sysctl_tcp_fin_timeout_addr:+0x}$lfs_cv_sysctl_tcp_fin_timeout_addr"
-            lfs_cv_sysctl_tcp_fin_timeout_addr="${lfs_cv_sysctl_tcp_fin_timeout_addr:-no}"
-    ])
-    if test :${lfs_cv_sysctl_tcp_fin_timeout_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR], [$lfs_cv_sysctl_tcp_fin_timeout_addr],
-        [The symbol sysctl_tcp_fin_timeout is not exported by most kernels.  Define this
-        to the address of sysctl_tcp_fin_timeout in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable tcp_sync_mss address], [lfs_cv_tcp_sync_mss_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_tcp_sync_mss_addr=`($EGREP '\<tcp_sync_mss' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_tcp_sync_mss_addr="${lfs_cv_tcp_sync_mss_addr:+0x}$lfs_cv_tcp_sync_mss_addr"
-            lfs_cv_tcp_sync_mss_addr="${lfs_cv_tcp_sync_mss_addr:-no}"
-    ])
-    if test :${lfs_cv_tcp_sync_mss_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_SYNC_MSS_ADDR], [$lfs_cv_tcp_sync_mss_addr],
-        [The symbol tcp_sync_mss is not exported by most kernels.  Define this
-        to the address of tcp_sync_mss in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable tcp_write_xmit address], [lfs_cv_tcp_write_xmit_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_tcp_write_xmit_addr=`($EGREP '\<tcp_write_xmit' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_tcp_write_xmit_addr="${lfs_cv_tcp_write_xmit_addr:+0x}$lfs_cv_tcp_write_xmit_addr"
-            lfs_cv_tcp_write_xmit_addr="${lfs_cv_tcp_write_xmit_addr:-no}"
-    ])
-    if test :${lfs_cv_tcp_write_xmit_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_WRITE_XMIT_ADDR], [$lfs_cv_tcp_write_xmit_addr],
-        [The symbol tcp_write_xmit is not exported by most kernels.  Define this
-        to the address of tcp_write_xmit in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable tcp_cwnd_application_limited address],
-            [lfs_cv_tcp_cwnd_application_limited_addr], [
-            if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-                lfs_cv_tcp_cwnd_application_limited_addr=`($EGREP '\<tcp_cwnd_application_limited' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-            fi
-            lfs_cv_tcp_cwnd_application_limited_addr="${lfs_cv_tcp_cwnd_application_limited_addr:+0x}$lfs_cv_tcp_cwnd_application_limited_addr"
-            lfs_cv_tcp_cwnd_application_limited_addr="${lfs_cv_tcp_cwnd_application_limited_addr:-no}"
-    ])
-    if test :${lfs_cv_tcp_cwnd_application_limited_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR], [$lfs_cv_tcp_cwnd_application_limited_addr],
-        [The symbol tcp_cwnd_application_limited is not exported by most kernels.  Define this
-        to the address of tcp_cwnd_application_limited in the kernel system map so that the
-        inet driver can be properly supported.])
-    fi
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_openreq_cachep])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_set_keepalive])
+    _LINUX_KERNEL_SYMBOL_ADDR([ip_tos2prio])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_rmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_wmem_default])
+    _LINUX_KERNEL_SYMBOL_ADDR([sysctl_tcp_fin_timeout])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_sync_mss])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_write_xmit])
+    _LINUX_KERNEL_SYMBOL_ADDR([tcp_cwnd_application_limited])
     _LINUX_KERNEL_ENV([
         AC_CHECK_MEMBER([struct sock.protinfo.af_inet.ttl],
             [lfs_cv_af_inet_ttl_member_name='ttl'],
@@ -675,119 +566,35 @@ AC_DEFUN([_LFS_CONFIG_SOCK], [
 # 
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_FATTACH], [
-    AC_CACHE_CHECK([for usable mount_sem address], [lfs_cv_mount_sem_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_mount_sem_addr=`($EGREP '\<mount_sem' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_mount_sem_addr="${lfs_cv_mount_sem_addr:+0x}$lfs_cv_mount_sem_addr"
-        lfs_cv_mount_sem_addr="${lfs_cv_mount_sem_addr:-no}"
-    ])
-    if test :${lfs_cv_mount_sem_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_MOUNT_SEM_ADDR], [$lfs_cv_mount_sem_addr],
-        [The symbol mount_sem is not exported by most kernels.  Define this to
-        the address of the mount_sem in the kernel system map so that
-        fattach/fdetach can be properly supported.])
-    else
+    _LINUX_KERNEL_SYMBOL_ADDR([mount_sem], [], [
         AC_DEFINE_UNQUOTED([HAVE_TASK_NAMESPACE_SEM], [1],
         [Some recent 2.4 RH kernel place the mount semaphore into the task
         structure rather than using the static global mount_sem semaphore.
         Define this if you have a modified kernel.])
-    fi
-    AC_CACHE_CHECK([for usable clone_mnt address], [lfs_cv_clone_mnt_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_clone_mnt_addr=`($EGREP '\<clone_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_clone_mnt_addr="${lfs_cv_clone_mnt_addr:+0x}$lfs_cv_clone_mnt_addr"
-        lfs_cv_clone_mnt_addr="${lfs_cv_clone_mnt_addr:-no}"
     ])
-    if test :${lfs_cv_clone_mnt_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_CLONE_MNT_ADDR], [$lfs_cv_clone_mnt_addr],
-        [The symbol clone_mnt is not exported by most kernels.  Define this to
-        the address of clone_mnt in the kernel system map so that
-        fattach/fdetach can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable check_mnt address], [lfs_cv_check_mnt_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_check_mnt_addr=`($EGREP '\<check_mnt' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_check_mnt_addr="${lfs_cv_check_mnt_addr:+0x}$lfs_cv_check_mnt_addr"
-        lfs_cv_check_mnt_addr="${lfs_cv_check_mnt_addr:-no}"
+    lfs_pipe=yes
+    lfs_fattach=yes
+    _LINUX_KERNEL_SYMBOL_ADDR([clone_mnt], [], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_ADDR([check_mnt], [], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_ADDR([graft_tree], [], [lfs_fattach=no; lfs_pipe=no])
+    _LINUX_KERNEL_SYMBOL_ADDR([do_umount], [], [lfs_fattach=no; lfs_pipe=no])
+    AC_CACHE_CHECK([for kernel symbol support for fattach/fdetach], [lfs_cv_fattach], [
+        lfs_cv_fattach="$lfs_fattach"
     ])
-    if test :${lfs_cv_check_mnt_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_CHECK_MNT_ADDR], [$lfs_cv_check_mnt_addr],
-        [The symbol check_mnt is not exported by most kernels.  Define this to
-        the address of check_mnt in the kernel system map so that
-        fattach/fdetach can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable graft_tree address], [lfs_cv_graft_tree_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_graft_tree_addr=`($EGREP '\<graft_tree' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_graft_tree_addr="${lfs_cv_graft_tree_addr:+0x}$lfs_cv_graft_tree_addr"
-        lfs_cv_graft_tree_addr="${lfs_cv_graft_tree_addr:-no}"
-    ])
-    if test :${lfs_cv_graft_tree_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_GRAFT_TREE_ADDR], [$lfs_cv_graft_tree_addr],
-        [The symbol graft_tree is not exported by most kernels.  Define this to
-        the address of graft_tree in the kernel system map so that
-        fattach/fdetach can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable do_umount address], [lfs_cv_do_umount_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_do_umount_addr=`($EGREP '\<do_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_do_umount_addr="${lfs_cv_do_umount_addr:+0x}$lfs_cv_do_umount_addr"
-        lfs_cv_do_umount_addr="${lfs_cv_do_umount_addr:-no}"
-    ])
-    if test :${lfs_cv_do_umount_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_DO_UMOUNT_ADDR], [$lfs_cv_do_umount_addr],
-        [The symbol do_umount is not exported by most kernels.  Define this to
-        the address of do_umount in the kernel system map so that
-        fattach/fdetach can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for ability to support fattach/fdetach], [lfs_cv_fattach], [
-        case "$lfs_cv_clone_mnt_addr:$lfs_cv_check_mnt_addr:$lfs_cv_graft_tree_addr:$lfs_cv_do_umount_addr" in
-            no:*:*:* | *:no:*:* | *:*:no:* | *:*:*:no)
-                lfs_cv_fattach=no
-                ;;
-            *)
-                lfs_cv_fattach=yes
-                ;;
-        esac
-    ])
-    if test :${lfs_cv_fattach:-no} != :no ; then
+    if test :"${lfs_cv_fattach:-no}" != :no ; then
         AC_DEFINE_UNQUOTED([HAVE_KERNEL_FATTACH_SUPPORT], [1],
         [If the addresses for the necessary symbols above are defined, then
         define this to include fattach/fdetach support.])
     fi
-    AC_CACHE_CHECK([for ability to support pipe], [lfs_cv_pipe], [
-        case "$lfs_cv_clone_mnt_addr:$lfs_cv_check_mnt_addr:$lfs_cv_graft_tree_addr:$lfs_cv_do_umount_addr" in
-            no:*:*:* | *:no:*:* | *:*:no:* | *:*:*:no)
-                lfs_cv_pipe=no
-                ;;
-            *)
-                lfs_cv_pipe=yes
-                ;;
-        esac
+    AC_CACHE_CHECK([for kernel symbol support for pipe], [lfs_cv_pipe], [
+        lfs_cv_pipe="$lfs_pipe"
     ])
     if test :${lfs_cv_pipe:-no} != :no ; then
         AC_DEFINE_UNQUOTED([HAVE_KERNEL_PIPE_SUPPORT], [1],
         [If the addresses for the necessary symbols above are defined, then
         define this to include pipe support.])
     fi
-    AC_CACHE_CHECK([for usable def_fifo_f_ops address], [lfs_cv_def_fifo_f_ops_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_def_fifo_f_ops_addr=`($EGREP '\<def_fifo_f_ops' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_def_fifo_f_ops_addr="${lfs_cv_def_fifo_f_ops_addr:+0x}$lfs_cv_def_fifo_f_ops_addr"
-        lfs_cv_def_fifo_f_ops_addr="${lfs_cv_def_fifo_f_ops_addr:-no}"
-    ])
-    if test :${lfs_cv_def_fifo_f_ops_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_DEF_FIFO_F_OPS_ADDR], [$lfs_cv_def_fifo_f_ops_addr],
-        [The symbol def_fifo_f_ops is not exported by most kernels.  Define this to
-        the address of def_fifo_f_ops in the kernel system map so that
-        system fifos can be properly supported.])
-    fi
+    _LINUX_KERNEL_SYMBOL_ADDR([def_fifo_fops])
 ])# _LFS_CONFIG_FATTACH
 # =========================================================================
 
@@ -803,71 +610,27 @@ _LFS_CONFIG_LIS
 # pcibios_init          <-- extern, declared in <linux/pci.h>
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_LIS], [
-    AC_CACHE_CHECK([for usable sys_unlink address], [lfs_cv_sys_unlink_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_sys_unlink_addr=`($EGREP '\<sys_unlink' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+    _LINUX_KERNEL_SYMBOL_ADDR([sys_unlink], [], [
+        if test :"${linux_cv_k_marchdir}" = :parisc ; then
+            AC_MSG_WARN([lis_unlink() will always return ENOSYS])
         fi
-        lfs_cv_sys_unlink_addr="${lfs_cv_sys_unlink_addr:+0x}$lfs_cv_sys_unlink_addr"
-        lfs_cv_sys_unlink_addr="${lfs_cv_sys_unlink_addr:-no}"
     ])
-    if test :${lfs_cv_sys_unlink_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_UNLINK_ADDR], [$lfs_cv_sys_unlink_addr],
-        [The symbol sys_unlink is not exported by most kernels.  Define this
-        to the address of sys_unlink in the kernel system map so that LiS
-        compatibility can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sys_mknod address], [lfs_cv_sys_mknod_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_sys_mknod_addr=`($EGREP '\<sys_mknod' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+    _LINUX_KERNEL_SYMBOL_ADDR([sys_mknod], [], [
+        if test :"${linux_cv_k_marchdir}" = :parisc ; then
+            AC_MSG_WARN([lis_mknod() will always return ENOSYS])
         fi
-        lfs_cv_sys_mknod_addr="${lfs_cv_sys_mknod_addr:+0x}$lfs_cv_sys_mknod_addr"
-        lfs_cv_sys_mknod_addr="${lfs_cv_sys_mknod_addr:-no}"
     ])
-    if test :${lfs_cv_sys_mknod_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_MKNOD_ADDR], [$lfs_cv_sys_mknod_addr],
-        [The symbol sys_mknod is not exported by most kernels.  Define this to
-        the address of sys_mknod in the kernel system map so that LiS
-        compatibility can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sys_umount address], [lfs_cv_sys_umount_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_sys_umount_addr=`($EGREP '\<sys_umount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+    _LINUX_KERNEL_SYMBOL_ADDR([sys_umount], [], [
+        if test :"${linux_cv_k_marchdir}" = :parisc ; then
+            AC_MSG_WARN([lis_umount() will always return ENOSYS])
         fi
-        lfs_cv_sys_umount_addr="${lfs_cv_sys_umount_addr:+0x}$lfs_cv_sys_umount_addr"
-        lfs_cv_sys_umount_addr="${lfs_cv_sys_umount_addr:-no}"
     ])
-    if test :${lfs_cv_sys_umount_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_UMOUNT_ADDR], [$lfs_cv_sys_umount_addr],
-        [The symbol sys_umount is not exported by most kernels.  Define this
-        to the address of sys_umount in the kernel system map so that LiS
-        compatibility can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable sys_mount address], [lfs_cv_sys_mount_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_sys_mount_addr=`($EGREP '\<sys_mount' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
+    _LINUX_KERNEL_SYMBOL_ADDR([sys_mount], [], [
+        if test :"${linux_cv_k_marchdir}" = :parisc ; then
+            AC_MSG_WARN([lis_mount() will always return ENOSYS])
         fi
-        lfs_cv_sys_mount_addr="${lfs_cv_sys_mount_addr:+0x}$lfs_cv_sys_mount_addr"
-        lfs_cv_sys_mount_addr="${lfs_cv_sys_mount_addr:-no}"
     ])
-    if test :${lfs_cv_sys_mount_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SYS_MOUNT_ADDR], [$lfs_cv_sys_mount_addr],
-        [The symbol sys_mount is not exported by most kernels.  Define this to
-        the address of sys_mount in the kernel system map so that LiS
-        compatibility can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable pcibios_init address], [lfs_cv_pcibios_init_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_pcibios_init_addr=`($EGREP '\<pcibios_init' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_pcibios_init_addr="${lfs_cv_pcibios_init_addr:+0x}$lfs_cv_pcibios_init_addr"
-        lfs_cv_pcibios_init_addr="${lfs_cv_pcibios_init_addr:-no}"
-    ])
-    if test :${lfs_cv_pcibios_init_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_PCIBIOS_INIT_ADDR], [$lfs_cv_pcibios_init_addr],
-        [The symbol pcibios_init is not exported by most kernels.  Define this
-        to the address of pcibios_init in the kernel system map so that LiS
-        compatibility can be properly supported.])
-    fi
+    _LINUX_KERNEL_SYMBOL_ADDR([pcibios_init])
 ])# _LFS_CONFIG_LIS
 # =========================================================================
 
@@ -881,32 +644,8 @@ AC_DEFUN([_LFS_CONFIG_LIS], [
 # sock_readv_writev     <-- extern, declared in <linux/net.h>
 # -------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_LFS], [
-    AC_CACHE_CHECK([for usable file_move address], [lfs_cv_file_move_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_file_move_addr=`($EGREP '\<file_move' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_file_move_addr="${lfs_cv_file_move_addr:+0x}$lfs_cv_file_move_addr"
-        lfs_cv_file_move_addr="${lfs_cv_file_move_addr:-no}"
-    ])
-    if test :${lfs_cv_file_move_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_FILE_MOVE_ADDR], [$lfs_cv_file_move_addr],
-        [The symbol file_move is not exported by most kernels.  Define this to
-        the address of file_move in the kernel system map so that Linux
-        Fast-STREAMS can be properly supported.])
-    fi
-    AC_CACHE_CHECK([for usable open_softirq address], [lfs_cv_open_softirq_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_open_softirq_addr=`($EGREP '\<open_softirq' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_open_softirq_addr="${lfs_cv_open_softirq_addr:+0x}$lfs_cv_open_softirq_addr"
-        lfs_cv_open_softirq_addr="${lfs_cv_open_softirq_addr:-no}"
-    ])
-    if test :${lfs_cv_open_softirq_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_OPEN_SOFTIRQ_ADDR], [$lfs_cv_open_softirq_addr],
-        [The symbol open_softirq is not exported by most kernels.  Define this to
-        the address of open_softirq in the kernel system map so that Linux
-        Fast-STREAMS can be properly supported.])
-    else
+    _LINUX_KERNEL_SYMBOL_ADDR([file_move])
+    _LINUX_KERNEL_SYMBOL_ADDR([open_softirq], [], [
         AC_MSG_ERROR([
 *** 
 *** Compiling Linux Fast STREAMS requires the availability of the kernel
@@ -918,20 +657,8 @@ AC_DEFUN([_LFS_CONFIG_LFS], [
 *** which it is being configured.
 *** 
         ])
-    fi
-    AC_CACHE_CHECK([for usable sock_readv_writev address], [lfs_cv_sock_readv_writev_addr], [
-        if test -n "$linux_cv_k_sysmap" -a -r "$linux_cv_k_sysmap" ; then
-            lfs_cv_sock_readv_writev_addr=`($EGREP '\<sock_readv_writev' $linux_cv_k_sysmap | sed -e 's| .*||') 2>/dev/null`
-        fi
-        lfs_cv_sock_readv_writev_addr="${lfs_cv_sock_readv_writev_addr:+0x}$lfs_cv_sock_readv_writev_addr"
-        lfs_cv_sock_readv_writev_addr="${lfs_cv_sock_readv_writev_addr:-no}"
     ])
-    if test :${lfs_cv_sock_readv_writev_addr:-no} != :no ; then
-        AC_DEFINE_UNQUOTED([HAVE_SOCK_READV_WRITEV_ADDR], [$lfs_cv_sock_readv_writev_addr],
-        [The symbol sock_readv_writev is not exported by most kernels.  Define this to
-        the address of sock_readv_writev in the kernel system map so that Linux
-        Fast-STREAMS can be properly supported.])
-    fi
+    _LINUX_KERNEL_SYMBOL_ADDR([sock_readv_writev])
 ])# _LFS_CONFIG_LFS
 # =========================================================================
 

@@ -1,0 +1,197 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/15 07:35:17 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2004/05/15 07:35:17 $ by $Author: brian $
+#
+# =============================================================================
+
+# This automake file fragment includes rules for generating symbol versions.
+# This is only necessary (and permissible) if the kernel supports versioned
+# symbols.
+
+MODVERSIONS_H = $(PKGINCL)/modversions.h
+
+if AMDEP
+sinclude ./$(DEPDIR)/modversions.Ph
+endif
+
+SUFFIXES = .c .ver
+
+if AMDEP
+.c.ver:
+	$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Pver" `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER)
+else
+.c.ver:
+	$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || echo '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER)
+endif
+
+if KERNEL_VERSIONS
+
+if AMDEP
+
+$(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
+	@v=`echo "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions/ ; \
+	mkdir -p -- $$v ; \
+	for s in $(EXPORT_SRCFILES) ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
+		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver" ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$v$$r.ver -MD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver ; \
+	done
+
+$(MODVERSIONS_H): $(EXPORT_VERFILES)
+	@if test -e $(MODVERSIONS_H) ; then \
+		echo "touch $(MODVERSIONS_H)" ; \
+		touch $(MODVERSIONS_H) ; \
+	else \
+		v=`echo "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions/ ; \
+		echo "mkdir -p -- $$v" ; \
+		mkdir -p -- $$v ; \
+		touch $(MODVERSIONS_H) ; \
+		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"  > $(MODVERSIONS_H)" ; \
+		echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
+		echo "echo \"#define _SYS_MODVERSIONS_H\" >> $(MODVERSIONS_H)" ; \
+		echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
+		echo "echo \" \" > ./$(DEPDIR)/modversions.Ph" ; \
+		echo " " > ./$(DEPDIR)/modversions.Ph ; \
+		vers='' ; \
+		list='$(EXPORT_SRCFILES)'; \
+		for s in $$list ; do \
+			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+			r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
+			if test -f $$v$$r.ver ; then \
+				p=`echo "$$v" | sed -e 's|^[^/]*/||'` ; \
+				echo "echo \"#include \"$$p$$r.ver\"\" >> $(MODVERSIONS_H)" ; \
+				echo "#include \"$$p$$r.ver\"" >> $(MODVERSIONS_H) ; \
+				echo "( echo \"sinclude ./$(DEPDIR)/$$r.Pver\" ; echo \"\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
+				( echo "sinclude ./$(DEPDIR)/$$r.Pver" ; echo "" ) >> ./$(DEPDIR)/modversions.Ph ; \
+				echo "( echo \"$$v$$r.ver: $$d$$s\" ; echo \"\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
+				( echo "$$v$$r.ver: $$d$$s" ; echo "" ) >> ./$(DEPDIR)/modversions.Ph ; \
+				vers="$${vers}$${vers:+ }$$v$$r.ver" ; \
+			fi ; \
+		done ; \
+		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\" >> $(MODVERSIONS_H)" ; \
+		echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H) ; \
+		echo "( echo \"\" ; echo \"$(MODVERSIONS_H): $$vers\" ) >> ./$(DEPDIR)/modversions.Ph" ; \
+		( echo "" ; echo "$(MODVERSIONS_H): $$vers" ) >> ./$(DEPDIR)/modversions.Ph ; \
+	fi
+
+else
+
+$(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
+	@v=`echo "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions/ ; \
+	mkdir -p -- $$v ; \
+	for s in $(EXPORT_SRCFILES) ; do \
+		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
+		echo "$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver" ; \
+		$(CPP) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v$$r.ver ; \
+	done
+
+$(MODVERSIONS_H): $(EXPORT_VERFILES)
+	@if test -e $(MODVERSIONS_H) ; then \
+		echo "touch $(MODVERSIONS_H)" ; \
+		touch $(MODVERSIONS_H) ; \
+	else \
+		v=`echo "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions/ ; \
+		echo "mkdir -p -- $$v" ; \
+		mkdir -p -- $$v ; \
+		touch $(MODVERSIONS_H) ; \
+		echo "echo \"#ifndef _SYS_MODVERSIONS_H\"  > $(MODVERSIONS_H)" ; \
+		echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
+		echo "echo \"#define _SYS_MODVERSIONS_H\" >> $(MODVERSIONS_H)" ; \
+		echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
+		vers='' ; \
+		list='$(EXPORT_SRCFILES)'; \
+		for s in $$list ; do \
+			if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
+			r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
+			if test -f $$v$$r.ver ; then \
+				p=`echo "$$v" | sed -e 's|^[^/]*/||'` ; \
+				echo "echo \"#include \"$$p$$r.ver\"\" >> $(MODVERSIONS_H)" ; \
+				echo "#include \"$$p$$r.ver\"" >> $(MODVERSIONS_H) ; \
+				vers="$${vers}$${vers:+ }$$v$$r.ver" ; \
+			fi ; \
+		done ; \
+		echo "echo \"#endif /* _SYS_MODVERSIONS_H */\" >> $(MODVERSIONS_H)" ; \
+		echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H) ; \
+	fi
+
+endif
+
+clean-ksyms:
+	@v=`echo "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions/ ; \
+	list='$(EXPORT_SRCFILES)'; for s in $$list; do \
+		r=`echo "$$s" | sed -e 's|.*/||;s|\.c$$||'` ; \
+		echo "rm -f $$v$$r.ver" ; \
+		rm -f $$v$$r.ver ; \
+	done
+	rm -f $(MODVERSIONS_H)
+
+else
+
+$(MODVERSIONS_H):
+	mkdir -p -- $(PKGINCL) ; \
+	echo "#ifndef _SYS_MODVERSIONS_H"  > $(MODVERSIONS_H) ; \
+	echo "#define _SYS_MODVERSIONS_H" >> $(MODVERSIONS_H) ; \
+	echo "#endif /* _SYS_MODVERSIONS_H */" >> $(MODVERSIONS_H)
+
+clean-ksyms:
+	rm -f $(MODVERSIONS_H)
+
+endif
+
+all: $(MODVERSIONS_H)
+
+dep: $(MODVERSIONS_H)
+
+clean-local: clean-ksyms
+
+#.PHONY: dep clean-ksyms
+
+# vim: ft=automake

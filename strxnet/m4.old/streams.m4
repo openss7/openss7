@@ -2,7 +2,7 @@ dnl =========================================================================
 dnl BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 et nocindent
 dnl =========================================================================
 dnl
-dnl @(#) $Id: streams.m4,v 0.9.2.1 2004/04/05 12:39:05 brian Exp $
+dnl @(#) $Id: streams.m4,v 0.9.2.2 2004/05/15 07:35:18 brian Exp $
 dnl
 dnl =========================================================================
 dnl
@@ -54,7 +54,7 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl 
 dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2004/04/05 12:39:05 $ by $Author: brian $
+dnl Last Modified $Date: 2004/05/15 07:35:18 $ by $Author: brian $
 dnl 
 dnl =========================================================================
 
@@ -74,56 +74,56 @@ dnl both are specified, it defaults to LfS.
 dnl -------------------------------------------------------------------------
 
 # =========================================================================
-# AC_LINUX_STREAMS
+# _LINUX_STREAMS
 # -------------------------------------------------------------------------
-AC_DEFUN([AC_LINUX_STREAMS],
-[
-    AC_REQUIRE([AC_LINUX_KERNEL])
+AC_DEFUN([_LINUX_STREAMS], [
+    AC_REQUIRE([_LINUX_KERNEL])
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
     _LINUX_STREAMS_OUTPUT
-])# AC_LINUX_STREAMS
+    AC_SUBST([STREAMS_CPPFLAGS])
+])# _LINUX_STREAMS
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_OPTIONS
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_OPTIONS],
-[
+AC_DEFUN([_LINUX_STREAMS_OPTIONS], [
     AC_ARG_WITH([lis],
-        AC_HELP_STRING([--with-lis=HEADERS], [specify the LiS header file
-            directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
-            [with_lis=$withval],
-            [with_lis=''])
+        AS_HELP_STRING([--with-lis=HEADERS],
+            [specify the LiS header file directory.  @<:@default=INCLUDEDIR/LiS@:>@]),
+        [with_lis=$withval],
+        [with_lis=''])
     AC_ARG_WITH([lfs],
-        AC_HELP_STRING([--with-lfs=HEADERS], [specify the LfS header file
-            directory. @<:@default=INCLUDEDIR/LfS@:>@]),
-            [with_lfs=$withval],
-            [with_lfs=''])
+        AS_HELP_STRING([--with-lfs=HEADERS],
+            [specify the LfS header file directory. @<:@default=INCLUDEDIR/LfS@:>@]),
+        [with_lfs=$withval],
+        [with_lfs=''])
 ])# _LINUX_STREAMS_OPTIONS
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_SETUP
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_SETUP],
-[
-    AC_CACHE_CHECK([for kernel STREAMS header files], [streams_cv_includes], [dnl
+AC_DEFUN([_LINUX_STREAMS_SETUP], [
+    AC_CACHE_CHECK([for kernel STREAMS header files], [streams_cv_includes], [
+        streams_cv_package=
+        streams_cv_includes=
         if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
             _LINUX_STREAMS_LIS_CHECK_HEADERS
-            if test :"${lis_cv_includes:-no}" != :no ; then
-                streams_cv_includes="$lis_cv_includes"
+            if test :"${streams_cv_lis_includes:-no}" != :no ; then
+                streams_cv_includes="$streams_cv_lis_includes"
                 streams_cv_package="LiS"
             fi
         fi
         if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
             _LINUX_STREAMS_LFS_CHECK_HEADERS
-            if test :"${lfs_cv_includes:-no}" != :no ; then
-                streams_cv_includes="$lfs_cv_includes"
-                streams_cv_package="LFS"
+            if test :"${streams_cv_lfs_includes:-no}" != :no ; then
+                streams_cv_includes="$streams_cv_lfs_includes"
+                streams_cv_package="LfS"
             fi
         fi
-        if test :"${streams_cv_includes:-no}" = :no ; then
+        if test :"${streams_cv_package:-no}" = :no ; then
             if test :"${with_lis:-no}" != :no ; then
                 AC_MSG_ERROR([
 *** 
@@ -158,23 +158,22 @@ AC_DEFUN([_LINUX_STREAMS_SETUP],
         fi
     ])
     STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_cv_includes}"
+    STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${streams_cv_xti_includes:+ -I}${streams_cv_xti_includes}"
 ])# _LINUX_STREAMS_SETUP
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_LIS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-# Test for the existence of Linux STREAMS header files.  The package normally
-# requires either Linux STREAMS or Linux Fast-STREAMS header files (or both)
-# to compile.
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
-[
-    lis_cv_includes=
+AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [
+    # Test for the existence of Linux STREAMS header files.  The package
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS header files
+    # (or both) to compile.
+    streams_cv_lis_includes=
     if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no
     then
         # compiling for the running kernel
-        eval "lis_search_path=\"
+        eval "streams_search_path=\"
             ${with_lis}
             ${includedir}/LiS
             ${oldincludedir}/LiS
@@ -184,7 +183,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
             \""
     else
         # building for another environment
-        eval "lis_search_path=\"
+        eval "streams_search_path=\"
             ${with_lis}
             ${linux_cv_module_prefix}/${includedir}/LiS
             ${linux_cv_module_prefix}/${oldincludedir}/LiS
@@ -196,65 +195,75 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS],
             /usr/src/LiS/include
             \""
     fi
-    lis_search_path=`echo "$lis_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-    for lis_dir in $lis_search_path ; do
-        if test -d $lis_dir -a -r $lis_dir/sys/stream.h ; then
-            lis_cv_includes="$lis_dir"
+    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+    for streams_dir in $streams_search_path ; do
+        if test -d $streams_dir -a -r $streams_dir/sys/stream.h ; then
+            streams_cv_lis_includes="$streams_dir"
             break
         fi
     done
+    # Some of our older RPM releases of LiS put the xti header files into their
+    # own subdirectory (/usr/include/xti/).  The current version places them in
+    # with the LiS header files.  This tests whether we need an additional
+    # -I/usr/include/xti in the streams includes line.  This check can be
+    # dropped when the older RPM releases of LiS fall out of favor.
+    streams_cv_xti_includes=
+    streams_dir=`echo "$streams_cv_lis_includes" | sed -e 's|/*$||;s|usr/src/LiS/include|usr/src/LiS/include/LiS|;s|LiS$|xti|'`
+    if test -d $streams_dir -a -r $streams_dir/xti.h ; then
+        streams_cv_xti_includes="$streams_dir"
+    fi
 ])# _LINUX_STREAMS_LIS_CHECK_HEADERS
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_LFS_CHECK_HEADERS
 # -------------------------------------------------------------------------
-# Test for the existence of Linux Fast-STREAMS header files.  The package
-# normally requires either Linux STREAMS or Linux Fast-STREAMS header files
-# (or both) to compile.
-# -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS],
-[
-    lfs_cv_includes=
+AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [
+    # Test for the existence of Linux Fast-STREAMS header files.  The package
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS header files
+    # (or both) to compile.
+    streams_cv_lfs_includes=
     if test :"${cross_compiling:-no}" = :no -a :"${with_k_release:-no}" = :no ; then
         # compiling for the running kernel
-        eval "lfs_search_path=\"
+        eval "streams_search_path=\"
             ${with_lfs}
-            ${includedir}
-            ${oldincludedir}
-            /usr/include
-            /usr/local/include
-            /usr/src/streams/src/include
+            ${includedir}/streams
+            ${oldincludedir}/streams
+            /usr/include/streams
+            /usr/local/include/streams
+            /usr/src/streams/include
             \""
     else
         # building for another environment
-        eval "lfs_search_path=\"
+        eval "streams_search_path=\"
             ${with_lfs}
-            ${linux_cv_module_prefix}/${includedir}
-            ${linux_cv_module_prefix}/${oldincludedir}
-            ${linux_cv_module_prefix}/usr/include
-            ${linux_cv_module_prefix}/usr/local/include
-            ${linux_cv_module_prefix}/usr/src/streams/src/include
-            ${includedir}
-            ${oldincludedir}
-            /usr/src/streams/src/include
+            ${linux_cv_module_prefix}/${includedir}/streams
+            ${linux_cv_module_prefix}/${oldincludedir}/streams
+            ${linux_cv_module_prefix}/usr/include/streams
+            ${linux_cv_module_prefix}/usr/local/include/streams
+            ${linux_cv_module_prefix}/usr/src/streams/include
+            ${includedir}/streams
+            ${oldincludedir}/streams
+            /usr/src/streams/include
             \""
     fi
-    lfs_search_path=`echo "$lfs_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-    for lfs_dir in $lfs_search_path ; do
-        if test -d $lfs_dir -a -r $lfs_dir/sys/stream.h ; then
-            lfs_cv_includes="$lfs_dir"
+    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+    for streams_dir in $streams_search_path ; do
+        if test -d $streams_dir -a -r $streams_dir/sys/stream.h ; then
+            streams_cv_lfs_includes="$streams_dir"
             break
         fi
     done
+    # For Linux Fast-STREAMS, xti includes are part of the release
+    # /usr/include/streams subdirectory.
+    streams_cv_xti_includes=
 ])# _LINUX_STREAMS_LFS_CHECK_HEADERS
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_OUTPUT
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_OUTPUT],
-[
+AC_DEFUN([_LINUX_STREAMS_OUTPUT], [
     case "$streams_cv_package" in
         LiS)
             _LINUX_STREAMS_LIS_DEFINES
@@ -263,15 +272,13 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT],
             _LINUX_STREAMS_LFS_DEFINES
             : ;;
     esac
-    AC_SUBST([STREAMS_CPPFLAGS])
 ])# _LINUX_STREAMS_OUTPUT
 # =========================================================================
 
 # =========================================================================
 # _LINUX_STREAMS_LIS_DEFINES
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
-[
+AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [
     case "$linux_cv_march" in
 	alpha*)			: ;;
 	arm*)			: ;;
@@ -294,7 +301,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # "head/mod.c" to determine whether to define struct pt_regs; and in
             # <LiS/include/sys/lislocks.h> to determine the size of semaphore
             # memory.
-            #
             STREAMS_CPPFLAGS="-D_PPC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390x*)			
@@ -308,14 +314,12 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # determine whether a bunch of PCI DMA mapping functions are
             # available; "include/sys/osif.h" to determine whether a bunch of
             # PCI DMA mapping functions are available.
-            #
             STREAMS_CPPFLAGS="-D_S390X_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	s390*)			
             # Define when compiling for S390.  Strangely enough, _S390_LIS_ is
             # never checked without _S390X_LIS_.  Rendering it as an alias for
             # the above.
-            #
             STREAMS_CPPFLAGS="-D_S390_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sh*)			: ;;
@@ -327,7 +331,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # define is used to determine when ioremap functions are not
             # available <LiS/include/osif.h>.  Strangely enough, none of the
             # other checks are performed as for _SPARC_LIS_ below.
-	    #
             STREAMS_CPPFLAGS="-D_SPARC64_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	sparc*)			
@@ -339,7 +342,6 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
             # available <LiS/include/osif.h>, when PCI BIOS is not present
             # (head/osif.c), and when <linux/poll.h> is missing POLLMSG
             # <LiS/include/sys/poll.h>
-            #
             STREAMS_CPPFLAGS="-D_SPARC_LIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
 	*)			: ;;
@@ -351,8 +353,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES],
 # =========================================================================
 # _LINUX_STREAMS_LFS_DEFINES
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES],
-[
+AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [
     STREAMS_CPPFLAGS="-D_LFS_SOURCE${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 ])# _LINUX_STREAMS_LFS_DEFINES
 # =========================================================================
@@ -360,8 +361,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES],
 # =========================================================================
 # _LINUX_STREAMS_
 # -------------------------------------------------------------------------
-AC_DEFUN([_LINUX_STREAMS_],
-[
+AC_DEFUN([_LINUX_STREAMS_], [
 ])# _LINUX_STREAMS_
 # =========================================================================
 
