@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH NOENABLE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B noenable, lis_noenable
 \- disables a \fISTREAMS\fR message queue from being scheduled
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "noenable(queue_t *" q );
+.BI "void noenable(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
-the queue to suppress scheduling.
+the queue for which to suppress scheduling.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR noenable ()
@@ -93,11 +101,29 @@ sets the
 flag on the specified
 .IR q .
 This tells the
-.IR STREAMS (4)
+.I STREAMS
 executive that the
 .I q
 cannot be scheduled for
-.BR runqueues () .
+.BR runqueues ()
+by calls to
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+or
+.BR putbq (9)
+when these function enqueue a normal priority message.
+.BR noenable ()
+has no effect on the scheduling of queue service procedures when the queue is
+back-enabled,
+when
+.BR qenable (9)
+is called, or when a priority message is enqueued with
+.BR appq (9),
+.BR insq (9),
+.BR putq (9)
+or
+.BR putbq (9).
 .PP
 .BR noenable ()
 can be cancelled with
@@ -113,11 +139,45 @@ has not subsequently been called for the same
 .IR q ,
 a second call to
 .BR noenable ()
-will have no effect.
-.SH "RETURN VALUES"
+for the queue will have no effect.
+.PP
+Whether a queue has been disabled with a call to
+.BR noenable ()
+can be tested with
+.BR canenable (9).
+.\"
+.\"
+.SH USAGE
 .PP
 .BR noenable ()
-returns void.
+can be used to temporarily suspend queue service procedure processing for a
+queue for normal priority messages.  This permits data messages to be enqueued
+with
+.BR putq (9),
+.BR putbq (9),
+.BR appq (9)
+or
+.BR insq (9)
+without invoking the queue's service procedure.
+.PP
+This facility can be used to provide Nagle-like algorithms for flow control on
+read or write queues.  For example, multiple messages can be enqueued
+permitting the queue's service procedure, when later invoked, to coalesce
+smaller messages into larger ones.  Such a queue can be pushed by scheduling
+the service procedure explicitly with the
+.BR qenable (9)
+call once a sufficient time period has elapsed, or once a sufficient number of
+bytes have been enqueued.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR noenable ()
+sets the
+.B QNOENB
+flag and returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 If the
@@ -130,11 +190,13 @@ or does not point to a queue structure,
 then
 .BR noenable ()
 will silently fail.
-.SH CAVEATS
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR noenable ()
-does not remove the
-.I q
+does not remove the queue,
+.IR q ,
 from the current
 .BR runqueues ()
 schedule list.  It only sets the
@@ -142,37 +204,258 @@ schedule list.  It only sets the
 flag to indicate whether the queue should be subsequently scheduled.
 To stop a queue from being scheduled, use
 .BR qprocsoff (9).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR noenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR noenable ()
+is MP-safe; however,
+if one thread disables a queue with
+.BR noenable ()
+and another enables the queue with
+.BR enableok (9),
+there will be a race condition on the
+.B QNOENB
+flag.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.BR enableok (9),
+.BR appq (9),
 .BR canenable (9),
-and
+.BR enableok (9),
+.BR freezestr (9),
+.BR insq (9),
+.BR putbq (9),
+.BR putq (9),
 .BR qenable (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-The manpage was written for
-.B LiS\c
-.
+.BR noenable ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR noenable ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR noenable ()
+uses atomic bit operations and does not require taking the queue write lock.
+This makes
+.BR noenable ()
+safe for use on a write locked stream that has been frozen with
+.BR freezestr (9).
+.I LiS
+takes the queue spin lock and uses normal bit operations to set the flag.
+.IP \(em
+.BR noenable ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR noenable ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR noenable ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not invoke
+.BR noenable ()
+on a stream that has previously been frozen with
+.BR freezestr (9).
+.IP \(em
+.BR noenable ()
+called with an invalid
+.I q
+argument will have an undefined result.
+In referenced versions of
+.I LiS
 .[
 LiS
 .]
+the result is undefined in the same situations due to an
+.I LiS
+coding error.
+Repaired versions of
+.I LiS
+will make
+.BR noenable ()
+fail silently in these situations.
+Portable
+.I STREAMS
+drivers and modules should never invoke
+.BR noenable ()
+with an invalid
+.I q
+argument.
+.IP \(em
+.BR noenable ()
+only supresses the scheduling of queues for normal messages enqueued with
+.BR appq (9).
+Only
+.I LiS
+provides the
+.BR appq (9)
+function so the behaviour of
+.BR noenable ()
+with regard to
+.BR appq (9)
+is non-portable.
+As with
+.BR insq (9)
+.I LiS
+suppresses the scheduling of queues for any message enqueued with
+.BR appq (9).
+Portable
+.I STREAMS
+drivers and modules should not use the
+.BR appq (9)
+function call.
+.I STREAMS
+drivers and modules using the
+.BR appq (9)
+function call should not rely on the
+.I LiS
+behavior with regard to
+.BR noenable ().
+.IP \(em
+.BR noenable ()
+does not suppress the scheduling of queues when back-enabling is performed,
+when
+.BR qenable (9)
+is explicitly called, or when priority messages are enqueued with
+.BR putq (9),
+.BR putbq (9),
+.BR insq (9)
+or
+.BR appq (9).
+.IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+state that
+.BR noenable ()
+disables the scheduling of queues resulting from a normal priority message
+being placed on the queue with
+.BR putq (9)
+or
+.BR putbq (9)
+and that it disables scheduling of queues resulting from any message being
+placed on the queue with
+.BR insq (9).
+.I LiS
+also follows this behaviour.
+.IP \(em
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+state that
+.BR noenable ()
+disables the scheduling of queues resulting from a normal priority message
+being placed on the queue with
+.BR putq (9),
+.BR putbq (9)
+or
+.BR insq (9),
+and that the scheduling of queues resulting from back-enabling or high
+priority messages being enqueued is never suppressed with
+.BR noenable ().
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+does not talk about
+.BR insq (9)
+behaviour.
+.IP \(em
+Portable
+.I STREAMS
+drivers and modules should not rely upon the behaviour of
+.BR insq (9)
+with regard to high-priority messages when
+.BR noenable ()
+is in effect.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR noenable ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

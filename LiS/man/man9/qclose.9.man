@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qclose.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qclose.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QCLOSE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qclose, lis_qclose
 \- closes a \fISTREAMS\fR module or driver
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = qclose(queue_t *" q ", int " flag ", cred_t *" credp );
+.BI "int qclose(queue_t *" q ", int " flag ", cred_t *" credp );
+.\"
+.\"
 .SH ARGUMENTS
 .TP
 .I q
@@ -92,16 +98,18 @@ procedure.
 .TP
 .I credp
 the credentials of the caller.
+.\"
+.\"
 .SH DESCRIPTION
 .BR qclose ()
 closes a
-.IR STREAMS (4)
+.I STREAMS
 module or driver by calling the queue's
 .I qi_qclose
 procedure.
 .BR qclose ()
 is invoked on the last close of a
-.IR STREAMS (4)
+.I STREAMS
 character special file.
 .PP
 .I q
@@ -128,19 +136,9 @@ typedef struct cred {
 } cred_t;
 \fR\s+2
 .fi
-.SH CAVEATS
-.PP
-.BR qclose ()
-is an internal
-.IR STREAMS (4)
-function that is not intended to be called directly by
-the module writer.  See
-.BR close (2s)
-and
-.B I_POP
-under
-.BR streamio (2).
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR qclose ()
@@ -148,17 +146,59 @@ returns zero (0).
 Upon failure,
 .BR qclose ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
-.SH BUGS
+When
+.BR qclose ()
+fails, it returns a negative error number as follows:
 .PP
-.B LiS
-.[
-LiS
-.]
-invokes the module's
-.I qi_qclose
-procedure directly and ignores the return value.
+In addition, any error returned by the module's
+.I q->q_info->qi_close
+function can be returned by
+.BR qclose ().
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qclose ()
+should only be called from user context or from within a
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qclose ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qclose ()
+is an internal
+.I STREAMS
+function that is not intended to be called directly by
+the module writer.  See
+.BR close (2s)
+and
+.B I_POP
+under
+.BR streamio (2).
+.PP
+.BR qclose ()
+is an internal
+.I STREAMS
+function which was not intended to be called directly by
+.I STREAMS
+modules or drivers.
+.BR qclose ()
+is not part of the DDI/DKI and should no be called by portable programs.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 Following is an example of a module close procedure.
@@ -175,37 +215,66 @@ int xxx_close(queue_t* q, int flag, cred_t* crp)
 }
 \fR\s+2
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
 .BR close (2s),
 .BR streamio (2),
 .BR qopen (9),
 .BR qattach (9),
 .BR qdetach (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.B LiS
 .[
 LiS
 .]
+invokes the module's
+.I qi_qclose
+procedure directly and ignores the return value.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR qclose ()
-first appeared in SVR 3.
+is not exported by SVR 4.2 MP DDI/DKI
+or
+.IR Solaris \(rg.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr3
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.BR qclose ()
+is compliant with the description of the internal
+.BR qclose ()
+function of
+SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
 .[
 magic
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qclose ()
+first appeared in as a module entry point in SVR 3.
 .[
-svr42
-.]
-.[
-svr4
+svr3
 .]
 .\"
 .\"

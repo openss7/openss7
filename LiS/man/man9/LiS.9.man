@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: LiS.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: LiS.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,9 +72,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LiS 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B LiS
 \- introduction to \fISTREAMS\fR kernel functions
+.\"
+.\"
 .SH SYNOPSIS
 .B #include <sys/stropts.h>
 .br
@@ -85,13 +89,19 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .br
 .B #include <sys/dki.h>
+.\"
+.\"
 .SH DESCRIPTION
 .PP
+.\"
+.\"
 .SH OVERVIEW
 .PP
+.\"
 .SS "Header Files"
-.HP
+.HP 12
 .B <sys/stropts.h>
+.PD 0
 .HP
 .B <sys/stream.h>
 .HP
@@ -100,12 +110,14 @@ sort-adjacent-labels
 .B <sys/ddi.h>
 .HP
 .B <sys/dki.h>
-.PP
+.PD
+.\"
 .SS "Common Drivers"
-.HP
+.HP 12
 .BR fifo (4)
 \-
 first-in first-out special file, named pipe
+.PD 0
 .HP
 .BR clone (4)
 \-
@@ -114,12 +126,14 @@ the STREAMS clone driver
 .BR sad (4)
 \-
 the STREAMS administrative driver
+.PD
+.\"
 .SS "Common Modules"
-.PP
-.HP
+.HP 12
 .BR pipemod (4)
 \-
 STREAMS module supporting flush handling in STREAMS fifos and pipes
+.PD 0
 .HP
 .BR ldl (4)
 \-
@@ -137,12 +151,14 @@ a STREAMS XTI/TLI compatibility interface
 .BR tirdwr (4)
 \-
 a STREAMS XTI/TLI read write comptibility interface
+.PD
+.\"
 .SS "System Calls"
-.PP
-.HP
+.HP 12
 .BR getmsg (2)
 \-
 get next message from a STREAMS character device
+.PD 0
 .HP
 .BR getpmsg (2s)
 \-
@@ -199,11 +215,14 @@ control device
 .BR streamio (2)
 \-
 STREAMS ioctl commands
+.PD
+.\"
 .SS "Module and Driver Registration Functions"
-.HP
+.HP 12
 .BR lis_register_strmod (9)
 \-
 register a STREAMS module
+.PD 0
 .HP
 .BR lis_unregister_strmod (9)
 \-
@@ -220,12 +239,14 @@ unregister a STREAMS device
 .BR lis_find_strdev (9)
 \-
 finds a streamtab entry for a device
+.PD
+.\"
 .SS "Message Handling Functions"
-.PP
-.HP
+.HP 12
 .BR adjmsg (9)
 \-
 trim bytes from the front or back of a STREAMS message
+.PD 0
 .HP
 .BR allocb (9)
 \-
@@ -330,12 +351,14 @@ unlink a message block from a STREAMS message
 .BR xmsgsize (9)
 \-
 calculate the size of message blocks in a STREAMS message
+.PD
+.\"
 .SS "Queue Handling Functions"
-.PP
-.HP
+.HP 12
 .BR appq (9)
 \-
 append a STREAMS message after another
+.PD 0
 .HP
 .BR backq (9)
 \-
@@ -484,12 +507,14 @@ sets attributes of a STREAMS message queue
 .BR WR (9)
 \-
 return the write queue of a STREAMS queue pair
+.PD
+.\"
 .SS "Miscellaneous Functions"
-.PP
-.HP
+.HP 12
 .BR bcopy (9)
 \-
 copy byte strings
+.PD 0
 .HP
 .BR bzero (9)
 \-
@@ -558,12 +583,39 @@ remove a file
 .BR untimeout (9)
 \-
 stop a timer
-.SH "RETURN VALUES"
+.PD
+.\"
+.\"
+.SH RETURN
 .PP
+These functions have various return values.
+See the individual manual pages for more information.
+.\"
+.\"
 .SH ERRORS
 .PP
-.SH CAVEATS
+These functions have various error conditions.
+See the individual manual pages for more information.
+.\"
+.\"
+.SH CONTEXT
 .PP
+These functions can be executed in various contexts.
+See the individual manual pages for more information.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+These functions have various degress of MP and preemptive kernel support.
+See the individual manual pages for more information.
+.\"
+.\"
+.SH NOTICES
+.PP
+These functions have various caveats.
+See the individual manual pages for more information.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR adjmsg (9),
@@ -652,27 +704,62 @@ stop a timer
 .BR untimeout (9),
 .BR WR (9),
 .BR xmsgsize (9).
-
-
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.I LiS
+has a wide range of noxious and hard to fix bugs, mostly concerning MP or
+preemptive kernel operation.  See the individual manual pages for more
+information.
+.I LiS
+is hardly usable.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
 .\"
 .\"
-.XX
+.SH COMPATIBILITY
+.PP
+For the large part,
+.I LiS
+is compatible only with non-MP SVR 4.
+.PP
+For a fully functional
+.I STREAMS
+.I SVR 4.2 MP
 .[
-magic
+svr42spg
 .]
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr42
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I LiS
+is partially conformant to
+.IR "SVR 4" .
 .[
 svr4
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.I STREAMS
+first appeared in
+.IR "SVR 3" .
+.[
+svr3
 .]
 .\"
 .\"

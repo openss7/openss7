@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkb.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: linkb.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LINKB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B linkb
 \- link a message block to a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "linkb(struct msgb *" mp1 ", struct msgb *" mp2 );
+.BI "void linkb(struct msgb *" mp1 ", struct msgb *" mp2 );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the message to which to link.
 .TP
 .I mp2
 the message to link.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR linkb ()
@@ -95,10 +103,14 @@ links the message pointed to by
 .I mp2
 onto the end of the message pointed to be
 .IR mp1 .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR linkb ()
 returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR linkb ()
@@ -106,44 +118,77 @@ silently fails if either
 .IR mp1 " or " mp2
 are
 .BR NULL .
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR linkb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR linkb ()
+is MP-safe.  The caller is responsible to ensure exclusive access to the
+passed in messages.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
 LiS
 .]
 does not permit multiple processes to be operating on the same
-.IR STREAMS (4)
+.I STREAMS
 message at the
 same time.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR unlinkb (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR linkb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR linkb ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR linkb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

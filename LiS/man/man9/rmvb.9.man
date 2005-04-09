@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmvb.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: rmvb.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH RMVB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B rmvb, lis_rmvb
 \- remove a message block from a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "mblk_t *" msg " = rmvb(mblk_t *" mp ", mblk_t *" bp );
+.BI "mblk_t *rmvb(mblk_t *" mp ", mblk_t *" bp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,14 +94,15 @@ the message chain from which to remove a block.
 .TP
 .I bp
 the message block to remove.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Removes the message block pointed to by
 .I bp
 from the message pointed to by
 .I mp
-and returns the pointer to the (new) first message block in the message,
-.IR msg .
+and returns the pointer to the (new) first message block in the message.
 .PP
 .BR rmvb ()
 does removes the message block
@@ -108,21 +115,22 @@ but does not free the message block
 .I b_cont
 pointer is set to
 .BR NULL .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR rmvb ()
-returns a pointer to the modified message
-.IR msg .
-The modified message
-.I msg
-may be
+returns a pointer to the modified message.
+The modified message may be
 .BR NULL .
 .PP
 Upon failure,
 .BR rmvb ()
 returns
 .BR "(mblk_t *)(-1)" .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -133,7 +141,26 @@ fails it returns
 only fails if
 .I bp
 was not in the message.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR rmvb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR rmvb ()
+is MP-safe; however, it is the responsibility of the caller to ensure
+exclusive access to the passed in message
+.I mp
+and message block
+.IR dp .
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR rmvb ()
 returns
@@ -156,36 +183,86 @@ and
 .BR rmvb ()
 should return
 .BR (mblk_t *)(-1).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR linkb (9),
 .BR unlinkb (9),
 .BR freeb (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+When
+.I mp
+is
+.B NULL
+and
+.I bp
+is not,
+.I bp
+does not exist in the message pointed to by
+.IR mp ,
+and 
+.BR rmvb ()
+should return
+.BR (mblk_t *)(-1).
+.I LiS
+returns
+.B NULL
+in this situation.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR rmvb ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+When
+.IR mp " and " bp
+are
+.BR NULL ,
+.BR rmvb ()
+correctly returns
+.BI "(mblk_t *)(" -1 )\fR.
+Under
+.IR LiS ,
+.BR rmvb ()
+will return
+.B NULL
+in the same situation.  This is an
+.I LiS
+bug.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR rmvb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

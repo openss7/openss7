@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcopy.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: bcopy.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BCOPY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B bcopy
+.B bcopy, lis_bcopy
 \- copy byte strings
+.\"
+.\"
 .SH SYNOPSIS
 .PP
-.B #include <string.h>
+.B #include <linux/string.h>
 .HP 8
-.BI "bcopy(const void *" src ", void *" dest ", size_t " len );
+.BI "void bcopy(const void *" src ", void *" dest ", size_t " len );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -91,6 +97,8 @@ the destination address to which to copy bytes.
 .TP
 .I len
 the number of bytes to copy.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR bcopy ()
@@ -103,26 +111,45 @@ to the destination address
 If
 .I len
 is zero, this function has no effect.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR bcopy ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR bcopy ()
 always succeeds.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bcopy ()
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bcopy ()
+is MP-safe, provided the caller ensures exclusive access to the memory areas involved.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
 LiS
 .]
 preserves this deprecated function.
-.BR memcpy (3)
+.BR memcpy (9)
 should be used instead.
 For older
-.IR STREAMS (4)
+.I STREAMS
 modules and drivers, it is sufficient to define the macro:
 .sp
 .nf
@@ -131,36 +158,77 @@ modules and drivers, it is sufficient to define the macro:
 #define bcopy(__src, __dst, __len) (void)memcpy(__dst, __src, __len)
 \s+2\fR
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bzero (9),
-.BR memcpy (3).
+.BR memcpy (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR bcopy ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bcopy ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+and
+.IR UnixWare \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+documentation.
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR bcopy ()
 first appeared in SVR 2.
 .[
 svr2
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
 .]
 .\"
 .\"

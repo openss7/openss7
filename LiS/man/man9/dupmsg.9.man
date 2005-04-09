@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dupmsg.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: dupmsg.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH DUPMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B dupmsg
+.B dupmsg, lis_dupmsg
 \- duplicate a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "mblk_t *" msg " = dupmsg(mblk_t *" mp );
+.BI "mblk_t *dupmsg(mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message chain to duplicate.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR dupmsg ()
@@ -93,17 +101,20 @@ blocks.
 The data blocks are reused.  Each data block will have its reference counter
 incremented.  If one duplicate message alters the data in a data block, the
 change affects all duplicate messages.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR dupmsg ()
-returns a pointer to the duplicate message,
-.IR msg .
+returns a pointer to the duplicate message.
 .PP
 Upon failure,
 .BR dupmsg ()
 returns
 .BR NULL .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -127,7 +138,22 @@ is not
 should be called with the
 .I priority
 associated with the message for which duplication failed.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR dupmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR dupmsg ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -143,6 +169,16 @@ is made for each message block.  If
 .BR dupb (9)
 fails, the partially duplicated message is freed using
 .BR freemsg (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR dupb (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR freemsg (9).
+.\"
+.\"
 .SH BUGS
 .PP
 .B LiS
@@ -152,38 +188,65 @@ LiS
 used to have some problems serializing access to the reference count in data
 blocks which caused inconsistencies in the reference count when duplicate
 messages were freed.
-.SH "SEE ALSO"
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-.BR dupb (9),
-.BR copyb (9),
-.BR copymsg (9),
-.BR freemsg (9).
+.BR dupmsg ()
+is compatible with LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+When
+.BR dupmsg ()
+is passed a
+.B NULL
+.I mp
+pointer, the results are undefined.  When LiS
+.BR dupmsg ()
+is passed a
+.B NULL
+.I mp
+pointer, it returns
+.BR NULL .
+.sp
+Portable
+.I STREAMS
+modules and drivers should not pass
+.B NULL
+or invalid message block pointers to this function.
+.IP \(em
+LiS used to have some problems serializing access to the reference count in
+data blocks which caused inconsistencies in the reference count when duplicate
+messages were freed.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR dupmsg ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: OTHERQ.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: OTHERQ.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,9 +72,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH OTHER 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B OTHER, OTHERQ
+.B OTHER, OTHERQ, lis_OTHER, lis_OTHERQ
 \- return the other queue of a \fISTREAMS\fR queue pair
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
@@ -82,11 +86,15 @@ sort-adjacent-labels
 .BI "queue_t *" oq " = OTHER(" q );
 .HP 8
 .BI "queue_t *" oq " = OTHERQ(" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue for which to find the other queue in the queue pair.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR OTHERQ ()
@@ -96,7 +104,13 @@ pointer
 regardless of whether
 .I q
 points to the read queue or the write queue of the queue pair.
-.SH "RETURN VALUES"
+.PP
+.BR OTHERQ ()
+is typically and often used to find the opposite queue from a pointer to one of
+the queues in a queue pair.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR OTHERQ ()
@@ -111,6 +125,8 @@ returns
 .BR OTHERQ ()
 is typically and often used to find the opposite queue from a pointer to one of
 the queues in a queue pair.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -129,7 +145,34 @@ is
 .BR NULL ;
 .I q->q_other
 does not point to a valid queue structure.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR OTHERQ ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR OTHERQ ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call-outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -151,19 +194,68 @@ LiS
 .]
 function call is inefficient, particularly as this function is called often
 and regularly.
+.PP
+If the passed in queue pointer,
+.IR q ,
+is invalid, the result is undefined.
+.PP
+If the passed in queue pointer,
+.IR q ,
+is
+.BR NULL ,
+a kernel oops will occur.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR RD (9),
 .BR WR (9),
 .BR SAMESTR (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.b
+.BR OTHERQ ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR OTHERQ ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and systems based on
+.IR "SVR 4" .
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR OTHERQ ()
+first appeared in
+.IR "SVR 3" ,
+.[
+svr3spg
+.]
+where it was implemented as a macro.
 .\"
 .\"
 .[

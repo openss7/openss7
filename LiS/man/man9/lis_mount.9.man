@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_mount.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_mount.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,9 +72,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH MOUNT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B mount, lis_mount
 \- mount a file system
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
@@ -82,6 +86,8 @@ sort-adjacent-labels
 .B #include <sys/dki.h>
 .HP 8
 .BI "int " retval " = lis_mount(char *" specialfile ", char *" dir ", char *" filesystemtype ", unsigned long " mountflags ", void *" data );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -99,6 +105,8 @@ how to mount the filesystem.
 .TP
 .I data
 filesystem specific data.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR mount ()
@@ -114,7 +122,7 @@ that can be called from the kernel.
 The purpose of this function being called from the kernel is to permit STREASM
 kernel modules to mount their own filesystems.  Normally a file system would
 be mounted by a
-.IR STREAMS (4)
+.I STREAMS
 module or driver when the
 .B Linux
 kernel module is initialized (i.e. within the
@@ -145,6 +153,7 @@ can be as follows:
 .TP 16
 .B MS_RDONLY
 mount the file system read only.
+.PD 0
 .TP 16
 .B MS_NOSUID
 ignore suid and sgid bits.
@@ -172,6 +181,7 @@ do not change the access times on directories.
 .TP 16
 .B MS_BIND
 bind the subtree elsewhere.
+.PD
 .PP
 .I data
 is an argument that is interpreted differently depending on the file system
@@ -179,7 +189,9 @@ type.
 .PP
 For additional information, see
 .BR mount (2).
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR mount ()
@@ -187,6 +199,8 @@ returns zero (0).
 Upon failure,
 .BR mount ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -194,7 +208,21 @@ When
 fails, it returns a negative error number that can contain any of the errors
 listed under
 .BR mount (2).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mount ()
+must be called from user (process) context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mount ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR mount ()
 is implemented by changing the data segment to the kernel data segment and
@@ -206,34 +234,50 @@ of the caller is not changed.
 This makes this function rather useless if the process invoking it is not the
 kernel module loading daemon, or other process running with real root
 permission.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR mount (2),
 .BR lis_umount2 (9),
 .BR lis_mknod (9),
 .BR lis_unlink (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+Under GCOM releases of
+.IR LiS ,
+.BR moutn ()
+will not function and will panic the kernel on architectures that do not have a simple call
+interface for system calls (e.g. parisc).
+.PP
+Previous and current OpenSS7 releases of
+.I LiS
+do not have this problem.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR mount ()
-appeared in SVR 2.
+is compatible with
+.BR mount (2).
 .\"
 .\"
-.XX
-.[
-magic
-.]
+.SH CONFORMANCE
+.PP
+.I SVR 4.2
 .[
 svr42
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mount ()
+.IR "SVR 2" .
 .[
-svr4
+svr2
 .]
 .\"
 .\"

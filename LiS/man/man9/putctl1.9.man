@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl1.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: putctl1.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH PUTCTL1 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B putctl1, lis_putctl1
 \- puts a 1 byte control message on a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = putctl1(queue_t *" q ", int " type ", int " param );
+.BI "int putctl1(queue_t *" q ", int " type ", int " param );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -91,6 +97,8 @@ the type of control message.
 .TP
 .I param
 a one byte parameter for the message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR putctl1 ()
@@ -106,7 +114,9 @@ If
 is a data message type and not a control message type,
 .BR putctl1 ()
 will fail.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR putctl1 ()
@@ -115,6 +125,8 @@ returns true (1).
 Upon failure,
 .BR putctl1 ()
 returns false (0).
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR putctl1 ()
@@ -125,9 +137,29 @@ is not a control message type, or if the passed in queue pointer
 is
 .BR NULL ;
 or, if allocation of the necessary message blocks fails.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-None.
+.BR putctl1 ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putctl1 ()
+is MP-safe; however, the driver or module put procedures invoked must also be MP-safe.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR putctl (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9).
+.\"
+.\"
 .SH BUGS
 .PP
 .B LiS
@@ -159,36 +191,99 @@ is closing, or the queue has had put and service routine processing turned off
 LiS
 .]
 should return failure when the operation fails.
-.SH "SEE ALSO"
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-.BR putctl (9),
-.BR putnextctl (9),
-.BR putnextctl1 (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
+.BR putctl1 ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR LiS ,
+.BR putctl1 ()
+will return success even if the operation fails because of the following
+conditions:
+.I q
+is not
+.BR NULL ,
+but points to something other than a queue structure;
+the queue pointed to by
+.I q
+has a
+.I q_info
+pointer of
+.BR NULL ;
+the queue pointed to by
+.I q
+has no put procedure; or the queue pointed to by
+.I q
+is closing, or the queue has had put and service routine processing turned off
+(e.g. with
+.BR qprocsoff (9)).
+.I LiS
+should return failure when the operation fails.
+.IP \(em
+.BR putctl1 ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putctl1 ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putctl1 ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and comatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI.
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR putctl1 ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

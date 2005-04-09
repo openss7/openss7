@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_unregister_strdev.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_unregister_strdev.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,34 +72,42 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_UNREGSITER_STRDEV 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_unregister_strdev
 \- unregister a \fISTREAMS\fR device
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = lis_unregister_strdev(major_t " major );
+.BI "int lis_unregister_strdev(major_t " major );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I major
 the major device number to unregister.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR lis_unregister_strdev ()
 deregisters a
-.IR STREAMS (4)
+.I STREAMS
 driver previously registered with
 .BR lis_register_strdev (9).
 .PP
 .BR lis_unregister_strdev ()
 removes the
-.IR STREAMS (4)
+.I STREAMS
 driver identified by its major device number,
 .IR major ,
 from the
-.IR STREAMS (4)
+.I STREAMS
 device switch table and deregisters the character major
 number,
 .IR major ,
@@ -108,16 +116,30 @@ from the
 kernel using
 .BR unregister_chrdev ().
 Before removing the
-.IR STREAMS (4)
+.I STREAMS
 driver,
 .B LiS
 .[
 LiS
 .]
 will also clear any autopush list associated with the
-.IR STREAMS (4)
+.I STREAMS
 driver.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH USAGE
+.PP
+.BR lis_unregister_strdev ()
+can be called multiple times for the same device driver with different
+selections of the
+.I major
+device number.  This has the effect that multiple (external) character major
+device numbers will be disassociated with the
+.I STREAMS
+device.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon succes,
 .BR lis_unregister_strdev ()
@@ -125,6 +147,8 @@ returns zero (0).
 Upon failure,
 .BR lis_unregister_strdev ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -144,11 +168,34 @@ LiS
 .TP 12
 .RB [ EBUSY ]
 The
-.IR STREAMS (4)
+.I STREAMS
 driver identified by
 .I major
 has open file descriptors.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR lis_unregister_strdev ()
+can be called from any blocking context.  Consideration for import on
+performance and latency should be given before calling
+.BR lis_unregister_strdev ()
+from soft or hard interrupt context.  Typically,
+.BR lis_unregister_strdev ()
+is called from the
+.BR module_exit (9)
+procedure of a kernel module associated with a
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR lis_unregister_strdev ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 Although
 .B LiS
@@ -158,17 +205,19 @@ LiS
 will demand load a
 .B Linux
 kernel module supporting a
-.IR STREAMS (4)
+.I STREAMS
 driver, it will not remove that module once
 it is deregistered.
 .B Linux
 does, however, provide a mechanism for autocleaning kernel modules that have a
 zero reference count and this facility could be used instead.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 Following is an example that demonstrates how 4 major device numbers could be
 registered and deregistered against a
-.IR STREAMS (4)
+.I STREAMS
 driver:
 .sp
 .in +4
@@ -221,34 +270,70 @@ void x_terminate(void)
 }
 \s+2\fR
 .fi
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR lis_register_strdev (9),
 .BR lis_register_strmod (9),
 .BR lis_unregister_strdev (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR lis_unregister_strdev ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR lis_unregister_strdev ()
+is an
+.I LiS
 .[
 LiS
 .]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR lis_unregister_strdev ()
+is an
+.I LiS
+.[
+LiS
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR lis_unregister_strdev ()
-is an LiS-specific function that first appeared in early version of
+is an
+.IR LiS -specific
+function that first appeared in early version of
 .BR LiS .
-.\"
-.\"
-.XX
 .[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+LiS
 .]
 .\"
 .\"

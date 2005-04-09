@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ESBALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B esballoc
+.B esballoc, lis_esballoc
 \- allocate a \fISTREAMS\fR message and data block with a caller supplied data buffer
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "mblk_t *" mp " = esballoc(unsigned char *" base ", int " size, ", int " priority ", frtn_t *" freeinfo );
+.BI "mblk_t *esballoc(unsigned char *" base ", int " size, ", int " priority ", frtn_t *" freeinfo );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,19 +100,21 @@ the priority of the message header request.
 .TP
 .I freeinfo
 a pointer to a structure describing the function and argument to pass to free the buffer.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B ESBALLOC
 is used where the
-.IR STREAMS (4)
+.I STREAMS
 driver needs control over the location, allocation and deallocation of data
 buffers.  This may be because the data buffers are subject to some physical
 contraints (e.g. must be allocated in DMA-able memory, or must exist in
 dual-ported RAM or in a decriptor ring).  This may also be because some other
 mechanism outside of
-.IR STREAMS (4)
+.I STREAMS
 has already allocated and passed the data buffer to a
-.IR STREAMS (4)
+.I STREAMS
 driver.
 .PP
 Where it is not necessary that the caller provide the data buffer,
@@ -126,12 +134,14 @@ can be one of the following values:
 .TP 12
 .B BPRI_LO
 The caller requests a low priority message buffer.
+.PD 0
 .TP 12
 .B BPRI_MED
 The caller requests a medium priority message buffer.
 .TP 12
 .B BPRI_HI
 The caller requests a high priority message buffer.
+.PD
 .PP
 The data buffer of length
 .I size
@@ -165,28 +175,28 @@ is freed with
 .PP
 The allocated message block will have a data block type of
 .BR M_DATA .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .B ESBALLOC
-returns a pointer,
-.IR mp ,
-to the allocated message block.
+returns a pointer to the allocated message block.
 .PP
 Upon failure,
 .B ESBALLOC
 returns a
 .B NULL
-message pointer,
-.IR mp .
+message pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When an error occurs,
 .BR ESBALLOC
 will return a
 .B NULL
-message pointer,
-.IR mp .
+message pointer.
 .PP
 .BR ESBALLOC
 will fail if
@@ -202,14 +212,32 @@ the message block or data block.
 .PP
 Failure to allocate a message block is typically followed by a call to
 .BR esbbcall (9).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR esballoc ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+The priority
+.B BPRI_WAITOK
+must only be used from a blocking context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR esballoc ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
 .PP
 As with other post-SVR 4.2
 .[
 svr42
 .]
 compliant
-.IR STREAMS (4)
+.I STREAMS
 implementations,
 .B LiS
 .[
@@ -238,42 +266,176 @@ see \*(lqThe Magic Garden\*(rq section 7.2.2.
 magic
 %S 7.2.2
 .]
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following examples shows how a data buffer suitable for use by Direct
+Memory Access is allocated:
+.nf
+\fC\s-2
+void xxx_free_func(char *buf)
+{
+    kfree(buf);
+    MOD_DEC_USE_COUNT;
+}
+
+mblk_t *xxx_alloc_dma_buf(size_t bufsize)
+{
+    unsigned char *buf;
+    MOD_INC_USE_COUNT;
+    if ((buf = kmalloc(bufsize, GFP_ATOMIC | GFP_DMA))) {
+        mblk_t *mp;
+        frtn_t freertn = {
+            free_func:&xxx_free_func,
+            free_arg:(char *) buf,
+        };
+        if (!(mp = esballoc(buf, bufsize, BPRI_MED, &freertn)))
+            xxx_free_func(buf);
+        return (mp);
+    }
+    MOD_DEC_USE_COUNT;
+    return (NULL);
+}
+\s+2\fP
+.fi
+.PP
+The example, above, also shows the technique for keeping the current kernel
+module from unloading before the free function is called for all outstanding
+message blocks that reference the free function.  See
+.RI \*(lq NOTICES \*(rq,
+above.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR freeb (9),
 .BR freemsg (9),
 .BR bufcall "(9), and "
 .BR esbbcall (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR esballoc ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR esballoc ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR esballoc ()
+uses the priority mechanism described above under
+.RI \*(lq NOTICES \*(rq,
+above.
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR Solaris \(rg
+.[
+solspg
+.]
+and
+.I LiS
+.[
+lis
+.]
+ignore the
+.I priority
+argument as also described above under
+.RI \*(lq NOTICES \*(rq.
+Portable
+.I STREAMS
+drivers and modules will not rely upon the response of
+.BR esballoc ()
+to any given value of the
+.I priority
+argument.
+.IP \(em
+.BR esballoc ()
+will return
+.B NULL
+only if the allocation fails.
+Under LiS,
+.BR esballoc ()
+will return
+.B NULL
+if
+.IR base " or " freeinfo
+is
+.BR NULL .
+.BR esballoc ()
+will panic when
+.IR base " or " freeinfo
+are
+.BR NULL .
+Under LiS, the same conditions will return
+.BR NULL .
+Portable
+.I STREAMS
+drivers and modules will not pass invalid or
+.B NULL
+arguments to
+.BR esballoc ().
+.IP \(em
+.BR esballoc ()
+accepts the priority
+.BR BPRI_WAITOK ,
+which is
+.IR OSF/1 \(rg-specific
+.[
+osfspg
+.]
+and non-portable.
+.BR BPRI_WAITOK
+will block the calling thread if a message block is not immediately available,
+and is only intended to be called from a blocking context (e.g. from the
+.BR qopen (9)
+and
+.BR qclose (9)
+procedures).
+Portable
+.I STREAMS
+drivers and modules will only use the priority values of
+.BR BPRI_LO ,
+.BR BPRI_MED
+and
+.BR BPRI_HI .
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
-.B ESBALLOC
-first appeared in SVR 3 STREAMS
+.BR esballoc ()
+first appeared in SVR 4 DDI/DKI.
 .[
-svr3
-.]
-and continued in SVR 4.2 STREAMS.
-.[
-svr42
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr4dk
 .]
 .\"
 .\"

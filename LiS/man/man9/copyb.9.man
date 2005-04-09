@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyb.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: copyb.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,32 +72,55 @@ sort-adjacent-labels
 .\"
 .\"
 .TH COPYB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B copyb
+.B copyb, lis_copyb
 \- copy a \fISTREAMS\fR message block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "struct msgb *" bp " = copyb(struct msgb *" mp );
+.BI "mblk_t *copyb(mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message block to copy.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR copyb ()
 generates a new copy of the message block and data block and buffer indicated
 by
 .IR mp ,
-and returns a pointer to the new message block as
-.IR bp .
+and returns a pointer to the new message block.
 The new data block has the same type as the copied data block and the
 .IR b_rptr " and " b_wptr
 in the new message block are set to the beginning and end of the copied data
 in the new data block and buffer.
-.SH "RETURN VALUES"
+.PP
+The data buffer copied consists of only the portions between the
+.I b_rptr
+and
+.I b_wptr
+of the passed in message block.
+.PP
+.BR copyb ()
+calls
+.BR allocb (9)
+to copy message blocks with priority
+.BR BRPI_MED .
+Message alignment and memory type assurances are as described in
+.BR allocb (9).
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR copyb ()
@@ -108,6 +131,8 @@ Upon failure,
 returns a
 .B NULL
 pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -134,7 +159,24 @@ should be called with the
 of the data block necessary and the
 .I priority
 associated with the operation.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR copyb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR copyb ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message block.  On return, the caller has the only reference to the returned
+message block.
+.\"
+.\"
+.SH NOTICES
 .PP
 The
 .B LiS
@@ -156,42 +198,125 @@ This does not appear consistent with SVR 4.2 STREAMS.
 .[
 svr42
 .]
-.SS "Considerations for MP"
-.PP
-.BR copyb ()
-is kernel thread-safe and MP-safe can be invoked from inside or outside and
-interrupt handler.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bufcall (9),
 .BR copymsg (9),
 .BR dupb "(9) and "
 .BR dupmsg (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR copyb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR copyb ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementattions based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR copyb ()
+copies both the
+.I b_band
+and
+.I b_flag
+members of the passed in message block to the returned message block.
+Older versions of
+.I LiS
+.[
+lis
+.]
+did not copy
+.I b_band
+or
+.I b_flag
+members.  Recent versions copy both.
+.IR AIX \(rg
+copies
+.IR b_band ,
+but not
+.IR b_flag ,
+members.
+.IR Solaris \(rg
+copies both
+.I b_band
+and
+.I b_flag
+members.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers should not rely on any
+.BR msgb (9)
+fields being copied into the returned message block and should copy or
+reinitialize all significant fields (such as
+.IR b_band " and " b_flag ).
+.IP \(em
+.BR copyb ()
+aligns the new data buffer in the same manner as if
+.BR allocb (9)
+was called and the data was copied between
+.IR db_base " and " db_lim .
+(See
+.BR msgb "(9) and " datab (9)).
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+make no assurances whatsoever about the resulting alignment.
+.I LiS
+.[
+lis
+.]
+restores the same alignment in the copy as the original data to a word
+boundary.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers should make no assumptions about the alignment of data
+resulting from a
+.BR copyb ()
+or
+.BR copymsg (9)
+operation.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR copyb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

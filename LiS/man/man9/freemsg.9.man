@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freemsg.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: freemsg.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,24 +72,32 @@ sort-adjacent-labels
 .\"
 .\"
 .TH FREEMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B freemsg
+.B freemsg, lis_freemsg
 \- frees a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "freemsg(struct msgb *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message chain to free.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR freemsg ()
 frees the
-.IR STREAMS (4)
+.I STREAMS
 message pointed to by
 .I mp
 and the associated message blocks, data blocks and data buffers.
@@ -106,10 +114,14 @@ will be called with the
 provided previously to a
 .BR esballoc (9)
 call.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR freemsg ()
 returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 If the block pointer,
@@ -121,7 +133,23 @@ is
 then
 .BR freeb ()
 will silently fail.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR freemsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR freemsg ()
+is MP-safe.  It is the caller's responsibility to ensure that it has the last
+remaining reference to the message blocks in the passed in message.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR freemsg (9)
 is implemented with a looping call to
@@ -151,38 +179,55 @@ LiS
 should use kernel memory caches instead and should free the message blocks and
 data blocks when they are no longer used to allow existing cache slots to be
 reused.  Bypassing the kernel memory allocation and deallocation mechanisms
-by using a free list results in poorer performance that might be suspected by
+by using a free list results in poorer performance than might be expected by
 those that do not understand kernel memory chaching mechanisms.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR allocb (9),
 .BR esballoc "(9) and "
 .BR freeb (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR freemsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR freemsg ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR freemsg ()
 appeared first in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

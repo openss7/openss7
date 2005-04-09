@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocson.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qprocson.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,35 +72,100 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QPROCSON 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qprocson, lis_qprocson
 \- enables a \fISTREAMS\fR message queue for multi-processing
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "qprocson(queue_t *" rq );
+.BI "void qprocson(queue_t *" rq );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I rq
 the read queue of the queue pair for which to turn on queue procedures.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qprocson ()
 enables the invocation of put and service procedures for the queue pair whose
 read queue pointer is pointed to by
 .IR rq .
-.SH "RETURN VALUES"
+.PP
+.BR qprocson ()
+should be called before returning from the
+.BR qopen (9)
+procedure and before passing any messages with
+.BR put (9)
+or
+.BR putnext (9),
+invoking callbacks with
+.BR mi_bufcall (9),
+.BR qbufcall (9)
+or
+.BR qtimeout (9)
+and before executing
+.BR qwait (9)
+or
+.BR qwait_sig (9).
+.PP
+.BR qprocson ()
+is provided so that a module or driver
+.BR qopen (9)
+procedure is able to prepare
+.BR put (9)
+and
+.BR srv (9)
+procedures from the open routine before the
+.BR put (9)
+and
+.BR srv (9)
+procedures are invoked by upstream stream head, modules or drivers on either
+queue in the queue pair.
+.\"
+.\"
+.SH RETURN
 .PP
 .BR qprocson ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR qprocsoff ()
 is always successful.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qprocson ()
+can be called from any
+.BR !in_irq ()
+context including user context, queue procedures, call-outs, callbacks, but
+must not be called from an interrupt service routine.
+.PP
+.BR qprocsoff ()
+must be called by the
+.BR qclose ()
+procedure (i.e. in user context) before returning.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qprocson ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -109,9 +174,164 @@ LiS
 .BR qprocson ()
 must be called with the queue-pair read queue, otherwise only the write queue
 will have processing turned on.  This is probably a bug.
+.PP
+.BR qprocson ()
+must be called with a valid read queue pointer for a queue pair.
+.BR qprocson ()
+must not be called on a stream that is frozen with
+.BR freezestr (9).
+.PP
+Before a call to
+.BR qprocson ()
+a driver or module is only partially attached to a stream.  With procedures
+turned off, any upstream or downstream module calling
+.BR putnext (9)
+will bypass the module.
+After the explicit (or implicit) call to
+.BR qprocson ()
+the driver or module is fully inserted into the stream.
+.PP
+See also
+.IR \*(lqCOMPATIBILITY\*(rq ,
+below.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.BR qprocson (9).
+.BR qprocsoff (9),
+.BR qopen (9),
+.BR putnext (9),
+.BR allocq (9),
+.BR freezestr (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qprocson ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qprocson ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and system based on
+.IR "SVR 4" ,
+with the following porting considerations:
+.IP \(em \w'\(em\(em'u
+.BR qprocson ()
+sets the
+.I QHLIST
+flag in the
+.BR queue (9)
+structure for both queues in the queue pair.
+.BR qprocson ()
+can be called repeatedly for the same queue pair and only the first call will
+have an effect.  This can crash or lock processors on other systems (with the
+exception of
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+as described below.)
+.IP \(em
+Although
+.BR qprocson ()
+is supposed to be called before returning from the
+.BR qopen (9)
+procedure,
+on systems that support it,
+.B Linux Fast-STREAMS
+performs an implicit
+.BR qprocson ()
+upon return from
+.BR qopen (9)
+in the case that
+.BR qprocson ()
+was not called before return.
+.IP \(em
+.BR qprocson ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qprocson ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qprocson ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qprocson ()
+first appeared in SVR 4 MP DDI/DKI.
+.[
+svr4dk
+.]
+.\"
+.\"
 .SH VERSIONS
 .PP
 This manpage is written for
@@ -125,18 +345,6 @@ LiS
 first appeared in SVR 4.2.
 .[
 svr42
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
 .]
 .\"
 .\"

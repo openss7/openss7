@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canenable.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: canenable.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,20 +72,30 @@ sort-adjacent-labels
 .\"
 .\"
 .TH CANENABLE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.SH "NAME"
-.B canenable
+.\"
+.\"
+.SH NAME
+.B canenable, lis_safe_canenable
 \- test whether a \fISTREAMS\fR message queue can be scheduled.
-.SH "SYNOPSIS"
+.\"
+.\"
+.SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = canenable(queue_t *" q );
-.SH "ARGUMENTS"
+.BI "int canenable(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I q
-the queue to test for ability to be enabled.
-.SH "DESCRIPTION"
+the queue to test whether a subsequent
+.BR qenable (9)
+can be successful.
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 .BR canenable ()
 tests whether the queue pointed to by
@@ -101,7 +111,9 @@ when the caller wishes to determine whether
 .BR qenable (9)
 will indeed result in the scheduling of the queue's
 service procedure.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR canenable ()
 returns true (1) if the queue pointed to by
@@ -114,11 +126,35 @@ returns false (0) if the queue pointed to by
 .I q
 cannot be enabled with
 .BR qenable (9).
-.SH "ERRORS"
+.\"
+.\"
+.SH ERRORS
 .PP
 .BR canenable ()
 is always successful.
-.SH "CAVEATS"
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR canenable ()
+is not MP-safe.
+Consideration should be given that the return may change before the condition
+is tested if
+.BR noenable (9)
+or
+.BR qprocsoff (9)
+are allowed to execute concurrent with
+.BR canenable ().
+.\"
+.\"
+.SH NOTICES
 .PP
 If
 .B LiS
@@ -127,36 +163,119 @@ LiS
 .]
 .BR qenable ()
 encounters an error, it returns false (0).
+.PP
+.BR canenable ()
+simply returns the result of testing the
+.B QNOENB
+bit.
+.PP
+It is questionable whether
+.BR canenable ()
+is usable in a Multiprocessor (MP) environment.
+.BR canenable ()
+tests atomic flags in the
+.BR queue (9)
+structure flags word that can be altered by other processors immediately
+prior to, or subsequent to, the call to
+.BR canenable ().
+Therefore, there is always a race condition possible between
+.BR canenable ()
+and
+.BR noenable (9),
+.BR qprocsoff (9),
+(or other utilities affecting the
+.B QNOENB
+flag in the
+.BR queue (9)
+flags word) on MP systems.
+.PP
+.BR canenable ()
+might have some limited use on UP systems where interrupts can be locked out
+across the call.
+.PP
+.BR canenable ()
+should not be called by portable
+.I STREAMS
+modules and drivers.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR qenable (9),
 .BR noenable (9),
 .BR enableok (9).
-.SH "VERSIONS"
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR canenable ()
-first appeared in SVR 4.
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR canenable ()
+is compatible with
+.IR "SVR 3 SPG"
 .[
-svr4
+svr3spg
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+A call to
+.BR canenable ()
+with a
+.B NULL
+.I q
+or with a
+.RB non- NULL
+.I q
+that points to other than a valid
+.B queue_t
+structure is invalid and the result in undefined.
+When LiS
+.BR qenable ()
+encounters such an error, it will return false (0).
+Portable
+.I STREAMS
+modules and drivers should not call this function with invalid queue pointers.
+.IP \(em
+None of
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+or
+.IR UnixWare \(rg
+provide this function.
+Portable
+.I STREAMS
+modules and drivers should not call this function.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 3 SPG" .
 .[
-magic
+svr3spg
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR canenable ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

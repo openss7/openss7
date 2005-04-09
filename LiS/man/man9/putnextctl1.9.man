@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnextctl1.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: putnextctl1.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH PUTNEXTCTL1 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B putnextctl1, lis_putnextctl1
 \- puts a 1 byte control message on the downstream \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = putnextctl1(queue_t *" q ", int " type ", int " param );
+.BI "int putnextctl1(queue_t *" q ", int " type ", int " param );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -91,6 +97,8 @@ the type of the control message to put.
 .TP
 .I param
 a one byte parameter to place in the message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR putnextctl1 ()
@@ -106,7 +114,9 @@ If
 is a data message and not control message type
 .BR putnextctl1 ()
 will fail.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR putnextctl1 ()
@@ -115,6 +125,8 @@ returns true (1).
 Upon failure,
 .BR putnextctl1 ()
 returns false (0).
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR putnextctl1 ()
@@ -125,11 +137,26 @@ is not a control message type, or if the passed in queue pointer
 is
 .BR NULL ;
 or, if allocation of the necessary message blocks fails.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR putnextctl1 ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putnextctl1 ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR putnextctl1 ()
 is implemented in
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -138,9 +165,18 @@ with a call to
 using the
 .I q->q_next
 pointer for the queue.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putnextctl (9).
+.\"
+.\"
 .SH BUGS
 .PP
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -166,39 +202,117 @@ has no put procedure; or the queue pointed to by
 is closing, or the queue has had put and service routine processing turned off
 (e.g. with
 .BR qprocsoff (9)).
-.B LiS
+.I LiS
 .[
 LiS
 .]
 should return failure when the operation fails.
-.SH "SEE ALSO"
-.PP
-.BR putctl (9),
-.BR putctl1 (9),
-.BR putnextctl (9).
-.SH VERSIONS
-.PP
-This manpage is for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR putnextctl1 ()
-first appeared in SVR 3.
+is compatible with
+.IR "SVR 4.2 DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR LiS ,
+.BR putnextctl1 ()
+will return success even if the operation fails because of the following
+conditions:
+.IR q " and " q->q_next
+are not
+.BR NULL ,
+but
+.I q->q_next
+points to something other than a queue structure;
+the queue pointed to by
+.I q->q_next
+has a
+.I q_info
+pointer of
+.BR NULL ;
+the queue pointed to by
+.I q->q_next
+has no put procedure; or the queue pointed to by
+.I q->q_next
+is closing, or the queue has had put and service routine processing turned off
+(e.g. with
+.BR qprocsoff (9)).
+.I LiS
+should return failure when the operation fails.
+.IP \(em
+.I LiS
+implements
+.BR putnextctl1 ()
+with a call to
+.BR putctl1 (9)
+using the
+.I q->q_next
+pointer for the queue.
+This does not protect dereferencing of the
+.I q->q_next
+pointer and is not MP-safe.
+.IP \(em
+.BR putnextctl1 ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putnextctl1 ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putnextctl1 ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 DDI/DKI" .
 .[
-magic
+usldk
 .]
-.[
-svr42
-.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putnextctl1 ()
+first appeared in
+.IR "SVR 4 MP" .
 .[
 svr4
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,15 +72,21 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BCANPUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.SH "NAME"
-.B bcanput
+.\"
+.\"
+.SH NAME
+.B bcanput, lis_bcanput
 \- test flow control on a \fISTREAMS\fR message queue
-.SH "SYNOPSIS"
+.\"
+.\"
+.SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = bcanput(queue_t *" q ", unsigned char " band );
-.SH "ARGUMENTS"
+.BI "int bcanput(queue_t *" q ", unsigned char " band );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I q
@@ -88,10 +94,12 @@ the queue to test for flow control.
 .TP
 .I band
 the queue band within the queue to test for flow control.
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 It is the responsibility of a
-.IR STREAMS (4)
+.I STREAMS
 module puting a banded non-priority
 message to a subsequent message queue to check for flow control using
 .BR bcanput ()
@@ -134,28 +142,51 @@ returns false (0), it also sets the
 flag for the specified
 .IR band ,
 indicating that the
-.IR STREAMS (4)
+.I STREAMS
 executive should backenable service
 procedures backwards up the queues when the flow controlled
 .I band
 is no longer full.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR bcanput ()
 will return false (0) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is flow
 controlled for the specified band, and return true (1) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is not flow controlled for the specified band.
-.SH "ERRORS"
+.\"
+.\"
+.SH ERRORS
 .PP
 .BR bcanput ()
-always succeed.
-.SH "CAVEATS"
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bcanput ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bcanput ()
+is MP-safe; unless the caller performs an unprotected pointer dereference.
+That is,
+.BR bcanputnext (9)
+should always be called in preference to
+.BI bcanput( q->q_next ).
+.\"
+.\"
+.SH NOTICES
 .PP
 In the
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -164,7 +195,7 @@ implementation, if
 suffers an internal error, it will return false (0).
 This is problematic because the calling queue will never be backenabled.
 .PP
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -174,69 +205,137 @@ implements
 \fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
 with macros that call
 \fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
-.SH "NOTES"
-.PP
-.B LfS
-.[
-LfS
-.]
-implements
-.BR bcanput ()
-and
-.BR bcanputnext (9)
-functions directly and ensures integrity of dereferencing of
-the
-.I q
-pointer.  This means that, while equivalent,
-.BI bcanput( q->q_next ", " band )
-and
-.BI bcanputnext( q ", " band )
-are different in that the caller is responsible for protecting the integrity of
-the
-.I q->q_next
-dereferencing for
-.BI bcanput( q->q_next ", " band )\fR.
-Driver and module writers should always use
-.BI bcanputnext( q ", " band )
-instead of
-.BI bcanput( q->q_next ", " band )\fR.
-In fact, driver and module writers should avoid the dereference
-.I q->q_next
-altogether.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putq (9),
 .BR canput (9),
 .BR canputnext (9),
 .BR bcanputnext (9),
+.BR freezestr (9),
 .BR noenable "(9), and "
 .BR enableok (9).
+.\"
+.\"
+.SH BUGS
+If
+.BR bcanput ()
+suffers an internal error, it will return false (0), and the calling queue will
+not be backenabled.
+There are likely more bugs in the
+.I LiS
+implementation of this function.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bcanput ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixdoc
+.]
+indicates that if a
+.BR qband (9)
+structure does not exist for
+.I band
+that
+.BR bcanput ()
+returns true (1).
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR bcanput ()
+as a function that can only be passed a queue pointer in the queue pair within
+a queue's procedure.
+.IP \(em
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+indicates that the stream cannot be frozen when calling
+.BR bcanput (9)
+and that private locks cannot be held across the call.
+.IP \(em
+.BR bcanput ()
+should always succeeds.  Under
+.IR LiS ,
+.BR bcabput ()
+will return zero (0 - flow controlled) if an internal error occurs, without
+setting the
+.BR QWANTW " or " QB_WANTW
+flag for the queue or band.  This means that, although flow controlled, no
+backenable procedure will be run.  This can lead to indefinite postponement of
+a queue service procedure under
+.IR LiS .
+.IP \(em
+.BR bcanput ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR bcanput ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR bcanput ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR bcanput ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4.0 DDI/DKI" .
 .[
-svr4
-.]
-.SH "VERSIONS"
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr4dk
 .]
 .\"
 .\"

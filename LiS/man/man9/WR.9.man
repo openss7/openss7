@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: WR.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: WR.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH WR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B WR
 \- return the write queue of a \fISTREAMS\fR queue pair
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "queue_t *" wq " = WR(" q );
+.BI "queue_t *WR(" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
-the read queue for the queue pair.
+a pointer to either the read or write queue of a queue pair.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR WR ()
@@ -98,7 +106,9 @@ points to the write queue or the write queue of the queue pair.
 .BR WR ()
 is typically and often used to find the write queue from a pointer to one of
 the queues in a queue pair.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR WR ()
@@ -109,6 +119,8 @@ Upon failure,
 .BR WR ()
 returns
 .BR NULL .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -127,7 +139,34 @@ is
 .BR NULL ;
 .I q->q_other
 does not point to a valid queue structure.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR WR ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR WR ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call-outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -149,31 +188,150 @@ LiS
 .]
 function call is inefficient, particularly as this function is called often
 and regularly.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR WR (9),
 .BR OTHERQ (9),
 .BR SAMESTR (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR WR ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR WR ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR LiS ,
+.[
+lis
+.]
+permit both a read or write queue pointer to be passed
+as the
+.I q
+argument to
+.BR WR ().
+If a write queue pointer is passed to
+.BR WR (),
+then the passed in write queue pointer is returned.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+permit only a read queue to be passed as the
+.I q
+argument to
+.BR WR ().
+Passing a write queue to
+.BR WR ()
+on these implementations can cause a kernel panic.
+On these systems
+.BR WR ()
+is often defined as:
+.sp
+.nf
+\fC\s-2\
+#define WR(__q) ((__q)+1)
+\s+2\fP
+.fi
+.IP \(em
+.BR WR ()
+is implemented on
+.B Linux Fast-STREAMS
+as both an
+.B extern inline
+function as well as a macro.
+It accepts either read or write queue pointer and returns the passed in write
+queue pointer when called with a write queue.
+.I WR(q) == WR(WR(q))
+and
+.I WR(RD(q)) == (RD(q) + 1)
+are invariantly true.
+.sp
+.nf
+\fC\s-2\
+#undef WR
+#define WR(__q) ((__q)+1)
+\s+2\fP
+.fi
+.sp
+is a valid alternative implementation if the
+.I STREAMS
+programmer wishes the more restrictive
+.BR WR ()
+behavior.
+.IP \(em
+Portable
+.I STREAMS
+drivers and modules should not
+call
+.BR WR ()
+with a queue other than the read queue;
+nor
+rely upon
+.BR WR ()
+being defined as a macro or a function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR WR ()
+first appeared in
+.IR "SVR 3" ,
 .[
-svr42
+svr3spg
 .]
-.[
-svr4
-.]
+where it was defined as a macro.
 .\"
 .\"
 .[

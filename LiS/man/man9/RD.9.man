@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RD.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: RD.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,29 @@ sort-adjacent-labels
 .\"
 .\"
 .TH RD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.\"
+.\"
 .SH NAME
 .B RD
 \- return the read queue of a \fISTREAMS\fR queue pair
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "queue_t *" rq " = RD(" q );
+.BI "queue_t *RD(" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the write queue of a queue pair.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR RD ()
@@ -94,7 +104,13 @@ pointer
 regardless of whether
 .I q
 points to the read queue or the write queue of the queue pair.
-.SH "RETURN VALUES"
+.PP
+.BR RD ()
+is typically and often used to find the read queue from a pointer to one of
+the queues in a queue pair.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR RD ()
@@ -109,6 +125,8 @@ returns
 .BR RD ()
 is typically and often used to find the read queue from a pointer to one of
 the queues in a queue pair.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -127,7 +145,35 @@ is
 .BR NULL ;
 .I q->q_other
 does not point to a valid queue structure.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR RD ()
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.PP
+.BR RD ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call-outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -147,33 +193,152 @@ The
 .[
 LiS
 .]
-function call is inefficient, particularly as this function is called often
+function call is inefficient, particularly if this function is called often
 and regularly.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR RD (9),
 .BR OTHERQ (9),
 .BR SAMESTR (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR RD ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR RD ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR LiS ,
+.[
+lis
+.]
+permit both a read or write queue pointer to be passed
+as the
+.I q
+argument to
+.BR RD ().
+If a read queue pointer is passed to
+.BR RD (),
+then the passed in read queue pointer is returned.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+permit only a write queue to be passed as the
+.I q
+argument to
+.BR RD ().
+Passing a read queue to
+.BR RD ()
+on these implementations can cause a kernel panic.
+On these systems
+.BR RD ()
+is often defined as:
+.sp
+.nf
+\fC\s-2\
+#define RD(__q) ((__q)-1)
+\s+2\fP
+.fi
+.IP \(em
+.BR RD ()
+is implemented on
+.B Linux Fast-STREAMS
+as both an
+.B extern inline
+function as well as a macro.
+It accepts either read or write queue pointer and returns the passed in read
+queue pointer when called with a read queue.
+.I RD(q) == RD(RD(q))
+and
+.I RD(WR(q)) == (WR(q) - 1)
+are invariantly true.
+.sp
+.nf
+\fC\s-2\
+#undef RD
+#define RD(__q) ((__q)-1)
+\s+2\fP
+.fi
+.sp
+is a valid alternative implementation if the
+.I STREAMS
+programmer wishes the more restrictive
+.BR RD ()
+behaviour.
+.IP \(em
+Portable
+.I STREAMS
+drivers and modules should not
+call
+.BR RD ()
+with a queue other than the write queue;
+nor
+rely upon
+.BR RD ()
+being defined as a macro or a function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR RD ()
+first appeared in
+.IR "SVR 3" ,
 .[
-svr42
+svr3spg
 .]
-.[
-svr4
-.]
+where it was defined as a macro.
 .\"
 .\"
 .[

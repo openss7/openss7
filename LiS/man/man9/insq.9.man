@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: insq.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B insq
+.B insq, lis_insq
 \- inserts a message into a \fISTREAMS\fR message queue
 .\"
 .\"
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" mp );
+.BI "int insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" nmp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -95,7 +95,7 @@ the queue into which to insert the message.
 .I emp
 the message on the queue before which to insert the message.
 .TP
-.I mp
+.I nmp
 the message to insert.
 .\"
 .\"
@@ -103,7 +103,7 @@ the message to insert.
 .PP
 .BR insq ()
 inserts the message pointed to by
-.I mp
+.I nmp
 before the message pointed to by
 .I emp
 in the queue specified by
@@ -113,12 +113,12 @@ If the message pointer
 is
 .B NULL
 it indicates that the message pointed to by
-.I mp
+.I nmp
 is to be inserted at the end of the queue.
 This means that
-\fB\)insq(\fI\)q\fB\), NULL, \fI\)mp\fB\))\fR
+.BI insq( q ", NULL, " nmp )
 is equivalent to
-\fB\)putq(\fI\)q\fB\), \fI\)mp\fB\))\fR.
+.BI putq( q ", " nmp ).
 .PP
 Messages can be inserted before other messages only if the
 resulting insertion would not violate the proper ordering of priority and
@@ -127,18 +127,18 @@ be inserted before all messages.  Low priority messages can only be inserted
 before low priority messages of the same or lesser priority band.
 .\"
 .\"
-.SH "RETURN VALUES"
+.SH RETURN
 .PP
 Upon success,
 .BR insq ()
 returns true (1) and the message pointed to by
-.I mp
+.I nmp
 has been inserted into the queue.
 .PP
 Upon failure,
 .BR insq ()
 returns false (0) and the message pointed to by
-.I mp
+.I nmp
 remains unaltered.  (See
 .BR "\*(lqBUGS\*(rq" " below.)"
 .\"
@@ -150,7 +150,7 @@ When
 fails, it returns false (0).
 .BR insq ()
 can fail because the passed in message pointer
-.I mp
+.I nmp
 is a
 .B NULL
 pointer;
@@ -173,9 +173,85 @@ processing turned off (e.g. with
 .PP
 .BR insq ()
 also fails if the message passed in by
-.I mp
+.I nmp
 cannot be inserted before the message passed in by
 .IR emp .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR insq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR insq ()
+is not MP-safe.
+.BR insq ()
+would be MP-safe, if the caller could ensure exclusive access to the passed in
+messages and queue.
+.PP
+On uniprocessor systems it may be sufficient to block interrupts to ensure
+exclusive access to
+.IR q .
+Ensuring exclusive access to the passed in message,
+.IR emp ,
+is difficult on SMP systems, because 
+.BR putq "(9), " putbq (9) " and " insq (9)
+can change
+.I emp->b_next
+and
+.BR getq "(9), " flushq "(9), " flushband "(9) and " rmvq (9)
+can change
+.IR emp ,
+(e.g. remove it from the queue).
+.PP
+Normally, exclusive access to the passed in queue on both UP and SMP systems can be ensured most
+easily by freezing the stream associated with
+.I q
+using
+.BR freezestr (9).
+Otherwise, it is also possible to ensure exclusive access with
+.BR MPSTR_STRLOCK (),
+.BR MPSTR_QLOCK (),
+.BR qwriter (),
+.BR streams_put (),
+or with appropriate synchronization boundaries
+.RB ( STR_PERQUEUE " or " D_MTPERQ ).
+However,
+.B LiS
+.[
+LiS
+.]
+only has a broken
+.BR freezestr (9),
+subsequent to version 2.18.0,
+and the other facilities metioned are not implemented in
+.B LiS\c
+.
+.[
+LiS
+.]
+This makes
+.BR appq ()
+unusable on MP systems in
+.BR LiS .
+.PP
+This is similar to the synchronization necessary for use of
+.BR insq (9)
+and
+.BR rmvq (9),
+which are equally unusable on MP systems under
+.BR LiS .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR rmvq (9),
+.BR putq (9),
+.BR putbq (9).
 .\"
 .\"
 .SH BUGS
@@ -187,7 +263,7 @@ For versions prior to OpenSS7 release
 lis
 .]
 incorrectly frees the message pointed to by
-.I mp
+.I nmp
 when the call to
 .BR insq ()
 fails due to a
@@ -206,7 +282,7 @@ On the other hand,
 LiS
 .]
 does not free the message pointer pointed to by
-.I mp
+.I nmp
 when
 .BR insq ()
 fails because the insertion would mis-sequence the queue.
@@ -214,7 +290,7 @@ Because of this bug, when
 .BR insq ()
 returns failure (0), it is difficult to determine whether the message
 pointed to by
-.I mp
+.I nmp
 has been freed or not.
 This is inconsistent with SVR 4.2 MP and other implementations.
 .\"
@@ -237,38 +313,149 @@ handling in that it fails while
 is in effect or if the stream is closing.
 .\"
 .\"
-.SH "SEE ALSO"
+.SH COMPATIBILITY
 .PP
-.BR rmvq (9),
-.BR putq (9),
-.BR putbq (9).
-.\"
-.\"
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
+.BR insq ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and LiS
 .[
 LiS
 .]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR insq ()
+passed a
+.B NULL
+or invalid
+.IR q " or " nmp
+pointer will return failure (0).
+.IP \(em
+.BR insq ()
+does not modify
+.IR q " or " nmp
+when it returns failure (0).  Under
+.B LiS,
+failure (0) modifies the
+.I nmp
+message, freeing it with
+.BR freemsg (9)
+under some circumstances.  This is an
+.B LiS
+bug on some versions of
+.BR LiS .
+No passed in structures should
+be modified on failure.
+.sp
+On older versions,
+.B LiS
+incorrectly frees the message pointed to by
+.I nmp
+when the call to
+.BR insq ()
+fails due to a
+.B NULL
+queue pointer
+.IR q ,
+or when the queue pointer
+.I q
+does not point to a valid queue structure, or when the queue pointer
+.I q
+points to a queue that is closing or has processing turned off.
+On the other hand, LiS does not free the message pointer pointed to by
+.I nmp
+when
+.BR insq ()
+fails because the insertion would mis-sequence the queue.  Because of this
+bug, when
+.BR insq ()
+returns failure (0), it is difficult to determine whether the message
+pointed to by
+.I nmp
+has been freed or not.
+.IP \(em
+.BR insq ()
+will insert messages into a queue that has had
+.BR qprocsoff (9)
+called or which is closing
+.RB ( qclose (9)
+has been called for the queue).  Under
+.BR LiS ,
+.BR insq ()
+will return failure (0) in these cases and free the message pointed to by
+.IR nmp .
+.B LiS
+behaviour is incorrect for these cases.
+.BR qprocsoff (9)
+only affects the running of queue procedures and should not affect
+.BR insq ().
+.BR qclose (9)
+may need to exchange messages with lower level queue pairs and manipulate
+queues: making
+.BR insq ()
+return
+.B NULL
+during close is an
+.B LiS
+bug.
+.IP \(em
+.BR insq ()
+will insert a message before another in the queue in any order: it is the
+caller's responsibility to ensure proper ordering of the queue.
+Under
+.BR LiS ,
+.BR insq ()
+will fail and return (0), not freeing
+.IR nmp ,
+if the insertion would misorder the queue.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR insq ().
+Under
+.BR LiS ,
+freezing a stream with
+.BR LiS '
+broken
+.BR freezestr (9)
+will have no effect on the operation of
+.BR insq (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR insq ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

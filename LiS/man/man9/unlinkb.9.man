@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlinkb.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: unlinkb.9.man,v 1.1.4.4 2005/04/08 22:40:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH UNLINKB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B unlinkb, lis_unlinkb
 \- unlink a message block from a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "mblk_t *" msg " = unlinkb(mblk_t *" mp );
+.BI "mblk_t *unlinkb(mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message chain to unlink.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR unlinkb ()
@@ -93,7 +101,9 @@ removes the first message block from the message pointed to by
 and returns a pointer to the next message block in the message (or
 .B NULL
 if there are no remaining message blocks in the message).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR unlinkb ()
@@ -104,6 +114,8 @@ Upon failure,
 .BR unlinkb ()
 returns
 .BR NULL .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -115,37 +127,72 @@ fails when the message pointer
 .I mp
 is
 .BR NULL .
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-None.
+.BR unlinkb ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+is MP-safe; however, the caller is responsible for ensuring exclusive access
+to the passed in message block,
+.IR mp .
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"None.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR linkb (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR unlinkb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR unlinkb ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and systems based on
+.IR "SVR 4" .
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR unlinkb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

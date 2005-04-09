@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeq.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: freeq.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,39 +72,73 @@ sort-adjacent-labels
 .\"
 .\"
 .TH FREEQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B freeq
+.B freeq, lis_freeq
 \- deallocate a \fISTREAMS\fR queue pair
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "freeq(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue to free.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR freeq ()
 deallocates a queue pair that wass previously allocated with
 .BR allocq (9).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR freeq ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR freeq ()
 always succeeds.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR freeq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+Because the queue is flushed before freeing,
+the same considerations as are given in
+.BR flushq (9)
+must be taken before calling
+.BR freeq ()
+from interrupt context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR freeq ()
+is MP-safe.  The caller must ensure that it has the last references to the
+passed in queue.
+.\"
+.\"
+.SH NOTICES
 .PP
 Although this function is documented in
-.IR STREAMS (4),
+.IR STREAMS ,
 it is not normally called directly by
-.IR STREAMS (4)
+.I STREAMS
 modules or drivers.
 .PP
 The
@@ -114,36 +148,83 @@ LiS
 .]
 version of this function does not check to see that the queue pair is not
 still connected in a stream.
+.PP
+This function should not be used by portable
+.I STREAMS
+modules or drivers.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR allocq (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR freeq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR freeq ()
+is compatible with LiS
 .[
 LiS
 .]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+Under LiS,
+.BR freeq ()
+does not check to see that the queue pair is not still connected in a stream.
+.IP \(em
+.BR freeq ()
+should not be called by normal
+.I STREAMS
+modules or drivers and is implementation specific.
+.IP \(em
+This function is not exported by
+.IR "SVR 4.2 MP DDI/DKI " or
+any other UNIX directly.
 .PP
-.BR allocq ()
-appears in the SVR 4 STREAMS
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR freeq ()
+is compliant to the description of the internal
+.BR freeq ()
+function in SVR 4
 .[
 svr4
 .]
-documentation.
-.\"
-.\"
-.XX
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
 .[
 magic
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR freeq ()
+is an internal SVR 4
+.I STREAMS
+function described in
+.IR "\*(lqThe Magic Garden\*(rq" .
 .[
-svr42
+magic
 .]
-.[
-svr4
-.]
+.PP
+.BR lis_freeq ()
+is no longer an exported function as of LiS-2.18.0.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_unlink.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_unlink.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,20 +72,28 @@ sort-adjacent-labels
 .\"
 .\"
 .TH UNLINK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 \fBunlink\fR, \fBlis_unlink\fR - remove a file
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .br
 .B #include <sys/dki.h>
 .HP 8
-.BI "int " retval " = lis_unlink(char *" pathname );
+.BI "int lis_unlink(char *" pathname );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I pathname
 the pathname of a file to remove.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR unlink ()
@@ -99,13 +107,13 @@ wrapper function to the system call
 that can be called from the kernel.
 .PP
 The purpose of this function being called from the kernel is to permit
-.IR STREAMS (4)
+.I STREAMS
 kernel modules to create their own character special devices in the
 .B /dev
 directory and dynamically allocate device major numbers to those devices.
 .PP
 Normally, a character special device would be created by a
-.IR STREAMS (4)
+.I STREAMS
 module or driver when the
 .B Linux
 kernel module loads (i.e. within the
@@ -128,7 +136,9 @@ is the path to the file to remove.
 .PP
 For additional information, see
 .BR unlink (2).
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR unlink ()
@@ -136,6 +146,8 @@ returns zero (0).
 Upon failure,
 .BR unlink ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -143,7 +155,21 @@ When
 fails, it returns a negative error number that can contain any of the errors
 listed under
 .BR unlink (2).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unlink ()
+must be called from user (process) context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unlink ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR unlink ()
 is implemented by changing the data segment to the kernel data segment and
@@ -154,35 +180,52 @@ This means that the
 of the caller is not changed.
 This makes this function rather useless if the process invoking it is not the
 kernel module loading daemon, or other process running with real root
-permission.
+permission, and a potential security breach otherwise.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR unlink (2),
 .BR lis_mount (9),
 .BR lis_umount2 (9),
 .BR lis_mknod (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+Under GCOM releases of
+.IR LiS ,
+.BR unlink ()
+will not function and will panic the kernel on architectures that do not have a simple call
+interface for system calls (e.g. parisc).
+.PP
+Previous and current OpenSS7 releases of
+.I LiS
+do not have this problem.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR unlink ()
-appeared in SVR 2.
+is compatible with
+.BR unlink (2).
 .\"
 .\"
-.XX
-.[
-magic
-.]
+.SH CONFORMANCE
+.PP
+.I SVR 4.2
 .[
 svr42
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unlink ()
+appeared in
+.IR "SVR 2" .
 .[
-svr4
+svr2
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SAMESTR.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: SAMESTR.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH SAMESTR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B SAMESTR
 \- test for \fISTREAMS\fR pipe or fifo
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = SAMESTR(" q );
+.BI "int SAMESTR(" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue to test for being a stream end.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR SAMESTR ()
@@ -98,7 +106,9 @@ belongs to a
 .BR pipe (3)
 or a
 .BR fifo (4).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR SAMESTR ()
 returns true (1) if the next queue from the specified queue,
@@ -123,6 +133,17 @@ is a
 .BR pipe (3)
 or
 .BR fifo (4).
+.PP
+.BR SAMESTR ()
+also returns false (0) if the next queue from the specified queue,
+.IR q->q_next ,
+is
+.BR NULL .
+In this case, the queue
+.I q
+is a stream end (stream head or driver).
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -141,7 +162,35 @@ is
 .BR NULL ;
 .I q->q_next
 does not point to a valid queue structure.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR SAMESTR ()
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.PP
+.BR SAMESTR ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call-outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -163,31 +212,154 @@ LiS
 .]
 function call is inefficient, particularly as this function is called often
 and regularly.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR RD (9),
 .BR WR (9),
 .BR OTHER (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR SAMESTR ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR SAMESTR ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
+.]
+and systems based on
+.IR "SVR 4 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR SAMESTR ()
+is defined for
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR LiS .
+.[
+lis
+.]
+These systems also support
+.IR STREAMS -based
+.BR pipe "(4) and " fifo (4).
+.IP \(em
+.BR SAMESTR ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR SAMESTR ()
+to be called on a stream frozen with
+.BR freezestr (9).
+This is presumably because
+.IR UnixWare \(rg
+and
+.IR Solaris \(rg
+allows frozen streams to manipulate the
+.I q->q_next
+pointers directly.
+.IR HP-UX \(rg
+on the other hand, does not allow
+.I q->q_next
+pointers to be manipulated directly and provides the
+.BR weldq (9)
+function to perform that action.
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR SAMESTR ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
+.BR SAMESTR ()
+is not defined for
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR UXP/V \(rg.
+.[
+uxpspg
+.]
+These systems do not support
+.IR STREAMS -based
+.BR pipe "(4) and " fifo (4).
+.BR SAMESTR ()
+is not very useful on systems that do not support
+.IR STREAMS -based
+.BR pipe (4)
+or
+.BR fifo (4).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR SAMESTR ()
+first appeared in
+.IR "SVR 4" .
 .[
-svr42
+svr4spg
 .]
-.[
-svr4
-.]
+where it was implemented as a macro.
 .\"
 .\"
 .[

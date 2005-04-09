@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_register_strdev.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_register_strdev.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_REGISTER_STRDEV 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_register_strdev
 \- register a \fISTREAMS\fR device
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = lis_register_strdev(major_t " major ", struct streamtab *" strtab ", int " nminor ", const char *" name );
+.BI "int lis_register_strdev(major_t " major ", struct streamtab *" strtab ", int " nminor ", const char *" name );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,21 +100,23 @@ the number of minor devices to allocate.
 .TP
 .I name
 the name of the \fISTREAMS\fR driver.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR lis_register_strdev ()
 allocates a major device number and
 registers a new
-.IR STREAMS (4)
+.I STREAMS
 device with the
 .B Linux
 kernel against that major device
 number.
 Once a
-.IR STREAMS (4)
+.I STREAMS
 device is registered, opening a device with the registered major device number
 will result in a call to the
-.IR STREAMS (4)
+.I STREAMS
 driver's open routine.
 .PP
 .BR lis_register_strdev ()
@@ -116,7 +124,7 @@ is an LiS-specific function.
 .[
 LiS
 .]
-.IR STREAMS (4)
+.I STREAMS
 devices registered with
 .BR lis_register_strdev ()
 can be deregistered with
@@ -124,7 +132,7 @@ can be deregistered with
 .PP
 .BR lis_register_strdev ()
 registers the
-.IR STREAMS (4)
+.I STREAMS
 device with the
 .B streamtab
 structure pointed to by
@@ -166,8 +174,8 @@ has the feature that if a character major device is unassigned and an attempt
 is made to open a character device with the major device number, the
 .B Linux
 kernel will attempt to load the kernel module
-\fB\)char-major-\fI\)XXX\fR\),
-where
+.BI char-major- XXX\c
+, where
 .I XXX
 is the ascii major device number.
 .PP
@@ -179,18 +187,54 @@ and is not specific to
 .[
 LiS
 .]
-.SH "RETURN VALUES"
+.PP
+In addition, if the device filesystem,
+.BR devfs (5),
+and device filesystem daemon,
+.BR devfsd (8),
+are active,
+then the kernel will attempt to load module
+.BI /dev/ devname\c
+, where
+.I devname
+is the name of the device opened.
+.PP
+This too is a feature of
+.B Linux
+and is not specific to
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.SH USAGE
+.PP
+.BR lis_register_strdev ()
+can be called multiple times for the same device driver with different
+selections of the
+.I major
+device number.  This has the effect that multiple (external) character major
+device numbers will be assigned to the
+.I STREAMS
+device.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR lis_register_strdev ()
 returns a positive integer representing the major device number assigned to
 the
-.IR STREAMS (4)
+.I STREAMS
 device.
 .PP
 Upon failure,
 .BR lis_register_strdev ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -214,21 +258,46 @@ is
 .TP
 .RB [ EBUSY ]
 The specified major device number is already in use by another
-.IR STREAMS (4)
+.I STREAMS
 character special device.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR lis_register_strdev ()
+can be called from any blocking context.  Consideration for impact on
+performance and latency should be given before calling
+.BR lis_register_strdev ()
+from soft or hard interrupt context.
+Typically,
+.BR lis_register_strdev ()
+is called from the
+.BR module_init (9)
+procedure of a kernel module associated with the
+.I STREAMS
+device.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR lis_register_strdev ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
 LiS
 .]
 uses a fixed size switch table to contain registered devices.
-is 
+.\"
+.\"
 .SH EXAMPLES
 .PP
 The following example demonstrates how 4 major device numbers could be
 registered against a
-.IR STREAMS (4)
+.I STREAMS 
 driver:
 .sp
 .in +4
@@ -300,10 +369,14 @@ alias char-major-222 streams-x  # demand load streams device x
 .fi
 
 .B 
+.\"
+.\"
 .SH FILES
 .B /etc/conf.modules
 .br
 .B /etc/modules.conf
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR lis_register_strmod (9),
@@ -311,15 +384,54 @@ alias char-major-222 streams-x  # demand load streams device x
 .BR lis_unregister_strmod (9).
 .\"
 .\"
-.XX
+.SH BUGS
+.PP
+.BR lis_register_strdev ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR lis_register_strdev ()
+is an
+.I LiS
 .[
-magic
+LiS
 .]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules in inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr42
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of \fISTREAMS\fR drivers is implementation
+specific and not subject to standardization.
+.BR lis_register_strdev ()
+is an
+.I LiS
 .[
-svr4
+LiS
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR lis_register_strdev ()
+first appeared in
+.IR LiS .
+.[
+LiS
 .]
 .\"
 .\"

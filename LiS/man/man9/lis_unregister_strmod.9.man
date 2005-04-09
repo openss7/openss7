@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_unregister_strmod.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_unregister_strmod.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,43 +72,51 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_UNREGISTER_STRMOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_unregister_strmod
 \- deregister a \fISTREAMS\fR module
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = lis_unregister_strmod(struct streamtab *" strtab );
+.BI "int lis_unregister_strmod(struct streamtab *" strtab );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I strtab
 the \fISTREAMS\fR table entry to unregister.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR lis_unregister_strmod ()
 deregisters a
-.IR STREAMS (4)
+.I STREAMS
 module previoulsy registered with
 .BR lis_register_strmod (9).
 .PP
 .BR lis_unregister_strmod ()
 removes the
-.IR STREAMS (4)
+.I STREAMS
 module identified by
 .I strtab
 from all autopush lists, and removes the module from the
-.IR STREAMS (4)
+.I STREAMS
 module switch
 table.
 Subsequent attempts to push the module will fail unless the module is
 configured for demand loading (see
-.IR "\*(lqCAVEATS\*(rq" ,
+.IR "\*(lqNOTICES\*(rq" ,
 below).
 .PP
 For demand loaded
-.IR STREAMS (4)
+.I STREAMS
 modules,
 .BR lis_unregister_strmod ()
 is normally and properly called from within the
@@ -116,7 +124,21 @@ is normally and properly called from within the
 kernel module's
 .B init_module
 routine.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH USAGE
+.PP
+.BR lis_register_strmod ()
+is provided to deregister
+.I STREAMS
+modules written for
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR lis_unregister_strmod ()
@@ -124,6 +146,8 @@ returns zero (0).
 Upon failure,
 .BR lis_unregister_strmod ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -133,16 +157,40 @@ fails, it returns the negative of one of the following errors:
 .RB [ EINVAL ]
 .I strtab
 does not refer to an existing registered
-.IR STREAMS (4)
+.I STREAMS
 module.
 .TP 12
 .RB [ EBUSY ]
 The
-.IR STREAMS (4)
+.I STREAMS
 module indicated by
 .I strtab
 is currently pushed on an open stream.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR 
+.BR lis_unregister_strmod ()
+can be called from any blocking context.  Consideration for import on
+performance and latency should be given before calling
+.BR lis_unregister_strmod ()
+from soft or hard interrupt context.  Typically,
+.BR lis_unregister_strmod ()
+is called from the
+.BR module_exit (9)
+procedure of a kernel module associated with a
+.I STREAMS
+module.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR lis_unregister_strmod ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 There are some interactions between the
 demand
@@ -172,7 +220,7 @@ kernel modules that provide
 .[
 LiS
 .]
-.IR STREAMS (4)
+.I STREAMS
 modules should only call
 .BR lis_register_strmod (9)
 from their kernel module intialization routines, and should only call
@@ -180,17 +228,19 @@ from their kernel module intialization routines, and should only call
 from their kernel module cleanup routines.  See
 .IR "\*(lqEXAMPLES\*(rq" ,
 below.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 Following is an example of a
-.IR STREAMS (4)
+.I STREAMS
 module which is dynamically registered
 and deregistered from the
 .B LiS
 .[
 LiS
 .]
-.IR STREAMS (4)
+.I STREAMS
 subsystem:
 .sp
 .in +4
@@ -227,7 +277,7 @@ kernel module loading and unloading and
 .[
 LiS
 .]
-.IR STREAMS (4)
+.I STREAMS
 module registration and deregistration,
 .BR lis_register_strmod "(9) and " lis_unregister_strmod (9)
 should only be called from within the kernel module init and cleanup routines
@@ -249,34 +299,64 @@ void cleanup_module(void)
 }
 \s+2\fR
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR lis_register_strdev (9),
 .BR lis_register_strmod (9),
 .BR lis_unregister_strdev (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR lis_unregister_strmod ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR lis_unregister_strmod ()
+is an
+.I LiS
 .[
 LiS
 .]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR lis_unregister_strmod ()
+is an
+.I LiS
+.[
+lis
+.]
+implementation specific function.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR lis_unregister_strdev ()
-is an LiS-specific function that first appeared in early version of
-.BR LiS .
-.\"
-.\"
-.XX
+first appeared in an early version of
+.IR LiS .
 .[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+LiS
 .]
 .\"
 .\"

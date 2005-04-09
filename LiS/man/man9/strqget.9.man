@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH STRQGET 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B strqget, lis_strqget
 \- gets information about a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = strqget(queue_t *" q ", qfields_t " what ", unsigned char " band ", long *" val );
+.BI "int strqget(queue_t *" q ", qfields_t " what ", unsigned char " band ", long *" val );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,6 +100,8 @@ what band (if applicable).
 .TP
 .I val
 a pointer into which to place the value.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR strqget ()
@@ -183,7 +191,7 @@ must be zero (0).
 .PP
 .BR strqget ()
 provides a mechanism whereby a
-.IR STREAMS (4)
+.I STREAMS
 module or driver can access information
 about a queue or queue band without directly accessing the
 .B queue
@@ -297,31 +305,49 @@ set when the queue is not to be enabled.
 .TP 12
 .B QBACK
 set when the queue is a back-enabled queue.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QRETRY
 set when the retry timer is set for the queue.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QSCAN
 set when the queue is in the scan list.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QCLOSING
 set when the stream head wants to close this queue.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QWASFULL
 set when the queue was previously full (QFULL was set) but the
 queue count has not yet dropped to the low water mark.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QCLOSEWT
 set when the stream head is waiting for the queue to drain.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QPROCSOFF
 set when the put and service procedures for the queue are turned off.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QRUNNING
 set while the queue's service procedure is running.
+This flag is
+.IR LiS -specific.
 .TP 12
 .B QWAITING
 set when qdetach is waiting on the queue for a wakeup.
+This flag is
+.IR LiS -specific.
 .\"
 .\"
 .\"
@@ -355,11 +381,17 @@ set when the previous queue wants to write to this queue band.
 .TP 12
 .B QB_BACK
 set when the queue band is back-enabled.
+This field is
+.IR LiS -specific.
 .TP 12
 .B QB_WASFULL
 set when the queue band was previously full (QB_FULL was set) but the queue
 band count has not yet dropped to the low water mark for the queue band.
-.SH "RETURN VALUES"
+This flag is
+.IR LiS -specific.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR strqget ()
@@ -373,6 +405,8 @@ returns a non-zero error number.
 The memory area pointed to by
 .I val
 remains unchanged.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -402,49 +436,116 @@ and
 was non-zero;
 .I what
 is not a valid queue or queue band attribute.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-.B LiS
+.BR strqget ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strqget ()
+is MP-safe.
+.PP
+Calling
+.BR strqget ()
+on a queue and stream previously frozen with
+.BR freezestr (9)
+could result in single-party deadlock.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I LiS
 .[
 LiS
 .]
 defines a number of queue flags that are not elsewhere defined, yet returns
 those flags from a call to
 .BR strqget ().
-.B LiS
+.I LiS
 .[
 LiS
 .]
 should mask off its private flags when returning flags from a call to
 .BR strqget ().
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR strqset (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR strqget ()
-first appeared in SVR 3.
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strqget ()
+is source-level compatible with
+.I SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR strqget ()
+only returns defined flags.
+.I LiS
+defines a number of queue flags that are not elsewhere defined, yet
+returns those flags from a call to
+.BR strqget ().
+.I LiS
+should mask off its private flags when returning flags from a call to
+.BR strqget ().
+.IP \(em
+.IR UnixWare \(rg
 .[
-svr3
+uw7spg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR strqget ().
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
 .[
-magic
+usldk
 .]
+.IR Solaris \(rg
+documentation.
 .[
-svr42
+soldoc
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR strqget ()
+first appeared in SVR 4 MP.
 .[
-svr4
+svr4spg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qdetach.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qdetach.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QDETACH 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qdetach, lis_qdetach
 \- detach a module from a \fISTREAMS\fR file.
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "lis_qdetach(queue_t *" q ", int " do_close ", int " flag ", cred_t *" credp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -96,13 +102,15 @@ procedure.
 .TP
 .I credp
 the credentials of the caller.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qdetach ()
 is called when the
 .B I_POP
 command is issued to a
-.IR STREAMS (4)
+.I STREAMS
 character special file.  See
 .BR streamio (2)
 for more information on
@@ -114,35 +122,56 @@ is responsible for calling the module's
 routine, unlinking the queue pair from the stream, and calling
 .BR freeq (9)
 to deallocate the queue pair.
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR lis_qdetach ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR qdetach ()
 fails silently.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qdetach ()
+should only be called from user context or from within a
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qdetach ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 This is an internal
-.IR STREAMS (4)
+.I STREAMS
 function which was not intended to be called by
 the
-.IR STREAMS (4)
+.I STREAMS
 module or driver writer.
-.SH BUGS
 .PP
-The
-.B LiS
-.[
-LiS
-.]
-version of this function does not have the same declaration as the SVR 4.2
-.[
-svr42
-.]
-function.
+.BR qdetach ()
+is an internal
+.I STREAMS
+function which was not intended to be called by the
+.I STREAMS
+module or driver writer.
+.BR qdetach ()
+is not part of the DDI/DKI adn should not be called by portable programs.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR qattach (9),
@@ -151,14 +180,65 @@ function.
 .BR open (2s),
 .BR close (2s),
 .BR streamio (2).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+The
+.I LiS
 .[
 LiS
 .]
+version of this function does not have the same declaration as the SVR 4.2
+.[
+svr42
+.]
+function.
+.\"
+.\"
+.SH COMPATIBILITY
+.BR qdetach ()
+is compatible with descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.I SVR 4.2 MP
+and systems based on
+.I SVR 4
+do not export this function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR qdetach ()
+is consistent with the description of the internal
+.BR qdetach ()
+function of
+SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR qdetach ()
 first appeared in SVR 3.
@@ -168,18 +248,6 @@ svr3
 .PP
 .BR lis_qdetach ()
 is no longer an exported function as of LiS-2.18.0.
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
 .\"
 .\"
 .[

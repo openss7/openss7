@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_free.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: kmem_free.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,61 +72,184 @@ sort-adjacent-labels
 .\"
 .\"
 .TH KMEM_FREE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B kmem_free
+.B kmem_free, lis_kmem_free
 \- deallocates kernel memory
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/kmem.h>
 .HP
 .BI "void kmem_free(void *" ptr ", size_t " size );
+.\"
+.\"
 .SH ARGUMENTS
 .TP
 .I ptr
 a pointer to the memory to free.
 .I size
 the size of the memory to free.
+.\"
+.\"
 .SH DESCRIPTION
 Deallocates the memory previously allocated with
 .BR kmem_alloc (9)
 or
 .BR kmem_zalloc (9).
-.SH "RETURN VALUES"
+.PP
+As a side-effect of freeing memory allocated with
+.BR kmem_alloc (9)
+or
+.BR kmem_zalloc (9),
+.BR kmem_free ()
+also causes outstanding buffer calls to be scheduled.
+.BR kmem_free ()
+checks the
+.I strbcwait
+system flag to see if there are buffer calls waiting.  If the
+.I strbcwait
+flag is set,
+.BR kmem_free ()
+sets the
+.I strbcalls
+flag to tell the
+.I STREAMS
+scheduler to run buffer callbacks on the next run of
+.BR runqueues ()
+and sets the
+.I qrunflag
+to indicate to the system that
+.BR runqueues (9)
+should be executed as soon as possible.
+This is consistent with the procedure described for
+.BR kmem_free (9)
+under SVR 4.
+.[
+magic
+.]
+.\"
+.\"
+.SH RETURN
 .PP
 .BR kmem_free ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 If
 .BR kmem_free ()
-fails, it failes silently.
-.SH CAVEATS
+fails, it fails silently.
+.\"
+.\"
+.SH CONTEXT
 .PP
-This is simply implemented in LiS
+.BR kmem_free ()
+can be called in any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR kmem_free ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+This is simply implemented in
+.I LiS
 .[
 LiS
 .]
 with Linux
 .BR kfree ().
-.SH "BUGS"
+.I LiS
+ignores the
+.I size
+argument.
+.\"
+.\"
+.SH "SEE ALSO"
+.BR kmem_alloc (9),
+.BR kmem_zalloc (9).
+.\"
+.\"
+.SH BUGS
 .PP
-LiS
+Older version of
+.I LiS
 .[
 LiS
 .]
-uses
+use
 .B int
 as the type of the
 .I size
 argument, instead of
 .BR size_t .
-.SH "SEE ALSO"
-.BR kmem_alloc (9),
-.BR kmem_zalloc (9).
-.XX
+Current versions ignore the
+.I size
+argument altogether.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR kmem_free ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+Under LiS,
+.BR kmem_free ()
+ignores the
+.I size
+argument and frees memory using
+.BR lis_mfree()
+which always calls
+.BR kfree (9).
+.I LiS
+does not properly schedule buffer calls in accordance with
+SVR 4.2.
+.IP \(em
+.BR kmem_free ()
+is implemented as a function call.
+.I LiS
+implements
+.BR kmem_free ()
+as a macro.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-Magic
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR kmem_free ()
+first appeared in SVR 2.
+.[
+svr2
+.]
+.\"
+.\"
 .[
 $LIST$
 .]

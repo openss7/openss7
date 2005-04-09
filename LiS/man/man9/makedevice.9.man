@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: makedevice.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: makedevice.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,16 +72,22 @@ sort-adjacent-labels
 .\"
 .\"
 .TH MAKEDEVICE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B makedevice
+.B makedevice, lis_makedevice
 \- create a device from major and minor device numbers
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
 .HP 8
-.BI "dev_t " dev " = makedevice(unsigned char " major ", unsigned char " minor );
+.BI "dev_t makedevice(major_t " major ", minor_t " minor );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -90,6 +96,8 @@ the major device number to combine into a device number.
 .TP
 .I minor
 the minor device number to combine into a device number.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR makedevice ()
@@ -100,52 +108,240 @@ device number from a device
 number and a device
 .I minor
 number.
-.SH "RETURN VALUE"
+.PP
+.BR makedevice ()
+should support both external (real) and internal (base) device major numbers and
+external (real) and internal (extended) device minor numbers; however,
+.I LiS
+only supports internal (base) device major numbers and internal (extended) device
+minor numbers.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR makedevice ()
+is used in the
+.I STREAMS
+driver
+.BR qopen ()
+procedure to create external device numbers to return from the call on
+.BR clone (4)
+opens.
+.PP
+If it is necessary that the
+.I STREAMS
+driver build device numbers from external device major and minor, the
+.BR makedev ()
+or
+.BR makedev (3)
+macros are preferable.
+Unfortunately,
+.I LiS
+does not support a kernel version of
+.BR makedev ().
+.\"
+.\"
+.SH RETURN
 .PP
 .BR makedevice ()
 returns the
 .B dev_t
-device number,
-.IR dev .
+device number for the supplied major and minor numbers;
+when it fails, it returns
+.BR NODEV .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR makedevice ()
-always succeeds.
-.SH CAVEATS
+always succeeds in generating a device number.
+.\"
+.\"
+.SH CONTEXT
 .PP
-None.
-.SH BUGS
+.BR makedevice ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
 .PP
-None.
+.BR makedevice ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Depending on the architecture, the internal base major device number may or
+may not be equal to one of the external (real) major device numbers assigned
+to the driver.
+.PP
+Portable
+.I STREAMS
+drivers should neither rely upon the specific value returned by
+.BR getmajor (),
+nor should it hard code the range of minor device numbers available to the
+major device number returned by
+.BR getmajor ().
+.PP
+.B major_t
+is
+.BR "unsigned int" .
+.PP
+The current maximum range of extended minor device numbers is the range of
+.B minor_t
+which is
+.B unsigned int
+or a range of 0 to
+.BR MAXINT .
+.PP
+Although the extended minor device range is currently from
+0 to
+.BR MAXINT ,
+only the first 2^10 minor device numbers can be represented as external (real)
+device numbers on an older 16-bit device number Linux system; the first 2^22
+minor device numbers can be represented as external (real) device number on an
+older 32-bit device number Linux system.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR getmajor (9),
 .BR getminor (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR makedevice ()
-fist appeared in SVR 3.
-.[
-svr3
-.]
+is only capable of generating internal device numbers.
+.I LiS
+does not provide support for
+.BR makedev ()
+which should be capable of generating external device numbers.
 .\"
 .\"
-.XX
+.SH COMPATIBILITY
+.PP
+.BR makedevice ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-magic
+usldk
 .]
-.[
-svr42
-.]
+and implementations based on
+.IR "SVR 4.2" ,
 .[
 svr4
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR "SVR 4.2" ,
+.BR makedevice ()
+does not examine the validity of major or minor device components.
+.IP \(em
+.IR Solaris \(rg
+provides a somewhat different mechanism.  See
+.BR ddi_driver_major (),
+.BR ddi_getiminor (),
+.BR ddi_create_minor_node ()
+and
+.BR ddi_remove_minor_node ().
+.IP \(em
+.IR UnixWare "\(rg DDI8"
+provides a different mechanism with registered driver resources and channel
+numbers.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+does not support extended device numbering, and
+.BR makedevice ()
+on earlier versions of
+.I LiS
+reduces to
+.BR makedev ().
+Current versions of
+.I LiS
+only provide a
+.BR makedevice ()
+that supports internal device numbering.
+.IP \(em
+.BR makedevice ()
+is provided for source level compatibility with
+.I SVR 4.2 MP
+and implementations based on
+.I SVR 4.2
+for the purpose of porting drivers to
+.BR Linux .
+Because the
+.B dev_t
+structure for
+.B Linux
+differs from that of other implementations,
+binaries are incompatible.
+.IP \(em
+.BR makedevice ()
+only provide functionality comparable to
+.I SVR 4.2 MP DDI/DKI
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR makedevice ()
+in support of
+.RI non- STREAMS
+devices is not supported.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR makedevice ()
+first appeared in
+.IR "SVR 4" .
+.[
+svr4
+.]
+.BR makedev (9)
+first appeared in
+.IR "SVR 3" .
+.[
+svr3
 .]
 .\"
 .\"

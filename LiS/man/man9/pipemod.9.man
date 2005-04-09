@@ -19,6 +19,8 @@
 .\" MA 02139, USA.
 .\"
 .TH PIPEMOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B pipemod
 \- 
@@ -28,6 +30,8 @@ module supporting flush handling in
 .I fifos
 and
 .I pipes
+.\"
+.\"
 .SH DESCRIPTION
 The
 .B pipemod
@@ -65,12 +69,18 @@ only necessary on one end of a pipe.
 .B pipemod
 is not needed if flush handling need not be supported, or if it its
 function is supported by other means.
+.\"
+.\"
 .SH "SEE ALSO"
 .BR fifo "(9), "
 .BR pipe "(3), "
 .BR fifo "(4), "
 .BR STREAMS "(4) "
+.\"
+.\"
 .SH HISTORY
 Unix System V Release 4 (SVR4)
+.\"
+.\"
 .SH AUTHOR
 John Boyd, protologos LLC.

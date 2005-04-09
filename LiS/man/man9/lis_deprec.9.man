@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_deprec.9.man,v 1.1.2.2 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: lis_deprec.9.man,v 1.1.2.3 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,17 +72,33 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_DEPREC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_deprec
-\- deprecated LiS symbols
+\- deprecated \fILiS\fR symbols
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .HP 12
 \fBdeprecated_symbol\fR()
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Undocumented.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .hy 6
-These are deprecated LiS symbols:
+These are deprecated
+.I LiS
+.[
+LiS
+.]
+symbols:
 .TP
 .BR lis_add_timer ,
 .PD 0
@@ -211,6 +227,8 @@ These are deprecated LiS symbols:
 .TP
 .BR lis_print_stream ,
 .TP
+.BR lis_qattach ,
+.TP
 .BR lis_qdetach ,
 .TP
 .BR lis_queuerun_cnts ,
@@ -267,29 +285,66 @@ These are deprecated LiS symbols:
 .PD
 .\"
 .\"
-.SH "CAVEATS"
+.SH RETURN
+.PP
+Return values were various.
+.\"
+.\"
+.SH ERRORS
+.PP
+Error conditions were various.
+.\"
+.\"
+.SH CONTEXT
+.PP
+These functions could be executed in various contexts.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+These functions had varying degrees of MP and preemptive kernel support.
+.\"
+.\"
+.SH NOTICES
 .PP
 Note that most of these symbols were undocumented in LiS-2.18.19.
 .\"
 .\"
-.SH "HISTORY"
+.SH "SEE ALSO"
 .PP
-These symbols appeared in LiS-2.16.19 but were deprecated in LiS-2.18.0.  These symbols are also
-deprecated in LiS.
+.BR lis_undoc (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None of these function were necessary for compatibility with anything other than a previous version
+of
+.IR LiS .
 .[
 LiS
 .]
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+These symbols appeared in LiS-2.16.19 but were deprecated in LiS-2.18.0.  These symbols are also
+deprecated in the current version of
+.IR LiS .
 .[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+LiS
 .]
 .\"
 .\"

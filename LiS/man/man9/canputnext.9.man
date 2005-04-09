@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,23 +72,31 @@ sort-adjacent-labels
 .\"
 .\"
 .TH CANPUTNEXT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B canputnext
+.B canputnext, lis_canputnext
 \- test flow control on a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = canputnext(queue_t *" q );
-.SH "ARGUMENTS"
+.BI "int canputnext(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue upstream of the queue to test for flow control.
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 It is the responsibility of a
-.IR STREAMS (4)
+.I STREAMS
 module putting a band zero (0)
 non-priority message to a subsequent message queue to check for flow control
 using
@@ -124,26 +132,73 @@ When
 returns false (0), it also sets the
 .B QWANTW
 flag for the queue indicating that the
-.IR STREAMS (4)
+.I STREAMS
 executive should backenable the
 service procedures feeding the flow controlled queue once the flow controlled
 queue is no longer full (i.e. message have been read from the queue to reduce
 the queue size below the low water mark for the queue).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR canputnext ()
 will return false (0) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is flow
 controlled and return true (1) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is not
 flow controlled.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR canputnext ()
-always succeed.
-.SH CAVEATS
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canputnext ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Under
+.BR LiS ,
+.BR canputnext ()
+is not MP-safe.
+.PP
+Although
+.BI canput( q->q_next )
+is functionally equivalent to
+.BI bcanputnext( q ),
+for the
+.BR canput (9)
+form, the dereference of the
+.I q->q_next
+pointer is not protected on MP architectures and may change as a result of a
+concurrent reconfiguration of the stream (e.g. an
+.BR I_PUSH " or " I_POP
+.BR streamio (7)
+operation).
+For MP operation,
+.BI canput( q->q_next )
+should not be called and
+.BR canputnext ()
+should always be called instead.
+.PP
+Because
+.B LiS
+violates this condition,
+.BR canputnext ()
+is not MP-safe under
+.BR LiS .
+.\"
+.\"
+.SH NOTICES
 .PP
 In the
 .B LiS
@@ -168,47 +223,120 @@ This does not protect the
 .I q->q_next
 dereference and can cause problems when modules are being pushed onto or
 popped from running streams.
-.SH "NOTES"
-.PP
-.B LfS
-.[
-LfS
-.]
-implements
-.BR bcanputnext ()
-directly and protects the
-.I q->q_next
-dereference.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putnext (9),
 .BR canput (9),
 .BR bcanput (9),
 .BR bcanputnext (9),
+.BR freezestr (9),
 .BR noenable "(9), and "
 .BR enableok (9).
-.SH VERSIONS
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR canputnext ()
-first appeared in SVR 3 STREAMS
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
 .]
-and continued in SVR 4.2 STREAMS.
+and implementations based on
+.IR "SVR 4.2 MP" ,
 .[
 svr42
 .]
-.\"
-.\"
-.XX
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR canputnext ()
+should explicitly protect dereferencing of the
+.I q->q_next
+pointer with the stream head read lock that prevents reconfiguration of the
+stream during the call.
+.B LiS
+does not explicitly protect this dereference.
+.IP \(em
+.BR canputnext ()
+called with an invalid
+.I q
+pointer or a
+.I q
+pointer that has an invalid
+.I q->q_next
+pointer, will have undefined results and may crash or destabilize the kernel.
+LiS will return false (0) under the same conditions.
+.I STREAMS
+modules and drivers that always obtain
+.I q
+from a pointer passed by the
+.I STREAMS
+scheduler via
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9),
+.BR srv (9),
+(as is normal) will not encounter this problem.
+.IP \(em
+.BR canputnext ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-magic
+usldk
 .]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR canputnext ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR canputnext ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR canputnext ()
+first appeared in SVR 4 MP.
 .[
 svr42
-.]
-.[
-svr4
 .]
 .\"
 .\"

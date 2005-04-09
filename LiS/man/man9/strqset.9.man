@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH STRQSET 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B strqset, lis_strqset
 \- sets attributes of a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = strqset(queue_t *" q ", qfields_t " what ", unsigned char " band ", long " val );
+.BI "int strqset(queue_t *" q ", qfields_t " what ", unsigned char " band ", long " val );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,6 +100,8 @@ which band (if applicable).
 .TP
 .I val
 the value to set for the parameter.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR strqset ()
@@ -158,8 +166,8 @@ For this operation
 must be zero (0).
 .PP
 .BR strqset ()
-provides a mechanims whereby a
-.IR STREAMS (4)
+provides a mechanism whereby a
+.I STREAMS
 module or driver can change information
 about a queue or queue band without directly accessing the
 .B queue
@@ -199,7 +207,9 @@ structure contains at least the following members:
 .HP
 .BI "ulong " qb_lowat
 \- the low water mark for the band.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR strqset ()
@@ -209,6 +219,8 @@ Upon failure,
 .BR strqset ()
 returns a non-zero error number.
 The requested attribute is remains unchanged.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -242,37 +254,95 @@ specified an attribute that is appropriate for
 but which is invalid for
 .BR strqset ():
 .BR QCOUNT ", " QFIRST ", " QLAST " or " QFLAG .
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-None.
+.BR strqset ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR strqset ()
+is MP-safe.
+.PP
+Calling
+.BR strqset ()
+on a queue and stream previously frozen with
+.BR freezestr (9)
+could result in single-party deadlock.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"None.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR strqget (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR strqset (9)
+has not known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR strqset (9)
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and systems based on
+.IR "SVR 4" ,
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR strqset ().
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR strqset ()
-first appeared in SVR 3.
+first appeared in SVR 4 MP.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr4spg
 .]
 .\"
 .\"

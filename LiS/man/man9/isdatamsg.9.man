@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: isdatamsg.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: isdatamsg.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,26 +72,36 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ISDATAMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B isdatamsg
+.B isdatamsg, lis_isdatamsg
 \- tests a \fISTREAMS\fR data block for data type
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = isdatamsg(mblk_t *" mp );
+.BI "int isdatamsg(mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message block to test for being of a data type.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Tests whether the data block associated with the message block pointed to by
 .I mp
 has a data block type.  Data blocks have data type when they are of type
 .BR M_DATA ", " M_PROTO ", " M_PCPROTO " or " M_DELAY .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR isdatamsg ()
 returns true (1) if the data block associated with the message block pointed to by
@@ -104,12 +114,30 @@ returns false (0) if the data block associated with the message block pointed to
 .I mp
 is not of type
 .BR M_DATA ", " M_PROTO ", " M_PCPROTO " or " M_DELAY .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR isdatamsg ()
 is always successful.  (See
-.B "\*(lqCAVEATS\*(rq" ", below.)"
-.SH CAVEATS
+.B "\*(lqNOTICES\*(rq" ", below.)"
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR isdatamsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR isdatamsg ()
+is MP-safe.  The caller is responsible for protecting the integrity of the
+message block.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -128,36 +156,55 @@ does not check the passed in message block pointer
 .I mp
 for a valid address and will result in an oops, segmentation fault or bus
 error if the message block pointer is not a pointer to a valid data block.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR datamsg (9),
 .BR isdatablk (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR isdatamsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR isdatamsg ()
+is source-level compatible with
+SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR isdatamsg ()
 first appeared in SVR 3.
 .[
 svr3
 .]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
+(Don't think so...)
 .\"
 .\"
 .[

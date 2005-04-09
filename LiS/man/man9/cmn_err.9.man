@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmn_err.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: cmn_err.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH CMN_ERR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B cmn_err
+.B cmn_err, lis_cmn_err
 \- print a kernel command error
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/cmn_err.h>
 .HP 8
 .BI "cmn_err(int " err_lvl ", char *" fmt ", " ... );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -93,6 +99,8 @@ format string.
 .TP
 .I ...
 the arguments to complete the format string.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR cmn_err ()
@@ -140,13 +148,17 @@ will generate a
 .B Linux
 kernel panic with the resulting message.
 .RE
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Unlike
 .BR printk (),
 .BR cmn_err ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR cmn_err ()
@@ -156,7 +168,22 @@ is invalid or formatting of the message
 per
 .I fmt
 and the variable arguments fails.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR cmn_err ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR cmn_err ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -165,32 +192,66 @@ LiS
 uses
 .BR printk ()
 to print the messages.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR printk ().
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR cmn_err ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR cmn_err ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+SVR 4 systems normally print a newline at before the information provided to
+.BR cmn_err ()
+unless the
+.B CE_CONT
+flag is specified, and do not normally print a newline after the information provided to
+.BR cmn_err ().
+This is the opposite of BSD and Linux behavior, which print a newline at the end of the sequence
+rather than the beginning.
+.B LiS
+can be compiled with flags providing either behavior.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR cmn_err ()
 is a System V function that first appeared in SVR 2.
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
 .\"
 .\"
 .[

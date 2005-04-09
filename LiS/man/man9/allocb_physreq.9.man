@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb_physreq.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: allocb_physreq.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ALLOCB_PHYSREQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B allocb_physreq
+.B allocb_physreq, lis_allocb_physreq
 \- allocate a \fISTREAMS\fR message and data block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "mblk_t *" mp " = allocb_physreq(int " size ", unsigned int " priority ", void *" physreq_ptr );
+.BI "mblk_t *allocb_physreq(int " size ", unsigned int " priority ", void *" physreq_ptr );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -92,6 +98,8 @@ the priority of the allocation request.
 .I physreq_ptr
 a pointer to a physical request structure describing the extra characteristics requested for the
 allocated buffer.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR allocb_physreq ()
@@ -103,7 +111,7 @@ subject to the memory constraints specified by the structure indicated by
 If the requested
 .I size
 is less than the
-.IR STREAMS (4)
+.I STREAMS
 constant
 .B FASTBUF
 then a data block of size
@@ -112,7 +120,7 @@ will be created.
 If the requested
 .I size
 is larger than the
-.IR STREAMS (4)
+.I STREAMS
 constant
 .B FASTBUF
 then a data block of size
@@ -149,7 +157,9 @@ returns the identical result as would a call to
 .PP
 The allocated message block will have a data block type of
 .BR M_DATA .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR allocb_physreq ()
@@ -165,6 +175,8 @@ return a
 .B NULL
 message pointer,
 .IR mp .
+.\"
+.\"
 .SH ERRORS
 .PP
 When an error occurs,
@@ -181,7 +193,50 @@ specified memory constraints.
 .PP
 Failure to allocate a message block is typically followed by a call to
 .BR bufcall (9).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocb_physreq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocb_physreq ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR allocb_physreq ()
+is a
+.IR UnixWare \(rg-specific
+function.
+.BR allocb_physreq ()
+is provided for source level compatibility with
+.IR UnixWare \(rg
+and, despite the description above, ignores the
+.I physreq_ptr
+argument.
+.PP
+Portable
+.I STREAMS
+drivers and modules should not use
+.BR allocb_physreq ().
+To control the physical requirement of the memory allocated, allocate the
+memory using a suitable kernel memory allocator (such as
+.BR kmalloc (9)
+or
+.BR get_freepages (9)
+with suitable
+.I gpf_flags
+such as
+.BR GFP_DMA )
+and then use
+.BR esballoc (9)
+to allocate the message block.
 .PP
 As with other post-SVR 4.2
 .[
@@ -191,7 +246,7 @@ svr42
 svr42
 .]
 compliant
-.IR STREAMS (4)
+.I STREAMS
 implementations,
 .B LiS
 .[
@@ -233,27 +288,138 @@ and results in a simple call to
 with the argument
 .I physreq_ptr
 being ignored.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR freeb (9),
 .BR freemsg (9),
 .BR bufcall (9),
 .BR esbbcall (9).
-.SH HISTORY
+.\"
+.\"
+.SH BUGS
+.PP
+In the function prototype for
+.BR allocb_physreq (),
+the
+.I size
+argument should be of type
+.B size_t
+instead of
+.BR int ;
+and the
+.I physreq_ptr
+agument should be of type
+.B physreq_t
+pointer, instead of
+.B void
+pointer.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR allocb_physreq ()
-first appeared in SVR 4.
+is source level compatible with
+.IR UnixWare \(rg
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+Despite the description above,
+.BR allocb_physreq ()
+is not specially implemented and results in a simple call to
+.BR allocb (9)
+with the argument
+.I physreq_ptr
+being largely ignored.
+.IP \(em
+.I STREAMS
+modules relying on
+.BR allocb_physreq ()
+should consider the following aspects of
+.B Linux
+memory allocation: (1) allocations are always aligned to the next largest
+power of 2 boundary greater than the requested size; (2) allocations of
+greater than a page size result in contiguous memory allocations; (3)
+allocations of greater than a page size are aligned to a page boundary.
+.IP ""
+Unfortunately,
+.B LiS
 .[
-svr4
+LiS
 .]
-.SH VERSIONS
-.PP
-This manpage was written for
+hides some memory pointers at the beginning of the allocated area which
+completely destroys
+.B Linux
+allocation characteristics for the data buffer, rendering this function useless under
 .B LiS\c
 .
 .[
 LiS
 .]
+.IP \(em
+This function is not provided by
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+nor any other
+.I SVR 4
+based implementation with the exception of
+.IR UnixWare \(rg.
+.IP \(em
+.BR allocb_physreq ()
+is provided for source level compatibility with
+.IR UnixWare \(rg
+for the purpose of porting
+.IR UnixWare \(rg
+drivers to
+.BR Linux .
+Because internal structure and definitions for
+.B LiS
+.[
+LiS
+.]
+differ from that of
+.IR UnixWare \(rg,
+binaries are incompatible.
+.IP \(em
+.BR allocb_physreq ()
+only provides functionality comparable to
+.IR UnixWare \(rg
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR allocb_physreq ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg
+documentation.
+.[
+uw7doc
+.]
+.[
+uw7spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR allocb_physreq ()
+first appeared in
+.IR UnixWare \(rg.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_version.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_version.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,9 +72,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_VERSION 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_version, lis_date
 \- the version and release date of LiS
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
@@ -82,6 +86,22 @@ sort-adjacent-labels
 .B "char " lis_version [];
 .HP 8
 .B "char " lis_date [];
+.\"
+.\"
+.SH MEMBERS
+.PP
+.TP \w'lis_version\(em'u
+.I lis_version
+contains the
+.I LiS
+version number
+.TP
+.I lis_date
+contains the
+.I LiS
+package date
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .B lis_version
@@ -99,6 +119,29 @@ is a character string that contains the date that the current
 LiS
 .]
 version was released.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR lis_version " and " lis_date
+are
+.IR LiS -specific
+constants.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use\
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR lis_version " and " lis_date
@@ -107,26 +150,6 @@ are
 -specific.
 .[
 LiS
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
 .]
 .\"
 .\"

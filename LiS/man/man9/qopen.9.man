@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qopen.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qopen.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QOPEN 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qopen, lis_qopen
 \- call a \fISTREAMS\fR module or driver open routine
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = qopen(queue_t *" q ", dev_t *" devp ", int " flag ", cred_t *" credp );
+.BI "int qopen(queue_t *" q ", dev_t *" devp ", int " flag ", cred_t *" credp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,20 +100,26 @@ open flags.
 .TP
 .I credp
 the credentials of the caller.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qopen ()
 is an internal
-.IR STREAMS (4)
+.I STREAMS
 function which invokes a
-.IR STREAMS (4)
+.I STREAMS
 module or driver open
 routine.
 .PP
 .I q
 is a pointer to the read queue of a newly allocated queue pair for the module
 or driver,  allocated with
-.BR allocq (9).
+.BR allocq (9)
+and for which a
+.B qinit
+structure was associated with
+.BR setq (9).
 .PP
 .I devp
 is a pointer to a
@@ -116,7 +128,7 @@ device number.
 For a driver,
 .B devp
 points to the device number of the
-.IR STREAMS (4)
+.I STREAMS
 character special file that was
 opened that invoked the driver's open routine.
 A driver open routine returns the resulting device
@@ -127,7 +139,7 @@ See
 For a module,
 .B devp
 points to the device number of the
-.IR STREAMS (4)
+.I STREAMS
 character special file under whose
 stream file the module is being pushed.  A module open routine does not alter
 the device number but may use the passed in device number to determine which
@@ -139,18 +151,22 @@ contain one of:
 .TP 12
 .B DRVOPEN
 the module was opened as a
-.IR STREAMS (4)
+.I STREAMS
 driver.
 .TP 12
 .B MODOPEN
 the module was opened as a
-.IR STREAMS (4)
+.I STREAMS
 module.
 .TP 12
 .B CLONEOPEN
 the module was opened via the
 .BR clone (4)
-driver.
+driver.  This flag will only be set on the initial open of a driver that was
+made via a clone driver.  This setting of
+.I flag
+requests that the driver assign a unique minor device number to the newly
+created stream.
 .PP
 .I credp
 points to a
@@ -172,19 +188,9 @@ typedef struct cred {
 } cred_t;
 \fR\s+2
 .fi
-.SH CAVEATS
-.PP
-.BR qopen ()
-is an internal
-.IR STREAMS (4)
-function that is not intended to be called
-directly by the module writer.  See
-.BR open (2s)
-and
-.B I_PUSH
-under
-.BR streamio (2).
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR qopen ()
@@ -194,6 +200,8 @@ pointed to by
 Upon failure,
 .BR qopen ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 When
 .BR qopen ()
@@ -225,8 +233,52 @@ a buffer could not be allocated as part of the open.
 .TP 12
 .RB [ ENOSR ]
 a
-.IR STREAMS (4)
+.I STREAMS
 resource could not be allocated as part of the open.
+.\"
+.\"
+.SH CONTEXT
+.BR qopen ()
+should only be called from user context with the open semaphore held and a
+write lock on the stream head.
+.\"
+.\"
+.SH MP-STREAMS
+.BR qopen ()
+must be called single-threaded with the open semaphore and the stream write
+lock held.
+.PP
+Driver and module
+.I q->q_info->qi_open
+procedures are always invoked single-threaded and exclusive in accordance with
+descriptions for SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+This is also consistent with exclusive open/close access under
+.IR Solaris \(rg.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR qopen ()
+is an internal
+.I STREAMS
+function that is not intended to be called
+directly by the module or driver writer.  See
+.BR open (2)
+and
+.B I_PUSH
+under
+.BR streamio (2)
+for indirect methods of invoking this function.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 Following is an example of a module open routine:
@@ -336,37 +388,64 @@ int ss_open(queue_t * q, dev_t * devp, int flag, int sflag,
 }
 \fR\s+2
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
+.BR allocq (9),
+.BR setq (9),
+.BR makedevice (9),
+.BR clone (4),
 .BR open (2s),
 .BR streamio (2),
 .BR qclose (9),
 .BR qattach (9),
 .BR qdetach (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.PP
+.\"
+.\"
+.SH BUGS
+.I LiS
+is notorious for races and bugs in the
 .BR qopen ()
-first appeared in SVR 3.
+and
+.BR qclose ()
+procedures.
+.\"
+.\"
+.SH COMPATIBILITY
+.BR qopen ()
+is not an exported function in SVR 4.2
+or
+.IR Solaris \(rg.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr3
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.I \*(lqMagic Garden\*(rq
 .[
 magic
 .]
-.[
-svr42
-.]
+description of internal
+.I SVR 4
 .[
 svr4
+.]
+function.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qopen ()
+first appeared as an internal function with \fISTREAMS\fP in SVR 3.
+.[
+svr3
 .]
 .\"
 .\"

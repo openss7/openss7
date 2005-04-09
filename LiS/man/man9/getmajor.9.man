@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getmajor.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: getmajor.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,64 +72,311 @@ sort-adjacent-labels
 .\"
 .\"
 .TH GETMAJOR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B getmajor
+.B getmajor, lis_getmajor
 \- get the major device number for a device.
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/streams.h>
 .br
 .B #include <sys/ddi.h>
 .HP 8
-.BI "unsigned char " retval " = getmajor(dev_t " dev );
+.BI "major_t getmajor(dev_t " dev );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I dev
 the device number from which to extract the major device number.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-.BR getmajor ()
-returns the major device number associated with the
-.B dev_t
-.IR dev .
-.SH "RETURN VALUES"
+.BR getmajor (9),
+.BR getminor (9)
+and
+.BR makedevice (9)
+are the device handling functions defined in
+.I SVR 4
+.[
+svr4
+.]
+that are normally used by
+.I STREAMS
+device drivers in the
+.BR qopen (9)
+procedure.
 .PP
-Always returns the major device number.
+.BR getmajor ()
+gets the internal (base) device major number associated with the external
+.B dev_t
+device number,
+.IR dev .
+.BR getmajor ()
+is the normal architecture independent function call providing newer internal
+and extended device numbering replacing the older
+.I SVR 4
+.[
+svr4
+.]
+behaviour using a function of the same name.
+.PP
+.BR getmajor ()
+is an architecture independent function that obtains the internal (base) major
+device number associated with device
+.IR dev .
+.PP
+.BR getemajor (),
+on the other hand, will return the external (real) major device number
+associated with the device
+.IR dev .
+.I LiS
+does not implement
+.BR getemajor ().
+.PP
+.BR major ()
+was the SVR 3
+.[
+svr3
+.]
+name for this function.
+.BR major (3)
+also exists as a user subroutine in
+.BR <sys/sysmacros.h> .
+.I LiS
+does not implement
+.BR major ().
+.\"
+.\"
+.SH USAGE
+.PP
+.BR getmajor ()
+is used by drivers and modules that do not require knowledge of external major
+device numbers and that wish to use a simplified approach to assignment of
+minor device numbers for
+.BR clone (4)
+operations.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR getmajor ()
+always returns the major device number.
+.\"
+.\"
 .SH ERRORS
 .PP
-Always succeeds.
-.SH CAVEATS
+.BR getmajor ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
 .PP
 .BR getmajor ()
-simply invokes the kernel macro
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getmajor ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+In older versions of
+.IR LiS ,
+.[
+LiS
+.]
+.BR getmajor ()
+simply invoked the kernel macro
 .BR MAJOR ().
+Also, in older versions of
+.IR LiS ,
+.BR getmajor ()
+returned
+.BR "unsigned char" .
+More recent versions of
+.I LiS
+use an internal representation for
+.B dev_t
+and have an internal function.
+Also, more recent versions return
+.BR major_t ,
+which is
+.BR "unsigned int" .
+.PP
+Depending on the architecture, the internal base major device number may or
+may not be equal to one of the external (real) major device numbers assigned
+to the driver.
+.PP
+Portable
+.I STREAMS
+drivers should neither rely upon the specific value returned by
+.BR getmajor (),
+nor should it hard code the range of minor device numbers available to the
+major device number returned by
+.BR getmajor ().
+.PP
+.B major_t
+is
+.BR "unsigned int" .
+.PP
+The current maximum range of extended minor device numbers is the range of
+.B minor_t
+which is
+.B unsigned int
+or a range of 0 to
+.BR MAXINT .
+.PP
+Although the extended minor device range is currently from
+0 to
+.BR MAXINT ,
+only the first 2^10 minor device numbers can be represented as external (real)
+device numbers on an older 16-bit device number Linux system; the first 2^22
+device numbers can be represented as external (real) device numbers on newer
+32-bit device number Linux systems.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR getminor (9),
 .BR makedevice (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+Under current versions of
+.IR LiS ,
+.BR getmajor ()
+will not accept an external
+.B dev_t
+device number and return a proper value.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR getmajor ()
-first appeared in SVR 2.
-.\"
-.\"
-.XX
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-magic
+usldk
 .]
-.[
-svr42
-.]
+and implementations based on
+.IR "SVR 4"
 .[
 svr4
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+provides a somewhat different mechanism.  See
+.BR ddi_driver_major (),
+.BR ddi_getiminor (),
+.BR ddi_create_minor_node ()
+and
+.BR ddi_remove_minor_node ().
+.IP \(em
+.IR UnixWare "\(rg DDI8"
+provides a different mechanism with registered driver resources and channel
+numbers.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+does not support extended device numbering, and
+.BR getmajor ()
+on earlier versions of
+.I LiS
+reduces to
+.BR getemajor ().
+On current versions of
+.IR LiS ,
+.BR getmajor ()
+still does not support extended device numbering, however,
+.BR getmajor ()
+will now only accept an internal device number argument.
+.IP \(em
+.BR getmajor ()
+is provided for source level compatibility with
+.I SVR 4.2 MP
+and implementations based on
+.I SVR 4.2
+for the purpose of porting drivers to
+.BR Linux .
+Because the
+.B dev_t
+structure for
+.B Linux
+differs from that of other implementations,
+binaries are incompatible.
+.IP \(em
+.BR getmajor ()
+only provide functionality comparable to
+.I SVR 4.2 MP DDI/DKI
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR getmajor ()
+in support of
+.RI non- STREAMS
+devices is not supported.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getmajor ()
+first appeared in SVR 4.
+.[
+svr4
+.]
+.BR major (9)
+first appeared in SVR 3.
+.[
+svr3
 .]
 .\"
 .\"

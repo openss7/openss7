@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH PULLUPMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B pullupmsg, lis_pullupmsg
 \- pull up the bytes in a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = pullupmsg(struct msgb *" mp ", int " len );
+.BI "int pullupmsg(mblk_t *" mp ", int " len );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the message to pull up.
 .TP
 .I len
 how to pull up the message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR pullupmsg ()
@@ -137,12 +145,14 @@ in the message blocks of all absorbed data blocks.
 .PP
 .BR pullupmsg ()
 is typically used where it is necessary for the first number of bytes in a
-.IR STREAMS (4)
+.I STREAMS
 message be continguous to meet the needs of the routines processing
 the bytes contained in the message.  In this case,
 .BR pullupmsg ()
 is called before processing the bytes.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR pullupmsg ()
@@ -153,6 +163,8 @@ is altered.
 Upon failure,
 .BR pullupmsg ()
 returns false (0), and the passed in message is unaltered.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR pullupmsg ()
@@ -167,7 +179,28 @@ or, when the passed in message point
 is
 .BR NULL ;
 or, when allocation of the necessary blocks fails.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR pullupmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR pullupmsg ()
+is MP-safe; however, the caller is responsible for ensuring exclusive access
+to the passed in message.
+.\"
+.\"
+.SH NOTICES
+.PP
+The DKI function
+.BR msgpullup (9)
+should be used in preference to
+.BR pullupmsg ().
 .PP
 It is not always necessary to allocate a new data block to contain the pulled
 up bytes: if there is sufficient room in the initial data block, the initial
@@ -178,34 +211,57 @@ LiS
 .]
 checks for this possibility and efficiently reuses the initial data block
 where possible.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR msgpullup (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR pullupmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR pullupmsg ()
+is source-level compatible to SVR 4.2 DDI/DKI
 .[
-LiS
+usldk
 .]
+and
+.IR Solaris \(rg.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR pullupmsg ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

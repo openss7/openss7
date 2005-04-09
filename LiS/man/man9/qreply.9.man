@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qreply.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qreply.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QREPLY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qreply, lis_qreply
 \- replys to a message from a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "qreply(queue_t *" q ", mblk_t *" mp );
+.BI "void qreply(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the queue from which to reply.
 .TP
 .I mp
 the message with which to reply.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qreply ()
@@ -102,13 +110,39 @@ or the write queue downstream from the specified read queue pointed to by
 .BR qreply ()
 is normally used within
 .IR q 's
-put or service procedures to reply to messages that have arrived on its write
-queue from upstream, or its read queue from downstream.
-.SH "RETURN VALUES"
+.BR put (9)
+or
+.BR srv (9)
+procedure to reply to messages that have arrived on its write queue from
+upstream, or its read queue from downstream.
+.PP
+It is the responsibility of the procedure calling
+.BR qreply ()
+with a normal message pointer to by
+.I mp
+to first call
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+for the queue to check for flow control.  If
+.BR canputnext (9)
+or
+.BR bcanputnext (9)
+fails for queue
+.IR q ,
+the procedure should not normally invoke
+.BR qreply ()
+with a low priority message for the flow controlled queue
+.BI OTHERQ( q ) ->q_next .
+.\"
+.\"
+.SH RETURN
 .PP
 .BR qreply ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR qreply ()
@@ -144,12 +178,47 @@ does not have a put procedure;
 .BI OTHERQ( q ) ->q_next
 has put and service procedures turned off (e.g. with
 .BR qprocsoff (9)).
-.SH CAVEATS
 .PP
-\fB\)qreply(\fI\)q\fB\), \fI\)mp\fB\))\fR\)
+.BR qreply ()
+fails silently when a queue band structure cannot be allocated for the band
+specified in
+.IR mp->b_band .
+The caller can ensure that a queue band structure exists for the band in
+question by calling
+.BR strqset (9)
+for the band.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qreply ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qreply ()
+is MP-safe.  The caller is responsible for ensuring exclusive access to the
+passed in message block.  The caller should remove all global references to
+the passed in message block before calling
+.BR qreply ().
+.PP
+.BR qreply ()
+whould always be used in the MP environment in preference to
+.BI put(OTHERQ( q ) ->q_next ", " mp )
+because the later does not protect dereference of the
+.I q_next
+pointer.
+.BI putnext(OTHERQ( q "), " mp )
+would be an acceptable alternative.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BI qreply( q ", " mp )
 has the same effect as
-\fB\)putnext(OTHERQ(\fI\)q\fB\))\fI\)->q_next\fB\), \fI\)mp\fB\))\fR\).
-.PP
+.BI putnext(OTHERQ( q "), " mp )).
 Because
 .BR qreply ()
 invokes the put procedure of the upstream or downstream queue, the same care
@@ -157,36 +226,141 @@ should be taken with
 .BR qreply ()
 as is taken with
 .BR putnext (9).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR OTHERQ (9),
 .BR putnext (9),
 .BR putq (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR qreply ()
-first appeared in SVR 3.
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR qreply ()
+fails silently and frees
+.I mp
+if a queue band structure cannot be allocated on demand for
+.IR mp->b_band .
+Under
+.IR LiS ,
+.BR qreply ()
+fails silently and frees
+.I mp
+if
+the message pointer
+.I mp
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL ,
+or
+.BI OTHERQ( q )
+is
+.BR NULL ;
+.BI OTHERQ( q )
+does not refer to a queue structure;
+.BI OTHERQ( q ) ->q_next
+is
+.BR NULL ;
+.BI OTHERQ( q ) ->q_next
+does not refer to a queue structure;
+.BI OTHERQ( q ) ->q_next->q_info
+is
+.BR NULL ,
+or
+.BI OTHERQ( q ) ->q_next
+does not have a put procedure;
+.BI OTHERQ( q ) ->q_next
+has put and service procedures turned off (e.g. with
+.BR qprocsoff (9)).
+.IP \(em
+.BR qreply ()
+protects dereference of the
+.I q_next
+pointer with the stream head read lock.
+SVR 4.2 MP and
+.IR Solaris \(rg
+offer the same protection.
+Under
+.IR LiS ,
+.BR qreply ()
+does not protect dereference of the
+.I q_next
+pointer against module pushes and pops.
+.IP \(em
+.BR qreply ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qreply ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qreply ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
+See
+.BR putnext (9)
+for additional information.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qreply ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canput.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: canput.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,20 +72,28 @@ sort-adjacent-labels
 .\"
 .\"
 .TH CANPUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.SH "NAME"
-.B canput
+.\"
+.\"
+.SH NAME
+.B canput, lis_canput
 \- test flow control on a \fISTREAMS\fR message queue
-.SH "SYNOPSIS"
+.\"
+.\"
+.SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = canput(queue_t *" q );
-.SH "ARGUMENTS"
+.BI "int canput(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue to test for flow control.
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 .BR canput ()
 checks whether the stream is flow controlled starting at the
@@ -115,32 +123,89 @@ returns false (0), it also sets the
 flag for the queue upon which
 .BR canput ()
 stopped, indicating that the
-.IR STREAMS (4)
+.I STREAMS
 executive should backenable
 service procedures when the flow controlled queue is
 no longer full.
 .PP
 It is the responsibility of a
-.IR STREAMS (4)
+.I STREAMS
 module putting a band zero (0)
 non-priority message to a message queue to check for flow control using
 .BR canput ()
 before placing a message on the queue with
 .BR putq (9).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR canput ()
 returns false (0) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is flow controlled
 and returns true (1) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is not flow
 controlled.
-.SH "ERRORS"
+.\"
+.\"
+.SH ERRORS
 .PP
 .BR canput ()
-always succeeds.
+always succeeds for a valid
+.IR q .
+If
+.I q
+is invalid, the result is undefined.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR canput ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR canput ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+It is the responsibility of a
+.I STREAMS
+module putting a band zero (0)
+non-priority message to a message queue to check for flow control using
+.BR canput ()
+before placing a message on the queue with
+.BR putq (9).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+In the
+.B LiS
+.[
+LiS
+.]
+implementation, if
+.BR canput ()
+suffers an internal error, it will return false (0).
+.PP
+.B LiS
+.[
+LiS
+.]
+implements
+\fB\)canput(\fI\)q\fB\))\fR\),
+\fB\)canputnext(\fI\)q\fB\))\fR\) and
+\fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
+with macros that call
+\fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
+.\"
+.\"
 .SH "EXAMPLES"
 .PP
 .BR canput ()
@@ -174,56 +239,8 @@ from the lower queue put procedure to test the upper queue for flow control.
 If the upper queue is flow controlled, the message is placed on the lower
 queue.  Otherwise, if the lower queue is empty and the upper queue is not flow
 controlled, the example places the message directly on the upper queue.
-.SH "CAVEATS"
-.PP
-In the
-.B LiS
-.[
-LiS
-.]
-implementation, if
-.BR canput ()
-suffers an internal error, it will return false (0).
-.PP
-.B LiS
-.[
-LiS
-.]
-implements
-\fB\)canput(\fI\)q\fB\))\fR\),
-\fB\)canputnext(\fI\)q\fB\))\fR\) and
-\fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
-with macros that call
-\fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
-.SH "NOTES"
-.PP
-.PP
-.B LfS
-.[
-LfS
-.]
-implements 
-.BR canput ()
-and
-.BR canputnext (9)
-function directly and ensure integrity of dereferencing of the
-.I q
-pointer.  This means that, while equivalent,
-.BI canput( q->q_next )
-and
-.BI canputnext( q )
-are different in that the caller is responsible for protecting the integrity of
-the
-.I q->q_next
-dereferencing for
-.BI canput( q->q_next )\fR.
-Driver and module writers should always use
-.BI canputnext( q )
-instead of
-.BI canput( q->q_next )\fR.
-In fact, driver and module writers should avoid the dereference
-.I q->q_next
-altogether.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putq (9),
@@ -232,31 +249,112 @@ altogether.
 .BR bcanputnext (9),
 .BR noenable "(9) and "
 .BR enableok (9).
-.SH "VERSIONS"
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR canput ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR canput ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+If
+.BR canput ()
+suffers an internal error,
+.I q
+is
+.BR NULL ,
+or points to a structure other than a
+.B queue_t 
+structure,
+it will return false (0).
+Portable
+.I STREAMS
+drivers and modules will not pass
+.B NULL
+or invalid arguments to
+.I STREAMS
+functions.
+.IP \(em
+Under
+.BR LiS ,
+.BI canput( q ),
+.BI canputnext( q )
+and
+.BI bcanputnext( q ", " band )
+are macros that call
+.BI bcanput( q ", " band ).
+.IP \(em
+.BR canput ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR canput ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR canput ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR canput ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

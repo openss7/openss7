@@ -1,0 +1,638 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: freezestr.9.man,v 1.1.2.1 2005/04/08 22:40:46 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so lis.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database lis.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH FREEZESTR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B freezestr, lis_freezestr
+\- freeze the state of a stream queue
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "void freezestr(queue_t *" q );
+.PD 0
+.HP
+.BI "void lis_freezestr(queue_t *" q );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue (and indirectly the stream) to freeze.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR freezestr ()
+freezes the state of the queue,
+.IR q,
+and the stream containing
+.IR q .
+A queue cannot be altered while frozen.
+The purpose of
+.BR freezestr ()
+is to lock the state of the
+.I q
+so that its members can be accessed directly.
+.PP
+.BR freezestr ()
+blocks entry to all queue procedures,
+.BR qopen (9)
+.BR qclose (9),
+.BR put (9)
+and
+.BR srv (9).
+.PP
+.BR freezestr ()
+waits until all other threads in
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+and
+.BR srv (9)
+procedures
+in the stream containing
+.I q
+exit.
+.BR freezestr ()
+then locks the stream so that all other threads will be blocked from entering
+those functions with the exception of the current thread.
+.PP
+In addition, the queue specified by
+.I q
+is locked and all other threads will be blocked from executing queue
+manipulation functions
+.BR appq (9),
+.\".BR bcanget (9),
+.BR bcanput (9),
+.\".BR canget (9),
+.BR canput (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR insq (9),
+.BR putbq (9),
+.BR putq (9),
+.BR rmvq (9),
+.BR setq (9),
+.BR strqget (9)
+and
+.BR strqset (9)
+for the locked queue and local interrupts will be suppressed.
+.PP
+A procedure that freezes a stream queue with
+.BR freezestr ()
+must thaw the stream queue with
+.BR unfreezestr (9)
+before returning.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR freezestr ()
+returns void.
+(See
+.RI \*(lq COMPATIBILITY ,\*(rq
+below.)
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR freezestr ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR freezestr ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR freezestr ()
+is MP-safe; however,
+the caller is responsible for the validity of the reference
+.IR q .
+References to
+.I q
+from a procedure, call-out or callback predicated on the queue pair to which
+.I q
+belongs
+are guaranteed valid.
+The caller must guarantee validity from call outs, callbacks, soft interrupts
+and interrupt service routines not predicated on the queue pair to which
+.I q
+belongs.
+.PP
+Calling
+.BR freezestr ()
+from any context will disable local interrupts on the calling processor.  As
+local interrupts will remain disabled until
+.BR unfreezestr (9)
+is called, the period for which a driver or module freezes a stream is
+critical and has an impact on system performance.
+The caller should not call any functions which may cause the calling thread to
+sleep while it holds a frozen stream.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR freezestr ()
+does not block or synchronize with
+.BR bufcall (9),
+.BR esbbcall (9),
+or
+.BR timeout (9)
+callback functions.  Separate means are required to ensure exclusion of those
+functions.
+.PP
+.BR freezestr ()
+does not affect the operation of
+.BR qprocson (9)
+and
+.BR qprocsoff (9)
+which are separate facilities.
+.PP
+Although calling
+.BR freezestr ()
+twice for the same queue will result in single-party deadlock of the calling
+processor for most
+.I STREAMS
+implementations,
+.B Linux Fast-STREAMS
+uses recursive locks and will not deadlock when called multiple times for the
+same queue.
+.PP
+The caller must not call queue
+.I STREAMS
+utility functions that manipulate queue state.  These functions include
+.\".BR bcanget (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.\".BR canget (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putbq (9),
+.BR putq (9),
+.BR qcountstrm (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR SAMESTR (9).
+.\".BR appq (9),
+.\".BR insq (9),
+.\".BR rmvq (9),
+.\".BR setq (9),
+.\".BR strqget (9),
+.\".BR strqset (9).
+Calling these functions with a frozen queue will result in single-party
+deadlock of the calling processor.
+.PP
+The
+.I q->q_flag
+member is never protected against writes by freezing the stream.  The
+.I q->q_flag
+member must be considered a read-only field or must be accessed with atomic
+bit operations.
+.PP
+A procedure calling
+.BR freezestr ()
+and returning without calling
+.BR unfreezestr (9)
+will indefinitely postpone interrupts on the calling processor, manipulation
+of the stream (qopen, qclose), and and queue procedures (insq, rmvq) on the
+frozen queue.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR freezestr ()
+is implemented by taking a recursive write lock on the stream head with
+interrupt suppression.  This protects all of the
+.I q->q_next
+pointers in the entire stream.
+.BR freezestr ()
+also takes a recursive write lock on the queue structure referenced by
+.IR q .
+This protects all of the members of the queue structure as well as the
+.I mp->b_next
+pointers of messages on the queue.
+Note that
+.I q->q_flags
+are not protected by structure locks but are operated on using atomic bit
+operations.
+.PP
+Because recursive locks are taken, calling
+.BR freezestr ()
+for a frozen stream will not result in single-part deadlock.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example (but not a terribly useful one) of the use of
+.BR freezestr ():
+.sp
+.nf
+\fC\s-2\
+...
+freezestr(q);
+{
+   if ((mp = q->q_first) &&
+       mp->b_datap->db_type == M_PCPROTO &&
+       *((ulong *) mp->b_rptr) == T_INFO_ACK && !mp->b_next)
+      qenable(q);
+}
+unfreezestr(q);
+...
+\fC\s+2
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR allocq (9)
+.BR appq (9),
+.\".BR bcanget (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bufcall (9),
+.\".BR canget (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR insq (9),
+.BR noenable (9),
+.BR put (9)
+.BR putbq (9),
+.BR putq (9),
+.BR qclose (9),
+.BR qcountstrm (9),
+.BR qenable (9),
+.BR qopen (9),
+.BR qprocsoff (9)
+.BR qprocson (9)
+.BR qreply (9),
+.BR qsize (9),
+.BR rmvq (9),
+.BR SAMESTR (9).
+.BR setq (9),
+.BR srv (9),
+.BR STREAMS (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR timeout (9),
+.BR unfreezestr (9),
+.BR MPSTR_QLOCK (9),
+.BR MPSTR_QRELE (9),
+.BR MPSTR_STPLOCK (9),
+.BR MPSTR_STPRELE (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR freezestr ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR freezestr ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4 MP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+provide this function.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+and
+.IR LiS
+.[
+lis
+.]
+do not provide this function.
+.RI ( HP-UX \(rg
+provides the symbols, but they do nothing.)
+.IP \(em
+.IR Solaris \(rg
+provides the function prototype:
+.BI "void freezestr(queue_t *" q ).
+All the others provide the prototype
+.BI "pl_t freezestr(queue_t *" q ).
+For compatibility with
+.IR Solaris \(rg,
+the software priority level otherwise returned by
+.BR freezestr ()
+is stored internally as well as being returned.
+.BR unfreezestr (9)
+will access this internal software priority level to restore when the
+.IR Solaris \(rg,
+version of
+.BR unfreezestr (9)
+is called.
+.IP \(em
+.BR freezestr ()
+does not result in single-party deadlock on the calling processor when called
+twice for the same queue.
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+will result in single-party deadlock on the calling processor in the same
+circumstance.
+Portable
+.I STREAMS
+drivers and modules will not call
+.BR freezestr ()
+for a stream that the caller has already frozen.
+.IP \(em
+Calling
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+or
+.BR SAMESTR (9)
+for a queue in a stream frozen by the caller will not result in single-party
+deadlock of the calling processor.
+.IR "SVR 4.2 MP" ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+and
+.IR UnixWare \(rg
+will result in single-party deadlock in the same circumstance.
+Portable
+.I STREAMS
+drivers and modules will not attempt to call any of these restricted functions
+while it holds a stream frozen with
+.BR freezestr ().
+.IP \(em
+.BR freezestr ()
+blocks all threads except the calling thread from putting messages onto or
+taking message off of the queue specified by
+.IR q .
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+state that any thread currently within the stream will be blocked if it
+attempts to put messages onto or take messages off of
+.B any
+queue within the stream (with the sole exception of the caller).
+If the
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+or
+.IR UnixWare \(rg
+behavior is desired, the queue should establish per-stream synchronization
+(i.e. only allowing one thread of execution within the entire stream).
+.IP \(em
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+specify that the following functions cannot be called on a frozen stream:
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR SAMESTR (9).
+.IP \(em
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+specify that the following functions must have the stream frozen across the
+call:
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9).
+.IR Solaris \(rg
+specifies that these functions must have the queue protected with
+.I STREAMS
+functions or some other locking mechanism.
+.IP \(em
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+states that the stream cannot be frozen while calling
+.BR rmvq (9),
+but this is probably an error in the
+.IR SUPER-UX \(rg
+documentation.
+.[
+suxspg
+.]
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI.
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+A version of
+.BR freezestr ()
+first appeared in SVR 4 MP.
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

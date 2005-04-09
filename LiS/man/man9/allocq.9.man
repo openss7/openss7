@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,27 +72,47 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ALLOCQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B alloq
+.B alloq, lis_allocq
 \- allocate a \fISTREAMS\fR queue pair
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "queue_t *" q " = allocq();
+.B queue_t *allocq(void);
 .HP 8
-.BI "queue_t *" q " = lis_allocq(const char *" name );
+.BI "queue_t *lis_allocq(const char *" name );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I name
 the name of the queue to allocate.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Allocate a new
 .BR NULL -initialized
 queue pair.
-.SH "RETURN VALUES"
+Queue pairs allocated with
+.BR allocq ()
+can be freed with
+.BR freeq (9).
+.PP
+Queue pairs allocated with
+.BR allocq ()
+will have no putp, srvp, open or close procedures associated with either
+queue, will have zero maximum and minimum packet sizes and high and low water
+marks; and will have no synchronization queues associated with the queue pair.
+.\"
+.\"
+.SH RETURN
 .BR allocq ()
 returns the newly allocated queue pair as a pointer to the
 read queue of the pair,
@@ -105,6 +125,8 @@ argument, a name to associate with the queue structure for debugging purposes.
 returns
 .B NULL
 on failure.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR allocq ()
@@ -113,13 +135,28 @@ returns
 on failure.
 .BR allocq ()
 fails when the queue pair cannot be allocated.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocq ()
+is MP-safe.  The caller has exclusive access to the returned queue pair.
+.\"
+.\"
+.SH NOTICES
 .PP
 Although this function is documented in
-.IR STREAMS (4),
+.IR STREAMS ,
 it is not normally called
 directly by
-.IR STREAMS (4)
+.I STREAMS
 modules or drivers.
 .PP
 The
@@ -128,39 +165,85 @@ version
 .[
 LiS
 .]
-of this function does no have the same declaration as the SVR 4.2 STREAMS
+of this function does not have the same declaration as the SVR 4.2 STREAMS
 .[
 svr42
 .]
 version.
+.PP
+This function should not be used by portable
+.I STREAMS
+modules or drivers.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR freeq (9).
-.SH HISTORY
+.\"
+.\"
+.SH BUGS
 .PP
 .BR allocq ()
-appears in the SVR 4 STREAMS
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR allocq ()
+is compatible with SVR 4
 .[
 svr4
 .]
-documentation.
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR allocq ()
+should not be called by normal
+.I STREAMS
+modules or drivers and is implementation specific.
+.IP \(em
+This function is not exported by
+.IR "SVR 4.2 MP DDI/DKI " or
+any other UNIX directly.
 .PP
-.BR lis_allocq ()
-is no longer an exported function as of LiS-2.18.0.
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.BR allocq ()
+is compliant with the description of the internal
+.BR allocq ()
+function in SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
 .[
 magic
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR allocq ()
+is an internal
+.I "SVR 4"
+.I STREAMS
+function described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.PP
+.BR lis_allocq ()
+is no longer an exported function as of LiS-2.18.0.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = putbq(queue_t *" q ", struct msgb *" mp );
+.BI "int putbq(queue_t *" q ", mblk_t *" mp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -106,15 +106,26 @@ back onto the queue pointed to by
 When the message is placed back on the queue, it is placed on the head of the
 queue, rather than the tail of the queue as would result from a call to
 .BR putq (9).
+The message is placed in the proper order at the head of the priority, normal
+or specified band, queue counts are adjusted and queue enabling is performed.
 .PP
 .BR putbq ()
 is normally called from within queue service routines to place a message back
 on the queue subsequent to a call to
 .BR getq (9)
-that removes a message which it turns out cannot be processed at the moment.
+that removes a message which it turns out cannot be processed at the moment
+due to flow restrictions from testing
+.BR canput (9)
+or
+.BR bcanput (9).
+When
+.BR putbq ()
+is executed following
+.BR getq (9)
+for the same queue, it is guaranteed to succeed.
 .\"
 .\"
-.SH "RETURN VALUES"
+.SH RETURN
 .PP
 Upon success,
 .BR putbq ()
@@ -131,6 +142,10 @@ are unaffected.
 The caller is retains ownership of the message
 .I mp
 when the call fails.
+.PP
+The return value from
+.BR putbq ()
+should always be examined.
 .\"
 .\"
 .SH ERRORS
@@ -149,10 +164,56 @@ is closing or for which
 put and service routine processing has been
 turned off (e.g. with
 .BR qprocsoff (9)).
+.PP
+Upon failure,
+.BR putbq ()
+returns false (0) and the message pointed to by
+.I mp
+is unaltered.  It is the caller's responsibility to free
+.I mp
+if the caller so desires.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR putbq ()
+can be called from any context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putbq ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR putbq ()
+only fails if a queue band for
+.BR mp->b_band
+does not yet exist and one could not be allocated.  It can be ensured that
+.BR putbq ()
+will not fail for the same
+.I q
+for which the message was obtained with
+.BR getq (9).
+Otherwise, it can be ensured that the queue band exists by calling
+.BR setqstr (9)
+for the band in question before calling
+.BR putbq ().
+.PP
+Care should be taken not to return with
+.BR putbq ()
+a priority message take off of a queue in a service procedure with
+.BR getq (9).
+This is because placing the priority message back on the queue will cause the
+service procedure to re-execute at the earliest opportunity resulting in
+possible indefinite looping.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR getq (9),
 .BR putq (9).
 .\"
@@ -175,31 +236,127 @@ handling in that it fails while
 is in effect or if the stream is closing.
 .\"
 .\"
-.SH VERSIONS
+.SH COMPATIBILITY
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR putbq ()
+is compatible with
+.IR "SVR 4.2 DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+If
+.BR putbq ()
+is passed an invalid
+.IR q " or " mp
+argument, the result is undefined.
+Under
+.IR LiS ,
+.BR putbq ()
+fails if the passed in message pointer
+.I mp
+is
+.BR NULL ;
+or, the passed in queue pointer
+.I q
+is
+.BR NULL ,
+points to a structure other than a queue structure, or refers to a queue that
+is closing or for which
+put and service routine processing has been
+turned off (e.g. with
+.BR qprocsoff (9)).
+.IP \(em
+.BR putbq ()
+only fails if
+.I mp->b_band
+refers to a non-existent queue band and a queue band structure could not be
+allocated.  When
+.BR putbq ()
+returns failure,
+.I mp
+is unchanged.
+This is consistent with SVR 4.2 DDI/DKI and
+.IR Solaris \(rg
+documentation.
+Under older versions of
+.IR LiS ,
+regardless of whether
+.BR putbq ()
+returns success or failure, the message pointed to by
+.I mp
+is placed on the queue pointed to by
+.I q
+or freed, so that the caller to
+.BR putbq ()
+always loses ownership of the message pointed to by
+.I mp
+upon return from the call.
+This is inconsistent with SVR 4.2 DDI/DKI and
+.IR Solaris \(rg
+documentation.
+This is an
+.B LiS
+bug in older versions of
+.BR LiS .
+.IP \(em
+.BR putbq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putbq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putbq ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR putbq ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

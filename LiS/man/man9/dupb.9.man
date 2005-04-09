@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dupb.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: dupb.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH DUPB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B dupb
+.B dupb, lis_dupb
 \- duplicate a \fISTREAMS\fR message block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BR "struct msgb *" bp " = dupb(struct msgb *" mp );
+.BI "struct msgb *dupb(struct msgb *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message block to duplicate.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR dupb ()
@@ -93,19 +101,21 @@ as the passed in data block.  The
 .IR b_wptr " and " b_rptr
 pointers of the new message block are set to the same values as the duplicated
 message block.  The data block remains untouched.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR dupb ()
-returns a pointer to the duplicated message block,
-.IR bp .
+returns a pointer to the duplicated message block.
 .PP
 Upon failure,
 .BR dupb ()
 returnes a
 .B NULL
-.I bp
 pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -126,40 +136,88 @@ fails,
 should be called with the
 .I priority
 associated with the message for which duplication failed.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
+.BR dupb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR dupb ()
+is MP-safe; however, it is the responsibility of the caller to ensure
+exclusive access to the passed in message block.  On return, the caller has
+the only reference to the returned message block.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR esbbcall (9),
 .BR copyb (9),
 .BR copymsg "(9) and "
 .BR dupmsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR dubp ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR dupb ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+and LiS
+.[
+LiS
+.]
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+When
+.BR dupb ()
+is passed a
+.B NULL
+.I bp
+pointer, the results are undefined.  When LiS
+.BR dupb ()
+is passed a
+.B NULL
+.I bp
+pointer, it returns
+.BR NULL .
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR dupb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

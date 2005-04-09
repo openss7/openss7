@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocsoff.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qprocsoff.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,35 +72,95 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QPROCSOFF 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qprocsoff, lis_qprocsoff
 \- disables \fISTREAMS\fR message queue processing for multi-processing
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include (sys/stream.h>
 .HP 8
-.BI "qprocsoff(queue_t *" rq );
+.BI "void qprocsoff(queue_t *" rq );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I rq
 the read queue of the queue pair for which to turn off queue procedures.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qprocsoff ()
-disables invocation of put and service procedures for the queue pair whose
-read queue pointer is pointed to by
+disables invocation of
+.BR put (9)
+and
+.BR srv (9)
+procedures for the queue pair whose read queue pointer is pointed to by
 .IR rq .
-.SH "RETURN VALUES"
+.PP
+If there are existing threads other than the calling thread executing
+.BR put (9)
+or
+.BR srv (9)
+procedures for the queue,
+.IR q ,
+then
+.BR qprocsoff ()
+will block until these threads exit before returning.
+Once
+.BR qprocsoff ()
+returns, it is guaranteed that a
+.I STREAMS
+module or driver queue pair is single threaded after
+.BR qprocsoff ()
+returns and before
+.BR qprocson (9)
+is called.
+.\"
+.\"
+.SH RETURN
 .PP
 .BR qprocsoff ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR qprocsoff ()
 is always successful.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qprocsoff ()
+can be called from any
+.BR !in_irq ()
+context including user context, queue procedures, call-outs, callbacks, but
+must not be called from an interrupt service routine.
+.BR qprocsoff ()
+must be called by the
+.BR qclose ()
+procedure (i.e. in user context) before returning.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qprocsoff ()
+is MP-safe.
+Upon return from
+.BR qprocsoff ()
+the the queue pair is guaranteed to be single threaded.
+.BR qprocsoff ()
+should not be called twice for the same queue pair from the same thread.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -109,32 +169,296 @@ LiS
 .BR qprocsoff ()
 must be called with the queue-pair read queue, otherwise only the write queue
 will have processing turned off.  This is probably a bug.
-.SH "SEE ALSO"
-.PP
-.BR qprocson (9).
-.SH VERSIONS
-.PP
-This manpage is written for
-.B LiS\c
-.
-.[
-LiS
-.]
 .PP
 .BR qprocsoff ()
-first appeared in SVR 4.2.
+must be called with a valid read queue pointer for a queue pair.
+.BR qprocsoff ()
+must not be called on a stream that is frozen with
+.BR freezestr (9).
+.PP
+Before a call to
+.BR qprocsoff ()
+a driver or module is fully attached on a stream.
+.BR qprocsoff ()
+bypasses the module so that any upstream or downstream module calling
+.BR putnext (9)
+will bypass the module.
+Pending
+.BR put (9)
+events on the queue pair will be run before
+.BR qprocsoff ()
+returns.
+Pending
+.BR srv (9)
+events will be cancelled.
+All pending synchronous call-out and callback events for the queue pair will be
+blocked.
+All pending asynchronous call-outs and callbacks for the
+queue pair (e.g.,
+.BR timeout (9),
+.BR bufcall (9))
+will not be blocked.
+It is still the caller's responsibility to cancel all pending call-outs and
+callbacks for which a call id was returned.
+.PP
+.BR qprocsoff ()
+can be called twice on the same queue pair without consequence.
+.PP
+After a call to
+.BR qprocsoff ()
+the caller must not directly or indirectly invoke any queue entry points.  This includes
+all queue utility functions and other
+.I STREAMS
+utility functions that take
+.I q
+or
+.BI WR( q )
+as an argument.
+.PP
+See also
+.RI \*(lq COMPATIBILITY \*(rq,
+below.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR freezestr (9),
+.BR qprocson (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR qprocsoff ()
+should wait until all other threads exit
+.BR qopen (9),
+.BR qclose (9),
+.BR put "(9), and
+.BR srv (9)
+procedrues before returning.
+The
+.I LiS
+implementation does not wait, and merely sets a flag and returns.
+.PP
+Under
+.IR LiS ,
+.BR qprocsoff ()
+called with a write queue pointer will only turn procedures off for the write queue of the queue
+pair.  This is a bug.
+.PP
+Under
+.IR LiS ,
+attempts to enter the
+.BR put (9)
+procedure of a queue with procedures turned off with
+.BR qprocsoff ()
+will result in the message being freed and dropped and the 
+.BR put (9)
+procedure will not execute.
+Other threads should, instead, be blocked.
+
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.PP
+.BR qprocsoff ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr42
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR qprocsoff ()
+clears the
+.I QHLIST
+flag in the
+.BR queue (9)
+structure for both queues in the queue pair.
+.BR qprocsoff ()
+can be called repeatedly for the same queue pair and only the first call will
+have an effect.  This can crash or lock processors on other systems (with the
+exception of
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+as noted below.)
+.IP \(em
+.BR qprocsoff ()
+waits for all other threads to exit
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+and
+.BR srv (9)
+procedures before returning.  This is consistent with
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+and documentation for
+.IR Solaris \(rg
+.[
+soldoc
+.]
+but inconsistent with
+.IR LiS .
+.[
+lis
+.]
+Under
+.IR LiS ,
+.BR qprocsoff ()
+does not wait for
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+or
+.BR srv (9)
+procedures on other threads to exit before returning, but simply
+sets a flag.
+.IP \(em
+The module or driver can neglect to call
+.BR qprocsoff ()
+before returning from the module's
+.BR qclose (9)
+procedure and the
+.I STREAMS
+scheduler will perform an implicit
+.BR qprocsoff ().
+This is consistent with
+.I LiS
+behavior but different from
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR UnixWare \(rg,
+.IR OSF/1 \(rg,
+and
+.IR Solaris \(rg.
+Because
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR UnixWare \(rg,
+.IR OSF/1 \(rg,
+and 
+.IR Solaris \(rg
+should never return from
+.BR qclose (9)
+without calling
+.BR qprocsoff (),
+there should be no compatibility issues.
+.IP \(em
+.IR AIX \(rg
+and
+.IR HP-UX \(rg
+do not support a
+.BR qprocson (9)
+or
+.BR qprocsoff (9)
+function.   On
+.IR HP-UX \(rg
+they are
+a null operation.
+.IP \(em
+.BR qprocsoff ()
+can be called twice without danger.
+This is not true for
+.IR "SVR 4.2 MP DDI/DKI"
+or
+.IR Solaris \(rg
+but is consistent with
+.IR HP-UX \(rg
+and
+.IR LiS .
+.IP \(em
+.BR qprocsoff ()
+blocks other threads attempting to enter the
+.BR put (9)
+procedure until it returns.
+Under
+.IR LiS ,
+attempts to enter the
+.BR put (9)
+procedure will result in the message being dropped or freed.
+See
+.BR put (9)
+for more information.
+.IP \(em
+.BR qprocsoff ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qprocsoff ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qprocsoff ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
 .[
-magic
+usldk
 .]
+.IR AIX \(rg,
 .[
-svr42
+aixdoc
 .]
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+.IR OSF/1 \(rg,
+.[
+osfdoc
+.]
+.IR Solaris \(rg,
+.[
+soldoc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qprocsoff ()
+first appeared in
+.IR "SVR 4 MP" .
 .[
 svr4
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeb.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: freeb.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH FREEB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B freeb
+.B freeb, lis_freeb
 \- frees a \fISTREAMS\fR message block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "freeb(struct msgb *" bp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I bp
 the block to free.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR freeb ()
@@ -104,10 +112,14 @@ will be called with the
 provided previously to the
 .BR esballoc (9)
 call.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR freeb ()
 returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 If the block pointer,
@@ -119,7 +131,23 @@ is
 then
 .BR freeb ()
 will silently fail.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR freeb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR freeb ()
+is MP-safe; however, the caller must ensure that it has the last remaining
+reference to the message block.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR freemsg (9)
 is implemented with a looping call to
@@ -134,36 +162,53 @@ data buffers
 .B FASTBUF
 or less in size.  Determining the point at which a buffer is actually freed is
 rather complicated.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR allocb (9),
 .BR esballoc "(9), and "
 .BR freemsg (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR freeb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR freeb ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR freeb ()
 appeared first in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

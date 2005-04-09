@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.5 2005/04/02 22:14:20 brian Exp $
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.6 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/02 22:14:20 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,52 +72,113 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_UNDOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_undoc
 \- undocumented LiS symbols
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .HP 12
 \fBundocumented_symbol\fR()
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Undocumented.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .hy 6
 These are undocumented LiS symbols:
 .TP
 .BR __wrap_memcmp ,
-.PD 0
+Do not use this function, use the linux kernel
+.BR memcmp (9)
+function instead.
 .TP
 .BR __wrap_memcpy ,
+Do not use this function, use the linux kernel
+.BR memcpy (9)
+function instead.
 .TP
 .BR __wrap_memset ,
+Do not use this function, use the linux kernel
+.BR memset (9)
+function instead.
 .TP
 .BR __wrap_strcat ,
+Do not use this function, use the linux kernel
+.BR strcat (9)
+function instead.
 .TP
 .BR __wrap_strchr ,
+Do not use this function, use the linux kernel
+.BR strchr (9)
+function instead.
 .TP
 .BR __wrap_strcmp ,
+Do not use this function, use the linux kernel
+.BR strcmp (9)
+function instead.
 .TP
 .BR __wrap_strcpy ,
+Do not use this function, use the linux kernel
+.BR strcpy (9)
+function instead.
 .TP
 .BR __wrap_strlen ,
+Do not use this function, use the linux kernel
+.BR strlen (9)
+function instead.
 .TP
 .BR __wrap_strncat ,
+Do not use this function, use the linux kernel
+.BR strncat (9)
+function instead.
 .TP
 .BR __wrap_strncmp ,
+Do not use this function, use the linux kernel
+.BR strncmp (9)
+function instead.
 .TP
 .BR __wrap_strncpy ,
+Do not use this function, use the linux kernel
+.BR strncpy (9)
+function instead.
 .TP
 .BR __wrap_strnicmp ,
+Do not use this function, use the linux kernel
+.BR strnicmp (9)
+function instead.
 .TP
 .BR __wrap_strrchr ,
+Do not use this function, use the linux kernel
+.BR strrchr (9)
+function instead.
 .TP
 .BR __wrap_strstr ,
+Do not use this function, use the linux kernel
+.BR strstr (9)
+function instead.
 .TP
 .BR lis_alloc_atomic_fcn ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_alloc_dma_fcn ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_alloc_kernel_fcn ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_apush_get ,
 .TP
@@ -126,20 +187,95 @@ These are undocumented LiS symbols:
 .BR lis_assert_fail ,
 .TP
 .BR lis_atomic_add ,
+Do not use this function, use the linux kernel
+.BR atomic_add ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_ADD (9)
+function.
 .TP
 .BR lis_atomic_dec ,
+Do not use this function, use the linux kernel
+.BR atomic_dec ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_DECR (9)
+function.
 .TP
 .BR lis_atomic_dec_and_test ,
+Do not use this function, use the linux kernel
+.BR atomic_dec_and_test ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_SUB (9)
+function.
 .TP
 .BR lis_atomic_inc ,
+Do not use this function, use the linux kernel
+.BR atomic_inc ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_INCR (9)
+function.
 .TP
 .BR lis_atomic_read ,
+Do not use this function, use the linux kernel
+.BR atomic_read ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_READ (9)
+function.
 .TP
 .BR lis_atomic_set ,
+Do not use this function, use the linux kernel
+.BR atomic_set ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_WRITE (9)
+function.
 .TP
 .BR lis_atomic_sub ,
-.TP
-.BR lis_backq_fcn ,
+Do not use this function, use the linux kernel
+.BR atomic_sub ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR ATOMIC_INT_SUB (9)
+function.
 .TP
 .BR lis_bcanputnext_anyband ,
 .TP
@@ -150,60 +286,143 @@ These are undocumented LiS symbols:
 .BR lis_debug_mask2 ,
 .TP
 .BR lis_disable_irq ,
+Do not use this function, use the linux kernel
+.BR disable_irq ()
+function instead.
 .TP
 .BR lis_down_fcn ,
+Do not use this function, use the linux kernel
+.BR down_interruptible ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK_SIG (9)
+function.
 .TP
 .BR lis_down_nosig_fcn ,
+Do not use this function, use the linux kernel
+.BR down ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK (9)
+function.
 .TP
 .BR lis_dsecs ,
 .TP
 .BR lis_enable_irq ,
+Do not use this function, use the linux kernel
+.BR enable_irq ()
+function instead.
 .TP
 .BR lis_free ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
 .TP
 .BR lis_free_dma ,
+Do not use this function, use the linux kernel
+.BR free_dma ()
+function instead.
 .TP
 .BR lis_free_irq ,
+Do not use this function, use the linux kernel
+.BR free_irq ()
+function instead.
 .TP
 .BR lis_free_mem_fcn ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
 .TP
 .BR lis_free_pages_fcn ,
-.TP
-.BR lis_freezestr ,
+Do not use this function, use the linux kernel
+.BR free_pages ()
+function instead.
 .TP
 .BR lis_get_free_pages_atomic_fcn ,
+Do not use this function, use the linux kernel
+.BR get_free_pages ()
+function instead.
 .TP
 .BR lis_get_free_pages_fcn ,
+Do not use this function, use the linux kernel
+.BR get_free_pages ()
+function instead.
 .TP
 .BR lis_get_free_pages_kernel_fcn ,
+Do not use this function, use the linux kernel
+.BR get_free_pages ()
+function instead.
 .TP
 .BR lis_getint ,
-.TP
-.BR lis_getmajor ,
-.TP
-.BR lis_getminor ,
 .TP
 .BR lis_gettimeofday ,
 .TP
 .BR lis_hitime ,
 .TP
 .BR lis_in_interrupt ,
+Do not use this function, use the linux kernel
+.BR in_interrupt ()
+function instead.
 .TP
 .BR lis_interruptible_sleep_on ,
+Do not use this function, use the linux kernel
+.BR interruptible_sleep_on ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK_SIG (9)
+function.
 .TP
 .BR lis_interruptible_sleep_on_timeout ,
+Do not use this function, use the linux kernel
+.BR interruptible_sleep_on_timeout ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK_SIG (9)
+function.
 .TP
 .BR lis_ioremap ,
+Do not use this function, use the linux kernel
+.BR ioremap ()
+function instead.
 .TP
 .BR lis_ioremap_nocache ,
+Do not use this function, use the linux kernel
+.BR ioremap_nocache ()
+function instead.
 .TP
 .BR lis_iounmap ,
+Do not use this function, use the linux kernel
+.BR iounmap ()
+function instead.
 .TP
 .BR lis_irqreturn_handled ,
 .TP
 .BR lis_irqreturn_not_handled ,
 .TP
 .BR lis_jiffies ,
+Do not use this function, use the linux kernel
+.BR jiffies ()
+function instead.
 .TP
 .BR lis_kernel_down ,
 .TP
@@ -212,14 +431,21 @@ These are undocumented LiS symbols:
 .BR lis_kernel_version ,
 .TP
 .BR lis_kfree ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
 .TP
 .BR lis_kmalloc ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_major ,
 .TP
-.BR lis_makedevice ,
-.TP
 .BR lis_malloc ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_mark_mem_fcn ,
 .TP
@@ -234,152 +460,371 @@ These are undocumented LiS symbols:
 .BR lis_num_cpus ,
 .TP
 .BR lis_osif_cli ,
+Do not use this function, use the linux kernel
+.BR cli ()
+function instead.
 .TP
 .BR lis_osif_do_gettimeofday ,
+Do not use this function, use the linux kernel
+.BR do_gettimeofday ()
+function instead.
 .TP
 .BR lis_osif_do_settimeofday ,
+Do not use this function, use the linux kernel
+.BR do_settimeofday ()
+function instead.
 .TP
 .BR lis_osif_pci_alloc_consistent ,
+Do not use this function, use the linux kernel
+.BR pci_alloc_consistent ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_supported ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_supported ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_sync_single ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_sync_single ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_sync_single_for_cpu ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_sync_single_for_cpu ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_sync_single_for_device ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_sync_single_for_device ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_to_offset ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_to_offset ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_dma_to_page ,
+Do not use this function, use the linux kernel
+.BR pci_dac_dma_to_page ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_page_to_dma ,
+Do not use this function, use the linux kernel
+.BR pci_dac_page_to_dma ()
+function instead.
 .TP
 .BR lis_osif_pci_dac_set_dma_mask ,
+Do not use this function, use the linux kernel
+.BR pci_dac_set_dma_mask ()
+function instead.
 .TP
 .BR lis_osif_pci_disable_device ,
+Do not use this function, use the linux kernel
+.BR pci_disable_device ()
+function instead.
 .TP
 .BR lis_osif_pci_dma_supported ,
+Do not use this function, use the linux kernel
+.BR pci_dma_supported ()
+function instead.
 .TP
 .BR lis_osif_pci_dma_sync_sg ,
+Do not use this function, use the linux kernel
+.BR pci_dma_sync_sg ()
+function instead.
 .TP
 .BR lis_osif_pci_dma_sync_single ,
+Do not use this function, use the linux kernel
+.BR pci_dma_sync_single ()
+function instead.
 .TP
 .BR lis_osif_pci_enable_device ,
+Do not use this function, use the linux kernel
+.BR pci_enable_device ()
+function instead.
 .TP
 .BR lis_osif_pci_find_class ,
+Do not use this function, use the linux kernel
+.BR pci_find_class ()
+function instead.
 .TP
 .BR lis_osif_pci_find_device ,
+Do not use this function, use the linux kernel
+.BR pci_find_device ()
+function instead.
 .TP
 .BR lis_osif_pci_find_slot ,
+Do not use this function, use the linux kernel
+.BR pci_find_slot ()
+function instead.
 .TP
 .BR lis_osif_pci_free_consistent ,
+Do not use this function, use the linux kernel
+.BR pci_free_consistent ()
+function instead.
 .TP
 .BR lis_osif_pci_map_page ,
+Do not use this function, use the linux kernel
+.BR pci_map_page ()
+function instead.
 .TP
 .BR lis_osif_pci_map_sg ,
+Do not use this function, use the linux kernel
+.BR pci_map_sg ()
+function instead.
 .TP
 .BR lis_osif_pci_map_single ,
+Do not use this function, use the linux kernel
+.BR pci_map_single ()
+function instead.
 .TP
 .BR lis_osif_pci_module_init ,
+Do not use this function, use the linux kernel
+.BR pci_module_init ()
+function instead.
 .TP
 .BR lis_osif_pci_read_config_byte ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_byte ()
+function instead.
 .TP
 .BR lis_osif_pci_read_config_dword ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_dword ()
+function instead.
 .TP
 .BR lis_osif_pci_read_config_word ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_word ()
+function instead.
 .TP
 .BR lis_osif_pci_set_dma_mask ,
+Do not use this function, use the linux kernel
+.BR pci_set_dma_mask ()
+function instead.
 .TP
 .BR lis_osif_pci_set_master ,
+Do not use this function, use the linux kernel
+.BR cpi_set_master ()
+function instead.
 .TP
 .BR lis_osif_pci_unmap_page ,
+Do not use this function, use the linux kernel
+.BR pci_unmap_page ()
+function instead.
 .TP
 .BR lis_osif_pci_unmap_sg ,
+Do not use this function, use the linux kernel
+.BR pci_unmap_sg ()
+function instead.
 .TP
 .BR lis_osif_pci_unmap_single ,
+Do not use this function, use the linux kernel
+.BR pci_unmap_single ()
+function instead.
 .TP
 .BR lis_osif_pci_unregister_driver ,
+Do not use this function, use the linux kernel
+.BR pci_unregister_driver ()
+function instead.
 .TP
 .BR lis_osif_pci_write_config_byte ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_byte ()
+function instead.
 .TP
 .BR lis_osif_pci_write_config_dword ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_dword ()
+function instead.
 .TP
 .BR lis_osif_pci_write_config_word ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_dword ()
+function instead.
 .TP
 .BR lis_osif_sg_dma_address ,
+Do not use this function, use the linux kernel
+.BR sg_dma_address ()
+function instead.
 .TP
 .BR lis_osif_sg_dma_len ,
+Do not use this function, use the linux kernel
+.BR sg_dma_len ()
+function instead.
 .TP
 .BR lis_osif_sti ,
+Do not use this function, use the linux kernel
+.BR sti ()
+function instead.
 .TP
 .BR lis_own_spl ,
 .TP
 .BR lis_pci_alloc_consistent ,
+Do not use this function, use the linux kernel
+.BR pci_alloc_consistent ()
+function instead.
 .TP
 .BR lis_pci_disable_device ,
+Do not use this function, use the linux kernel
+.BR pci_disable_device ()
+function instead.
 .TP
 .BR lis_pci_dma_handle_to_32 ,
+Do not use this function, use the linux kernel
+.BR pci_dma_handle_to_32 ()
+function instead.
 .TP
 .BR lis_pci_dma_handle_to_64 ,
+Do not use this function, use the linux kernel
+.BR pci_dma_handle_to_64 ()
+function instead.
 .TP
 .BR lis_pci_dma_supported ,
+Do not use this function, use the linux kernel
+.BR pci_dma_supported ()
+function instead.
 .TP
 .BR lis_pci_dma_sync_single ,
+Do not use this function, use the linux kernel
+.BR pci_dma_sync_single ()
+function instead.
 .TP
 .BR lis_pci_enable_device ,
+Do not use this function, use the linux kernel
+.BR pci_enable_device ()
+function instead.
 .TP
 .BR lis_pci_find_class ,
+Do not use this function, use the linux kernel
+.BR pci_find_class ()
+function instead.
 .TP
 .BR lis_pci_find_device ,
+Do not use this function, use the linux kernel
+.BR pci_find_device ()
+function instead.
 .TP
 .BR lis_pci_find_slot ,
+Do not use this function, use the linux kernel
+.BR pci_find_slot ()
+function instead.
 .TP
 .BR lis_pci_free_consistent ,
+Do not use this function, use the linux kernel
+.BR pci_free_consistent ()
+function instead.
 .TP
 .BR lis_pci_map_single ,
+Do not use this function, use the linux kernel
+.BR pci_map_single ()
+function instead.
 .TP
 .BR lis_pci_read_config_byte ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_byte ()
+function instead.
 .TP
 .BR lis_pci_read_config_dword ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_dword ()
+function instead.
 .TP
 .BR lis_pci_read_config_word ,
+Do not use this function, use the linux kernel
+.BR pci_read_config_word ()
+function instead.
 .TP
 .BR lis_pci_set_dma_mask ,
+Do not use this function, use the linux kernel
+.BR pci_set_dma_mask ()
+function instead.
 .TP
 .BR lis_pci_set_master ,
+Do not use this function, use the linux kernel
+.BR pci_set_master ()
+function instead.
 .TP
 .BR lis_pci_unmap_single ,
+Do not use this function, use the linux kernel
+.BR pci_unmap_single ()
+function instead.
 .TP
 .BR lis_pci_write_config_byte ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_byte ()
+function instead.
 .TP
 .BR lis_pci_write_config_dword ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_dword ()
+function instead.
 .TP
 .BR lis_pci_write_config_word ,
+Do not use this function, use the linux kernel
+.BR pci_write_config_word ()
+function instead.
 .TP
 .BR lis_pcibios_find_class ,
+Do not use this function, use the linux kernel
+.BR pcibios_find_class ()
+function instead.
 .TP
 .BR lis_pcibios_find_device ,
+Do not use this function, use the linux kernel
+.BR pcibios_find_device ()
+function instead.
 .TP
 .BR lis_pcibios_init ,
+Do not use this function, use the linux kernel
+.BR pcibios_init ()
+function instead.
 .TP
 .BR lis_pcibios_present ,
+Do not use this function, use the linux kernel
+.BR pcibios_present ()
+function instead.
 .TP
 .BR lis_pcibios_read_config_byte ,
+Do not use this function, use the linux kernel
+.BR pcibios_read_config_byte ()
+function instead.
 .TP
 .BR lis_pcibios_read_config_dword ,
+Do not use this function, use the linux kernel
+.BR pcibios_read_config_dword ()
+function instead.
 .TP
 .BR lis_pcibios_read_config_word ,
+Do not use this function, use the linux kernel
+.BR pcibios_read_config_word ()
+function instead.
 .TP
 .BR lis_pcibios_strerror ,
+Do not use this function, use the linux kernel
+.BR pcibios_strerror ()
+function instead.
 .TP
 .BR lis_pcibios_write_config_byte ,
+Do not use this function, use the linux kernel
+.BR pcibios_write_config_byte ()
+function instead.
 .TP
 .BR lis_pcibios_write_config_dword ,
+Do not use this function, use the linux kernel
+.BR pcibios_write_config_dword ()
+function instead.
 .TP
 .BR lis_pcibios_write_config_word ,
+Do not use this function, use the linux kernel
+.BR pcibios_write_config_word ()
+function instead.
 .TP
 .BR lis_phys_to_virt ,
+Do not use this function, use the linux kernel
+.BR phys_to_virt ()
+function instead.
 .TP
 .BR lis_print_block ,
 .TP
@@ -392,12 +837,37 @@ These are undocumented LiS symbols:
 .BR lis_print_queue ,
 .TP
 .BR lis_printk ,
+Do not use this function, use the linux kernel
+.BR printk ()
+function instead.
 .TP
 .BR lis_putbqf ,
+Do not use this function.
+Similar to
+.BR putbq (9),
+but exhibits the older
+.I LiS
+behavior of freeing the message upon failure.
+Use
+.BR putbq (9)
+and check the return value instead.  See
+.BR putbq (9)
+for conditions under which the return value can be ignored.
 .TP
 .BR lis_putbyte ,
 .TP
 .BR lis_putqf ,
+Do not use this function.
+Similar to
+.BR putq (9),
+but exhibits the older
+.I LiS
+behavior of freeing the message upon failure.
+Use
+.BR putq (9)
+and check the return value instead.  See
+.BR putq (9)
+for conditions under which the return value can be ignored.
 .TP
 .BR lis_qcountstrm ,
 .TP
@@ -408,120 +878,431 @@ These are undocumented LiS symbols:
 .BR lis_register_module_qlock_option ,
 .TP
 .BR lis_release_region ,
+Do not use this function, use the linux kernel
+.BR release_region ()
+function instead.
 .TP
 .BR lis_request_dma ,
+Do not use this function, use the linux kernel
+.BR request_dma ()
+function instead.
 .TP
 .BR lis_request_irq ,
+Do not use this function, use the linux kernel
+.BR request_irq ()
+function instead.
 .TP
 .BR lis_request_region ,
+Do not use this function, use the linux kernel
+.BR request_region ()
+function instead.
 .TP
 .BR lis_rw_lock_alloc_fcn ,
+Do not use this function, allocate a
+.BR rw_lock_t
+structure instead with, for example,
+.BR kmem_alloc (9).
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_ALLOC (9)
+function.
 .TP
 .BR lis_rw_lock_free_fcn ,
+Do not use this function, free the structure allocated above with, for example,
+.BR kmem_free (9).
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_DEALLOC (9)
+function.
 .TP
 .BR lis_rw_lock_init_fcn ,
+Do not use this function, use the linux kernel
+.BR read_write_lock_init ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_ALLOC (9)
+function.
 .TP
 .BR lis_rw_read_lock_fcn ,
-do not use this function, use the linux kernel
-.BR read_lock (9)
+Do not use this function, use the linux kernel
+.BR read_lock ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_RDLOCK (9)
+function.
 .TP
 .BR lis_rw_read_lock_irq_fcn ,
-do not use this function, use the linux kernel
-.BR read_lock_irq (9)
+Do not use this function, use the linux kernel
+.BR read_lock_irq ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_RDLOCK (9)
+function.
 .TP
 .BR lis_rw_read_lock_irqsave_fcn ,
-do not use this function, use the linux kernel
-.BR read_lock_irqsave (9)
+Do not use this function, use the linux kernel
+.BR read_lock_irqsave ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_RDLOCK (9)
+function.
 .TP
 .BR lis_rw_read_unlock_fcn ,
-do not use this function, use the linux kernel
-.BR read_unlock (9)
+Do not use this function, use the linux kernel
+.BR read_unlock ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_rw_read_unlock_irq_fcn ,
-do not use this function, use the linux kernel
-.BR read_unlock_irq (9)
+Do not use this function, use the linux kernel
+.BR read_unlock_irq ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_rw_read_unlock_irqrestore_fcn ,
-do not use this function, use the linux kernel
-.BR read_unlock_irqrestore (9)
+Do not use this function, use the linux kernel
+.BR read_unlock_irqrestore ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_rw_write_lock_fcn ,
-do not use this function, use the linux kernel
-.BR write_lock (9)
+Do not use this function, use the linux kernel
+.BR write_lock ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_WRLOCK (9)
+function.
 .TP
 .BR lis_rw_write_lock_irq_fcn ,
-do not use this function, use the linux kernel
-.BR write_lock_irq (9)
+Do not use this function, use the linux kernel
+.BR write_lock_irq ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_WRLOCK (9)
+function.
 .TP
 .BR lis_rw_write_lock_irqsave_fcn ,
-do not use this function, use the linux kernel
-.BR write_lock_irqsave (9)
+Do not use this function, use the linux kernel
+.BR write_lock_irqsave ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_WRLOCK (9)
+function.
 .TP
 .BR lis_rw_write_unlock_fcn ,
-do not use this function, use the linux kernel
-.BR write_unlock (9)
+Do not use this function, use the linux kernel
+.BR write_unlock ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_rw_write_unlock_irq_fcn ,
-do not use this function, use the linux kernel
-.BR write_unlock_irq (9)
+Do not use this function, use the linux kernel
+.BR write_unlock_irq ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_rw_write_unlock_irqrestore_fcn ,
-do not use this function, use the linux kernel
-.BR write_unlock_irqrestore (9)
+Do not use this function, use the linux kernel
+.BR write_unlock_irqrestore ()
 function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR RW_UNLOCK (9)
+function.
 .TP
 .BR lis_safe_putmsg ,
 .TP
 .BR lis_secs ,
 .TP
 .BR lis_sem_alloc ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_ALLOC (9)
+function.
 .TP
 .BR lis_sem_destroy ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_DEALLOC (9)
+function.
 .TP
 .BR lis_sem_init ,
+Do not use this function, use the linux kernel
+.BR sem_init (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_ALLOC (9)
+function.
 .TP
 .BR lis_sleep_on ,
+Do not use this function, use the linux kernel
+.BR sleep_on (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK (9)
+function.
 .TP
 .BR lis_sleep_on_timeout ,
+Do not use this function, use the linux kernel
+.BR sleep_on_timeout (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_LOCK (9)
+function.
 .TP
 .BR lis_spin_is_locked_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_is_locked ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK_OWNED (9)
+function.
 .TP
 .BR lis_spin_lock_alloc_fcn ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK_ALLOC (9)
+function.
 .TP
 .BR lis_spin_lock_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_lock ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK (9)
+function.
 .TP
 .BR lis_spin_lock_free_fcn ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK_DEALLOC (9)
+function.
 .TP
 .BR lis_spin_lock_init_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_lock_init ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK_ALLOC (9)
+function.
 .TP
 .BR lis_spin_lock_irq_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_lock_irq ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK (9)
+function.
 .TP
 .BR lis_spin_lock_irqsave_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_lock_irqsave ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR LOCK (9)
+function.
 .TP
 .BR lis_spin_trylock_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_trylock ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR TRYLOCK (9)
+function.
 .TP
 .BR lis_spin_unlock_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_unlock ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR UNLOCK (9)
+function.
 .TP
 .BR lis_spin_unlock_irq_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_unlock_irq ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR UNLOCK (9)
+function.
 .TP
 .BR lis_spin_unlock_irqrestore_fcn ,
-.TP
-.BR lis_spl0_fcn ,
-.TP
-.BR lis_splstr_fcn ,
-.TP
-.BR lis_splx_fcn ,
+Do not use this function, use the linux kernel
+.BR spin_unlock_irqrestore ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR UNLOCK (9)
+function.
 .TP
 .BR lis_sprintf ,
 .TP
@@ -535,50 +1316,164 @@ function instead.
 .TP
 .BR lis_thread_stop ,
 .TP
-.BR lis_timeout_fcn ,
-.TP
 .BR lis_udelay ,
-.TP
-.BR lis_unfreezestr ,
+Do not use this function, use the linux kernel
+.BR udelay ()
+function instead.
 .TP
 .BR lis_up_fcn ,
+Do not use this function, use the linux kernel
+.BR up ()
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SLEEP_UNLOCK (9)
+function.
 .TP
 .BR lis_usecs ,
 .TP
 .BR lis_usectohz ,
 .TP
 .BR lis_vfree ,
+Do not use this function, use the
+.BR kmem_free (9)
+function instead.
 .TP
 .BR lis_virt_to_phys ,
+Do not use this function, use the linux kernel
+.BR virt_to_phys ()
+function instead.
 .TP
 .BR lis_vmalloc ,
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .TP
 .BR lis_vremap ,
 .TP
 .BR lis_vsprintf ,
 .TP
 .BR lis_wait_event ,
+Do not use this function, use the linux kernel
+.BR wait (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SV_WAIT (9)
+function.
 .TP
 .BR lis_wait_event_interruptible ,
+Do not use this function, use the linux kernel
+.BR wait_interruptible (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SV_WAIT_SIG (9)
+function.
 .TP
 .BR lis_wake_up ,
+Do not use this function, use the linux kernel
+.BR wake_up (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SV_BROADCAST (9)
+function.
 .TP
 .BR lis_wake_up_interruptible ,
+Do not use this function, use the linux kernel
+.BR wake_up_interruptible (9)
+function instead.
+Under
+.BR "Linux Fast-STREAMS" ,
+.[
+LfS
+.]
+use the SVR 4.2 compatible
+.BR SV_SIGNAL (9)
+function.
 .TP
 .BR lis_zmalloc .
-.PD
+Do not use this function, use the
+.BR kmem_alloc (9)
+function instead.
 .\"
 .\"
-.XX
+.SH RETURN
+.PP
+These functions have various return values that are as yet undocumented.
+.\"
+.\"
+.SH ERRORS
+.PP
+These functions have various error conditions that are as yet undocumented.
+.\"
+.\"
+.SH CONTEXT
+.PP
+These functions have various execution contexts that are as yet undocumented.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+These functions have varying support for MP and preemptive kernels that are as yet undocumented.
+.\"
+.\"
+.SH NOTICES
+.PP
+These functions have various caveats that are as yet undocumented.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR lis_deprec (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+None of these functions are necessary for compatibility with anything other than another version of
+.IR LiS .
 .[
-magic
+LiS
 .]
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr42
+LfS
 .]
-.[
-svr4
-.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Most of these symbols are wrapper functions for Linux kernel functions.  Do not
+use these functions.  Portable
+.I STREAMS
+modules and drivers will not use any of these functions.
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these symbols are wrapper functions for Linux kernel functions.  Do not
+use these functions.
 .\"
 .\"
 .[

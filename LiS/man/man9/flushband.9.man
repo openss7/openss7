@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH FLUSHBAND 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B flushband
+.B flushband, lis_flushband
 \- flushes band \fISTREAMS\fR messages from a message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "flushband(queue_t *" q ", unsigned char " band ", int " flag );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -91,11 +97,13 @@ the queue band in the queue to flush.
 .TP
 .I flag
 how to flush the queue band.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR flushband ()
 is used to flush messages from a
-.IR STREAMS (4)
+.I STREAMS
 message queue band.  It is typically
 called in a
 .B M_FLUSH
@@ -120,18 +128,85 @@ can be one of the following:
 .B FLUSHDATA
 Flush only data messages; do not flush the control messages from the queue
 band.
+.PD 0
 .TP 12
 .B FLUSHALL
 Flush all the messages from queue band: both data messages and control
 messages.
+.PD
 .RE
+.\"
+.\"
+.SH RETURN
+.BR flushband ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+If the
+.I q
+passed to
+.BR flushband ()
+is
+.BR NULL ,
+or the
+.I q
+does not point to a valid queue structure, then
+.BR flushband ()
+will silently fail.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR flushband ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.PP
+Because
+.BR flushband ()
+can take some time to process if there are many messages on the queue or
+.I flags
+is
+.BR FLUSHDATA ,
+.BR flushband ()
+should not be called from interrupt service routines or functions with
+interrupts disabled or global locks held.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR flushband ()
+is MP-safe.
+.BR flushband ()
+takes a recursive write lock on the queue being flushed.  This means that calling
+.BR flushband ()
+on a stream that has been frozen with
+.BR freezestr (9)
+will not result in single-party deadlock.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B LiS
+.[
+LiS
+.]
+implements the call to
+.BR flushq (9)
+.BI flushq( q ", " band )
+as a call to
+.BI flushband( q ", " 0 ", " flag ).
+.\"
+.\"
 .SH EXAMPLES
 .PP
 .BR flushband ()
 is normally used within the
 .B M_FLUSH
 handling procedures for a
-.IR STREAMS (4)
+.I STREAMS
 module or driver as follows:
 .sp
 .in +4
@@ -193,60 +268,180 @@ int x_r_flush(queue_t *q, mblk_t *mp)
 }
 \s+2\fR
 .fi
-.SH "RETURN VALUES"
-.BR flushband ()
-returns
-.BR void .
-.SH ERRORS
-.PP
-If the
-.I q
-passed to
-.BR flushband ()
-is
-.BR NULL ,
-or the
-.I q
-does not point to a valid queue structure, then
-.BR flushband ()
-will silently fail.
-.SH CAVEATS
-.PP
-.B LiS
-.[
-LiS
-.]
-implements the call to
-.BR flushq (9)
-.BI flushq( q ", " band )
-as a call to
-.BI flushband( q ", " 0 ", " flag ).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR flushq (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
+.BR flushband ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR flushband ()
-first appeared in SVR 3.
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B LiS
+removes all messages from the queue and then rebuilds the queue one message at a
+time while freeing those to be flushed.  This is a rather inefficient way to do
+things, and with LiS running at higher priority than soft interrupts, bottom
+halves and timeouts, all these are locked out until the flush is complete.
+.IP \(em
+.B LiS
+empties the queue and unlocks the queue and then goes about adding messages back
+onto the queue that need to remain using normal utility functions.  This means
+that order is not necessarily preserved (even for messages that were on the
+queue) with concurrent calls to
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9)
+or
+.BR putbq (9)
+functions.
+Also, queue enabling and back-enabling will not necessary be performed
+correctly.
+There doesn't seem to be any excuse for the
+.B LiS
+approach, removing messages from the queue,
+.BR rmvq (9),
+is no more difficult than inserting them,
+.BR insq (9).
+.IP \(em
+.BR flushband ()
+flushes normal and high priority messages when
+.I band
+is zero (0).
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+state that a
+.I band
+of zero (0) will only flush ordinary messages.
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg
+.[
+solspg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+state that a
+.I band
+of zero (0) flushes normal and high priority messages.
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+states that a
+.I band
+of zero (0) flushes normal priority (band 0) messages.
+.IR LiS ,
+when
+.I band
+is zero (0),
+will only flush normal priority messages from band zero and will leave high
+priority messages on the queue.
+.sp
+Portable
+.I STREAMS
+modules and drivers should never call
+.BR flushband ()
+with a band of zero (0).  Portable
+.I STREAMS
+modules and drivers should call
+.BR flushq (9)
+instead.
+.IP \(em
+.BR flushband ()
+does not clear the
+.B QWANTR
+flag when flushing an empty queue.  This is an indication to the
+.I STREAMS
+scheduler that
+.BR getq (9)
+read an empty queue and back-enabling has already been performed for the queue.
+LiS clears the
+.B QWANTR
+flag when flushing an empty queue.  This means that the next call to
+.BR getq (9)
+for the empty queue will perform an extra back-enable.
+.IP \(em
+.BR flushband ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR flushband ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR flushband ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI
 .[
-magic
+usldk
 .]
-.[
-svr42
-.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR flushband ()
+first appeared in SVR 4.
 .[
 svr4
 .]

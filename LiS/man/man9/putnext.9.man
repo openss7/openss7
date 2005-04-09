@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnext.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH PUTNEXT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B putnext, lis_putnext
 \- puts a message on the downstream \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "putnext(queue_t *" q ", mblk_t *" mp );
+.BI "void putnext(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the queue upstream of the queue to which to put the message.
 .TP
 .I mp
 the message to put to the downstream queue.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR putnext ()
@@ -116,10 +124,14 @@ the procedure should not normally invoke
 .BR putnext ()
 with a low priority message for the flow controlled queue
 .IR q->q_next .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR putnext ()
 returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR putnext ()
@@ -141,7 +153,38 @@ the pointer
 .I q->q_next
 is
 .BR NULL .
-.SH CAVEATS
+.PP
+.BR putnext ()
+fails silently when a queue band structure cannot be allocated for the band
+specified in
+.IR mp->b_band .
+The caller can ensure that a queue band structure exists for the band in quest
+by calling
+.BR strqset (9)
+for the band.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR putnext ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+Consideration must be given when calling
+.BR putnext ()
+from interrupt service routine context that the next module in the stream
+might not be prepared to be called at interrupt service routine context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putnext ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message,
+.IR mp .
+The driver or module put procedure invoked must also be MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 The
 .B LiS
@@ -164,18 +207,159 @@ queue pointed to by
 is closing, or the queue has had put and service routine processing turned off
 (e.g. with
 .BR qprocsoff (9)).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putq (9),
 .BR canputnext (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR putnext ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR putnext ()
+is source-level compatible with SVR 4.2 DDI/DKI
 .[
-LiS
+usldk
 .]
+and
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR LiS ,
+.BR putnext ()
+fails silently if
+.I q->q_next
+has a
+.I q_info
+pointer of
+.BR NULL ;
+the queue pointed to by
+.I q->q_next
+has no put procedure; or the
+queue pointed to by
+.I q->q_next
+is closing, or the queue has had put and service routine processing turned off
+(e.g. with
+.BR qprocsoff (9)).
+.IP \(em
+Under
+.IR LiS ,
+.BR putnext ()
+simply calls
+.BR put ()
+with the
+.I q->q_next
+pointer.
+This does not protect agains simultaneous pushes and pops of modules and other actions that could
+affect
+.I q->q_next
+and the structure of the stream.
+.IP \(em
+.BR put "(9), " putnext "(), " qreply (9)
+will invoke a queue's put procedure shared an multi-threaded.
+This is equivalent to
+.IR Solaris \(rg
+drivers with the
+.B D_MP
+flag set or with the
+.B D_MTPUTSHARED
+flag set.
+.sp
+Older versions of
+.I LiS
+hold an exclusive nesting queue procedures lock while calling
+.BR putnext ()
+executes.
+.I LiS
+.BR lis_safe_putnext ()
+and
+.BR lis_safe_qreply (9)
+call the
+.BR lis_safe_putmsg (9)
+function, meaning that all message passing functions in
+.I LiS
+lock out interrupts until the entire thread of execution completes.
+.sp
+Because
+.I LiS
+also uses this lock for service procedures, this means that while the
+.I LiS
+schedule is running (at kernel thread priority 50), interrupts, timeouts, bottom
+halves, hi tasklets and soft interrupts are indefinitely postponed.  This is not
+acceptable for soft real-time performance.  Rewrite
+.I LiS
+put procedures to be MP-safe.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+do not permit
+.BR putnext ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+SVID,
+.[
+svid
+.]
+XID.
+.[
+xbd5
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putnext ()
+first appeared in SVR 3.
+.[
+svr3spg
+.]
+In SVR 3,
+.[
+svr3spg
+.]
+4 and 4.2,
+.BR putnext ()
+returned
+.BR int .
+C compilers at the time did not support
+.B void
+as a return value, and the value returned by
+.BR putnext ()
+was ignored.
+.\"
+.\"
+.SH VERSIONS
 .PP
 .BR putnext ()
 first appeared in SVR 3.
@@ -195,18 +379,6 @@ C compilers at the time did not support
 as a return value, and the value returned by
 .BR putnext ()
 was ignored.
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
 .\"
 .\"
 .[

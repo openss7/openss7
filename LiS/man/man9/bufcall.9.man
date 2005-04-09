@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bufcall.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: bufcall.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,32 +72,66 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BUFCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B bufcall
+.B bufcall, lis_bufcall
 \- install a \fISTREAMS\fR buffer callback
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = bufcall(unsigned " size ", int " priority ", void (*" function ")(long), long " arg );
+.BI "int bufcall(unsigned " size ", int " priority ", void (*" function ")(long), long " arg );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP 12
 .I size
-the size of buffer requested.
-.TP
+The size of the requested data buffer.
+.TP 12
 .I priority
-the priority the the buffer request.
-.TP
+The priority of the requested message.  The priority can be one of the
+following values:
+.RS
+.TP 12
+.B BPRI_LO
+The buffer needed is a high priority buffer.
+.PD 0
+.TP 12
+.B BPRI_MED
+The buffer needed is a medium priority buffer.
+.TP 12
+.B BPRI_HI
+The buffer needed is a low priority buffer.
+.PD
+.PP
+The
+.I priority
+argument is ignored by post-SVR 4.2 STREAMS
+.[
+svr42
+.]
+implementations.
+.RE
+.TP 12
 .I function
-the callback to function when a buffer of an appropriate size becomes available.
+The callback function to call when a buffer of the requested size and message of the
+requested priority becomes available.
+.TP 12
+.I arg
+The argument to pass to the callback function.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 When allocation of a buffer fails as a result of a failed call to
 .BR allocb (9),
 the service routine should
 place the
-.IR STREAMS (4)
+.I STREAMS
 message that invoked the
 .BR allocb (9)
 call back on the queue with
@@ -122,44 +156,9 @@ arguments that were issued to
 .PP
 In this way, the queue service routine will be recalled once there is
 sufficient memory to allocate the requested buffer and message blocks.
-.PP
-The arguments to
-.BR bufcall ()
-are interpreted as follows:
-.TP 12
-.I size
-The size of the requested data buffer.
-.TP 12
-.I priority
-The priority of the requested message.  The priority can be one of the
-following values:
-.RS
-.TP 12
-.B BPRI_LO
-The buffer needed is a high priority buffer.
-.TP 12
-.B BPRI_MED
-The buffer needed is a medium priority buffer.
-.TP 12
-.B BPRI_HI
-The buffer needed is a low priority buffer.
-.PP
-The
-.I priority
-argument is ignored by post-SVR 4.2 STREAMS
-.[
-svr42
-.]
-implementations.
-.RE
-.TP 12
-.I function
-The callback function to call when a buffer of the requested size and message of the
-requested priority becomes available.
-.TP 12
-.I arg
-The argument to pass to the callback function.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR bufcall ()
@@ -173,6 +172,8 @@ Upon failure,
 .BR bufcall ()
 returns false (0) and no call will be generated to the specified
 .IR function .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -185,7 +186,22 @@ returns false (0) when the function pointer to the callback function,
 is
 .BR NULL ,
 or cannot allocate the necessary internal structures.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bufcall ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bufcall ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 The
 .B LiS
@@ -244,38 +260,116 @@ LiS
 .]
 meaninglessly assigns an integer id to the buffer call structure and the
 inefficiencies of linear searches are pointless.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
-.BR qbufcall (9),
 .BR putbq (9),
 .BR allocb "(9) and "
 .BR unbufcall (9).
-.SH HISTORY
+.\"
+.\"
+.SH BUGS
 .PP
 .BR bufcall ()
-first appeared in SVR 3.
-.[
-svr3
-.]
-.SH VERSIONS
+does not function in the same manner as described for other SVR 4.2 systems.
+See
+.RI \*(lq COMPATIBILITY \*(rq,
+below.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR bufcall ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-.\"
-.\"
-.XX
+and systems based on
+.IR "SVR 4"
 .[
-magic
+svr4spg
 .]
+with the folllowing portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR LiS ,
+.BR bufcall ()
+does not actually generate a callback function once a buffer of the
+appropriate size becomes available.  Instead
+.I LiS
+starts a timer.  When the timer expires, the ability to allocate the necessary
+buffers is checked and the callback function invoked if it is now possible to
+allocate the necessary structures and buffers.  This is not entirely
+consistent with
+.I SVR 4.2
 .[
 svr42
 .]
+operation.
+.\"
+.\"
+.IP \(em
+.I LiS
+builds a linked list of buffer call structures and assigns an integer id
+to each structure.  Searches for unique buffer ids when ids are assigned and
+searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.  In fact,
+\*(lqThe Magic Garden\*(rq explains that in SVR 4.2
 .[
-svr4
+svr42
+.]
+a
+.BR bufcall ()
+results in the creation of a
+.B strevent
+structure which is linked to the
+.I strbcalls
+system variable
+and sets the
+.I strbcwait
+flag which is then causes
+.BR kmem_free ()
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.I LiS
+meaninglessly assigns an integer id to the buffer call structure and the
+inefficiencies of linear searches are pointless.
+.IP \(em
+Depending on the system,
+.BR bufcall ()
+returns
+.BR int ", " bcid_t " or " bufcall_id_t .
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bufcall ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_mknod.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_mknod.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,16 +72,22 @@ sort-adjacent-labels
 .\"
 .\"
 .TH MKNOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B mknod, lis_mknod
 \- create a special or ordinary file
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .br
 .B #include <sys/dki.h>
 .HP 8
-.BI "int " retval " = lis_mknod(const char *" pathname ", mode_t " mode ", dev_t " dev );
+.BI "int lis_mknod(const char *" pathname ", mode_t " mode ", dev_t " dev );
+.\"
+.\"
 .SH ARGUMENTS
 .TP
 .I pathname
@@ -92,6 +98,8 @@ the mode of the character special device file to make.
 .TP
 .I dev
 the device number.
+.\"
+.\"
 .SH DESCRIPTION
 .BR mknod ()
 is an
@@ -104,9 +112,9 @@ wrapper function to the system call
 that can be called from the kernel.
 .PP
 The purpose of this kernel function call is to permit
-.IR STREAMS (4)
+.I STREAMS
 kernel modules to create their own character special devices.  This allows the
-.IR STREAMS (4)
+.I STREAMS
 device driver to allocate a character device major number at kernel module
 initialization, see
 .BR lis_register_strdev (9),
@@ -130,18 +138,20 @@ is one of the following:
 .TP 10
 .B S_IFREG
 Normal file to be created empty.
-.TP 10
+.PD 0
+.TP
 .B S_IFCHR
 Character special file.
-.TP 10
+.TP
 .B S_IFBLK
 Block special file.
-.TP 10
+.TP
 .B S_IFIFO
 FIFO named pipe.
-.TP 10
+.TP
 .B S_IFSOCK
 Socket.
+.PD
 .PP
 The permissions is the normal combination of the file permissions and the
 caller's
@@ -160,7 +170,9 @@ is ignored.
 .PP
 For additional information, see
 .BR mknod (2).
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success, the requested file is created and
 .BR mknod ()
@@ -168,6 +180,8 @@ returns zero (0).
 Upon failure, no file is created and
 .BR mknod ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -175,7 +189,22 @@ When
 fails, it returns a negative error number that can contain any of the errors
 listed under
 .BR mknod (2).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mknod ()
+must be called from user (process) context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mknod ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
 .BR mknod ()
 is implemented by changing the data segment to the kernel data segment and
 calling
@@ -185,35 +214,52 @@ This means that the
 of the caller is not changed.
 This makes this function rather useless if the process invoking it is not the
 kernel module loading daemon, or other process running with real root
-permission.
+permission, and a potential security breach otherwise.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR mknod (2),
 .BR lis_mount (9),
 .BR lis_umount2 (9),
 .BR lis_unlink (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+Under GCOM releases of
+.IR LiS ,
+.BR mknod ()
+will not function and will panic the kernel on architectures that do not have a simple call
+interface for system calls (e.g. parisc).
+.PP
+Previous and current OpenSS7 releases of
+.I LiS
+do not have this problem.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR mknod ()
-appeared in SVR 2.
+is compatible with
+.BR mknod (2).
 .\"
 .\"
-.XX
-.[
-magic
-.]
+.SH CONFORMANCE
+.PP
+.I SVR 4.2
 .[
 svr42
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mknod ()
+appeared in
+.IR "SVR 2" .
 .[
-svr4
+svr2
 .]
 .\"
 .\"

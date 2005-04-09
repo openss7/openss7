@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,43 +72,140 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ADJMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B adjmsg
+.B adjmsg, lis_adjmsg
 \- trim bytes from the front or back of a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
-.HP 8
-.IB retval " = adjmsg(mblk_t *" mp ", int " length );
+.HP
+.BI "int adjmsg(mblk_t *" mp ", ssize_t " len );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
-a pointer to the message to adjust.
+a pointer to the
+.I STREAMS
+initial message block representing the message to adjust.
 .TP
-.I length
-the length to which to adjust the message.
+.I len
+the number of bytes to trim and the direction from which to trim.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR adjmsg ()
 trims
-.IR "" abs( length )
+.RI abs( len )
 bytes from a
-.IR STREAMS (4)
+.I STREAMS
 message pointed to by
 .IR mp .
 .PP
 If
-.I length
+.I len
 is less than zero,
 .BR adjmsg ()
 will trim bytes from the head of the message.
 .PP
 If
-.I length
+.I len
 is greater than zero,
 .BR adjmsg ()
 will trim bytes from the tail of the message.
+.PP
+If
+.I len
+is zero,
+.BR adjmsg ()
+succeeds but does nothing.
+.PP
+During the trimming process, blocks are trimmed by advancing the
+.I b_rptr
+for head trims
+.RI ( len "> 0), or ,
+decreasing the
+.I b_wptr
+for tail trims
+.RI ( len "< 0),
+by the number of bytes trimmed from the block.  If an entire block is trimmed
+(its
+.I b_rptr
+meets its
+.IR b_wptr ),
+the block is not removed from the chain, but is left as a zero length block.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR adjmsg ()
+is typically used to trim headers and footers off of protocol messages on the
+read side of a 
+.I STREAMS
+module.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR adjmsg ()
+trims the requested number of bytes from the head or tail of the message and
+returns true (1).
+.PP
+Upon failure,
+.BR adjmsg ()
+returns false (0),
+and the passed in message remains unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+If
+.I mp
+is a null pointer,
+.I len
+is greated that the message size, or if the bytes to trim crosses message blocks of
+differing types,
+.BR adjmsg ()
+will fail and return false (0).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR adjmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR adjmsg ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in
+message,
+.IR mp .
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that
+.BR adjmsg ()
+will not fail due to allocation errors.  Failures depend only on the
+characteristics of the passed in message referenced by
+.I mp
+and the provided
+.IR len .
+.PP
+If the passed in length,
+.IR len ,
+is zero,
+.BR adjmsg ()
+will not alter the passed in message and will return true (1).
 .PP
 Any message blocks that are completely trimmed by
 .BR adjmsg ()
@@ -117,66 +214,85 @@ are not removed from the message, but have their
 set to their
 .IR b_rptr 's;
 that is, the length of the data they contain is set to zero (0).
-.SH "RETURN VALUES"
-.PP
-.BR adjmsg ()
-returns one (1) on success and zero (0) on failure.
-.SH ERRORS
-.PP
-If
-.I mp
-is a null pointer,
-.I length
-is greated that the message size, or if the bytes to trim crosses message blocks of
-differing types,
-.BR adjmsg ()
-will fail and
-.I retval
-will be zero (0).
-.SH CAVEATS
-.PP
-Note that the LiS
-.[
-LiS
-.]
-version of
-.BR adjmsg ()
-will not fail due to allocation errors.  Failures depend only on the
-characteristics of the passed in message referenced by
-.I mp
-and the provided
-.IR length .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR msgpullup (9),
 .BR pullupmsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR adjmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR adjmsg ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.I LiS
+.[
+LiS
+.]
+does not free zero length message blocks created or encountered during the
+trimming process, and returns success (1) when
+.I len
+is zero (0).
+.IP \(em
+.IR AIX \(rg
+.[
+aixdoc
+.]
+does nothing if
+.I len
+is zero.
+.IP \(em
+.IR Solaris \(rg
+.[
+soldoc
+.]
+may free zero length message blocks created or encountered during the trimming process.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+does not free zero length message blocks encountered during the trimming
+process.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR adjmsg ()
 first appeared in SVR 4.
 .[
 svr4
-.]
-.[
-svr4
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.PP
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
 .]
 .[
 svr4

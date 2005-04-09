@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,16 +72,22 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TIMEOUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B timeout, lis_timeout
+.B timeout, lis_timeout, lis_timeout_fcn
 \- start a timer
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .br
 .B #include <sys/dki.h>
 .HP 8
-.BI "toid_t " tid " = timeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks );
+.BI "toid_t timeout(timo_fcn_t *" timo_fcn ", caddr_t " arg ", long " ticks );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -93,6 +99,8 @@ the argument to pass to the timeout function.
 .TP
 .I ticks
 the number of clock ticks to wait.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR timeout ()
@@ -118,7 +126,16 @@ argument as follows:
 .nf
 typedef void timo_fcn_t(caddr_t arg);
 .fi
-.SH "RETURN VALUES"
+.PP
+The callback function
+.I timo_fcn
+will be executed at some time greater than or equal to the interval specified
+in the
+.I ticks
+argument.
+.\"
+.\"
+.SH RETURN
 .PP
 .BR timeout ()
 returns a
@@ -132,11 +149,13 @@ typedef int timeout_id_t;
 .PP
 Upon success,
 .BR timeout ()
-returns a non-zero timeout id.
+returns a non-zero timeout id and the timeout is scheduled.
 .PP
 Upon failure,
 .BR timeout ()
-returns a zero (0) timeout id.
+returns a zero (0) timeout id and no timeout is scheduled.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -144,15 +163,52 @@ When
 fails, it returns a zero (0) timeout id.
 .BR timeout ()
 fails when it cannot allocate the internal structures for the timeout.
-.SH CAVEATS
+If it is important that a timeout be scheduled with assurance, the return value
+should always be checked.
+.\"
+.\"
+.SH CONTEXT
 .PP
-.B LiS
+.BR timeout ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR timeout ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR timeout ()
+callback function can execute at the same time as any queue
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9)
+or
+.BR srv (9)
+procedure,
+.BR bufcall (9)
+or
+.BR timeout (9)
+callback
+or interrupt service routine.
+In addition, for a sufficiently small
+.I tick
+values, the callback function may execute before the call to
+.BR timeout (9)
+returns.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I LiS
 .[
 LiS
 .]
 provides a wrapper to Linux Kernel timer functions to implement
 .BR timeout ().
-.BR LiS 's
+.IR LiS 's
 implementation
 .[
 LiS
@@ -160,40 +216,161 @@ LiS
 creates a Linux timer structure, assigns it a sequential
 integer timer identifier, and places it in a timer list.
 Whenever
-.B LiS
+.I LiS
 .[
 LiS
 .]
 starts a timer it checks the list to see if the integer timer identifier is
 unique.  This is an exhaustive linear search.  This is inefficient.
-.IR STREAMS (4)
+.I STREAMS
 modules or drivers that set timers often will experience poorer performance
 than if the Linux kernel timer facility was used directly.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR untimeout (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR timeout ()
-first appeared in SVR 2.
+has no known bugs.
 .\"
 .\"
-.XX
+.SH COMPATIBILITY
+.PP
+.BR timeout ()
+is source-level compatible with
+.I "SVR 4.2 MP DDI/DKI"
+and
+.IR Solaris \(rg
+with the following portability considerations:
+.\"
+.\"
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
 .[
-magic
+aixdoc
 .]
+uses
+.B int
+return value of the
+.BR timeout ()
+utility.
+Also,
+.B timo_fnc_t
+is not defined and the prototype for the timeout call out function is
+.BR "void (*func)(void *arg)" .
+.IP \(em
+.IR UnixWare \(rg
 .[
-svr42
+uw7doc
 .]
+panics when a timeout structure cannot be allocated, instead of returning
+zero.
+.IP \(em
+Both
+.IR AIX \(rg
 .[
-svr4
+aixdoc
+.]
+and
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+have different prototypes for
+.BR timeout (9)
+and
+.BR untimeout (9)
+when used for
+.I STREAMS
+as when used for other drivers.  The prototypes for
+.BR timeout (9)
+and
+.BR untimeout (9)
+for use by
+.I STREAMS
+are the old
+.I SVR 3
+.[
+svr3spg
+.]
+definitions which use an
+.B int
+for the
+.BR toid_t .
+.IP \(em
+The
+.IR Solaris \(rg
+.[
+soldoc
+.]
+prototype for this function is as follows:
+.sp
+.nf
+.BI "timeout_id_t timeout(void (*" func ")(void *), void *" arg ", clock_t " ticks );
+.fi
+.sp
+Where
+.B timeout_id_t
+is defined as equivalent to
+.BR toid_t " and " int ,
+and
+.B clock_t
+is
+.BR long ,
+this is compatible with other definitions.
+.IP \(em
+.I LiS
+uses an
+.B int
+as a return value from
+.BR lis_timeout ().
+.\"
+.\"
+.IP \(em
+.I LiS
+provides a wrapper to Linux Kernel timer functions to implement
+.BR timeout ().
+.IR LiS 's
+implementation creates a Linux timer structure, assigns it a sequential
+integer timer identifier, and places it in a timer list.  Whenever
+.I LiS
+starts
+a timer it checks the list to see if the integer timer identifier is unique.
+This is an exhaustive linear search.  This is inefficient.
+.I STREAMS
+modules or drivers that set timers often will experience poorer performance
+than if the Linux kernel timer facility was used directly.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR timeout ()
+first appeared in
+.IR "SVR 2" .
+.[
+svr2
 .]
 .\"
 .\"

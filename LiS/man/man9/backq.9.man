@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: backq.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: backq.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,60 +72,73 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BACKQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B backq
+.B backq, lis_backq, lis_backq_fcn
 \- find the upstream or downstream \fISTREAMS\fR queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "queue_t *" bq " = backq(queue_t *" q );
+.BI "queue_t *backq(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue for which to find the upstream queue.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR backq ()
-returns the queue,
-.IR bq ,
-which feeds messages to the specified queue,
+returns a pointer to the queue
+which feeds messages to
 .IR q .
 .PP
-If the specified queue,
-.IR q ,
-is a normal read queue, then the returned back queue,
-.IR bq ,
-is the downstream queue.
-If the specified queue,
-.IR q ,
-is a normal write queue, then the returned back queue,
-.IR bq ,
-is the upstream queue.
+If
+.I q
+references a normal read queue, then the returned queue pointer references the
+downstream queue.  If
+.I q
+references a normal write queue, then the returned queue pointer references
+the upstream queue.
 .PP
-If the specified queue,
-.IR q ,
-is a FIFO read queue, then the returned back queue,
-.IR bq ,
-is the FIFO write queue.
-If the specified queue,
-.IR q ,
-is a FIFO write queue, then the returned back queue,
-.IR bq ,
-is the FIFO read queue.
+If
+.I q
+references a FIFO read queue, then the returned queue pointer references the
+FIFO write queue.  If
+.I q
+references a FIFO write queue, then the returned queue pointer references the
+FIFO read queue.
 .PP
-If the specified queue,
-.IR q ,
-is a pipe read queue, then the returned back queue,
-.IR bq ,
-is write queue at the other end of the pipe.
-If the specified queue,
-.IR q ,
-is a pipe write queue, then the returned back queue,
-.IR bq ,
-is the read queue at the other end of the pipe.
-.SH "RETURN VALUES"
+If
+.I q
+references a PIPE read queue, then the returned queue pointer references the
+write queue at the other end of the PIPE.  If
+.I q
+references a PIPE write queue, then the returned queue pointer references the
+read queue at the other end of the PIPE.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR backq ()
+is problematic in MP systems.
+MP-safe drivers and modules should avoid using this function.
+When
+.BR backq ()
+is absolutely necessary, it should only be called from a module procedure and
+should only be passed a
+.I q
+belonging to the queue pair for which a module procedure is sycncrhonised.
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR backq ()
@@ -135,6 +148,8 @@ Upon failure,
 .BR backq ()
 returns
 .BR NULL .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR backq ()
@@ -149,7 +164,49 @@ the pointer
 is not a pointer to a queue structure,
 or there is no upstream queue for a write queue or downstream queue for a read
 queue.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR backq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR backq ()
+is not MP-safe under
+.B LiS\c
+.
+.[
+LiS
+.]
+The returned queue reference might no longer be valid if a push or pop of a
+module has been made by the queue, or the queue has been linked under a
+multiplexing driver, after return from
+.BR backq ().
+.PP
+If the stream and queue is frozen with
+.BR freezestr (9),
+then the returned queue reference would normally be valid until the stream is
+thawed with
+.BR unfreezestr (9),
+or the queue pointers are manipulated by the caller; however,
+because
+.B LiS
+does not have a working
+.BR freezestr (9),
+.BR backq ()
+is not MP-safe under
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -159,27 +216,166 @@ will also return
 .B NULL
 if there is an internal error: that is, if the OTHER(q) pointer is
 .BR NULL .
+.PP
+.BR backq (),
+is obsolete.
+There are no utility functions that protect dereference of the
+.BI OTHERQ( q ) ->q_next
+across the return from the call (such as
+.I q->q_next
+is protected by, for example,
+.BR putnext (9)).
+.BR backq (),
+should not be used by portable MP-safe modules.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
+.BR unfreezestr (9),
 .BR strqget "(9) and "
 .BR strqset (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.PP
+Because
+.B LiS
+does not have a working
+.BR freezestr (9),
+.BR backq ()
+is not MP-safe under
+.B LiS\c
+.
+.[
+LiS
+.]
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR backq ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4"
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+does not document this function.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+lists
+.BR backq ()
+as a function that can only be passed a queue in the queue pair currently
+being synchronized within a module procedure.  See
+.IR \*(lqNOTICES\*(rq ,
+above.
+.IP \(em
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR Solaris \(rg
+.[
+soldoc
+.]
+indicate that the returned pointer is
+.B NULL
+if
+.I q
+is a stream head write queue or a stream end read queue.
+.IP \(em
+.BR backq ()
+returns
+.B NULL
+if
+.I q
+points to a stream end read queue, regardless of whether a FIFO or PIPE
+midpoint exists beyond
+.IR q .
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpdoc
+.]
+do not explicitly document what happens in the case of FIFOs and PIPEs, but
+indicate that the queue pointer returned with that whose
+.I q_next
+pointer points to
+.IR q .
+.IP \(em
+.BR backq ()
+will return
+.B NULL
+if
+.I q
+is
+.BR NULL .
+.IP \(em
+.BR backq ()
+will return
+.B NULL
+if
+.I q
+is a
+.RB non- NULL
+pointer to a structure other than a valid
+.B queue_t
+structure.
+.IP \(em
+.BR backq ()
+will fail silently and return
+.B NULL
+in the two situations above, and when an internal error occurs.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR backq ()
-first appeared in SVR 3 STREAMS
+first appeared in
+.IR "SVR 3" .
 .[
-svr3
-.]
-and continued in SVR 4.2 STREAMS.
-.[
-svr42
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.[
-LiS
+svr3spg
 .]
 .\"
 .\"

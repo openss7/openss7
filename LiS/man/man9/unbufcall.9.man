@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unbufcall.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: unbufcall.9.man,v 1.1.4.4 2005/04/08 22:40:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH UNBUFCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B unbufcall, lis_unbufcall
 \- removes a \fISTREAMS\fR buffer callback
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "unbufcall(int " bcid );
+.BI "void unbufcall(int " bcid );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I bcid
 the bufcall identifier to cancel.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR unbufcall ()
@@ -96,11 +104,15 @@ is the buffer callback identifier that was returned from a previous call to
 .PP
 .BR unbufcall ()
 is typically used to remove outstanding buffer calls when a stream is closing.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR unbufcall ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR bufcall ()
@@ -110,7 +122,32 @@ no longer exists;
 or, 
 .I bcid
 is invalid.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR unbufcall ()
+can be called from any context, including user context, module procedures,
+call outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR unbufcall ()
+is MP-safe.
+.PP
+Because the module is permitted to unload after calling
+.BR unbufcall ()
+for all outstanding buffer callbacks the call to
+.BR unbufcall ()
+will not return until either the callback function has completed, or the
+callback function has been cancelled.  Therefore the callback function will be
+guaranteed not to run once 
+.BR unbufcall ()
+has returned for all outstanding callbacks.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -120,37 +157,138 @@ uses rather inefficient linear lookups with interrupts disabled while looking
 for the
 .I bcid
 in the list of buffer callbacks.  As buffer callbacks should be rare in most
-.IR STREAMS (4)
+.I STREAMS
 module and driver designs, this is of little moment.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bufcall (9),
 .BR esbbcall (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+Unfortunately,
+under
+.IR LiS ,
 .[
 LiS
 .]
+.BR unbufcall ()
+returns immediately when a callback is being executed without cancelling the callback.  This makes
+the function rather unusable on
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR unbufcall ()
-first appeared in SVR 3.
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and systems based on
+.I SVR 4
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.I LiS
+.[
+lis
+.]
+uses rather inefficient linear lookups with interrupts disabled while
+looking for the
+.I bcid
+in the list of buffer callbacks.  As buffer callbacks should be rare in most
+.I STREAMS
+module and driver designs, this is of little moment.
+.IP \(em
+In
+.I SVR 4
+.[
+svr4spg
+.]
+.BR unbufcall ()
+was redefined to accept a
+.B bcid_t
+.I bcid
+instead of an
+.B int
+.I bcid
+as was the case for
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.IR Solaris \(rg
+.[
+soldoc
+.]
+ues a
+.B bufcall_id_t
+instead.
+.IR AIX \(rg
+.[
+aixdoc
+.]
+and
+.IR UXP/V \(rg
+.[
+uxpdoc
+.]
+use
+.B register int
+for
+.IR bcid .
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+uses a plain
+.BR int .
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+use a
+.BR toid_t .
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR unbufcall ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

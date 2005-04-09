@@ -19,6 +19,8 @@
 .\" MA 02139, USA.
 .\"
 .TH CONNLD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
 .SH NAME
 .B connld
 \- 
@@ -27,6 +29,8 @@ module supporting the generation of unique new
 .BR STREAMS "\-based"
 .I pipes
 from an existing pipe end.
+.\"
+.\"
 .SH DESCRIPTION
 The
 .B connld
@@ -68,6 +72,8 @@ by a subsequent
 .B I_RECVFD
 .I ioctl
 operation.
+.\"
+.\"
 .SH "APPLICATION USAGE"
 The intent of
 .B connld
@@ -150,6 +156,8 @@ process of passing file descriptors can still be carried out via
 new
 .BR open "()'s "
 as long as both ends remain attached.
+.\"
+.\"
 .SH "SEE ALSO"
 .BR fattach "(3), "
 .BR fattach "(8), "
@@ -158,7 +166,11 @@ as long as both ends remain attached.
 .BR fifo "(9), "
 .BR pipe "(3), "
 .BR STREAMS "(4) "
+.\"
+.\"
 .SH HISTORY
 Unix System V Release 4 (SVR4)
+.\"
+.\"
 .SH AUTHOR
 John Boyd, protologos LLC.

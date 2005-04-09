@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bzero.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: bzero.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,15 +72,21 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BZERO 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.SH "NAME"
-.B bzero
+.\"
+.\"
+.SH NAME
+.B bzero, lis_bzero
 \- zero a byte string
-.SH "SYNOPSIS"
+.\"
+.\"
+.SH SYNOPSIS
 .PP
-.B #include <string.h>
+.B #include <linux/string.h>
 .HP 8
-.BI "void *" retval " = bzero(const void *" str ", size_t " len );
-.SH "ARGUMENTS"
+.BI "void bzero(const void *" str ", size_t " len );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I str
@@ -88,7 +94,9 @@ the start of the memory region to zero.
 .TP
 .I len
 the size of the memory region to zero.
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 .BR bzero ()
 zeros
@@ -98,46 +106,123 @@ bytes of byte string starting at address
 If
 .I len
 is zero, this function has no effect.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR bzero ()
 returns
 .BR void .
-.SH "ERRORS"
+.\"
+.\"
+.SH ERRORS
 .PP
 .BR bzero ()
 always succeeds.
-.SH "CAVEATS"
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bzero ()
+can be called from any context, including user context, module procedures,
+call-outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bzero ()
+is MP-safe; however, the caller must ensure exclusive access to the memory regions involved.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
 LiS
 .]
 preserves this deprecated function.
-.BR memset (3)
+.BR memset (9)
 should be used instead.
 For older
-.IR STREAMS (4)
+.I STREAMS
 modules and drivers, it is sufficient to define the macro:
 .sp
 .nf
+\fC\s-2
 #define bzero(__str, __len) (void)memset(__src, 0, __len)
+\s+2\fP
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR bzero (9),
-.BR memset (3).
+.BR memset (9).
 .\"
 .\"
-.XX
+.SH BUGS
+.PP
+.BR bzero ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bzero ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+and
+.IR UnixWare \(rg.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-magic
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+documentation.
+.[
+aixdoc
 .]
 .[
-svr42
+hpuxdoc
 .]
 .[
-svr4
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR bzero ()
+first appeared in SVR 2.
+.[
+svr2
 .]
 .\"
 .\"

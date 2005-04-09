@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: isdatablk.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: isdatablk.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,26 +72,36 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ISDATABLK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B isdatablk
+.B isdatablk, lis_isdatablk
 \- tests a \fISTREAMS\fR data block for data type
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = isdatablk(dblk_t *" dp );
+.BI "int isdatablk(dblk_t *" dp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I dp
 the data block to test for being a data type. 
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 Tests whether the data block pointed to by
 .I dp
 has a data block type.  Data blocks have data type when they are of type
 .BR M_DATA ", " M_PROTO ", " M_PCPROTO " or " M_DELAY .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR isdatablk ()
 returns true (1) if the data block pointed to by
@@ -104,12 +114,30 @@ returns false (0) if the data block pointed to by
 .I dp
 is not of type
 .BR M_DATA ", " M_PROTO ", " M_PCPROTO " or " M_DELAY .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR isdatablk ()
 is always successful.  (See
-.B "\*(lqCAVEATS\*(rq" ", below.)"
-.SH CAVEATS
+.B "\*(lqNOTICES\*(rq" ", below.)"
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR isdatablk ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR isdatablk ()
+is MP-safe.  The caller is responsible for protecting the integrity of the
+message block.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -128,6 +156,14 @@ does not check the passed in data block pointer
 .I dp
 for a valid address and will result in an oops, segmentation fault or bus error
 if the data block pointer is not a pointer to a valid data block.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datamsg (9),
+.BR isdatamsg (9).
+.\"
+.\"
 .SH BUGS
 .PP
 .B LiS\c
@@ -137,36 +173,52 @@ LiS
 .]
 implements this function as a macro.  There is an error in the
 version of this macro definition which renders it unusable.
-.SH "SEE ALSO"
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-.BR datamsg (9),
-.BR isdatamsg (9).
-.SH VERSIONS
+.BR isdatablk ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.I LiS
+implements
+.BR isdatablk ()
+as a macro.  Some
+.I LiS
+versions have a typographical error in the
+.I LiS
+macro definition that render it unusable.
+.IP \(em
+.BR isdatablk ()
+is binary compatible with LiS (versions without the typographical error).
 .PP
-This manpage was written for
-.B LiS\c
-.
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-LiS
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR isdatablk ()
 first appeared in SVR 3.
 .[
 svr3
 .]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
+(Don't think so...)
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: testb.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: testb.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH TESTB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B testb, lis_testb
 \- test is a \fISTREAMS\fR message can be allocated
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = testb(int " size ", unsigned int " priority );
+.BI "int testb(int " size ", unsigned int " priority );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the size of message allocation to test.
 .TP
 .I prioirty
 the priority of the request to test.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR testb ()
@@ -115,16 +123,35 @@ The caller requests a medium priority message buffer.
 .TP 12
 .B BPRI_HI
 The caller requests a high priority message buffer.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR testb ()
 returns true (1) if the allocate would succeed, and returns false (0) if the
 allocation would fail.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR testb ()
 always succeeds.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR testb ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR testb ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 As with other post SVR 3 STREAMS
 .[
@@ -165,35 +192,104 @@ Therefore, the return from
 .BR allocb "(9) and " esballoc (9)
 must always be tested for
 .BR NULL .
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR allocb (9),
 .BR esballoc (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR testb ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR testb ()
+is compatible with
+.I "SVR 4.2 MP DDI/DKI"
 .[
-LiS
+usldk
 .]
+and systems based on
+.I SVR 4
+.[
+svr4spg
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixdoc
+.]
+defines the first argument as
+.BR "register int" .
+.IP \(em
+.IR AIX \(rg
+and
+.IR Solaris \(rg
+.[
+soldoc
+.]
+ignore the
+.I priority
+argument.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+.IR HP-UX \(rg
+.[
+hpuxdoc
+.]
+.IR SUPER-UX \(rg
+.[
+suxdoc
+.]
+.IR OSF/1 \(rg
+.[
+osfdoc
+.]
+do not.
+.IP \(em
+.IR OSF/1 \(rg
+adds the
+.B BPRI_WAITOK
+priority.
+.IP \(em
+.IR UXP/V \(rg
+.[
+uxpdoc
+.]
+does not document this function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR testb ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

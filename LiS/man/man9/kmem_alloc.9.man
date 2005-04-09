@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_alloc.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: kmem_alloc.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,30 +72,53 @@ sort-adjacent-labels
 .\"
 .\"
 .TH KMEM_ALLOC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B kmem_alloc
+.B kmem_alloc, lis_kmem_alloc
 \- allocate kernel memory
+.\"
+.\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/types.h>
+.br
 .B #include <sys/kmem.h>
 .HP
-.BI "void *" ptr " = kmem_alloc(size_t " size ", int " flags );
+.BI "void *kmem_alloc(size_t " size ", int " flags );
+.\"
+.\"
 .SH ARGUMENTS
 .TP
 .I size
-the size of memory to allocate.
+the size of the contaguous region of kernel memory to allocate.
 .TP
 .I flags
-how to allocate the memory.
+whether to sleep or not.
+.\"
+.\"
 .SH DESCRIPTION
 Requests that the number of bytes of kernel memory specified by the argument
 .I size
 be allocated with the options specified by
 .I flags
 and returned as a
-.I ptr
+.B void *
 to the allocated memory.
-.SH "RETURN VALUE"
+.I flags
+can be one of the following values:
+.TP \w'\ KM_NOSLEEP\ 'u
+.B KM_SLEEP
+can wait and reschedule, success guaranteed.
+.PD 0
+.TP
+.B KM_NOSLEEP
+cannot wait or reschedule, may fail and return
+.BR NULL .
+.PD
+.\"
+.\"
+.SH RETURN
 .PP
 .BR kmem_alloc ()
 returns a pointer to the alocated memory on success.  On failure,
@@ -103,6 +126,8 @@ returns a pointer to the alocated memory on success.  On failure,
 returns a
 .B NULL
 pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -110,8 +135,36 @@ When
 fails to allocate the requested memory, it returns a
 .B NULL
 pointer.
-.SH CAVEATS
-The LiS
+.BR kmem_alloc ()
+should only fail and return
+.B NULL
+if
+.I flags
+was set to
+.BR KM_NOSLEEP .
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR kmem_alloc ()
+can be called from any context with flag
+.BR KM_NOSLEEP ,
+including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.BR kmem_alloc ()
+can only be called from user context with flag
+.BR KM_SLEEP .
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR kmem_alloc ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+The
+.I LiS
 .[
 LiS
 .]
@@ -122,13 +175,111 @@ ignores the
 argument an always allocates using
 .I Linux
 .BR GFP_ATOMIC .
+.\"
+.\"
 .SH "SEE ALSO"
 .BR kmem_zalloc (9),
 .BR kmem_free (9).
-.XX
+.\"
+.\"
+.SH BUGS
+.PP
+Under
+.IR LiS ,
+.BR kmem_alloc ()
+ignores the
+.I flags
+argument and allocates memory using
+.BR lis_malloc ()
+which always calls
+.BR kmalloc (9)
+with a general fault protection class of
+.BR GFP_ATOMIC .
+This means that
+.BR kmem_alloc ()
+can fail and return
+.B NULL
+even if
+.I flags
+is set to
+.BR KM_SLEEP .
+Also, this means that when
+.I flags
+is set to
+.BR KM_SLEEP ,
+the calling process will neither wait nor reschedule.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR kmem_alloc ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+Under
+.IR LiS ,
+.BR kmem_alloc ()
+ignores the
+.I flags
+argument and allocates memory using
+.BR lis_malloc ()
+which always calls
+.BR kmalloc (9)
+with a general fault protection class of
+.BR GFP_ATOMIC .
+This means that
+.BR kmem_alloc ()
+can fail and return
+.B NULL
+even if
+.I flags
+is set to
+.BR KM_SLEEP .
+Also, this means that when
+.I flags
+is set to
+.BR KM_SLEEP ,
+the calling process will neither wait nor reschedule.
+These are
+.I LiS
+bugs.
+.IP \(em
+.I LiS
+implements
+.BR kmem_alloc ()
+as a macro.
+.PP
+For a fully function
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-Magic
+LfS
 .]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR kmem_alloc ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+(Don't think so...)
+.\"
+.\"
 .[
 $LIST$
 .]

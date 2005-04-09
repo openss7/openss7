@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgsize.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
+.\" @(#) $Id: SPLX.9.man,v 1.1.2.1 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -71,99 +71,191 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MSGSIZE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH SPLX 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B msgsize, lis_msgsize
-\- calculate the size of the message blocks in a \fISTREAMS\fR message
+.B SPLX, lis_splx, lis_slpx_fcn
+\- set priority level zero (0)
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
-.HP 8
-.BI "int " retval " = msgsize(mblk_t *" mp );
+.HP
+.BI "SPLX(pl_t " pl ");"
+.HP
+.BI "lis_splx(pl_t " pl ");"
+.HP
+.BI "void lis_splx_fcn(pl_t " pl ", char *" file ", int " line ");
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I mp
-the message for which to calculate the size.
+.I pl
+the priority level to set.
+.TP
+.I file
+The file where the function was called, typically
+.BR __FILE__ .
+.TP
+.I line
+The line number in the file, typically
+.BR __LINE__ .
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR msgsize ()
-counts the size of all of the data blocks in the message pointed to by
-.IR mp .
+.BR splx ()
+restores a previous priority level and returns
+.BR void .
+.\"
+.\"
+.SH USAGE
+.PP
+The following code snippet illustrates the use of the
+.BR splx ()
+function:
+.RS
+.nf
+\fC\s-1
+{
+	pl_t save_pl = splstr();
+
+	/* do some stuff */
+
+	splx(save_pl);
+}
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH RETURN
 .PP
-Upon success,
-.BR msgsize ()
-returns the number of bytes in the messag pointed to by
-.IR mp .
-.PP
-Upon failure,
-.BR msgsize ()
-returns zero (0).
+When the
+.BR splx ()
+function succeeds, it restores the specified priority level and returns
+.BR void ;
+when it fails, it fails silently.
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR msgsize ()
-fails and returns zero (0) when
-the message pointer
-.I mp
-is
-.BR NULL .
+.BR splx ()
+fiales when the specified
+.I pl
+is invalid.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR msgsize ()
+The
+.BR splx ()
 can be called from any context, including user context, module procedures,
 callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR msgsize ()
-is MP-safe.  It is the responsibility of the caller, however, to ensure
-exclusive access to the passed in message.
+The
+.BR splx ()
+function is MP-safe; however, it does not perform well in an MP environment and
+is almost always not what the author intended.  It is wiser to use basic or
+read-write locks for mutual exclusion, rather than relying on suppression of
+local bottom half or hard interrupts for serialization.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.I LiS
+implementation of
+.BR splx ()
+simply restores flags from the
+.I pl
+argument.
 .\"
 .\"
 .SH NOTICES
 .PP
-.BR msgsize ()
-is used internally to count the size of messages place on and taken off of
-message queues.
-.\"
-.\"
-.SH "SEE ALSO"
 .PP
-.BR msgdsize (9),
-.BR xmsgsize (9).
-.\"
-.\"
-.SH BUGS
+.BR splx ()
+and family are
+.IR "SVR 4.2" -specific
+functions.
 .PP
-.BR msgsize ()
-has no known bugs.
-.\"
-.\"
-.SH COMPATIBILITY
-.PP
-.BR msgsize ()
-is an
+There is, in fact, only one
 .I LiS
 .[
 LiS
 .]
-implementation specific function.
+.I STREAMS
+driver that uses this function, and that is the
+.BR ldl (4)
+driver.  Also, the
+.BR ldl (4)
+driver misused this function, and has been converted to no longer use it.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SPL0 (9),
+.BR SPLSTR (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR splx ()
+does not follow
+.I SVR 4.2
+.[
+svr42
+.]
+rules for arguments of type
+.BR pl_t .
+In particular, it does not follow the ordinality rules for arguments of this
+type.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR splx ()
+is compatible with
+.I SVR 4.2 MP DDI/DKI
+.[
+usldk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR splx ()
+is provided for source level compatibility with
+.IR "SVR 4.2"
+for the purpose of porting
+.IR "SVR 4.2"
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.I LiS
+.[
+lis
+.]
+differ from that of
+.IR "SVR 4.2"
+binaries are incompatible.
+.IP \(em
+.BR splx ()
+only provides functionality comparable to
+.IR "SVR 4.2"
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR splx ()
+in support of
+.RI non- STREAMS
+devices are not supported.
 .PP
 For a fully functional and compatible
 .I STREAMS
@@ -176,19 +268,22 @@ LfS
 .\"
 .SH CONFORMANCE
 .PP
-.BR msgsize ()
-is an
-.IR LiS -specific
-function.
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.[
+uslspg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
-.BR msgsize ()
+.BR splx ()
 first appeared in
-.IR LiS .
+.IR "SVR 4.2" .
 .[
-LiS
+svr42
 .]
 .\"
 .\"
@@ -196,3 +291,4 @@ LiS
 $LIST$
 .]
 .TI
+

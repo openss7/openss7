@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: untimeout.9.man,v 1.1.4.4 2005/04/08 22:40:51 brian Exp $
+.\" @(#) $Id: unfreezestr.9.man,v 1.1.2.1 2005/04/08 22:40:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,256 +71,281 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH UNTIMEOUT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH UNFREEZESTR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B untimeout, lis_untimeout
-\- stop a timer
+.B unfreezestr
+\- thaw the state of a stream queue
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .br
-.B #include <sys/dki.h>
-.HP 8
-.BI "toid_t untimeout(toid_t " tid );
+.B #include <sys/ddi.h>
+.HP
+void \fBunfreezestr\fR(queue_t *\fIq\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
 .TP
-.I tid
-the timeout identifier to cancel.
+.I q
+the queue within the stream to thaw.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR untimeout ()
-stops a timer previously started with
-.BR timeout (9).
-.I tid
-is the timer identifier that was returned from a previous call to
-.BR timeout (9).
+.BR unfreezestr ()
+thaws the state of the stream containing
+.I q
+and unlocks
+.IR q .
+Streams are normally in the thawed state and queues are normally in the
+unlocked state.
+The purpose of
+.BR unfreezestr ()
+is to thaw the state of the stream containing
+.I q
+and unlocking
+.I q
+after freezing them with
+.BR freezestr (9).
 .PP
-.BR untimeout ()
-is typically used to stop timers before they expire, and to deallocate timers
-before a stream is closed.
+.BR unfreezestr ()
+must be called before returning in the same thread in which
+.BR freezestr (9)
+was called.
 .\"
 .\"
 .SH RETURN
 .PP
-.BR untimeout ()
-returns a
-.B timo_t
-defined as follows:
-.sp
-.nf
-typedef int toid_t;
-typedef int timeout_id_t;
-.fi
-.PP
-The return value from
-.BR untimeout ()
-is undefined and ignored.
+.BR unfreezestr ()
+returns
+.BR void .
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR untimeout ()
-fails silently
-.IR "" ( retval
-is ignored) when
-the timer associated with the timer identifier
-.I tid
-no longer exists or is invalid.
+.BR unfreezestr ()
+always succeeds.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR untimeout ()
+.BR unfreezestr ()
 can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+call outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
-.BR untimeout ()
-is MP-safe.
-.PP
-Because the module is permitted to unload after calling
-.BR untimeout ()
-for all outstanding buffer callbacks the call to
-.BR untimeout ()
-will not return until either the callback function has completed, or the
-callback function has been cancelled.  Therefore the callback function will be
-guaranteed not to run once 
-.BR untimeout ()
-has returned for all outstanding callbacks.
+.BR unfreezestr ()
+is MP-safe; however, the caller is responsible for the validity of the
+reference
+.IR q .
+References to
+.I q
+from a procedure, call out or callback predicated on the queue pair to which
+.I q
+belongs are guaranteed valid.  The caller must guarantee the validity from
+call outs, callbacks, soft interrupts and interrupt service routines not
+predicated on the queue pair to which
+.I q
+belongs.
 .\"
 .\"
 .SH NOTICES
 .PP
-.B LiS
-.[
-LiS
-.]
-provides a wrapper to Linux Kernel timer functions to implement
-.BR timeout ().
-.BR LiS 's
-implementation
-.[
-LiS
-.]
-creates a Linux timer structure, assigns it a sequential
-integer timer identifier, and places it in a timer list.
-Whenever
-.B LiS
-.[
-LiS
-.]
-stops a timer, it checks the list for the integer timer identifier with
-interrupts disabled.  This is an exhaustive linear search.  This is
-inefficient.
-.I STREAMS
-modules or drivers that stop timers often will experience poorer performance
-than if the Linux kernel timer facility was used
-directly.
+.BR unfreezestr ()
+called with with an invalid
+.I q
+pointer will have undefined results.
 .PP
-.BR untimeout ()
-can be called with a
-.I toid
-returned by
-.BR timeout (9).
+If
+.BR unfreezestr ()
+is called twice for the same queue, or is called without first calling
+.BR freezestr (9),
+results will be undefined.
+(Actually,
+.B Linux Fast-STREAMS
+protects against this and will issue a bug report and leave the stream in the
+unfrozen state.)
+.\"
+.\"
+.SH EXAMPLES
 .PP
-.BR untimeout ()
-must be called for all outstanding timeout calls from the
-.BR qclose (9)
-procedure of the modules before exiting and unloading.
-.PP
-.BR untimeout ()
-must be called promptly for outstanding timeouts.
+See
+.BR freezestr (9).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
+.BR appq (9),
+.BR bcanget (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bufcall (9),
+.BR canget (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR insq (9),
+.BR noenable (9),
+.BR put (9)
+.BR putbq (9),
+.BR putq (9),
+.BR qbufcall (9)
+.BR qclose (9),
+.BR qcountstrm (9),
+.BR qenable (9),
+.BR qopen (9),
+.BR qprocsoff (9)
+.BR qprocson (9)
+.BR qreply (9),
+.BR qsize (9),
+.BR qtimeout (9)
+.BR qwriter (9)
+.BR rmvq (9),
+.BR SAMESTR (9).
+.BR setq (9),
+.BR srv (9),
+.BR STREAMS (9),
+.BR strqget (9),
+.BR strqset (9),
 .BR timeout (9).
 .\"
 .\"
 .SH BUGS
 .PP
-Unfortunately,
-under
-.IR LiS ,
-.[
-LiS
-.]
-.BR untimeout ()
-returns immediately when a callback is being executed without cancelling the callback.  This makes
-the function rather unusable on
-.IR LiS .
-.[
-LiS
-.]
+.BR unfreezestr ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR untimeout ()
+.BR unfreezestr ()
 is compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
 and systems based on
-.IR "SVR 4"
-.[
-svr4spg
-.]
+.IR "SVR 4" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-The
-.IR UnixWare \(rg
-function prototype returns
-.BR void .
-.IP \(em
-Under
-.IR LiS ,
+.IR Solaris \(rg,
 .[
-lis
+solspg
 .]
-.BR timeout (9)
-creates a Linux timer structure, assigns it a sequential integer timer
-identifier, and places it in a timer list.  Whenever
-.I LiS
-stops a timer, it
-checks the list for the integer timer identifier with interrupts disabled.
-This is an exhaustive linear search.  This is inefficient.
-.I STREAMS
-modules or drivers that stop timers often will experience poorer performance
-than if the Linux kernel timer facility was used directly.
-.IP \(em
-.IR AIX \(rg
+.IR SUPER-UX \(rg,
 .[
-aixdoc
+suxspg
 .]
-describes this function as accepting an
-.B int
-.I bcid
-and returning an
-.B int
-return value.
+and
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+provide this function.
+.IP \(em
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and
+.IR UXP/V \(rg.
+.[
+uxpspg
+.]
+do not provide this function.
+.RI ( HP-UX \(rg
+provides the symbols, but they do nothing.)
+.IP \(em
+Older versions of
+LiS
+.[
+LiS
+.]
+did not provide this DDI/DKI function.
+Newer versions of
+LiS
+.[
+LiS
+.]
+provide broken versions of this DDI/DKI function.
 .IP \(em
 .IR Solaris \(rg
 .[
-soldoc
+solspg
 .]
-describes this function as having the following prototype:
-.sp
-.nf
-.BI "clock_t untimeout(timeout_id_t " toid );
-.fi
-.sp
-The
-.B clock_t
-return value is described as being -1 when the
-.I toid
-is not found and zero or positive otherwise.
+and
+.IR LiS
+.[
+LiS
+.]
+provide the function prototype:
+.BI "void unfreezestr(queue_t *" q ).
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+provide the prototype
+.BR "void unfreezestr(queue_t *" q ", pl_t " pl ).
 .IP \(em
-Both
-.IR AIX \(rg
-.[
-aixdoc
-.]
-and
-.IR OSF/1 \(rg
-.[
-osfdoc
-.]
-have different prototypes for
-.BR timeout (9)
-and
-.BR untimeout (9)
-when used for
-.I STREAMS
-as when used for other drivers.  The prototypes for
-.BR timeout (9)
-and
-.BR untimeout (9)
-for use by
-.I STREAMS
-are the old
-.I SVR 3
-.[
-svr3spg
-.]
-definitions which use an
-.B int
-for the
-.BR toid_t .
+.I "SVR 4.2 MP DDI/DKI"
+specifies that the following functions cannot be called on a frozen stream:
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR enableok (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR getq (9),
+.BR noenable (9),
+.BR put (9),
+.BR putb (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR SAMESTR (9).
+.IP \(em
+.IR "SVR 4.2 MP DDI/DKI"
+specifies that the following functions must have the stream frozen across the
+call:
+.BR insq (9),
+.BR rmvq (9),
+.BR strqget (9),
+.BR strqset (9).
 .PP
-For a fully functional and compatible
+For a fully functional
 .I STREAMS
 implementation, use
 .BR "Linux Fast-STREAMS" .
@@ -339,10 +364,11 @@ usldk
 .\"
 .SH HISTORY
 .PP
-.BR untimeout ()
-first appeared in SVR 2.
+A version of
+.BR freezestr ()
+first appeared in SVR 4 MP DDI/DKI.
 .[
-svr2
+svr4dk
 .]
 .\"
 .\"

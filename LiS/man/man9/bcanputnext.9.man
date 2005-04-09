@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH BCANPUTNEXT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B bcanputnext
+.B bcanputnext, lis_bcanputnext
 \- test flow control on a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = bcanputnext(queue_t *" q ", int " band );
+.BI "int bcanputnext(queue_t *" q ", int " band );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,10 +94,12 @@ the queue upstream of the queue to test for flow control.
 .TP
 .I band
 the queue band of the queue to test for flow control.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 It is the responsibility of a
-.IR STREAMS (4)
+.I STREAMS
 module putting a banded non-priority
 message to a subsequent queue to check for flow control on that queue using
 .BR bcanputnext ()
@@ -134,25 +142,48 @@ return false (0), it also sets the
 flag for the specified
 .IR band ,
 indicating that the
-.IR STREAMS (4)
+.I STREAMS
 executive should backenable service procedures
 backwards up the queues when the flow controlled
 .I band
 is no longer full.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR bcanputnext ()
 will return false (0) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is flow
 controlled for the specified band, and return true (1) when the specified
-.IR STREAMS (4)
+.I STREAMS
 message queue is not flow controlled for the specified band.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR bcanputnext ()
 always succeed.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR bcanputnext ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR bcanputnext ()
+is supposed to be an MP-safe version of
+.BI bcanput( q->q_next );
+however, under
+.B LiS
+this function is not MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 In the
 .B LiS
@@ -177,25 +208,19 @@ This does not protect the
 .I q->q_next
 dereference and can cause problems when modules are being pushed onto or
 popped from running streams.
-.SH "NOTES"
-.PP
-.B LfS
-.[
-LfS
-.]
-implements
-.BR bcanputnext ()
-directly and protects the
-.I q->q_next
-dereference.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putnext (9),
 .BR canput (9),
 .BR canputnext (9),
 .BR bcanput (9),
+.BR freezestr (9),
 .BR noenable "(9), and "
 .BR enableok (9).
+.\"
+.\"
 .SH BUGS
 .PP
 Because
@@ -208,30 +233,140 @@ without locking the stream against module pushes, pops and other changes to
 the
 .I q->q_next
 pointer, it is not MP-safe, largely defeating the purpose of the function.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR bcanputnext ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR bcanputnext ()
+is supposed to be MP-safe.
+Under LiS,
+.BR bcanputnext ()
+does not protect dereferencing of queue pointers during the search for a queue
+or band limited queue.
+.IP \(em
+.BR bcanputnext ()
+always succeeds.  Under LiS,
+.BR bcanput ()
+will return zero (0 - flow controlled) if an internal error occurs, without
+setting the
+.BR QWANTW " or " QB_WANTW
+flag for the queue or band.  This means that, although flow controlled, no
+backenable procedure will be run.  This can lead to indefinite postponement of
+a queue service procedure under LiS.
+.IP \(em
+The declaration for
+.BR bcanputnext ()
+provides that
+.I band
+is of type
+.BR int .
+Under LiS,
+.I band
+is
+.BR "unsigned char" .
+.IP \(em
+.BR bcanputnext ()
+normally protects dereferences of the
+.I q->q_next
+pointer with a stream head lock.
+Under LiS,
+.BR bcanputnext ()
+is simply a macro that calls
+.BR bcanput (9)
+without protection for the
+.I q->q_next
+pointer dereference.
+.IP \(em
+.BR bcanputnext ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR bcanputnext ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR bcanputnext ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+documentation;
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+and
+.IR LiS 
+.[
+LiS
+.]
+source code.
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR bcanputnext ()
 first appeared in SVR 4 MP.
-.[
-svr4
-.]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
 .[
 svr4
 .]

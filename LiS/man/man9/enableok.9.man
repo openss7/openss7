@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableok.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ENABLEOK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B enableok
+.B enableok, lis_enableok
 \- allows a \fISTREAMS\fR message queue to be scheduled
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "enableok(queue_t *" q );
+.BI "void enableok(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue to permit to be enabled.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR enableok ()
@@ -93,7 +101,7 @@ clears the
 flag on the specified
 .IR q .
 This tells the
-.IR STREAMS (4)
+.I STREAMS
 executive that the
 .I q
 can be scheduled for
@@ -114,10 +122,28 @@ has not subsequently been called for the same
 a second call to
 .BR enableok ()
 will have no effect.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH USAGE
+.PP
+.BR enableok ()
+can be used in conjunction with
+.BR noenable (9)
+to temporarily suspend queue service procedure processing for a queue for
+normal priority messages.
+.BR noenable (9)
+permits data messages to be enqueued without invoking the queue's service
+procedure.  A call to
+.BR enableok ()
+will then reverse the situation and restore normal queue scheduling.
+.\"
+.\"
+.SH RETURN
 .PP
 .BR enableok ()
 returns void.
+.\"
+.\"
 .SH ERRORS
 .PP
 If the
@@ -130,7 +156,39 @@ or does not point to a queue structure,
 then
 .BR enableok ()
 will silently fail.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR enableok ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR enableok ()
+is MP-safe.
+.BR enableok ()
+uses atomic bit operations and can be called on a queue that is frozen
+with
+.BR freezestr (9).
+No global locks need to be held across the call to
+.BR enableok ()
+and 
+.BR enableok ()
+takes no locks.
+.PP
+If one thread enables a queue with
+.BR enableok ()
+and another disables the queue with
+.BR noenable (9),
+there will be a race condition on the
+.B QNOENAB
+flag.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR enableok ()
 does not add the
@@ -144,37 +202,158 @@ To add a
 .I q
 to the current run list, use
 .BR qenable (9).
+.\"
+.\"
+.SH EXAMPLE
+.PP
+.BR enableok (9)
+can be used to re-enable a queue after a call to
+.BR noenable (9).
+The following
+.BR qrestart ()
+function will restart a disabled queue:
+.sp
+.nf
+\fC\s-2\
+void qrestart(queue_t *q)
+{
+	enableok(q);
+	if (q->q_first)
+		qenable(q);
+}
+\s+2\fP
+.fi
+.PP
+Note that
+.BR enableok ()
+does not place the queue on the
+.BR runqueues ()
+list.  It takes
+.BR qenable (9)
+to do that.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR noenable (9),
 .BR canenable (9),
 and
 .BR qenable (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR enableok ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR enableok ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR enableok ()
+uses atomic bit operations and does not take the queue write lock.
+This makes
+.BR enableok ()
+safe to call while the queue is locked (e.g. while the queue is frozen
+with
+.BR freezestr (9)).
+Under
+.IR LiS ,
+.BR enableok ()
+takes the queue spin lock and uses normal bit operations to set the flag.
+.IP \(em
+.BR enableok ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR enableok ()
+to be called on a stream frozen with
+.BR freezestr (9).
+.IR Solaris \(rg
+.[
+solspg
+.]
+permits
+.BR enableok ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not invoke
+.BR enableok ()
+on a stream that has previously been frozen with
+.BR freezestr (9).
+.IP \(em
+.BR enableok ()
+called with an invalid
+.I q
+argument will have an undefined result.
+In referenced versions of
+.I LiS
 .[
 LiS
 .]
+the result is undefined in the same situations due to an
+.I LiS
+coding error.  Repaired versions of
+.I LiS
+will make
+.BR enableok ()
+fail silently in these situations.
+Portable
+.I STREAMS
+drivers and modules should never invoke
+.BR enableok ()
+with an invalid
+.I q
+argument.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR enableok ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

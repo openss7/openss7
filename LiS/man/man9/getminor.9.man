@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getminor.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: getminor.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,64 +72,303 @@ sort-adjacent-labels
 .\"
 .\"
 .TH GETMINOR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
-.SH "NAME"
-.B getminor
+.\"
+.\"
+.SH NAME
+.B getminor, lis_getminor
 \- get the minor device number for a device.
-.SH "SYNOPSIS"
+.\"
+.\"
+.SH SYNOPSIS
 .PP
 .B #include <sys/streams.h>
 .br
 .B #include <sys/ddi.h>
 .HP 8
-.BI "unsigned char " retval " = getminor(dev_t " dev );
-.SH "ARGUMENTS"
+.BI "minor_t getminor(dev_t " dev );
+.\"
+.\"
+.SH ARGUMENTS
 .PP
 .TP
 .I dev
 the device number from which to extract the minor device number.
-.SH "DESCRIPTION"
+.\"
+.\"
+.SH DESCRIPTION
 .PP
-.BR getminor ()
-returns the minor device number associated with the
-.B dev_t
-.IR dev .
-.SH "RETURN VALUES"
-.PP
-Always returns the minor device number.
-.SH "ERRORS"
-.PP
-Always succeeds.
-.SH "CAVEATS"
-.PP
-.BR getminor ()
-simply invokes the kernel macro
-.BR MINOR ().
-.SH "VERSIONS"
-.PP
-This manpage was written for
-.B LiS\c
-.
+.BR getmajor (9),
+.BR getminor (9)
+and
+.BR makedevice (9)
+are the device handling functions defined in
+.I SVR 4
 .[
-LiS
+svr4
 .]
+that are normally used by
+.I STREAMS
+device drivers in the
+.BR qopen ()
+procedure.
 .PP
 .BR getminor ()
-first appeared in SVR 2.
+gets the internal (extended) device minor number associated with the external
+.BR dev_t
+device number,
+.IR dev .
+.BR getminor ()
+is the normal architecture independent function call providing newer internal
+and extended device numbering replacing older
+.I SVR 4
+.[
+svr4
+.]
+behaviour using a function of the same name.
+.PP
+.BR getminor ()
+is an architecture independent function that obtains the internal (extended)
+minor device number associated with device
+.IR dev .
+.BR geteminor (),
+on the other hand, will return the external (real) minor device number
+associated with the device
+.IR dev .
+.BR minor ()
+was the
+.I SVR 3
+.[
+svr3
+.]
+name for this function.
+.BR minor (3)
+also exists as a user subroutine in
+.BR <sys/sysmacros.h> .
+.\"
+.\"
+.SH USAGE
+.PP
+.BR getminor ()
+is used by drivers and modules that do not required knowledge of external
+major device numbers and that wish to use a simplified approach to assignment
+of minor device numbers for
+.BR clone (4)
+operations.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR getminor ()
+always returns the minor device number.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR getminor ()
+always succeeds.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR getminor ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getminor ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+In older versions of
+.IR LiS ,
+.BR getminor ()
+simply invoked the kernel macro
+.BR MINOR ().
+Also, in older versions of
+.IR LiS ,
+.BR getmajor ()
+returned
+.BR "unsigned char" .
+More recent versions of
+.I LiS
+use an internal representation for
+.B dev_t
+and have an internal function.
+Also, more recent versions return
+.BR major_t ,
+which is
+.BR "unsigned int" .
+.PP
+Depending on the architecture, the internal extended minor device number may
+or may not be equal to one of the external (real) minor device numbers
+assigned to the driver.
+.PP
+Portable
+.I STREAMS
+drivers should neither rely upon the specific value returned by
+.BR getminor (),
+nor should it hard code the range of minor device numbers available to the
+major device number returned by
+.BR getmajor (9).
+.PP
+.B minor_t
+is
+.BR "unsigned int" .
+.PP
+The current maximum range of extended minor device numbers is the range
+of
+.B minor_t
+which is
+.B unsigned int
+or a range from 0 to
+.BR MAXINT .
+.PP
+Although the extended minor device range is currently from
+0 to
+.BR MAXINT ,
+only the first 2^10 minor device numbers can be represented as external (real)
+device numbers on an older 16-bit device number Linux system; the first 2^22
+device numbers can be represented as external (real) device numbers on newer
+32-bit device number Linux systems.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR getminor (9),
 .BR makedevice (9).
 .\"
 .\"
-.XX
+.SH BUGS
+.PP
+Under current versions of
+.IR LiS ,
+.BR getminor ()
+will not accept an external
+.B dev_t
+device number and return a proper value.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR getminor ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-magic
+usldk
 .]
-.[
-svr42
-.]
+and implementations based on
+.IR "SVR 4"
 .[
 svr4
+.]
+including
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+provides a somewhat different mechanism.  See
+.BR ddi_driver_major (),
+.BR ddi_getiminor (),
+.BR ddi_create_minor_node ()
+and
+.BR ddi_remove_minor_node ().
+.IP \(em
+.IR UnixWare "\(rg DDI8"
+provides a different mechanism with registered driver resources and channel
+numbers.
+.IP \(em
+.I LiS
+.[
+lis
+.]
+does not support extended device numbering, and
+.BR getminor ()
+on
+.I LiS
+reduces to
+.BR geteminor ().
+On current versions of
+.IR LiS ,
+.BR getminor ()
+still does not support extended device numbering, however,
+.BR getminor ()
+will now only accept an internal device number argument.
+.IP \(em
+.BR getminor ()
+is provided for source level compatibility with
+.I SVR 4.2 MP
+and implementations based on
+.I SVR 4.2
+for the purpose of porting drivers to
+.BR Linux .
+Because the
+.B dev_t
+structure for
+.B Linux
+differs from that of other implementations,
+binaries are incompatible.
+.IP \(em
+.BR getminor ()
+only provide functionality comparable to
+.I SVR 4.2 MP DDI/DKI
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionality provided by
+.BR getminor ()
+in support of
+.RI non- STREAMS
+devices is not supported.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getminor ()
+first appeared in SVR 4.
+.[
+svr4
+.]
+.BR minor (9)
+first appeared as
+in SVR 3.
+.[
+svr3
 .]
 .\"
 .\"

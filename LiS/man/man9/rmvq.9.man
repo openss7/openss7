@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmvq.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: rmvq.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH RMVQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B rmvq, lis_rmvq
 \- remove a message from a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "rmvq(queue_t *" q ", mblk_t *" mp );
+.BI "void rmvq(queue_t *" q ", mblk_t *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the queue from which to remove the message.
 .TP 
 .I mp
 the message to remove.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR rmvq ()
@@ -97,11 +105,15 @@ from the queue pointed to by
 .IR q .
 The message can be removed from the middle of the queue and does not need to
 be at the head or tail of the queue.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR rmvq ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR rmvq ()
@@ -126,9 +138,85 @@ the message pointed to by
 .I mp
 does not exist on the queue
 .IR q .
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-.B LiS
+.BR rmvq ()
+can be called from any context including user context, queue procedures,
+callouts, callbacks and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR rmvq ()
+is not MP-safe.
+.BR rmvq ()
+would be MP-safe, if the caller could ensure exclusive access to the passed in
+message,
+.IR mp ,
+and queue,
+.IR q .
+.PP
+On uniprocessor systems it may be sufficient to block interrupts to ensure
+exclusive access to queue,
+.IR q .
+Ensuring exclusive access to the passed in message,
+.IR mp ,
+is difficult on SMP systems, because
+.BR putq (9),
+.BR putbq "(9) and
+.BR insq (9)
+can change
+.I mp->b_next
+and
+.BR getq (9),
+.BR flushq (9),
+.BR flushband "(9) and
+.BR rmvq (9)
+can change
+.IR mp ,
+(e.g. remove it from the queue).
+.PP
+Normally exclusive access to the passed in queue,
+.IR q ,
+on both UP and SMP systems can be ensured most easily by freezing the stream
+associated with the queue,
+.IR q ,
+using
+.BR freezestr (9).
+Otherwise, it is also possible to ensure exclusive access with
+.BR MPSTR_STRLOCK (),
+.BR MPSTR_QLOCK (),
+.BR qwriter (),
+.BR streams_put (),
+or with appropriate synchronization boundaries
+.RB ( STR_PERQUEUE " or " D_MTPERQ ).
+However,
+.I LiS
+.[
+LiS
+.]
+only has a broken
+.BR freezestr (9),
+subsequent to version 2.18.0,
+and the other facilities mentioned are not implemented in
+.IR LiS .
+.[
+LiS
+.]
+This makes
+.BR rmvq ()
+unusable on MP systems in
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH NOTICES
+.PP
+.I LiS
 .[
 LiS
 .]
@@ -136,7 +224,7 @@ does not maintain a pointer in the
 .B msgb
 structure to the queue to which a given message currently belongs.  This means
 that
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -148,36 +236,116 @@ using a linear search.
 This is inefficient if
 .BR rmvq ()
 is called often by a
-.IR STREAMS (4)
+.I STREAMS
 module or driver.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR insq (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR rmvq ()
-first appeared in SVR 3.
+has no known bugs aside from problems with MP-safety.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR rmvq ()
+is source-level compatible with SVR 4.2 MP DDI/DKI
 .[
-svr3
+usldk
+.]
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR rmvq ()
+is always successful.
+.IP "" 4
+Under
+.IR LiS ,
+.BR rmvq ()
+silently fails if
+the message pointer
+.I mp
+is
+.BR NULL ;
+the queue pointer
+.I q
+is
+.BR NULL ;
+the queue pointer
+.I q
+does not point to a valid queue structure;
+.I q
+is closing;
+.I q
+has put and service procedures turned off (e.g. with
+.BR qprocsoff (9));
+the message pointed to by
+.I mp
+does not exist on the queue
+.IR q .
+.IP \(em
+.I LiS
+does not maintain a pointer in the
+.BR msgb (9)
+structure to the queue to which a given message currently belongs.  This means
+that
+.I LiS
+must search the queue pointed to by
+.I q
+for the message pointed to by
+.I mp
+using a linear search.  This is inefficient if
+.BR rmvq ()
+is called often by a
+.IR STREAMS (4)
+module or driver.
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+and
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+require that a stream be frozen with
+.BR freezestr (9)
+for the duration of the call to
+.BR rmvq ().
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
-magic
+usldk
 .]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR rmvq ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

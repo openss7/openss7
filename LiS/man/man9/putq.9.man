@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putq.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: putq.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = putq(queue_t *" q ", mblk_t *" mp );
+.BI "int putq(queue_t *" q ", mblk_t *" mp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -130,7 +130,7 @@ with a low priority message for the flow controlled queue
 .IR q .
 .\"
 .\"
-.SH "RETURN VALUES"
+.SH RETURN
 .PP
 Upon success,
 .BR putq ()
@@ -170,9 +170,46 @@ is closing, or the queue has had put and service routine processing turned off
 .BR qprocsoff (9)).
 .\"
 .\"
+.SH CONTEXT
+.PP
+.BR putq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.PP
+.BR putq ()
+called on a queue frozen by
+.BR freezestr (9)
+will result in single-party deadlock.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR putq ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+It can be guaranteed that
+.BR putq ()
+will always succeed, even for banded messages, by calling
+.BR strqset (9)
+to set the high and low water marks and packet sizes for all bands used by the
+driver or module.
+.PP
+When
+.BR putq ()
+fails and returns zero (0), it is the callers responsibility to address the
+disposition of the passed in message,
+.IR mp .
+A typical response would be to free the message using
+.BR freemsg (9).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR canput (9),
+.BR freezestr (9),
 .BR putnext (9),
 .BR getq (9).
 .\"
@@ -200,31 +237,73 @@ handling in that it fails while
 is in effect or if the stream is closing.
 .\"
 .\"
-.SH VERSIONS
-.PP
-This manpage is for
-.B LiS\c
-.
-.[
-LiS
-.]
+.SH COMPATIBILITY
 .PP
 .BR putq ()
-first appeared in SVR 3.
+is compatible with 
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following porting considerations:
+.IP \(em \w'\(em\(em'u
+.BR putq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR putq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR putq ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR putq ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

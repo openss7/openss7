@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qsize.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qsize.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,25 +72,36 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QSIZE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qsize, lis_qsize
 \- return the number of messages on a queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " size " = qsize(queue_t *" q );
+.BI "int qsize(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
-the queue to size.
+a pointer to the queue for which to return the count of the number of
+messages.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qsize ()
 returns the number of messages in the queue pointed to by
 .IR q .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR qsize ()
@@ -100,6 +111,8 @@ returns the number of messages in the queue pointed to by
 Upon failure,
 .BR qsize ()
 returns zero (0).
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -112,10 +125,25 @@ is
 .B NULL
 or
 .I q
-does not point to a valid queue structure;
-.SH CAVEATS
+does not point to a valid queue structure.
+.\"
+.\"
+.SH CONTEXT
 .PP
-.B LiS
+.BR qsize ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qsize ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.I LiS
 .[
 LiS
 .]
@@ -125,43 +153,131 @@ structure.  Therefore, this function must count the message in the queue each
 time that the function is called.  This is inefficient if many calls to
 .BR qsize ()
 are performed by a given
-.IR STREAMS (4)
+.I STREAMS
 module or driver.
 .PP
-.B LiS
+.I LiS
 .[
 LiS
 .]
 returns zero (0) on failure.  It should probably return -1 to indicate failure
 to distinguish this from the case where the queue is simply empty.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR strqget (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH BUGS
 .PP
 .BR qsize ()
-first appeared in SVR 3.
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR qsize ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr3
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B Linux Fast-STREAMS
+maintains a count of the messages on a given queue or queue band in the
+.BR queue_t (9)
+structure.  Therefore, the messages do not need to be counted when
+.BR qsize ()
+is called.
+.IP ""
+Under
+.IR LiS ,
+.BR qsize ()
+must lock the queue and walk the buffer chains counting the number of messages
+on the queue for each invocation.
+.I LiS
+is inefficient if many calls to
+.BR qsize ()
+are performed by a given
+.I STREAMS
+module or driver.
+.IP \(em
+.BR qsize ()
+always succeeds.
+.I LiS
+returns zero (0) on failure.
+.IP \(em
+.BR qsize ()
+called with an invalid
+.I q
+pointer can panic the system.
+Under
+.IR LiS ,
+.BR qsize ()
+called with an invalid
+.I q
+pointer will return zero (0).
+.IP \(em
+.BR qsize ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qsize ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qsize ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
-magic
+usldk
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qsize ()
+first appeared in
+.IR "SVR 3" .
 .[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

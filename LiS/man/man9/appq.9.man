@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: appq.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: appq.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B appq
+.B appq, lis_appq
 \- append a \fISTREAMS\fR message after another
 .\"
 .\"
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI int " retval " "= appq(queue_t *" q ", mblk_t *" mp1 ", mblk_t *" mp2 );
+.BI "int appq(queue_t *" q ", mblk_t *" emp ", mblk_t *" nmp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -92,10 +92,10 @@ sort-adjacent-labels
 .I q
 the queue to which to append the message.
 .TP
-.I mp1
+.I emp
 the message after which to append the message.
 .TP
-.I mp2
+.I nmp
 the message to append.
 .\"
 .\"
@@ -103,25 +103,49 @@ the message to append.
 .PP
 .BR appq ()
 appends the
-.IR STREAMS (4)
+.I STREAMS
 message
-.I mp2
+.I nmp
 just after the message
-.I mp1
+.I emp
 already on queue
 .IR q .
 If there is no message after
-.I mp1
+.I emp
 in the queue
 .IR q ,
 this has the same effect as
 calling
 .BR putq (9)
 with
-.IR mp2 .
+.IR nmp .
+.PP
+.BR appq ()
+performs all of the normal
+.I STREAMS
+scheduler functions associated with
+.BR putq (9)
+including enabling of the queue,
+.IR q ,
+when the first message or a priority message is placed on the queue.
+If queue scheduling has been disabled with
+.BR noenable (9),
+only priority messages will result in the queue being scheduled.
 .\"
 .\"
-.SH "RETURN VALUES"
+.SH USAGE
+.PP
+.BR appq ()
+is an
+.IR LiS -specific
+function that should not be called by portable
+.I STREAMS
+modules and drivers.
+Instead, the module or drivers should use the DDI/DKI defined
+.BR insq (9).
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR appq ()
@@ -134,7 +158,7 @@ Upon failure,
 returns false (0) and the message pointed to by
 .I mp
 remains unaltered.  (See
-.RB " BUGS "
+.RI \*(lq BUGS ,\*(rq
 below.)
 .\"
 .\"
@@ -145,7 +169,7 @@ When
 fails, it returns false (0).
 .BR appq ()
 fails if any of
-.IR q ", " mp1 " or " mp2
+.IR q ", " emp " or " nmp
 is
 .BR NULL ,
 or if
@@ -162,14 +186,89 @@ turned off (e.g. with
 .BR qprocsoff (9)).
 .\"
 .\"
-.SH CAVEATS
+.SH CONTEXT
+.PP
+.BR appq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR appq ()
+is not MP-safe.
+.BR appq ()
+would be MP-safe, if the caller could ensure exclusive access to the passed in
+messages and queue.
+.PP
+On uniprocessor systems it may be sufficient to block interrupts to ensure
+exclusive access to
+.IR q .
+Ensuring exclusive access to the passed in message,
+.IR emp ,
+is difficult on SMP systems, because 
+.BR putq "(9), " putbq (9) " and " insq (9)
+can change
+.I emp->b_next
+and
+.BR getq "(9), " flushq "(9), " flushband "(9) and " rmvq (9)
+can change
+.IR emp ,
+(e.g. remove it from the queue).
+.PP
+Normally, exclusive access to the passed in queue on both UP and SMP systems can be ensured most
+easily by freezing the stream associated with
+.I q
+using
+.BR freezestr (9).
+Otherwise, it is also possible to ensure exclusive access with
+.BR MPSTR_STRLOCK (),
+.BR MPSTR_QLOCK (),
+.BR qwriter (),
+.BR streams_put (),
+or with appropriate synchronization boundaries
+.RB ( STR_PERQUEUE " or " D_MTPERQ ).
+However,
+.B LiS
+.[
+LiS
+.]
+only has a broken
+.BR freezestr (9),
+subsequent to version 2.18.0,
+and the other facilities metioned are not implemented in
+.B LiS\c
+.
+.[
+LiS
+.]
+This makes
+.BR appq ()
+unusable on MP systems in
+.BR LiS .
+.PP
+This is similar to the synchronization necessary for use of
+.BR insq (9)
+and
+.BR rmvq (9),
+which are equally unusable on MP systems under
+.BR LiS .
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR appq ()
 is implemented with a call to
 .BR insq (9).
-\fB\)appq(\fI\)q\fB\), \fI\)mp1\fB\), \fI\)mp2\fB\))\fR
+\fB\)appq(\fI\)q\fB\), \fI\)emp\fB\), \fI\)nmp\fB\))\fR
 is functionally equivalent to
-\fB\)insq(\fI\)q\fB\), \fI\)mp1->b_next\fB\), \fI\)mp2\fB\))\fR.
+\fB\)insq(\fI\)q\fB\), \fI\)emp->b_next\fB\), \fI\)nmp\fB\))\fR.
+Note that,
+because
+.B LiS
+does not protect the dereference of the
+.I emp->b_next
+pointer, this function is unusable on MP systems.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -181,6 +280,84 @@ is functionally equivalent to
 .\"
 .SH BUGS
 .PP
+For versions prior to OpenSS7 release
+.BR LiS-2.16.18-17 ,
+.B LiS
+.[
+lis
+.]
+incorrectly frees the message pointed to by
+.I nmp
+when the call to
+.BR appq ()
+fails due to a
+.B NULL
+queue pointer
+.IR q ,
+or when the queue pointer
+.I q
+does not point to a valid queue structure,
+or when the queue pointer
+.I q
+points to a queue that is closing or has processing turned off.
+On the other hand,
+.B LiS
+.[
+LiS
+.]
+does not free the message pointer pointed to by
+.I nmp
+when
+.BR appq ()
+fails because the insertion would mis-sequence the queue.
+Also, for these versions of
+.BR LiS ,
+.BR appq ()
+returns
+.BR void ,
+so it had an inherent buffer leak because the message pointed to by
+.I nmp
+could be neither freed nor placed on any queue.
+This is inconsistent with
+.BR insq (9)
+behavior in
+.B SVR 4.2 MP
+.[
+svr42spg
+.]
+and other implementations.
+.\"
+.\"
+.PP
+Beginning with OpenSS7 release version
+.BR LiS-2.16.18-17
+and for subsequent versions,
+the message is not freed upon failure and the caller retains ownership of the
+message subsequent to failure.
+Also, in these versions of
+.B LiS
+.BR appq ()
+returns
+.B int
+(success, true; failure, false).
+This is consistent with
+.BR insq (9)
+behavior in
+.B SVR 4.2 MP
+.[
+svr42spg
+.]
+and other implementations.
+.\"
+.PP
+However, for all releases,
+.BR appq ()
+still has bugs related to
+.BR qprocsoff (9)
+handling in that it fails while
+.BR qprocsoff (9)
+is in effect or if the stream is closing.
+.PP
 Because
 .BR appq ()
 calls
@@ -188,43 +365,161 @@ calls
 it is subject to the same bugs as
 .BR insq (9).
 See
-.RB " BUGS "
+.RI \*(lq BUGS \*(rq
 in
 .BR insq (9)
 for more information.
-.\"
-.\"
-.SH VERSIONS
 .PP
 .BR appq ()
+is not MP safe.
+.BR appq ()
+is implemented in
+.B LiS
+with a call to
+.BR insq (9)
+without protecting a dereference of the
+.I emp->b_next
+pointer, making this function unusable on MP systems.
+.PP
+On systems that properly implement
+.BR insq (9)
+and
+.BR freezestr (9),
+a function such as
+.BR appq ()
+is not required.  Normally,
+.BR insq (9)
+must not be called on a stream that has not first been frozen with
+.BR freezestr (9).
+Freezing the stream (in all
+.I STREAMS
+implementations
+.B except
+.BR LiS )
+protect dereferences of pointers belonging to the frozen queue or messages on the frozen queue.
+Therefore, to accomplish the same effect as
+.BR appq ()
+on a proper
+.I STREAMS
+implementations, one would write:
+.sp
+.RS
+.nf
+\fC\s-1
+freezestr(q);
+insq(q, emp->b_next, nmp);
+unfreezestr(q);
+\s+1\fP
+.fi
+.RE
+Unfortunately,
+.BR LiS '
+broken
+.BR freezestr (9)
+implementation coupled with its broken
+.BR insq (9)
+implementation makes this impossible.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR appq ()
+is compatible with
+.I LiS
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR appq ()
 is an
-.BR LiS -specific
+.IR LiS -specific
 function.
-.[
-LiS
-.]
+Portable
+.I STREAMS
+drivers and modules will not call this function.
+.IP \(em
+.BR appq ()
+called with a
+.B NULL
+.IR q ", " emp " or " nmp
+argument, will fail silently (losing a reference to
+.IR nmp ).
+Portable
+.I STREAMS
+drivers and modules will not pass invalid arguments.
+.IP \(em
+.BR appq ()
+called with a
+.RB non- NULL
+.I q
+pointer that does not point to a valid queue structure will result in the
+silent freeing of the
+.I emp
+message block.
+Portable
+.I STREAMS
+drivers and modules will not pass invalid arguments.
+.IP \(em
+.BR appq ()
+does not schedule the queue service procedure when a priority message is
+appended to the queue.
+Portable
+.I STREAMS
+drivers and modules will not rely upon the queue service procedure not being
+scheduled with a priority message is appended.
+.IP \(em
+.BR appq ()
+does not protect dereferencing of the
+.I emp->b_next
+pointer with the queue spin lock making it unsafe to be called concurrent
+with
+.BR putq (9).
+Portable
+.I STREAMS
+drivers and modules will not call this function.
+.IP \(em
 Before OpenSS7 release
-.BR LIS-2.16.18-17 ,
+.BR LiS-2.16.18-17 ,
 .BR appq ()
 returned
-.BR void .
+.BR void ,
+and frees the message,
+.IR nmp ,
+upon failure.
 As of OpenSS7 release
-.BR LIS-2.16.18-17 ,
+.BR LiS-2.16.18-17 ,
 .BR appq ()
 returns
-.BR int .
+.BR int ,
+and does not free the message,
+.IR nmp ,
+upon failure.
+In OpenSS7 release
+.BR LiS-2.18.1 ,
+.BR appq ()
+returns
+.BR int ,
+and does not free the message,
+.IR nmp ,
+upon failure.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR appq ()
+first appeared in
+.IR LiS .
 .\"
 .\"
 .[

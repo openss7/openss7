@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QENABLE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qenable, lis_qenable
 \- schedules a \fISTREAMS\fR message queue service routine
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "qenable(queue_t *" q );
+.BI "void qenable(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue to enable.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qenable ()
@@ -108,11 +116,15 @@ can be determined with a call to
 is normally called to indirectly invoke the execution of
 .IR q 's
 service procedure.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR qenable ()
 returns
 .BR void .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR qenable ()
@@ -140,26 +152,253 @@ or,
 .I q
 has been disabled with a call to
 .BR noenable (9).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
+.BR qenable ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qenable ()
+is MP-safe.
+.PP
+If the queue was not already enabled
+.RB ( srv (9)
+procedure already scheduled to run) on a different CPU,
+.BR qenable ()
+schedules the service procedure of
+.I q
+on the current CPU.  In this case, the queue service procedure for
+.I q
+will not execute until after
+.BR qenable ()
+returns and the function that called
+.BR qenable ()
+returns or encounters a preemption point.
+However, if the queue is already scheduled by another processor  and
+.BR qenable ()
+was not called from a context synchronous with the service procedure, another
+processor may run the service procedure before
+.BR qenable ()
+returns.
+.PP
+Therefore,
+.BR qenable ()
+should be called with
+.I STREAMS
+synchronization in effect, or hold the necessary private locks across the
+call to
+.BR qenable (),
+if it is ncessary to synchronize the call to
+.BR qenable ()
+with execution of the service procedure.
+.\"
+.\"
+.SH NOTICE
+.PP
+.BR qenable ()
+has no effect if
+.B QNOENB
+is set,
+the queue has already been enabled due to internal
+.I STREAMS
+scheduler actions, or a previous call to
+.BR qenable ()
+that has not yet completed service.
+.PP
+Enabling a queue from within its own
+.BR srv (9)
+procedure will not reschedule the service procedure.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR canenable (9),
 .BR noenable (9),
 .BR enableok (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage is for
-.B LiS\c
-.
+Under
+.IR LiS ,
 .[
 LiS
 .]
+.BR qenable ()
+will not enable a queue previously disabled with
+.BR enableok ()
+or
+.BR qprocsoff ().
+.PP
+.I LiS
+source code,
+.[
+LiS
+.]
+on the other hand shows that no queue will be enabled while the
+.BR QNOENB ", "  QPROCSOFF " or " QCLOSING
+flags are set.
+.BR qenable ()
+should schedule a queue regardless of whenther
+.BR noenable (9)
+was called for the queue.
+.PP
+.I LiS
+has a nasty bug in
+.BR qenable ()
+requiring the non-standard
+.BR canenable (9)
+function.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR qenable ()
-first appeared in SVR 4.
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-svr4
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR qenable ()
+only schedules the queue for later service.
+.IP \(em
+.BR qenable ()
+schedules a queue regardless of whether the
+.B QNOENB
+flag is set, or whether
+.BR noenable (9)
+has been called for the queue,
+.IR q .
+Under
+.IR LiS ,
+.[
+LiS
+.]
+.BR qenable ()
+will not enable a queue previously disabled with
+.BR enableok ()
+or
+.BR qprocsoff ().
+This is an
+.I LiS
+bug.
+.IP \(em
+.BR qenable ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR qenable ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR qenable ()
+on a stream frozen with
+.BR freezestr (9).
+.IP \(em
+.BR qenable ()
+enables the queue regardless of the settings of other flags.
+.IR UnixWare \(rg
+documentation
+.[
+uw7doc
+.]
+explicitly states that
+.BR qenable ()
+schedules the queue regardless of whether
+.BR noenable (9)
+was invoked on the queue previously.
+.IR AIX
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg
+and
+.IR Solaris \(rg
+documentation
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+do not say that
+.BR noenable (9)
+defeats
+.BR qenable ()
+either.
+.I LiS
+source code,
+.[
+LiS
+.]
+on the other hand shows that no queue will be enabled while the
+.BR QNOENB ", "  QPROCSOFF " or " QCLOSING
+flags are set.
+This is an
+.I LiS
+bug.
+.IP \(em
+.I LiS
+has a nasty bug in
+.BR qenable ()
+requiring the non-standard
+.BR canenable (9)
+function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCES
+.PP
+.PP
+.IR "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qenable ()
+first appeared in SVR 3.
+.[
+svr3spg
 .]
 The original versions of
 .BR qenable ()
@@ -167,18 +406,6 @@ returned
 .B int
 instead of
 .BR void .
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qattach.9.man,v 1.1.4.3 2005/03/30 14:46:33 brian Exp $
+.\" @(#) $Id: qattach.9.man,v 1.1.4.4 2005/04/08 22:40:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH QATTACH 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B qattach, lis_qattach
 \- attach a module onto a \fISTREAMS\fR file.
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = lis_qattach(stdata_t *" head ", struct streamtab *" info ", dev_t *" devp ", cred_t *" credp );
+.BI "int lis_qattach(stdata_t *" head ", struct streamtab *" info ", dev_t *" devp ", cred_t *" credp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -94,13 +100,15 @@ a pointer to the device number to be passed to the module's qopen procedure.
 .TP
 .I credp
 the credentials of the caller.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR qattach ()
 is called when the
 .B I_PUSH
 command is issued to a
-.IR STREAMS (4)
+.I STREAMS
 character special file.  See
 .BR streamio (2)
 for more informaiton on
@@ -113,7 +121,9 @@ linking the queues into the stream,
 and calling the module's
 .BR qopen (9)
 routine.
-.SH "RETURN VALUE"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR lis_attach ()
@@ -121,6 +131,8 @@ returns zero (0).
 Upon failure,
 .BR lis_attach ()
 returns a negative error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -139,14 +151,62 @@ In addition, any error returned by the module's
 .BR qopen (9)
 function can be returned by
 .BR qattach ().
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR qattach ()
+should only be called from user context or from within a
+.BR qopen ()
+or
+.BR qclose ()
+procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR qattach ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 This is an internal
-.IR STREAMS (4)
+.I STREAMS
 function which was not intended to be called by
 the
-.IR STREAMS (4)
+.I STREAMS
 module or driver writer.
+.PP
+.BR qattach ()
+is an internal
+.I STREAMS
+function which was not intended to be called by
+the
+.I STREAMS
+module or driver writer.
+.BR qattach ()
+is not part of the DDI/DKI and should not be called by portable programs.
+.BR qattach ()
+is highly implementation dependent in function an prototype.  Use of this
+function by a driver or module will guarantee that it is not portable even between
+releases of
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR qdetach (9),
+.BR qopen (9),
+.BR qclose (9),
+.BR open (2s),
+.BR close (2s),
+.BR streamio (2).
+.\"
+.\"
 .SH BUGS
 .PP
 The
@@ -159,43 +219,60 @@ version of this function does not have the same declaration as the SVR 4.2
 svr42
 .]
 function.
-.SH "SEE ALSO"
-.PP
-.BR qdetach (9),
-.BR qopen (9),
-.BR qclose (9),
-.BR open (2s),
-.BR close (2s),
-.BR streamio (2).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR qattach ()
-first appeared in SVR 3.
+is compatible with descriptions of
+.I STREAMS
+internals for
+.IR "SVR 4" ,
+.[
+magic
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.I SVR 4.2 MP
+and systems based on
+.I SVR 4
+do not export this function.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.BR qattach ()
+is compliant with the description of the internal
+.BR qattach ()
+function of SVR 4
+.[
+svr4
+.]
+as described in
+.IR "\*(lqThe Magic Garden\*(rq" .
+.[
+magic
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR qattach ()
+first appeared (as an internal function) in SVR 3.
 .[
 svr3
 .]
 .PP
 .BR lis_qattach ()
 is no longer an exported function as of LiS-2.18.0.
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
 .\"
 .\"
 .[

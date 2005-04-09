@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copymsg.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: copymsg.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH COPYMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B copymsg
+.B copymsg, lis_copymsg
 \- copy a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BR "struct msgb *" msg " = copymsg(struct msgb *" mp );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I mp
 the message chain to copy.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR copymsg ()
@@ -97,7 +105,9 @@ The new data blocks each have the same type as the copied data blocks and the
 .IR b_rptr " and " b_wptr
 of each block in the new message are set to the beginning and end of the
 copied data from the corresponding blocks in the old message.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR copymsg ()
@@ -111,6 +121,8 @@ returns a
 .B NULL
 .I msg
 pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -133,7 +145,24 @@ if any of the data blocks are mangled (i.e. the
 pointer is less than the
 .IR db_base );
 or, memory allocation for any of the copied blocks fails.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR copymsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR copymsg ()
+is MP-safe; however, the caller is responsible for ensuring exclusive access
+to the passed in message.  Upon return, the caller will have the only
+reference to the returned message.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
@@ -168,29 +197,78 @@ This does not appear consistent with SVR 4.2 STREAMS.
 .[
 svr42
 .]
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR copyb (9),
 .BR dupb "(9) and "
 .BR dupmsg (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
+.PP
+.BR copymsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR copymsg ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR copymsg ()
+fails if memory allocation for message blocks fails.
+Under
+.IR LiS ,
+.BR copymsg ()
+can fail because the passed in message pointer,
+.IR mp ,
+is
+.BR NULL ;
+the size of any of the blocks to be copied has a negative message length (i.e.
+the
+.I b_wptr
+pointer is less than the
+.IR b_rptr );
+if any of the data blocks are mangled (i.e. the
+.I db_lim
+pointer is less than the
+.IR db_base );
+or, memory allocation for any of the copied blocks fails.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR copymsg ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgpullup.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: msgpullup.9.man,v 1.1.4.4 2005/04/08 22:40:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH MSGPULLUP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B msgpullup, lis_msgpullup
 \- pull up bytes in a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "struct msgb *" msg " = msgpullup(struct msgb *" mp ", int " len );
+.BI "mblk_t *msgpullup(mblk_t *" mp ", int " len );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the message chain to pull up.
 .TP
 .I len
 how to pull up the message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR msgpullup ()
@@ -95,9 +103,7 @@ will copy
 .I len
 bytes from the message pointed to by
 .I mp
-into a new message returned as a pointer to by
-.IR msg ,
-if possible.
+into a new message, if possible, whose pointer is returned.
 If the passed in message pointed to by
 .I mp
 contains more bytes than specified by
@@ -118,7 +124,9 @@ is specified as -1,
 all the bytes of the passed in message pointed to by
 .I mp
 will be concatenated and copied into the new message.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR msgpullup ()
@@ -128,6 +136,8 @@ Upon failure,
 .BR msgpullup ()
 returns
 .BR NULL .
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR msgpullup ()
@@ -137,10 +147,28 @@ when the number of bytes in the passed in message pointed to by
 .I mp
 is less than
 .IR len ;
-and when allocation for the new message
-.I msg
-fails.
-.SH CAVEATS
+and when allocation for the new message fails.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR msgpullup ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR msgpullup ()
+is MP-safe.  It is the caller's responsibility to ensure exclusive access to
+the passed in message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR msgpullup ()
+is a DKI replacement for
+.BR pullupmsg (9).
 .PP
 The
 .B LiS
@@ -155,28 +183,67 @@ of bytes in the passed in message is less than
 This is inefficient if it is normally the case that the passed in message has
 less bytes than
 .IR len .
+.\"
+.\"
 .SH SEE ALSO
 .PP
 .BR pullupmsg (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.BR msgpullup ()
+has no known bugs.
 .\"
 .\"
-.XX
-.[
-magic
-.]
+.SH COMPATIBILITY
+.PP
+.BR msgpullup ()
+is source-level compatible with SVR 4.2 DDI/DKI
 .[
 svr42
 .]
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+The LiS implementation of
+.BR msgpullup ()
+allocates blocks for the new message before it check to see whether the number
+of bytes in the passed in message is less than
+.IR len.
+This is inefficient if it is normally the case that the passed in message has
+less bytes than
+.IR len .
+.IP \(em
+.IR Solaris \(rg
+and LiS properly align pulled up bytes.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
 .[
-svr4
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR msgpullup ()
+first appeared in SVR 4 DDI/DKI.
+.[
+svr4dk
 .]
 .\"
 .\"

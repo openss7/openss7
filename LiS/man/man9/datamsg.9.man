@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datamsg.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: datamsg.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,19 +72,27 @@ sort-adjacent-labels
 .\"
 .\"
 .TH DATAMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B datamsg
+.B datamsg, lis_datamsg
 \- tests a \fISTREAMS\fR message type for data
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = datamsg(int " type );
+.BI "int datamsg(int " type );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I type
 the message block type to test for being a data message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR datamsg ()
@@ -95,6 +103,7 @@ following:
 .TP 12
 .B M_DATA
 The message type is a data message type.
+.PD 0
 .TP 12
 .B M_PROTO
 The message type is a protocol data message type.
@@ -104,6 +113,7 @@ The message type is a priority protocol data message type.
 .TP 12
 .B M_DELAY
 The message type is a delay data message type.
+.PD
 .PP
 If the passed in message
 .I type
@@ -112,45 +122,95 @@ is one of these message types,
 returns true (1); otherwise,
 .BR datamsg ()
 returns false (0).
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 .BR datamsg ()
 returns true (1) if the passed in message type is a data message type.
 .BR datamsg ()
 returns false (0) if the passed in message type is not a data message type.
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR datamsg ()
 is always successful.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR datamsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR datamsg ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 .[
 LiS
 .]
-implements this function as a macro.
+implements this function as a macro,
+which is rather against its stated purpose of providing functional interfaces.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR isdatablk "(9) and "
 .BR isdatamsg (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
+.PP
+.BR datamsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR datamsg ()
+is source-level compatible with SVR 4.2 MP DDI/DKI,
+and
+.IR Solaris \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+LiS implements
+.BR datamsg ()
+as a C preprocessor macro,
+which is rather against its stated purpose of providing functional interfaces.
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR datamsg ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

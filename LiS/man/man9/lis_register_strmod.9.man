@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_register_strmod.9.man,v 1.1.4.3 2005/03/30 14:46:32 brian Exp $
+.\" @(#) $Id: lis_register_strmod.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,32 +72,40 @@ sort-adjacent-labels
 .\"
 .\"
 .TH LIS_REGISTER_STRMOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B lis_register_strmod
 \- register a \fISTREAMS\fR module
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "modID_t " modid " = lis_register_strmod(struct streamtab *" strtab ", const char *" name );
+.BI "modID_t lis_register_strmod(struct streamtab *" strtab ", const char *" name );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
-.SH DESCRIPTION
 .TP
 .I strtab
 the \fISTREAMS\fR stream table entry to register.
 .TP
 .I name
 the name of the \fISTREAMS\fR module
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 .BR lis_register_strmod ()
 registers a new
-.IR STREAMS (4)
+.I STREAMS
 module identified by
 .I name
 and allocates a module identifier to the module.
 Once a
-.IR STREAMS (4)
+.I STREAMS
 module is registered, it can be pushed on other streams by
 .I name
 with
@@ -112,7 +120,7 @@ function.
 .[
 LiS
 .]
-.IR STREAMS (4)
+.I STREAMS
 modules registered with
 .BR lis_register_strmod ()
 can be deregistered with
@@ -127,7 +135,7 @@ indicating that
 LiS
 .]
 has loadable
-.IR STREAMS (4)
+.I STREAMS
 module support,
 .B LiS
 .[
@@ -154,13 +162,27 @@ is successful and the loaded
 .B Linux
 kernel module registers the
 .I MODNAME
-.IR STREAMS (4)
+.I STREAMS
 module using
 .BR lis_register_strmod () ,
 the push operation that initiated the loading of the
 .B Linux
 kernel module will succeed.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH USAGE
+.PP
+.BR lis_register_strmod ()
+is provided to register
+.I STREAMS
+modules written for
+.IR LiS .
+.[
+LiS
+.]
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR lis_register_strmod ()
@@ -170,6 +192,8 @@ Upon failure,
 .BR lis_register_strmod ()
 returns a
 .BR LIS_NULL_MID .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -184,14 +208,33 @@ is
 .BR NULL ;
 .I name
 is already used by another registered
-.IR STREAMS (4)
+.I STREAMS
 module; or,
 .B LiS
 .[
 LiS
 .]
 cannot allocate a free module identifier.
-.SH NOTES
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR lis_register_strmod ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+Consideration for impact on performance and
+latency should be given before calling
+.BR lis_register_strmod ()
+from soft or hard interrupt context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strmod ()
+is MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
 .PP
 .BR lis_register_strmod ()
 should return an informative error number instead of just returning
@@ -207,10 +250,12 @@ LiS
 .]
 should implement the module switch table as a linked list and allocate module
 structures dynamically.
+.\"
+.\"
 .SH EXAMPLES
 .PP
 The following is an example of a
-.IR STREAMS (4)
+.I STREAMS
 module which dynamically registers
 using
 .BR lis_register_strdmod ().
@@ -240,36 +285,103 @@ void x_terminate(void)
 }
 \s+2\fR
 .fi
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR lis_register_strdev (9),
 .BR lis_unregister_strmod (9),
 .BR lis_unregister_strdev (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR lis_register_strmod ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR lis_register_strmod ()
+is an
+.I LiS
 .[
 LiS
 .]
+implementation specific function, with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixspg
+.]
+uses the function
+.BR str_install_AIX ()
+with the
+.B STR_LOAD_MOD
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+uses the function
+.BR str_install_HPUX ()
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.IR OSF/1 \(rg
+uses the function
+.BR strmod_add ()
+with the
+.B STR_IS_MODULE
+flag to register
+.I STREAMS
+modules.
+.IP \(em
+.I LfS
+.[
+LfS
+.]
+uses the function
+.BR register_strmod ()
+to register modules.
 .PP
-.BR lis_regsiter_strmod ()
+For a fully function and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and unregistration of
+.I STREAMS
+modules is implementation specific and not subject to standardization.
+.BR lis_register_strmod ()
 is an
-.BR LiS -specific
-function which first appeared in early versions of
-.BR LiS .
+.I LiS
+.[
+lis
+.]
+implementation specific function.
 .\"
 .\"
-.XX
+.SH HISTORY
+.PP
+.BR lis_register_strmod ()
+first appeared in early versions of
+.IR LiS .
 .[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+lis
 .]
 .\"
 .\"

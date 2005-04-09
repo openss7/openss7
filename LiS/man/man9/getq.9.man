@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getq.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: getq.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,28 +72,34 @@ sort-adjacent-labels
 .\"
 .\"
 .TH GETQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B getq
+.B getq, lis_getq
 \- gets a message from a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "struct msgb *" mp " = getq(queue_t *" q );
+.BI "mblk_t *getq(queue_t *" q );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
 .I q
 the queue from which to get a message.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR getq ()
-retrieves a message from the specified
+retrieves a message from the specified queue,
 .I q
-and returns that message
-.I mp
-to the caller.
-If there are no message on the specified
+and returns a pointer to that message to the caller.  If there are no message on
+the specified queue,
 .IR q ,
 .BR getq ()
 returns a
@@ -109,9 +115,29 @@ back-enabling,
 performs the necessary back-enabling by scheduling queue service routine
 backwards up the queue chain.
 .PP
+When
+.BR getq ()
+returns
+.B NULL
+(the queue,
+.IR q ,
+is empty),
+.BR getq ()
+sets the
+.B QWANTR
+flag for the queue and performs back-enabling.
+The
+.B QWANTR
+flag indicates to the streams scheduler that back-enabling has already been
+performed for the empty queue and subsequent calls to
+.BR getq ()
+for the same empty queue will not generate another back-enable.
+.PP
 .BR getq ()
 is normally called from within a queue service routine.
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR getq ()
@@ -123,6 +149,8 @@ Upon failure,
 returns a
 .B NULL
 pointer.
+.\"
+.\"
 .SH ERRORS
 .PP
 When the queue specified by
@@ -132,7 +160,16 @@ is empty,
 returns a
 .B NULL
 pointer.
-.SH CAVEATS
+If the
+.B QWANTR
+flag is not already set for the queue,
+.BR getq ()
+will set the
+.B QWANTR
+flag and back-enable the stream.
+.\"
+.\"
+.SH NOTICES
 .PP
 .B LiS
 returns a
@@ -144,37 +181,183 @@ is
 or the structure pointed to by
 .I q
 is not a queue structure.
-as part of the OpenSS7 Project http://www.openss7.org/
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR getq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR getq ()
+is intended to be MP-safe; however, the implementation in
+.I LiS 2.18.1
+of backenabling contains multiple race conditions that can result in loss of
+synchronization of the queue,
+.IR q ,
+flags.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR rmvq (9),
 .BR putbq (9),
 .BR putq (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR getq ()
+executed by one thread while another thread has the stream and queue frozen with
+.BR freezestr (9)
+should cause the thread calling
+.BR getq ()
+to spin or block until the stream is thawed with
+.BR unfreezestr (9).
+This is not the case for
+.IR LiS .
 .[
 LiS
 .]
 .PP
 .BR getq ()
+has multiple races in recent
+.I LiS
+implementation: an attempt at reducing lock contention by releasing write locks
+on the queue,
+.IR q ,
+and reacquiring read locks on the same queue results in breaching the atomicity
+of operations performed during backenabling.
+This makes
+.BR getq ()
+largely unusable
+for MP
+.I STREAMS
+drivers or modules on premptive or multiprocessor Linux kernels.
+The only partial solution to this is to make all
+.I STREAMS
+drivers and modules of at least per-queue synchronization.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR getq ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR getq ()
+passed a
+.B NULL
+or invalid queue pointer,
+.IR q ,
+will have undefined results.
+Under
+.IR LiS ,
+an
+.B NULL
+.I q
+pointer will return
+.B NULL
+(but an invalid queue pointer can still have undefined results because
+.I LiS
+mistakenly locks the queue before testing the validity of the queue pointer).
+As most service procedures pass
+.BR getq ()
+the queue pointer passed to the service procedure, these corner cases should
+rarely be encountered.
+.IP \(em
+.BR getq ()
+will retrieve messages from a queue that has had
+.BR qprocsoff (9)
+called or which is closing
+.RB ( qclose (9)
+has been called).
+Under
+.IR LiS ,
+.BR getq ()
+will return
+.B NULL
+in these cases.
+.I LiS
+behavior is incorrect for these cases.
+.BR qprocsoff (9)
+only effects the running of queue procedures and should not affect
+.BR getq ().
+.BR qclose (9)
+may need to exchange messages with lower level queue pairs and making
+.BR getq ()
+return
+.B NULL
+during close is an
+.I LiS
+bug.
+.IP \(em
+.BR getq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR getq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR getq ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.IR Solaris \(rg
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR getq ()
 first appeared in SVR 3.
 .[
-svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
+svr3spg
 .]
 .\"
 .\"

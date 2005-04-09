@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 1.1.4.3 2005/03/30 14:46:29 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 1.1.4.4 2005/04/08 22:40:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:29 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:45 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ALLOCB 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B allocb
+.B allocb, lis_allocb
 \- allocate a \fISTREAMS\fR message and data block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
-.HP 8
-.BI "mblk_t *" mp " = allocb(int " size ", unsigned int " priority );
+.HP
+.BI "mblk_t *allocb(int " size ", uint " priority );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,6 +94,8 @@ the size of message buffer to allocate.
 .TP
 .I priority
 the priority of the allocation request.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR allocb ()
@@ -97,7 +105,7 @@ allocates a message block and a data block of the requested
 If the requested
 .I size
 is less than the
-.IR STREAMS (4)
+.I STREAMS
 constant
 .B FASTBUF
 then a data block of size
@@ -106,7 +114,7 @@ will be created.
 If the requested
 .I size
 is larger than the
-.IR STREAMS (4)
+.I STREAMS
 constant
 .B FASTBUF
 then a data block of size
@@ -130,7 +138,9 @@ The caller requests a high priority message buffer.
 .PP
 The allocated mesage block will have a data block type of
 .BR M_DATA .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR allocb ()
@@ -146,6 +156,8 @@ return a
 .B NULL
 message pointer,
 .IR mp .
+.\"
+.\"
 .SH ERRORS
 .PP
 When an error occurs,
@@ -161,7 +173,22 @@ datastructures for the message block, data block or data buffer.
 .PP
 Failure to allocate a message block is typically followed by a call to
 .BR bufcall "(9) or " esbbcall (9).
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR allocb ()
+can be called from any context, including user context, module procedures,
+call outs, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR allocb ()
+is MP-safe.  The caller has exclusive access to the returned message.
+.\"
+.\"
+.SH NOTICES
 .PP
 As with other post-SVR 4.2
 .[
@@ -171,7 +198,7 @@ svr42
 svr42
 .]
 compliant
-.IR STREAMS (4)
+.I STREAMS
 implementations, LiS
 .[
 LiS
@@ -199,12 +226,186 @@ see \*(lqThe Magic Garden.\*(rq
 .[
 magic
 .]
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR freeb (9),
 .BR freemsg (9),
 .BR bufcall "(9), and "
 .BR esbbcall (9).
+.\"
+.\"
+.SH BUGS
+.PP
+In the function prototype for
+.BR allocb (),
+the
+.I size
+argument should be
+.B size_t
+instead of
+.BR int .
+
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR allocb ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+and systems based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR HP-UX \(rg
+.[
+hpuxspg
+.]
+deny priority requests based on two system tunable thresholds in the number
+of bytes of memory allocated for
+.IR STREAMS :
+a low fraction above which requests of priority
+.B BPRI_LO
+will be refused, a medium fraction above which requests of priority
+.B BPRI_MED
+will be refused, and \*(lqthewall\*(rq at which all requests are refused.
+.IP \(em
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+and
+.I LiS
+.[
+lis
+.]
+only fail allocation when the system is out of memory.
+.IP \(em
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+introduced the
+.B BPRI_WAITOK
+priority level, which is not provided by
+.B LiS
+.[
+LiS
+.]
+.BR allocb (),
+and it is, therefore, not
+compatibile with
+.IR OSF/1 \(rg.
+.[
+osfspg
+.]
+.B BPRI_WAITOK
+is normally only used by stream heads and in the
+.BR qopen (9)
+or
+.BR qclose (9)
+procedure (which run in user context).
+.IP \(em
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+documentation
+says that some implementations  may fail based on priority,
+.IR priority ,
+but
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+doesn't.
+.IP \(em
+.BR allocb ()
+ignores the priority mechanism described above under
+.IR \*(lqNOTICES\*(rq .
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+permits implementations to decide how to use the priority argument.
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg,
+.[
+suxspg
+.]
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR UXP/V \(rg
+.[
+uxpspg
+.]
+and
+.I LiS
+.[
+lis
+.]
+ignore the
+.I priority
+argument.
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HP-UX \(rg,
+.[
+hpuxspg
+.]
+uses thresholds and denies buffers on the basis of priority,
+.IR priority .
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I "SVR 4.2 MP DDI/DKI"
+.[
+usldk
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 .BR allocb ()
@@ -216,28 +417,8 @@ and continued in SVR 4.2 STREAMS.
 .[
 svr42
 .]
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
 .\"
 .\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
-.[
-svr3
 .]
 .\"
 .\"

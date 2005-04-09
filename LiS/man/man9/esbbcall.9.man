@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esbbcall.9.man,v 1.1.4.3 2005/03/30 14:46:30 brian Exp $
+.\" @(#) $Id: esbbcall.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:30 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ESBBCALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B esbbcall
+.B esbbcall, lis_esbbcall
 \- installs a buffer callback for an extended \fISTREAMS\fR message block
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = esbbcall(int " priority ", void (*" function ")(long), long " arg );
+.BI "int esbbcall(int " priority ", void (*" function ")(long), long " arg );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,12 +94,17 @@ the priority of the message header request.
 .TP
 .I function
 the callback function to execute when a message header is available.
+.TP
+.I arg
+the argument to pass the callback function.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 When allocation of a message block fails as a result of a failed call to
 .BR esballoc (9),
 the service routine should place a
-.IR STREAMS (4)
+.I STREAMS
 message that invoked
 .BR esballoc (9)
 call back on the queue with
@@ -125,12 +136,14 @@ following values:
 .TP 12
 .B BPRI_LO
 The message block needed is for a low priority buffer.
+.PD 0
 .TP 12
 .B BPRI_MED
 The message block needed is for a medium priority buffer.
 .TP 12
 .B BPRI_HI
 The message block needed is for a high priority buffer.
+.PD
 .PP
 The
 .I priority
@@ -139,7 +152,7 @@ argument is ignored by SVR 4.2
 svr42
 .]
 and later
-.IR STREAMS (4)
+.I STREAMS
 implementations.  This
 argument is only used by SVR 3
 .[
@@ -161,7 +174,24 @@ routine which failed a call to
 The argument to pass to the callback function.  This is normally a pointer to
 the queue whose service function failed the
 .BR esballoc (9).
-.SH "RETURN VALUES"
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.SH RETURN
+.PP
+.BR esbbcall ()
+returns a
+.B bcid_t
+defined as follows:
+.nf
+\fC\s-2
+typedef int bcid_t;
+typedef int bufcall_id_t;
+\s+2\fP
+.fi
 .PP
 Upon success,
 .BR esbbcall ()
@@ -175,6 +205,8 @@ Upon failure,
 .BR esbbcall ()
 returns false (0) and no call will be generated to the specified
 .IR function .
+.\"
+.\"
 .SH ERRORS
 .PP
 When
@@ -189,10 +221,67 @@ is
 or
 .BR esbbcall ()
 cannot allocate the necessary internal structures.
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR esbbcall ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR esbbcall ()
+is MP-safe.
+.PP
+Considerations should be given when writing the callback function that a
+.BR esbbcall ()
+callback function can execute at the same time as any
+.BR qopen (9),
+.BR qclose (9),
+.BR put (9),
+.BR srv (9),
+procedure,
+.BR bufcall (9),
+.BR esbbcall (),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR qtimeout (9)
+callback,
+and interrupt service routines (on another processor).
+.PP
+However, the
+.BR esbbcall ()
+callback function will be serviced by the same thread as the thread from which
+the
+.BR esbbcall ()
+was issued.  Therefore, the callback function will not execute
+until after
+.BR esbbcall ()
+returns.
+Because the servicing thread and the current thread are the same, the
+.BR esbbcall ()
+callback will not be invoked until after the function that called
+.BR esbbcall ()
+returns.
+This means that it is safe to store the returned bufcall id in global
+variables accessed by the callback function.
+.PP
+This is the same for
+.BR qtimeout (9),
+.BR qbufcall (9),
+.BR timeout (9),
+.BR bufcall (9)
+and
+.BR esbbcall ()
+functions.
+.\"
+.\"
+.SH NOTICES
 .PP
 The
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -200,7 +289,7 @@ implementation of
 .BR esbbcall ()
 does not actually generate a callback function once a message block of the
 appropriate priority becomes available.  Instead,
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -213,7 +302,7 @@ svr42
 .]
 operation.
 .PP
-.B LiS
+.I LiS
 .[
 LiS
 .]
@@ -251,37 +340,124 @@ LiS
 .]
 meaninglessly assigns an integer id to the buffer call structure and the
 inefficiencies of linear searches are pointless.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR putbq (9),
 .BR esballoc "(9) and "
 .BR unbufcall (9).
-.SH HISTORY
+.\"
+.\"
+.SH BUGS
 .PP
 .BR esbbcall ()
-first appeared in SVR 3.
-.[
-svr3
-.]
-.SH VERSIONS
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR esbbcall ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-.\"
-.\"
-.XX
-.[
-magic
-.]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR esbbcall ()
+is provided by
+.B Linux Fast-STREAMS
+for compatibility with some implementations.
+.IR AIX \(rg,
+.IR OSF/1 \(rg
+and
+.IR UXP/V \(rg
+do not document this function.
+.IR HP-UX \(rg,
+.IR LiS ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+document this function.
+Portable
+.I STREAMS
+drivers will call
+.BR bufcall (9)
+with a
+.I size
+argument of zero, instead of calling
+.BR esbbcall ().
+.IP \(em
+.IR LiS ,
+.BR esbbcall ()
+does not actually generate a callback function once a buffer of the
+appropriate size becomes available.  Instead,
+.I LiS
+starts a timer.  When the
+timer expires, the ability to allocate the necessary buffers is checked and
+the callback function invoked if it is now possible to allocate the necessary
+structure and buffers.  This is no entirely consistent with SVR 4.2
 .[
 svr42
 .]
+operation.
+.IP \(em
+.I LiS
+builds a linked list of buffer call structures and assigns an integer id
+to each structure.  Searches for unique buffer ids when ids are assigned and
+searches for buffer ids when
+.BR unbufcall (9)
+is called are linear searches that are slow and inefficient.  In fact,
+\*(lqThe Magic Garden\*(rq explains that in SVR 4
 .[
 svr4
+.]
+a
+.BR esbbcall ()
+results in the create of a
+.B strevent
+structure which is linked ot the
+.I strbcalls
+system variable and sets the
+.I strbcwait
+flag which then causes
+.BR kmem_free (9)
+to set the
+.IR qrunflag .
+At no point in this process is an integer id assigned to the
+.B strevent
+structure.  This means that
+.I LiS
+meaninglessly assigns an integer id to the
+buffer call structure and the inefficiencies of linear searches are pointless.
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" ;
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR esbbcall ()
+first appeared in SVR 4.
+.[
+svr4spg
 .]
 .\"
 .\"

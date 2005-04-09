@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushq.9.man,v 1.1.4.3 2005/03/30 14:46:31 brian Exp $
+.\" @(#) $Id: flushq.9.man,v 1.1.4.4 2005/04/08 22:40:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,14 +72,20 @@ sort-adjacent-labels
 .\"
 .\"
 .TH FLUSHQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
-.B flushq
+.B flushq, lis_flushq
 \- flushes messages from a \fISTREAMS\fR message queue
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
 .BI "flushq(queue_t *" q ", int " flag );
+.\"
+.\"
 .SH ARGUMENTS
 .PP
 .TP
@@ -88,11 +94,13 @@ the queue to flush.
 .TP
 .I flag
 how to flush the queue.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR flushq ()
 is used to flush messages from a
-.IR STREAMS (4)
+.I STREAMS
 message queue.  It is typically
 called in a
 .B M_FLUSH
@@ -113,17 +121,87 @@ can be one of the following:
 .TP 12
 .B FLUSHDATA
 Flush only data messages; do not flush the control messages from the queue.
+.PD 0
 .TP 12
 .B FLUSHALL
 Flush all the messages from queue: both data messages and control messages.
+.PD
 .RE
+.PP
+If
+.I flag
+is other than
+.BR FLUSHDATA " or " FLUSHALL
+.BR flushq ()
+will perform
+.BR FLUSHALL .
+.\"
+.\"
+.SH RETURN
+.PP
+.BR flushq ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+If the
+.I q
+passed to
+.BR flushq ()
+is
+.BR NULL ,
+or the
+.I q
+does not point to a valid queue structure, then
+.BR flushq ()
+will silently fail.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR flushq ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.PP
+Because
+.BR flushq ()
+can take some time to process if there are many messages on the queue or
+.I flags
+is
+.BR FLUSHDATA ,
+.BR flushq ()
+should not be called from interrupt service routines or functions with
+interrupts disabled or global locks held.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR flushq ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B LiS
+.[
+LiS
+.]
+implements the call to
+.BR flushq (9)
+.BI flushq( q ", " band )
+as a call to
+.BI flushband( q ", " 0 ", " flag ).
+.\"
+.\"
 .SH EXAMPLES
 .PP
 .BR flushq ()
 is normally used within the
 .B M_FLUSH
 handling procedures for a
-.IR STREAMS (4)
+.I STREAMS
 module or driver as follows:
 .sp
 .in +4
@@ -207,63 +285,120 @@ void x_free_priv(queue_t *q)
 }
 \s+2\fR
 .fi
-.SH "RETURN VALUES"
-.PP
-.BR flushq ()
-returns
-.BR void .
-.SH ERRORS
-.PP
-If the
-.I q
-passed to
-.BR flushq ()
-is
-.BR NULL ,
-or the
-.I q
-does not point to a valid queue structure, then
-.BR flushq ()
-will silently fail.
-.SH CAVEATS
-.PP
-.B LiS
-.[
-LiS
-.]
-implements the call to
-.BR flushq (9)
-.BI flushq( q ", " band )
-as a call to
-.BI flushband( q ", " 0 ", " flag ).
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR freezestr (9),
 .BR flushband (9).
-.SH VERSIONS
+.\"
+.\"
+.SH BUGS
 .PP
-This manpage was written for
-.B LiS\c
-.
+.BR flushq ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR flushq ()
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B LiS
+removes all messages from the queue and then rebuilds the queue one message at a
+time while freeing those to be flushed.  This is a rather inefficient way to do
+things, and with
+.B LiS
+running at higher priority than soft interrupts, bottom halves and timeouts, all
+these are locked out until the flush is complete.
+.IP \(em
+.B LiS
+empties the queue and unlocks the queue and then goes about adding messages back
+onto the queue that need to remain using normal utility functions.  This means
+that order is not necessarily preserved (even for messages that were on the
+queue) with concurrent calls to
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
+.BR rmvq (9)
+or
+.BR putbq (9)
+functions.  Also, queue enabling and back-enabling will not necessary be
+performed correctly.  There doesn't seem to be any excuse for the
+.B LiS
+approach, removing messages from the queue,
+.BR rmvq (9),
+is no more difficult than inserting them,
+.BR insq (9).
+.IP \(em
+.B LiS
+clears the
+.B QWANTR
+flag when flushing an empty queue.  This means that the next call to
+.BR getq (9)
+for the empty queue will perform an extra back-enable.
+.IP \(em
+.BR flushq ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+.IR Solaris \(rg,
+.[
+solspg
+.]
+.IR SUPER-UX \(rg
+.[
+suxspg
+.]
+and
+.IR UnixWare \(rg
+.[
+uw7spg
+.]
+do not permit
+.BR flushq ()
+to be called on a stream frozen with
+.BR freezestr (9).
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR flushq ()
+on a stream frozen with
+.BR freezestr (9).
+.PP
+For a fully functional
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVR 4.2 MP DDI/DKI,
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
 .PP
 .BR flushq ()
 first appeared in SVR 3.
 .[
 svr3
-.]
-.\"
-.\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
 .]
 .\"
 .\"

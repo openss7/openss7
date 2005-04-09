@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xmsgsize.9.man,v 1.1.4.2 2005/03/30 14:46:34 brian Exp $
+.\" @(#) $Id: xmsgsize.9.man,v 1.1.4.3 2005/04/08 22:40:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/08 22:40:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -72,21 +72,36 @@ sort-adjacent-labels
 .\"
 .\"
 .TH XMSGSIZE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
 .SH NAME
 .B xmsgsize, lis_xmsgsize
 \- calculate the size of message blocks in a \fISTREAMS\fR message
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP 8
-.BI "int " retval " = xmsgsize(mblk_t *" mp );
+.BI "int xmsgsize(mblk_t *" mp );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mp
+the message to count data block sizes.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR xmsgsize ()
 counts the number of data bytes in data blocks of the same type as the first
 data block in the message pointed to by
 .IR mp .
-.SH "RETURN VALUES"
+.\"
+.\"
+.SH RETURN
 .PP
 Upon success,
 .BR xmsgsize ()
@@ -95,6 +110,8 @@ returns the byte count as described above.
 Upon failure,
 .BR xmsgsize ()
 silently fails and returns zero (0).
+.\"
+.\"
 .SH ERRORS
 .PP
 .BR xmsgsize ()
@@ -104,39 +121,93 @@ fails when the message pointer
 .I mp
 is
 .BR NULL .
-.SH CAVEATS
+.\"
+.\"
+.SH CONTEXT
 .PP
-None.
+.BR xmsgsize ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR xmsgsize ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR xmsgsize ()
+is an
+.IR LiS -specific
+function.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR msgdsize (9),
 .BR msgsize (9).
-.SH VERSIONS
-.PP
-This manpage was written for
-.B LiS\c
-.
-.[
-LiS
-.]
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 .BR xmsgsize ()
-first appeared in SVR 3.
+is compatible with
+.I LiS
 .[
-svr3
+lis
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR xmsgsize ()
+is an
+.I LiS
+function that is also provided in
+.BR "Linux Fast-STREAMS" .
+.IP \(em
+.BR xmsgsize ()
+will panic the system if
+.IR mp
+is
+.BR NULL .
+Under
+.IR LiS ,
+.BR xmsgsize ()
+will return zero (0)
+if
+.I mp
+is
+.BR NULL .
+.IP \(em
+Portable
+.I STREAMS
+drivers and modules should not call
+.BR xmsgsize ()
+or
+.BR lis_xmsgsize ().
+.PP
+For a fully functional and compatible
+.I STREAMS
+implementation, use
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
 .]
 .\"
 .\"
-.XX
+.SH CONFORMANCE
+.PP
+.I LiS
 .[
-magic
+lis
 .]
-.[
-svr42
-.]
-.[
-svr4
-.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR xmsgsize ()
+first appeared in LiS.
 .\"
 .\"
 .[
