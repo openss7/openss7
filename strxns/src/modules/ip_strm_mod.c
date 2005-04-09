@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:31 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:31 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:31 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:31 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $";
 
 #include "os7/compat.h"
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:31 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -96,6 +96,9 @@ MODULE_SUPPORTED_DEVICE(IP_TO_STREAMS_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(IP_TO_STREAMS_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-ip_strm_mod");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

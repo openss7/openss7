@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.4 $) $Date: 2005/04/02 03:23:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2005/04/09 09:43:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 03:23:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:43:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,6 +118,7 @@ man_MANS = \
 	man9/freeb.9 \
 	man9/freemsg.9 \
 	man9/freeq.9 \
+	man9/freezestr.9 \
 	man9/getmajor.9 \
 	man9/getminor.9 \
 	man9/getq.9 \
@@ -279,7 +280,6 @@ man_MANS = \
 	man9/lis_msgpullup.9 \
 	man9/lis_msgsize.9 \
 	man9/lis_msg_type_name.9 \
-	man9/lis_msgutil.9 \
 	man9/lis_noenable.9 \
 	man9/lis_num_cpus.9 \
 	man9/lis_old_inode.9 \
@@ -472,7 +472,6 @@ man_MANS = \
 	man9/lis_stdata_cnt.9 \
 	man9/lis_strclose.9 \
 	man9/lis_strcount.9 \
-	man9/lis_stream_utils.9 \
 	man9/lis_strgetpmsg.9 \
 	man9/lis_strioctl.9 \
 	man9/lis_strm_name.9 \
@@ -524,7 +523,6 @@ man_MANS = \
 	man9/msgdsize.9 \
 	man9/msgpullup.9 \
 	man9/msgsize.9 \
-	man9/msgutil.9 \
 	man9/noenable.9 \
 	man9/OTHER.9 \
 	man9/OTHERQ.9 \
@@ -537,7 +535,6 @@ man_MANS = \
 	man9/putnextctl.9 \
 	man9/putq.9 \
 	man9/qattach.9 \
-	man9/qbufcall.9 \
 	man9/qclose.9 \
 	man9/qdetach.9 \
 	man9/qenable.9 \
@@ -550,8 +547,9 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/SAMESTR.9 \
-	man9/stream_utils.9 \
-	man9/strlog.9 \
+	man9/SPL0.9 \
+	man9/SPLSTR.9 \
+	man9/SPLX.9 \
 	man9/strqget.9 \
 	man9/strqset.9 \
 	man9/testb.9 \
@@ -559,6 +557,7 @@ man_MANS = \
 	man9/umount2.9 \
 	man9/umount.9 \
 	man9/unbufcall.9 \
+	man9/unfreezestr.9 \
 	man9/unlink.9 \
 	man9/unlinkb.9 \
 	man9/untimeout.9 \
@@ -640,6 +639,7 @@ dist_noinst_MANS = \
 	man9/freeb.9.man \
 	man9/freemsg.9.man \
 	man9/freeq.9.man \
+	man9/freezestr.9.man \
 	man9/getmajor.9.man \
 	man9/getminor.9.man \
 	man9/getq.9.man \
@@ -801,7 +801,6 @@ dist_noinst_MANS = \
 	man9/lis_msgpullup.9.man \
 	man9/lis_msgsize.9.man \
 	man9/lis_msg_type_name.9.man \
-	man9/lis_msgutil.9.man \
 	man9/lis_noenable.9.man \
 	man9/lis_num_cpus.9.man \
 	man9/lis_old_inode.9.man \
@@ -994,7 +993,6 @@ dist_noinst_MANS = \
 	man9/lis_stdata_cnt.9.man \
 	man9/lis_strclose.9.man \
 	man9/lis_strcount.9.man \
-	man9/lis_stream_utils.9.man \
 	man9/lis_strgetpmsg.9.man \
 	man9/lis_strioctl.9.man \
 	man9/lis_strm_name.9.man \
@@ -1046,7 +1044,6 @@ dist_noinst_MANS = \
 	man9/msgdsize.9.man \
 	man9/msgpullup.9.man \
 	man9/msgsize.9.man \
-	man9/msgutil.9.man \
 	man9/noenable.9.man \
 	man9/OTHER.9.man \
 	man9/OTHERQ.9.man \
@@ -1059,7 +1056,6 @@ dist_noinst_MANS = \
 	man9/putnextctl.9.man \
 	man9/putq.9.man \
 	man9/qattach.9.man \
-	man9/qbufcall.9.man \
 	man9/qclose.9.man \
 	man9/qdetach.9.man \
 	man9/qenable.9.man \
@@ -1072,8 +1068,9 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/SAMESTR.9.man \
-	man9/stream_utils.9.man \
-	man9/strlog.9.man \
+	man9/SPL0.9.man \
+	man9/SPLSTR.9.man \
+	man9/SPLX.9.man \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
 	man9/testb.9.man \
@@ -1081,6 +1078,7 @@ dist_noinst_MANS = \
 	man9/umount2.9.man \
 	man9/umount.9.man \
 	man9/unbufcall.9.man \
+	man9/unfreezestr.9.man \
 	man9/unlink.9.man \
 	man9/unlinkb.9.man \
 	man9/untimeout.9.man \

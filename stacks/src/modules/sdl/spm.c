@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:13 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:13 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:13 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:13 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.8 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:13 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -91,6 +91,9 @@ MODULE_SUPPORTED_DEVICE(SPM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SPM_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-spm");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

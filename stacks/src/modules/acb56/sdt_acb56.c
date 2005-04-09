@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:29:44 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/08 19:29:44 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -96,6 +96,9 @@ MODULE_DESCRIPTION(ACB56_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ACB56_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ACB56_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdt_acb56");
 #endif
 #endif				/* LINUX */
 

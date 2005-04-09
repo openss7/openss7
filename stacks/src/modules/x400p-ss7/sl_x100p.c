@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:43 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:19 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:43 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:43 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:19 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:43 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -100,6 +100,9 @@ MODULE_SUPPORTED_DEVICE(SL_X100P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_X100P_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sl_x400p");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

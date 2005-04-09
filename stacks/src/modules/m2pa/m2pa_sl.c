@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:42:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/01 06:22:37 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:42:09 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:42:09 $";
 
 #include "os7/compat.h"
 
@@ -72,7 +72,7 @@ static char const ident[] =
 // #define _DEBUG
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/01 06:22:37 $"
+#define M2PA_SL_REVISION	"LfS $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:42:09 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -92,6 +92,9 @@ MODULE_SUPPORTED_DEVICE(M2PA_SL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2PA_SL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-m2pa_sl");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:43:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:51 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:43:17 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:51 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:43:17 $";
 
 #include "os7/compat.h"
 
@@ -75,6 +75,9 @@ MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SCCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sscop_n");
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:37 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/08 19:31:37 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:23 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -84,6 +84,9 @@ MODULE_AUTHOR(STREAMS_CONTACT);
 MODULE_DESCRIPTION(STREAMS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(STREAMS_DEVICE);
 MODULE_LICENSE(STREAMS_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams");
+#endif
 #endif
 
 #include <sys/stream.h>

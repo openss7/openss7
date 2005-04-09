@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.11 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.12 2005/04/09 09:31:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "int insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" mp );
+.BI "int insq(queue_t *" q ", mblk_t *" emp ", mblk_t *" nmp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -94,7 +94,7 @@ the queue into which to insert the message.
 .I emp
 the message before which to insert the message.
 .TP
-.I mp
+.I nmp
 the message to insert.
 .\"
 .\"
@@ -102,7 +102,7 @@ the message to insert.
 .PP
 .BR insq ()
 inserts the message pointed to by
-.I mp
+.I nmp
 before the message pointed to by
 .I emp
 in the queue specified by
@@ -112,12 +112,12 @@ If the message pointer
 is
 .B NULL
 it indicates that the message pointed to by
-.I mp
+.I nmp
 is to be inserted at the end of the queue.
 This means that
-.BI insq( q ", " \fBNULL\fP ", " mp )
+.BI insq( q ", NULL, " nmp )
 is equivalent to
-.BI putq( q ", " mp ).
+.BI putq( q ", " nmp ).
 .\"
 .\"
 .SH RETURN
@@ -125,13 +125,13 @@ is equivalent to
 Upon success,
 .BR insq ()
 returns true (1) and the message pointed to by
-.I mp
+.I nmp
 has been inserted into the queue.
 .PP
 Upon failure,
 .BR insq ()
 returns false (0) and the message pointed to by
-.I mp
+.I nmp
 remains unaltered.  (See
 .BR \*(lqCOMPATIBILITY\*(rq " below.)"
 .\"
@@ -192,24 +192,24 @@ with the following exceptions:
 passed a
 .B NULL
 or invalid
-.IR q " or " mp
+.IR q " or " nmp
 pointer will have undefined results.  Under LiS, a
 .B NULL
-.IR q " or " mp
+.IR q " or " nmp
 pointer will return failure (0).
 .IP \(em
 .BR insq ()
 does not modify
-.IR q " or " mp
+.IR q " or " nmp
 when it returns failure (0).  Under LiS, failure (0) modifies the
-.I mp
+.I nmp
 message, freeing it with
 .BR freemsg (9)
 under some circumstances.  This is an LiS bug.  No passed in structures should
 be modified on failure.
 .IP ""
 LiS incorrectly frees the message pointed to by
-.I mp
+.I nmp
 when the call to
 .BR insq ()
 fails due to a
@@ -222,7 +222,7 @@ does not point to a valid queue structure, or when the queue pointer
 .I q
 points to a queue that is closing or has processing turned off.
 On the other hand, LiS does not free the message pointer pointed to by
-.I mp
+.I nmp
 when
 .BR insq ()
 fails because the insertion would mis-sequence the queue.  Because of this
@@ -230,7 +230,7 @@ bug, when
 .BR insq ()
 returns failure (0), it is difficult to determine whether the message
 pointed to by
-.I mp
+.I nmp
 has been freed or not.
 .IP \(em
 .BR insq ()
@@ -241,7 +241,7 @@ called or which is closing
 has been called for the queue).  Under LiS,
 .BR insq ()
 will return failure (0) in these cases and free the message pointed to by
-.IR mp .
+.IR nmp .
 LiS behaviour is incorrect for these cases.
 .BR qprocsoff (9)
 only affects the running of queue procedures and should not affect
@@ -260,7 +260,7 @@ caller's responsibility to ensure proper ordering of the queue.
 Under LiS,
 .BR insq ()
 will fail and return (0), not freeing
-.IR mp ,
+.IR nmp ,
 if the insertion would misorder the queue.
 .IP \(em
 .IR UnixWare \(rg

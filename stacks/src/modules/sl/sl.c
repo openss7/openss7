@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:14 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:14 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:14 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:00 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:14 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:00 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -71,7 +71,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:14 $"
+#define SL_REVISION	"LfS $RCSname$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:00 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -91,6 +91,9 @@ MODULE_SUPPORTED_DEVICE(SL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sl");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

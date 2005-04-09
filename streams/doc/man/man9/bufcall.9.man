@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bufcall.9.man,v 0.9.2.9 2005/03/30 13:38:36 brian Exp $
+.\" @(#) $Id: bufcall.9.man,v 0.9.2.10 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -305,6 +305,14 @@ See
 for additional information.
 .\"
 .\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MP-STREAMS
+.\".PP
+.\"
+.\"
 .SH NOTICES
 .PP
 .BR bcid_t " and " bufcall_id_t
@@ -330,6 +338,7 @@ pointer, all outstanding buffer calls must be cancelled with
 before the queue is deallocated (i.e. before returning from the
 .BR qclose (9))
 procedure.
+.\"
 .\"
 .SH EXAMPLES
 .PP
@@ -361,7 +370,6 @@ int xxx_srvp(queue_t *q)
 .\"
 .SH "SEE ALSO"
 .PP
-.BR allocb (9),
 .BR putbq (9),
 .BR allocb (9),
 .BR unbufcall (9),

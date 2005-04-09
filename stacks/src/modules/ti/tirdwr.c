@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:18 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:18 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:34 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:18 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:34 $";
 
 #include "os7/compat.h"
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:18 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:34 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -92,6 +92,9 @@ MODULE_SUPPORTED_DEVICE(TIRDWR_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TIRDWR_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-tirdwr");
+#endif
 #endif				/* LINUX */
 
 #ifndef TIRDWR_MOD_NAME

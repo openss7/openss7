@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: timeout.9.man,v 0.9.2.11 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: timeout.9.man,v 0.9.2.12 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -161,8 +161,8 @@ When
 .BR timeout ()
 fails, it returns a zero (0) timeout id.
 .BR timeout ()
-fails when it cannot allocate the internal structures for the timeout.  If it
-is important that a timeout be scheduled with assurance, the return value
+fails when it cannot allocate the internal structures for the timeout.
+If it is important that a timeout be scheduled with assurance, the return value
 should always be checked.
 .\"
 .\"

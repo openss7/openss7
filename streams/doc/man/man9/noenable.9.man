@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 0.9.2.9 2005/03/30 13:38:52 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 0.9.2.10 2005/04/09 09:31:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -111,7 +111,7 @@ or
 .BR putbq (9)
 when these function enqueue a normal priority message.
 .BR noenable ()
-has not effect on the scheduling of queue service procedures when the queue is
+has no effect on the scheduling of queue service procedures when the queue is
 back-enabled,
 when
 .BR qenable (9)
@@ -185,12 +185,15 @@ does not remove the queue from the current
 schedule list.  It only sets the
 .B QNOENB
 flag to indicate whether the queue should be subsequently scheduled.
+To stop a queue from being scheduled, use
+.BR qprocsoff (9).
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR noenable ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -202,7 +205,7 @@ uses atomic bit operations and does not write lock the queue.  Therefore,
 .BR noenable ()
 can be called for a queue that has been frozen with
 .BR freezestr (9).
-No global locks need to be held across ac all to
+No global locks need to be held across a call to
 .BR noenable ()
 and
 .BR noenable ()

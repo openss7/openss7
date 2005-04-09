@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:09 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:09 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -96,6 +96,9 @@ MODULE_SUPPORTED_DEVICE(MTP_MIN_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_MIN_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mtp_min");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -108,6 +108,9 @@ MODULE_SUPPORTED_DEVICE(SDT_TPI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDT_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdt_tpi");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

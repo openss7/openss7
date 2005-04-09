@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unregister_strmod.9.man,v 0.9.2.3 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: unregister_strmod.9.man,v 0.9.2.4 2005/04/09 09:31:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -137,54 +137,147 @@ Once a
 .\"
 .SH USAGE
 .PP
+.BR register_strmod ()
+is provided to deregister
+.I STREAMS
+modules written for
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
 .SH RETURN
 .PP
+Upon success,
+.BR unregister_strmod ()
+returns zero (0).
+Upon failure,
+.BR unregister_strmod ()
+returns a negative error number.
 .\"
 .\"
 .SH ERRORS
 .PP
+When
+.BR unregister_strmod ()
+failes to unregister the specified
+.I STREAMS
+module, it returns an appropriate negative error number as follows:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+.I fmod
+was
+.BR NULL ,
+or the
+.BR fmodsw (9)
+structure referenced contained invalid information.
+.TP
+.RB [ ENXIO ]
+.I fmod
+does not reference a registered
+.I STREAMS
+module.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR 
+.BR unregister_strmod ()
+can be called from any blocking context.  Consideration for import on
+performance and latency should be given before calling
+.BR unregister_strmod ()
+from soft or hard interrupt context.  Typically,
+.BR unregister_strmod ()
+is called from the
+.BR module_exit (9)
+procedure of a kernel module associated with a
+.I STREAMS
+module.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR unregister_strmod ()
+is MP-safe.
 .\"
 .\"
 .SH NOTICES
 .PP
-.\"
-.\"
-.SH IMPLEMENTATION
+Loadable kernel modules that call
+.BR regsiter_strmod (9)
+when loading must call
+.BR unregister_strmod ()
+before unloading.
+.BR unregister_strmod ()
+must be called with the same value of
+.I fmod
+with which
+.BR register_strmod (9)
+was called.
 .PP
+Modules unregistered with
+.BR unregister_strmod ()
+will no longer appear in
+.BR /proc/streams/modules .
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR register_strmod (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR unregister_strmod ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR unregister_strmod ()
+is a
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function.  Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
 .PP
 See
 .BR STREAMS (9)
-for additional compatibility considerations.
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+Registration and unregistration of
+.I STREAMS
+drivers is implementation specific and not subject to standardization.
+.BR unregister_strmod ()
+is a
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+implementation specific function.
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR unregister_strdev ()
+first appeared in
+.BR "Linux Fast-STREAMS" .
+.[
+LfS
+.]
 .\"
 .\"
 .[

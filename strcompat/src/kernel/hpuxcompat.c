@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:25 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:25 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:36:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:25 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:25 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:25 $"
+#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -131,6 +131,9 @@ MODULE_AUTHOR(HPUXCOMP_CONTACT);
 MODULE_DESCRIPTION(HPUXCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(HPUXCOMP_DEVICE);
 MODULE_LICENSE(HPUXCOMP_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-hpuxcompat");
+#endif
 #endif
 
 static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;

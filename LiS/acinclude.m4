@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.18 $) $Date: 2005/04/01 06:22:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.19 $) $Date: 2005/04/09 09:34:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 06:22:15 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:34:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -558,6 +558,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 ])
+    _LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_ENV([dnl
 	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
 			   [linux_cv_have_iop_lookup_nameidata], [dnl

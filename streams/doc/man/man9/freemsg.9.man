@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freemsg.9.man,v 0.9.2.10 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: freemsg.9.man,v 0.9.2.11 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -177,7 +177,7 @@ LiS
 should use kernel memory caches instead and should free the message blocks and
 data blocks when they are no longer used to allow existing cache slots to be
 reused.  Bypassing the kernel memory allocation and deallocation mechanisms
-by using a free list results in poorer performance that might be suspected by
+by using a free list results in poorer performance than might be expected by
 those that do not understand kernel memory caching mechanisms.
 .\"
 .\"

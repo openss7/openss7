@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgsize.9.man,v 0.9.2.2 2005/03/30 13:38:51 brian Exp $
+.\" @(#) $Id: msgsize.9.man,v 0.9.2.3 2005/04/09 09:31:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -121,13 +121,6 @@ is
 .BR NULL .
 .\"
 .\"
-.SH NOTICES
-.PP
-.BR msgsize ()
-is used internally to count the size of messages place on and taken off of
-message queues.
-.\"
-.\"
 .SH CONTEXT
 .PP
 .BR msgsize ()
@@ -139,6 +132,13 @@ can be called from any context.
 .BR msgsize ()
 is MP-safe.  It is the responsibility of the caller, however, to ensure
 exclusive access to the passed in message.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR msgsize ()
+is used internally to count the size of messages place on and taken off of
+message queues.
 .\"
 .\"
 .SH "SEE ALSO"

@@ -144,6 +144,7 @@ printk_wput (queue_t *q, mblk_t *msg)
 } /* printk_wput  */
 
 #ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-printk");
 MODULE_ALIAS("char-major-" __stringify(PRINTK__CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(PRINTK__CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(PRINTK__CMAJOR_0) "-0");

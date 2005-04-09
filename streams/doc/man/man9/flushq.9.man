@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushq.9.man,v 0.9.2.10 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: flushq.9.man,v 0.9.2.11 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -107,9 +107,11 @@ can be one of the following:
 .TP \w'\ FLUSHDATA\ 'u
 .B FLUSHDATA
 Flush only data messages; do not flush the control messages from the queue.
+.PD 0
 .TP
 .B FLUSHALL
 Flush all the messages from queue: both data messages and control messages.
+.PD
 .PP
 If
 .I flag

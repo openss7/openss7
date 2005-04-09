@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datamsg.9.man,v 0.9.2.3 2005/03/30 13:38:45 brian Exp $
+.\" @(#) $Id: datamsg.9.man,v 0.9.2.4 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:45 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,6 +102,7 @@ following:
 .TP
 .B M_DATA
 The message type is a data message type.
+.PD 0
 .TP
 .B M_PROTO
 The message type is a protocol data message type.
@@ -111,6 +112,7 @@ The message type is a priority protocol data message type.
 .TP
 .B M_DELAY
 The message type is a delay data message type.
+.PD
 .PP
 If the passed in message
 .I type
@@ -175,7 +177,8 @@ is implemented as an
 .B extern inline
 function.  LiS implements
 .BR datamsg ()
-as a C preprocessor macro.
+as a C preprocessor macro,
+which is rather against its stated purpose of providing functional interfaces.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

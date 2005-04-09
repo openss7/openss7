@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $";
 
 #include "os7/compat.h"
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -87,6 +87,9 @@ MODULE_SUPPORTED_DEVICE(CH_SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(CH_SDL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-ch_x400p");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

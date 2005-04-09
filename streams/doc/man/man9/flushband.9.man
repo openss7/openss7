@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.11 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,10 +118,12 @@ can be one of the following:
 .B FLUSHDATA
 Flush only data messages; do not flush the control messages from the queue
 band.
+.PD 0
 .TP
 .B FLUSHALL
 Flush all the messages from queue band: both data messages and control
 messages.
+.PD
 .PP
 If
 .I flag
@@ -375,6 +377,16 @@ when
 is zero (0),
 will only flush normal priority messages from band zero and will leave high
 priority messages on the queue.
+.sp
+Portable
+.I STREAMS
+modules and drivers should never call
+.BR flushband ()
+with a band of zero (0).  Portable
+.I STREAMS
+modules and drivers should call
+.BR flushq (9)
+instead.
 .IP \(em
 .BR flushband ()
 does not clear the

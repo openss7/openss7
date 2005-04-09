@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqget.9.man,v 0.9.2.10 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: strqget.9.man,v 0.9.2.11 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -449,7 +449,8 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR strqget ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .IR Solaris \(rg
 and LiS
 .[
@@ -503,6 +504,9 @@ usldk
 .]
 .IR Solaris \(rg
 documentation.
+.[
+soldoc
+.]
 .\"
 .\"
 .SH HISTORY

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:42 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:42 $";
 
 #include "os7/compat.h"
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:42 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -87,6 +87,9 @@ MODULE_SUPPORTED_DEVICE(MX_SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_SDL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mx_x400p");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

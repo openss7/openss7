@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $
+ @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $"
+#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:17 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $";
+    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:17 $";
 
 #include "os7/compat.h"
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:16 $"
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:17 $"
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -78,6 +78,9 @@ MODULE_SUPPORTED_DEVICE(SSCOP_TPI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sscop_t");
+#endif
 #endif				/* LINUX */
 
 #ifdef SSCOP_TPI_DEBUG

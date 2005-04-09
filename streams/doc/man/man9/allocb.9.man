@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.11 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -464,14 +464,14 @@ procedure (which run in user context).
 uw7spg
 .]
 documentation
-says that some implementations  may fail based on priority,
+says that some implementations may fail based on priority,
 .IR bpri ,
-but doesn't way what
+but
 .IR UnixWare \(rg
 .[
 uw7spg
 .]
-does.
+doesn't.
 .IP \(em
 .BR allocb ()
 uses the priority mechanism described above under

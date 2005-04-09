@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 22:21:12 $
+# @(#) $RCSfile: sctp-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/04/09 09:33:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 22:21:12 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:33:08 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -62,7 +62,8 @@ function remove_depmods() {
     [ $# -gt 0 ] || return 0
     echo "$*"
     for t in $@ ; do
-	remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "remove_depmods \$$prereq"
     done
 }
 
@@ -79,65 +80,46 @@ function install_init_preinst() { :
     #
     for dir in /lib/modules/2.[456]\.* /lib/modules/preferred /lib/modules/default /lib/modules/boot ; do
 	[ -d $dir ] || continue
-	sctp_mods="`find $dir \
-	    \( -name 'sctp.o'     -o -name 'sctp.ko'    \
-	    -o -name 'sctp.o.gz'  -o -name 'sctp.ko.gz' \) 2>/dev/null`"
-	[ -n "$sctp_mods" ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'`
+	    case " $KERNEL_MODULES " in (*" $b "*) modl_mods="${modl_mods:+$modl_mods }$m" ;; (*) continue ;; esac
+	done
 	if [ -f $dir/modules.dep ] ; then
 	    #
 	    # First we can build a dependency tree from every dependency expression that can be
-	    # found in the modules.dep file.
+	    # found in each modules.dep file.
 	    #
-	    dep=
-	    while read line ; do
+	    dep= ; while read line ; do
 		case $line in
-		    *\) line="`echo $line | sed -e 's|\\$||'`"
-			dep="${dep:+$dep }$line"
-			continue
-			;;
-		    *)  dep="${dep:+$dep }$line"
-			;;
+		    *\\) line="`echo $line | sed -e 's|\\$||'`"
+			dep="${dep:+$dep }$line" ; continue ;;
+		    *)  dep="${dep:+$dep }$line" ;;
 		esac
 		set dummy $dep
-		if [ "${2+set}" = "set" ] ; then
-		    t=$1
+		if [ "${3+set}" = "set" ] ; then
+		    t=`echo $2 | sed -e 's|:$||'`
 		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-		    shift
+		    shift 2
 		    for p in $@ ; do
 			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-			eval "$prereq=\"\${$prereq:+\$$prereq }$t"
-			eval "$target=\"\${$target:+\$$target }$p"
+			eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
+			eval "$target=\"\${$target:+\$$target }$p\""
 		    done
 		fi
 		dep=
 		continue
 	    done < $dir/modules.dep
-	    #
-	    # All modules that ultimately depends on the "sctp" module must go.
-	    #
-	    sctp_deps="`remove_depmods $prereq_sctp`"
-	else
-	    #
-	    # We cannot figure out a dependency tree, so just remove any module that even starts
-	    # with "sctp"
-	    #
-	    sctp_deps="`find $dir \
-		\( -name 'sctp*.o'     -o -name 'sctp*.ko'    \
-		-o -name 'sctp*.o.gz'  -o -name 'sctp*.ko.gz' \) 2>/dev/null`"
-	fi
-	if [ -n "$sctp_mods" -o -n "$sctp_deps" ] ; then
-	    rm -f -- $sctp_mods $sctp_deps
 	fi
     done
-    prel_old="@preload@"
-    if [ -f $prel_old ] ; then
+    prel_fil="@preload@"
+    if [ -f $prel_fil ] ; then
 	prel_tmp=$tmppath/modprobe.preload.tmp.$$
 	prel_new=$tmppath/modprobe.preload.new.$$
-	cp -f -- $prel_old $prel_new
-	sed -e '/^[[:space:]]*streams/d' $prel_new > $prel_tmp
+	cp -f -- $prel_fil $prel_new
+	sed -e '\|^[[:space:]]*streams|d' $prel_new > $prel_tmp
 	mv -f -- $prel_tmp $prel_new
-	chmod --reference=$prel_old -- $prel_new
-	cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+	chmod --reference=$prel_fil -- $prel_new
+	cp -f -b --suffix=.rpmsave -- $prel_new $prel_fil
 	rm -f -- $prel_new
     fi
     #
@@ -148,6 +130,18 @@ function install_init_preinst() { :
 	    if [ -f $initrddir/$i ] ; then
 		/sbin/chkconfig --del $i || :
 	    fi
+	done
+    fi
+    #
+    # Finally remove all conflicting modules and their dependents
+    #
+    if [ -n "$modl_mods" ] ; then
+	rm -f -- $modl_mods
+	for m in $KERNEL_MODULES ; do
+	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+	    [ -n "$modl_deps" ] || continue
+	    rm -f -- $modl_deps
 	done
     fi
 }
@@ -170,8 +164,11 @@ subpkg=init
 # =============================================================================
 #
 # $Log: sctp-init.preinst.in,v $
-# Revision 0.9.2.1  2005/03/26 22:21:12  brian
-# - working up debian maint scripts
+# Revision 0.9.2.2  2005/04/09 09:33:08  brian
+# - updated debian scriptlets
+#
+# Revision 1.2  2005/04/09 09:33:08  brian
+# - updated debian scriptlets
 #
 # Revision 1.1  2005/03/26 22:21:12  brian
 # - working up debian maint scripts

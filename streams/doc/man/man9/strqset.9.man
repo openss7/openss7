@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.9 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.10 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -166,7 +166,7 @@ For this operation
 must be zero (0).
 .PP
 .BR strqset ()
-provides a mechanims whereby a
+provides a mechanism whereby a
 .IR STREAMS (4)
 module or driver can change information
 about a queue or queue band without directly accessing the
@@ -209,8 +209,8 @@ structure contains at least the following members:
 \- the low water mark for the band.
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
 .SH RETURN
@@ -275,9 +275,9 @@ on a queue and stream previously frozen with
 could result in single-party deadlock.
 .\"
 .\"
-.SH NOTICES
-.PP
-None.
+.\".SH NOTICES
+.\".PP
+.\"None.
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:01 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -81,7 +81,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -101,6 +101,9 @@ MODULE_SUPPORTED_DEVICE(CD_HDLC_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(CD_HDLC_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-cd_hdlc");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

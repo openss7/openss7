@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esbbcall.9.man,v 0.9.2.11 2005/03/30 13:38:46 brian Exp $
+.\" @(#) $Id: esbbcall.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -306,7 +306,6 @@ That is,
 .BI esbbcall( priority ", " function ", " arg )
 calls
 .BI bufcall( 0 ", " priority ", " function ", " arg )\fR.
-
 .\"
 .\"
 .SH EXAMPLES

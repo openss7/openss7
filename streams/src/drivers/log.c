@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/31 06:53:24 $"
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -89,6 +89,9 @@ MODULE_AUTHOR(LOG_CONTACT);
 MODULE_DESCRIPTION(LOG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LOG_DEVICE);
 MODULE_LICENSE(LOG_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-log");
+#endif
 #endif
 
 #ifndef CONFIG_STREAMS_LOG_NAME

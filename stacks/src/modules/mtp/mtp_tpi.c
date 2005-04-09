@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:10 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:42:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:10 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:10 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:42:31 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:10 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:42:31 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -74,7 +74,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/31 06:53:10 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:42:31 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -94,6 +94,9 @@ MODULE_SUPPORTED_DEVICE(MTP_TPI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mtp_tpi");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

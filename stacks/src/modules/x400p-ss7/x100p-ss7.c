@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:21 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/03/31 06:53:21 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -100,6 +100,9 @@ MODULE_SUPPORTED_DEVICE(X100P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(X100P_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-x100p-ss7");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

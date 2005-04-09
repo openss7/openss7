@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:17 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:17 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:17 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:17 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -94,7 +94,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:17 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -115,6 +115,9 @@ MODULE_SUPPORTED_DEVICE(TCAP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TCAP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-tcap");
+#endif
 #endif				/* LINUX */
 
 #ifndef FIXME

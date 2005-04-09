@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getminor.9.man,v 0.9.2.11 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: getminor.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -219,7 +219,7 @@ is MP-safe.
 .PP
 Depending on the architecture, the internal extended minor device number may
 or may not be equal to one of the external (real) minor device numbers
-assigned ot the driver.
+assigned to the driver.
 .PP
 Portable
 .I STREAMS

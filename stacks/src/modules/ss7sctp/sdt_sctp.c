@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:16 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:16 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:12 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:16 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:12 $";
 
 #include "os7/compat.h"
 
@@ -70,7 +70,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:16 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:12 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -90,6 +90,9 @@ MODULE_SUPPORTED_DEVICE(SDT_SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDT_SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdt_sctp");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

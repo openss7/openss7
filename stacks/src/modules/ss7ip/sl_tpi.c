@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:15 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:07 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -96,6 +96,9 @@ MODULE_SUPPORTED_DEVICE(SL_TPI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sl_tpi");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

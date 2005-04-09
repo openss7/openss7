@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 14:43:35 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:41:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 14:43:35 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 14:43:35 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:41:32 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 14:43:35 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:41:32 $";
 
 #define EXPORT_SYMTAB
 
@@ -71,7 +71,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/30 14:43:35 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:41:32 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -87,6 +87,9 @@ MODULE_DESCRIPTION(HDLC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(HDLC_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(HDLC_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-cd");
 #endif
 #endif				/* LINUX */
 

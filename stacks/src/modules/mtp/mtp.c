@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:08 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:27 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:27 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:08 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:27 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -99,6 +99,9 @@ MODULE_SUPPORTED_DEVICE(MTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mtp");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

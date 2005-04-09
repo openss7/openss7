@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: dupb.9.man,v 0.9.2.8 2005/03/30 13:38:46 brian Exp $
+.\" @(#) $Id: dupb.9.man,v 0.9.2.9 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -188,7 +188,7 @@ is passed a
 .I bp
 pointer, it returns
 .BR NULL .
-.PP
+.IP \(em
 Symbol
 .BR lis_dupb ()
 is provided for binary compatibility with LiS.  See
@@ -207,6 +207,10 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 3" .
+.[
+svr3
+.]
 .\"
 .\"
 .SH HISTORY

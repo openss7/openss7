@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/31 06:53:24 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/31 06:53:24 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:26 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/31 06:53:24 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:26 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/03/31 06:53:24 $"
+#define CONNLD_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/09 09:37:26 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -91,6 +91,9 @@ MODULE_AUTHOR(CONNLD_CONTACT);
 MODULE_DESCRIPTION(CONNLD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
 MODULE_LICENSE(CONNLD_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-connld");
+#endif
 #endif
 
 #ifndef CONFIG_STREAMS_CONNLD_NAME

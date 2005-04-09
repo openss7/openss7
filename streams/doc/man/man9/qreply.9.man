@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qreply.9.man,v 0.9.2.8 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: qreply.9.man,v 0.9.2.9 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -163,24 +163,11 @@ question by calling
 for the band.
 .\"
 .\"
-.SH NOTICES
-.PP
-.BI qreply( q ", " mp )
-has the same effect as
-.BI putnext(OTHERQ( q "), " mp )).
-Because
-.BR qreply ()
-invokes the put procedure of the upstream or downstream queue, the same care
-should be taken with
-.BR qreply ()
-as is taken with
-.BR putnext (9).
-.\"
-.\"
 .SH CONTEXT
 .PP
 .BR qreply ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -199,6 +186,20 @@ because the later does not protect dereference of the
 pointer.
 .BI putnext(OTHERQ( q "), " mp )
 would be an acceptable alternative.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BI qreply( q ", " mp )
+has the same effect as
+.BI putnext(OTHERQ( q "), " mp )).
+Because
+.BR qreply ()
+invokes the put procedure of the upstream or downstream queue, the same care
+should be taken with
+.BR qreply ()
+as is taken with
+.BR putnext (9).
 .\"
 .\"
 .SH "SEE ALSO"

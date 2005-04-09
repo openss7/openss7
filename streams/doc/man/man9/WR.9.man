@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: WR.9.man,v 0.9.2.10 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: WR.9.man,v 0.9.2.11 2005/04/09 09:31:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -189,7 +189,7 @@ usldk
 and systems based on
 .IR "SVR 4" ,
 with the following portability considerations:
-.IP \(em 3
+.IP \(em \w'\(em\(em'u
 .IR SUPER-UX \(rg,
 .[
 suxspg
@@ -210,7 +210,7 @@ argument to
 If a write queue pointer is passed to
 .BR WR (),
 then the passed in write queue pointer is returned.
-.IP \(em \w'\(em\(em'u
+.IP \(em
 .IR AIX \(rg,
 .[
 aixspg

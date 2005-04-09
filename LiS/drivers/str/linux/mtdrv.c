@@ -410,6 +410,9 @@ MODULE_AUTHOR("David Grothe");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("multi-threaded open test helper driver");
 #endif
+#if defined(MODULE_ALIAS)
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
 
 #endif
 

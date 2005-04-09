@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9.2.6 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.7 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -229,7 +229,7 @@ and no module identification numbers are available for allocation.
 .\"
 .SH CONTEXT
 .PP
-register_strmod ()
+.BR register_strmod ()
 can be called from any context.  Consideration for impact on performance and
 latency should be given before calling
 .BR register_strmod ()
@@ -239,7 +239,7 @@ from soft or hard interrupt context.
 .SH MP-STREAMS
 .PP
 .BR register_strmod ()
-is MP-safe.
+is MP-safe when called from the correct context.
 .\"
 .\"
 .SH NOTICES

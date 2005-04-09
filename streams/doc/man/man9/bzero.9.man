@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bzero.9.man,v 0.9.2.9 2005/03/30 13:38:36 brian Exp $
+.\" @(#) $Id: bzero.9.man,v 0.9.2.10 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -81,7 +81,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #include <string.h>
+.B #include <linux/string.h>
 .HP
 .BI "void bzero(void *" str ", size_t " len );
 .\"
@@ -132,7 +132,7 @@ call-outs, callbacks, soft interrupts and interrupt service routines.
 .SH MP-STREAMS
 .PP
 .BR bzero ()
-is MP-safe.
+is MP-safe; however, the caller must ensure exclusive access to the memory regions involved.
 .\"
 .\"
 .SH NOTICES

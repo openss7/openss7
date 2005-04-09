@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.11 2005/03/30 13:38:36 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -163,7 +163,7 @@ message queue is not flow controlled for the specified band.
 .SH ERRORS
 .PP
 .BR bcanput ()
-always succeed.
+always succeeds.
 .\"
 .\"
 .SH CONTEXT
@@ -176,7 +176,7 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 .SH MP-STREAMS
 .PP
 .BR bcanput ()
-is MP-safe; however, the caller perform an unprotected pointer dereference.
+is MP-safe; unless the caller performs an unprotected pointer dereference.
 That is,
 .BR bcanputnext (9)
 should always be called in preference to

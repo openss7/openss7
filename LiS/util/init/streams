@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/09 09:36:13 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -50,7 +50,7 @@ config="/etc/sysconfig/$name"
 
 [ -f /proc/modules ] || exit 0
 
-for STREAMS_MKNOD in /sbin/streams_mknod /usr/sbin/streams_mknod /bin/streams_mknod /usr/bin/streams_mknod ; do
+for STREAMS_MKNOD in /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
     if [ -x $STREAMS_MKNOD ] ; then
 	break
     else
@@ -225,7 +225,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/09 09:36:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -271,7 +271,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 05:20:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:36:13 $ by $Author: brian $
 #
 # =============================================================================
 

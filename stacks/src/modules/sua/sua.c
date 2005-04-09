@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $";
 
 #include "os7/compat.h"
 
@@ -92,6 +92,9 @@ MODULE_DESCRIPTION(SUA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SUA_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SUA_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sua");
 #endif
 #endif				/* LINUX */
 

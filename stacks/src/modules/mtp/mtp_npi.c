@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:09 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:09 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:09 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:09 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:09 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -92,6 +92,9 @@ MODULE_SUPPORTED_DEVICE(MTP_NPI_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MTP_NPI_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mtp_npi");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

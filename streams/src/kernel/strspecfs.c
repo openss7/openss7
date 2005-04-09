@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/30 02:24:37 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/04/09 09:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:37 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/30 02:24:37 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/04/09 09:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/30 02:24:37 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/04/09 09:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/03/30 02:24:37 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/04/09 09:37:23 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -109,6 +109,9 @@ MODULE_AUTHOR(SPECFS_CONTACT);
 MODULE_DESCRIPTION(SPECFS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPECFS_DEVICE);
 MODULE_LICENSE(SPECFS_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("specfs");
+#endif
 #endif
 
 #ifdef CONFIG_STREAMS_MODULE

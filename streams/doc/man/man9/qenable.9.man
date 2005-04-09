@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.10 2005/03/30 13:38:52 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.11 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -79,17 +79,17 @@ sort-adjacent-labels
 \- schedules a \fISTREAMS\fR message queue service routine
 .\"
 .\"
-.SH ARGUMENTS
-.TP
-.I q
-the queue to enable.
-.\"
-.\"
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
 .HP
 .BI "void qenable(queue_t *" q );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I q
+the queue to enable.
 .\"
 .\"
 .SH DESCRIPTION

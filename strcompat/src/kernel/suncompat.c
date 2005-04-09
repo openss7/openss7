@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -120,7 +120,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:23 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -137,6 +137,9 @@ MODULE_AUTHOR(SUNCOMP_CONTACT);
 MODULE_DESCRIPTION(SUNCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SUNCOMP_DEVICE);
 MODULE_LICENSE(SUNCOMP_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-suncompat");
+#endif
 #endif
 
 __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q);

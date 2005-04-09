@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/04/01 09:52:13 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/04/09 09:36:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/01 09:52:13 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:36:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/01 09:52:13 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:36:50 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -508,9 +508,9 @@ __LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name)
 {
 	return allocq();
 }
-__LIS_EXTERN_INLINE void lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
+__LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
-	return (void) appq(q, mp1, mp2);
+	return appq(q, mp1, mp2);
 }
 __LIS_EXTERN_INLINE queue_t *lis_backq(queue_t *q)
 {

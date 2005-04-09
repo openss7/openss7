@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:18 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -102,6 +102,9 @@ MODULE_SUPPORTED_DEVICE(TIMOD_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(TIMOD_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-timod");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -569,6 +569,9 @@ MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("STREAMS timod module, converts ioctls to TLI");
 #endif
+#if defined(MODULE_ALIAS)
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
 #endif					/* LINUX */
 
 #endif					/* MODULE */

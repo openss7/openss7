@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/03/09 08:03:31 $";
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -167,6 +167,9 @@ long do_spipe(int *fds)
 	struct file *file1, *file2;
 	int fd1, fd2;
 	int err;
+#if HAVE_PUT_FILP_ADDR
+	static void (*put_filp) (struct file * file) = (typeof(put_filp)) HAVE_PUT_FILP_ADDR;
+#endif
 	err = -ENFILE;
 	if (!(file1 = pipe_file_open()))
 		goto no_file1;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:27 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:31:27 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:27 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:27 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:31:27 $"
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -131,6 +131,9 @@ MODULE_AUTHOR(OSFCOMP_CONTACT);
 MODULE_DESCRIPTION(OSFCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(OSFCOMP_DEVICE);
 MODULE_LICENSE(OSFCOMP_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-osfcompat");
+#endif
 #endif
 
 __OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp);

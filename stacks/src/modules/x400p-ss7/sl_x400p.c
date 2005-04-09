@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:20 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:20 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -100,6 +100,9 @@ MODULE_SUPPORTED_DEVICE(SL_X400P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SL_X400P_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sl_x400p");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

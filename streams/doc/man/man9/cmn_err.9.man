@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cmn_err.9.man,v 0.9.2.12 2005/03/30 13:38:36 brian Exp $
+.\" @(#) $Id: cmn_err.9.man,v 0.9.2.13 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -221,9 +221,17 @@ svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+SVR 4 systems normally print a newline at before the information provided to
+.BR cmn_err ()
+unless the
+.B CE_CONT
+flag is specified, and do not normally print a newline after the information provided to
+.BR cmn_err ().
+This is the opposite of BSD and Linux behavior, which print a newline at the end of the sequence
+rather than the beginning.
+.B LiS
+can be compiled with flags providing either behavior.
 .IP \(em
-.IP \(em
-.PP
 Symbol
 .BR lis_cmn_err ()
 is provided for binary compatibility with LiS.

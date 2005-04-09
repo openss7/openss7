@@ -413,6 +413,9 @@ MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("STREAMS unique pipe generator pseudo-module");
 #endif
+#if defined(MODULE_ALIAS)
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
 
 #endif					/* LINUX */
 #endif					/* !defined __NO_VERSION__ */

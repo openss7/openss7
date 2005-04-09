@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:16 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -75,7 +75,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:16 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -95,6 +95,9 @@ MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sscop");
+#endif
 #endif				/* LINUX */
 
 #ifdef SCCOP_DEBUG

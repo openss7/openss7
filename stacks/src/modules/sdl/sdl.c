@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:13 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -87,6 +87,9 @@ MODULE_SUPPORTED_DEVICE(SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdl");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

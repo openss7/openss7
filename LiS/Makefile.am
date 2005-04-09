@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/04/02 16:47:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2005/04/09 09:30:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:47:25 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:30:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -151,7 +151,7 @@ libLiShead_a_SOURCES		= head/head.c \
 libLiShead_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiShead_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
-				  -DLIS_OBJNAME=`echo $* | sed -e ''s/^.*-//''`
+				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiShead_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiShead_a_OBJECTS): $(libLiShead_a_DEPENDENCIES)
 
@@ -166,7 +166,7 @@ libLiSdrvr_a_SOURCES		= drivers/str/clone.c \
 libLiSdrvr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSdrvr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) \
-				  -DLIS_OBJNAME=`echo $* | sed -e ''s/^.*-//''`
+				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiSdrvr_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiSdrvr_a_OBJECTS): $(libLiSdrvr_a_DEPENDENCIES)
 
@@ -181,7 +181,7 @@ libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 
 libLiSload_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 libLiSload_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
-				  -DLIS_OBJNAME=`echo $* | sed -e ''s/^.*-//''`
+				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 libLiSload_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libLiSload_a_OBJECTS): $(libLiSload_a_DEPENDENCIES)
 
@@ -252,7 +252,11 @@ KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			=
 
+if WITH_KO_MODULES
+kpre				= streams_
+else
 kpre				= streams-
+endif
 
 include am/kernel.am
 
@@ -393,7 +397,7 @@ EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/exports.ver
 
 GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) \
-				  -DLIS_OBJNAME=`echo $* | sed -e ''s/^.*-//''`
+				  -DLIS_OBJNAME=`echo $* | sed -e 's/^.*-//'`
 
 include am/genksyms.am
 

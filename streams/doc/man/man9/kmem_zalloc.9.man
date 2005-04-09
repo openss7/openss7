@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.11 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.12 2005/04/09 09:31:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B kmem_zalloc
-\- allocate kernel memory
+\- allocate and zero kernel memory
 .\"
 .\"
 .SH SYNOPSIS
@@ -108,13 +108,15 @@ zeroed, and returned as a
 to the allocated memory.
 .I flags
 can be one of the following values:
-.TP
+.TP \w'\ KM_NOSLEEP\ 'u
 .B KM_SLEEP
 can wait and reschedule, success guaranteed.
+.PD 0
 .TP
 .B KM_NOSLEEP
 cannot wait or reschedule, may fail and return
 .BR NULL .
+.PD
 .\"
 .\"
 .SH RETURN

@@ -140,6 +140,7 @@ void _RP clone_init(void)
 }
 
 #ifdef MODULE_ALIAS
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(CLONE__CMAJOR_0) "-0");

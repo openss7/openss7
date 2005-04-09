@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.5 2005/03/31 06:53:08 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.6 2005/04/09 09:42:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2005/03/31 06:53:08 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.6  2005/04/09 09:42:20  brian
+ - addition of module alias for ko modules
+
  Revision 0.9.2.5  2005/03/31 06:53:08  brian
  - changes for EL$ (CentOS 4.0) compatibility
 
@@ -62,7 +65,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:08 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $";
 
 #include "os7/compat.h"
 
@@ -86,6 +89,9 @@ MODULE_DESCRIPTION(M3UA_DESCRIP);
 MODULE_SUPPORTED_DEVICE(M3UA_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M3UA_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-m3ua_as");
 #endif
 #endif				/* LINUX */
 

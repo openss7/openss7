@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:04 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:56 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:56 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -80,7 +80,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:04 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:56 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -98,6 +98,9 @@ MODULE_SUPPORTED_DEVICE(ISUP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ISUP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-isup");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

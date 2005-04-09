@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/31 06:53:24 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/31 06:53:24 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/31 06:53:24 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/03/31 06:53:24 $"
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -91,6 +91,9 @@ MODULE_AUTHOR(PIPE_CONTACT);
 MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
 MODULE_LICENSE(PIPE_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-pipe");
+#endif
 #endif
 
 #ifndef CONFIG_STREAMS_PIPE_NAME

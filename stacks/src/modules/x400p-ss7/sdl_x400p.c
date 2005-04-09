@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/03/31 06:53:18 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -101,6 +101,9 @@ MODULE_SUPPORTED_DEVICE(SDL_X400P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDL_X400P_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdl_x400p");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

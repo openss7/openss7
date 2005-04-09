@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:21 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:47 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:21 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:21 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:47 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:21 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:47 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
-#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/03/31 06:53:21 $"
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:47 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -106,6 +106,9 @@ MODULE_SUPPORTED_DEVICE(MX_X400P_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_X400P_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-x400p_mx");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

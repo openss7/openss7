@@ -88,6 +88,9 @@ MODULE_AUTHOR("The Software Group Ltd.");
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("Linux IP to Streams driver");
 #endif
+#if defined(MODULE_ALIAS)
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
 
 
 /* version dependencies have been confined to a separate file */

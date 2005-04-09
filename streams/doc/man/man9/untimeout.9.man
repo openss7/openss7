@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.10 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.11 2005/04/09 09:31:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:50 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -173,6 +173,7 @@ is MP-safe; however, the caller of
 .BR untimeout ()
 must ensure that the callback function has not returned running before
 calling
+.BR untimeout ().
 .\"
 .\"
 .SH NOTICES

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyb.9.man,v 0.9.2.9 2005/03/30 13:38:36 brian Exp $
+.\" @(#) $Id: copyb.9.man,v 0.9.2.10 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -234,11 +234,12 @@ copies both the
 and
 .I b_flag
 members of the passed in message block to the returned message block.
+Older versions of
 .I LiS
 .[
 lis
 .]
-does not copy
+did not copy
 .I b_band
 or
 .I b_flag

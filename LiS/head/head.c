@@ -3078,6 +3078,7 @@ void lis_process_rput(stdata_t *shead, queue_t *q, mblk_t *mp)
     {
 	freemsg(mp) ;
 	lis_stream_error(shead, err, err) ;
+	return;
     }
 
     CP(q,mp) ;

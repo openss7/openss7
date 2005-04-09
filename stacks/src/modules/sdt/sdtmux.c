@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:38 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/09 09:42:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:38 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:38 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/09 09:42:57 $"
 
-static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/08 19:30:38 $";
+static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/09 09:42:57 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
@@ -90,6 +90,9 @@ MODULE_DESCRIPTION(SDTM_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SDTM_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SDTM_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdtmux");
 #endif
 #endif				/* LINUX */
 

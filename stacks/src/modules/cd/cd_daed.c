@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:01 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $";
 
 #include "os7/compat.h"
 
@@ -69,7 +69,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:01 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
@@ -88,6 +88,9 @@ MODULE_SUPPORTED_DEVICE(CD_DAED_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(CD_DAED_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-cd_daed");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

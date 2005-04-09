@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/04/05 01:57:05 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2005/04/09 09:35:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/05 01:57:05 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:35:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -501,6 +501,62 @@ kernel version %{kernel_version}.
 
 %pre %{core_name}
 # ---------------------------------------------------------------------------
+function remove_depmods() {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+        prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+        eval "remove_depmods \$$prereq"
+    done
+}
+if [ $1 = 1 ] ; then : # fresh install
+    # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
+    # installed kernel modules hanging around for this kernel version.
+    list="%{modules}"
+    if [ -d %{_kmoduledir} ] ; then
+	for m in `find %{_kmoduledir} \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+		case " $list " in (*" $b "*) ;; (*) continue ;; esac
+		echo "$m"
+		modl_mods="${modl_mods:+$modl_mods }$m"
+	done
+        if [ -f %{_kmoduledir}/modules.dep ] ; then
+            # First we can build a dependency tree from every dependency expression that can be
+            # found in the modules.dep file.
+            dep= ; while read line ; do
+                case $line in
+                    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
+                            dep="${dep:+$dep }$line" ; continue ;;
+                    (*)	    dep="${dep:+$dep }$line" ;;
+                esac
+                [ -n "$dep" ] || continue;
+                set dummy $dep
+                if [ "${3+set}" = "set" ] ; then
+                    t=`echo $2 | sed -e 's|:$||'`
+                    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+                    shift 2
+                    for p in $@ ; do
+                        prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
+                        eval "$target=\"\${$target:+\$$target }$p\""
+                    done
+                fi
+                dep=
+            done < %{_kmoduledir}/modules.dep
+        fi
+    fi
+    # remove conflicting and dependent modules
+    if [ -n "$modl_mods" ] ; then
+        rm -f -- $modl_mods
+        for m in $list ; do
+            prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+            eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+            [ -n "$modl_deps" ] || continue
+            rm -f -- $modl_deps
+        done
+    fi
+fi
 if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
@@ -940,57 +996,49 @@ function remove_depmods() {
     [ $# -gt 0 ] || return 0
     echo "$*"
     for t in $@ ; do
-        remove_depmods eval "\$prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`"
+        prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+        eval "remove_depmods \$$prereq"
     done
 }
 # This is an initial installation of the init subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
-# treat every fresh installation like an upgrade from non-deb install.
+# treat every fresh installation like an upgrade from non-deb/rpm install.
 if [ $1 = 1 ] ; then : # fresh install
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
     # postun actions.
-    for dir in /%_lib/modules/2.[456]\.* /%_lib/modules/preferred /%_lib/modules/default /%_lib/modules/boot ; do
+    list="%{modules}"
+    for dir in %{_kmoduledir}/../* ; do
         [ -d $dir ] || continue
-        strm_mods="`find $dir \
-            \( -name 'sctp.o'     -o -name 'sctp.ko'    \
-            -o -name 'sctp.o.gz'  -o -name 'sctp.ko.gz' \) 2>/dev/null`"
-        [ -n "$strm_mods" ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+		case " $list " in (*" $b "*) ;; (*) continue ;; esac
+		echo "$m"
+		modl_mods="${modl_mods:+$modl_mods }$m"
+	done
         if [ -f $dir/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
-            dep=
-            while read line ; do
+            dep= ; while read line ; do
                 case $line in
-                    *\) line="`echo $line | sed -e 's|\\$||'`"
-                        dep="${dep:+$dep }$line"
-                        continue
-                        ;;
-                    *)  dep="${dep:+$dep }$line"
-                        ;;
+                    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
+                            dep="${dep:+$dep }$line" ; continue ;;
+                    (*)	    dep="${dep:+$dep }$line" ;;
                 esac
+                [ -n "$dep" ] || continue;
                 set dummy $dep
-                if [ "${2+set}" = "set" ] ; then
-                    t=$1
+                if [ "${3+set}" = "set" ] ; then
+                    t=`echo $2 | sed -e 's|:$||'`
                     target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                    shift
+                    shift 2
                     for p in $@ ; do
                         prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\${$prereq:+\$$prereq }$t"
-                        eval "$target=\"\${$target:+\$$target }$p"
+                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
+                        eval "$target=\"\${$target:+\$$target }$p\""
                     done
                 fi
                 dep=
-                continue
             done < $dir/modules.dep
-            # All modules that ultimately depends on the "sctp" module must go.
-            strm_deps="`remove_depmods $prereq_sctp`"
-        else
-            # We cannot figure out a dependency tree, so just remove any module that even starts
-            # with "sctp"
-            strm_deps="`find $dir \
-                \( -name 'sctp-*.o'     -o -name 'sctp-*.ko'    \
-                -o -name 'sctp-*.o.gz'  -o -name 'sctp-*.ko.gz' \) 2>/dev/null`"
         fi
         if [ -n "$strm_mods" -o -n "$strm_deps" ] ; then
             rm -f -- $strm_mods $strm_deps
@@ -1017,6 +1065,16 @@ if [ $1 = 1 ] ; then : # fresh install
             if [ -f %_initrddir/$i ] ; then
                 /sbin/chkconfig --del $i || :
             fi
+        done
+    fi
+    # remove conflicting and dependent modules
+    if [ -n "$modl_mods" ] ; then
+        rm -f -- $modl_mods
+        for m in $list ; do
+            prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+            eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+            [ -n "$modl_deps" ] || continue
+            rm -f -- $modl_deps
         done
     fi
 fi
@@ -1182,12 +1240,16 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.49  2005/04/05 01:57:05  brian
-# - more robust sed
+# Revision 0.9.2.50  2005/04/09 09:35:04  brian
+# - update spec files
 #
-# Revision 1.49  2005/04/05 01:57:05  brian
-# - more robust sed
+# Revision 1.50  2005/04/09 09:35:04  brian
+# - update spec files
 #
+
+* Tue Apr  5 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.49  2005/04/05 01:57:05  brian
+- more robust sed
 
 * Sat Apr  2 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.48  2005/04/02 16:47:28  brian

@@ -1082,6 +1082,9 @@ static void lis_cdev_put(struct dentry *d)
     struct inode	*inode = d->d_inode ;
     struct cdev		*cp ;
     static spinlock_t	 lock = SPIN_LOCK_UNLOCKED ;
+#if HAVE_CDEV_PUT_ADDR
+    static void (*cdev_put)(struct cdev *) = (typeof(cdev_put)) HAVE_CDEV_PUT_ADDR;
+#endif
 
 
     if (LIS_DEBUG_ADDRS || LIS_DEBUG_REFCNTS)
@@ -4835,6 +4838,9 @@ MODULE_AUTHOR("David Grothe <dave@gcom.com>");
 #endif
 #if defined(MODULE_DESCRIPTION)
 MODULE_DESCRIPTION("SVR4 STREAMS for Linux (GPL Code)");
+#endif
+#if defined(MODULE_ALIAS)
+MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 #endif
 
 /************************************************************************

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/02 13:13:37 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:37:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/04/02 13:13:37 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -67,6 +67,7 @@ static char const ident[] =
 #include <linux/acct.h>
 #include <linux/devfs_fs_kernel.h>
 #include <linux/fs.h>
+#include <linux/sched.h>
 
 #include <asm/uaccess.h>
 
@@ -98,7 +99,7 @@ static int (*check_mnt) (struct vfsmount * mnt)
 #else
 static inline int check_mnt(struct vfsmount *mnt)
 {
-	return mnt->mnt_namespace == current->namepsace;
+	return mnt->mnt_namespace == current->namespace;
 }
 #endif
 #if defined HAVE_GRAFT_TREE_ADDR

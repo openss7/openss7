@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:06 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:06 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:06 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:06 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -95,6 +95,9 @@ MODULE_SUPPORTED_DEVICE(M2TP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(M2TP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-m2tp");
+#endif
 #endif				/* LINUX */
 
 /*

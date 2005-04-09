@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmvb.9.man,v 0.9.2.10 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: rmvb.9.man,v 0.9.2.11 2005/04/09 09:31:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -102,8 +102,7 @@ Removes the message block pointed to by
 .I bp
 from the message pointed to by
 .I mp
-and returns the pointer to the (new) first message block in the message,
-.IR msg .
+and returns the pointer to the (new) first message block in the message.
 .PP
 .BR rmvb ()
 removes the message block
@@ -122,11 +121,8 @@ pointer is set to
 .PP
 Upon success,
 .BR rmvb ()
-returns a pointer to the modified message
-.IR msg .
-The modified message
-.I msg
-may be
+returns a pointer to the modified message.
+The modified message may be
 .BR NULL .
 .PP
 Upon failure,
@@ -156,7 +152,7 @@ can be called from any context.
 .SH MP-STREAMS
 .PP
 .BR rmvb ()
-is MP-safe.  However, it is the responsibility of the caller to ensure
+is MP-safe; however, it is the responsibility of the caller to ensure
 exclusive access to the passed in message
 .I mp
 and message block

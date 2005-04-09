@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:44:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/05 02:01:19 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:44:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:44:29 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:44:29 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/04/05 02:01:19 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:44:29 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -104,6 +104,9 @@ MODULE_SUPPORTED_DEVICE(LDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(LDL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-ldl");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $
+ @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/26 23:37:42 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:41:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $"
 
-static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/26 23:37:42 $";
+static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel
@@ -98,6 +98,9 @@ MODULE_DESCRIPTION(ACB56_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ACB56_DEVICES);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(ACB56_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sdl_acb56");
 #endif
 #endif
 

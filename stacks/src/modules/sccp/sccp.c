@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:10 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/31 06:53:10 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -102,6 +102,9 @@ MODULE_SUPPORTED_DEVICE(SCCP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCCP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sccp");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_ip.c,v 0.9.2.4 2005/03/08 19:30:49 brian Exp $
+ @(#) $Id: sscop_ip.c,v 0.9.2.5 2005/04/09 09:43:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -24,11 +24,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/08 19:30:49 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:43:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/08 19:30:49 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:43:17 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -53,6 +53,9 @@ MODULE_DESCRIPTION(SSCOP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SSCOP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SSCOP_LICENSE);
+#endif
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-sscop_ip");
 #endif
 #endif				/* LINUX */
 

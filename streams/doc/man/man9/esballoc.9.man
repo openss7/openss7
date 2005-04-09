@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.11 2005/03/30 13:38:46 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -105,15 +105,15 @@ a pointer to a free routine description structure.
 .PP
 .BR esballoc ()
 is used where the
-.IR STREAMS (4)
+.I STREAMS
 driver needs control over the location, allocation and deallocation of data
 buffers.  This may be because the data buffers are subject to some physical
 contraints (e.g. must be allocated in DMA-able memory, or must exist in
 dual-ported RAM or in a descriptor ring).  This may also be because some other
 mechanism outside of
-.IR STREAMS (4)
+.I STREAMS
 has already allocated and passed the data buffer to a
-.IR STREAMS (4)
+.I STREAMS
 driver.
 .PP
 Where it is not necessary that the caller provide the data buffer,
@@ -249,7 +249,7 @@ Many post-SVR 4.2
 svr42
 .]
 compliant
-.IR STREAMS (4)
+.I STREAMS
 implementations ignore the
 .I priority
 argument to

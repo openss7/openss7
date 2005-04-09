@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/04/02 16:47:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/04/09 09:30:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:47:50 $ by $Author: brian $
+# Last Modified $Date: 2005/04/09 09:30:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -318,7 +318,11 @@ KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			= $(STREAMS_MODMAP)
 
+if WITH_KO_MODULES
+kpre				= streams_
+else
 kpre				= streams-
+endif
 
 include am/kernel.am
 

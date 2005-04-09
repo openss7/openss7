@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:10 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:10 $ by $Author: brian $
+ Last Modified $Date: 2005/04/09 09:42:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:10 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:10 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -77,7 +77,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:10 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -97,6 +97,9 @@ MODULE_SUPPORTED_DEVICE(MX_SDL_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(MX_SDL_LICENSE);
 #endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-mx_sdl");
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS
