@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2005/03/28 10:56:09 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/04/11 04:17:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/03/28 10:56:09 $ by $Author: brian $
+## Last Modified $Date: 2005/04/11 04:17:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -130,7 +130,7 @@ $(debian_dir_stamp): $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz $(debbuildd
 # builds that including signing.  If you don't like the security issues that raises, dont use it and
 # you will be prompted for a passphrase with each signature.
 ##
-$(debian_dsc_file) $(debian_tar_file): $(debian_dir)
+$(debian_dsc_file) $(debian_tar_file):: $(debian_dir)
 	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -uc $(DEBXOPTS) )
 #	(cd "$(debbuilddir)" ; $(DPKG_SOURCE) -b -sn $(debian_dir))
 

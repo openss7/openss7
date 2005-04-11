@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/04/01 03:20:47 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.92 $) $Date: 2005/04/11 07:14:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 03:20:47 $ by $Author: brian $
+# Last Modified $Date: 2005/04/11 07:14:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -694,6 +694,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}${rootdir}/usr/src/linux-obj
+		${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}
 		${DESTDIR}${rootdir}/usr/src/kernel-headers-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
@@ -704,6 +705,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}/usr/src/linux-obj
+		${DESTDIR}/usr/src/kernel-headers-${kversion}
 		${DESTDIR}/usr/src/kernel-headers-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
@@ -797,7 +799,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 	else
 	    eval "k_source_search_path=\"
 		${kbuilddir}
-		${DESTDIR}${rootdir}/usr/src/kernel-source-${kversion}
+		${DESTDIR}${rootdir}/usr/src/kernel-source-${knumber}
 		${DESTDIR}${rootdir}/usr/src/linux-${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}
 		${DESTDIR}${rootdir}/usr/src/linux-${knumber}
@@ -805,7 +807,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/source
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
-		${DESTDIR}/usr/src/kernel-source-${kversion}
+		${DESTDIR}/usr/src/kernel-source-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}
 		${DESTDIR}/usr/src/linux-${knumber}
@@ -1351,13 +1353,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	    then
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
-		    ${kmachdir}/defconfig${kboot:+-}${kboot}
+		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
 		    ${kbuilddir}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
 		    ${DESTDIR}${rootdir}/boot/config-${kversion}
 		    ${DESTDIR}${rootdir}/boot/config
+		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
@@ -1367,11 +1370,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	    else
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
-		    ${kmachdir}/defconfig${kboot:+-}${kboot}
+		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
 		    ${kbuilddir}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
+		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
@@ -1606,11 +1610,37 @@ dnl
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude2 | -I${kbuilddir}/include2 |g"`
 	fi
 	linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -Iinclude/asm| -I${ksrcdir}/include/asm|g"`
+dnl
+dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
+dnl	build directory.
+dnl
+	if test ":$linux_cv_k_ko_modules" != :yes ; then
+	    eval "linux_src=\"$ksrcdir\""
+	    eval "linux_bld=\"$kbuilddir\""
+	    if test "$linux_src" != "$linux_bld" ; then
+		linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags" | sed -e "s| -I${ksrcdir}/include| -I${kbuilddir}/include|g"`
+	    fi
+	fi
     ])
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	cp -f "$kconfig" .config
 	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check`"
 	rm -f .config
+dnl
+dnl	Unfortunately we need to rip the module flags from the kernel source
+dnl	directory makefiles; however, the modversions.h file is in the build
+dnl	directory, not the source directory.  For debian this means that we take
+dnl	the flags from the kernel-source package but the modversions.h file is
+dnl	in the kernel-headers package.  So, we need to change source directory
+dnl	to build directory unless they are the same.
+dnl
+	if test ":$linux_cv_k_ko_modules" != :yes ; then
+	    eval "linux_src=\"$ksrcdir\""
+	    eval "linux_bld=\"$kbuilddir\""
+	    if test "$linux_src" != "$linux_bld" ; then
+		linux_cv_k_modflags=`echo "$linux_cv_k_modflags" | sed -e "s| ${ksrcdir}/include| ${kbuilddir}/include|g"`
+	    fi
+	fi
     ])
     CFLAGS="$linux_cv_k_cflags"
     CPPFLAGS="$linux_cv_k_cppflags"
@@ -2066,29 +2096,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVERSIONS], [dnl
 # _LINUX_CHECK_KERNEL_UPDATE_MODULES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_UPDATE_MODULES], [dnl
-    AC_CACHE_CHECK([for kernel update-modules directory], [linux_cv_modutildir], [dnl
-	linux_cv_modutildir='no'
-	eval "linux_search_path=\"
-	    ${DESTDIR}${sysconfdir}/modutils
-	    ${sysconfdir}/modutils
-	    ${DESTDIR}${rootdir}/etc/modutils
-	    ${DESTDIR}/etc/modutils
-	    /etc/modutils\""
-	linux_search_path=`echo "$linux_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	for linux_tmp in $linux_search_path ; do
-	    if test -d $linux_tmp ; then
-		linux_cv_modutildir="$linux_tmp"
-		break
-	    fi
-	done
-    ])
-    if test :"${linux_cv_modutildir:-no}" != :no
-    then
-	linux_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	modutildir="${linux_cv_modutildir#$linux_tmp}"
-    else
-	modutildir='${sysconfdir}/modutils'
-    fi
+    modutildir='${sysconfdir}/modutils'
     AC_SUBST([modutildir])dnl
 ])# _LINUX_CHECK_KERNEL_UPDATE_MODULES
 # =============================================================================
@@ -2097,43 +2105,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_UPDATE_MODULES], [dnl
 # _LINUX_CHECK_KERNEL_MODULE_PRELOAD
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULE_PRELOAD], [dnl
-    AC_CACHE_CHECK([for kernel module preload file], [linux_cv_preloads], [dnl
-	linux_cv_preloads='no'
-	if test :"${linux_cv_k_ko_modules:-no}" = :no
-	then
-	    eval "linux_search_path=\"
-		${DESTDIR}${sysconfdir}/modules
-		${sysconfdir}/modules
-		${DESTDIR}${rootdir}/etc/modules
-		${DESTDIR}/etc/modules
-		/etc/modules\""
-	else
-	    eval "linux_search_path=\"
-		${DESTDIR}${sysconfdir}/modprobe.preload
-		${sysconfdir}/modprobe.preload
-		${DESTDIR}${rootdir}/etc/modprobe.preload
-		${DESTDIR}/etc/modprobe.preload
-		/etc/modprobe.preload\""
-	fi
-	linux_search_path=`echo "$linux_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	for linux_tmp in $linux_search_path ; do
-	    if test -f $linux_tmp ; then
-		linux_cv_preloads="$linux_tmp"
-		break
-	    fi
-	done
-    ])
-    if test :"${linux_cv_preloads:-no}" != :no
+    if test :"${linux_cv_k_ko_modules:-no}" = :no
     then
-	linux_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	preloads="${linux_cv_preloads#$linux_tmp}"
+	preloads='${sysconfdir}/modules'
     else
-	if test :"${linux_cv_k_ko_modules:-no}" = :no
-	then
-	    preloads='${sysconfdir}/modules'
-	else
-	    preloads='${sysconfdir}/modprobe.preload'
-	fi
+	preloads='${sysconfdir}/modprobe.preload'
     fi
     AC_SUBST([preloads])dnl
 ])# _LINUX_CHECK_KERNEL_MODULE_PRELOAD
