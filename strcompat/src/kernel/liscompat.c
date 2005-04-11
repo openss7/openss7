@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:36:58 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/11 02:01:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:36:58 $ by $Author: brian $
+ Last Modified $Date: 2005/04/11 02:01:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:36:58 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/11 02:01:13 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:36:58 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/11 02:01:13 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -117,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/04/09 09:36:58 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/11 02:01:13 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -202,7 +202,7 @@ __LIS_EXTERN_INLINE struct msgb *lis_allocb_physreq(int size, unsigned int prior
 EXPORT_SYMBOL_GPL(lis_allocb_physreq);
 __LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name);
 EXPORT_SYMBOL_GPL(lis_allocq);
-__LIS_EXTERN_INLINE void lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
+__LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2);
 EXPORT_SYMBOL_GPL(lis_appq);
 __LIS_EXTERN_INLINE queue_t *lis_backq(queue_t *q);
 EXPORT_SYMBOL_GPL(lis_backq);

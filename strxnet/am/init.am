@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/04/06 13:45:36 $
+# @(#) $RCSfile: init.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/11 03:37:44 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/06 13:45:36 $ by $Author: brian $
+## Last Modified $Date: 2005/04/11 03:37:44 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -68,7 +68,7 @@ install-initscripts: $(dist_initrd_SCRIPTS)
 
 post-initscripts:
 	@$(ECHO) "Making $@"
-	@if test -z '$(DESTDIR)' ; then \
+	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
 		if runlevel >/dev/null 2>&1 ; then \
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 				f=`$(ECHO) $$p | sed -e 's|^.*/||'` ; \
@@ -97,7 +97,7 @@ post-initscripts:
 
 preun-initscripts:
 	@$(ECHO) "Making $@"
-	@if test -z '$(DESTDIR)' ; then \
+	@if test -z '$(DESTDIR)' -a \( -f $(DESTDIR)$(initrddir)/rc -o -f $(DESTDIR)$(initrddir)/../rc \) ; then \
 		if runlevel >/dev/null 2>&1 ; then \
 			list='$(dist_initrd_SCRIPTS)' ; for p in $$list ; do \
 				rlist="$$p $$rlist" ; \

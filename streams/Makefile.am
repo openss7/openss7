@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2005/04/09 09:30:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/04/11 02:00:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:30:36 $ by $Author: brian $
+# Last Modified $Date: 2005/04/11 02:00:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -410,19 +410,19 @@ EXTRA_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
 strchg_SOURCES			= src/util/strchg.c
 strchg_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strchg_LDADD			= libstreams.la
+strchg_LDFLAGS			= -static libstreams.la
 strchg_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strchg_CFLAGS			= $(USER_CFLAGS)
 
 strconf_SOURCES			= src/util/strconf.c
 strconf_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strconf_LDADD			= libstreams.la
+strconf_LDFLAGS			= -static libstreams.la
 strconf_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strconf_CFLAGS			= $(USER_CFLAGS)
 
 strreset_SOURCES		= src/util/strreset.c
 strreset_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strreset_LDADD			= libstreams.la
+strreset_LDFLAGS		= -static libstreams.la
 strreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strreset_CFLAGS			= $(USER_CFLAGS)
 
@@ -523,62 +523,62 @@ strvf_CFLAGS			= $(USER_CFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 test_clone_SOURCES		= src/test/test-clone.c
-test_clone_LDFLAGS		= libstreams.la
+test_clone_LDFLAGS		= -static libstreams.la
 test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS)
 
 test_connld_SOURCES		= src/test/test-connld.c
-test_connld_LDFLAGS		= libstreams.la
+test_connld_LDFLAGS		= -static libstreams.la
 test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS)
 
 test_echo_SOURCES		= src/test/test-echo.c
-test_echo_LDFLAGS		= libstreams.la
+test_echo_LDFLAGS		= -static libstreams.la
 test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS)
 
 test_fifo_SOURCES		= src/test/test-fifo.c
-test_fifo_LDFLAGS		= libstreams.la
+test_fifo_LDFLAGS		= -static libstreams.la
 test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS)
 
 test_log_SOURCES		= src/test/test-log.c
-test_log_LDFLAGS		= libstreams.la
+test_log_LDFLAGS		= -static libstreams.la
 test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS)
 
 test_nsdev_SOURCES		= src/test/test-nsdev.c
-test_nsdev_LDFLAGS		= libstreams.la
+test_nsdev_LDFLAGS		= -static libstreams.la
 test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS)
 
 test_nuls_SOURCES		= src/test/test-nuls.c
-test_nuls_LDFLAGS		= libstreams.la
+test_nuls_LDFLAGS		= -static libstreams.la
 test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipe_SOURCES		= src/test/test-pipe.c
-test_pipe_LDFLAGS		= libstreams.la
+test_pipe_LDFLAGS		= -static libstreams.la
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
 
 test_pipemod_SOURCES		= src/test/test-pipemod.c
-test_pipemod_LDFLAGS		= libstreams.la
+test_pipemod_LDFLAGS		= -static libstreams.la
 test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS)
 
 test_sad_SOURCES		= src/test/test-sad.c
-test_sad_LDFLAGS		= libstreams.la
+test_sad_LDFLAGS		= -static libstreams.la
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
-test_sc_LDFLAGS			= libstreams.la
+test_sc_LDFLAGS			= -static libstreams.la
 test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS)
 
 test_streams_SOURCES		= src/test/test-streams.c
-test_streams_LDFLAGS		= libstreams.la
+test_streams_LDFLAGS		= -static libstreams.la
 test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS)
 
