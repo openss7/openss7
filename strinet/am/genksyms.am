@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/04/06 13:45:36 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/11 07:45:41 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/06 13:45:36 $ by $Author: brian $
+## Last Modified $Date: 2005/04/11 07:45:41 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -108,7 +108,7 @@ else
 ## !am__fastdepCC
 if AMDEP
 ## AMDEP
-	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$*.Pver' tmpdepfile='$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 ## AMDEP
 endif
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || $(ECHO) '$(srcdir)/'`$< | $(KGENKSYMS) > $@
@@ -137,9 +137,9 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 	@list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
-		$(ECHO) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$$r.Pver\" tmpdepfile=\"$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(ECHO) "source=\"$$s\" object=\"$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
-		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$$r.Pver" tmpdepfile="$$r.TPver" $(CCDEPMODE) $(depcomp)  \
+		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
 	touch stamp-verfiles
@@ -248,7 +248,7 @@ else
 ## !am__fastdepCC
 if AMDEP
 ## AMDEP
-	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$*.Pver' tmpdepfile='$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	source='$<' object='$@' libtool=no DEPDIR='$(DEPDIR)' depfile='$(DEPDIR)/$*.Pver' tmpdepfile='$(DEPDIR)/$*.TPver' $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 ## AMDEP
 endif
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ `test -f '$<' || $(ECHO) '$(srcdir)/'`$< | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $@
@@ -302,9 +302,9 @@ $(EXPORT_VERFILES): $(EXPORT_SRCFILES) $(STRCONF_CONFIG)
 	list="$(EXPORT_SRCFILES)"; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/"; fi; \
 		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
-		$(ECHO) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$$r.Pver\" tmpdepfile=\"$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
+		$(ECHO) "source=\"$$s\" object=\"$$v/$$r.ver\" libtool=no DEPDIR='$(DEPDIR)' depfile=\"$(DEPDIR)/$$r.Pver\" tmpdepfile=\"$(DEPDIR)/$$r.TPver\" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver" ; \
-		source="$$s" object="$$v/$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$$r.Pver" tmpdepfile="$$r.TPver" $(CCDEPMODE) $(depcomp)  \
+		source="$$s" object="$$v/$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(GENKSYMS) $(GENKSYMS_SMP_PREFIX) -k $(PACKAGE_KNUMBER) > $$v/$$r.ver ; \
 	done
 ## AMDEP
