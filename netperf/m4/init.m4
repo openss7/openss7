@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/24 00:26:59 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/11 07:14:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 00:26:59 $ by $Author: brian $
+# Last Modified $Date: 2005/04/11 07:14:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -206,12 +206,13 @@ dnl initrddir is where we are going to put init scripts
 dnl
     AC_CACHE_CHECK([for init SysV init.d directory], [init_cv_initrddir], [dnl
 	init_cv_initrddir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/rc.d/init.d
-	    ${DESTDIR}${sysconfdir}/init.d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path='
+	    '"${DESTDIR}"'${sysconfdir}/rc.d/init.d
+	    '"${DESTDIR}"'${sysconfdir}/init.d'
 	for init_tmp in $init_search_path ; do
-	    if test -d $init_tmp -a ! -L $init_tmp ; then
+	    eval "init_dir=\"$init_tmp\""
+	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    if test -d $init_dir -a ! -L $init_dir ; then
 		init_cv_initrddir="$init_tmp"
 		break
 	    fi
@@ -222,25 +223,17 @@ dnl configdir is where we are going to put init script default files
 dnl
     AC_CACHE_CHECK([for init SysV config directory], [init_cv_configdir], [dnl
 	init_cv_configdir='no'
-	eval "init_search_path=\"
-	    ${DESTDIR}${sysconfdir}/sysconfig
-	    ${DESTDIR}${sysconfdir}/default\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path='
+	    '"${DESTDIR}"'${sysconfdir}/sysconfig
+	    '"${DESTDIR}"'${sysconfdir}/default'
 	for init_tmp in $init_search_path ; do
-	    if test -d $init_tmp ; then
+	    eval "init_dir=\"$init_tmp\""
+	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    if test -d $init_dir ; then
 		init_cv_configdir="$init_tmp"
 		break
 	    fi
 	done
-	if test :${init_cv_configdir:-no} = :no ; then
-	    if test :${init_cv_rcs_dir:-no} = :no ; then
-dnl             redhat style
-		init_cv_configdir="${DESTDIR}${sysconfdir}/sysconfig"
-	    else
-dnl             debian style
-		init_cv_configdir="${DESTDIR}${sysconfdir}/default"
-	    fi
-	fi
     ])
     AC_CACHE_CHECK([for init SysV installation], [init_cv_install], [dnl
 	init_cv_install='yes'
@@ -264,10 +257,10 @@ dnl
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl         redhat style
-	    initrddir="${sysconfdir}/rc.d/init.d"
+	    initrddir='${sysconfdir}/rc.d/init.d'
 	else
 dnl         debian style
-	    initrddir="${sysconfdir}/init.d"
+	    initrddir='${sysconfdir}/init.d'
 	fi
     fi
     AC_SUBST([initrddir])
@@ -280,10 +273,10 @@ dnl
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
 dnl         redhat style
-	    configdir="${sysconfdir}/sysconfig"
+	    configdir='${sysconfdir}/sysconfig'
 	else
 dnl         debian style
-	    configdir="${sysconfdir}/default"
+	    configdir='${sysconfdir}/default'
 	fi
     fi
     AC_SUBST([configdir])
