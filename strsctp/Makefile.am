@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/04/09 09:30:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/12 00:05:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:30:43 $ by $Author: brian $
+# Last Modified $Date: 2005/04/12 00:05:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -503,18 +503,18 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
-dist_sysconf_DATA		=
-
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		=
 
-dist_config_DATA		=
-
 ## ! WITH_RCSD_DIRECTORY
 endif
+
+dist_sysconf_DATA		=
+
+dist_config_DATA		=
 
 ## INSTALL_INITSCRIPTS
 endif

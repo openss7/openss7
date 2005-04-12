@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/12 00:05:38 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -25,22 +25,40 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-name='specfs'
+name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
 
 [ -e /proc/modules ] || exit 0
 
+for STREAMS_MKNOD in /sbin/strmakenodes /usr/sbin/strmakenodes /bin/strmakenodes /usr/bin/strmakenodes ; do
+    if [ -x $STREAMS_MKNOD ] ; then
+	break
+    else
+	STREAMS_MKNOD=
+    fi
+done
+
 # Specify defaults
+
+STREAMS_MAKEDEVICES="no"
+STREAMS_REMOVEDEVICES="no"
+STREAMS_MOUNTSPECFS="yes"
+STREAMS_MOUNTPOINT="/dev/streams"
 
 # Source config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
 
+[ -z "$STREAMS_MKNOD" ] && STREAMS_MAKEDEVICES='no'
+[ -z "$STREAMS_MKNOD" ] && STREAMS_REMOVEDEVICES='no'
+
 RETVAL=0
 
-if [ "$VERBOSE" -ne 0 ] ; then
+umask 077
+
+if [ "${VERBOSE:-0}" -ne 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -48,12 +66,13 @@ fi
 
 build_options() {
     # Build up the options string
+    :
 }
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
     for module in streams streams-liskmod streams-mtdrv streams-pipemod ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -69,11 +88,61 @@ start() {
     else
 	echo "(failed.)"
     fi
+    if grep '^[[:space:]]*streams[/.]' /etc/sysctl.conf $redir ; then
+	echo -n "Reconfiguring kernel parameters: "
+	sysctl -p /etc/sysctl.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -f /etc/streams.conf ] ; then
+	echo -n "Configuring STREAMS parameters: "
+	sysctl -p /etc/streams.conf $redir
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_MAKEDEVICES" = ":yes" ] ; then
+	echo -n "Making STREAMS devices: "
+	$STREAMS_MKNOD
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	fi
+    fi
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	echo -n "Removing STREAMS modules: "
+	rmmod $modules
+	RETVAL=$?
+    fi
     return $RETVAL
 }
 
 stop() {
     echo -n "Stopping $desc: $name "
+    RETVAL=$?
+    if [ -n "$STREAMS_MKNOD" -a ":$STREAMS_REMOVEDEVICES" = ":yes" ] ; then
+	echo -n "Removing STREAMS devices: "
+	$STREAMS_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
@@ -115,7 +184,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/03/24 05:20:20 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/12 00:05:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -161,7 +230,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 05:20:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/12 00:05:38 $ by $Author: brian $
 #
 # =============================================================================
 

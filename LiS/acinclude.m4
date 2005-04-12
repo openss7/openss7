@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.19 $) $Date: 2005/04/09 09:34:17 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.20 $) $Date: 2005/04/12 00:07:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:34:17 $ by $Author: brian $
+# Last Modified $Date: 2005/04/12 00:07:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -95,7 +95,7 @@ AC_DEFUN([AC_LIS], [dnl
 		     debian/lis-lib.preinst
 		     debian/lis-source.preinst
 		     debian/lis-util.preinst
-		     util/modutils/streams])
+		     util/modutils/lis])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

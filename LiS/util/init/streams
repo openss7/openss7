@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/09 09:36:13 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/04/12 00:05:38 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -114,7 +114,6 @@ remove_modules() {
 		rmmod $modules
 	RETVAL=$?
     fi
-    RETVAL=0
     return $RETVAL
 }
 
@@ -124,7 +123,7 @@ stop() {
 	    $STREAMS_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^streams[-]?' /proc/modules 2>/dev/null | remove_modules
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]?' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
@@ -225,7 +224,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/04/09 09:36:13 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/04/12 00:05:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -271,7 +270,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:36:13 $ by $Author: brian $
+# Last Modified $Date: 2005/04/12 00:05:38 $ by $Author: brian $
 #
 # =============================================================================
 

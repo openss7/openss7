@@ -38,8 +38,8 @@
 #include <linux/module.h>
 #include <linux/init.h>
 
-char	lis_version[] = "2.18.0" ;
-char	lis_date[]    = "10/13/04" ;
+char	lis_version[] = PACKAGE_VERSION "." PACKAGE_RELEASE ;
+char	lis_date[]    = PACKAGE_DATE ;
 
 #if 0
 
