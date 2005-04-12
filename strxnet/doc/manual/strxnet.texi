@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.12 2005/04/11 20:48:42 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.13 2005/04/12 09:29:03 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/11 20:48:42 $ by $Author: brian $
+% Last Modified $Date: 2005/04/12 09:29:03 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -345,7 +345,8 @@ subsequent releases are intended to be loaded on top of an OpenSS7 release of Li
 Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
 also download and install the @samp{strxns} package from Tar Ball.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from X/Open publications and other sources).  Consult the permission notices
 contained in the documentation for more information.  This document is released under the @cite{GNU
@@ -481,10 +482,10 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Utilities
 @cindex utilities
 
-@subsection @command{test-xnet}
+@c @subsection @command{test-xnet}
 
-Note that @command{test-xnet} is maintained as a manual page,
-@ref{test-xnet(8), test-xnet(8), *manpages*, The Manual Pages}.
+@c Note that @command{test-xnet} is maintained as a manual page,
+@c @ref{test-xnet(8), test-xnet(8), *manpages*, The Manual Pages}.
 
 
 @c ----------------------------------------------------------------------------

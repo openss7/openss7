@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.7 2005/04/11 20:48:39 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.8 2005/04/12 09:28:52 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/11 20:48:39 $ by $Author: brian $
+% Last Modified $Date: 2005/04/12 09:28:52 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -142,10 +142,9 @@ Canada @*
 
 @noindent
 This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
-documentation, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
-This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
-Project} and was funded in part by
-@uref{http://www.hob.de/, HOB International}.
+documentation, and is consistent with @value{PACKAGE_NAME}
+@value{PACKAGE_VERSION}.  This manual was developed under the
+@uref{http://www.openss7.org/, OpenSS7 Project}.
 
 @noindent
 Permission is granted to make and distribute verbatim copies of this manual
@@ -336,7 +335,7 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @cindex licensing
 
 This package is released and distributed under the @cite{GNU General Public License}
-(@pxref{GPL}).  Please note, however, that there are different licensing terms for the manual
+(@pxref{GNU General Public License}).  Please note, however, that there are different licensing terms for the manual
 pages and some of the documentation (derived from X/Open publications and other sources).  Consult
 the permission notices contained in the documentation for more information.  This document, is
 released under the @cite{GNU Free Documentation License} (@pxref{Documentation License}) with all

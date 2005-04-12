@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.6 2005/04/11 20:48:39 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.7 2005/04/12 09:28:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/04/11 20:48:39 $ by $Author: brian $
+@c Last Modified $Date: 2005/04/12 09:28:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -419,6 +419,7 @@ Interface documentation, (@pxref{Development}).
 The sections that follow provide information on OpenSS7 releases of the @*
 @value{PACKAGE_TITLE} package.
 
+@ifnotplaintext
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
@@ -448,6 +449,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 * Release LiS-2.16.16-1::	Release 1
 @end menu
 @end ifnothtml
+@end ifnotplaintext
 
 @c ----------------------------------------------------------------------------
 
@@ -849,7 +851,8 @@ The next release may include some @dfn{strss7} software.
 @cindex bugs
 
 @dfn{@value{PACKAGE_TITLE}} has many known bugs.  These are alpha releases.  Use at your own risk.
-Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANY} under @ref{GPL}.}
+Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANY} under @ref{GNU General
+Public License}.}
 
 @b{This software is @i{alpha} software.  As such, it will likely crash your kernel.  Installation
 of the software may irreparably mangle your header files or Linux distribution in such a way as to

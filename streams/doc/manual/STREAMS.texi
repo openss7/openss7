@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.16 2005/04/11 20:48:41 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.17 2005/04/12 09:28:59 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/11 20:48:41 $ by $Author: brian $
+% Last Modified $Date: 2005/04/12 09:28:59 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,7 +301,7 @@ schedule of the @value{PACKAGE_TITLE} package.
 @cindex licensing
 
 This package is released and distributed under the @cite{GNU General Public License}
-(@pxref{GPL}).  Please note, however, that there are different licensing terms for the manual
+(@pxref{GNU General Public License}).  Please note, however, that there are different licensing terms for the manual
 pages and some of the documentation (derived from X/Open publications and other sources).  Consult
 the permission notices contained in the documentation for more information.  This document, is
 released under the @cite{GNU Free Documentation License} (@pxref{Documentation License}) with all
