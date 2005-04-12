@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/06 13:45:37 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/04/11 18:07:17 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/06 13:45:37 $ by $Author: brian $
+## Last Modified $Date: 2005/04/11 18:07:17 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,7 +61,7 @@ if RPM_BUILD_USER
 # installing.
 ##
 pre-libraries:
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@for dir in /lib /usr/lib /usr/local/lib ; do \
 		test "$$dir" != "$(libdir)" || continue ; \
 		libs='$(lib_LTLIBRARIES)' ; for lib in $$libs ; do \
@@ -86,7 +86,7 @@ PRE_INSTALL_AM		+= pre-libraries
 # in a cross-build situation, therefore, we perform the "finish" action ourselves.
 ##
 post-libraries:
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
@@ -106,7 +106,7 @@ POST_INSTALL_AM		+= post-libraries
 # in a cross-build situation, therefore, we perform the "unfinish" action ourselves.
 ##
 postun-libraries:
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \

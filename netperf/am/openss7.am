@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/04/06 13:45:37 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2005/04/11 18:07:17 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/06 13:45:37 $ by $Author: brian $
+## Last Modified $Date: 2005/04/11 18:07:17 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -125,21 +125,21 @@ $(FORCED_TARGETS): forced-% : %
 MY_PHONY		+= $(FORCED_TARGETS)
 
 $(RELEASE_DIRECTORIES)::
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
 	
 release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 release: $(RELEASE_DIRECTORIES) $(RELEASE)
 
 release-clean-local:
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
 	done
 
 release-clean-am: release-clean-local
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@if test -n "$(RELEASECLEANFILES)" ; then \
 		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
 		rm -f -- $(RELEASECLEANFILES) ; \
@@ -161,7 +161,7 @@ endif
 MY_RECURSIVE_TARGETS =
 
 $(MY_RECURSIVE_TARGETS):
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
 	target=`$(ECHO) $@ | sed s/-recursive//` ; \
 	list='$(SUBDIRS)' ; for subdir in $$list ; do \
@@ -190,7 +190,7 @@ ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck
 
 $(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_RECURSIVE_TARGETS):
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
 	list='$(subdirs)' ; for subdir in $$list ; do \
@@ -203,7 +203,7 @@ $(ALL_RECURSIVE_TARGETS):
 ALL_RECURSIVE_CLEAN_TARGETS =
 
 release-clean-recursive:
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@failcom='exit 1' ; \
 	for f in x $$MAKEFLAGS ; do \
 		case $$f in \
@@ -365,13 +365,13 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 		  sign.log rebuild.log resign.log uninstall.log
 
 $(LOGGING_TARGETS): FORCE
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'` ; \
 	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target 2>&1 | tee $@" ; \
 	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target 2>&1 | tee $@
 
 configure.log: FORCE
-	@$(ECHO) "Making $@"
+	@$(ECHO) "Making $@ in `pwd`"
 	(cd $(top_builddir); ./config.status --recheck; ./config.status)
 
 FORCE:
