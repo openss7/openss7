@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/02 03:22:43 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/11 23:27:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 03:22:43 $ by $Author: brian $
+# Last Modified $Date: 2005/04/11 23:27:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_SUBST([PACKAGE_UCNAME])dnl
     PACKAGE_DATE=`date -I`
     AC_SUBST([PACKAGE_DATE])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_DATE], ["$PACKAGE_DATE"], [The package release date.])
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_DEBUG
