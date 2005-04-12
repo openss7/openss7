@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/01 09:52:27 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/04/11 20:47:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 09:52:27 $ by $Author: brian $
+# Last Modified $Date: 2005/04/11 20:47:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -465,27 +465,27 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 	the function ip_route_output() defined.  Newer RH kernels (EL3) use
 	the 2.6 functions and do not provide ip_route_output().  Define this
 	macro if your kernel provides ip_route_output().])
-    else
-	_LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow], [dnl
-	    AC_MSG_ERROR([
-**** 
-**** To use the package on newer kernels requires the availability of the
-**** function ip_route_output_flow() to permit calling ip_route_connect()
-**** which is an inline in net/route.h.  I cannot find this symbol on your
-**** system and the resulting kernel module will therefore not load.
-****
-		    ])
-	])
-	_LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key], [dnl
-	    AC_MSG_ERROR([
-**** 
-**** To use the package on newer kernels requires the availability of the
-**** function __ip_route_output_key() to permit calling ip_route_connect()
-**** which is an inline in net/route.h.  I cannot find this symbol on your
-**** system and the resulting kernel module will therefore not load.
-****
-		    ])
-	])
+dnl     else
+dnl 	_LINUX_KERNEL_SYMBOL_EXPORT([ip_route_output_flow], [dnl
+dnl 	    AC_MSG_ERROR([
+dnl **** 
+dnl **** To use the package on newer kernels requires the availability of the
+dnl **** function ip_route_output_flow() to permit calling ip_route_connect()
+dnl **** which is an inline in net/route.h.  I cannot find this symbol on your
+dnl **** system and the resulting kernel module will therefore not load.
+dnl ****
+dnl 		    ])
+dnl 	])
+dnl 	_LINUX_KERNEL_SYMBOL_EXPORT([__ip_route_output_key], [dnl
+dnl 	    AC_MSG_ERROR([
+dnl **** 
+dnl **** To use the package on newer kernels requires the availability of the
+dnl **** function __ip_route_output_key() to permit calling ip_route_connect()
+dnl **** which is an inline in net/route.h.  I cannot find this symbol on your
+dnl **** system and the resulting kernel module will therefore not load.
+dnl ****
+dnl 		    ])
+dnl 	])
     fi
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl

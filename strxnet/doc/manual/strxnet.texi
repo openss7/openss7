@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.11 2005/03/15 00:56:46 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.12 2005/04/11 20:48:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:46 $ by $Author: brian $
+% Last Modified $Date: 2005/04/11 20:48:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -272,25 +272,24 @@ Indices
 
 @c --------------------------------------------------------------------------
 
-@node Acknowledgments, Introduction, , Top
+@node Acknowledgments
 @unnumbered Acknowledgments
 @cindex credits
 
-As with most open source projects, this project would not have been possible
-without the valiant efforts and productive software of the @cite{Free Software
-Foundation} and the @cite{Linux Kernel Community}.
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
+Community}.
 
 @menu
 * Sponsors::			Sponsors
 * Contributors::		Contributors
 @end menu
 
-@node Sponsors, Contributors, , Acknowledgments
+@node Sponsors
 @unnumberedsec Sponsors
 @cindex sponsors
 
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in
-part by:
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
 
 @itemize
 @item Lockheed Martin
@@ -301,7 +300,7 @@ part by:
 @item Sonus Networks
 @end itemize
 
-@node Contributors, , Sponsors, Acknowledgments
+@node Contributors
 @unnumberedsec Contributors
 @cindex contributors
 
@@ -319,7 +318,7 @@ of significant contributors to the project:
 @item Others
 @end itemize
 
-@node Introduction, Reference, Acknowledgments, Top
+@node Introduction
 @chapter Introduction
 @cindex introduction
 
@@ -335,34 +334,64 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 * Conventions::			Conventions
 @end menu
 
-@node Notice, Overview, , Introduction
+@node Notice
 @section Notice
 @cindex notice
 
-Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended
-to provide additional support to GCOM release of LiS and were released primarily
-in Tar Ball format.  As of @value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.
-@value{PACKAGE_TARNAME}-0.9.2-5 and subsequent releases are intended to be loaded on top
-of an OpenSS7 release of LiS or Linux Fast-STREAMS.  If you wish to use these
-packages over a GCOM release of LiS, you will now need to also download and
-install the @samp{strxns} package from Tar Ball.
+Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
+additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
+@value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
+subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
+Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
+also download and install the @samp{strxns} package from Tar Ball.
 
-@node Overview, Organization, Notice, Introduction
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contained in the documentation for more information.  This document is released under the @cite{GNU
+Free Documentation License} (@pxref{FDL}) with all sections invariant.
+
+@node Overview
 @section Overview
 @cindex overview
 
-This manual documents the design, implementation, installation, operation and
-future development of the @value{PACKAGE_TITLE} package.
-package.
+This manual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
 
-The @value{PACKAGE_TITLE} package is an X/Open Transport Interface (XTI/TLI)
-package for Linux that can be used with
+The @value{PACKAGE_TITLE} package is
+an X/Open Transport Interface (XTI/TLI) package for Linux
+that can be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
 It includes development tools, header files and manual pages for
 
-@node Organization, Conventions, Overview, Introduction
+@itemize
+@item @cite{Transport Provider Interface}
+@item @cite{OpenSS7 XTI/TLi Library}
+@end itemize
+
+@noindent
+In addition, it provides STREAMS drivers and modules for DLPI including:
+
+@itemize
+@item Transport Interface Module (@file{streams-timod.o}), and
+@item Transport Interface Read-Write Modules (@file{streams-tirdwr.o}).
+@end itemize
+
+@noindent
+The @value{PACKAGE_TITLE} package is essential to the development and support of
+X/Open XTI/TLI
+modules and drivers and provides a fundamental set of
+X/Open
+header files and manual pages for such development.
+
+The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Network Services (XNS), Network
+Provider Interface (NPI) or Data Link Provider Interface (DLPI) components.  See the OpenSS7
+@command{strxns}@footnote{@xref{Top, OpenSS7 XNS Networking, About This Manual, strxns, OpenSS7 XNS Networking Installation and Reference Manual}}
+package.
+
+@node Organization
 @section Organization of this Document
 @cindex organization
 
@@ -392,15 +421,16 @@ This document is organized (loosely) into several sections as follows:
 @end multitable
 @end iftex
 
-
-@node Conventions, , Organization,  Introduction
+@node Conventions
 @section Conventions and Definitions
 @cindex conventions
 @cindex definitions
 
+This manual uses @cite{texinfo} typographic conventions.
+
 @c ----------------------------------------------------------------------------
 
-@node Reference, Conformance, Introduction, Top
+@node Reference
 @chapter Reference
 @cindex reference
 
@@ -415,49 +445,66 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Files, Drivers, , Reference
+@node Files
 @section Files
 @cindex headers
 
+@include tree.texi
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Drivers, Modules, Files, Reference
+@node Drivers
 @section Drivers
 @cindex drivers
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Modules, Utilities, Drivers, Reference
+@node Modules
 @section Modules
 @cindex modules
 
+@subsection Transport Interface Module
+
+@subsubheading Licensing
+
+
+@subsection Transport Interface Read-Write Module
+
+@subsubheading Licensing
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Utilities, Development, Modules, Reference
+@node Utilities
 @section Utilities
 @cindex utilities
 
+@subsection @command{test-xnet}
+
+Note that @command{test-xnet} is maintained as a manual page,
+@ref{test-xnet(8), test-xnet(8), *manpages*, The Manual Pages}.
+
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Development, , Utilities, Reference
+@node Development
 @section Development
 @cindex developing
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Conformance, Releases, Reference, Top
+@node Conformance
 @chapter Conformance
 @cindex conformance
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Releases, Installation, Conformance, Top
+@node Releases
 @chapter Releases
 @cindex releases
 
@@ -466,7 +513,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Installation, GPL, Releases, Top
+@node Installation
 @chapter Installation
 @cindex installation
 
@@ -475,7 +522,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node GPL, LGPL, Installation, Top
+@node GPL
 @appendix GPL
 @cindex license GPL
 
@@ -483,7 +530,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @include texi/gpl.texi
 
-@node LGPL, FDL, GPL, Top
+@node LGPL
 @appendix LGPL
 @cindex license LGPL
 
@@ -491,7 +538,7 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @include texi/lesser.texi
 
-@node FDL, Indices, LGPL, Top
+@node FDL
 @appendix FDL
 @cindex license FDL
 
@@ -499,7 +546,10 @@ This document is organized (loosely) into several sections as follows:
 @c ----------------------------------------------------------------------------
 @include texi/fdl.texi
 
-@node Indices, , FDL, Top
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
 @appendix Indices
 @cindex indices
 
@@ -515,32 +565,32 @@ This document is organized (loosely) into several sections as follows:
 * Author Index::		Index of Authors
 @end menu
 
-@node Concept Index, Type Index, , Indices
+@node Concept Index
 @appendixsec Index of Concepts
 @printindex cp
 
-@node Type Index, Function Index, Concept Index, Indices
+@node Type Index
 @appendixsec Index of Data Types
 @printindex tp
 
-@node Function Index, Variable Index, Type Index, Indices
+@node Function Index
 @appendixsec Index of Functions and Macros
 @printindex fn
 
-@node Variable Index, File Index, Function Index, Indices
+@node Variable Index
 @appendixsec Index of Variables and Constants
 @printindex vr
 
-@node File Index, Option Index, Variable Index, Indices
+@node File Index
 @appendixsec Index of Files and Programs
 @printindex pg
 
-@node Option Index, Author Index, File Index, Indices
+@node Option Index
 @appendixsec Index of Configuration Options
 @printindex op
 
-@node Author Index, , Option Index, Indices
-@unnumbered Author Index
+@node Author Index
+@appendixsec Index of Authors
 @printindex au
 
 @c ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.6 2005/03/15 00:56:45 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.7 2005/04/11 20:48:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:45 $ by $Author: brian $
+% Last Modified $Date: 2005/04/11 20:48:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -165,6 +165,9 @@ another language, under the same conditions as for modified versions.
 @vskip 0pt
 @end titlepage
 @page
+
+@c Define an index of authors.
+@defindex au
 
 @ifnottex
 @node Top
@@ -568,7 +571,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.6 $); $Date: 2005/03/15 00:56:45 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/04/11 20:48:42 $.
 
 @subsubheading AUTHOR
 @format
@@ -732,7 +735,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.6 $); $Date: 2005/03/15 00:56:45 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.7 $); $Date: 2005/04/11 20:48:42 $.
 @end flushleft
 @end format
 

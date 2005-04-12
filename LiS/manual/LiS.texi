@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.6 2005/04/05 04:30:00 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.7 2005/04/11 20:48:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/05 04:30:00 $ by $Author: brian $
+% Last Modified $Date: 2005/04/11 20:48:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -335,13 +335,12 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public
-License} (@pxref{Copying}).  Please note, however, that there are different
-licensing terms for the manual pages and some of the documentation (derived from
-X/Open publications and other sources).  Consult the permission notices
-contained in the documentation for more information.  This document, is released
-under the @cite{GNU Free Documentation License} (@pxref{Documentation License})
-with all sections invariant.
+This package is released and distributed under the @cite{GNU General Public License}
+(@pxref{GPL}).  Please note, however, that there are different licensing terms for the manual
+pages and some of the documentation (derived from X/Open publications and other sources).  Consult
+the permission notices contained in the documentation for more information.  This document, is
+released under the @cite{GNU Free Documentation License} (@pxref{Documentation License}) with all
+sections invariant.
 
 @node Overview
 @section Overview

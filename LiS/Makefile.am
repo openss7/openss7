@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2005/04/09 09:30:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/04/12 00:04:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:30:30 $ by $Author: brian $
+# Last Modified $Date: 2005/04/12 00:04:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -264,7 +264,7 @@ if WITH_KO_MODULES
 else
 if PKG_BUILD_INDEP
 dist_modutil_DATA		= \
-				util/modutils/streams
+				util/modutils/lis
 endif
 endif
 
@@ -301,17 +301,19 @@ streams_CFLAGS			= $(USER_CFLAGS)
 
 timetst_SOURCES			= util/timetst.c
 timetst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+timetst_LDFLAGS			= -static libLiS.la
 timetst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 timetst_CFLAGS			= $(USER_CFLAGS)
 
 strtst_SOURCES			= util/strtst.c
 strtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-strtst_LDFLAGS			= -lpthread
+strtst_LDFLAGS			= -lpthread -static libLiS.la
 strtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 strtst_CFLAGS			= $(USER_CFLAGS)
 
 polltst_SOURCES			= util/polltst.c
 polltst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+polltst_LDFLAGS			= -static libLiS.la
 polltst_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 polltst_CFLAGS			= $(USER_CFLAGS)
 
@@ -359,17 +361,19 @@ rwf_CFLAGS			= $(USER_CFLAGS)
 
 lis_test_SOURCES		= util/linux/test.c
 lis_test_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+lis_test_LDFLAGS		= -static libLiS.la
 lis_test_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test_CFLAGS			= $(USER_CFLAGS)
 
 lis_test2_SOURCES		= util/linux/test2.c
 lis_test2_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+lis_test2_LDFLAGS		= -static libLiS.la
 lis_test2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 lis_test2_CFLAGS		= $(USER_CFLAGS)
 
 thrtst_SOURCES			= util/linux/thrtst.c
 thrtst_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-thrtst_LDFLAGS			= -lpthread
+thrtst_LDFLAGS			= -lpthread -static libLiS.la
 thrtst_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 thrtst_CFLAGS			= $(USER_CFLAGS)
 
@@ -434,9 +438,6 @@ if WITH_RCSD_DIRECTORY
 dist_initrd_SCRIPTS		= \
 				util/init/streams.sh
 
-dist_sysconf_DATA		= \
-				util/sysconfig/streams.conf
-
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
@@ -444,11 +445,14 @@ else
 dist_initrd_SCRIPTS		= \
 				util/init/streams
 
-dist_config_DATA		= \
-				util/sysconfig/streams
-
 ## ! WITH_RCSD_DIRECTORY
 endif
+
+dist_sysconf_DATA		= \
+				util/sysconfig/streams.conf
+
+dist_config_DATA		= \
+				util/sysconfig/streams
 
 ## INSTALL_INITSCRIPTS
 endif

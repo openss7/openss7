@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.15 2005/03/15 00:56:44 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.16 2005/04/11 20:48:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:44 $ by $Author: brian $
+% Last Modified $Date: 2005/04/11 20:48:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -276,9 +276,9 @@ Indices
 @unnumbered Acknowledgments
 @cindex credits
 
-As with most open source projects, this project would not have been possible
-without the valiant efforts and productive software of the @cite{Free Software
-Foundation} and the @cite{Linux Kernel Community}.
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
+Community}.
 
 @menu
 * Sponsors::			Sponsors
@@ -289,8 +289,7 @@ Foundation} and the @cite{Linux Kernel Community}.
 @unnumberedsec Sponsors
 @cindex sponsors
 
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in
-part by:
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
 
 @itemize
 @item Lockheed Martin
@@ -340,21 +339,18 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @cindex notice
 
 This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and
-modules previously part of
-@cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS) Installation and Reference Manual}.}.
-In stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains
-code mostly developed by other parties.
+@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
+part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
+Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
+@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
+other parties.
 @cindex licensing
-This package is released and distributed under the @cite{GNU General Public License}
-(@pxref{GPL}).  Please note, however, that there are different licensing terms
-for the manual pages and some of the documentation (derived from X/Open
-publications and other sources).  Consult the permission notices contained in
-the documentation for more information.  This document, is released under the
-@cite{GNU Free Documentation License} (@pxref{FDL}) with all sections
-invariant.
 
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GPL}).
+Please note, however, that there are different licensing terms for the manual pages and some of the
+documentation (derived from X/Open publications and other sources).  Consult the permission notices
+contained in the documentation for more information.  This document is released under the @cite{GNU
+Free Documentation License} (@pxref{FDL}) with all sections invariant.
 
 @node Overview
 @section Overview
@@ -363,8 +359,9 @@ invariant.
 This manual documents the design, implementation, installation, operation and future development of
 the @value{PACKAGE_TITLE} package.
 
-The @value{PACKAGE_TITLE} package is an X/Open Networking Services (XNS) package for Linux that can
-be used with
+The @value{PACKAGE_TITLE} package is
+an X/Open Networking Services (XNS)
+package for Linux that can be used with
 @cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
@@ -385,11 +382,15 @@ In addition, it provides STREAMS drivers and modules for DLPI including:
 @item DLPI to Linux IP Module (@file{streams-ip_strm_mod.o}).
 @end itemize
 
-The @value{PACKAGE_TITLE} package is essential to the development and support of XNS STREAMS
-networking modules and drivers and provides a fundamental set of X/Open header files and manual
-pages for such development.
+@noindent
+The @value{PACKAGE_TITLE} package is essential to the development and support of
+XNS STREAMS networking
+modules and drivers and provides a fundamental set of
+X/Open
+header files and manual pages for such development.
 
-The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Transport Interface (XTI), Transport
+The @value{PACKAGE_TITLE} does @emph{not} provide the
+X/Open Transport Interface (XTI), Transport
 Provider Interface (TPI) or Transport Layer Interface (TLI) components.  See the OpenSS7
 @command{strxnet}@footnote{@xref{Top, OpenSS7 XTI/TLI, About This Manual, strxnet, OpenSS7 XTI/TLI Library Reference Manual}}
 and
@@ -500,21 +501,17 @@ An OpenSS7 GPL header has been added to the source code to make this clear.
 
 @subsubheading Licensing
 
-The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and
-is licensed under the GNU Lesser General Public License @xref{LGPL}.  However,
-this OpenSS7 release is distributed under the GNU General Public License
-@xref{GPL}.  An OpenSS7 GPL header has been added to the source code to make
-this clear.
+The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and is licensed under the
+GNU Lesser General Public License @xref{LGPL}.  However, this OpenSS7 release is distributed under
+the GNU General Public License @xref{GPL}.  An OpenSS7 GPL header has been added to the source code
+to make this clear.
 
-LiS includes two adapter drivers to assist in interfacing STREAMS drivers
-to the Linux Kernel's TCP/IP protocols.  One driver, @dfn{ip_strm_mod}
-acts as an IP interface driver.  It fits below IP using standard
-@command{ifconfig}@footnote{@xref{ifconfig(8), ifconfig(8), ifconfig(8),
-*manpages*, The Manual Pages}.} procedures.  It, in turn, communicates
-downstream with any STREAMS driver using the DLPI protocol in a fashion
-similar to the manner in which IP on Unix systems interfaces to lower
-interface drivers.  This allows a DLPI STREAMS driver to act as an interface
-driver to Linux TCP/IP.
+LiS includes two adapter drivers to assist in interfacing STREAMS drivers to the Linux Kernel's
+TCP/IP protocols.  One driver, @dfn{ip_strm_mod} acts as an IP interface driver.  It fits below IP
+using standard @command{ifconfig}@footnote{@xref{ifconfig(8), ifconfig(8), ifconfig(8), *manpages*,
+The Manual Pages}.} procedures.  It, in turn, communicates downstream with any STREAMS driver using
+the DLPI protocol in a fashion similar to the manner in which IP on Unix systems interfaces to lower
+interface drivers.  This allows a DLPI STREAMS driver to act as an interface driver to Linux TCP/IP.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -591,6 +588,9 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 @include texi/fdl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 
 @node Indices
 @appendix Indices
