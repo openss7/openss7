@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: put.9.man,v 0.9.2.11 2005/03/30 13:38:52 brian Exp $
+.\" @(#) $Id: put.9.man,v 0.9.2.13 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -184,6 +184,8 @@ lfs
 .]
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_OSF
+or
+.B CONFIG_STREAMS_COMPAT_OSF_MODULE
 defined.
 .PP
 .BR streams_put ()
@@ -198,6 +200,8 @@ lfs
 .]
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_HPUX
+or
+.B CONFIG_STREAMS_COMPAT_HPUX_MODULE
 defined.
 .\"
 .\"
@@ -452,7 +456,7 @@ Symbol
 is provided for compatibility with
 .IR LiS .
 See
-.BR lisbcm (9).
+.BR liscompat (9).
 .BR lis_safe_putmsg ()
 simply calls
 .BR put ()

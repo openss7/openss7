@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlink.9.man,v 0.9.2.10 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: unlink.9.man,v 0.9.2.11 2005/04/13 04:30:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -171,6 +171,8 @@ must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_LIS
+or
+.B CONFIG_STREAMS_COMPAT_LIS_MODULE
 defined.
 .PP
 Unlink is implemented by changing the data segment to the kernel data segment

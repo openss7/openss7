@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: physreq.9.man,v 0.9.2.8 2005/03/30 13:38:52 brian Exp $
+.\" @(#) $Id: physreq.9.man,v 0.9.2.9 2005/04/13 04:30:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -215,9 +215,11 @@ when
 .B _UW7_SOURCE
 is defined before DDI include files are included and the kernel was compiled
 with compatibility flag:
-.B CONFIG_STREAMS_COMPAT_UW7
+.BR CONFIG_STREAMS_COMPAT_UW7 ,
+.BR CONFIG_STREAMS_COMPAT_UW7_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_LIS ,
 or
-.BR CONFIG_STREAMS_COMPAT_LIS .
+.BR CONFIG_STREAMS_COMPAT_LIS_MODULE .
 .IP \(em
 .I LiS
 ignores this argument and provides a

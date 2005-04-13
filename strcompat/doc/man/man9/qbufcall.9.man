@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qbufcall.9.man,v 0.9.2.3 2005/03/30 13:38:52 brian Exp $
+.\" @(#) $Id: qbufcall.9.man,v 0.9.2.4 2005/04/13 04:30:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -296,6 +296,8 @@ symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
+or
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
 set.
 .PP
 The primary difference between

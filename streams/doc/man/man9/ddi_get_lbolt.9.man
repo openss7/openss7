@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ddi_get_lbolt.9.man,v 0.9.2.9 2005/03/30 13:38:46 brian Exp $
+.\" @(#) $Id: ddi_get_lbolt.9.man,v 0.9.2.10 2005/04/13 04:30:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:46 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -147,6 +147,8 @@ symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SUN
+or
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
 set.
 .PP
 .BR ddi_get_lbolt ()

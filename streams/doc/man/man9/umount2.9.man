@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: umount2.9.man,v 0.9.2.8 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: umount2.9.man,v 0.9.2.10 2005/04/13 07:51:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -186,6 +186,8 @@ must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_LIS
+or
+.B CONFIG_STREAMS_COMPAT_LIS_MODULE
 defined.
 .\"
 .\"
@@ -247,6 +249,14 @@ lfs
 differ from that of
 .IR LiS ,
 binaries are incompatible.
+.sp
+Note that
+.BR lis_umount2 ()
+was deprecated as of
+.IR "LiS 2.18.0" .
+See
+.BR lisdeprec (9)
+for more information.
 .IP \(em
 .BR umount2 ()
 only provides functionality comparable to

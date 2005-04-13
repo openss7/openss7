@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: RW_ALLOC.9.man,v 0.9.2.3 2005/03/30 13:38:34 brian Exp $
+.\" @(#) $Id: RW_ALLOC.9.man,v 0.9.2.4 2005/04/13 04:30:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -226,6 +226,8 @@ must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_SVR4
+or
+.B CONFIG_STREAMS_COMPAT_SVR4_MODULE
 defined.
 .PP
 .BR RW_ALLOC ()

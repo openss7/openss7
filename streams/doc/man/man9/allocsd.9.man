@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocsd.9.man,v 0.9.2.5 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: allocsd.9.man,v 0.9.2.6 2005/04/13 04:30:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 04:30:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -118,8 +118,15 @@ will return a
 pointer.
 .\"
 .\"
-.\".SH ERRORS
-.\".PP
+.SH ERRORS
+.PP
+When an error occurs,
+.BR allocsd ()
+will return a
+.BR NULL
+pointer.
+.BR allocsd ()
+fails when there is insufficient cache memory to satisfy the allocation request.
 .\"
 .\"
 .SH CONTEXT
@@ -128,8 +135,10 @@ pointer.
 can be called from any context, including user context, module procedures, call outs, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
-.\".SH MP-STREAMS
-.\".PP
+.SH MP-STREAMS
+.PP
+.BR allocsd ()
+is MP-safe.  The caller has exclusive access to the returned stream head.
 .\"
 .\"
 .SH NOTICES
@@ -163,12 +172,25 @@ See
 for additional compatibility considerations.
 .\"
 .\"
-.\".SH CONFORMANCE
-.\".PP
+.SH CONFORMANCE
+.PP
+.BR allocsd ()
+is specific to
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+and is not subject to standardization.
 .\"
 .\"
-.\".SH HISTORY
-.\".PP
+.SH HISTORY
+.PP
+.BR allocsd ()
+is specific to
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
 .\"
 .\"
 .[
