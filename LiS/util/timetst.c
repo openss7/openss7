@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -34,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,36 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2003/12/15 23:35:47 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] =
-    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.1.4.2 $) $Date: 2003/12/15 23:35:47 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
  * Copyright 1997 David Grothe, Gcom, Inc <dave@gcom.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- * 
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
- * MA 02139, USA.
- * 
  */
-
-#ident "@(#) LiS timetst.c 2.5 09/02/04 14:46:08 "
 
 #define	inline			/* make disappear */
 

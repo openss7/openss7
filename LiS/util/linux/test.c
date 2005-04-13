@@ -4,7 +4,8 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -34,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -47,13 +48,12 @@
 
  Last Modified $Date$ by $Author$
 
- -----------------------------------------------------------------------------
- $Log$
  *****************************************************************************/
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+
 
 /* 
  *  Test program for clarification of Berges bug.

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.13 2005/04/12 09:29:03 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.14 2005/04/12 23:01:47 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/12 09:29:03 $ by $Author: brian $
+% Last Modified $Date: 2005/04/12 23:01:47 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -389,7 +389,7 @@ header files and manual pages for such development.
 
 The @value{PACKAGE_TITLE} does @emph{not} provide the X/Open Network Services (XNS), Network
 Provider Interface (NPI) or Data Link Provider Interface (DLPI) components.  See the OpenSS7
-@command{strxns}@footnote{@xref{Top, OpenSS7 XNS Networking, About This Manual, strxns, OpenSS7 XNS Networking Installation and Reference Manual}}
+@command{strxns}@footnote{@xref{Top, OpenSS7 XNS Networking, About This Manual, strxns, OpenSS7 XNS Networking Installation and Reference Manual}.}
 package.
 
 @node Organization

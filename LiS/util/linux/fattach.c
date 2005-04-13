@@ -1,10 +1,11 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.4.1 $) $Date: 2003/12/10 11:09:29 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
@@ -34,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,43 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2003/12/10 11:09:29 $ by $Author: brian $
-
- -----------------------------------------------------------------------------
- $Log: fattach.c,v $
- Revision 1.1.1.1.4.1  2003/12/10 11:09:29  brian
- Start of autoconf changes.
+ Last Modified $Date$ by $Author$
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.4.1 $) $Date: 2003/12/10 11:09:29 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-static char const ident[] =
-    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.4.1 $) $Date: 2003/12/10 11:09:29 $";
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*
  *  fattach.c - try to fattach a list of paths to a path naming a STREAMS
  *  device, or to the ends of a pipe.
  *
  *  Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Library General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Library General Public License for more details.
- * 
- *  You should have received a copy of the GNU Library General Public
- *  License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
- *  MA 02139, USA.
  */
-
-#ident "@(#) LiS fattach.c 1.2 12/15/00"
 
 #include <unistd.h>
 #include <stdlib.h>

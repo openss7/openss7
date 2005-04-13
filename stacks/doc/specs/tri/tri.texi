@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tri.texi,v 0.9.2.8 2005/03/15 00:56:57 brian Exp $
+% @(#) $Id: tri.texi,v 0.9.2.9 2005/04/12 23:01:44 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/03/15 00:56:57 $ by $Author: brian $
+% Last Modified $Date: 2005/04/12 23:01:44 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -3273,7 +3273,7 @@ the form of an error acknowledgement to the appropriate primitive in error.
 Only those primitive which require acknowledgements may generate a non-fatal
 error acknowledgement.  These acknowledgements always report syntactical error
 in the specified primitive when the TR provider receives the primitive.  The
-primitive descriptions@footnote{@xref{TRI Primitives}} define those primitive
+primitive descriptions@footnote{@xref{TRI Primitives}.} define those primitive
 and rules regarding acknowledgement for each primitive.  These errors are
 reported to the TR user with the @samp{TR_ERROR_ACK} primitive,
 (@pxref{TR_ERROR_ACK}), and give the TR user the option of reissuing the TR
