@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.3 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.4 2005/04/13 07:51:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,6 +83,8 @@ sort-adjacent-labels
 .PP
 .B #undef _SOL_SOURCE
 .br
+.B #undef _LIS_SOURCE
+.br
 .B #include <sys/stream.h>
 .br
 .B #include <sys/ddi.h>
@@ -91,6 +93,8 @@ sort-adjacent-labels
 .sp 2
 .PP
 .B #define _SOL_SOURCE
+.br
+.B #define _LIS_SOURCE
 .br
 .B #include <sys/stream.h>
 .br
@@ -190,13 +194,20 @@ before returning.
 .SH RETURN
 .PP
 For compatibility with
-.IR Solaris \(rg,
+.IR Solaris \(rg
 .[
 solspg
 .]
+and
+.IR LiS ,
+.[
+lis
+.]
 if
 .B _SOL_SOURCE
-is defined before including the
+or
+.B _LIS_SOURCE
+are defined before including the
 .I stream.h
 and
 .I ddi.h
@@ -221,7 +232,9 @@ uw7spg
 .]
 if
 .B _SOL_SOURCE
-is undefined before including the
+and
+.B _LIS_SOURCE
+are undefined before including the
 .I stream.h
 and
 .I ddi.h
@@ -481,10 +494,14 @@ solspg
 .[
 suxspg
 .]
-and
 .IR UnixWare \(rg,
 .[
 uw7spg
+.]
+and
+.IR LiS
+.[
+lis
 .]
 provide this function.
 .IP \(em
@@ -500,35 +517,53 @@ hpuxspg
 .[
 osfspg
 .]
+and
 .IR UXP/V \(rg
 .[
 uxpspg
-.]
-and
-.IR LiS
-.[
-lis
 .]
 do not provide this function.
 .RI ( HP-UX \(rg
 provides the symbols, but they do nothing.)
 .IP \(em
 .IR Solaris \(rg
-provides the function prototype:
+and
+.IR LiS
+provide the function prototype:
 .BI "void freezestr(queue_t *" q ).
 All the others provide the prototype
 .BI "pl_t freezestr(queue_t *" q ).
 For compatibility with
-.IR Solaris \(rg,
+.IR Solaris \(rg
+and
+.IR LiS ,
 the software priority level otherwise returned by
 .BR freezestr ()
 is stored internally as well as being returned.
 .BR unfreezestr (9)
 will access this internal software priority level to restore when the
-.IR Solaris \(rg,
+.IR Solaris \(rg
+or
+.IR LiS
 version of
 .BR unfreezestr (9)
 is called.
+.IP \(em
+.IR LiS
+has a particularly broken version of this function.  Under
+.IR LiS ,
+.BR freezestr ()
+only sets a flag (in a non-MP-safe way) on each stream head and queue in the
+stream.  It does not stop the stream from being closed, flushed, or other
+actions taken as a result of timeouts, callbacks or buffer calls.
+.BR freezestr ()
+in
+.B Linux Fast-STREAMS
+does not recreate these
+.I LiS
+bugs, but provides a 
+.BR freezestr ()
+that functions properly.
 .IP \(em
 .BR freezestr ()
 does not result in single-party deadlock on the calling processor when called

@@ -1,0 +1,2398 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: liscompat.9.man,v 0.9.2.2 2005/04/13 07:51:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/13 07:51:11 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH LISCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B liscompat
+\- \fBLinux Fast-STREAMS\fP LiS Compatibility Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B insmod liscompat.o
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.I LiS Binary Compatibility Module
+is a
+.B Linux Fast-STREAMS
+.[
+LfS
+.]
+module that provides binary compatibility with
+.I LiS\c
+.
+.[
+LiS
+.]
+The
+.I LiS CM
+is provided for binary compatibility with
+.I STREAMS
+drivers and modules compiled
+as
+.B Linux
+kernel modules.
+When compiled with kernel configuration flag
+.B CONFIG_STREAMS_DEBUG
+set,
+.B Linux Fast-STREAMS
+will issue warnings whenever
+.I LiS CM
+symbols are invoked.
+.\"
+.\"
+.PP
+Many of the symbols provided by
+.I LiS
+.[
+LiS
+.]
+are inefficient wrappers for
+.B Linux
+kernel functions.
+New
+.I STREAMS
+drivers and modules should always be compiled against
+.B Linux Fast-STREAMS
+and
+.I Linux
+symbols for performance and efficiency.
+.\"
+.\"
+.PP
+Many of the SVR 4.2
+.I STREAMS
+functions provided by
+.I LiS
+.[
+LiS
+.]
+contains bugs.  The symbols provided by the
+.I LiS CM
+are not bug-for-bug compatible with
+.I LiS\c
+.
+.[
+LiS
+.]
+This means that incorrect
+.I STREAMS
+drivers and modules that appear to run
+correctly under
+.I LiS
+.[
+LiS
+.]
+may fail to operate with the
+.IR "LiS CM" .
+.\"
+.\"
+.PP
+.I LiS
+can permit erroneous
+.I STREAMS
+functions to appear to run correctly.
+The equivalent
+.B Linux Fast-STREAMS
+.I LiS CM
+functions are unforgiving of being passed
+.B NULL
+pointers and out of range arguments.
+This means that incorrect
+.I STREAMS
+drivers and modules that appear to run
+correctly under
+.I LiS
+.[
+LiS
+.]
+may fail to operate with the
+.IR "LiS CM" .
+.\"
+.\"
+.SS lis_adjmsg
+.PP
+.BR lis_adjmsg ()
+has no known bugs.
+.I CM
+calls
+.BR adjmsg (9).
+New programs should use
+.BR adjmsg (9).
+.\"
+.\"
+.SS lis_alloc_atomic_fcn
+.PP
+.BR lis_alloc_atomic_fcn ()
+is an inefficient wrapper to
+.BR kmalloc (9).
+.I CM
+calls
+.BR kmem_alloc (9)
+with flag
+.B KM_NOSLEEP .
+New programs should use
+.BR kmem_alloc (9).
+.\"
+.\"
+.SS lis_alloc_dma_fcn
+.PP
+.BR lis_alloc_dma_fcn ()
+is an inefficient wrapper to
+.BR kmalloc (9).
+.I CM
+calls
+.BR kmalloc (9)
+with flag
+.BR (GFP_KERNEL|GFP_DMA) .
+New programs should use
+.BR kmalloc (9).
+.\"
+.\"
+.SS lis_alloc_kernel_fcn
+.PP
+.BR lis_alloc_kernel_fcn ()
+is an inefficient wrapper to
+.BR kmalloc (9).
+.I CM
+calls
+.BR kmem_alloc (9)
+with flag
+.BR KM_SLEEP .
+New programs should use
+.BR kmem_alloc (9).
+.\"
+.\"
+.SS lis_allocb
+.PP
+.BR lis_allocb ()
+has no known bugs.
+.I CM
+calls
+.BR allocb (9).
+New programs should use
+.BR allocb (9).
+.\"
+.\"
+.SS lis_allocb_physreq
+.PP
+.BR lis_allocb_physreq ()
+simply calls
+.BR lis_allocb ()
+and does not satisfy the physical memory request.
+.I CM
+calls
+.BR allocb (9).
+New programs should allocate memory meeting the requirements and then call
+.BR esballoc (9).
+.\"
+.\"
+.SS lis_appq
+.PP
+.BR lis_appq ()
+has no known bugs.
+.I CM
+calls
+.BR appq (9).
+New programs should use
+.BR appq (9).
+.\"
+.\"
+.SS lis_apush_get
+.PP
+.BR lis_apush_get ()
+has no known bugs.
+.I CM
+calls
+.BR apush_get (9).
+This has different side-effects than
+.BR lis_apush_get ().
+New programs should use
+.BR apush_get (9).
+.\"
+.\"
+.SS lis_apush_set
+.PP
+.BR lis_apush_set ()
+has no known bugs.
+.I CM
+calls
+.BR apush_set (9).
+This has different side-effects than
+.BR lis_apush_get ().
+New programs should use
+.BR apush_set (9).
+.\"
+.\"
+.SS lis_assert_fail
+.PP
+.BR lis_assert_fail (9)
+has no known bugs.
+.I CM
+calls
+.BR printk (9).
+New programs should use
+.BR printk (9),
+.BR cmn_err (9)
+or
+.BR strlog (9).
+.\"
+.\"
+.SS lis_atomic_add
+.PP
+.BR lis_atomic_add ()
+is an inefficient wrapper to
+.BR atomic_add (9).
+.I CM
+calls
+.BR atomic_add (9).
+New programs should use
+.BR atomic_add (9).
+.\"
+.\"
+.SS lis_atomic_dec
+.PP
+.BR lis_atomic_dec ()
+is an inefficient wrapper to
+.BR atomic_dec (9).
+.I CM
+calls
+.BR atomic_dec (9).
+New programs should use
+.BR atomic_dec (9).
+.\"
+.\"
+.SS lis_atomic_dec_and_test
+.PP
+.BR lis_atomic_dec_and_test ()
+is an inefficient wrapper to
+.BR atomic_dec_and_test (9).
+.I CM
+calls
+.BR atomic_dec_and_test (9).
+New programs should use
+.BR atomic_dec_and_test (9).
+.\"
+.\"
+.SS lis_atomic_inc
+.PP
+.BR lis_atomic_inc ()
+is an inefficient wrapper to
+.BR atomic_inc (9).
+.I CM
+calls
+.BR atomic_inc (9).
+New programs should use
+.BR atomic_inc (9).
+.\"
+.\"
+.SS lis_atomic_read
+.PP
+.BR lis_atomic_read ()
+is an inefficient wrapper to
+.BR atomic_read (9).
+.I CM
+calls
+.BR atomic_read (9).
+New programs should use
+.BR atomic_read (9).
+.\"
+.\"
+.SS lis_atomic_set
+.PP
+.BR lis_atomic_set ()
+is an inefficient wrapper to
+.BR atomic_set (9).
+.I CM
+calls
+.BR atomic_set (9).
+New programs should use
+.BR atomic_set (9).
+.\"
+.\"
+.SS lis_atomic_sub
+.PP
+.BR lis_atomic_sub ()
+is an inefficient wrapper to
+.BR atomic_sub (9).
+.I CM
+calls
+.BR atomic_sub (9).
+New programs should use
+.BR atomic_sub (9).
+.\"
+.\"
+.SS lis_backq
+.PP
+.BR lis_backq ()
+strangely calls
+.BR lis_backq_fcn ()
+with its own file name and line number.
+.I CM
+calls
+.BR backq (9).
+New programs should use
+.BR backq (9).
+.\"
+.\"
+.SS lis_backq_fcn
+.PP
+.BR lis_backq_fcn ()
+is not MP safe.
+.I CM
+calls the MP-safe
+.BR backq (9).
+New programs should use
+.BR backq (9).
+.\"
+.\"
+.SS lis_bcanput
+.PP
+.BR lis_bcanput ()
+returns false when it suffers and internal error.
+.I CM
+calls
+.BR bcanput (9).
+.BR bcanput (9)
+does not suffer internal errors and return false.
+.B NULL
+pointers passed to the function will cause a kernel oops.
+New programs should use
+.BR bcanput (9).
+.\"
+.\"
+.SS lis_bcanputnext
+.PP
+.BR lis_bcanputnext ()
+simply calls
+.BR lis_bcanput ()
+and is not MP-safe.
+.I CM
+calls the MP-save
+.BR bcanputnext (9).
+New programs should use
+.BR bcanputnext (9).
+.\"
+.\"
+.SS lis_bcanputnext_anyband
+.PP
+.BR lis_bcanputnext_anyband ()
+returns false when it suffers an internal error.
+.I CM
+calls
+.BR bcanputnext (9)
+with band
+.BR ANYBAND .
+.BR bcanput (9)
+does not suffer internal errors and return false.
+.B NULL
+pointers passed to the function will cause a kernel oops.
+New programs should use
+.BR bcanputnext (9)
+with band
+.BR ANYBAND .
+.\"
+.\"
+.SS lis_bprintf
+.PP
+.BR lis_bprintf ()
+is used for debugging in LiS.
+.I CM
+simply returns.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_bufcall
+.PP
+.BR lis_bufcall ()
+is an inefficient implementation.
+.I CM
+calls
+.BR bufcall (9).
+New programs should use
+.BR bufcall (9).
+.\"
+.\"
+.SS lis_clone_major
+.PP
+.BR lis_clone_major ()
+returns the clone major number.
+.I CM
+returns the configured clone major,
+.BR CONFIG_STREAMS_CLONE_MAJOR .
+New programs should not use this function.
+.\"
+.\"
+.SS lis_cmn_err
+.PP
+.BR lis_cmn_err ()
+is an inefficient wrapper to
+.BR printk (9)
+and
+.BR panic (9).
+.I CM
+calls
+.BR cmn_err (9).
+New programs should use
+.BR cmn_err (9).
+.\"
+.\"
+.SS lis_copyb
+.PP
+.BR lis_copyb ()
+in LiS will fail if
+.I b_wptr
+is less than
+.I b_rptr
+or if
+.I db_lim
+is less than
+.I db_base.
+.I CM
+calls
+.BR copyb (9).
+.BR copyb (9)
+does not fail under the conditions that LiS fails.
+New programs should use
+.BR copyb (9).
+.\"
+.\"
+.SS lis_copymsg
+.PP
+.BR lis_copymsg ()
+fails on a message block with
+.I b_wptr
+less then
+.IR b_rptr ,
+or
+.I db_lim
+less than
+.IR db_base .
+.I CM
+calls
+.BR copymsg (9).
+.BR copymsg (9)
+does not fail on negative length message blocks.
+New programs should use
+.BR copymsg (9).
+.\"
+.\"
+.SS lis_date
+.\"
+.\"
+.SS lis_debug_mask
+.PP
+.BR lis_debug_mask
+is an LiS debug variable.
+.I CM
+ignores this variable.
+New programs should not reference this variable.
+.\"
+.\"
+.SS lis_debug_mask2
+.PP
+.BR lis_debug_mask2
+is an LiS debug variable.
+.I CM
+ignores this variable.
+New programs should not reference this variable.
+.\"
+.\"
+.SS lis_disable_irq
+.PP
+.BR lis_disable_irq ()
+is an inefficient wrapper for
+.BR disable_irq (9).
+.I CM
+calls
+.BR disable_irq (9).
+New programs should use
+.BR disable_irq (9).
+.\"
+.\"
+.SS lis_down_fcn
+.PP
+.BR lis_down_fcn ()
+is an inefficient wrapper to
+.BR down_interruptible (9).
+.I CM
+calls
+.BR down_interruptible (9).
+New programs should use
+.BR down_interruptible (9).
+.\"
+.\"
+.SS lis_dsecs
+.PP
+.BR lis_dsecs ()
+is a inefficient wrapper to
+.BR do_gettimeofday (9).
+.I CM
+calls
+.BR do_gettimeofday (9).
+New programs should use
+.BR do_gettimeofday (9).
+.\"
+.\"
+.SS lis_dupb
+.PP
+.BR lis_dupb ()
+.\"
+.\"
+.SS lis_dupmsg
+.PP
+.BR lis_dupmsg
+.\"
+.\"
+.SS lis_enable_irq
+.PP
+.BR lis_enable_irq
+is an inefficient wrapper to
+.BR enable_irq (9).
+.I CM
+calls
+.BR enable_irq (9).
+New programs should use
+.BR enable_irq (9).
+.\"
+.\"
+.SS lis_esballoc
+.PP
+.BR lis_esballoc ()
+.\"
+.\"
+.SS lis_esbbcall
+.PP
+.BR lis_esbbcall ()
+.\"
+.\"
+.SS lis_flushband
+.PP
+.BR lis_flushband ()
+.\"
+.\"
+.SS lis_flushq
+.PP
+.BR lis_flushq ()
+.\"
+.\"
+.SS lis_free
+.PP
+.BR lis_free
+.\"
+.\"
+.SS lis_free_dma
+.PP
+.BR lis_free_dma ()
+is an inefficient wrapper for
+.BR free_dma (9).
+.I CM
+calls
+.BR free_dma (9).
+New programs should use
+.BR free_dma (9).
+.\"
+.\"
+.SS lis_free_irq
+.PP
+.BR lis_free_irq ()
+is an inefficient wrapper for
+.BR free_irq (9).
+.I CM
+calls
+.BR free_irq (9).
+New programs should use
+.BR free_irq (9).
+.\"
+.\"
+.SS lis_free_mem_fcn
+.\"
+.\"
+.SS lis_free_pages_fcn
+.PP
+.BR lis_free_pages_fcn ()
+is an inefficient wrapper for
+.BR free_pages (9).
+.I CM
+calls
+.BR free_pages (9).
+New programs should use
+.BR free_pages (9).
+.\"
+.\"
+.SS lis_free_passfp
+.\"
+.\"
+.SS lis_freeb
+.PP
+.BR lis_freeb
+.\"
+.\"
+.SS lis_freemsg
+.PP
+.BR lis_freemsg ()
+.\"
+.\"
+.SS lis_freeq
+.PP
+.BR lis_freeq
+.\"
+.\"
+.SS lis_fstr_sw
+.PP
+.BR lis_fstr_sw
+.\"
+.\"
+.SS lis_get_fifo
+.PP
+.BR lis_get_fifo ()
+.\"
+.\"
+.SS lis_get_free_pages_atomic_fcn
+.PP
+.BR lis_get_free_pages_atomic_fcn ()
+is an inefficient wrapper for
+.BR get_free_pages (9).
+.I CM
+calls
+.BR get_free_pages (9).
+New programs should use
+.BR get_free_pages (9).
+.\"
+.\"
+.SS lis_get_free_pages_fcn
+.PP
+.BR lis_get_free_pages_fcn
+is an inefficient wrapper for
+.BR get_free_pages (9).
+.I CM
+calls
+.BR get_free_pages (9).
+New programs should use
+.BR get_free_pages (9).
+.\"
+.\"
+.SS lis_get_free_pages_kernel_fcn
+is an inefficient wrapper for
+.BR get_free_pages (9).
+.I CM
+calls
+.BR get_free_pages (9).
+New programs should use
+.BR get_free_pages (9).
+.\"
+.\"
+.SS lis_getint
+.PP
+.BR lis_getint ()
+is an inefficient wrapper function.
+.I CM
+directly accesses memory.
+New programs should not call this function.
+.\"
+.\"
+.SS lis_getq
+.PP
+.BR lis_getq ()
+.\"
+.\"
+.SS lis_gettimeofday
+.PP
+.BR lis_gettimeofday ()
+is an inefficient wrapper for
+.BR do_gettimeofday (9).
+New programs should use
+.BR do_gettimeofday (9).
+.\"
+.\"
+.SS lis_hitime
+.PP
+.BR lis_hitime ()
+.\"
+.\"
+.SS lis_insq
+.PP
+.BR lis_insq ()
+.\"
+.\"
+.SS lis_interruptible_sleep_on
+.PP
+.BR lis_interruptible_sleep_on ()
+is an inefficient wrapper for
+.BR interruptible_sleep_on (9).
+.I CM
+calls
+.BR interruptible_sleep_on (9).
+New programs should use
+.BR interruptible_sleep_on (9).
+.\"
+.\"
+.SS lis_ioremap
+.PP
+.BR lis_ioremap
+is an inefficient wrapper for
+.BR ioremap (9).
+.I CM
+calls
+.BR ioremap (9).
+New programs should use
+.BR ioremap (9).
+.\"
+.\"
+.SS lis_ioremap_nocache
+.PP
+.BR lis_ioremap_nocache
+is an inefficient wrapper for
+.BR ioremap_nocache (9).
+.I CM
+calls
+.BR ioremap_nocache (9).
+New programs should use
+.BR ioremap_nocache (9).
+.\"
+.\"
+.SS lis_iounmap
+.PP
+.BR lis_iounmap
+is an inefficient wrapper for
+.BR iounmap (9).
+.I CM
+calls
+.BR iounmap (9).
+New programs should use
+.BR iounmap (9).
+.\"
+.\"
+.SS lis_jiffies
+.PP
+.BR lis_jiffies ()
+is an inefficient wrapper for
+.BR jiffies (9).
+.I CM
+returns the value of
+.BR jiffies (9).
+New programs should use
+.BR jiffies (9).
+.\"
+.\"
+.SS lis_kernel_down
+.PP
+.BR lis_kernel_down ()
+is an inefficient wrapper for
+.BR down_interruptible (9).
+.I CM
+calls
+.BR down_interruptible (9).
+New programs should use
+.BR down_interruptible (9).
+.\"
+.\"
+.SS lis_kernel_up
+.PP
+.BR lis_kernel_up ()
+is an inefficient wrapper for
+.BR up (9).
+.I CM
+calls
+.BR up (9).
+New programs should use
+.BR up (9).
+.\"
+.\"
+.SS lis_kernel_version
+.PP
+.BR lis_kernel_version
+is a copy of
+.BR UTS_RELEASE .
+New programs should use
+.BR UTS_RELEASE .
+.\"
+.\"
+.SS lis_kfree
+.PP
+.BR lis_kfree ()
+is an inefficient wrapper for
+.BR kfree (9).
+.I CM
+calls
+.BR kfree (9).
+New programs should use
+.BR kfree (9).
+.\"
+.\"
+.SS lis_kmalloc
+.PP
+.BR lis_kmalloc ()
+is an inefficient wrapper for
+.BR kmalloc (9).
+New programs should use
+.BR kmalloc (9).
+.\"
+.\"
+.SS lis_linkb
+.PP
+.BR lis_linkb
+.\"
+.\"
+.SS lis_major
+.PP
+.BR lis_major
+.\"
+.\"
+.SS lis_malloc
+.PP
+.BR lis_malloc ()
+is an inefficient kernel memory allocator.
+.I CM
+calls
+.BR kalloc (9).
+New programs should use
+.BR kalloc (9).
+.\"
+.\"
+.SS lis_milli_to_ticks
+.PP
+.BR lis_milli_to_ticks
+.\"
+.\"
+.SS lis_mknod
+.PP
+.BR lis_mknod ()
+is an inefficient wrapper to
+.BR sys_mknod (9).
+.I CM
+calls
+.BR sys_mknod (9).
+New programs should use
+.BR sys_mknod (9)
+or
+.BR vfs_mknod (9).
+.\"
+.\"
+.SS lis_mount
+.PP
+.BR lis_mount ()
+is an inefficient wrapper to
+.BR sys_mount (9).
+.I CM
+calls
+.BR sys_mount (9).
+New programs should use
+.BR sys_mount (9)
+or
+.BR kern_mount (9).
+.\"
+.\"
+.SS lis_msecs
+.PP
+.BR lis_msecs ()
+is an inefficient wrapper to
+.BR do_gettimeofday (9).
+.I CM
+calls
+.BR do_gettimeofday (9).
+New programs should use
+.BR do_gettimeofday (9).
+.\"
+.\"
+.SS lis_msg_type_name
+.PP
+.BR lis_msg_type_name ()
+is an LiS debug display function.
+.I CM
+returns a noxious string.
+New programs should not call this function.
+.\"
+.\"
+.SS lis_msgdsize
+.PP
+.BR lis_msgdsize ()
+.\"
+.\"
+.SS lis_msgpullup
+.PP
+.BR lis_msgpullup ()
+.\"
+.\"
+.SS lis_msgsize
+.PP
+.BR lis_msgsize ()
+.\"
+.\"
+.SS lis_num_cpus
+.PP
+.BR lis_num_cpus
+is an LiS variable set to
+.BR NUM_CPUS ,
+which happens to be 1 on all SP systems and 32 on all SMP systems.  As such it
+is a useless variable.
+.I CM
+sets this to
+.B NUM_CPUS
+for compatibility.
+New programs should use
+.B NUM_CPUS
+or
+.BR smp_num_cpus .
+.\"
+.\"
+.SS lis_osif_cli
+.PP
+.BR lis_osif_cli
+is an inefficient wrapper for
+.BR cli (9).
+.I CM
+calls
+.BR cli (9).
+New programs should use
+.BR cli (9).
+.\"
+.\"
+.SS lis_osif_do_gettimeofday
+.PP
+.BR lis_osif_do_gettimeofday ()
+is an inefficient wrapper for
+.BR do_gettimeofday (9).
+.I CM
+calls
+.BR do_gettimeofday (9).
+New programs should use
+.BR do_gettimeofday (9).
+.\"
+.\"
+.SS lis_osif_do_settimeofday
+.PP
+.BR lis_osif_do_settimeofday ()
+is an inefficient wrapper for
+.BR do_settimeofday (9).
+.I CM
+calls
+.BR do_settimeofday (9).
+New programs should use
+.BR do_settimeofday (9).
+.\"
+.\"
+.SS lis_osif_pci_alloc_consistent
+.PP
+.BR lis_osif_pci_alloc_consistent ()
+is an inefficient wrapper for
+.BR pci_alloc_consistent (9).
+.I CM
+calls
+.BR pci_alloc_consistent (9).
+New programs should use
+.BR pci_alloc_consistent (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_supported
+.PP
+.BR lis_osif_pci_dac_dma_supported ()
+is an inefficient wrapper for
+.BR pci_dac_dma_supported (9).
+.I CM
+calls
+.BR pci_dac_dma_supported (9).
+New programs should use
+.BR pci_dac_dma_supported (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_sync_single
+.PP
+.BR lis_osif_pci_dac_dma_sync_single ()
+is an inefficient wrapper for
+.BR pci_dac_dma_sync_single (9).
+.I CM
+calls
+.BR pci_dac_dma_sync_single (9).
+New programs should use
+.BR pci_dac_dma_sync_single (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_sync_single_for_cpu
+.PP
+.BR lis_osif_pci_dac_dma_sync_single_for_cpu ()
+is an inefficient wrapper for
+.BR pci_dac_dma_sync_single_for_cpu (9).
+.I CM
+calls
+.BR pci_dac_dma_sync_single_for_cpu (9).
+New programs should use
+.BR pci_dac_dma_sync_single_for_cpu (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_sync_single_for_device
+.PP
+.BR lis_osif_pci_dac_dma_sync_single_for_device ()
+is an inefficient wrapper for
+.BR pci_dac_dma_sync_single_for_device (9).
+.I CM
+calls
+.BR pci_dac_dma_sync_single_for_device (9).
+New programs should use
+.BR pci_dac_dma_sync_single_for_device (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_to_offset
+.PP
+.BR lis_osif_pci_dac_dma_to_offset ()
+is an inefficient wrapper for
+.BR pci_dac_dma_to_offset (9).
+.I CM
+calls
+.BR pci_dac_dma_to_offset (9).
+New programs should use
+.BR pci_dac_dma_to_offset (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_dma_to_page
+.PP
+.BR lis_osif_pci_dac_dma_to_page ()
+is an inefficient wrapper for
+.BR pci_dac_dma_to_page (9).
+.I CM
+calls
+.BR pci_dac_dma_to_page (9).
+New programs should use
+.BR pci_dac_dma_to_page (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_page_to_dma
+.PP
+.BR lis_osif_pci_dac_page_to_dma ()
+is an inefficient wrapper for
+.BR pci_dac_page_to_dma (9).
+.I CM
+calls
+.BR pci_dac_page_to_dma (9).
+New programs should use
+.BR pci_dac_page_to_dma (9).
+.\"
+.\"
+.SS lis_osif_pci_dac_set_dma_mask
+.PP
+.BR lis_osif_pci_dac_set_dma_mask ()
+is an inefficient wrapper for
+.BR pci_dac_set_dma_mask (9).
+.I CM
+calls
+.BR pci_dac_set_dma_mask (9).
+New programs should use
+.BR pci_dac_set_dma_mask (9).
+.\"
+.\"
+.SS lis_osif_pci_disable_device
+.PP
+.BR lis_osif_pci_disable_device ()
+is an inefficient wrapper for
+.BR pci_disable_device (9).
+.I CM
+calls
+.BR pci_disable_device (9).
+New programs should use
+.BR pci_disable_device (9).
+.\"
+.\"
+.SS lis_osif_pci_dma_supported
+.PP
+.BR lis_osif_pci_dma_supported ()
+is an inefficient wrapper for
+.BR pci_dma_supported (9).
+.I CM
+calls
+.BR pci_dma_supported (9).
+New programs should use
+.BR pci_dma_supported (9).
+.\"
+.\"
+.SS lis_osif_pci_dma_sync_sg
+.PP
+.BR lis_osif_pci_dma_sync_sg ()
+is an inefficient wrapper for
+.BR pci_dma_sync_sg (9).
+.I CM
+calls
+.BR pci_dma_sync_sg (9).
+New programs should use
+.BR pci_dma_sync_sg (9).
+.\"
+.\"
+.SS lis_osif_pci_dma_sync_single
+.PP
+.BR lis_osif_pci_dma_sync_single ()
+is an inefficient wrapper for
+.BR pci_dma_sync_single (9).
+.I CM
+calls
+.BR pci_dma_sync_single (9).
+New programs should use
+.BR pci_dma_sync_single (9).
+.\"
+.\"
+.SS lis_osif_pci_enable_device
+.PP
+.BR lis_osif_pci_enable_device ()
+is an inefficient wrapper for
+.BR pci_enable_device (9).
+.I CM
+calls
+.BR pci_enable_device (9).
+New programs should use
+.BR pci_enable_device (9).
+.\"
+.\"
+.SS lis_osif_pci_find_class
+.PP
+.BR lis_osif_pci_find_class ()
+is an inefficient wrapper for
+.BR pci_find_class (9).
+.I CM
+calls
+.BR pci_find_class (9).
+New programs should use
+.BR pci_find_class (9).
+.\"
+.\"
+.SS lis_osif_pci_find_device
+.PP
+.BR lis_osif_pci_find_device ()
+is an inefficient wrapper for
+.BR pci_find_device (9).
+.I CM
+calls
+.BR pci_find_device (9).
+New programs should use
+.BR pci_find_device (9).
+.\"
+.\"
+.SS lis_osif_pci_find_slot
+.PP
+.BR lis_osif_pci_find_slot ()
+is an inefficient wrapper for
+.BR pci_find_slot (9).
+.I CM
+calls
+.BR pci_find_slot (9).
+New programs should use
+.BR pci_find_slot (9).
+.\"
+.\"
+.SS lis_osif_pci_free_consistent
+.PP
+.BR lis_osif_pci_free_consistent ()
+is an inefficient wrapper for
+.BR pci_free_consistent (9).
+.I CM
+calls
+.BR pci_free_consistent (9).
+New programs should use
+.BR pci_free_consistent (9).
+.\"
+.\"
+.SS lis_osif_pci_map_page
+.PP
+.BR lis_osif_pci_map_page ()
+is an inefficient wrapper for
+.BR pci_map_page (9).
+.I CM
+calls
+.BR pci_map_page (9).
+New programs should use
+.BR pci_map_page (9).
+.\"
+.\"
+.SS lis_osif_pci_map_sg
+.PP
+.BR lis_osif_pci_map_sg ()
+is an inefficient wrapper for
+.BR pci_map_sg (9).
+.I CM
+calls
+.BR pci_map_sg (9).
+New programs should use
+.BR pci_map_sg (9).
+.\"
+.\"
+.SS lis_osif_pci_map_single
+.PP
+.BR lis_osif_pci_map_single ()
+is an inefficient wrapper for
+.BR pci_map_single (9).
+.I CM
+calls
+.BR pci_map_single (9).
+New programs should use
+.BR pci_map_single (9).
+.\"
+.\"
+.SS lis_osif_pci_module_init
+.PP
+.BR lis_osif_pci_module_init ()
+is an inefficient wrapper for
+.BR pci_module_init (9).
+.I CM
+calls
+.BR pci_module_init (9).
+New programs should use
+.BR pci_module_init (9).
+.\"
+.\"
+.SS lis_osif_pci_read_config_byte
+.PP
+.BR lis_osif_pci_read_config_byte ()
+is an inefficient wrapper for
+.BR pci_read_config_byte (9).
+.I CM
+calls
+.BR pci_read_config_byte (9).
+New programs should use
+.BR pci_read_config_byte (9).
+.\"
+.\"
+.SS lis_osif_pci_read_config_dword
+.PP
+.BR lis_osif_pci_read_config_byte ()
+is an inefficient wrapper for
+.BR pci_read_config_dword (9).
+.I CM
+calls
+.BR pci_read_config_dword (9).
+New programs should use
+.BR pci_read_config_dword (9).
+.\"
+.\"
+.SS lis_osif_pci_read_config_word
+.PP
+.BR lis_osif_pci_read_config_word ()
+is an inefficient wrapper for
+.BR pci_read_config_word (9).
+.I CM
+calls
+.BR pci_read_config_word (9).
+New programs should use
+.BR pci_read_config_word (9).
+.\"
+.\"
+.SS lis_osif_pci_set_dma_mask
+.PP
+.BR lis_osif_pci_set_dma_mask ()
+is an inefficient wrapper for
+.BR pci_set_dma_mask (9).
+.I CM
+calls
+.BR pci_set_dma_mask (9).
+New programs should use
+.BR pci_set_dma_mask (9).
+.\"
+.\"
+.SS lis_osif_pci_set_master
+.PP
+.BR lis_osif_pci_set_master ()
+is an inefficient wrapper for
+.BR pci_set_master (9).
+.I CM
+calls
+.BR pci_set_master (9).
+New programs should use
+.BR pci_set_master (9).
+.\"
+.\"
+.SS lis_osif_pci_unmap_page
+.PP
+.BR lis_osif_pci_unmap_page ()
+is an inefficient wrapper for
+.BR pci_unmap_page (9).
+.I CM
+calls
+.BR pci_unmap_page (9).
+New programs should use
+.BR pci_unmap_page (9).
+.\"
+.\"
+.SS lis_osif_pci_unmap_sg
+.PP
+.BR lis_osif_pci_unmap_sg ()
+is an inefficient wrapper for
+.BR pci_unmap_sg (9).
+.I CM
+calls
+.BR pci_unmap_sg (9).
+New programs should use
+.BR pci_unmap_sg (9).
+.\"
+.\"
+.SS lis_osif_pci_unmap_single
+.PP
+.BR lis_osif_pci_unmap_single ()
+is an inefficient wrapper for
+.BR pci_unmap_single (9).
+.I CM
+calls
+.BR pci_unmap_single (9).
+New programs should use
+.BR pci_unmap_single (9).
+.\"
+.\"
+.SS lis_osif_pci_unregister_driver
+.PP
+.BR lis_osif_pci_unregister_driver ()
+is an inefficient wrapper for
+.BR pci_unregister_driver (9).
+.I CM
+calls
+.BR pci_unregister_driver (9).
+New programs should use
+.BR pci_unregister_driver (9).
+.\"
+.\"
+.SS lis_osif_pci_write_config_byte
+.PP
+.BR lis_osif_pci_write_config_byte ()
+is an inefficient wrapper for
+.BR pci_write_config_byte (9).
+.I CM
+calls
+.BR pci_write_config_byte (9).
+New programs should use
+.BR pci_write_config_byte (9).
+.\"
+.\"
+.SS lis_osif_pci_write_config_dword
+.PP
+.BR lis_osif_pci_write_config_dword ()
+is an inefficient wrapper for
+.BR pci_write_config_dword (9).
+.I CM
+calls
+.BR pci_write_config_dword (9).
+New programs should use
+.BR pci_write_config_dword (9).
+.\"
+.\"
+.SS lis_osif_pci_write_config_word
+.PP
+.BR lis_osif_pci_write_config_word ()
+is an inefficient wrapper for
+.BR pci_write_config_word (9).
+.I CM
+calls
+.BR pci_write_config_word (9).
+New programs should use
+.BR pci_write_config_word (9).
+.\"
+.\"
+.SS lis_osif_sg_dma_address
+.PP
+.BR lis_osif_sg_dma_address ()
+is an inefficient wrapper for
+.BR sg_dma_address (9).
+.I CM
+calls
+.BR sg_dma_address (9).
+New programs should use
+.BR sg_dma_address (9).
+.\"
+.\"
+.SS lis_osif_sg_dma_len
+.PP
+.BR lis_osif_sg_dma_len ()
+is an inefficient wrapper for
+.BR sg_dma_len (9).
+.I CM
+calls
+.BR sg_dma_len (9).
+New programs should use
+.BR sg_dma_len (9).
+.\"
+.\"
+.SS lis_osif_sti
+.PP
+.BR lis_osif_sti ()
+is an inefficient wrapper for
+.BR sti (9).
+.I CM
+calls
+.BR sti (9).
+New programs should use
+.BR sti (9).
+.\"
+.\"
+.SS lis_own_spl
+.\"
+.\"
+.SS lis_pci_disable_device
+.PP
+.BR lis_pci_disable_device ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_enable_device
+.PP
+.BR lis_pci_enable_device ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_find_class
+.PP
+.BR lis_pci_find_class ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_find_device
+.PP
+.BR lis_pci_find_device ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_find_slot
+.PP
+.BR lis_pci_find_slot ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_read_config_byte
+.PP
+.BR lis_pci_read_config_byte ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_read_config_dword
+.PP
+.BR lis_pci_read_config_dword ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_read_config_word
+.PP
+.BR lis_pci_read_config_word ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_set_master
+.PP
+.BR lis_pci_set_master ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_write_config_byte
+.PP
+.BR lis_pci_write_config_byte ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_write_config_dword
+.PP
+.BR lis_pci_write_config_dword ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pci_write_config_word
+.PP
+.BR lis_pci_write_config_word ()
+.I CM
+does not support this function and will return a bug and
+.B NULL
+if it is called.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_find_class
+.PP
+.BR lis_pcibios_find_class ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_find_class (9).
+.I CM
+calls
+.BR pcibios_find_class (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_find_device
+.PP
+.BR lis_pcibios_find_device ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_find_device (9).
+.I CM
+calls
+.BR pcibios_find_device (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_init
+.PP
+.BR lis_pcibios_init ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_init (9).
+.I CM
+calls
+.BR pcibios_init (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_present
+.PP
+.BR lis_pcibios_present ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_present (9).
+.I CM
+calls
+.BR pcibios_present (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_read_config_byte
+.PP
+.BR lis_pcibios_read_config_byte ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_read_config_byte (9).
+.I CM
+calls
+.BR pcibios_read_config_byte (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_read_config_dword
+.PP
+.BR lis_pcibios_read_config_dword ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_read_config_dword (9).
+.I CM
+calls
+.BR pcibios_read_config_dword (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_read_config_word
+.PP
+.BR lis_pcibios_read_config_word ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_read_config_word (9).
+.I CM
+calls
+.BR pcibios_read_config_word (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_strerror
+.PP
+.BR lis_pcibios_strerror ()
+is an LiS debugging function for the obsolete pcibios interface.
+.I CM
+returns a noxious string.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_write_config_byte
+.PP
+.BR lis_pcibios_write_config_byte ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_write_config_byte (9).
+.I CM
+calls
+.BR pcibios_write_config_byte (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_write_config_dword
+.PP
+.BR lis_pcibios_write_config_dword ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_write_config_dword (9).
+.I CM
+calls
+.BR pcibios_write_config_dword (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_pcibios_write_config_word
+.PP
+.BR lis_pcibios_write_config_word ()
+is an inefficient wrapper for the obsolete
+.BR pcibios_write_config_word (9).
+.I CM
+calls
+.BR pcibios_write_config_word (9).
+New programs should not use this function.
+.\"
+.\"
+.SS lis_phys_to_virt
+.\"
+.\"
+.SS lis_print_block
+.PP
+.BR lis_print_block ()
+is an LiS debug print function.
+.I CM
+does nothing.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_print_data
+.PP
+.BR lis_print_data ()
+is an LiS debug print function.
+.I CM
+does nothing.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_print_mem
+.PP
+.BR lis_print_mem ()
+is an LiS debug print function.
+.I CM
+does nothing.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_print_msg
+.PP
+.BR lis_print_msg ()
+is an LiS debug print function.
+.I CM
+does nothing.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_print_queue
+.PP
+.BR lis_print_queue ()
+is an LiS debug print function.
+.I CM
+does nothing.
+New programs should not use this function.
+.\"
+.\"
+.SS lis_printk
+.PP
+.BR lis_printk ()
+is an inefficient wrapper to
+.BR printk (9).
+.I CM
+calls
+.BR printk (9).
+New programs should use
+.BR printk (9).
+.\"
+.\"
+.SS lis_pullupmsg
+.PP
+.BR lis_pullupmsg ()
+.\"
+.\"
+.SS lis_putbq
+.PP
+.BR lis_putbq ()
+.\"
+.\"
+.SS lis_putbyte
+.PP
+.BR lis_putbyte ()
+.\"
+.\"
+.SS lis_putctl
+.PP
+.BR lis_putctl ()
+.\"
+.\"
+.SS lis_putctl1
+.PP
+.BR lis_putctl1 ()
+.\"
+.\"
+.SS lis_putnextctl
+.PP
+.BR lis_putnextctl ()
+.\"
+.\"
+.SS lis_putnextctl1
+.PP
+.BR lis_putnextctl1 ()
+.\"
+.\"
+.SS lis_putq
+.PP
+.BR lis_putq ()
+.\"
+.\"
+.SS lis_qcountstrm
+.PP
+.BR lis_qcountstrm ()
+.\"
+.\"
+.SS lis_qenable
+.PP
+.BR lis_qenable ()
+.\"
+.\"
+.SS lis_qprocsoff
+.PP
+.BR lis_qprocsoff ()
+.\"
+.\"
+.SS lis_qprocson
+.PP
+.BR lis_qprocson ()
+.\"
+.\"
+.SS lis_qsize
+.PP
+.BR lis_qsize ()
+.\"
+.\"
+.SS lis_queue_name
+.PP
+.BR lis_queue_name ()
+.\"
+.\"
+.SS lis_register_strdev
+.PP
+.BR lis_register_strdev ()
+has no known bugs, but many incarnations.
+.I CM
+calls
+.BR register_strdev_major (9).
+New programs should use
+.BR register_strdev_major (9).
+.\"
+.\"
+.SS lis_register_strmod
+.PP
+.BR lis_register_strmod ()
+has no know bugs.
+.I CM
+calls
+.BR register_strmod (9).
+New programs should use
+.BR register_strmod (9).
+.\"
+.\"
+.SS lis_release_region
+.PP
+.BR lis_release_region ()
+is an inefficient wrapper to
+.BR release_region (9).
+.I CM
+calls
+.BR release_region (9).
+New programs should use
+.BR release_region (9).
+.\"
+.\"
+.SS lis_request_dma
+.PP
+.BR lis_request_dma ()
+is an inefficient wrapper to
+.BR request_dma (9).
+.I CM
+calls
+.BR request_dma (9).
+New programs should use
+.BR request_dma (9).
+.\"
+.\"
+.SS lis_request_irq
+.PP
+.BR lis_request_irq ()
+is an inefficient wrapper to
+.BR request_irq (9).
+.I CM
+calls
+.BR request_irq (9).
+New programs should use
+.BR request_irq (9).
+.\"
+.\"
+.SS lis_request_region
+.PP
+.BR lis_request_region ()
+is an inefficient wrapper to
+.BR request_region (9).
+.I CM
+calls
+.BR request_region (9).
+New programs should use
+.BR request_region (9).
+.\"
+.\"
+.SS lis_rmvb
+.\"
+.\"
+.SS lis_rmvq
+.\"
+.\"
+.SS lis_rw_lock_alloc_fcn
+.PP
+.BR lis_rw_lock_alloc_fcn ()
+is an inefficient wrapper to
+.BR kmalloc (9).
+.I CM
+calls
+.BR kmem_alloc (9).
+New programs should use
+.BR kmem_alloc (9).
+.\"
+.\"
+.SS lis_rw_lock_free_fcn
+.PP
+.BR lis_rw_lock_free_fcn ()
+is an inefficient wrapper to
+.BR kfree (9).
+.I CM
+calls
+.BR kmem_free (9).
+New programs should use
+.BR kmem_free (9).
+.\"
+.\"
+.SS lis_rw_lock_init_fcn
+.PP
+.BR lis_rw_lock_init_fcn ()
+is an inefficient wrapper to
+.BR rwlock_init (9).
+.I CM
+calls
+.BR rwlock_init (9).
+New programs should use
+.BR rwlock_init (9).
+.\"
+.\"
+.SS lis_rw_read_lock_fcn
+.PP
+.BR lis_rw_read_lock_fcn ()
+is an inefficient wrapper to
+.BR read_lock (9).
+.I CM
+calls
+.BR read_lock (9).
+New programs should use
+.BR read_lock (9).
+.\"
+.\"
+.SS lis_rw_read_lock_irq_fcn
+.PP
+.BR lis_rw_read_lock_irq_fcn ()
+is an inefficient wrapper to
+.BR read_lock_irq (9).
+.I CM
+calls
+.BR read_lock_irq (9).
+New programs should use
+.BR read_lock_irq (9).
+.\"
+.\"
+.SS lis_rw_read_lock_irqsave_fcn
+.PP
+.BR lis_rw_read_lock_irqsave_fcn ()
+is an inefficient wrapper to
+.BR read_lock_irqsave (9).
+.I CM
+calls
+.BR read_lock_irqsave (9).
+New programs should use
+.BR read_lock_irqsave (9).
+.\"
+.\"
+.SS lis_rw_read_unlock_fcn
+.PP
+.BR lis_rw_read_unlock_fcn ()
+is an inefficient wrapper to
+.BR read_unlock (9).
+.I CM
+calls
+.BR read_unlock (9).
+New programs should use
+.BR read_unlock (9).
+.\"
+.\"
+.SS lis_rw_read_unlock_irq_fcn
+.PP
+.BR lis_rw_read_unlock_irq_fcn ()
+is an inefficient wrapper to
+.BR read_unlock_irq (9).
+.I CM
+calls
+.BR read_unlock_irq (9).
+New programs should use
+.BR read_unlock_irq (9).
+.\"
+.\"
+.SS lis_rw_read_unlock_irqrestore_fcn
+.PP
+.BR lis_rw_read_unlock_irqrestore_fcn ()
+is an inefficient wrapper to
+.BR read_unlock_irqrestore (9).
+.I CM
+calls
+.BR read_unlock_irqrestore (9).
+New programs should use
+.BR read_unlock_irqrestore (9).
+.\"
+.\"
+.SS lis_rw_write_lock_fcn
+.PP
+.BR lis_rw_write_lock_fcn ()
+is an inefficient wrapper to
+.BR write_lock (9).
+.I CM
+calls
+.BR write_lock (9).
+New programs should use
+.BR write_lock (9).
+.\"
+.\"
+.SS lis_rw_write_lock_irq_fcn
+.PP
+.BR lis_rw_write_lock_irq_fcn ()
+is an inefficient wrapper to
+.BR write_lock_irq (9).
+.I CM
+calls
+.BR write_lock_irq (9).
+New programs should use
+.BR write_lock_irq (9).
+.\"
+.\"
+.SS lis_rw_write_lock_irqsave_fcn
+.PP
+.BR lis_rw_write_lock_irqsave_fcn ()
+is an inefficient wrapper to
+.BR write_lock_irqsave (9).
+.I CM
+calls
+.BR write_lock_irqsave (9).
+New programs should use
+.BR write_lock_irqsave (9).
+.\"
+.\"
+.SS lis_rw_write_unlock_fcn
+.PP
+.BR lis_rw_write_unlock_fcn ()
+is an inefficient wrapper to
+.BR write_unlock (9).
+.I CM
+calls
+.BR write_unlock (9).
+New programs should use
+.BR write_unlock (9).
+.\"
+.\"
+.SS lis_rw_write_unlock_irq_fcn
+.PP
+.BR lis_rw_write_unlock_irq_fcn ()
+is an inefficient wrapper to
+.BR write_unlock_irq (9).
+.I CM
+calls
+.BR write_unlock_irq (9).
+New programs should use
+.BR write_unlock_irq (9).
+.\"
+.\"
+.SS lis_rw_write_unlock_irqrestore_fcn
+.PP
+.BR lis_rw_write_unlock_irqrestore_fcn ()
+is an inefficient wrapper to
+.BR write_unlock_irqrestore (9).
+.I CM
+calls
+.BR write_unlock_irqrestore (9).
+New programs should use
+.BR write_unlock_irqrestore (9).
+.\"
+.\"
+.SS lis_safe_OTHERQ
+.PP
+.BR lis_safe_OTHERQ ()
+.I CM
+calls
+.BR OTHERQ (9).
+.\"
+.\"
+.SS lis_safe_RD
+.PP
+.BR lis_safe_RD ()
+.I CM
+calls
+.BR RD (9).
+.\"
+.\"
+.SS lis_safe_SAMESTR
+.PP
+.BR lis_safe_SAMESTR ()
+.I CM
+calls
+.BR SAMESTR (9).
+.\"
+.\"
+.SS lis_safe_WR
+.PP
+.BR lis_safe_WR ()
+.I CM
+calls
+.BR WR (9).
+.\"
+.\"
+.SS lis_safe_canenable
+.PP
+.BR lis_safe_canenable ()
+.I CM
+calls
+.BR canenable (9).
+.\"
+.\"
+.SS lis_safe_enableok
+.PP
+.BR lis_safe_enableok ()
+.I CM
+calls
+.BR enableok (9).
+.\"
+.\"
+.SS lis_safe_noenable
+.PP
+.BR lis_safe_noenable ()
+.I CM
+calls
+.BR noenable (9).
+.\"
+.\"
+.SS lis_safe_putmsg
+.PP
+.BR lis_safe_putmsg ()
+.I CM
+calls
+.BR put (9).
+.\"
+.\"
+.SS lis_safe_putnext
+.PP
+.BR lis_safe_putnext ()
+.I CM
+calls
+.BR putnext (9).
+.\"
+.\"
+.SS lis_safe_qreply
+.PP
+.BR lis_safe_qreply ()
+.I CM
+calls
+.BR qreply (9).
+.\"
+.\"
+.SS lis_secs
+.\"
+.\"
+.SS lis_sem_alloc
+.\"
+.\"
+.SS lis_sem_destroy
+.\"
+.\"
+.SS lis_sem_init
+.\"
+.\"
+.SS lis_sleep_on
+.\"
+.\"
+.SS lis_spin_is_locked_fcn
+.\"
+.\"
+.SS lis_spin_lock_alloc_fcn
+.\"
+.\"
+.SS lis_spin_lock_fcn
+.\"
+.\"
+.SS lis_spin_lock_free_fcn
+.\"
+.\"
+.SS lis_spin_lock_init_fcn
+.\"
+.\"
+.SS lis_spin_lock_irq_fcn
+.\"
+.\"
+.SS lis_spin_lock_irqsave_fcn
+.\"
+.\"
+.SS lis_spin_trylock_fcn
+.\"
+.\"
+.SS lis_spin_unlock_fcn
+.\"
+.\"
+.SS lis_spin_unlock_irq_fcn
+.\"
+.\"
+.SS lis_spin_unlock_irqrestore_fcn
+.\"
+.\"
+.SS lis_spl0_fcn
+.\"
+.\"
+.SS lis_splstr_fcn
+.\"
+.\"
+.SS lis_splx_fcn
+.\"
+.\"
+.SS lis_sprintf
+.\"
+.\"
+.SS lis_strm_name
+.\"
+.\"
+.SS lis_strm_name_from_queue
+.\"
+.\"
+.SS lis_stropts_file
+.\"
+.\"
+.SS lis_strqget
+.\"
+.\"
+.SS lis_strqset
+.\"
+.\"
+.SS lis_testb
+.\"
+.\"
+.SS lis_thread_start
+.\"
+.\"
+.SS lis_thread_stop
+.\"
+.\"
+.SS lis_timeout_fcn
+.\"
+.\"
+.SS lis_udelay
+.\"
+.\"
+.SS lis_unbufcall
+.\"
+.\"
+.SS lis_unlink
+.\"
+.\"
+.SS lis_unlinkb
+.\"
+.\"
+.SS lis_unregister_strdev
+.\"
+.\"
+.SS lis_unregister_strmod
+.\"
+.\"
+.SS lis_untimeout
+.\"
+.\"
+.SS lis_up_fcn
+.\"
+.\"
+.SS lis_usecs
+.\"
+.\"
+.SS lis_usectohz
+.\"
+.\"
+.SS lis_version
+.\"
+.\"
+.SS lis_vfree
+.\"
+.\"
+.SS lis_virt_to_phys
+.\"
+.\"
+.SS lis_vmalloc
+.\"
+.\"
+.SS lis_vremap
+.\"
+.\"
+.SS lis_vsprintf
+.\"
+.\"
+.SS lis_wake_up
+.\"
+.\"
+.SS lis_wake_up_interruptible
+.\"
+.\"
+.SS lis_xmsgsize
+.\"
+.\"
+.SS lis_zmalloc
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

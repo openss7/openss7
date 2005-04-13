@@ -1,1 +1,1 @@
-.so man9/setqsched.9.man
+.so man9/lisdeprec.9.man

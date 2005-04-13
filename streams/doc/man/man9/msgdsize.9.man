@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgdsize.9.man,v 0.9.2.8 2005/03/30 13:38:51 brian Exp $
+.\" @(#) $Id: msgdsize.9.man,v 0.9.2.9 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -165,8 +165,8 @@ does not.
 .PP
 Symbol
 .BR lis_msgdsize ()
-is provided for binary compatibility to LiS.  See
-.BR lisbcm (9).
+is provided for compatibility to LiS.  See
+.BR liscompat (9).
 .BR lis_msgdsize ()
 calls
 .BR msgdsize ()

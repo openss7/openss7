@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 0.9.2.10 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 0.9.2.11 2005/04/13 07:51:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -220,11 +220,19 @@ with the following portability considerations:
 and symbol
 .BR lis_allocq ()
 is provided for compatibility with LiS.  See
-.BR lisbcm (9).
+.BR liscompat (9).
 .BR lis_allocq ()
 simply calls
 .BR allocq ()
 directly.
+.sp
+Note that
+.BR lis_allocq ()
+was deprecated as of
+.IR "LiS 2.18.0" .
+See
+.BR lisdeprec (9)
+for more information.
 .IP \(em
 .BR allocq ()
 should not be called by normal

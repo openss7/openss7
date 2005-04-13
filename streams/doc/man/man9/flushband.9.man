@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.12 2005/04/09 09:31:47 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.13 2005/04/13 07:51:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/09 09:31:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -442,7 +442,7 @@ calls
 .BR flushband ()
 directly.
 See
-.BR lisbcm (9).
+.BR liscompat (9).
 LiS appears to be rather buggy with regard to flushing queues and the
 compatible
 .BR lis_flushband ()

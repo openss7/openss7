@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qprocson.9.man,v 0.9.2.10 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: qprocson.9.man,v 0.9.2.11 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -204,7 +204,7 @@ below.
 .BR qwait_sig (9),
 .BR allocq (9),
 .BR freezestr (9),
-.BR lisbcm (9).
+.BR liscompat (9).
 .\"
 .\"
 .SH BUGS
@@ -269,7 +269,7 @@ was not called before return.
 Symbol
 .BR lis_qprocson ()
 is provided for compatibility with LiS.  See
-.BR lisbcm (9).
+.BR liscompat (9).
 .BR lis_qprocson ()
 simply calls
 .BR qprocson ().

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlinkb.9.man,v 0.9.2.8 2005/03/30 13:38:54 brian Exp $
+.\" @(#) $Id: unlinkb.9.man,v 0.9.2.9 2005/04/13 07:51:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -173,8 +173,8 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 Symbol
 .BR lis_unlinkb ()
-is provided for binary compatibility with LiS.  See
-.BR lisbcm (9).
+is provided for compatibility with LiS.  See
+.BR liscompat (9).
 .BR lis_unlinkb ()
 calls
 .BR unlinkb ()

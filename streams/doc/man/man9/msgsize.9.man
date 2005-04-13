@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgsize.9.man,v 0.9.2.8 2005/04/09 09:31:48 brian Exp $
+.\" @(#) $Id: msgsize.9.man,v 0.9.2.9 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -172,8 +172,8 @@ of all blocks in the message.
 .PP
 Symbol
 .BR lis_msgsize ()
-is provided for binary compatibility with LiS.  See
-.BR lisbcm (9).
+is provided for compatibility with LiS.  See
+.BR liscompat (9).
 .PP
 See
 .BR STREAMS (9)

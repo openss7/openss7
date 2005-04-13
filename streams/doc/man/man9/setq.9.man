@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: setq.9.man,v 0.9.2.6 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: setq.9.man,v 0.9.2.7 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -170,11 +170,20 @@ has no known bugs.
 .PP
 Symbol
 .BR lis_setq ()
-is provided for binary compatibility with LiS.  See
-.BR lisbcm (9).
+is provided for compatibility with LiS.  See
+.BR liscompat (9).
 .BR lis_setq ()
 simply calls
 .BR setq ().
+.sp
+Note that
+.BR lis_setq ()
+was deprecated as of
+.IR "LiS 2.18.0" .
+See
+.BR lisdeprec (9)
+for more information.
+.sp
 This function is not exported by SVR 4.2 MP DDI/DKI or
 .IR Solaris \(rg.
 

@@ -1,1 +1,1 @@
-.so man9/setq.9.man
+.so man9/lisdeprec.9.man

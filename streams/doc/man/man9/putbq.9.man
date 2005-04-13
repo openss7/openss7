@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.9 2005/04/09 09:31:48 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.10 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/09 09:31:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -299,7 +299,7 @@ on a stream frozen with
 Symbol
 .BR lis_putbq ()
 is provided for compatibility with LiS.  See
-.BR lisbcm (9).
+.BR liscompat (9).
 .BR lis_putbq ()
 simply calls
 .BR putbq ()

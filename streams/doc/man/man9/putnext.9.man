@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnext.9.man,v 0.9.2.11 2005/04/09 09:31:49 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 0.9.2.12 2005/04/13 07:51:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/09 09:31:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -333,7 +333,7 @@ to be called on a stream frozen with
 Symbol
 .BR lis_safe_putnext ()
 is provided for binary compatibility with LiS.  See
-.BR lisbcm (9).
+.BR liscompat (9).
 .BR lis_safe_putnext ()
 simply calls
 .BR putnext ().
