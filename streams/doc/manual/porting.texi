@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.10 2005/04/13 23:45:26 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.11 2005/04/14 08:06:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/13 23:45:26 $ by $Author: brian $
+% Last Modified $Date: 2005/04/14 08:06:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -182,6 +182,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Acknowledgements::
 * Overview::
 * Porting::
+* Development::
 * Appendices::
 
  --- The Detailed Node Listing ---
@@ -207,6 +208,8 @@ Porting
 * Porting from SUPER-UX::
 * Porting from UXP/V::
 * Porting from Linux STREAMS (LiS) 2.18.1::
+
+Development
 
 Appendices
 
@@ -1026,6 +1029,151 @@ calculate the size of message blocks in a @cite{STREAMS} message
 @end ftable
 
 @subsection Configuration ala LiS 2.18.1
+
+@node Development
+@chapter Development
+@cindex development
+
+In the process of creating the @b{Linux Fast-STREAMS} subsystem in such a way so
+as to facilitate portability of @cite{STREAMS} drivers and modules from a wide
+range of @cite{UNIX} operating system variants, a number of guidelines for the
+development of portable @cite{STREAMS} drivers and moduels have been developed.
+These guidelines, when adhered to, will allow the resulting driver or module to
+be ported to another @cite{STREAMS} implementation with minimal porting.
+These portability guidelines are collected here.
+
+@section Portable @cite{STREAMS} Drivers and Modules
+
+@subsection Memory Allocation
+
+Portable @cite{STREAMS} modules and drivers will always allocate memory using
+the SVR4 memory allocators/deallocators:
+@iftex
+@b{kmem_alloc}(9),
+@end iftex
+@ifnottex
+@inforef{kmem_alloc(9), , *manpages*},
+@end ifnottex
+@iftex
+@b{kmem_zalloc}(9)
+@end iftex
+@ifnottex
+@inforef{kmem_zalloc(9), , *manpages*}
+@end ifnottex
+and
+@iftex
+@b{kmem_free}(9).
+@end iftex
+@ifnottex
+@inforef{kmem_free(9), , *manpages*}.
+@end ifnottex
+
+@subsection Alignment of Message Buffers
+
+@subsection Disabling and Enabling Queue Procedures
+
+Portable @cite{STREAMS} modules and drivers will always call
+@iftex
+@b{qprocson}(9)
+@end iftex
+@ifnottex
+@inforef{qprocson(9), , *manpages*},
+@end ifnottex
+before returning from its queue open procedure (see
+@iftex
+@b{qopen}(9)).
+@end iftex
+@ifnottex
+@inforef{qopen(9), , *manpages*}.)
+@end ifnottex
+
+Portable @cite{STREAMS} modules and drivers will always call
+@iftex
+@b{qprocsoff}(9)
+@end iftex
+@ifnottex
+@inforef{qprocsoff(9), , *manpages*},
+@end ifnottex
+upon entering its queue close procedure (see
+@iftex
+@b{qclose}(9)).
+@end iftex
+@ifnottex
+@inforef{qclose(9), , *manpages*}.)
+@end ifnottex
+
+@subsection Freezing and Unfreezing Streams
+
+@subsection Passing Messages from Interrupt Service Routines
+
+@subsection Identifiers: Buffer Call, Timeout and Multiplexor Link
+
+Although buffer callbacks identifiers (see
+@iftex
+@b{bufcall}(9)),
+@end iftex
+@ifnottex
+@inforef{bufcall(9), , *manpages*}),
+@end ifnottex
+timeout identifiers (see
+@iftex
+@b{timeout}(9)),
+@end iftex
+@ifnottex
+@inforef{timeout(9), , *manpages*}),
+@end ifnottex
+and multiplexing driver link identifiers (see
+@var{I_LINK} and @var{I_PLINK} under
+@iftex
+@b{streamio}(2)),
+@end iftex
+@ifnottex
+@inforef{streamio(2), , *manpages*}),
+@end ifnottex
+are often illustrated as small integer numbers, with some @cite{STREAMS}
+implementations, including @b{Linux Fast-STREAMS}, these identifiers are kernel
+addresses (pointers) and are never small integer values like 1, 2, or 3.
+
+Also, there is no guarantee that the identifier will be positive.  It is
+guaranteed that the retuned identifier will not be zero (0).  Zero is used by
+these function as a return value to indicate an error.
+
+Portable @cite{STREAMS} drivers and modules will not depend upon the returned
+identifier from 
+@iftex
+@b{bufcall}(9),
+@end iftex
+@ifnottex
+@inforef{bufcall(9), , *manpages*},
+@end ifnottex
+@iftex
+@b{timeout}(9)
+@end iftex
+@ifnottex
+@inforef{timeout(9), , *manpages*}
+@end ifnottex
+or
+@iftex
+@b{streamio}(2)
+@end iftex
+@ifnottex
+@inforef{streamio(2), , *manpages*}
+@end ifnottex
+as being any specific range of value.  Portable drivers and modules will save
+any returned identifiers in data types that will not loose the precision of the
+identifier.
+
+@subsection Synchronization with Timeouts and Callback Functions
+
+@subsection Synchronization with Callout Functions
+
+@subsection Synchronization of Drivers and Modules
+
+@subsection Special @cite{STREAMS} Message Types
+
+@subsection Use of Message Allocation Priorities
+
+@subsection Registration, Deregistration and Device Numbering
 
 @node Appendices
 @appendix Appendices

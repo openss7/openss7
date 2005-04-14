@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/01/26 22:12:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/14 08:06:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/01/26 22:12:25 $ by $Author: brian $
+# Last Modified $Date: 2005/04/14 08:06:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,6 +64,20 @@ EXTRA_info_TEXINFOS	= \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/lesser.texi
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+FIG_FIGS		= \
+			  SPG_fig01.fig \
+			  SPG_fig02.fig \
+			  SPG_fig03.fig \
+			  SPG_fig04.fig \
+			  SPG_fig05.fig \
+			  SPG_fig06.fig
+
+## PKG_BUILD_INDEP
+endif
 
 include ../../am/info.am
 

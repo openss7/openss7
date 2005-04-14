@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.15 2005/04/12 09:28:58 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.16 2005/04/14 08:06:08 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/12 09:28:58 $ by $Author: brian $
+% Last Modified $Date: 2005/04/14 08:06:08 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -208,6 +208,8 @@ Reference
 * Header Files::		STREAMS Header Files
 * Drivers::			STREAMS Drivers
 * Modules::			STREAMS Modules
+* Terminal I/O::		STREAMS Terminal I/O
+* Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
 * Module Entry Points::		STREAMS Module Entry Points
 * Structures::			STREAMS Structures
@@ -313,6 +315,155 @@ The primary contributor to @value{PACKAGE_TITLE} is Brian F. G. Bidulock.
 This manual documents how to develop and port STREAMS drivers and modules for
 @value{PACKAGE_TITLE}.
 
+@section Benefits of @cite{STREAMS}
+
+@cite{STREAMS} provides a flexible, portable and reusable set of tools for
+development of @b{Linux} system communications services.  @cite{STREAMS} allows
+an easy creation of modules that offer standard data communications services
+and the ability to manipulate those modules on a Stream.  From user level,
+modules can be dynamically selected and interconnected; kernel programming,
+assembly, and link editing are not required to create the interconnection.
+
+@cite{STREAMS} also greatly simplifies the user interface for languages that
+have complex input and output requirements.
+
+@subsection Standardized Service Interfaces
+
+@cite{STREAMS} simplifies the creation of modules that present a service
+interface to any neighbouring application program, module, or device driver.  A
+service interface is defined at the boundary between two neighbours.  In
+@cite{STREAMS}, a @i{service interface} is a set of messages and the rules that
+allow passage of these messages across the boundary.  A module that implements a
+service interface will receive a message from a neighbour and respond with an
+appropriate action (for example, send back a requires to retransmit) based on
+the specific message received and the preceding sequence of messages.
+
+In general, any two modules can be connected anywhere in a Stream.  However,
+rational sequences are generally constructed by connecting modules with
+compatible protocol service interfaces.  For example, a module that implements
+an X.25 protocol layer, as shown in Figure 2-13, presents a protocol service
+interface at its input and output sides.  In this case, other modules should
+only be connected to the input and output side if they have the compatible X.25
+service interface.
+
+@subsection Manipulating Modules
+
+@cite{STREAMS} provides the ability to manipulate modules from user level, to
+interchange modules with common service interfaces, and to change the service
+interface to a @cite{STREAMS} user process.  These capabilities yield further
+benefits when implementing networking services and protocols, including:
+
+@itemize
+@item User level programs can be independent of underlying protocols and
+physical communications media.
+@item Network architectures and higher level protocols can be independent of
+underlying protocols, drivers, and physical communications media.
+@item Higher level services can be created by selecting and connecting lower
+level services and protocols.
+@end itemize
+
+@subsubsection Protocol Portability
+
+Figure 2-13 shows how the same X.25 protocol module can be used with different
+drivers on different machines by implementing compatible service interfaces.
+The X.25 protocol module interfaces are Connection Oriented Network Service
+(CONS) and Link Access Protocol - Balanced (LAPB).
+
+@subsubsection Protocol Substitution
+
+Alternate protocol modules (and device drivers) can be exchanged on the same
+machine if they are implemented to an equivalent service interface.
+
+@subsubsection Protocol Migration
+
+Figure 2-14 illustrates how @cite{STREAMS} can move functions between kernel
+software and front end firmware.  A common downstream service interface allows
+the transport protocol module to be independent of the number or type of modules
+below.  The same transport module will connect without modification to either an
+X.25 module or X.25 driver that has the same service interface.
+
+By shifting functions between software and firmware, you can produce
+cost-effective, functionally equivalent systems over a wide range of
+configurations.  They can rapidly incorporate technological advances.  The same
+transport protocol module can be used on a lower capacity machine, where
+economics may preclude the use of front-end hardware, and also on a larger scale
+system where a front-end is economically justified.
+
+@subsubsection Module Reusability
+
+Figure 2-15 shows the same canonical module (for example, one that provide
+delete and kill processing on character strings) reused in two different
+Streams.  This module would typically be implemented as a filter, with no
+downstream service interface.  In both cases, a tty interface is presented to
+the Stream's user process since the module is nearest the Stream head.
+
+@section What is @cite{STREAMS}?
+
+@section @cite{STREAMS} Definitions
+
+@table @i
+@item Stream
+@item Stream Head
+@item Module
+@item Driver
+@item Messages
+@item Queues
+@item Stream I/O
+@item Multiplexing
+@item Polling
+@item Flow Control
+@end table
+
+@section When to Use @cite{STREAMS}
+
+@section How @cite{STREAMS} Works -- Application Interface
+
+@subsection Opening a Stream
+
+@subsection Closing a Stream
+
+@subsection Controlling Data Flow
+
+@section How @cite{STREAMS} Works -- Kernel Level
+
+@subsection Stream Head
+
+@subsection Modules
+
+@subsection Drivers
+
+@subsection Messages
+
+@subsubsection Message Types
+
+@subsection Message Queueing Priority
+
+@subsection Queues
+
+@subsection Multiplexing
+
+@subsection Multithreading
+
+The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric
+shared-memory multiprocessor computers.  All parts of the kernel, including
+@cite{STREAMS} modules and drivers, must ensure data integrity in a
+multiprocessing environment.  For the most part, developers must ensure that
+concurrently running kernel threads do not attempt to manipulate the same data
+at the same time.  The @cite{STREAMS} framework provides multi-threaded (MT)
+@cite{STREAMS} perimeters, which allows the developer control over the level of
+concurrency allowed in a module.  The DDI/DKI provides several advisory locks
+for protecting data.
+
+@section @cite{STREAMS} in Operation
+
+@subsection Service Interfaces
+@subsection Manipulating Modules
+@subsection Protocol Portability
+@subsection Protocol Substitution
+@subsection Protocol Migration
+@subsection Module Reusability
+
+
 @node Introduction
 @section Introduction
 @cpindex introduction
@@ -321,6 +472,29 @@ This manual documents how to develop and port STREAMS drivers and modules for
 @section Concepts
 @cpindex concepts
 
+@cartouche
+@image{SPG_fig01,4in} @center @b{Figure 2-1.  Simple Stream}
+@end cartouche
+
+@cartouche
+@image{SPG_fig02,4in} @center @b{Figure 2-2.  @cite{STREAMS}-based Pipe}
+@end cartouche
+
+@cartouche
+@image{SPG_fig03,4in} @center @b{Figure 2-3.  Stream to Communications Driver}
+@end cartouche
+
+@cartouche
+@image{SPG_fig04,0.5in} @center @b{Figure 2-4.  Queue Pair Allocation}
+@end cartouche
+
+@cartouche
+@image{SPG_fig05,5in} @center @b{Figure 2-5.  A Message}
+@end cartouche
+
+@cartouche
+@image{SPG_fig06,5in} @center @b{Figure 2-6.  Messages on a Message Queue}
+@end cartouche
 
 @node Reference
 @chapter Reference
@@ -329,6 +503,8 @@ This manual documents how to develop and port STREAMS drivers and modules for
 * Header Files::		STREAMS Header Files
 * Drivers::			STREAMS Drivers
 * Modules::			STREAMS Modules
+* Terminal I/O::		STREAMS Terminal I/O
+* Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
 * Module Entry Points::		STREAMS Module Entry Points
 * Structures::			STREAMS Structures
@@ -344,257 +520,390 @@ This manual documents how to develop and port STREAMS drivers and modules for
 @node Header Files
 @section Header Files
 @cpindex header files
-@menu
-Header Files
-@end menu
 
 @node Drivers
 @section Drivers
 @cpindex drivers
-@menu
-Drivers
-@end menu
 
 @node Modules
 @section Modules
 @cpindex modules
-@menu
-Modules
-@end menu
+
+@node Terminal I/O
+@section Terminal I/O
+@cpindex terminal i/o
+
+By default, terminal I/O in a @b{Linux} system does not use @cite{STREAMS}.  It,
+in fact, uses a @cite{STREAMS} @samp{pty} emulation.  However, this is only an
+emulation and does not provide all @cite{STREAMS} facilities.  It is not
+possible, for example, on a @b{Linux} @samp{pty} to push or pop modules from a
+terminal.  The @b{Linux} @samp{pty} only provides emulation for read/write and
+ioctl calls.
+
+A separate auxiliary package for @b{Linux Fast-STREAMS} that provides true
+@cite{STREAMS}-based @cite{UNIX'98} compliant pseudo terminals is available.
+This is the @code{strtty-0.7a.1} package available from
+@url{http://www.openss7.org/, The OpenSS7 Project}.
+
+@node Pipes
+@section Pipes
+@cpindex pipes
+
+@b{Linux Fast-STREAMS} supports @cite{STREMS}-based pipes as an optional
+feature.  @cite{STREAMS}-based pipes operate as described in the
+@cite{UNIX SVR4.2 Operating System API Reference} and the @cite{UNIX System V
+Release 4 Programmer's Guide: STREAMS}.
+
+By default, pipes created on @b{Linux} by the
+@iftex
+@b{pipe}(2)
+@end iftex
+@ifnottex
+@inforef{pipe(2), , *manpages*}
+@end ifnottex
+system call are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based pipes,
+configure @b{Linux Fast-STREAMS} with configuration parameter
+@code{--enable-streams-fifos}.
+
+@b{Linux Fast-STREAMS} also provides a character device based pipe facility
+using the
+@iftex
+@b{spx}(4)
+@end iftex
+@ifnottex
+@inforef{spx(4), , *manpages*}
+@end ifnottex
+driver.
+
+@b{Linux Fast-STREAMS} supports @cite{STREAMS}-based FIFOs (named pipes) as an
+optional feature.  @cite{STREAMS}-based FIFOs operate as described in the
+@cite{UNIX SVR4.2 Operating System API Reference} and the @cite{UNIX System V
+Release 4 Programmer's Guide: STREAMS}.
+
+By default, FIFOs created on @b{Linux} with the
+@iftex
+@b{mknod}(8)
+@end iftex
+@ifnottex
+@inforef{mknod(8), , *manpages*}
+@end ifnottex
+utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs,
+configure @b{Linux Fast-STREAMS} with configuration parameter
+@code{--enable-streams-fifos}.
 
 @node System Calls
 @section System Calls
 @cpindex system calls
-@menu
-System Calls
-@end menu
 
 @subsection New System Calls
 
 @subsubsection getmsg(2)
 @fnindex getmsg(2)
+
 @subsubsection getpmsg(2)
 @fnindex getpmsg(2)
+
 @subsubsection putmsg(2)
 @fnindex putmsg(2)
+
 @subsubsection putpmsg(2)
 @fnindex putpmsg(2)
+
 @subsubsection fattach(2)
 @fnindex fattach(2)
+
+@subsubsection fdetach(2)
+@fnindex fdetach(2)
+(Note: HP-UX mentions a fdetach system call: I do not know why.)
+
 @subsubsection isastream(2)
 @fnindex isastream(2)
 
 @subsection Modifications to Old System Calls
 
+@subsubsection fcntl(2)
+@fnindex fcntl(2)
+
+@subsubsection ioctl(2)
+@fnindex ioctl(2)
+
+@subsubsection signal(2)
+@fnindex signal(2)
+
 @subsubsection poll(2)
 @fnindex poll(2)
+
+@subsubsection select(2)
+@fnindex select(2)
+
 @subsubsection open(2)
 @fnindex open(2)
+
 @subsubsection close(2)
 @fnindex close(2)
+
 @subsubsection read(2)
 @fnindex read(2)
+
 @subsubsection readv(2)
 @fnindex readv(2)
+
 @subsubsection writev(2)
 @fnindex writev(2)
+
 @subsubsection pipe(2)
 @fnindex pipe(2)
 
 @node Module Entry Points
 @section Module entry points
 @cpindex module entry points
-@menu
-Module Entry Points
-@end menu
 
 @node Structures
 @section Structures
 @cpindex structures
-@menu
-Structures
-@end menu
 
 @subsection STREAMS Structures
 
 @subsubsection cdevsw(9)
 @tpindex cdevsw(9)
+
 @subsubsection cred_t(9)
 @tpindex cred_t(9)
+
 @subsubsection datab(9)
 @tpindex datab(9)
+
 @subsubsection fmodsw(9)
 @tpindex fmodsw(9)
+
 @subsubsection module_info(9)
 @tpindex module_info(9)
+
 @subsubsection module_stat(9)
 @tpindex module_stat(9)
+
 @subsubsection msgb(9)
 @tpindex msgb(9)
+
 @subsubsection qband(9)
 @tpindex qband(9)
+
 @subsubsection qinit(9)
 @tpindex qinit(9)
+
 @subsubsection queinfo(9)
 @tpindex queinfo(9)
+
 @subsubsection queue(9)
 @tpindex queue(9)
+
 @subsubsection streamtab(9)
 @tpindex streamtab(9)
+
 @subsubsection streamadm(9)
 @tpindex streamadm(9)
 
 @node Registration
 @section Registration
 @cpindex registration
-@menu
-Registration
-@end menu
 
 @subsection @value{PACKAGE_TITLE} Registration
 
 @subsubsection autopush_add(9)
 @fnindex autopush_add(9)
+
 @subsubsection autopush_del(9)
 @fnindex autopush_del(9)
+
 @subsubsection autopush_find(9)
 @fnindex autopush_find(9)
+
 @subsubsection autopush_vml(9)
 @fnindex autopush_vml(9)
+
 @subsubsection getadmin(9)
 @fnindex getadmin(9)
+
 @subsubsection getmid(9)
 @fnindex getmid(9)
+
 @subsubsection register_inode(9)
 @fnindex register_inode(9)
+
 @subsubsection register_inode_major(9)
 @fnindex register_inode_major(9)
+
 @subsubsection register_inode_minor(9)
 @fnindex register_inode_minor(9)
+
 @subsubsection register_strdev(9)
 @fnindex register_strdev(9)
+
 @subsubsection register_strdev_major(9)
 @fnindex register_strdev_major(9)
+
 @subsubsection register_strdev_minor(9)
 @fnindex register_strdev_minor(9)
+
 @subsubsection register_strmod(9)
 @fnindex register_strmod(9)
+
 @subsubsection unregister_inode(9)
 @fnindex unregister_inode(9)
+
 @subsubsection unregister_inode_major(9)
 @fnindex unregister_inode_major(9)
+
 @subsubsection unregister_inode_minor(9)
 @fnindex unregister_inode_minor(9)
+
 @subsubsection unregister_strdev(9)
 @fnindex unregister_strdev(9)
+
 @subsubsection unregister_strdev_major(9)
 @fnindex unregister_strdev_major(9)
+
 @subsubsection unregister_strdev_minor(9)
 @fnindex unregister_strdev_minor(9)
+
 @subsubsection unregister_strmod(9)
 @fnindex unregister_strmod(9)
 
 @node Message Handling
 @section Message Handling
 @cpindex message handling
-@menu
-Message Handling
-@end menu
 
 @subsection STREAMS Message Handling Utilities
 
 @subsubsection adjmsg(9)
 @fnindex adjmsg(9)
+
 @subsubsection allocb(9)
 @fnindex allocb(9)
+
 @subsubsection bufcall(9)
 @fnindex bufcall(9)
+
 @subsubsection copyb(9)
 @fnindex copyb(9)
+
 @subsubsection copymsg(9)
 @fnindex copymsg(9)
+
 @subsubsection datamsg(9)
 @fnindex datamsg(9)
+
 @subsubsection dupb(9)
 @fnindex dupb(9)
+
 @subsubsection dupmsg(9)
 @fnindex dupmsg(9)
+
 @subsubsection esballoc(9)
 @fnindex esballoc(9)
+
 @subsubsection freeb(9)
 @fnindex freeb(9)
+
 @subsubsection freemsg(9)
 @fnindex freemsg(9)
+
 @subsubsection linkb(9)
 @fnindex linkb(9)
+
 @subsubsection msgdsize(9)
 @fnindex msgdsize(9)
+
 @subsubsection msgpullup(9)
 @fnindex msgpullup(9)
+
 @subsubsection pcmsg(9)
 @fnindex pcmsg(9)
+
 @subsubsection pullupmsg(9)
 @fnindex pullupmsg(9)
+
 @subsubsection rmvb(9)
 @fnindex rmvb(9)
+
 @subsubsection testb(9)
 @fnindex testb(9)
+
 @subsubsection unbufcall(9)
 @fnindex unbufcall(9)
+
 @subsubsection unlinkb(9)
 @fnindex unlinkb(9)
 
 @node Queue Handling
 @section Queue Handling
 @cpindex queue handling
-@menu
-Queue Handling
-@end menu
 
 @subsection UP Queue Handling Functions
 
 @subsubsection backq(9)
 @fnindex backq(9)
+
 @subsubsection bcanput(9)
 @fnindex bcanput(9)
+
 @subsubsection canenable(9)
 @fnindex canenable(9)
+
 @subsubsection canput(9)
 @fnindex canput(9)
+
 @subsubsection enableok(9)
 @fnindex enableok(9)
+
 @subsubsection flushband(9)
 @fnindex flushband(9)
+
 @subsubsection flushq(9)
 @fnindex flushq(9)
+
 @subsubsection getq(9)
 @fnindex getq(9)
+
 @subsubsection insq(9)
 @fnindex insq(9)
+
 @subsubsection noenable(9)
 @fnindex noenable(9)
+
 @subsubsection OTHERQ(9)
 @fnindex OTHERQ(9)
+
 @subsubsection putbq(9)
 @fnindex putbq(9)
+
 @subsubsection putctl(9)
 @fnindex putctl(9)
+
 @subsubsection putctl1(9)
 @fnindex putctl1(9)
+
 @subsubsection putq(9)
 @fnindex putq(9)
+
 @subsubsection qenable(9)
 @fnindex qenable(9)
+
 @subsubsection qreply(9)
 @fnindex qreply(9)
+
 @subsubsection qsize(9)
 @fnindex qsize(9)
+
 @subsubsection RD(9)
 @fnindex RD(9)
+
 @subsubsection rmvq(9)
 @fnindex rmvq(9)
+
 @subsubsection SAMESTR(9)
 @fnindex SAMESTR(9)
+
 @subsubsection WR(9)
 @fnindex WR(9)
 
@@ -602,112 +911,148 @@ Queue Handling
 
 @subsubsection bcanputnext(9)
 @fnindex bcanputnext(9)
+
 @subsubsection canputnext(9)
 @fnindex canputnext(9)
+
 @subsubsection freezestr(9)
 @fnindex freezestr(9)
+
 @subsubsection put(9)
 @fnindex put(9)
+
 @subsubsection putnext(9)
 @fnindex putnext(9)
+
 @subsubsection putnextctl1(9)
 @fnindex putnextctl1(9)
+
 @subsubsection putnextctl(9)
 @fnindex putnextctl(9)
+
 @subsubsection qprocsoff(9)
 @fnindex qprocsoff(9)
+
 @subsubsection qprocson(9)
 @fnindex qprocson(9)
+
 @subsubsection strqget(9)
 @fnindex strqget(9)
+
 @subsubsection strqset(9)
 @fnindex strqset(9)
+
 @subsubsection unfreezestr(9)
 @fnindex unfreezestr(9)
 
 @node Miscellaneous Functions
 @section Miscellaneous Functions
 @cpindex miscellaneous functions
-@menu
-Miscellaneous Functions
-@end menu
 
 @subsection Miscellaneous DDI/DKI Functions
 
 @subsubsection kmem_alloc(9)
 @fnindex kmem_alloc(9)
+
 @subsubsection kmem_free(9)
 @fnindex kmem_free(9)
+
 @subsubsection kmem_zalloc(9)
 @fnindex kmem_zalloc(9)
+
 @subsubsection cmn_err(9)
 @fnindex cmn_err(9)
+
 @subsubsection bcopy(9)
 @fnindex bcopy(9)
+
 @subsubsection bzero(9)
 @fnindex bzero(9)
+
 @subsubsection copyin(9)
 @fnindex copyin(9)
+
 @subsubsection copyout(9)
 @fnindex copyout(9)
+
 @subsubsection delay(9)
 @fnindex delay(9)
+
 @subsubsection drv_getparm(9)
 @fnindex drv_getparm(9)
+
 @subsubsection drv_hztomsec(9)
 @fnindex drv_hztomsec(9)
+
 @subsubsection drv_hztousec(9)
 @fnindex drv_hztousec(9)
+
 @subsubsection drv_msectohz(9)
 @fnindex drv_msectohz(9)
+
 @subsubsection drv_priv(9)
 @fnindex drv_priv(9)
+
 @subsubsection drv_usectohz(9)
 @fnindex drv_usectohz(9)
+
 @subsubsection drv_usecwait(9)
 @fnindex drv_usecwait(9)
+
 @subsubsection max(9)
 @fnindex max(9)
+
 @subsubsection min(9)
 @fnindex min(9)
+
 @subsubsection getmajor(9)
 @fnindex getmajor(9)
+
 @subsubsection getminor(9)
 @fnindex getminor(9)
+
 @subsubsection makedevice(9)
 @fnindex makedevice(9)
+
 @subsubsection mknod(9)
 @fnindex mknod(9)
+
 @subsubsection mount(9)
 @fnindex mount(9)
+
 @subsubsection strlog(9)
 @fnindex strlog(9)
+
 @subsubsection timeout(9)
 @fnindex timeout(9)
+
 @subsubsection umount(9)
 @fnindex umount(9)
+
 @subsubsection unlink(9)
 @fnindex unlink(9)
+
 @subsubsection untimeout(9)
 @fnindex untimeout(9)
 
 @node Extensions
 @section Extensions
 @cpindex extensions
-@menu
-Extensions
-@end menu
 
 @subsection Common Extensions
 
 @subsubsection linkmsg(9)
 @fnindex linkmsg(9)
+
 @subsubsection putctl2(9)
 @fnindex putctl2(9)
+
 @subsubsection putnextctl2(9)
 @fnindex putnextctl2(9)
+
 @subsubsection weldq(9)
 @fnindex weldq(9)
+
 @subsubsection unweldq(9)
 @fnindex unweldq(9)
 
@@ -715,20 +1060,28 @@ Extensions
 
 @subsubsection allocq(9)
 @fnindex allocq(9)
+
 @subsubsection bcanget(9)
 @fnindex bcanget(9)
+
 @subsubsection canget(9)
 @fnindex canget(9)
+
 @subsubsection freeq(9)
 @fnindex freeq(9)
+
 @subsubsection qattach(9)
 @fnindex qattach(9)
+
 @subsubsection qclose(9)
 @fnindex qclose(9)
+
 @subsubsection qdetach(9)
 @fnindex qdetach(9)
+
 @subsubsection qopen(9)
 @fnindex qopen(9)
+
 @subsubsection setq(9)
 @fnindex setq(9)
 
@@ -736,18 +1089,25 @@ Extensions
 
 @subsubsection appq(9)
 @fnindex appq(9)
+
 @subsubsection esbbcall(9)
 @fnindex esbbcall(9)
+
 @subsubsection isdatablk(9)
 @fnindex isdatablk(9)
+
 @subsubsection isdatamsg(9)
 @fnindex isdatamsg(9)
+
 @subsubsection kmem_zalloc_node(9)
 @fnindex kmem_zalloc_node(9)
+
 @subsubsection msgsize(9)
 @fnindex msgsize(9)
+
 @subsubsection qcountstrm(9)
 @fnindex qcountstrm(9)
+
 @subsubsection xmsgsize(9)
 @fnindex xmsgsize(9)
 
@@ -755,58 +1115,85 @@ Extensions
 
 @subsubsection itimeout(9)
 @fnindex itimeout(9)
+
 @subsubsection LOCK(9)
 @fnindex LOCK(9)
+
 @subsubsection LOCK_ALLOC(9)
 @fnindex LOCK_ALLOC(9)
+
 @subsubsection LOCK_DEALLOC(9)
 @fnindex LOCK_DEALLOC(9)
+
 @subsubsection major(9)
 @fnindex major(9)
+
 @subsubsection makedev(9)
 @fnindex makedev(9)
+
 @subsubsection minor(9)
 @fnindex minor(9)
+
 @subsubsection sleep(9)
 @fnindex sleep(9)
+
 @subsubsection spl0(9)
 @fnindex spl0(9)
+
 @subsubsection spl1(9)
 @fnindex spl1(9)
+
 @subsubsection spl2(9)
 @fnindex spl2(9)
+
 @subsubsection spl3(9)
 @fnindex spl3(9)
+
 @subsubsection spl4(9)
 @fnindex spl4(9)
+
 @subsubsection spl5(9)
 @fnindex spl5(9)
+
 @subsubsection spl6(9)
 @fnindex spl6(9)
+
 @subsubsection spl7(9)
 @fnindex spl7(9)
+
 @subsubsection spl(9)
 @fnindex spl(9)
+
 @subsubsection splx(9)
 @fnindex splx(9)
+
 @subsubsection SV_ALLOC(9)
 @fnindex SV_ALLOC(9)
+
 @subsubsection SV_BROADCAST(9)
 @fnindex SV_BROADCAST(9)
+
 @subsubsection SV_DEALLOC(9)
 @fnindex SV_DEALLOC(9)
+
 @subsubsection SV_SIGNAL(9)
 @fnindex SV_SIGNAL(9)
+
 @subsubsection SV_WAIT(9)
 @fnindex SV_WAIT(9)
+
 @subsubsection SV_WAIT_SIG(9)
 @fnindex SV_WAIT_SIG(9)
+
 @subsubsection TRYLOCK(9)
 @fnindex TRYLOCK(9)
+
 @subsubsection UNLOCK(9)
 @fnindex UNLOCK(9)
+
 @subsubsection vtop(9)
 @fnindex vtop(9)
+
 @subsubsection wakeup(9)
 @fnindex wakeup(9)
 
@@ -814,26 +1201,37 @@ Extensions
 
 @subsubsection mi_bufcall(9)
 @fnindex mi_bufcall(9)
+
 @subsubsection mi_close_comm(9)
 @fnindex mi_close_comm(9)
+
 @subsubsection mi_next_ptr(9)
 @fnindex mi_next_ptr(9)
+
 @subsubsection mi_open_comm(9)
 @fnindex mi_open_comm(9)
+
 @subsubsection putctl2(9)
 @fnindex putctl2(9)
+
 @subsubsection slpstr(9)
 @fnindex slpstr(9)
+
 @subsubsection splx(9)
 @fnindex splx(9)
+
 @subsubsection str_install(9)
 @fnindex str_install(9)
+
 @subsubsection unweldq(9)
 @fnindex unweldq(9)
+
 @subsubsection wantio(9)
 @fnindex wantio(9)
+
 @subsubsection wantmsg(9)
 @fnindex wantmsg(9)
+
 @subsubsection weldq(9)
 @fnindex weldq(9)
 
@@ -841,18 +1239,25 @@ Extensions
 
 @subsubsection putctl2(9)
 @fnindex putctl2(9)
+
 @subsubsection putnextctl2(9)
 @fnindex putnextctl2(9)
+
 @subsubsection str_install(9)
 @fnindex str_install(9)
+
 @subsubsection str_uninstall(9)
 @fnindex str_uninstall(9)
+
 @subsubsection streams_get_sleep_lock(9)
 @fnindex streams_get_sleep_lock(9)
+
 @subsubsection streams_put(9)
 @fnindex streams_put(9)
+
 @subsubsection unweldq(9)
 @fnindex unweldq(9)
+
 @subsubsection weldq(9)
 @fnindex weldq(9)
 
@@ -860,22 +1265,31 @@ Extensions
 
 @subsubsection lbolt(9)
 @fnindex lbolt(9)
+
 @subsubsection puthere(9)
 @fnindex puthere(9)
+
 @subsubsection streams_open_comm(9)
 @fnindex streams_open_comm(9)
+
 @subsubsection streams_open_ocomm(9)
 @fnindex streams_open_ocomm(9)
+
 @subsubsection streams_close_comm(9)
 @fnindex streams_close_comm(9)
+
 @subsubsection strmod_add(9)
 @fnindex strmod_add(9)
+
 @subsubsection strmod_del(9)
 @fnindex strmod_del(9)
+
 @subsubsection time(9)
 @fnindex time(9)
+
 @subsubsection unweldq(9)
 @fnindex unweldq(9)
+
 @subsubsection weldq(9)
 @fnindex weldq(9)
 
@@ -883,84 +1297,124 @@ Extensions
 
 @subsubsection allocb_physreq(9)
 @fnindex allocb_physreq(9)
+
 @subsubsection ATOMIC_INT_ADD(9)
 @fnindex ATOMIC_INT_ADD(9)
+
 @subsubsection ATOMIC_INT_ALLOC(9)
 @fnindex ATOMIC_INT_ALLOC(9)
+
 @subsubsection ATOMIC_INT_DEALLOC(9)
 @fnindex ATOMIC_INT_DEALLOC(9)
+
 @subsubsection ATOMIC_INT_DECR(9)
 @fnindex ATOMIC_INT_DECR(9)
+
 @subsubsection ATOMIC_INT_INCR(9)
 @fnindex ATOMIC_INT_INCR(9)
+
 @subsubsection ATOMIC_INT_INIT(9)
 @fnindex ATOMIC_INT_INIT(9)
+
 @subsubsection ATOMIC_INT_READ(9)
 @fnindex ATOMIC_INT_READ(9)
+
 @subsubsection ATOMIC_INT_SUB(9)
 @fnindex ATOMIC_INT_SUB(9)
+
 @subsubsection ATOMIC_INT_WRITE(9)
 @fnindex ATOMIC_INT_WRITE(9)
+
 @subsubsection emajor(9)
 @fnindex emajor(9)
+
 @subsubsection eminor(9)
 @fnindex eminor(9)
+
 @subsubsection etoimajor(9)
 @fnindex etoimajor(9)
+
 @subsubsection getemajor(9)
 @fnindex getemajor(9)
+
 @subsubsection geteminor(9)
 @fnindex geteminor(9)
+
 @subsubsection itoemajor(9)
 @fnindex itoemajor(9)
+
 @subsubsection LOCK_OWNED(9)
 @fnindex LOCK_OWNED(9)
+
 @subsubsection MPSTR_QLOCK(9)
 @fnindex MPSTR_QLOCK(9)
+
 @subsubsection MPSTR_QRELE(9)
 @fnindex MPSTR_QRELE(9)
+
 @subsubsection MPSTR_STPLOCK(9)
 @fnindex MPSTR_STPLOCK(9)
+
 @subsubsection MPSTR_STPRELE(9)
 @fnindex MPSTR_STPRELE(9)
+
 @subsubsection msgphysreq(9)
 @fnindex msgphysreq(9)
+
 @subsubsection msgpullup_physreq(9)
 @fnindex msgpullup_physreq(9)
+
 @subsubsection msgscgth(9)
 @fnindex msgscgth(9)
+
 @subsubsection printf(9)
 @fnindex printf(9)
+
 @subsubsection RW_ALLOC(9)
 @fnindex RW_ALLOC(9)
+
 @subsubsection RW_DEALLOC(9)
 @fnindex RW_DEALLOC(9)
+
 @subsubsection RW_RDLOCK(9)
 @fnindex RW_RDLOCK(9)
+
 @subsubsection RW_TRYRDLOCK(9)
 @fnindex RW_TRYRDLOCK(9)
+
 @subsubsection RW_TRYWRLOCK(9)
 @fnindex RW_TRYWRLOCK(9)
+
 @subsubsection RW_UNLOCK(9)
 @fnindex RW_UNLOCK(9)
+
 @subsubsection RW_WRLOCK(9)
 @fnindex RW_WRLOCK(9)
+
 @subsubsection SLEEP_ALLOC(9)
 @fnindex SLEEP_ALLOC(9)
+
 @subsubsection SLEEP_DEALLOC(9)
 @fnindex SLEEP_DEALLOC(9)
+
 @subsubsection SLEEP_LOCK(9)
 @fnindex SLEEP_LOCK(9)
+
 @subsubsection SLEEP_LOCKAVAIL(9)
 @fnindex SLEEP_LOCKAVAIL(9)
+
 @subsubsection SLEEP_LOCKOWNED(9)
 @fnindex SLEEP_LOCKOWNED(9)
+
 @subsubsection SLEEP_LOCK_SIG(9)
 @fnindex SLEEP_LOCK_SIG(9)
+
 @subsubsection SLEEP_TRYLOCK(9)
 @fnindex SLEEP_TRYLOCK(9)
+
 @subsubsection SLEEP_UNLOCK(9)
 @fnindex SLEEP_UNLOCK(9)
+
 @subsubsection strioccall(9)
 @fnindex strioccall(9)
 
@@ -970,56 +1424,82 @@ Extensions
 
 @subsubsection ddi_create_minor_node(9)
 @fnindex ddi_create_minor_node(9)
+
 @subsubsection ddi_driver_major(9)
 @fnindex ddi_driver_major(9)
+
 @subsubsection ddi_driver_name(9)
 @fnindex ddi_driver_name(9)
+
 @subsubsection ddi_get_cred(9)
 @fnindex ddi_get_cred(9)
+
 @subsubsection ddi_getiminor(9)
 @fnindex ddi_getiminor(9)
+
 @subsubsection ddi_get_instance(9)
 @fnindex ddi_get_instance(9)
+
 @subsubsection ddi_get_lbolt(9)
 @fnindex ddi_get_lbolt(9)
+
 @subsubsection ddi_get_pid(9)
 @fnindex ddi_get_pid(9)
+
 @subsubsection ddi_get_soft_state(9)
 @fnindex ddi_get_soft_state(9)
+
 @subsubsection ddi_get_time(9)
 @fnindex ddi_get_time(9)
+
 @subsubsection ddi_remove_minor_node(9)
 @fnindex ddi_remove_minor_node(9)
+
 @subsubsection ddi_soft_state(9)
 @fnindex ddi_soft_state(9)
+
 @subsubsection ddi_soft_state_fini(9)
 @fnindex ddi_soft_state_fini(9)
+
 @subsubsection ddi_soft_state_free(9)
 @fnindex ddi_soft_state_free(9)
+
 @subsubsection ddi_soft_state_zalloc(9)
 @fnindex ddi_soft_state_zalloc(9)
+
 @subsubsection ddi_umem_alloc(9)
 @fnindex ddi_umem_alloc(9)
+
 @subsubsection mod_info(9)
 @fnindex mod_info(9)
+
 @subsubsection mod_install(9)
 @fnindex mod_install(9)
+
 @subsubsection mod_remove(9)
 @fnindex mod_remove(9)
+
 @subsubsection qbufcall(9)
 @fnindex qbufcall(9)
+
 @subsubsection queclass(9)
 @fnindex queclass(9)
+
 @subsubsection qtimeout(9)
 @fnindex qtimeout(9)
+
 @subsubsection qunbufcall(9)
 @fnindex qunbufcall(9)
+
 @subsubsection quntimeout(9)
 @fnindex quntimeout(9)
+
 @subsubsection qwait(9)
 @fnindex qwait(9)
+
 @subsubsection qwait_sig(9)
 @fnindex qwait_sig(9)
+
 @subsubsection qwriter(9)
 @fnindex qwriter(9)
 
@@ -1028,202 +1508,292 @@ Extensions
 
 @subsubsection lis_register_strdev(9)
 @fnindex lis_register_strdev(9)
+
 @subsubsection lis_register_strmod(9)
 @fnindex lis_register_strmod(9)
+
 @subsubsection lis_unregister_strdev(9)
 @fnindex lis_unregister_strdev(9)
+
 @subsubsection lis_unregister_strmod(9)
 @fnindex lis_unregister_strmod(9)
 
 @subsubsection lis_adjmsg(9)
 @fnindex lis_adjmsg(9)
+
 @subsubsection lis_allocb(9)
 @fnindex lis_allocb(9)
+
 @subsubsection lis_allocb_physreq(9)
 @fnindex lis_allocb_physreq(9)
+
 @subsubsection lis_allocq(9)
 @fnindex lis_allocq(9)
+
 @subsubsection lis_appq(9)
 @fnindex lis_appq(9)
+
 @subsubsection lis_backq(9)
 @fnindex lis_backq(9)
+
 @subsubsection lis_bcanput(9)
 @fnindex lis_bcanput(9)
+
 @subsubsection lis_bcanputnext(9)
 @fnindex lis_bcanputnext(9)
+
 @subsubsection lis_bcopy(9)
 @fnindex lis_bcopy(9)
+
 @subsubsection lis_bufcall(9)
 @fnindex lis_bufcall(9)
+
 @subsubsection lis_bzero(9)
 @fnindex lis_bzero(9)
+
 @subsubsection lis_canenable(9)
 @fnindex lis_canenable(9)
+
 @subsubsection lis_canput(9)
 @fnindex lis_canput(9)
+
 @subsubsection lis_canputnext(9)
 @fnindex lis_canputnext(9)
+
 @subsubsection lis_cmn_err(9)
 @fnindex lis_cmn_err(9)
+
 @subsubsection lis_copyb(9)
 @fnindex lis_copyb(9)
+
 @subsubsection lis_copymsg(9)
 @fnindex lis_copymsg(9)
+
 @subsubsection lis_datamsg(9)
 @fnindex lis_datamsg(9)
+
 @subsubsection lis_date(9)
 @fnindex lis_date(9)
+
 @subsubsection lis_dupb(9)
 @fnindex lis_dupb(9)
+
 @subsubsection lis_dupmsg(9)
 @fnindex lis_dupmsg(9)
+
 @subsubsection lis_enableok(9)
 @fnindex lis_enableok(9)
+
 @subsubsection lis_esballoc(9)
 @fnindex lis_esballoc(9)
+
 @subsubsection lis_esbbcall(9)
 @fnindex lis_esbbcall(9)
+
 @subsubsection lis_find_strdev(9)
 @fnindex lis_find_strdev(9)
+
 @subsubsection lis_flushband(9)
 @fnindex lis_flushband(9)
+
 @subsubsection lis_flushq(9)
 @fnindex lis_flushq(9)
+
 @subsubsection lis_freeb(9)
 @fnindex lis_freeb(9)
+
 @subsubsection lis_freemsg(9)
 @fnindex lis_freemsg(9)
+
 @subsubsection lis_freeq(9)
 @fnindex lis_freeq(9)
+
 @subsubsection lis_getq(9)
 @fnindex lis_getq(9)
+
 @subsubsection lis_insq(9)
 @fnindex lis_insq(9)
+
 @subsubsection lis_isdatablk(9)
 @fnindex lis_isdatablk(9)
+
 @subsubsection lis_isdatamsg(9)
 @fnindex lis_isdatamsg(9)
+
 @subsubsection lis_linkb(9)
 @fnindex lis_linkb(9)
+
 @subsubsection lis_mknod(9)
 @fnindex lis_mknod(9)
+
 @subsubsection lis_mount(9)
 @fnindex lis_mount(9)
+
 @subsubsection lis_msgdsize(9)
 @fnindex lis_msgdsize(9)
+
 @subsubsection lis_msgpullup(9)
 @fnindex lis_msgpullup(9)
+
 @subsubsection lis_msgsize(9)
 @fnindex lis_msgsize(9)
+
 @subsubsection lis_noenable(9)
 @fnindex lis_noenable(9)
+
 @subsubsection lis_OTHER(9)
 @fnindex lis_OTHER(9)
+
 @subsubsection lis_OTHERQ(9)
 @fnindex lis_OTHERQ(9)
+
 @subsubsection lis_pullupmsg(9)
 @fnindex lis_pullupmsg(9)
+
 @subsubsection lis_putbq(9)
 @fnindex lis_putbq(9)
+
 @subsubsection lis_putctl1(9)
 @fnindex lis_putctl1(9)
+
 @subsubsection lis_putctl(9)
 @fnindex lis_putctl(9)
+
 @subsubsection lis_putnext(9)
 @fnindex lis_putnext(9)
+
 @subsubsection lis_putnextctl1(9)
 @fnindex lis_putnextctl1(9)
+
 @subsubsection lis_putnextctl(9)
 @fnindex lis_putnextctl(9)
+
 @subsubsection lis_putq(9)
 @fnindex lis_putq(9)
+
 @subsubsection lis_qattach(9)
 @fnindex lis_qattach(9)
+
 @subsubsection lis_qclose(9)
 @fnindex lis_qclose(9)
+
 @subsubsection lis_qdetach(9)
 @fnindex lis_qdetach(9)
+
 @subsubsection lis_qenable(9)
 @fnindex lis_qenable(9)
+
 @subsubsection lis_qopen(9)
 @fnindex lis_qopen(9)
+
 @subsubsection lis_qprocsoff(9)
 @fnindex lis_qprocsoff(9)
+
 @subsubsection lis_qprocson(9)
 @fnindex lis_qprocson(9)
+
 @subsubsection lis_qreply(9)
 @fnindex lis_qreply(9)
+
 @subsubsection lis_qsize(9)
 @fnindex lis_qsize(9)
+
 @subsubsection lis_RD(9)
 @fnindex lis_RD(9)
+
 @subsubsection lis_register_strdev(9)
 @fnindex lis_register_strdev(9)
+
 @subsubsection lis_register_strmod(9)
 @fnindex lis_register_strmod(9)
+
 @subsubsection lis_rmvb(9)
 @fnindex lis_rmvb(9)
+
 @subsubsection lis_rmvq(9)
 @fnindex lis_rmvq(9)
+
 @subsubsection lis_safe_canenable(9)
 @fnindex lis_safe_canenable(9)
+
 @subsubsection lis_safe_enableok(9)
 @fnindex lis_safe_enableok(9)
+
 @subsubsection lis_safe_noenable(9)
 @fnindex lis_safe_noenable(9)
+
 @subsubsection lis_safe_OTHERQ(9)
 @fnindex lis_safe_OTHERQ(9)
+
 @subsubsection lis_safe_putnext(9)
 @fnindex lis_safe_putnext(9)
+
 @subsubsection lis_safe_qreply(9)
 @fnindex lis_safe_qreply(9)
+
 @subsubsection lis_safe_RD(9)
 @fnindex lis_safe_RD(9)
+
 @subsubsection lis_safe_SAMESTR(9)
 @fnindex lis_safe_SAMESTR(9)
+
 @subsubsection lis_safe_WR(9)
 @fnindex lis_safe_WR(9)
+
 @subsubsection lis_SAMESTR(9)
 @fnindex lis_SAMESTR(9)
+
 @subsubsection lis_stream_utils(9)
 @fnindex lis_stream_utils(9)
+
 @subsubsection lis_strqget(9)
 @fnindex lis_strqget(9)
+
 @subsubsection lis_strqset(9)
 @fnindex lis_strqset(9)
+
 @subsubsection lis_testb(9)
 @fnindex lis_testb(9)
+
 @subsubsection lis_timeout(9)
 @fnindex lis_timeout(9)
+
 @subsubsection lis_umount2(9)
 @fnindex lis_umount2(9)
+
 @subsubsection lis_umount(9)
 @fnindex lis_umount(9)
+
 @subsubsection lis_unbufcall(9)
 @fnindex lis_unbufcall(9)
+
 @subsubsection lis_unlink(9)
 @fnindex lis_unlink(9)
+
 @subsubsection lis_unlinkb(9)
 @fnindex lis_unlinkb(9)
+
 @subsubsection lis_unregister_strdev(9)
 @fnindex lis_unregister_strdev(9)
+
 @subsubsection lis_unregister_strmod(9)
 @fnindex lis_unregister_strmod(9)
+
 @subsubsection lis_untimeout(9)
 @fnindex lis_untimeout(9)
+
 @subsubsection lis_version(9)
 @fnindex lis_version(9)
+
 @subsubsection lis_WR(9)
 @fnindex lis_WR(9)
+
 @subsubsection lis_xmsgsize(9)
 @fnindex lis_xmsgsize(9)
 
 @node System Controls
 @section System Controls
 @cpindex system controls
-@menu
-System Controls
-@end menu
 
 @subsection System Controls
 
@@ -1310,7 +1880,7 @@ devices (@b{MAX_CHRDEV}).  Valid values are zero (0) or greater (@b{MAXINT}).  T
 
 @subsubsection sys.streams.msg_priority
 @vrindex sys.streams.msg_priority
-Defines whether allocation priority will honored or whether all allocations will be treated the
+Defines whether allocation priority will honoured or whether all allocations will be treated the
 same.  See
 @iftex
 @b{allocb}(9).
@@ -1318,7 +1888,7 @@ same.  See
 @ifnottex
 @inforef{allocb(9), , *manpages*}.
 @end ifnottex
-When true (non-zero), allocation priority will be honored when allocating message blocks.  When
+When true (non-zero), allocation priority will be honoured when allocating message blocks.  When
 false (zero), allocation priority will be ignored.  Valid values are zero (0) or non-zero.  The
 default value is zero (0).  Changing this value may have a positive or negative impact on system
 performance.
@@ -1338,7 +1908,7 @@ useful for debugging @i{STREAMS} drivers and modules.
 
 @subsubsection sys.streams.nstrpush
 @vrindex sys.streams.nstrpush
-Deinfes the maximum number of modules that can be pushed on a stream.  This includes both autopushed
+Defines the maximum number of modules that can be pushed on a stream.  This includes both autopushed
 modules and modules pushed using the
 @b{I_PUSH}
 @vrindex I_PUSH
@@ -1349,7 +1919,7 @@ IO control of
 @ifnottex
 @inforef{streamio(7), , *manpages*}.
 @end ifnottex
-Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the tranditional @i{UNIX}
+Valid values are zero (0) or greater (@b{MAXINT}).  The default value is the traditional @i{UNIX}
 value of 64.  This is the default values for all new streams.  Existing streams are unaffected.
 
 @subsubsection sys.streams.hiwat
@@ -1364,7 +1934,7 @@ message to the stream head.
 
 @subsubsection sys.streams.lowat
 @vrindex sys.streams.lowat
-Defines the default low water mark (in mesasge bytes) for the stream head.  Valid values are zero
+Defines the default low water mark (in message bytes) for the stream head.  Valid values are zero
 (0) or greater (@b{MAXINT}).  The default value is 1024.  This is the default value for all new
 stream heads.  Existing stream heads are unaffected.  The value on existing stream heads can be
 changed by a driver or module by sending an
@@ -1485,16 +2055,13 @@ or indirectly using
 @ifnottex
 @inforef{allocb (9), , *manpages*}
 @end ifnottex
-or allocating other @i{STREAMS} datastructures.  Valid values are zero (0) or greater (@b{MAXINT}).
+or allocating other @i{STREAMS} data structures.  Valid values are zero (0) or greater (@b{MAXINT}).
 This is the system wide maximum.  Existing allocations are unaffected by lowering this value.
 Changing this value to a low value may have some use in debugging @i{STREAMS} drivers and modules.
 
 @node /proc Filesystem
 @section /proc Filesystem
 @cpindex /proc filesystem
-@menu
-/proc Filesystem
-@end menu
 
 @node Examples
 @chapter Examples
@@ -1626,9 +2193,9 @@ numbers and makes it harder for boot and configuration scripts to properly creat
 @subsection Traditional Cloning
 
 The @b{clone}(4) driver supports traditional clone devices.  Traditional clone devices work by
-assigning the clone major device number adn a unique minor device number to a ``clone'' device.
+assigning the clone major device number and a unique minor device number to a ``clone'' device.
 When this device is opened, the minor device number of the device is used as the new major device
-number and zero (0) is used as the minor device number, and the @b{qopen}(9) is chaned to the
+number and zero (0) is used as the minor device number, and the @b{qopen}(9) is chained to the
 @b{qopen}(9) procedure of the new @b{streamtab}(9) structure resulting from looking up this newly
 created device number.  @var{sflag} is always set to @samp{CLONEOPEN} when the traditional clone
 driver opens a device.
@@ -1661,7 +2228,7 @@ used as the clone minor.
 The driver may either use an external (real) major device number or the internal (base) major device
 number.  That is, when calling @b{makedevice}(9) to create the device to return to the @var{devp}
 argument to @b{qopen}(9), the driver can use an external (real) major device number (returned by
-@b{getemajor}(9)) combind with an assigned external (real) minor device number (from 0 to 255); or,
+@b{getemajor}(9)) combined with an assigned external (real) minor device number (from 0 to 255); or,
 it can use an internal (base) major device number (returned by @b{getmajor}(9)) combined with an
 assigned extended minor device number (from 0 to 65535).  The latter approach is often easier to
 use.
@@ -1689,7 +2256,7 @@ driver are 32, 35 and 37):
 
 The @b{nsdev}(4) device also has the characteristic that if a device name with a major device number
 of the @b{nsdev}(4) device is opened and there is no device loaded that corresponds to the prefix
-name of the device from which to obtain a major device number, the @b{nsdev}(4) will attempt to laod
+name of the device from which to obtain a major device number, the @b{nsdev}(4) will attempt to load
 the `@t{@b{streams-}@i{prefix}}' kernel module using @b{request_module}(9) and try again: where,
 @samp{prefix} is the prefix of the device name up to the first point character (corresponding to a
 digit @kbd{.}).  So, in the example above, if the @samp{inet} driver was not loaded, but an attempt
@@ -1703,7 +2270,7 @@ and makes it easier for boot scripts to initialize devices.
 
 Another approach to creation and assignment of device numbers is the mountable @b{specfs}(5) file
 system.  The @b{specfs}(5) file system can be mounted to provide an in-kernel device directory
-similar to the @b{Linux} @file{devfs} file ssytem and the @dfn{Solaris} devices file system.  The
+similar to the @b{Linux} @file{devfs} file system and the @dfn{Solaris} devices file system.  The
 @b{spefs}(5) file system should normally be mounted on the @file{/dev/streams} subdirectory by
 system initialization scripts using a command such as: @command{mount -t specfs none /dev/streams}.
 See @b{mount}(8) for more information.  Once mounted over the @file{/dev/streams} subdirectory,
@@ -1737,14 +2304,14 @@ the table below:
 
 In fact, it does not matter what the character device major or minor device number is on the node in
 the @b{specfs}(5) file system.  This is because the inode in the file system is directly associated
-with the @b{streamtab}(9) structue and instance number without using the normal @b{Linux} character
+with the @b{streamtab}(9) structure and instance number without using the normal @b{Linux} character
 device mechanisms.  When a device instance exceeds the extended minor device numbering space
 assigned to a device driver in the @b{specfs}(5) file system, device number displayed by
 @b{stat}(2), @b{lstat}(2) or @b{fstat}(2) is chosen by wrapping the instance number into the
 extended minor device numbering space.
 
 This approach makes it unnecessary to statically assign major device numbers, or to dynamically
-assign major device numers to devices in boot scripts, and is by far the easiest approach.  All that
+assign major device numbers to devices in boot scripts, and is by far the easiest approach.  All that
 is required by packages at installation is that they establish the necessary symbolic links on
 device name and instance number without concern for major device numbers.
 

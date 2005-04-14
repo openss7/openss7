@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.17 2005/04/12 09:28:59 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.18 2005/04/14 08:06:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/12 09:28:59 $ by $Author: brian $
+% Last Modified $Date: 2005/04/14 08:06:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -472,29 +472,36 @@ filesystem for support and debugging.
 @section Drivers
 @cindex drivers
 
+The configuration of @cite{STREAMS} drivers and modules is performed when
+compiling the @b{Linux Fast-STREAMS} subsystem.  The @cite{STREAMS} subsystem,
+core drivers and modules are part of every @b{Linux Fast-STREAMS} system.
+
+The following sections list the core drivers and modules, @cite{STREAMS} kernel
+tunable parameters, and @cite{STREAMS} configuration information.
+
 @table @file
-@item streams-clone.o
+@item streams-clone.o ("clone")
 @pgindex streams-clone.o
 Clone device driver.
-@item streams-echo.o
+@item streams-echo.o ("echo")
 @pgindex streams-echo.o
 Echo (loopback) device driver.
-@item streams-fifo.o
+@item streams-fifo.o ("fifo")
 @pgindex streams-fifo.o
 FIFO (Named Pipe) driver.
-@item streams-log.o
+@item streams-log.o ("strlog")
 @pgindex streams-log.o
 STREAMS log driver.
-@item streams-nsdev.o
+@item streams-nsdev.o ("nsdev")
 @pgindex streams-nsdev.o
 Named STREAMS device driver.
-@item streams-nuls.o
+@item streams-nuls.o ("nuls")
 @pgindex streams-nuls.o
 Null stream driver.
-@item streams-pipe.o
+@item streams-pipe.o ("pipe")
 @pgindex streams-pipe.o
 Pipe driver.
-@item streams-sad.o
+@item streams-sad.o ("sad")
 @pgindex streams-sad.o
 STREAMS Administrative Driver.
 @end table
@@ -506,20 +513,29 @@ STREAMS Administrative Driver.
 @section Modules
 @cindex modules
 
+The configuration of @cite{STREAMS} drivers and modules is performed when
+compiling the @b{Linux Fast-STREAMS} subsystem.  The @cite{STREAMS} subsystem,
+core drivers and modules are part of every @b{Linux Fast-STREAMS} system.
+
+The following sections list the core drivers and modules, @cite{STREAMS} kernel
+tunable parameters, and @cite{STREAMS} configuration information.
+
 @table @file
-@item streams-connld.o
+@item streams-connld.o ("connld")
 @pgindex streams-connld.o
 Connld module.
-@item streams-pipemod.o
+@item streams-pipemod.o ("pipemod")
 @pgindex streams-pipemod.o
 Pipe module.
-@item streams-sc.o
+@item streams-sc.o ("sc")
 @pgindex streams-sc.o
 STREAMS configuration module.
-@item streams-sth.o
+@item streams-sth.o ("sth")
 @pgindex streams-sth.o
 Stream Head module.
 @end table
+
+Additional modules are provided by add-on packages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
