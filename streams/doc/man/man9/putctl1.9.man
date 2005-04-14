@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl1.9.man,v 0.9.2.9 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: putctl1.9.man,v 0.9.2.10 2005/04/13 23:45:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 23:45:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B putctl1
-\- puts a 1 byte control message on a \fISTREAMS\fR message queue
+\- put a 1 byte control message on a \fISTREAMS\fR message queue
 .\"
 .\"
 .SH SYNOPSIS

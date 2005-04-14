@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lisddi.h,v 0.9.2.10 2005/04/09 09:36:50 brian Exp $
+ @(#) $Id: lisddi.h,v 0.9.2.11 2005/04/13 23:45:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:36:50 $ by $Author: brian $
+ Last Modified $Date: 2005/04/13 23:45:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:36:50 $"
+#ident "@(#) $RCSfile: lisddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/13 23:45:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -171,13 +171,17 @@ struct stdata;
 
 extern void *lis__kfree(void *ptr);
 extern void *lis__kmalloc(int nbytes, int class, int use_cache);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_add_timer(struct timer_list *timer);
+#endif
 extern void *lis_alloc_atomic_fcn(int nbytes, char *file, int line);
 extern void *lis_alloc_dma_fcn(int nbytes, char *file, int line);
 extern void *lis_alloc_kernel_fcn(int nbytes, char *file, int line);
 extern int lis_apush_get(struct lis_strapush *ap);
 extern int lis_apush_set(struct lis_strapush *ap);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_apushm(dev_t dev, const char *mods[]);
+#endif
 extern void lis_assert_fail(const char *expr, const char *objname, const char *file,
 			    unsigned int line);
 extern void lis_atomic_add(lis_atomic_t *atomic_addr, int amt);
@@ -187,6 +191,7 @@ extern void lis_atomic_inc(lis_atomic_t *atomic_addr);
 extern int lis_atomic_read(lis_atomic_t *atomic_addr);
 extern void lis_atomic_set(lis_atomic_t *atomic_addr, int valu);
 extern void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_bprintf(char *fmt, ...);
 extern int lis_can_unload(void);
 extern int lis_check_guard(void *ptr, char *msg);
@@ -194,20 +199,28 @@ extern int lis_check_mem(void);
 extern int lis_check_q_magic(queue_t *q, char *file, int line);
 extern int lis_check_region(unsigned int from, unsigned int extent);
 extern int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth);
+#endif
 extern int lis_clone_major(void);
 extern void lis_cmn_err(int err_lvl, char *fmt, ...);
 extern char lis_date[];
 extern unsigned long lis_debug_mask;
 extern unsigned long lis_debug_mask2;
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_dec_mod_cnt_fcn(const char *file, int line);
 extern int lis_del_timer(struct timer_list *timer);
+#endif
 extern void lis_disable_irq(unsigned int irq);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_dobufcall(int cpu_id);
 extern int lis_doclose(struct inode *i, struct file *f, struct stdata *head, cred_t *creds);
+#endif
 extern int lis_down_fcn(lis_semaphore_t *lsem, char *file, int line);
 extern unsigned long lis_dsecs(void);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_enable_intr(struct streamtab *strtab, int major, const char *name);
+#endif
 extern void lis_enable_irq(unsigned int irq);
+#if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KERNEL_FATTACH_SUPPORT
 extern int lis_fattach(struct file *f, const char *path);
 extern int lis_fdetach(const char *path);
@@ -222,30 +235,39 @@ extern struct stdata *lis_file_str(struct file *f);
 extern streamtab_t *lis_find_strdev(major_t major);
 extern void lis_flush_print_buffer(void);
 extern struct fmodsw *lis_fmod_sw;
+#endif
 extern void lis_free(void *ptr, char *file_name, int line_nr);
 extern void lis_free_dma(unsigned int dma_nr);
 extern void lis_free_irq(unsigned int irq, void *dev_id);
 extern void *lis_free_mem_fcn(void *mem_area, char *file, int line);
 extern void *lis_free_pages_fcn(void *ptr, char *file, int line);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_free_passfp(mblk_t *mp);
 extern void lis_freedb(mblk_t *bp, int free_hdr);
 extern struct fmodsw *lis_fstr_sw;
 extern int lis_get_fifo(struct file **f);
+#endif
 extern void *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line);
 extern void *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line);
 extern void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern mblk_t *lis_get_passfp(void);
 extern int lis_get_pipe(struct file **f0, struct file **f1);
+#endif
 extern int lis_getint(unsigned char **p);
 extern void lis_gettimeofday(struct timeval *tv);
 extern unsigned long lis_hitime(void);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern lis_atomic_t lis_in_syscall;
 extern void lis_inc_mod_cnt_fcn(const char *file, int line);
 extern void lis_init_bufcall(void);
+#endif
 extern void lis_interruptible_sleep_on(wait_queue_head_t *wq);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_ioc_fattach(struct file *f, char *path);
 extern int lis_ioc_fdetach(char *path);
 extern int lis_ioc_pipe(unsigned int *fildes);
+#endif
 extern void *lis_ioremap(unsigned long offset, unsigned long size);
 extern void *lis_ioremap_nocache(unsigned long offset, unsigned long size);
 extern void lis_iounmap(void *ptr);
@@ -253,16 +275,20 @@ extern unsigned long lis_jiffies(void);
 extern int lis_kernel_down(struct semaphore *sem);
 extern void lis_kernel_up(struct semaphore *sem);
 extern char lis_kernel_version[];
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_kfree(const void *ptr);
 extern int lis_kill_pg(int pgrp, int sig, int priv);
 extern int lis_kill_proc(int pid, int sig, int priv);
 extern void *lis_kmalloc(size_t nbytes, int type);
 extern int lis_loadable_load(const char *name);
 extern const char *lis_maj_min_name(struct stdata *head);
+#endif
 extern int lis_major;
 extern void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_mark_mem(void *ptr, const char *file_name, int line_nr);
 extern long lis_max_mem;
+#endif
 extern long lis_milli_to_ticks(long milli_sec);
 extern int lis_mknod(char *name, int mode, dev_t dev);
 extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag,
@@ -270,8 +296,10 @@ extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long
 extern unsigned long lis_msecs(void);
 extern const char *lis_msg_type_name(mblk_t *mp);
 extern int lis_num_cpus;
+#if LIS_DEPRECARTED_FUNCTIONS
 extern struct inode *lis_old_inode(struct file *f, struct inode *i);
 extern lis_atomic_t lis_open_cnt;
+#endif
 extern void lis_osif_cli(void);
 extern void lis_osif_do_gettimeofday(struct timeval *tp);
 #ifdef HAVE_TIMESPEC_DO_SETTIMEOFDAY
@@ -282,6 +310,7 @@ extern void lis_osif_do_settimeofday(struct timeval *tp);
 extern void lis_osif_sti(void);
 extern int lis_own_spl(void);
 extern void *lis_phys_to_virt(unsigned long addr);
+#if LIS_DEPRECARTED_FUNCTIONS
 #if HAVE_KERNEL_PIPE_SUPPORT
 extern int lis_pipe(unsigned int *fd);
 #endif
@@ -289,20 +318,25 @@ extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
 extern unsigned lis_poll_bits(struct stdata *hd);
 extern char *lis_poll_events(short events);
 extern char *lis_poll_file;
+#endif
 extern void lis_print_block(void *ptr);
 extern void lis_print_data(mblk_t *mp, int opt, int cont);
 extern void lis_print_mem(void);
 extern void lis_print_msg(mblk_t *mp, const char *prefix, int opt);
 extern void lis_print_queue(queue_t *q);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_print_queues(void);
 extern void lis_print_spl_track(void);
 extern void lis_print_stream(struct stdata *hd);
+#endif
 extern int lis_printk(const char *fmt, ...);
 extern void lis_putbyte(unsigned char **p, unsigned char byte);
 extern const char *lis_queue_name(queue_t *q);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern volatile unsigned long lis_queuerun_cnts[NR_CPUS];
 extern lis_atomic_t lis_queues_running;
 extern int lis_recvfd(struct stdata *recvhd, strrecvfd_t * recv, struct file *fp);
+#endif
 extern void lis_release_region(unsigned int from, unsigned int extent);
 extern int lis_request_dma(unsigned int dma_nr, const char *device_id);
 #if HAVE_KTYPE_IRQRETURN_T
@@ -313,8 +347,10 @@ extern int lis_request_irq(unsigned int irq, void (*handler) (int, void *, struc
 			   unsigned long flags, const char *device, void *dev_id);
 #endif
 extern void lis_request_region(unsigned int from, unsigned int extent, const char *name);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern volatile unsigned long lis_runq_cnts[NR_CPUS];
 extern lis_atomic_t lis_runq_req_cnt;
+#endif
 extern lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, char *file, int line);
 extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file,
 					   int line);
@@ -337,11 +373,13 @@ extern unsigned long lis_secs(void);
 extern lis_semaphore_t *lis_sem_alloc(int count);
 extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem);
 extern void lis_sem_init(lis_semaphore_t *lsem, int count);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_sendfd(struct stdata *sendhd, unsigned int fd, struct file *fp);
 extern void lis_set_file_str(struct file *f, struct stdata *s);
 extern void lis_setqsched(int can_call);
 extern volatile unsigned long lis_setqsched_cnts[NR_CPUS];
 extern volatile unsigned long lis_setqsched_isr_cnts[NR_CPUS];
+#endif
 extern void lis_sleep_on(wait_queue_head_t *wq);
 extern int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line);
 extern lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file, int line);
@@ -358,30 +396,40 @@ extern void lis_spl0_fcn(char *file, int line);
 extern int lis_splstr_fcn(char *file, int line);
 extern void lis_splx_fcn(int x, char *file, int line);
 extern int lis_sprintf(char *bfr, const char *fmt, ...);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern lis_atomic_t lis_stdata_cnt;
 extern int lis_strclose(struct inode *i, struct file *f);
 extern lis_atomic_t lis_strcount;
 extern int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
 			  int *flagsp, int doit);
 extern int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg);
+#endif
 extern const char *lis_strm_name(struct stdata *head);
 extern const char *lis_strm_name_from_queue(queue_t *q);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_stropen(struct inode *i, struct file *f);
+#endif
 extern char *lis_stropts_file;
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band,
 			  int flags);
 extern ssize_t lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op);
 extern lis_atomic_t lis_strstats[24][4];
 extern ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op);
+#endif
 extern pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name);
 extern int lis_thread_stop(pid_t pid);
 extern void lis_udelay(long micro_secs);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_umount2(char *path, int flags);
+#endif
 extern int lis_unlink(char *name);
 extern void lis_up_fcn(lis_semaphore_t *lsem, char *file, int line);
 extern unsigned long lis_usecs(void);
 extern unsigned lis_usectohz(unsigned usec);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern int lis_valid_mod_list(struct str_list ml);
+#endif
 extern char lis_version[];
 extern void lis_vfree(void *ptr);
 extern unsigned long lis_virt_to_phys(volatile void *addr);
@@ -455,7 +503,9 @@ extern int lis_osif_pci_write_config_dword(struct pci_dev *dev, u8 where, u32 va
 extern int lis_osif_pci_write_config_word(struct pci_dev *dev, u8 where, u16 val);
 extern dma_addr_t lis_osif_sg_dma_address(struct scatterlist *sg);
 extern size_t lis_osif_sg_dma_len(struct scatterlist *sg);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_pci_cleanup(void);
+#endif
 extern void lis_pci_disable_device(lis_pci_dev_t *dev);
 extern int lis_pci_enable_device(lis_pci_dev_t *dev);
 extern lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct);
@@ -504,10 +554,12 @@ __LIS_EXTERN_INLINE struct msgb *lis_allocb_physreq(int size, unsigned int prior
 {
 	return allocb(size, priority);
 }
+#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name)
 {
 	return allocq();
 }
+#endif
 __LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
 {
 	return appq(q, mp1, mp2);
@@ -544,6 +596,7 @@ __LIS_EXTERN_INLINE mblk_t *lis_copymsg(mblk_t *mp)
 {
 	return copymsg(mp);
 }
+#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE int lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len)
 {
 	return copyin(ubuf, kbuf, len);
@@ -552,6 +605,7 @@ __LIS_EXTERN_INLINE int lis_copyout(struct file *fp, const void *kbuf, void *ubu
 {
 	return copyout(kbuf, ubuf, len);
 }
+#endif
 __LIS_EXTERN_INLINE mblk_t *lis_dupb(mblk_t *mp)
 {
 	return dupb(mp);
@@ -585,10 +639,12 @@ __LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp)
 {
 	return freemsg(mp);
 }
+#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_freeq(queue_t *q)
 {
 	return freeq(q);
 }
+#endif
 __LIS_EXTERN_INLINE mblk_t *lis_getq(queue_t *q)
 {
 	return getq(q);
@@ -648,10 +704,12 @@ __LIS_EXTERN_INLINE int lis_qcountstrm(queue_t *q)
 {
 	return qcountstrm(q);
 }
+#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
 {
 	return (void) qdetach(q, flag, creds);
 }
+#endif
 __LIS_EXTERN_INLINE void lis_qenable(queue_t *q)
 {
 	return qenable(q);
@@ -716,10 +774,12 @@ __LIS_EXTERN_INLINE void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
 {
 	return qreply(q, mp);
 }
+#if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 {
 	return setq(q, rinit, winit);
 }
+#endif
 __LIS_EXTERN_INLINE int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 {
 	return strqget(q, what, band, val);
@@ -759,14 +819,14 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #define lis_alloc_dma(__p1) lis_alloc_dma_fcn(__p1, __FILE__, __LINE__)
 #define lis_alloc_kernel(__p1) lis_alloc_kernel_fcn(__p1, __FILE__, __LINE__)
 //#define lis_backq(__p1) lis_backq_fcn(__p1, __FILE__, __LINE__)
-#define lis_dec_mod_cnt() lis_dec_mod_cnt_fcn(__FILE__, __LINE__)
+//#define lis_dec_mod_cnt() lis_dec_mod_cnt_fcn(__FILE__, __LINE__)
 #define lis_down(__p1) lis_down_fcn(__p1, __FILE__, __LINE__)
 #define lis_free_mem(__p1) lis_free_mem_fcn(__p1, __FILE__, __LINE__)
 #define lis_free_pages(__p1) lis_free_pages_fcn(__p1, __FILE__, __LINE__)
 #define lis_get_free_pages_atomic(__p1) lis_get_free_pages_atomic_fcn(__p1, __FILE__, __LINE__)
 #define lis_get_free_pages_kernel(__p1) lis_get_free_pages_kernel_fcn(__p1, __FILE__, __LINE__)
 #define lis_get_free_pages(__p1, __p2) lis_get_free_pages_fcn(__p1, __p2, __FILE__, __LINE__)
-#define lis_inc_mod_cnt() lis_inc_mod_cnt_fcn(__FILE__, __LINE__)
+//#define lis_inc_mod_cnt() lis_inc_mod_cnt_fcn(__FILE__, __LINE__)
 #define lis_rw_lock_init(__p1, __p2) lis_rw_lock_init_fcn(__p1, __p2, __FILE__, __LINE__)
 #define lis_rw_lock_alloc(__p1) lis_rw_lock_alloc_fcn(__p1, __FILE__, __LINE__)
 #define lis_rw_lock_free(__p1, __p2) lis_rw_lock_free_fcn(__p1, __p2, __FILE__, __LINE__)

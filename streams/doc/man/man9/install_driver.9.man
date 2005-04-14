@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: install_driver.9.man,v 0.9.2.10 2005/04/13 04:30:13 brian Exp $
+.\" @(#) $Id: install_driver.9.man,v 0.9.2.11 2005/04/13 23:45:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 23:45:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -81,7 +81,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _HPUX_SOURCE
+.B #define _SUN_SOURCE
 .br
 .B #include <sys/ddi.h>
 .br
@@ -245,13 +245,13 @@ can be called from
 is a
 .IR HP-UX \(rg-specific
 function:
-.B _HPUX_SOURCE
+.B _SUN_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_HPUX
+.B CONFIG_STREAMS_COMPAT_SUN
 or
-.B CONFIG_STREAMS_COMPAT_HPUX_MODULE
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
 defined.
 .\"
 .\"

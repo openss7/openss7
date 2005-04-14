@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.9 2005/04/11 20:48:41 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.10 2005/04/13 23:45:26 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/11 20:48:41 $ by $Author: brian $
+% Last Modified $Date: 2005/04/13 23:45:26 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -206,7 +206,7 @@ Porting
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.16.18::
+* Porting from Linux STREAMS (LiS) 2.18.1::
 
 Appendices
 
@@ -219,19 +219,21 @@ Appendices
 
 @iftex
 @node Acknowledgements
-@end iftex
-@ifnottex
-@node Acknowledgements, Overview, Top, Top
-@end ifnottex
 @unnumbered Acknowledgements
 @cindex credits
+@end iftex
+@ifnottex
+@node Acknowledgements
+@unnumbered Acknowledgements
+@cindex credits
+@end ifnottex
 
 @menu
 * Sponsors::                    Sponsors of Linux Fast-STREAMS
 * Contributors::                Contributors to Linux Fast-STREAMS
 @end menu
 
-@node Sponsors,  ,  , Acknowledgements
+@node Sponsors
 @unnumberedsec Sponsors of Linux Fast-STREAMS
 @cindex sponsors
 
@@ -241,13 +243,13 @@ OpenSS7 Corporation
 
 Additional funding for The OpenSS7 Project was provided by:
 
-@node Contributors,  ,  , Acknowledgements
+@node Contributors
 @unnumberedsec Contributors to Linux Fast-STREAMS
 @cindex contributors
 
 The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
 
-@node Overview, Porting, Acknowledgements, Top
+@node Overview
 @chapter Overview of Linux Fast-STREAMS
 @cindex overview
 @menu
@@ -258,14 +260,14 @@ The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
 This manual documents how to develop and port STREAMS drivers and modules for
 Linux Fast-STREAMS.
 
-@node Introduction, Concepts, , Overview
+@node Introduction
 @section Introduction
 @cpindex introduction
 @menu
 * Q and A::			Questions and Answers
 @end menu
 
-@node Q and A, , , Introduction
+@node Q and A
 @subsection Questions and Answers
 @cpindex questions
 @cpindex answers
@@ -283,11 +285,11 @@ Linux Fast-STREAMS.
 
 @subsubsection Why Compatibility?
 
-@node Concepts, , Introduction, Overview
+@node Concepts
 @section Concepts
 @cpindex concepts
 
-@node Porting, Appendices, Overview, Top
+@node Porting
 @chapter Porting
 @cindex porting
 
@@ -313,241 +315,265 @@ Porting information is organized into sections as follows:
 * Porting from Solaris 9/SunOS 5.9::
 * Porting from SUPER-UX::
 * Porting from UXP/V::
-* Porting from Linux STREAMS (LiS) 2.16.18::
+* Porting from Linux STREAMS (LiS) 2.18.1::
 @end menu
 
 @section Base Functions
 @cindex Base Functions
 
-@table @asis
+@subsection Message Functions
+@cindex message functions
+
+@ftable @asis
 @item @b{adjmsg}(9)
-@fnindex adjmsg(9)
+trim bytes from the front or back of a @cite{STREAMS} message
 @item @b{allocb}(9)
-@fnindex allocb(9)
+allocate a @cite{STREAMS} message and data block
 @item @b{bufcall}(9)
-@fnindex bufcall(9)
+install a buffer callback
 @item @b{copyb}(9)
-@fnindex copyb(9)
+copy a @cite{STREAMS} message block
 @item @b{copymsg}(9)
-@fnindex copymsg(9)
+copy a @cite{STREAMS} message
 @item @b{datamsg}(9)
-@fnindex datamsg(9)
+tests a @cite{STREAMS} message type for data
 @item @b{dupb}(9)
-@fnindex dupb(9)
+duplicate a @cite{STREAMS} message block
 @item @b{dupmsg}(9)
-@fnindex dupmsg(9)
+duplicate a @cite{STREAMS} message
 @item @b{esballoc}(9)
-@fnindex esballoc(9)
+allocate a @cite{STREAMS} message and data block with a caller supplied data buffer
 @item @b{freeb}(9)
-@fnindex freeb(9)
+frees a @cite{STREAMS} message block
 @item @b{freemsg}(9)
-@fnindex freemsg(9)
+frees a @cite{STREAMS} message
 @item @b{linkb}(9)
-@fnindex linkb(9)
+link a message block to a @cite{STREAMS} message
 @item @b{msgdsize}(9)
-@fnindex msgdsize(9)
+calculate the size of the data in a @cite{STREAMS} message
 @item @b{msgpullup}(9)
-@fnindex msgpullup(9)
+pull up bytes in a @cite{STREAMS} message
 @item @b{pcmsg}(9)
-@fnindex pcmsg(9)
+test a data block message type for priority control
 @item @b{pullupmsg}(9)
-@fnindex pullupmsg(9)
+pull up the bytes in a @cite{STREAMS} message
 @item @b{rmvb}(9)
-@fnindex rmvb(9)
+remove a message block from a @cite{STREAMS} message
 @item @b{testb}(9)
-@fnindex testb(9)
+test if a @cite{STREAMS} message can be allocated
 @item @b{unbufcall}(9)
-@fnindex unbufcall(9)
+remove a @cite{STREAMS} buffer callback
 @item @b{unlinkb}(9)
-@fnindex unlinkb(9)
-@end table
+unlink a message block from a @cite{STREAMS} message
+@end ftable
 
-@table @asis
+@subsection UP Queue Functions
+@cindex UP queue functions
+
+@ftable @asis
 @item @b{backq}(9)
-@fnindex backq(9)
+find the upstream or downstream queue
 @item @b{bcanput}(9)
-@fnindex bcanput(9)
+test flow control on a @cite{STREAMS} message queue
 @item @b{canenable}(9)
-@fnindex canenable(9)
+test whether a @cite{STREAMS} message queue can be scheduled
 @item @b{enableok}(9)
-@fnindex enableok(9)
+allow a @cite{STREAMS} message queue to be scheduled
 @item @b{flushband}(9)
-@fnindex flushband(9)
+flushes band @cite{STREAMS} messages from a message queue
 @item @b{flushq}(9)
-@fnindex flushq(9)
+flushes messages from a @cite{STREAMS} message queue
 @item @b{getq}(9)
-@fnindex getq(9)
+gets a message from a @cite{STREAMS} message queue
 @item @b{insq}(9)
-@fnindex insq(9)
+inserts a message into a @cite{STREAMS} message queue
 @item @b{noenable}(9)
-@fnindex noenable(9)
+disable a @cite{STREAMS} message queue from being scheduled
 @item @b{OTHERQ}(9)
-@fnindex OTHERQ(9)
+return the other queue of a @cite{STREAMS} queue pair
 @item @b{putbq}(9)
-@fnindex putbq(9)
+put a message back on a @cite{STREAMS} message queue
 @item @b{putctl}(9)
-@fnindex putctl(9)
+put a control message on a @cite{STREAMS} message queue
 @item @b{putctl1}(9)
-@fnindex putctl1(9)
+put a 1 byte control message on a @cite{STREAMS} message queue
 @item @b{putq}(9)
-@fnindex putq(9)
+put a message on a @cite{STREAMS} message queue
 @item @b{qenable}(9)
-@fnindex qenable(9)
+schedules a @cite{STREAMS} message queue service routine
 @item @b{qreply}(9)
-@fnindex qreply(9)
+replys to a message from a @cite{STREAMS} message queue
 @item @b{qsize}(9)
-@fnindex qsize(9)
+return the number of message on a queue
 @item @b{RD}(9)
-@fnindex RD(9)
+return the read queue of a @cite{STREAMS} queue pair
 @item @b{rmvq}(9)
-@fnindex rmvq(9)
+remove a message from a @cite{STREAMS} message queue
 @item @b{SAMESTR}(9)
-@fnindex SAMESTR(9)
+test for @cite{STREAMS} pipe or fifo
 @item @b{WR}(9)
-@fnindex WR(9)
-@end table
+return the write queue of a @cite{STREAMS} queue pair
+@end ftable
 
-@table @asis
+@subsection MP Queue Functions
+@cindex MP queue functions
+
+@ftable @asis
 @item @b{bcanputnext}(9)
-@fnindex bcanputnext(9)
+test flow control on a message queue
 @item @b{canputnext}(9)
-@fnindex canputnext(9)
+test flow control on a message queue
 @item @b{freezestr}(9)
-@fnindex freezestr(9)
+freeze the state of a stream queue
 @item @b{put}(9)
-@fnindex put(9)
+invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
 @item @b{putnext}(9)
-@fnindex putnext(9)
+put a message on the downstream @cite{STREAMS} message queue
 @item @b{putnextctl1}(9)
-@fnindex putnextctl1(9)
+put a 1 byte control message on the downstream @cite{STREAMS} message queue
 @item @b{putnextctl}(9)
-@fnindex putnextctl(9)
+put a control message on the downstream @cite{STREAMS} message queue
 @item @b{qprocsoff}(9)
-@fnindex qprocsoff(9)
+disables @cite{STREAMS} message queue processing for multi-processing
 @item @b{qprocson}(9)
-@fnindex qprocson(9)
+enables @cite{STREAMS} message queue processing for multi-processing
 @item @b{strqget}(9)
-@fnindex strqget(9)
+gets information about a @cite{STREAMS} message queue
 @item @b{strqset}(9)
-@fnindex strqset(9)
+sets attributes of a @cite{STREAMS} message queue
 @item @b{unfreezestr}(9)
-@fnindex unfreezestr(9)
-@end table
+thaw the state of a stream queue
+@end ftable
 
-@table @asis
+@subsection DDI/DKI Functions
+@cindex DDI/DKI functions
+
+@ftable @asis
 @item @b{kmem_alloc}(9)
-@fnindex kmem_alloc(9)
+allocate kernel memory
 @item @b{kmem_free}(9)
-@fnindex kmem_free(9)
+deallocates kernel memory
 @item @b{kmem_zalloc}(9)
-@fnindex kmem_zalloc(9)
+allocate and zero kernel memory
 @item @b{cmn_err}(9)
-@fnindex cmn_err(9)
+print a kernel command error
 @item @b{bcopy}(9)
-@fnindex bcopy(9)
+copy byte strings
 @item @b{bzero}(9)
-@fnindex bzero(9)
+zero a byte string
 @item @b{copyin}(9)
-@fnindex copyin(9)
+copy user data in from user space to kernel space
 @item @b{copyout}(9)
-@fnindex copyout(9)
+copy user data in from kernel space to user space
 @item @b{delay}(9)
-@fnindex delay(9)
+postpone the calling process for a number of clock ticks
 @item @b{drv_getparm}(9)
-@fnindex drv_getparm(9)
+driver retrieve kernel parameter
 @item @b{drv_hztomsec}(9)
-@fnindex drv_hztomsec(9)
+convert kernel tick time between microseconds or milliseconds
 @item @b{drv_htztousec}(9)
-@fnindex drv_htztousec(9)
+convert kernel tick time between microseconds or milliseconds
 @item @b{drv_msectohz}(9)
-@fnindex drv_msectohz(9)
+convert kernel tick time between microseconds or milliseconds
 @item @b{drv_priv}(9)
-@fnindex drv_priv(9)
+check if the current process is priviledged
 @item @b{drv_usectohz}(9)
-@fnindex drv_usectohz(9)
+convert kernel tick time between microseconds or milliseconds
 @item @b{drv_usecwait}(9)
-@fnindex drv_usecwait(9)
+delay for a number of microseconds
 @item @b{min}(9)
-@fnindex min(9)
+determine the minimum of two integers
 @item @b{max}(9)
-@fnindex max(9)
+determine the maximum of two integers
 @item @b{getmajor}(9)
-@fnindex getmajor(9)
+get the internal major device number for a device
 @item @b{getminor}(9)
-@fnindex getminor(9)
+get the extended minor device number for a device
 @item @b{makedevice}(9)
-@fnindex makedevice(9)
-@item @b{mknod}(9)
-@fnindex mknod(9)
-@item @b{mount}(9)
-@fnindex mount(9)
+create a device from a major and minor device numbers
 @item @b{strlog}(9)
-@fnindex strlog(9)
+pass a message to the @cite{STREAMS} logger
 @item @b{timeout}(9)
-@fnindex timeout(9)
-@item @b{umount}(9)
-@fnindex umount(9)
-@item @b{unlink}(9)
-@fnindex unlink(9)
+start a timer
 @item @b{untimeout}(9)
-@fnindex untimeout(9)
-@end table
+stop a timer
+@end ftable
 
-@table @asis
+@ftable @asis
+@item @b{mknod}(9)
+make block or character special files
+@item @b{mount}(9)
+mount and unmount filesystems
+@item @b{umount}(9)
+mount and unmount filesystems
+@item @b{unlink}(9)
+remove a file
+@end ftable
+
+@subsection Some Common Extension Functions
+@cindex some common extension functions
+
+@ftable @asis
 @item @b{linkmsg}(9)
-@fnindex linkmsg(9)
+link a message block to a @cite{STREAMS} message
 @item @b{putctl2}(9)
-@fnindex putctl2(9)
+put a two byte control message on a @cite{STREAMS} message queue
 @item @b{putnextctl2}(9)
-@fnindex putnextctl2(9)
+put a two byte control message on the downstream @cite{STREAMS} message queue
 @item @b{weldq}(9)
-@fnindex weldq(9)
+weld two (or four) queues together
 @item @b{unweldq}(9)
-@fnindex unweldq(9)
-@end table
+unweld two (or four) queues
+@end ftable
 
-@table @asis
+@subsection Some Internal Functions
+@cindex some internal functions
+
+@ftable @asis
 @item @b{allocq}(9)
-@fnindex allocq(9)
+allocate a @cite{STREAMS} queue pair
 @item @b{bcanget}(9)
-@fnindex bcanget(9)
+test for message arrival on a band on a stream
 @item @b{canget}(9)
-@fnindex canget(9)
+test for message arrival on a stream
 @item @b{freeq}(9)
-@fnindex freeq(9)
+deallocate a @cite{STREAMS} queue pair
 @item @b{qattach}(9)
-@fnindex qattach(9)
+attach a module onto a @cite{STREAMS} file
 @item @b{qclose}(9)
-@fnindex qclose(9)
+close a @cite{STREAMS} module or driver
 @item @b{qdetach}(9)
-@fnindex qdetach(9)
+detach a module from a @cite{STREAMS} file
 @item @b{qopen}(9)
-@fnindex qopen(9)
+call a @cite{STREAMS} module or driver open routine
 @item @b{setq}(9)
-@fnindex setq(9)
-@end table
+set sizes and procedures associated with a @cite{STREAMS} message queue
+@end ftable
 
-@table @asis
+@subsection Some Oddball Functions
+@cindex some oddball functions
+
+@ftable @asis
 @item @b{appq}(9)
-@fnindex appq(9)
+append one @cite{STREAMS} message after another
 @item @b{esbbcall}(9)
-@fnindex esbbcall(9)
+install a buffer callback for an extended @cite{STREAMS} message block
 @item @b{isdatablk}(9)
-@fnindex isdatablk(9)
+test a @cite{STREAMS} data block for data type
 @item @b{isdatamsg}(9)
-@fnindex isdatamsg(9)
+test a @cite{STREAMS} data block for data type
 @item @b{kmem_zalloc_node}(9)
-@fnindex kmem_zalloc_node(9)
 @item @b{msgsize}(9)
-@fnindex msgsize(9)
+calculate the size of the message blocks in a @cite{STREAMS} message
 @item @b{qcountstrm}(9)
-@fnindex qcountstrm(9)
+add all counts on all @cite{STREAMS} message queues in a stream
 @item @b{xmsgsize}(9)
-@fnindex xmsgsize(9)
-@end table
+calculate the size of message blocks in a @cite{STREAMS} message
+@end ftable
 
 
-@node Porting from SVR 4.2 MP, Porting from AIX 5L Version 5.1, , Porting
+@page
+@node Porting from SVR 4.2 MP
 @section Porting from SVR 4.2 MP
 @cindex Porting from SVR 4.2 MP
 
@@ -559,96 +585,129 @@ the other portability sections, please see that section.
 @subsection Commonalities with SVR 4.2 MP
 @subsection Compatibility functions for SVR 4.2 MP
 
-@table @asis
+@ftable @asis
+@item @b{ATOMIC_INT_ADD}(9)
+add an integer value to an atomic integer
+@item @b{ATOMIC_INT_ALLOC}(9)
+allocate and initalize an atomic integer
+@item @b{ATOMIC_INT_DEALLOC}(9)
+deallocate an atomic integer
+@item @b{ATOMIC_INT_DECR}(9)
+decrement and test an atomic integer
+@item @b{ATOMIC_INT_INCR}(9)
+increment an atomic integer
+@item @b{ATOMIC_INT_INIT}(9)
+initialize an atomic integer
+@item @b{ATOMIC_INT_READ}(9)
+read an atomic integer
+@item @b{ATOMIC_INT_SUB}(9)
+subtract and integer value from an atomic integer
+@item @b{ATOMIC_INT_WRITE}(9)
+write an integer value to an atomic integer
 @item @b{itimeout}(9)
-@fnindex itimeout(9)
 perform a timeout at an interrupt level
+@item @b{lbolt}(9)
+time in ticks since reboot
 @item @b{LOCK}(9)
-@fnindex LOCK(9)
 lock a basic lock
 @item @b{LOCK_ALLOC}(9)
-@fnindex LOCK_ALLOC(9)
 allocate a basic lock
 @item @b{LOCK_DEALLOC}(9)
-@fnindex LOCK_DEALLOC(9)
 deallocate a basic lock
+@item @b{LOCK_OWNED}(9)
+determine whether a basic lock is head by the caller
+@item @b{MPSTR_QLOCK}(9)
+release a queue from exclusive access
+@item @b{MPSTR_QRELE}(9)
+acquire a queue for exclusive access
+@item @b{MPSTR_STPLOCK}(9)
+acquire a stream head for exclusive access
+@item @b{MPSTR_STPRELE}(9)
+release a stream head from exclusive access
 @item @b{major}(9)
-@fnindex major(9)
 get the internal major number of a device
 @item @b{makedev}(9)
-@fnindex makedev(9)
 make a device number from internal major and minor device numbers
 @item @b{minor}(9)
-@fnindex minor(9)
 get the internal minor number of a device
+@item @b{RW_ALLOC}(9)
+allocate and initialize a read/write lock
+@item @b{RW_DEALLOC}(9)
+deallocate a read/write lock
+@item @b{RW_RDLOCK}(9)
+acquire a read/write lock in read mode
+@item @b{RW_TRYRDLOCK}(9)
+attempt to acquire a read/write lock in read mode
+@item @b{RW_TRYWRLOCK}(9)
+attempt to acquire a read/write lock in write mode
+@item @b{RW_UNLOCK}(9)
+release a read/write lock
+@item @b{RW_WRLOCK}(9)
+acquire a read/write lock in write mode
 @item @b{sleep}(9)
-@fnindex sleep(9)
 put a process to sleep
+@item @b{SLEEP_ALLOC}(9)
+allocate a sleep lock
+@item @b{SLEEP_DEALLOC}(9)
+deallocate a sleep lock
+@item @b{SLEEP_LOCK}(9)
+acquire a sleep lock
+@item @b{SLEEP_LOCKAVAIL}(9)
+determine whether a sleep lock is available
+@item @b{SLEEP_LOCKOWNED}(9)
+determine whether a sleep lock is held by the caller
+@item @b{SLEEP_LOCK_SIG}(9)
+acquire a sleep lock
+@item @b{SLEEP_TRYLOCK}(9)
+attempt to acquire a sleep lock
+@item @b{SLEEP_UNLOCK}(9)
+release a sleep lock
 @item @b{spl0}(9)
-@fnindex spl0(9)
 set priority level 0
 @item @b{spl1}(9)
-@fnindex spl1(9)
 set priority level 1
 @item @b{spl2}(9)
-@fnindex spl2(9)
 set priority level 2
 @item @b{spl3}(9)
-@fnindex spl3(9)
 set priority level 3
 @item @b{spl4}(9)
-@fnindex spl4(9)
 set priority level 4
 @item @b{spl5}(9)
-@fnindex spl5(9)
 set priority level 5
 @item @b{spl6}(9)
-@fnindex spl6(9)
 set priority level 6
 @item @b{spl7}(9)
-@fnindex spl7(9)
 set priority level 7
 @item @b{spl}(9)
-@fnindex spl(9)
 set priority level
 @item @b{splx}(9)
-@fnindex splx(9)
 set priority level x
 @item @b{SV_ALLOC}(9)
-@fnindex SV_ALLOC(9)
 allocate a basic condition variable
 @item @b{SV_BROADCAST}(9)
-@fnindex SV_BROADCAST(9)
 broadcast a basic condition variable
 @item @b{SV_DEALLOC}(9)
-@fnindex SV_DEALLOC(9)
 deallocate a basic condition variable
 @item @b{SV_SIGNAL}(9)
-@fnindex SV_SIGNAL(9)
 signal a basic condition variable
 @item @b{SV_WAIT}(9)
-@fnindex SV_WAIT(9)
 wait on a basic condition variable
 @item @b{SV_WAIT_SIG}(9)
-@fnindex SV_WAIT_SIG(9)
 interruptible wait on a basic condition variable
 @item @b{TRYLOCK}(9)
-@fnindex TRYLOCK(9)
 try to lock a basic lock
 @item @b{UNLOCK}(9)
-@fnindex UNLOCK(9)
 unlock a basic lock
 @item @b{vtop}(9)
-@fnindex vtop(9)
 convert virtual to physical address
 @item @b{wakeup}(9)
-@fnindex wakeup(9)
 wake a process
-@end table
+@end ftable
 
 @subsection Configuration ala SVR 4.2 MP
 
-@node Porting from AIX 5L Version 5.1, Porting from HP-UX 11.0i v2, Porting from SVR 4.2 MP, Porting
+@page
+@node Porting from AIX 5L Version 5.1
 @section Porting from AIX 5L Version 5.1
 @cindex Porting from AIX 5L Version 5.1
 
@@ -656,46 +715,42 @@ wake a process
 @subsection Commonalities with AIX 5L Version 5.1
 @subsection Compatibility Functions for AIX 5L Version 5.1
 
-@table @asis
+@ftable @asis
+@item @b{putctl2}(9)
+put a 2 byte control message on a @cite{STREAMS}
+@item @b{splstr}(9)
+set or restore priority levels
+@item @b{splx}(9)
+set or restore priority levels
+@item @b{unweldq}(9)
+unweld two pairs of streams queues
+@item @b{weldq}(9)
+weld together two paris of streams queues
+@end ftable
+
+@ftable @asis
 @item @b{mi_bufcall}(9)
-@fnindex mi_bufcall(9)
 reliable alternative to @b{buffcall}(9)
 @item @b{mi_close_comm}(9)
-@fnindex mi_close_comm(9)
-@i{STREAMS} common minor device close utility
+@cite{STREAMS} common minor device close utility
 @item @b{mi_next_ptr}(9)
-@fnindex mi_next_ptr(9)
-@i{STREAMS} common minor device list traversal
+@cite{STREAMS} minor device list traversal
 @item @b{mi_open_comm}(9)
-@fnindex mi_open_comm(9)
-@i{STREAMS} common minor device open utility
-@item @b{putctl2}(9)
-@fnindex putctl2(9)
-puts a 2 byte control message on a @i{STREAMS}
-@item @b{splstr}(9)
-@fnindex splstr(9)
-@item @b{splx}(9)
-@fnindex splx(9)
+@cite{STREAMS} common minor device open utility
+@item @b{mi_prev_ptr}(9)
+@cite{STREAMS} minor device list traversal
 @item @b{str_install}(9)
-@fnindex str_install(9)
-install a @i{STREAMS} module or driver
-@item @b{unweldq}(9)
-@fnindex unweldq(9)
-unweld two pairs of streams queues
+install a @cite{STREAMS} module or driver
 @item @b{wantio}(9)
-@fnindex wantio(9)
-perform direct I/O from a @i{STREAMS} driver
+perform direct I/O from a @cite{STREAMS} driver
 @item @b{wantmsg}(9)
-@fnindex wantmsg(9)
-provide a filter of wanted messages from a @i{STREAMS} module
-@item @b{weldq}(9)
-@fnindex weldq(9)
-weld together two paris of streams queues
-@end table
+provide a filter of wanted messages from a @cite{STREAMS} module
+@end ftable
 
 @subsection Configuration ala AIX 5L Version 5.1
 
-@node Porting from HP-UX 11.0i v2, Porting from OSF/1 1.2/Digital UNIX, Porting from AIX 5L Version 5.1, Porting
+@page
+@node Porting from HP-UX 11.0i v2
 @section Porting from HP-UX 11.0i v2
 @cindex Porting from HP-UX 11.0i v2
 
@@ -704,34 +759,32 @@ weld together two paris of streams queues
 
 @subsection Compatibility Functions for HP-UX 11.0i v2
 
-@table @asis
+@ftable @asis
 @item @b{putctl2}(9)
-@fnindex putctl2(9)
-puts a 2 byte control message on a @i{STREAMS} message queue
+put a 2 byte control message on a @cite{STREAMS} message queue
 @item @b{putnextctl2}(9)
-@fnindex putnextctl2(9)
-puts a 2 byte control message on the downstream @i{STREAMS} message queue
-@item @b{str_install}(9)
-@fnindex str_install(9)
-install a @i{STREAMS} module or driver
-@item @b{str_uninstall}(9)
-@fnindex str_uninstall(9)
-uninstall a @i{STREAMS} module or driver
-@item @b{streams_get_sleep_lock}(9)
-@fnindex streams_get_sleep_lock(9)
-@item @b{streams_put}(9)
-@fnindex streams_put(9)
+put a 2 byte control message on the downstream @cite{STREAMS} message queue
 @item @b{unweldq}(9)
-@fnindex unweldq(9)
 unweld two pairs of streams queues
 @item @b{weldq}(9)
-@fnindex weldq(9)
 weld together two paris of streams queues
-@end table
+@end ftable
+
+@ftable @asis
+@item @b{str_install}(9)
+install a @cite{STREAMS} module or driver
+@item @b{str_uninstall}(9)
+uninstall a @cite{STREAMS} module or driver
+@item @b{streams_get_sleep_lock}(9)
+provide access to the global sleep lock
+@item @b{streams_put}(9)
+invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+@end ftable
 
 @subsection Configuration ala HP-UX 11.0i v2
 
-@node Porting from OSF/1 1.2/Digital UNIX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting from HP-UX 11.0i v2, Porting
+@page
+@node Porting from OSF/1 1.2/Digital UNIX
 @section Porting from OSF/1 1.2/Digital UNIX
 @cindex Porting from OSF/1 1.2/Digital UNIX
 
@@ -740,34 +793,36 @@ weld together two paris of streams queues
 
 @subsection Compatibility Functions for OSF/1 1.2/Digial UNIX
 
-@table @asis
-@item @b{lbolt}(9)
-@fnindex lbolt(9)
-@item @b{puthere}(9)
-@fnindex puthere(9)
-@item @b{streams_open_comm}(9)
-@fnindex streams_open_comm(9)
-@item @b{streams_open_ocomm}(9)
-@fnindex streams_open_ocomm(9)
-@item @b{streams_close_comm}(9)
-@fnindex streams_close_comm(9)
-@item @b{strmod_add}(9)
-@fnindex strmod_add(9)
-@item @b{strmod_del}(9)
-@fnindex strmod_del(9)
-@item @b{time}(9)
-@fnindex time(9)
+@ftable @asis
 @item @b{unweldq}(9)
-@fnindex unweldq(9)
 unweld two pairs of streams queues
 @item @b{weldq}(9)
-@fnindex weldq(9)
 weld together two paris of streams queues
-@end table
+@end ftable
+
+@ftable @asis
+@item @b{lbolt}(9)
+time in ticks since reboot
+@item @b{puthere}(9)
+invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+@item @b{streams_close_comm}(9)
+common minor device close utility
+@item @b{streams_open_comm}(9)
+common minor device open utility
+@item @b{streams_open_ocomm}(9)
+common minor device open utility
+@item @b{strmod_add}(9)
+add a @cite{STREAMS} module
+@item @b{strmod_del}(9)
+delete a @cite{STREAMS} module or driver from the kernel
+@item @b{time}(9)
+(undoc)
+@end ftable
 
 @subsection Configuration ala OSF/1 1.2/Digial UNIX
 
-@node Porting from UnixWare 7.1.3 (OpenUnix 8), Porting from Solaris 9/SunOS 5.9, Porting from OSF/1 1.2/Digital UNIX, Porting
+@page
+@node Porting from UnixWare 7.1.3 (OpenUnix 8)
 @section Porting from UnixWare 7.1.3 (OpenUnix 8)
 @cindex Porting from UnixWare 7.1.3 (OpenUnix 8)
 
@@ -779,92 +834,38 @@ weld together two paris of streams queues
 The following compatibility functions are in addition to all SVR 4.2
 compatibility functions.
 
-@table @asis
+@ftable @asis
+@end ftable
+
+@ftable @asis
 @item @b{allocb_physreq}(9)
-@fnindex allocb_physreq(9)
-@item @b{ATOMIC_INT_ADD}(9)
-@fnindex ATOMIC_INT_ADD(9)
-@item @b{ATOMIC_INT_ALLOC}(9)
-@fnindex ATOMIC_INT_ALLOC(9)
-@item @b{ATOMIC_INT_DEALLOC}(9)
-@fnindex ATOMIC_INT_DEALLOC(9)
-@item @b{ATOMIC_INT_DECR}(9)
-@fnindex ATOMIC_INT_DECR(9)
-@item @b{ATOMIC_INT_INCR}(9)
-@fnindex ATOMIC_INT_INCR(9)
-@item @b{ATOMIC_INT_INIT}(9)
-@fnindex ATOMIC_INT_INIT(9)
-@item @b{ATOMIC_INT_READ}(9)
-@fnindex ATOMIC_INT_READ(9)
-@item @b{ATOMIC_INT_SUB}(9)
-@fnindex ATOMIC_INT_SUB(9)
-@item @b{ATOMIC_INT_WRITE}(9)
-@fnindex ATOMIC_INT_WRITE(9)
+allocate a @cite{STREAMS} message and data block
 @item @b{emajor}(9)
-@fnindex emajor(9)
+get the external (real) majore device number from the device number
 @item @b{eminor}(9)
-@fnindex eminor(9)
+get the external extended minor device number from the device number
 @item @b{etoimajor}(9)
-@fnindex etoimajor(9)
+convert an external major device number to an internal major device number
 @item @b{getemajor}(9)
-@fnindex getemajor(9)
+get the external (real) majore device number
 @item @b{geteminor}(9)
-@fnindex geteminor(9)
+get the external minor device number
 @item @b{itoemajor}(9)
-@fnindex itoemajor(9)
-@item @b{LOCK_OWNED}(9)
-@fnindex LOCK_OWNED(9)
-@item @b{MPSTR_QLOCK}(9)
-@fnindex MPSTR_QLOCK(9)
-@item @b{MPSTR_QRELE}(9)
-@fnindex MPSTR_QRELE(9)
-@item @b{MPSTR_STPLOCK}(9)
-@fnindex MPSTR_STPLOCK(9)
-@item @b{MPSTR_STPRELE}(9)
-@fnindex MPSTR_STPRELE(9)
+convert an internal major device number to an external major device number
 @item @b{msgphysreq}(9)
-@fnindex msgphysreq(9)
+cause a message block to meet physical requirements
 @item @b{msgpullup_physreq}(9)
-@fnindex msgpullup_physreq(9)
+pull up bytes in a @cite{STREAMS} message
 @item @b{msgscgth}(9)
-@fnindex msgscgth(9)
-@item @b{RW_ALLOC}(9)
-@fnindex RW_ALLOC(9)
-@item @b{RW_DEALLOC}(9)
-@fnindex RW_DEALLOC(9)
-@item @b{RW_RDLOCK}(9)
-@fnindex RW_RDLOCK(9)
-@item @b{RW_TRYRDLOCK}(9)
-@fnindex RW_TRYRDLOCK(9)
-@item @b{RW_TRYWRLOCK}(9)
-@fnindex RW_TRYWRLOCK(9)
-@item @b{RW_UNLOCK}(9)
-@fnindex RW_UNLOCK(9)
-@item @b{RW_WRLOCK}(9)
-@fnindex RW_WRLOCK(9)
-@item @b{SLEEP_ALLOC}(9)
-@fnindex SLEEP_ALLOC(9)
-@item @b{SLEEP_DEALLOC}(9)
-@fnindex SLEEP_DEALLOC(9)
-@item @b{SLEEP_LOCK}(9)
-@fnindex SLEEP_LOCK(9)
-@item @b{SLEEP_LOCKAVAIL}(9)
-@fnindex SLEEP_LOCKAVAIL(9)
-@item @b{SLEEP_LOCKOWNED}(9)
-@fnindex SLEEP_LOCKOWNED(9)
-@item @b{SLEEP_LOCK_SIG}(9)
-@fnindex SLEEP_LOCK_SIG(9)
-@item @b{SLEEP_TRYLOCK}(9)
-@fnindex SLEEP_TRYLOCK(9)
-@item @b{SLEEP_UNLOCK}(9)
-@fnindex SLEEP_UNLOCK(9)
+(undoc)
 @item @b{strioccall}(9)
-@fnindex strioccall(9)
-@end table
+(undoc)
+@end ftable
 
 @subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
 
-@node Porting from Solaris 9/SunOS 5.9, Porting from SUPER-UX, Porting from UnixWare 7.1.3 (OpenUnix 8), Porting
+@page
+@node Porting from Solaris 9/SunOS 5.9
 @section Porting from Solaris 9/SunOS 5.9
 @cindex Porting from Solaris 9/SunOS 5.9
 
@@ -873,80 +874,107 @@ compatibility functions.
 
 @subsection Compatibility Functions for Solaris 9/SunOS 5.9
 
-@table @asis
+@ftable @asis
+@item @b{_fini}(9)
+@item @b{_info}(9)
+@item @b{_init}(9)
+@item @b{attach}(9)
+attach a device to the system or resume a suspended device
 @item @b{ddi_create_minor_node}(9)
-@fnindex ddi_create_minor_node(9)
+create a minor node for this device
 @item @b{ddi_driver_major}(9)
-@fnindex ddi_driver_major(9)
+find the major device number associated with a driver
 @item @b{ddi_driver_name}(9)
-@fnindex ddi_driver_name(9)
+return normalized driver name
 @item @b{ddi_get_cred}(9)
-@fnindex ddi_get_cred(9)
+get a reference to the credentials of the current user
 @item @b{ddi_getiminor}(9)
-@fnindex ddi_getiminor(9)
+
 @item @b{ddi_get_instance}(9)
-@fnindex ddi_get_instance(9)
+get device instance number
 @item @b{ddi_get_lbolt}(9)
-@fnindex ddi_get_lbolt(9)
+get the current value of the system tick clock
 @item @b{ddi_get_pid}(9)
-@fnindex ddi_get_pid(9)
+
 @item @b{ddi_get_soft_state}(9)
-@fnindex ddi_get_soft_state(9)
+
 @item @b{ddi_get_time}(9)
-@fnindex ddi_get_time(9)
+get the current time in seconds since the epoch
 @item @b{ddi_remove_minor_node}(9)
-@fnindex ddi_remove_minor_node(9)
+remove a minor node for a device
 @item @b{ddi_removing_power}(9)
-@fnindex ddi_removing_power(9)
+
 @item @b{ddi_soft_state}(9)
-@fnindex ddi_soft_state(9)
+
 @item @b{ddi_soft_state_fini}(9)
-@fnindex ddi_soft_state_fini(9)
+
 @item @b{ddi_soft_state_free}(9)
-@fnindex ddi_soft_state_free(9)
+
 @item @b{ddi_soft_state_init}(9)
-@fnindex ddi_soft_state_init(9)
+
 @item @b{ddi_soft_state_zalloc}(9)
-@fnindex ddi_soft_state_zalloc(9)
+
 @item @b{ddi_umem_alloc}(9)
-@fnindex ddi_umem_alloc(9)
+allocate page aligned kernel memory
 @item @b{ddi_umem_free}(9)
-@fnindex ddi_umem_free(9)
+
+@item @b{detach}(9)
+detach a device from the system or suspend a device
+@item @b{getinfo}(9)
+
+@item @b{identify}(9)
+determine if a driver is associated with a device
+@item @b{install_driver}(9)
+install a device driver
 @item @b{mod_info}(9)
-@fnindex mod_info(9)
+provides information on a loadable kernel module to the @cite{STREAMS} executive
 @item @b{mod_install}(9)
-@fnindex mod_install(9)
+installs a loadable kernel module in the @cite{STREAMS} executive
 @item @b{mod_remove}(9)
-@fnindex mod_remove(9)
+removes a loadable module from the @cite{STREAMS} executive
+@item @b{power}(9)
+power a device attached to the system
+@item @b{probe}(9)
+
 @item @b{qbufcall}(9)
-@fnindex qbufcall(9)
-@item @b{queclass}(9)
-@fnindex queclass(9)
+install a buffer callback
 @item @b{qtimeout}(9)
-@fnindex qtimeout(9)
+start a timer associated with a queue
+@item @b{queclass}(9)
+
 @item @b{qunbufcall}(9)
-@fnindex qunbufcall(9)
+
 @item @b{quntimeout}(9)
-@fnindex quntimeout(9)
+
 @item @b{qwait}(9)
-@fnindex qwait(9)
+wait for a queue message
 @item @b{qwait_sig}(9)
-@fnindex qwait_sig(9)
+wait for a queue message or signal
 @item @b{qwriter}(9)
-@fnindex qwriter(9)
-@end table
+
+@end ftable
 
 @subsection Configuration ala Solaris 9/SunOS 5.9
 
-@node Porting from SUPER-UX, Porting from UXP/V, Porting from Solaris 9/SunOS 5.9, Porting
+@page
+@node Porting from SUPER-UX
 @section Porting from SUPER-UX
 @cindex Porting from SUPER-UX
 
 @subsection Differences from SUPER-UX
 @subsection Commonalities with SUPER-UX
+
+@subsection Compatibility Functions for SUPER-UX
+
+@ftable @asis
+@item @b{lbolt}(9)
+time in ticks since reboot
+@end ftable
+
 @subsection Configuration ala SUPER-UX
 
-@node Porting from UXP/V, Porting from Linux STREAMS (LiS) 2.16.18, Porting from SUPER-UX, Porting
+@page
+@node Porting from UXP/V
 @section Porting from UXP/V
 @cindex Porting from UXP/V
 
@@ -954,47 +982,52 @@ compatibility functions.
 @subsection Commonalities with UXP/V
 @subsection Configuration ala UXP/V
 
-@node Porting from Linux STREAMS (LiS) 2.16.18, , Porting from UXP/V, Porting
-@section Porting from Linux STREAMS (LiS) 2.16.18
-@cindex Porting from Linux STREAMS (LiS) 2.16.18
+@page
+@node Porting from Linux STREAMS (LiS) 2.18.1
+@section Porting from Linux STREAMS (LiS) 2.18.1
+@cindex Porting from Linux STREAMS (LiS) 2.18.1
 
-@subsection Differences from LiS 2.16.18
-@subsection Commonalities with LiS 2.16.18
+@subsection Differences from LiS 2.18.1
+@subsection Commonalities with LiS 2.18.1
 
-@subsection Compatibility Functions for LiS 2.16.18
+@subsection Compatibility Functions for LiS 2.18.1
 
-@table @asis
+@ftable @asis
+@item @b{lis_appq}(9)
+append one @cite{STREAMS} message after another
 @item @b{lis_date}(9)
-@fnindex lis_date(9)
 @item @b{lis_esbbcall}(9)
-@fnindex lis_esbbcall(9)
+install a buffer callback for an extended @cite{STREAMS} message block
 @item @b{lis_find_strdev}(9)
-@fnindex lis_find_strdev(9)
 @item @b{lis_mknod}(9)
-@fnindex lis_mknod(9)
+make block or character special files
 @item @b{lis_mount}(9)
-@fnindex lis_mount(9)
+mount a file system
 @item @b{lis_OTHER}(9)
-@fnindex lis_OTHER(9)
+return the other queue of a @cite{STREAMS} queue pair
 @item @b{lis_register_strdev}(9)
-@fnindex lis_register_strdev(9)
+register a @cite{STREAMS} device
 @item @b{lis_register_strmod}(9)
-@fnindex lis_register_strmod(9)
+register a @cite{STREAMS} module
 @item @b{lis_umount2}(9)
-@fnindex lis_umount2(9)
+unmount a file system
 @item @b{lis_umount}(9)
-@fnindex lis_umount(9)
+unmount a file system
+@item @b{lis_unlink}(9)
+remove a file
 @item @b{lis_unregister_strdev}(9)
-@fnindex lis_unregister_strdev(9)
+unregister a @cite{STREAMS} device
 @item @b{lis_unregsiter_strmod}(9)
-@fnindex lis_unregsiter_strmod(9)
+unregister a @cite{STREAMS} module
 @item @b{lis_version}(9)
-@fnindex lis_version(9)
-@end table
 
-@subsection Configuration ala LiS 2.16.18
+@item @b{lis_xmsgsize}(9)
+calculate the size of message blocks in a @cite{STREAMS} message
+@end ftable
 
-@node Appendices, , Porting, Top
+@subsection Configuration ala LiS 2.18.1
+
+@node Appendices
 @appendix Appendices
 @menu
 * Copying::                     Copying information for this Software
@@ -1002,15 +1035,15 @@ compatibility functions.
 * Indices::                     Indices
 @end menu
 
-@node Copying, Documentation License, , Appendices
+@node Copying
 @unnumbered Copying
 @include texi/gpl.texi
 
-@node Documentation License, Indices, Copying, Appendices
+@node Documentation License
 @unnumbered Documentation License
 @include texi/fdl.texi
 
-@node Indices, , Documentation License, Appendices
+@node Indices
 @unnumbered Indices
 @menu
 * Concept Index::               Concept Index
@@ -1020,27 +1053,27 @@ compatibility functions.
 * File Index::                  File Index
 @end menu
 
-@node Concept Index, Type Index, , Indices
+@node Concept Index
 @unnumbered Concept Index
 
 @printindex cp
 
-@node Type Index, Function Index, Concept Index, Indices
+@node Type Index
 @unnumbered Type Index
 
 @printindex tp
 
-@node Function Index, Variable Index, Type Index, Indices
+@node Function Index
 @unnumbered Function and Macro Index
 
 @printindex fn
 
-@node Variable Index, File Index, Function Index, Indices
+@node Variable Index
 @unnumbered Variable and Constant Macro Index
 
 @printindex vr
 
-@node File Index, , Variable Index, Indices
+@node File Index
 @unnumbered Program and File Index
 
 @printindex pg

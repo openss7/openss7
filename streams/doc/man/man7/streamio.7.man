@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.12 2005/03/30 13:38:32 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.13 2005/04/13 23:45:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 23:45:11 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -2029,8 +2029,8 @@ message can be returned in
 .PP
 Where the command is passed to the module or driver, or the command results in
 the call to a module or driver open or close procedures, or link or unlink
-procedures, the error number returned by the module or driver can be returned
-in
+procedures, the error number returned by the module or driver open or close
+procedure can be returned in
 .IR errno (3).
 .PP
 Any error returned in an
@@ -2091,7 +2091,7 @@ svr42
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
-.BR LiS ,
+.IR LiS ,
 .[
 LiS
 .]
@@ -2107,14 +2107,15 @@ aixcpc
 %O "Differences Between Portable Streams Environment and V.4 STREAMS"
 .]
 specific.
-.PP
+.IP \(em
 .B Linux Fast-STREAMS
-provides ioctls that are used to implement this system call.  In addition,
+provides ioctls that are used to implement this system call.
+.IP \(em
 .B Linux Fast-STREAMS
 recognizes some
 .IR Solaris \(rg-specific
 and
-.BR LiS -specific
+.IR LiS -specific
 IO control numbers for compatibility.
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.10 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.11 2005/04/13 23:45:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 23:45:19 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B putbq
-\- puts a message back on a \fISTREAMS\fP message queue
+\- put a message back on a \fISTREAMS\fP message queue
 .\"
 .\"
 .SH SYNOPSIS

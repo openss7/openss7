@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantmsg.9.man,v 0.9.2.8 2005/04/13 04:30:15 brian Exp $
+.\" @(#) $Id: wantmsg.9.man,v 0.9.2.9 2005/04/13 23:45:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/13 23:45:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -126,8 +126,8 @@ When a filter program has been installed with
 all messages passed to the queue's put procedure will first be passed to the supplied filter
 function.
 .PP
-If the filter function returns true (1), then the message is passed to the queue's put p
-rocedure; if it returns false (0), then the message is passed to the next module in the stream
+If the filter function returns true (1), then the message is passed to the queue's put
+procedure; if it returns false (0), then the message is passed to the next module in the stream
 bypassing the current queue.
 .PP
 In a multiprocessing kernel,
