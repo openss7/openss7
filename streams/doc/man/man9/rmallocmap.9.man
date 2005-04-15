@@ -1,0 +1,381 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: rmallocmap.9.man,v 0.9.2.1 2005/04/14 19:04:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/14 19:04:23 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH RMALLOCMAP 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B rmallocmap, rmallocmap_wait, rmfreemap
+\- allocate a resource map
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #define _UW7_SOURCE
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/map.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "struct map *rmallocmap(size_t " mapsize ");
+.HP
+.BI "struct map *rmallocmap_wait(size_t " mapsize ");
+.HP
+.BI "void rmfreemap(struct map *" map ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I mapsize
+the number of segments in the resource map (including the two system defined
+segments).  This is really just the size of the array to allocate.
+.TP
+.I map
+the map to free previously returned by
+.BR rmallocmap ()
+or
+.BR rmallocmap_wait ().
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR rmallocmap ()
+and
+.BR rmallocmap_wait ()
+allocate a
+.B struct map
+structure array of size
+.I mapsize
+and return a pointer to the allocated and initialized array.  The array is
+initialized as though it were initialized with
+.BR rminit (9).
+.BR rmallocmap_wait ()
+differs from
+.BR rmallocmap ()
+in that if memory is not immediately available, the calling process will block
+until memory becomes available.
+.PP
+.BR rmfreemap ()
+frees the map structure returned by
+.BR rmallocmap ()
+or
+.BR rmallocmap_wait ().
+It is the caller's responsibility to ensure that the map structure passed to
+.BR rmfreemap ()
+does not have any waiting processes and has no resources allocated.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR rmallocmap ()
+and
+.BR rmallocmap_wait ()
+allocate the map structure array of size
+.I mapsize
+and return a pointer to the base of the array.
+Upon failure,
+.BR rmallocmap ()
+and
+.BR rmallocmap_wait ()
+return
+.BR NULL .
+.PP
+.BR rmfreemap ()
+returns void.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR rmallocmap ()
+and
+.BR rmallocmap_wait ()
+fail when memory cannot be allocated, or
+.I mapsize
+is too small (less than 3).
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR rmallocmap ()
+and
+.BR rmfreemap ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.BR rmallocmap_wait ()
+can be called from any blockable context.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR rmallocmap ()
+and
+.BR rmallocmap_wait ()
+are MP-safe: the caller has exclusive access to the returned map pointer.
+.BR rmfreemap ()
+is MP-safe; however, the caller must ensure exclusive access to the passed in map.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR rmallocmap_wait ()
+is a
+.IR Solaris \(rg-specific
+function that should not be called by portable
+.I STREAMS
+drivers and modules.
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must have also been compiled with
+.BR CONFIG_STREAMS_COMPAT_SUN
+or
+.BR CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined.
+.PP
+.BR rmallocmap ()
+and
+.BR rmfreemap ()
+are
+.IR UnixWare \(rg-
+and
+.IR Solaris \(rg-specific
+functions that should not be called by portable
+.I STREAMS
+drivers and modules.
+.B _SUN_SOURCE
+or
+.B _UW7_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B Linux Fast-STREAMS
+must have also been compiled with
+.BR CONFIG_STREAMS_COMPAT_SUN ,
+.BR CONFIG_STREAMS_COMPAT_SUN_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_UW7
+or
+.BR CONFIG_STREAMS_COMPAT_UW7_MODULE
+defined.
+.PP
+The functions
+.BR kmem_zalloc (9),
+.BR rminit (9)
+and
+.BR kmem_free (9)
+should be used instead of either of these functions.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR kmem_zalloc (9),
+.BR kmem_free (9),
+.BR rmalloc (9),
+.BR rmget (9),
+.BR rmfree (9),
+.BR rminit (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR rmallocmap ()
+.BR rmallocmap_wait ()
+and
+.BR rmfreemap ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR rmallocmap ()
+.BR rmallocmap_wait ()
+and
+.BR rmfreemap ()
+are source-level compatible with
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR rmallocmap ()
+and
+.BR rmfreemap ()
+are
+.IR Solaris \(rg-
+and
+.IR UnixWare \(rg-specific
+functions.
+.BR rmallocmap_wait ()
+is a
+.IR Solaris \(rg-specific
+function.
+Neither of these functions should be used by portable
+.I STREAMS
+drivers and modules: use
+.BR kmem_zalloc (9),
+.BR rminit (9)
+and
+.BR kmem_free (9)
+instead.
+.IP \(em
+.BR rmallocmap ()
+.BR rmallocmap_wait ()
+and
+.BR rmfreemap ()
+are provided for source level compatibility with
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+for the purpose of porting
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg,
+binaries are incompatible.
+.IP \(em
+.BR rmallocmap ()
+.BR rmallocmap_wait ()
+and
+.BR rmfreemap ()
+only provide functionality comparable to
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+for use by
+.I STREAMS
+drivers and modules.  Any and all functionalit provided by
+.BR rmallocmap ()
+.BR rmallocmap_wait ()
+or
+.BR rmfreemap ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+and
+.IR Solaris \(rg
+.[
+soldoc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR rmallocmap ()
+and
+.BR rmfreemap ()
+first appeared in
+.IR UnixWare \(rg
+.[
+uw7doc
+.]
+.BR rmallocmap_wait ()
+appears in
+.IR Solaris \(rg.
+.[
+soldoc
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

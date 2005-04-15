@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.11 2005/04/14 08:06:09 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.13 2005/04/15 00:58:31 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/14 08:06:09 $ by $Author: brian $
+% Last Modified $Date: 2005/04/15 00:58:31 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -183,7 +183,9 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Overview::
 * Porting::
 * Development::
-* Appendices::
+* Copying::                     Copying information for this Software
+* Documentation License::       Copying information for this Manual
+* Indices::
 
  --- The Detailed Node Listing ---
 
@@ -211,11 +213,7 @@ Porting
 
 Development
 
-Appendices
-
-* Copying::                     Copying information for this Software
-* Documentation License::       Copying information for this Manual
-* Indices::                     Indices
+* Portable STREAMS Drivers and Modules::
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -584,9 +582,88 @@ This section captures portability information for SVR 4.2 MP based systems.
 If the operating system from which you are porting more closely fits one of
 the other portability sections, please see that section.
 
+@menu
+* Differences from SVR 4.2 MP::
+* Commonalities with SVR 4.2 MP::
+* Compatibility functions for SVR 4.2 MP::
+* Configuration ala SVR 4.2 MP::
+@end menu
+
+@node Differences from SVR 4.2 MP
 @subsection Differences from SVR 4.2 MP
+@cindex differences from svr 4.2 mp
+
+@b{Linux Fast-STREAMS} has very few differences from @cite{SVR 4.2 MP}.  Not all
+@cite{SVR 4.2 MP} functions are implemented in the base @b{Linux Fast-STREAMS}
+kernel modules.  Some functions are included in the @cite{SVR 4.2 MP}
+compatibility module, @file{streams-svr4compat.o}.
+
+@menu
+* Priority Levels::
+* Basic Locks::
+@end menu
+
+@node Priority Levels
+@subsubsection Priority Levels
+@cindex priority levels
+
+@b{Linux} has a different concept of priority levels than @cite{SVR 4.2 MP}.
+@b{Linux} has basically 4 priority levels as follows:
+
+@enumerate
+@item Preemptive
+
+At this priority level, software and hardware interrupts are enabled and the
+kernel is executing with premption enabled.  This means that the currently
+executing kernel thread could preempt and sleep in favor of another thread of
+kernel execution.
+
+This priority level only exists on preemptive (mostly 2.6) kernels.
+
+@item Non-Preemptive
+
+At this priority level, software and hardware interrupts are enabled and the
+kernel is executing with preemption disabled.  This means that the currently
+executing kernel thread will only be interrupted by sofware or hardware
+interrupts.
+
+This priority level exists in all kernels.
+
+@item Software Interrupts Disabled
+
+At this priority level, software interrupts are disabled and the kernel is
+executing with preemption disabled.  This means that the currently executing
+kernel thread will only be interrupted by hardware interrupts.
+
+This is the case when the executing thread is processing a software interrupt,
+or when the currently executing thread has disabled software interrupts.
+
+This priority level exists in all kernels.
+
+@item Interrupt Service Routines Disabled
+
+At this priority level, hardware interrupts are disabled and the kernel is
+executing with preemption disabled.  This means that the currently executing
+kernel thread will not be interrupted.
+
+This is the case when the executing thread is processing a hardware interrupt,
+or when the currently executing thread has disabled hardware interrupts.
+
+This priority level exists in all kernels.
+
+@end enumerate
+
+@node Basic Locks
+@subsubsection Basic Locks
+@cindex basic locks
+
+@node Commonalities with SVR 4.2 MP
 @subsection Commonalities with SVR 4.2 MP
+@cindex commonalities with svr 4.2 mp
+
+@node Compatibility functions for SVR 4.2 MP
 @subsection Compatibility functions for SVR 4.2 MP
+@cindex compatibility functions for svr 4.2 mp
 
 @ftable @asis
 @item @b{ATOMIC_INT_ADD}(9)
@@ -707,16 +784,33 @@ convert virtual to physical address
 wake a process
 @end ftable
 
+@node Configuration ala SVR 4.2 MP
 @subsection Configuration ala SVR 4.2 MP
+@cindex configuration ala svr 4.2 mp
 
 @page
 @node Porting from AIX 5L Version 5.1
 @section Porting from AIX 5L Version 5.1
 @cindex Porting from AIX 5L Version 5.1
 
+@menu
+* Differences from AIX 5L Version 5.1::
+* Commonalities with AIX 5L Version 5.1::
+* Compatibility Functions for AIX 5L Version 5.1::
+* Configuration ala AIX 5L Version 5.1::
+@end menu
+
+@node Differences from AIX 5L Version 5.1
 @subsection Differences from AIX 5L Version 5.1
+@cindex differences from aix 5l version 5.1
+
+@node Commonalities with AIX 5L Version 5.1
 @subsection Commonalities with AIX 5L Version 5.1
+@cindex commonalities with aix 5l version 5.1
+
+@node Compatibility Functions for AIX 5L Version 5.1
 @subsection Compatibility Functions for AIX 5L Version 5.1
+@cindex compatibility functions for aix 5l version 5.1
 
 @ftable @asis
 @item @b{putctl2}(9)
@@ -750,17 +844,33 @@ perform direct I/O from a @cite{STREAMS} driver
 provide a filter of wanted messages from a @cite{STREAMS} module
 @end ftable
 
+@node Configuration ala AIX 5L Version 5.1
 @subsection Configuration ala AIX 5L Version 5.1
+@cindex configuration ala aix 5l version 5.1
 
 @page
 @node Porting from HP-UX 11.0i v2
 @section Porting from HP-UX 11.0i v2
 @cindex Porting from HP-UX 11.0i v2
 
-@subsection Differences from HP-UX 11.0i v2
-@subsection Commonalities with HP-UX 11.0i v2
+@menu
+* Differences from HP-UX 11.0i v2::
+* Commonalities with HP-UX 11.0i v2::
+* Compatibility Functions for HP-UX 11.0i v2::
+* Configuration ala HP-UX 11.0i v2::
+@end menu
 
+@node Differences from HP-UX 11.0i v2
+@subsection Differences from HP-UX 11.0i v2
+@cindex differences from hp-ux 11.0i v2
+
+@node Commonalities with HP-UX 11.0i v2
+@subsection Commonalities with HP-UX 11.0i v2
+@cindex commonalities with hp-ux 11.0i v2
+
+@node Compatibility Functions for HP-UX 11.0i v2
 @subsection Compatibility Functions for HP-UX 11.0i v2
+@cindex compatibility functions for hp-ux 11.0i v2
 
 @ftable @asis
 @item @b{putctl2}(9)
@@ -784,17 +894,33 @@ provide access to the global sleep lock
 invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
 @end ftable
 
+@node Configuration ala HP-UX 11.0i v2
 @subsection Configuration ala HP-UX 11.0i v2
+@cindex configuration ala hp-ux 11.0i v2
 
 @page
 @node Porting from OSF/1 1.2/Digital UNIX
 @section Porting from OSF/1 1.2/Digital UNIX
 @cindex Porting from OSF/1 1.2/Digital UNIX
 
-@subsection Differences from OSF/1 1.2/Digial UNIX
-@subsection Commonalities with OSF/1 1.2/Digial UNIX
+@menu
+* Differences from OSF/1 1.2/Digial UNIX::
+* Commonalities with OSF/1 1.2/Digial UNIX::
+* Compatibility Functions for OSF/1 1.2/Digial UNIX::
+* Configuration ala OSF/1 1.2/Digial UNIX::
+@end menu
 
+@node Differences from OSF/1 1.2/Digial UNIX
+@subsection Differences from OSF/1 1.2/Digial UNIX
+@cindex differences from osf/1 1.2/digial unix
+
+@node Commonalities with OSF/1 1.2/Digial UNIX
+@subsection Commonalities with OSF/1 1.2/Digial UNIX
+@cindex commonalities with osf/1 1.2/digial unix
+
+@node Compatibility Functions for OSF/1 1.2/Digial UNIX
 @subsection Compatibility Functions for OSF/1 1.2/Digial UNIX
+@cindex compatibility functions for osf/1 1.2/digial unix
 
 @ftable @asis
 @item @b{unweldq}(9)
@@ -822,17 +948,33 @@ delete a @cite{STREAMS} module or driver from the kernel
 (undoc)
 @end ftable
 
+@node Configuration ala OSF/1 1.2/Digial UNIX
 @subsection Configuration ala OSF/1 1.2/Digial UNIX
+@cindex configuration ala osf/1 1.2/digial unix
 
 @page
 @node Porting from UnixWare 7.1.3 (OpenUnix 8)
 @section Porting from UnixWare 7.1.3 (OpenUnix 8)
 @cindex Porting from UnixWare 7.1.3 (OpenUnix 8)
 
-@subsection Differences from UnixWare 7.1.3 (OpenUnix 8)
-@subsection Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+@menu
+* Differences from UnixWare 7.1.3 (OpenUnix 8)::
+* Commonalities with UnixWare 7.1.3 (OpenUnix 8)::
+* Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)::
+* Configuration ala UnixWare 7.1.3 (OpenUnix 8)::
+@end menu
 
+@node Differences from UnixWare 7.1.3 (OpenUnix 8)
+@subsection Differences from UnixWare 7.1.3 (OpenUnix 8)
+@cindex differences from unixware 7.1.3 (openunix 8)
+
+@node Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+@subsection Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+@cindex commonalities with unixware 7.1.3 (openunix 8)
+
+@node Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)
 @subsection Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)
+@cindex compatibility functions for unixware 7.1.3 (openunix 8)
 
 The following compatibility functions are in addition to all SVR 4.2
 compatibility functions.
@@ -865,17 +1007,33 @@ pull up bytes in a @cite{STREAMS} message
 (undoc)
 @end ftable
 
+@node Configuration ala UnixWare 7.1.3 (OpenUnix 8)
 @subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
+@cindex configuration ala unixware 7.1.3 (openunix 8)
 
 @page
 @node Porting from Solaris 9/SunOS 5.9
 @section Porting from Solaris 9/SunOS 5.9
 @cindex Porting from Solaris 9/SunOS 5.9
 
-@subsection Differences from Solaris 9/SunOS 5.9
-@subsection Commonalities with Solaris 9/SunOS 5.9
+@menu
+* Differences from Solaris 9/SunOS 5.9::
+* Commonalities with Solaris 9/SunOS 5.9::
+* Compatibility Functions for Solaris 9/SunOS 5.9::
+* Configuration ala Solaris 9/SunOS 5.9::
+@end menu
 
+@node Differences from Solaris 9/SunOS 5.9
+@subsection Differences from Solaris 9/SunOS 5.9
+@cindex differences from solaris 9/sunos 5.9
+
+@node Commonalities with Solaris 9/SunOS 5.9
+@subsection Commonalities with Solaris 9/SunOS 5.9
+@cindex commonalities with solaris 9/sunos 5.9
+
+@node Compatibility Functions for Solaris 9/SunOS 5.9
 @subsection Compatibility Functions for Solaris 9/SunOS 5.9
+@cindex compatibility functions for solaris 9/sunos 5.9
 
 @ftable @asis
 @item @b{_fini}(9)
@@ -957,43 +1115,94 @@ wait for a queue message or signal
 
 @end ftable
 
+@node Configuration ala Solaris 9/SunOS 5.9
 @subsection Configuration ala Solaris 9/SunOS 5.9
+@cindex configuration ala solaris 9/sunos 5.9
 
 @page
 @node Porting from SUPER-UX
 @section Porting from SUPER-UX
 @cindex Porting from SUPER-UX
 
-@subsection Differences from SUPER-UX
-@subsection Commonalities with SUPER-UX
+@menu
+* Differences from SUPER-UX::
+* Commonalities with SUPER-UX::
+* Compatibility Functions for SUPER-UX::
+* Configuration ala SUPER-UX::
+@end menu
 
+@node Differences from SUPER-UX
+@subsection Differences from SUPER-UX
+@cindex differences from super-ux
+
+@node Commonalities with SUPER-UX
+@subsection Commonalities with SUPER-UX
+@cindex commonalities with super-ux
+
+@node Compatibility Functions for SUPER-UX
 @subsection Compatibility Functions for SUPER-UX
+@cindex compatibility functions for super-ux
 
 @ftable @asis
 @item @b{lbolt}(9)
 time in ticks since reboot
 @end ftable
 
+@node Configuration ala SUPER-UX
 @subsection Configuration ala SUPER-UX
+@cindex configuration ala super-ux
 
 @page
 @node Porting from UXP/V
 @section Porting from UXP/V
 @cindex Porting from UXP/V
 
+@menu
+* Differences from UXP/V::
+* Commonalities with UXP/V::
+* Compatibility Functions for UXP/V::
+* Configuration ala UXP/V::
+@end menu
+
+@node Differences from UXP/V
 @subsection Differences from UXP/V
+@cindex differences from uxp/v
+
+@node Commonalities with UXP/V
 @subsection Commonalities with UXP/V
+@cindex commonalities with uxp/v
+
+@node Compatibility Functions for UXP/V
+@subsection Compatibility Functions for UXP/V
+@cindex compatibility functions for uxp/v
+
+@node Configuration ala UXP/V
 @subsection Configuration ala UXP/V
+@cindex configuration ala uxp/v
 
 @page
 @node Porting from Linux STREAMS (LiS) 2.18.1
 @section Porting from Linux STREAMS (LiS) 2.18.1
 @cindex Porting from Linux STREAMS (LiS) 2.18.1
 
-@subsection Differences from LiS 2.18.1
-@subsection Commonalities with LiS 2.18.1
+@menu
+* Differences from LiS 2.18.1::
+* Commonalities with LiS 2.18.1::
+* Compatibility Functions for LiS 2.18.1::
+* Configuration ala LiS 2.18.1::
+@end menu
 
+@node Differences from LiS 2.18.1
+@subsection Differences from LiS 2.18.1
+@cindex differences from lis 2.18.1
+
+@node Commonalities with LiS 2.18.1
+@subsection Commonalities with LiS 2.18.1
+@cindex commonalities with lis 2.18.1
+
+@node Compatibility Functions for LiS 2.18.1
 @subsection Compatibility Functions for LiS 2.18.1
+@cindex compatibility functions for lis 2.18.1
 
 @ftable @asis
 @item @b{lis_appq}(9)
@@ -1028,22 +1237,46 @@ unregister a @cite{STREAMS} module
 calculate the size of message blocks in a @cite{STREAMS} message
 @end ftable
 
+@node Configuration ala LiS 2.18.1
 @subsection Configuration ala LiS 2.18.1
+@cindex configuration ala lis 2.18.1
 
 @node Development
 @chapter Development
 @cindex development
+
+@menu
+* Portable STREAMS Drivers and Modules::
+@end menu
+
+@node Portable STREAMS Drivers and Modules
+@section Portable @cite{STREAMS} Drivers and Modules
+@cindex portable @cite{STREAMS} drivers and modules
 
 In the process of creating the @b{Linux Fast-STREAMS} subsystem in such a way so
 as to facilitate portability of @cite{STREAMS} drivers and modules from a wide
 range of @cite{UNIX} operating system variants, a number of guidelines for the
 development of portable @cite{STREAMS} drivers and moduels have been developed.
 These guidelines, when adhered to, will allow the resulting driver or module to
-be ported to another @cite{STREAMS} implementation with minimal porting.
+be ported to another @cite{STREAMS} implementation with minimal effort.
 These portability guidelines are collected here.
 
-@section Portable @cite{STREAMS} Drivers and Modules
+@menu
+* Memory Allocation::
+* Alignment of Message Buffers::
+* Disabling and Enabling Queue Procedures::
+* Freezing and Unfreezing Streams::
+* Passing Messages from Interrupt Service Routines::
+* Timeout Call Back and Link Identifiers::
+* Synchronization with Timeouts and Callback Functions::
+* Synchronization with Callout Functions::
+* Synchronization of Drivers and Modules::
+* Special STREAMS Message Types::
+* Use of Message Allocation Priorities::
+* Registration/Deregistration and Device Numbering::
+@end menu
 
+@node Memory Allocation
 @subsection Memory Allocation
 
 Portable @cite{STREAMS} modules and drivers will always allocate memory using
@@ -1068,8 +1301,80 @@ and
 @inforef{kmem_free(9), , *manpages*}.
 @end ifnottex
 
+Additional eligible allocators are:
+
+@iftex
+@b{rmallocmap}(9)
+@end iftex
+@ifnottex
+@inforef{rmallocmap(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmfreemap}(9)
+@end iftex
+@ifnottex
+@inforef{rmfreemap(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmalloc}(9)
+@end iftex
+@ifnottex
+@inforef{rmalloc(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmalloc_wait}(9)
+@end iftex
+@ifnottex
+@inforef{rmalloc_wait(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmfree}(9)
+@end iftex
+@ifnottex
+@inforef{rmfree(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rminit}(9)
+@end iftex
+@ifnottex
+@inforef{rminit(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmsetwant}(9)
+@end iftex
+@ifnottex
+@inforef{rmsetwant(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{rmwanted}(9)
+@end iftex
+@ifnottex
+@inforef{rmwanted(9), , *manpages*}
+@end ifnottex
+
+Unfortunately, these resource map allocators are not available on
+@cite{AIX} so, if portability to the @cite{AIX PSE} is important, then do not
+use these allocators.
+
+Additional eligible allocators are:
+
+@iftex
+@b{kmem_fast_alloc}(9)
+@end iftex
+@ifnottex
+@inforef{kmem_fast_alloc(9), , *manpages*}
+@end ifnottex
+@iftex
+@b{kmem_fast_free}(9)
+@end iftex
+@ifnottex
+@inforef{kmem_fast_free(9), , *manpages*}
+@end ifnottex
+
+@node Alignment of Message Buffers
 @subsection Alignment of Message Buffers
 
+@node Disabling and Enabling Queue Procedures
 @subsection Disabling and Enabling Queue Procedures
 
 Portable @cite{STREAMS} modules and drivers will always call
@@ -1102,11 +1407,14 @@ upon entering its queue close procedure (see
 @inforef{qclose(9), , *manpages*}.)
 @end ifnottex
 
+@node Freezing and Unfreezing Streams
 @subsection Freezing and Unfreezing Streams
 
+@node Passing Messages from Interrupt Service Routines
 @subsection Passing Messages from Interrupt Service Routines
 
-@subsection Identifiers: Buffer Call, Timeout and Multiplexor Link
+@node Timeout Call Back and Link Identifiers
+@subsection Timeout Call Back and Link Identifiers
 
 Although buffer callbacks identifiers (see
 @iftex
@@ -1124,6 +1432,8 @@ timeout identifiers (see
 @end ifnottex
 and multiplexing driver link identifiers (see
 @var{I_LINK} and @var{I_PLINK} under
+@vindex I_LINK
+@vindex I_PLINK
 @iftex
 @b{streamio}(2)),
 @end iftex
@@ -1163,67 +1473,153 @@ as being any specific range of value.  Portable drivers and modules will save
 any returned identifiers in data types that will not loose the precision of the
 identifier.
 
+@node Synchronization with Timeouts and Callback Functions
 @subsection Synchronization with Timeouts and Callback Functions
 
+@node Synchronization with Callout Functions
 @subsection Synchronization with Callout Functions
 
+@node Synchronization of Drivers and Modules
 @subsection Synchronization of Drivers and Modules
 
+@node Special STREAMS Message Types
 @subsection Special @cite{STREAMS} Message Types
 
+@node Use of Message Allocation Priorities
 @subsection Use of Message Allocation Priorities
 
-@subsection Registration, Deregistration and Device Numbering
+@node Registration/Deregistration and Device Numbering
+@subsection Registration/Deregistration and Device Numbering
 
-@node Appendices
-@appendix Appendices
-@menu
-* Copying::                     Copying information for this Software
-* Documentation License::       Copying information for this Manual
-* Indices::                     Indices
-@end menu
+@subsubheading UNIX Device Numbering
+
+@quotation
+In versions of @cite{UNIX System V} previous to @cite{Release 4}, the major and
+minor device numbers were each 8 bit, and they were packed into a 16 bit word
+(usually a C Language @var{short} variable).  Under @cite{UNIX System V Release
+4}, the device numbers are held in a @samp{dev_t}
+@tpindex dev_t
+variable, which is often
+implemented as a 32 bit integer.  The minor device number is held as 14 bits,
+and a further 8 bits are used for the major device number.  @samp{dev_t}
+@tpindex dev_t
+is ofter
+referred to as the "expanded device type", since it allows many more minor
+devices than before.
+
+Many drivers were written for earlier releases, an may eventually be ported to
+@cite{UNIX System V Release 4}.  In earlier releases, some manufacturers got
+around the 256 minor device number limit by using multiple major device numbers
+for a device.  Devices were created with different major device numbers (the
+external major device number) but they all mapped to the same deivce driver
+entry in the device switch tables (the internal device number).  Even under this
+scheme, each major device could only support 256 minor devices, but the driver
+could support many more.  This has been recognized in @cite{UNIX System V
+Release 4}, and functions are provided to do this mapping; for example, the
+function @command{etoimajor}() and so on, give a machine independent interface
+to the device number mapping.
+@footnote{@cite{The Magic Garden Explained}}
+@end quotation
+
+@subsubheading Linux Device Numbering
+
+Verions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also
+provided an 8 bit major device number and an 8 bit minor device number grouped
+into a 16-bit combined device number.  Linux 2.6 kernels (and some patched 2.4
+kernels) now have larger device numbers.  These extended device numbers are 12
+bits for major device number and 20 bits for minor device number, with 32 bits
+for the combined device number.
+
+@subsubheading LiS Device Numbering
+
+@cite{LiS} prior to the 2.18.0 release was incapable of providing an internal
+representation of the device number and the number of minor device numbers for a
+device driver was restricted to 256.  @footnote{Actually, 255 as the kernel
+reserved minor device number 255 for expansion.}  Many
+@url{http://www.openss7.org/, OpenSS7} device drivers written for @cite{LiS}
+would allocate additional major device numbers if required.  Good examples of
+devices that require more than 255 minor device numbers are INET clone devices,
+SCTP streams, SS7 singalling link streams, MG media channels, etc.  These
+streams are often @var{I_PLINK}ed
+@vindex I_PLINK
+under a multiplexing driver and do not even
+consume a system file descriptor.
+
+@subsubheading Linux Fast-STREAMS Device Numbering
+
+@b{Linux Fast-STREAMS} began with extended device numbering.  The @file{specfs}
+shadow special character device filesystem used by @b{Linux Fast-STREAMS} uses
+the @samp{inode} number to hold the @samp{dev_t}
+@tpindex dev_t
+device number instead of the
+@samp{inode->i_rdev}, which on older kernels is only a 16-bit @var{short}.
+
+In earlier versions of @b{Linux Fast-STREAMS}, the internal device numbering is
+16-bits for major device number and 16-bits for minor device number.  This will
+soon be changed to 12-bits for major device number and 20-bits for minor device
+number to accomodate the newer @b{Linux} scheme.
+
+On 2.6 @b{Linux} kernels that support the newer extended device numbers,
+external device numbers and internal device numbers will be the same.
+On 2.4 @b{Linux} kernels with the older 16-bit device numbers, external device
+number and internal device numbers will differ.  In some situations, an internal
+device number can exists with no corresponding external device number (accessed
+only via a clone device or direct access to the mounted @file{specfs} shadow
+special character device filesystem).
+
+@ftable @asis
+@item @b{etoimajor}(9)
+change external to internal major device number
+@item @b{getemajor}(9)
+get external major device number
+@item @b{geteminor}(9)
+get external minor device number
+@item @b{itoemajor}(9)
+change internal to external major device number
+@end ftable
 
 @node Copying
-@unnumbered Copying
+@appendix Copying
 @include texi/gpl.texi
 
 @node Documentation License
-@unnumbered Documentation License
+@appendix Documentation License
 @include texi/fdl.texi
 
+@page
 @node Indices
 @unnumbered Indices
 @menu
-* Concept Index::               Concept Index
-* Type Index::                  Type Index
-* Function Index::              Function Index
-* Variable Index::              Variable Index
-* File Index::                  File Index
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
 @end menu
 
+@page
 @node Concept Index
-@unnumbered Concept Index
-
+@unnumberedsec Concept Index
 @printindex cp
 
+@page
 @node Type Index
-@unnumbered Type Index
-
+@unnumberedsec Type Index
 @printindex tp
 
+@page
 @node Function Index
-@unnumbered Function and Macro Index
-
+@unnumberedsec Function and Macro Index
 @printindex fn
 
+@page
 @node Variable Index
-@unnumbered Variable and Constant Macro Index
-
+@unnumberedsec Variable and Constant Macro Index
 @printindex vr
 
+@page
 @node File Index
-@unnumbered Program and File Index
-
+@unnumberedsec Program and File Index
 @printindex pg
 
 @page
