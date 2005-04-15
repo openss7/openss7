@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.16 2005/04/14 08:06:08 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.17 2005/04/15 00:58:31 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/14 08:06:08 $ by $Author: brian $
+% Last Modified $Date: 2005/04/15 00:58:31 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -2448,49 +2448,48 @@ device name and instance number without concern for major device numbers.
 @section Porting from LiS 2.16
 @cpindex porting from lis 2.16
 
-@appendix Appendices
-
 @node Copying
-@unnumbered Copying
+@appendix Copying
 @include texi/gpl.texi
 
 @node Documentation License
-@unnumbered Documentation License
+@appendix Documentation License
 @include texi/fdl.texi
 
+@page
 @node Indices
 @unnumbered Indices
 @menu
-* Concept Index::		Concept Index
-* Type Index::			Type Index
-* Function Index::		Function Index
-* Variable Index::		Variable Index
-* File Index::			File Index
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
 @end menu
 
+@page
 @node Concept Index
-@unnumbered Concept Index
-
+@unnumberedsec Concept Index
 @printindex cp
 
+@page
 @node Type Index
-@unnumbered Type Index
-
+@unnumberedsec Type Index
 @printindex tp
 
+@page
 @node Function Index
-@unnumbered Function and Macro Index
-
+@unnumberedsec Function and Macro Index
 @printindex fn
 
+@page
 @node Variable Index
-@unnumbered Variable and Constant Macro Index
-
+@unnumberedsec Variable and Constant Macro Index
 @printindex vr
 
+@page
 @node File Index
-@unnumbered Program and File Index
-
+@unnumberedsec Program and File Index
 @printindex pg
 
 @page
