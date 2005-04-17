@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.19 2005/04/17 07:38:45 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.20 2005/04/17 17:11:46 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/17 07:38:45 $ by $Author: brian $
+% Last Modified $Date: 2005/04/17 17:11:46 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -210,19 +210,16 @@ Introduction
 
 Overview
 
+* Definitions::			STREAMS Definitions
 * Concepts::			STREAMS Concepts
-* Benefits of STREAMS::		STREAMS Benefits
-* STREAMS Definitions::		STREAMS Definitions
-* When to Use STREAMS::		STREAMS Usage
 * Application Interface::	STREAMS Application Interface
-* Kernel Level::		STREAMS Kernel Facilities
-* STREAMS in Operation::	STREAMS Operation
+* Kernel Level Facilities::	STREAMS Kernel Facilities
 
 Reference
 
 * Files::			STREAMS Files
-* Drivers::			STREAMS Drivers
 * Modules::			STREAMS Modules
+* Drivers::			STREAMS Drivers
 * Terminal I/O::		STREAMS Terminal I/O
 * Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
@@ -524,7 +521,8 @@ is easier to write modular and reusable code.  The code is also simpler becuase 
 functions the programmer needs are provided by the @dfn{STREAMS} infrastructure.
 @end quotation
 
-Have you ever seen the RTP (Real-time Transport Protocol) implemented under a Socket?  Why not?
+Have you ever seen the RTP (Real-Time Transport Protocol, RFC 1889) implemented under a Socket?  Why
+not?  Is not the sockets interface so flexible as to permit such protocols to be implemented?
 
 There are several reasons that BSD Sockets have not been used for other protocol development:
 
@@ -532,11 +530,12 @@ There are several reasons that BSD Sockets have not been used for other protocol
 
 @item  Although BSD Sockets provides a framework for protocol development, it does not provide
 many utility functions for working with arbitrary protocols.  Most of the utilities are DARPA
-ARPANET specific.
+ARPANET specific.@footnote{This should not be suprising as the 4BSD releases were developed for
+DARPA.}
 
 @item Protocol to protocol module interfaces are poorly standardized for the BSD Sockets system,
 whereas, protocol to protocol module service interfaces are well defined under OSI for
-@cite{STREAMS}.
+@cite{STREAMS}.  (@b{Linux} discards the protocol to protocol interface anyway.)
 
 @item The BSD Sockets interface can easily be applied over @cite{STREAMS} transport protocol
 modules; however, the reverse is not true: the @cite{STREAMS} interface cannot easily be provided
@@ -563,7 +562,43 @@ model and no systemic approach to flow control.
 @item The @b{Linux} implementation of BSD Sockets discards much of the general purpose protocol
 framework, presumably in the persuit of speed.
 
+BSD sockets consists of a socket that interfaces with the user using filesystem and socket
+semantics, a protocol control block that represents the upper-most protocol, a socket to protocol
+interface, additional protocol control blocks representing lower protocol components, a protocol to
+protocol interface, a device interface abstraction, and a protocol to device interface.
+
+Linux discards the protocol control block, socket to protocol interface, protocol to protocol
+interface, and protocol to device interface.
+
+One of the major ramificaitons of @b{Linux} discarding the protocol to protocol interface is that it
+is very difficult to implement layered or tunneled protocols in the @b{Linux} kernel.
+@footnote{That is, even more difficult than on a BSD system.}
+Layered protocols that run, say, over UDP, such as econet, must internally use the socket interface
+to a UDP datagram socket to layer the econet protocol over UDP.  Under @dfn{STREAMS} it is much
+easier to either push econet as a module over the UDP transport provider stream, or to I_LINK
+transport provider streams under an econet multiplexing driver.
+
 @end itemize
+
+In commenting on the relative performance of @cite{STREAMS} and Sockets, Mitchel Waite had this to
+say:
+
+@quotation
+Sockets are like pipes with more power.  They are bidirectional and may cross network or other
+machine boundaries.  In addition, sockets allow limited control information as well as data.
+
+Streams are more general still, with extensive control information passing capabilities.
+
+One most @cite{UNIX} systems, messages (if available) have the lowest overhead and highest
+bandwidth, with pipes following close behind.  Because they support complex networking facilities,
+sockets are probably less efficient than streams, but because they rarely appear on the same machine
+as streams, the question is somewhat academic.  They certainly have much lower bandwidth than pipes
+or messages.@footnote{@cite{UNIX Papers, for UNIX Developers and Power Users, (Waite, 1987) pp. 358-359}}
+@end quotation
+
+With @b{Linux Fast-STREAMS} it will be very possible to compare the performance of @dfn{STREAMS} in
+comparison to @dfn{Sockets}.  It will also be possible to compare the performance of traditional
+@b{Linux} pipes and FIFOs with @dfn{STREAMS}-based pipes and FIFOs.
 
 @node Benefits of STREAMS
 @subsection Benefits of @cite{STREAMS}
@@ -579,12 +614,6 @@ and link editing are not required to create the interconnection.
 @cite{STREAMS} also greatly simplifies the user interface for languages that have complex input and
 output requirements.
 
-@menu
-* Standardized Service Interfaces::
-* Manipulating Modules::
-@end menu
-
-@node Standardized Service Interfaces
 @subsubsection Standardized Service Interfaces
 @cindex Standardized Service Interfaces
 
@@ -602,7 +631,6 @@ example, a module that implements an X.25 protocol layer, as shown in Figure 2-1
 protocol service interface at its input and output sides.  In this case, other modules should only
 be connected to the input and output side if they have the compatible X.25 service interface.
 
-@node Manipulating Modules
 @subsubsection Manipulating Modules
 @cindex Manipulating Modules
 
@@ -620,18 +648,18 @@ drivers, and physical communications media.
 protocols.
 @end itemize
 
-@subsubheading Protocol Portability
+@subsubsection Protocol Portability
 
 Figure 2-13 shows how the same X.25 protocol module can be used with different drivers on different
 machines by implementing compatible service interfaces.  The X.25 protocol module interfaces are
 Connection Oriented Network Service (CONS) and Link Access Protocol - Balanced (LAPB).
 
-@subsubheading Protocol Substitution
+@subsubsection Protocol Substitution
 
 Alternate protocol modules (and device drivers) can be exchanged on the same machine if they are
 implemented to an equivalent service interface.
 
-@subsubheading Protocol Migration
+@subsubsection Protocol Migration
 
 Figure 2-14 illustrates how @cite{STREAMS} can move functions between kernel software and front end
 firmware.  A common downstream service interface allows the transport protocol module to be
@@ -644,7 +672,7 @@ advances.  The same transport protocol module can be used on a lower capacity ma
 economics may preclude the use of front-end hardware, and also on a larger scale system where a
 front-end is economically justified.
 
-@subsubheading Module Reusability
+@subsubsection Module Reusability
 
 Figure 2-15 shows the same canonical module (for example, one that provide delete and kill
 processing on character strings) reused in two different Streams.  This module would typically be
@@ -796,6 +824,51 @@ to allow the implementation of the ISO networking protocols.
 @subsection Realities of STREAMS
 @cindex Realities of STREAMS
 
+The realities of @dfn{STREAMS} are as follows:
+
+@itemize
+
+@item @dfn{STREAMS} is implemented on every major ``Big Iron'' @cite{UNIX}.
+
+Even Sun Microsystems chose to abandon BSD Sockets as an internal kernel networking implemetnation
+and moved to the @cite{UNIX System V Release 4} @dfn{STREAMS} subsystem instead.@footnote{BSD'er
+will tell you that Sun Microsystems just made a bad decision.} @dfn{STREAMS} is implemented (to list
+a few) in 
+@cite{AIX 5L Version 5.1 PSE},
+@cindex AIX
+@cite{HP-UX 11.0i v2 STREAMS/UX},
+@cindex HP-UX
+@cite{OSF/1 1.2/Digital UNIX},
+@cindex OSF/1
+@cindex Digital UNIX
+@cite{UnixWare 7.1.3 (OpenUnix 8)},
+@cindex UnixWare
+@cindex OpenUnix
+@cite{Solaris 9/SunOS 5.9},
+@cindex Solaris
+@cindex SunOS
+@cite{Super-UX},
+@cindex Super-UX
+@cite{UXP/V}
+@cindex UXP/V
+and
+@cite{MacOS OT}.
+@cindex MacOS
+
+@item @dfn{STREAMS} is implemented on many Real-Time Operating Systems (RTOS) based on @cite{UNIX}.
+
+Examples include @cite{WindRiver}, @cite{PSOS}, @cite{VxWorks}, etc.
+
+@item @dfn{STREAMS} implementations are widely standardized on the @cite{UNIX System V Release 4.2}
+specifications.
+
+@item @dfn{STREAMS} provides standardized (POSIX, OpenGroup, SVID) Transport Library Interface to
+communications networking suites.
+
+@item @dfn{STREAMS} has many portable implementations.
+
+@end itemize
+
 @node Why Fast?
 @section Why Fast?
 @cindex Why Fast?
@@ -815,14 +888,50 @@ was the dismal performance provided by
 @cindex Linux STREAMS (LiS)
 Other reasons included:
 @itemize
+
 @item Mainline Adoption instead of Portability
+
+@cite{LiS} attempts to maintain portability across a number of operating systems.  The goals of
+portability and mainline adoption are usually at cross-purposes.  @dfn{Linux Fast-STREAMS} proposes
+mainline adoption in contrast to portability.  Many @dfn{STREAMS} implementations are available for
+other operating systems.
+
 @item Production Grade
+
+@cite{LiS} attempts to always provide debugging facilities@footnote{In fact, these debugging
+facilities always point at the driver or module writer when a bug is encountered in LiS itself!} and
+does not trust the driver or module writer.  This leads to poor performance and in many cases the
+propagation of bugs to the field by failing to panic the kernel.  @dfn{Linux Fast-STREAMS} aims at a
+production grade environment that implicitly trusts the driver or module while providing optional
+debugging facilities (both compile-time options as well as run-time options).
+
 @item SVR 4.2 MP Compatibility
+
+@cite{LiS} only provide @cite{SVR 4} uniprocessor capabilities.  @dfn{Linux Fast-STREAMS} provides
+@cite{SVR 4.2 MP} capabilities.
+
+@item Portability
+
+@cite{LiS} forces ported drivers and modules from other implementations to use the @cite{LiS} DDI
+and configuration mechanisms.  @dfn{Linux Fast-STREAMS} provides compatiblity functions for all
+major implementations of @dfn{STREAMS} as well as providing a rich DDI based on @cite{SVR 4.2 MP},
+@cite{Solaris}, and other implementations.
+
 @item Bug Circumvention
+
 @item Major Redesign
+
 @item Scalable
+
 @item Soft Real Time Performance
+
+@cite{LiS} avoids use of high-performance @b{Linux}-specific facilties because of its aims at
+portability.  @dfn{Linux Fast-STREAMS} being aimed at only @b{Linux} uses the highest-performance
+techniques available in the @b{Linux} kernel form implementation.  This includes kernel memory
+caches and other techniques.
+
 @item Maintainability
+
 @end itemize
 
 @node Why Linux?
@@ -899,16 +1008,63 @@ Maximum compatibility moves close to providing a standard for such interfaces.
 @chapter Overview of @value{PACKAGE_TITLE}
 @cindex overview
 @menu
+* Definitions::			STREAMS Definitions
 * Concepts::			STREAMS Concepts
-* STREAMS Definitions::		STREAMS Definitions
-* When to Use STREAMS::		STREAMS Usage
 * Application Interface::	STREAMS Application Interface
-* Kernel Level::		STREAMS Kernel Facilities
-* STREAMS in Operation::	STREAMS Operation
+* Kernel Level Facilities::	STREAMS Kernel Facilities
 @end menu
 
 This manual documents how to develop and port STREAMS drivers and modules for
 @value{PACKAGE_TITLE}.
+
+@node Definitions
+@section @cite{STREAMS} Definitions
+@cindex @cite{STREAMS}, definitions
+@cindex definitions, @cite{STREAMS}
+
+@table @dfn
+
+@item Stream
+A @dfn{Stream} is a full-duplex communications path between a User Process and a Kernel Level Device
+or Pseudo-Device Driver.
+
+@item Stream Head
+A @dfn{Stream Head} is the component in a @dfn{Stream} that is closest to the User Process.  The
+@dfn{Stream Head} sits in Kernel Space and provide interface to the User Process.
+
+@item Stream End
+A @dfn{Stream End} is the component in a @dfn{Stream} that is farthest from the User Process.  The
+@dfn{Stream End} sits in Kernel Space and is normally a Device or Pseudo-Device Driver.
+
+@item Module
+A @dfn{Module} is a protocol module that resides between the @dfn{Stream Head} and @dfn{Stream End}
+on a @dfn{Stream}.  Protocol @dfn{Modules} are optional and can be pushed or popped from a
+@dfn{Stream} using @command{ioctl} commands to the @dfn{Stream Head}.
+
+@item Driver
+A @dfn{Driver} is a device or pseudo-device driver that sits at the @dfn{Stream End}.  @dfn{Drivers}
+are associated with device numbers and are opened by the User Process.
+
+@item Messages
+A @dfn{Message} is a chain of data buffers used for passing data by reference between neighbouring
+@dfn{STREAMS} @dfn{Modules}, the @dfn{Stream Head} and the @dfn{Driver}.
+
+@item Queues
+Each @dfn{Stream Head}, @dfn{Stream End} and intervening @dfn{Module} consists of a pair of
+@dfn{Queues}: one downstream @dfn{Queue} for messages first written by the User Process, and one
+upstream @dfn{Queue} for messages ultimately read by the User Process.
+
+@item Stream I/O
+
+@item Multiplexing
+@dfn{Multiplexing} is a situation where multiple @dfn{Streams} can fan-in or fan-out from a
+@dfn{Module} or @dfn{Multiplexing Driver}.
+
+@item Polling
+
+@item Flow Control
+
+@end table
 
 @node Concepts
 @section Concepts
@@ -919,6 +1075,7 @@ Stream heads are the kernel-space interface to the user process.  Modules are pu
 protocol modules that are optionally placed between the user process (stream head) and the driver
 (stream end).  Drivers are device drivers or pseudo device drivers that can be opened using a
 character device special file.
+
 A simple stream is illustrated in @cite{Figure 2-1}.
 
 @cartouche
@@ -931,11 +1088,17 @@ to the User Process, again through any intervening Modules.
 
 It is possible to have a stream that does not contain a module or driver.  There are two types of
 streams that do not contain a module or driver: a pipe and a fifo (named pipe).
+
 A @dfn{STREAMS}-based pipe is illustrated in @cite{Figure 2-2}.
-A @dfn{STREAMS}-based FIFO is illustrated in @cite{Figure 2-3}.
 
 @cartouche
 @image{SPG_fig02,4in} @center @b{Figure 2-2.  @cite{STREAMS}-based Pipe}
+@end cartouche
+
+A @dfn{STREAMS}-based FIFO is illustrated in @cite{Figure 2-3}.
+
+@cartouche
+@image{SPG_fig07,4in} @center @b{Figure 2-3.  @cite{STREAMS}-based FIFO (named pipe)}
 @end cartouche
 
 Each @cite{STREAMS} driver or module has a number of constituent pieces.  Each @cite{STREAMS} driver
@@ -950,13 +1113,13 @@ associated with the queue.
 Each @cite{STREAMS} queue and queue band can contain @cite{STREAMS} messages.  @cite{STREAMS}
 messages are composed of message blocks, data blocks and data buffers in a chain-buffer arrangement.
 
-@menu
-* Objects::
-@end menu
+@cartouche
+@image{SPG_fig03,4in} @center @b{Figure 2-4.  Stream to Communications Driver}
+@end cartouche
 
-@node Objects
-@subsection Objects
-@cindex objects
+@cartouche
+@image{SPG_fig04,0.5in} @center @b{Figure 2-5.  Queue Pair Allocation}
+@end cartouche
 
 @menu
 * Driver Switch Table::
@@ -976,7 +1139,7 @@ messages are composed of message blocks, data blocks and data buffers in a chain
 @end menu
 
 @node Driver Switch Table
-@subsubsection Driver Switch Table
+@subsection Driver Switch Table
 @cindex Driver Switch Table
 
 Each @cite{STREAMS} device or pseudo-device driver registers itself with the @cite{STREAMS}
@@ -989,7 +1152,7 @@ devices with the necessary @b{Linux} mechanism and then implements an internal d
 as a list hashed on device number.
 
 @node Module Switch Table
-@subsubsection Module Switch Table
+@subsection Module Switch Table
 @cindex Module Switch Table
 
 Each @cite{STREAMS} module registers itself with the @cite{STREAMS} subsystem and is assigned a
@@ -999,7 +1162,7 @@ entered by module identification number into a module switch table.  @dfn{@value
 implements an internal module switch table as a list hashed on module identifier.
 
 @node Stream Table
-@subsubsection Stream Table
+@subsection Stream Table
 @cindex Stream Table
 
 Each @cite{STREAMS} driver or module has an external entry point into a streams table.  The stream
@@ -1010,7 +1173,7 @@ numbers, module identifiers, or other external registrations have been performed
 driver of module.
 
 @node Stream Administration
-@subsubsection Stream Administration
+@subsection Stream Administration
 @cindex Stream Administration
 
 Some @cite{STREAMS} implementation also provide some sort of @cite{STREAMS} administration structure
@@ -1018,7 +1181,7 @@ that contains more specific information about a @cite{STREAMS} driver or module,
 the driver or module, synchronization, administrative flags, version, etc.
 
 @node Module Information
-@subsubsection Module Information
+@subsection Module Information
 @cindex Module Information
 
 Each queue initialization strucutre points to a module information structure that provides some
@@ -1030,21 +1193,21 @@ low water marks for flow control.  If any of this later information needs to dif
 separate for each queue.
 
 @node Module Statistics
-@subsubsection Module Statistics
+@subsection Module Statistics
 @cindex Module Statistics
 
 Each queue initialization strucutre points to an optional module statistics structure that collects
 statistics for the stream.
 
 @node Stream Head
-@subsubsection Stream Head
+@subsection Stream Head
 @cindex Stream Head
 
 A stream head is a dynamic structure that is created whenever a @cite{STREAMS} driver (stream end)
 is instantiated. 
 
 @node Queue
-@subsubsection Queue
+@subsection Queue
 @cindex Queue
 
 A pair of queues are allocated, initialized, assigned and linked into a stream each time that a
@@ -1052,7 +1215,7 @@ A pair of queues are allocated, initialized, assigned and linked into a stream e
 queue pair is the common method for passing a handle to a driver or module instance.
 
 @node Queue Band
-@subsubsection Queue Band
+@subsection Queue Band
 @cindex Queue Band
 
 Queue bands are allocated and initialized in association with queues on demand.  Many @cite{STREAMS}
@@ -1060,7 +1223,7 @@ drivers or modules never have queue bands allocated because they do not pass pri
 messages, only normal messages.
 
 @node Queue Initialization
-@subsubsection Queue Initialization
+@subsection Queue Initialization
 @cindex Queue Initialization
 
 Each stream table (driver or module) has associated with it queue intialization information for the
@@ -1079,7 +1242,7 @@ of the driver or module.  Open and close function pointers in the other queue in
 structures will be ignored.}
 
 @node Message Block
-@subsubsection Message Block
+@subsection Message Block
 @cindex Message Block
 
 A message block is a structure that references a data block and data buffer.  Each message block is
@@ -1087,7 +1250,7 @@ a view into a data buffer and has a start (read pointer) and finish (write point
 buffer.  Message block can be chained together to form larger segmented messages.
 
 @node Data Block
-@subsubsection Data Block
+@subsection Data Block
 @cindex Data Block
 
 Data blocks are a description of a data buffer external to the buffer itself.  Each data block
@@ -1097,11 +1260,11 @@ Data blocks also contain any necessary information concerning the functions and 
 to free the data buffer.  Also, data blocks maintain reference counts of the number of message
 blocks that reference the data buffer.
 
-@subsubheading Data Block Types
+@subsubsection Data Block Types
 @cindex Data Block Types
 
 @node Data Buffer
-@subsubsection Data Buffer
+@subsection Data Buffer
 @cindex Data Buffer
 
 Data buffers can be allocated within the @cite{STREAMS} buffer pools using the @b{allocb}(9)
@@ -1109,75 +1272,21 @@ function or can be allocated externally and associated with a data and message b
 @b{esballoc}(9) function.
 
 @node User Credentials
-@subsubsection User Credentials
+@subsection User Credentials
 @cindex User Credentials
 
-@cartouche
-@image{SPG_fig03,4in} @center @b{Figure 2-4.  Stream to Communications Driver}
-@end cartouche
-
-@cartouche
-@image{SPG_fig04,0.5in} @center @b{Figure 2-5.  Queue Pair Allocation}
-@end cartouche
-
-@cartouche
-@image{SPG_fig05,5in} @center @b{Figure 2-6.  A Message}
-@end cartouche
-
-@cartouche
-@image{SPG_fig06,5in} @center @b{Figure 2-7.  Messages on a Message Queue}
-@end cartouche
-
-@node STREAMS Definitions
-@section @cite{STREAMS} Definitions
-@cindex @cite{STREAMS}, definitions
-@cindex definitions, @cite{STREAMS}
-
-@table @i
-
-@item Stream
-
-@item Stream Head
-
-@item Module
-
-@item Driver
-
-@item Messages
-
-@item Queues
-
-@item Stream I/O
-
-@item Multiplexing
-
-@item Polling
-
-@item Flow Control
-@end table
-
-@node When to Use STREAMS
-@section When to Use @cite{STREAMS}
-@cindex when to use @cite{STREAMS}
-@cindex @cite{STREAMS}, when to use it?
-
 @node Application Interface
-@section How @cite{STREAMS} Works -- Application Interface
-@cindex how @cite{STREAMS} works -- application interface
+@section Application Interface
 @cindex @cite{STREAMS}, application interface
 @cindex application interface, @cite{STREAMS}
 
-@subsection Opening a Stream
+@subsection System Calls
 
-@subsection Closing a Stream
-
-@subsection Controlling Data Flow
-
-@node Kernel Level
-@section How @cite{STREAMS} Works -- Kernel Level
-@cindex how @cite{STREAMS} works -- kernel level
-@cindex @cite{STREAMS}, kernel level
-@cindex kernel level, @cite{STREAMS}
+@node Kernel Level Facilities
+@section Kernel Level Facilities
+@cindex kernel level facilities
+@cindex @cite{STREAMS}, kernel level facilities
+@cindex kernel level facilities, @cite{STREAMS}
 
 @subsection Stream Head
 
@@ -1187,7 +1296,94 @@ function or can be allocated externally and associated with a data and message b
 
 @subsection Messages
 
+@cartouche
+@image{SPG_fig05,5in} @center @b{Figure 2-6.  A Message}
+@end cartouche
+
+@cartouche
+@image{SPG_fig06,5in} @center @b{Figure 2-7.  Messages on a Message Queue}
+@end cartouche
+
 @subsubsection Message Types
+
+@b{Normal Messages}
+
+@vtable @var
+@item M_DATA
+Normal data.
+@item M_PROTO
+Normal protocol information.
+@item M_BREAK
+Break request.
+@item M_PASSFP
+Passed file pointer.
+@item M_EVENT
+Normal event.
+@item M_SIG
+Signal.
+@item M_DELAY
+Delay request.
+@item M_CTL
+Normal inter-module control message.
+@item M_IOCTL
+Input-Output control.
+@item M_SETOPTS
+Normal set queue options.
+@item M_RSE
+Normal reserved.
+@item M_TRAIL
+@item M_BACKWASH
+@end vtable
+
+@b{Priority Messages}
+
+@vtable @var
+@item M_IOCACK
+Input-Output control acknowledgement (result).
+@item M_IOCNAK
+Input-Output control negative acknowledgement (error).
+@item M_PCPROTO
+Priority protocol information.
+@item M_PCSIG
+Priority signal.
+@item M_READ
+Read request.
+@item M_FLUSH
+Flush queue request.
+@item M_STOP
+Stop output request.
+@item M_START
+Start output request.
+@item M_HANGUP
+Hangup.
+@item M_ERROR
+Fatal error.
+@item M_COPYIN
+Input-Output control copyin request.
+@item M_COPYOUT
+Input-Output control copyout request.
+@item M_IOCDATA
+Input-Output control copied in data.
+@item M_PCRSE
+Priority reserved.
+@item M_STOPI
+Stop input request.
+@item M_STARTI
+Start input request.
+@item M_PCCTL
+Priority inter-module control message.
+@item M_PCSETOPTS
+Priority set queue options.
+@item M_PCEVENT
+Priority event.
+@item M_UNHANGUP
+Hangup corrected.
+@item M_NOTIFY
+@item M_HPDATA
+@item M_LETSPLAY
+@item M_DONTPLAY
+@item M_BACKDONE
+@end vtable
 
 @subsection Message Queueing Priority
 
@@ -1205,25 +1401,13 @@ same time.  The @cite{STREAMS} framework provides multi-threaded (MT) @cite{STRE
 which allows the developer control over the level of concurrency allowed in a module.  The DDI/DKI
 provides several advisory locks for protecting data.
 
-@node STREAMS in Operation
-@section @cite{STREAMS} in Operation
-@cindex @cite{STREAMS}, operation
-@cindex operation, @cite{STREAMS}
-
-@subsection Service Interfaces
-@subsection Manipulating Modules
-@subsection Protocol Portability
-@subsection Protocol Substitution
-@subsection Protocol Migration
-@subsection Module Reusability
-
 @node Reference
 @chapter Reference
 @cindex reference
 @menu
 * Files::			STREAMS Files
-* Drivers::			STREAMS Drivers
 * Modules::			STREAMS Modules
+* Drivers::			STREAMS Drivers
 * Terminal I/O::		STREAMS Terminal I/O
 * Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
@@ -1427,6 +1611,49 @@ is defined.
 
 @end table
 
+@node Modules
+@section Modules
+@cindex STREAMS, modules
+@cindex modules, STREAMS
+
+@menu
+* Stream Head Module ("sth")::
+* Connect Line Discipline Module ("connld")::
+* Pipe Module ("pipe")::
+* STREAMS Configuration Module ("sc")::
+@end menu
+
+@node Stream Head Module ("sth")
+@subsection Stream Head Module ("sth")
+@pgindex sth
+@cindex sth, module
+@cindex modules, sth
+@cindex Stream Head, module
+@cindex modules, Stream Head
+
+@node Connect Line Discipline Module ("connld")
+@subsection Connect Line Discipline Module ("connld")
+@pgindex connld
+@cindex connld, module
+@cindex modules, connld
+
+@node Pipe Module ("pipemod")
+@subsection Pipe Module ("pipemod")
+@pgindex pipemod
+@cindex pipemod, module
+@cindex modules, pipemod
+@cindex Pipe Module, module
+@cindex modules, Pipe Module
+
+@node STREAMS Configuration Module ("sc")
+@subsection STREAMS Configuration Module ("sc")
+@pgindex sc
+@cindex sc, module
+@cindex modules, sc
+@cindex STREAMS Configuration, module
+@cindex modules, STREAMS Configuration
+
+
 @node Drivers
 @section Drivers
 @cindex STREAMS, drivers
@@ -1507,49 +1734,6 @@ is defined.
 @cindex drivers, sad
 @cindex STREAMS Administrative Driver, driver
 @cindex drivers, STREAMS Administrative Driver
-
-
-@node Modules
-@section Modules
-@cindex STREAMS, modules
-@cindex modules, STREAMS
-
-@menu
-* Stream Head Module ("sth")::
-* Connect Line Discipline Module ("connld")::
-* Pipe Module ("pipe")::
-* STREAMS Configuration Module ("sc")::
-@end menu
-
-@node Stream Head Module ("sth")
-@subsection Stream Head Module ("sth")
-@pgindex sth
-@cindex sth, module
-@cindex modules, sth
-@cindex Stream Head, module
-@cindex modules, Stream Head
-
-@node Connect Line Discipline Module ("connld")
-@subsection Connect Line Discipline Module ("connld")
-@pgindex connld
-@cindex connld, module
-@cindex modules, connld
-
-@node Pipe Module ("pipemod")
-@subsection Pipe Module ("pipemod")
-@pgindex pipemod
-@cindex pipemod, module
-@cindex modules, pipemod
-@cindex Pipe Module, module
-@cindex modules, Pipe Module
-
-@node STREAMS Configuration Module ("sc")
-@subsection STREAMS Configuration Module ("sc")
-@pgindex sc
-@cindex sc, module
-@cindex modules, sc
-@cindex STREAMS Configuration, module
-@cindex modules, STREAMS Configuration
 
 
 @node Terminal I/O
@@ -1816,84 +2000,6 @@ Message block.
 @tpindex datab(9)
 Data block.
 
-@b{Normal Messages}
-
-@vtable @var
-@item M_DATA
-Normal data.
-@item M_PROTO
-Normal protocol information.
-@item M_BREAK
-Break request.
-@item M_PASSFP
-Passed file pointer.
-@item M_EVENT
-Normal event.
-@item M_SIG
-Signal.
-@item M_DELAY
-Delay request.
-@item M_CTL
-Normal inter-module control message.
-@item M_IOCTL
-Input-Output control.
-@item M_SETOPTS
-Normal set queue options.
-@item M_RSE
-Normal reserved.
-@item M_TRAIL
-@item M_BACKWASH
-@end vtable
-
-@b{Priority Messages}
-
-@vtable @var
-@item M_IOCACK
-Input-Output control acknowledgement (result).
-@item M_IOCNAK
-Input-Output control negative acknowledgement (error).
-@item M_PCPROTO
-Priority protocol information.
-@item M_PCSIG
-Priority signal.
-@item M_READ
-Read request.
-@item M_FLUSH
-Flush queue request.
-@item M_STOP
-Stop output request.
-@item M_START
-Start output request.
-@item M_HANGUP
-Hangup.
-@item M_ERROR
-Fatal error.
-@item M_COPYIN
-Input-Output control copyin request.
-@item M_COPYOUT
-Input-Output control copyout request.
-@item M_IOCDATA
-Input-Output control copied in data.
-@item M_PCRSE
-Priority reserved.
-@item M_STOPI
-Stop input request.
-@item M_STARTI
-Start input request.
-@item M_PCCTL
-Priority inter-module control message.
-@item M_PCSETOPTS
-Priority set queue options.
-@item M_PCEVENT
-Priority event.
-@item M_UNHANGUP
-Hangup corrected.
-@item M_NOTIFY
-@item M_HPDATA
-@item M_LETSPLAY
-@item M_DONTPLAY
-@item M_BACKDONE
-@end vtable
 @item mbinfo(9)
 @tpindex mbinfo(9)
 Message block information structure.
