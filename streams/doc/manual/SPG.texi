@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.20 2005/04/17 17:11:46 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.21 2005/04/18 06:24:30 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/17 17:11:46 $ by $Author: brian $
+% Last Modified $Date: 2005/04/18 06:24:30 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -164,6 +164,15 @@ another language, under the same conditions as for modified versions.
 
 @vskip 0pt
 @end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
 @page
 
 @c Define an index of authors.
@@ -177,6 +186,66 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @
 @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @end ifnottex
+
+@macro tabfig {image, number, caption}
+@iftex
+@float Table,Table \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end iftex
+@ifnottex
+@image{\image\} @anchor{Table \number\} @center @emph{Table \number\.@:  \caption\}
+@end ifnottex
+@end macro
+
+@macro tabref {number}
+@iftex
+@emph{@ref{Table \number\}}
+@end iftex
+@ifnottex
+@emph{@ref{Table \number\}}
+@end ifnottex
+@end macro
+
+@macro figure {image, number, caption}
+@iftex
+@cartouche
+@float Figure,Figure \number\
+@image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end iftex
+@ifnottex
+@image{\image\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end ifnottex
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@iftex
+@cartouche
+@float Figure,Figure \number\
+@image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end iftex
+@ifnottex
+@image{\image\,\size\} @anchor{Figure \number\} @center @emph{Figure \number\.@:  \caption\}
+@set fignum \number\
+@end ifnottex
+@end macro
+
+@macro figref {number}
+@iftex
+@emph{@ref{Figure \number\}}
+@end iftex
+@ifnottex
+@emph{@ref{Figure \number\}}
+@end ifnottex
+@end macro
 
 @menu
 * Acknowledgements::
@@ -214,14 +283,13 @@ Overview
 * Concepts::			STREAMS Concepts
 * Application Interface::	STREAMS Application Interface
 * Kernel Level Facilities::	STREAMS Kernel Facilities
+* Subsystems::			STREAMS Subsystems
 
 Reference
 
 * Files::			STREAMS Files
 * Modules::			STREAMS Modules
 * Drivers::			STREAMS Drivers
-* Terminal I/O::		STREAMS Terminal I/O
-* Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
 * Module Entry Points::		STREAMS Module Entry Points
 * Structures::			STREAMS Structures
@@ -347,8 +415,8 @@ compatible @cite{STREAMS} implementation for @b{Linux}
 
 @cite{STREAMS} is a facility first presented by Dennis M. Ritchie in 1984,@footnote{@cite{A Stream
 Input-Output System, AT&T Bell Laboratories Technical Journal 63, No. 8 Part 2 (October, 1984), pp.
-1897-1910.}} originally implemented on 4.1BSD and later part of @cite{Bell Laboratories Version
-Eight UNIX}, incorporated into
+1897-1910.}} originally implemented on 4.1BSD and later part of @cite{Bell Laboratories Eighth
+Edition UNIX}, incorporated into
 @cite{UNIX System V Release 3.0}
 @cpindex UNIX System V Release 3.0
 and enhanced in
@@ -358,91 +426,38 @@ and
 @cite{UNIX System V Release 4.2}.
 @cpindex UNIX System V Release 4.2
 @cite{STREAMS} was used in @cite{SVR4} for terminal input/ouput, pseudo-terminals, pipes, named
-pipes (FIFOs), interprocess communication and networking.
+pipes (FIFOs), interprocess communication and networking.  Since its release in @cite{System V
+Release 4}, @dfn{STREAMS} has been implemented across a wide range of @cite{UNIX}, @cite{UNIX}-like,
+and @cite{UNIX}-based systems, making its implementation and use an @i{ipso facto} standard.
 
 @cite{STREAMS} is a facility that allows for a reconfigurable full duplex communications path
-(stream) between a user process and a driver in the kernel.  Protocol modules can be pushed onto and
-popped from the stream between the user process and driver.  The user process, neighbouring protocol
-modules and the driver communicate with each other using a message passing scheme closely related to
-MOM (Message Oriented Middleware).  This permits a loose coupling between protocol modules, drivers
-and user processes, allowing a third-party and loadable kernel module approach to be taken towards
-the provisioning of protocol modules on platforms supporting @cite{STREAMS}.
+(stream) between a user process and a driver in the kernel.  Kernel protocol modules can be pushed
+onto and popped from the stream between the user process and driver.  The stream can be reconfigured
+in this way by a user process. The user process, neighbouring protocol modules and the driver
+communicate with each other using a message passing scheme closely related to MOM (Message Oriented
+Middleware).  This permits a loose coupling between protocol modules, drivers and user processes,
+allowing a third-party and loadable kernel module approach to be taken towards the provisioning of
+protocol modules on platforms supporting @cite{STREAMS}.
+
+On @cite{UNIX System V Relase 4.2}
+@cpindex UNIX System V Release 4.2
+@dfn{STREAMS} was used for terminal input-output, pipes, FIFOs (named pipes), and network
+communications.  Modern @cite{UNIX}, @cite{UNIX}-like and @cite{UNIX}-based systems providing
+@dfn{STREAMS} normally support some degree of network communications using @dfn{STREAMS}; however,
+many do not support @dfn{STREAMS}-based pipe and FIFOs@footnote{For example, AIX.} or terminal
+input-output.@footnote{For example, HP-UX}.
 
 @node Does Linux have STREAMS?
 @section Does Linux have STREAMS?
 @cindex Does Linux have STREAMS?
 
 No, not as part of the kernel.  That is rather peculiar, particularly since Linux normally follows
-SVR4 first and 4BSD second.
+SVR4 first and 4BSD second.  (Otherwise, it would just be another BSD.)
 
 A number of attempts were made to move the @cite{Linux STREAM (LiS)} project into the @b{Linux}
 kernel, however, each attempt crashed and burned in a shower of flames from BSD advocates on LKML.
 Arguments against appear to be based more on @dfn{Religious Denomination} rather than valid
 technical argument.  This is discussed more in the next section (@pxref{Why STREAMS?}).
-
-@subsection Intel Binary Compatibility Suite (iBCS)
-@cindex Intel Binary Compatibility Suite (iBCS)
-
-The @cite{Intel Binary Compatibility Suite} provides binary compatibiltiy on the @cite{Intel}
-architecture for systems comforming to @cite{SVR 4.2}.  @cite{RedHat} has released an @cite{iBCS}
-module for their distributions of @b{Linux} and the @b{Linux Kernel} for some time.
-
-@subsubsection OpenGroup Specifications
-@cindex OpenGroup Specifications
-
-OpenGroup and POSIX specifications have never directly addressed @dfn{STREAMS} implementation within
-the operating system.  I suppose that this is primarily because 4BSD based system have seldom
-included @dfn{STREAMS}.  Perhaps it was due to some religios upheaval from BSD advocates that did
-not want to see @dfn{STREAMS} become part of a standard.
-
-Nevertheless, the @dfn{STREAMS} subsystem has been an optional part of the
-@url{http://www.opengroup.org/, OpenGroup}
-specifications for some time.
-It is my opnion that the
-@url{http://www.opengroup.org/, OpenGroup}
-has missed a rich opportuninty for standardization of kernel level interfaces.
-
-@unnumberedsubsubsec UNIX 03 Compliance
-@cindex UNIX 03 compliance
-@cindex compliance, UNIX 03
-
-@dfn{UNIX 03} compliance to @cite{Open Group Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 5.2}).
-As the @dfn{iBCS} has proven, this does not require full @dfn{STREANS} support, however, it is an
-easier thing to accomplish with @dfn{STREAMS} support.  Even though the @cite{XNS 5.2} specification
-does not describe @dfn{STREAMS}, the @cite{SUSv3} does.  The @url{http://www.opengroup.org/,
-OpenGroup} has never defined the internals of the @dfn{STREAMS} facility in their @dfn{CAE}
-specifications; however, they are described and the user-space facilities and system calls are
-completely defined and described.
-
-@unnumberedsubsubsec UNIX 98 Compliance
-@cindex UNIX 98 compliance
-@cindex compliance, UNIX 98
-
-@dfn{UNIX 98} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 5}).
-As the @dfn{iBCS} has proven, this does not require full @dfn{STREANS} support, however, it is an
-easier thing to accomplish with @dfn{STREAMS} support.  Even though the @cite{XNS 5} specification
-does not describe @dfn{STREAMS}, the @cite{XSI 5} and @cite{SUSv2} does.  The
-@url{http://www.opengroup.org/, OpenGroup} has never defined the internals of the @dfn{STREAMS}
-facility in their @dfn{CAE} specifications; however, they are described and the user-space
-facilities and system calls are completely defined and described.
-
-@unnumberedsubsubsec UNIX 95 Compliance
-@cindex UNIX 95 compliance
-@cindex compliance, UNIX 95
-
-@dfn{UNIX 95} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 4.2}).
-As the @dfn{iBCS} has proven, this does not require full @dfn{STREANS} support, however, it is an
-easier thing to accomplish with @dfn{STREAMS} support.  Even though the @cite{XNS 4.2} specification
-does not describe @dfn{STREAMS}, the @cite{XSI 4.2} and @cite{SUS} does.  The
-@url{http://www.opengroup.org/, OpenGroup} has never defined the internals of the @dfn{STREAMS}
-facility in their @dfn{CAE} specifications; however, they are described and the user-space
-facilities and system calls are completely defined and described.
-
-@subsection Device Driver Interface (DDI)
-@cindex DDI
 
 @subsection Linux STREAMS (LiS)
 @cindex Linux STREAMS (LiS)
@@ -596,8 +611,8 @@ as streams, the question is somewhat academic.  They certainly have much lower b
 or messages.@footnote{@cite{UNIX Papers, for UNIX Developers and Power Users, (Waite, 1987) pp. 358-359}}
 @end quotation
 
-With @b{Linux Fast-STREAMS} it will be very possible to compare the performance of @dfn{STREAMS} in
-comparison to @dfn{Sockets}.  It will also be possible to compare the performance of traditional
+With @dfn{@value{PACKAGE_TITLE}} it will be very possible to compare the performance of @dfn{STREAMS}
+in comparison to @dfn{Sockets}.  It will also be possible to compare the performance of traditional
 @b{Linux} pipes and FIFOs with @dfn{STREAMS}-based pipes and FIFOs.
 
 @node Benefits of STREAMS
@@ -627,9 +642,12 @@ preceding sequence of messages.
 
 In general, any two modules can be connected anywhere in a Stream.  However, rational sequences are
 generally constructed by connecting modules with compatible protocol service interfaces.  For
-example, a module that implements an X.25 protocol layer, as shown in Figure 2-13, presents a
-protocol service interface at its input and output sides.  In this case, other modules should only
-be connected to the input and output side if they have the compatible X.25 service interface.
+example, a module that implements an X.25 protocol layer, as shown in
+@c @figref{13},
+Figure 13,
+presents a protocol service interface at its input and output sides.  In this case, other modules
+should only be connected to the input and output side if they have the compatible X.25 service
+interface.
 
 @subsubsection Manipulating Modules
 @cindex Manipulating Modules
@@ -650,9 +668,11 @@ protocols.
 
 @subsubsection Protocol Portability
 
-Figure 2-13 shows how the same X.25 protocol module can be used with different drivers on different
-machines by implementing compatible service interfaces.  The X.25 protocol module interfaces are
-Connection Oriented Network Service (CONS) and Link Access Protocol - Balanced (LAPB).
+@c @figref{13}
+Figure 13,
+shows how the same X.25 protocol module can be used with different drivers on different machines by
+implementing compatible service interfaces.  The X.25 protocol module interfaces are Connection
+Oriented Network Service (CONS) and Link Access Protocol - Balanced (LAPB).
 
 @subsubsection Protocol Substitution
 
@@ -661,10 +681,12 @@ implemented to an equivalent service interface.
 
 @subsubsection Protocol Migration
 
-Figure 2-14 illustrates how @cite{STREAMS} can move functions between kernel software and front end
-firmware.  A common downstream service interface allows the transport protocol module to be
-independent of the number or type of modules below.  The same transport module will connect without
-modification to either an X.25 module or X.25 driver that has the same service interface.
+@c @figref{14}
+Figure 14
+illustrates how @cite{STREAMS} can move functions between kernel software and front end firmware.  A
+common downstream service interface allows the transport protocol module to be independent of the
+number or type of modules below.  The same transport module will connect without modification to
+either an X.25 module or X.25 driver that has the same service interface.
 
 By shifting functions between software and firmware, you can produce cost-effective, functionally
 equivalent systems over a wide range of configurations.  They can rapidly incorporate technological
@@ -674,10 +696,12 @@ front-end is economically justified.
 
 @subsubsection Module Reusability
 
-Figure 2-15 shows the same canonical module (for example, one that provide delete and kill
-processing on character strings) reused in two different Streams.  This module would typically be
-implemented as a filter, with no downstream service interface.  In both cases, a tty interface is
-presented to the Stream's user process since the module is nearest the Stream head.
+@c @figref{15}
+Figure 15
+shows the same canonical module (for example, one that provide delete and kill processing on
+character strings) reused in two different Streams.  This module would typically be implemented as a
+filter, with no downstream service interface.  In both cases, a tty interface is presented to the
+Stream's user process since the module is nearest the Stream head.
 
 @node Criticism of STREAMS
 @subsection Criticism of STREAMS
@@ -892,7 +916,7 @@ Other reasons included:
 @item Mainline Adoption instead of Portability
 
 @cite{LiS} attempts to maintain portability across a number of operating systems.  The goals of
-portability and mainline adoption are usually at cross-purposes.  @dfn{Linux Fast-STREAMS} proposes
+portability and mainline adoption are usually at cross-purposes.  @dfn{@value{PACKAGE_TITLE}} proposes
 mainline adoption in contrast to portability.  Many @dfn{STREAMS} implementations are available for
 other operating systems.
 
@@ -901,19 +925,19 @@ other operating systems.
 @cite{LiS} attempts to always provide debugging facilities@footnote{In fact, these debugging
 facilities always point at the driver or module writer when a bug is encountered in LiS itself!} and
 does not trust the driver or module writer.  This leads to poor performance and in many cases the
-propagation of bugs to the field by failing to panic the kernel.  @dfn{Linux Fast-STREAMS} aims at a
+propagation of bugs to the field by failing to panic the kernel.  @dfn{@value{PACKAGE_TITLE}} aims at a
 production grade environment that implicitly trusts the driver or module while providing optional
 debugging facilities (both compile-time options as well as run-time options).
 
 @item SVR 4.2 MP Compatibility
 
-@cite{LiS} only provide @cite{SVR 4} uniprocessor capabilities.  @dfn{Linux Fast-STREAMS} provides
+@cite{LiS} only provide @cite{SVR 4} uniprocessor capabilities.  @dfn{@value{PACKAGE_TITLE}} provides
 @cite{SVR 4.2 MP} capabilities.
 
 @item Portability
 
 @cite{LiS} forces ported drivers and modules from other implementations to use the @cite{LiS} DDI
-and configuration mechanisms.  @dfn{Linux Fast-STREAMS} provides compatiblity functions for all
+and configuration mechanisms.  @dfn{@value{PACKAGE_TITLE}} provides compatiblity functions for all
 major implementations of @dfn{STREAMS} as well as providing a rich DDI based on @cite{SVR 4.2 MP},
 @cite{Solaris}, and other implementations.
 
@@ -926,7 +950,7 @@ major implementations of @dfn{STREAMS} as well as providing a rich DDI based on 
 @item Soft Real Time Performance
 
 @cite{LiS} avoids use of high-performance @b{Linux}-specific facilties because of its aims at
-portability.  @dfn{Linux Fast-STREAMS} being aimed at only @b{Linux} uses the highest-performance
+portability.  @dfn{@value{PACKAGE_TITLE}} being aimed at only @b{Linux} uses the highest-performance
 techniques available in the @b{Linux} kernel form implementation.  This includes kernel memory
 caches and other techniques.
 
@@ -1004,6 +1028,65 @@ Maximum compatibility moves close to providing a standard for such interfaces.
 
 @end enumerate
 
+@subsection Intel Binary Compatibility Suite (iBCS)
+@cindex Intel Binary Compatibility Suite (iBCS)
+
+The @cite{Intel Binary Compatibility Suite} provides binary compatibiltiy on the @cite{Intel}
+architecture for systems comforming to @cite{SVR 4.2}.  @cite{RedHat} has released an @cite{iBCS}
+module for their distributions of @b{Linux} and the @b{Linux Kernel} for some time.
+
+@subsubsection OpenGroup Specifications
+@cindex OpenGroup Specifications
+
+OpenGroup and POSIX specifications have never directly addressed @dfn{STREAMS} implementation within
+the operating system.  I suppose that this is primarily because 4BSD based system have seldom
+included @dfn{STREAMS}.  Perhaps it was due to some religios upheaval from BSD advocates that did
+not want to see @dfn{STREAMS} become part of a standard.
+
+Nevertheless, the @dfn{STREAMS} subsystem has been an optional part of the
+@url{http://www.opengroup.org/, OpenGroup} specifications for some time.  It is my opnion that the
+@url{http://www.opengroup.org/, OpenGroup} has missed a rich opportuninty for standardization of
+kernel level interfaces.
+
+@unnumberedsubsubsec UNIX 03 Compliance
+@cindex UNIX 03 compliance
+@cindex compliance, UNIX 03
+
+@dfn{UNIX 03} compliance to @cite{Open Group Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 5.2}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREANS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 5.2} specification does not describe @dfn{STREAMS}, the @cite{SUSv3} does.
+The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of the @dfn{STREAMS}
+facility in their @dfn{CAE} specifications; however, they are described and the user-space
+facilities and system calls are completely defined and described.
+
+@unnumberedsubsubsec UNIX 98 Compliance
+@cindex UNIX 98 compliance
+@cindex compliance, UNIX 98
+
+@dfn{UNIX 98} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 5}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREANS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 5} specification does not describe @dfn{STREAMS}, the @cite{XSI 5} and
+@cite{SUSv2} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals
+of the @dfn{STREAMS} facility in their @dfn{CAE} specifications; however, they are described and the
+user-space facilities and system calls are completely defined and described.
+
+@unnumberedsubsubsec UNIX 95 Compliance
+@cindex UNIX 95 compliance
+@cindex compliance, UNIX 95
+
+@dfn{UNIX 95} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
+provided.  (See @cite{XNS 4.2}).  As the @dfn{iBCS} has proven, this does not require full
+@dfn{STREANS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
+Even though the @cite{XNS 4.2} specification does not describe @dfn{STREAMS}, the @cite{XSI 4.2} and
+@cite{SUS} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of
+the @dfn{STREAMS} facility in their @dfn{CAE} specifications; however, they are described and the
+user-space facilities and system calls are completely defined and described.
+
+@subsection Device Driver Interface (DDI)
+@cindex DDI
+
 @node Overview
 @chapter Overview of @value{PACKAGE_TITLE}
 @cindex overview
@@ -1012,6 +1095,7 @@ Maximum compatibility moves close to providing a standard for such interfaces.
 * Concepts::			STREAMS Concepts
 * Application Interface::	STREAMS Application Interface
 * Kernel Level Facilities::	STREAMS Kernel Facilities
+* Subsystems::			STREAMS Subsystems
 @end menu
 
 This manual documents how to develop and port STREAMS drivers and modules for
@@ -1026,7 +1110,8 @@ This manual documents how to develop and port STREAMS drivers and modules for
 
 @item Stream
 A @dfn{Stream} is a full-duplex communications path between a User Process and a Kernel Level Device
-or Pseudo-Device Driver.
+or Pseudo-Device Driver.  A @dfn{Stream} is a group of @dfn{STTREAMS} message queue pairs in a chain
+from a kernel driver at the @dfn{Stream End} to a @dfn{Stream Head} at the user.
 
 @item Stream Head
 A @dfn{Stream Head} is the component in a @dfn{Stream} that is closest to the User Process.  The
@@ -1039,30 +1124,39 @@ A @dfn{Stream End} is the component in a @dfn{Stream} that is farthest from the 
 @item Module
 A @dfn{Module} is a protocol module that resides between the @dfn{Stream Head} and @dfn{Stream End}
 on a @dfn{Stream}.  Protocol @dfn{Modules} are optional and can be pushed or popped from a
-@dfn{Stream} using @command{ioctl} commands to the @dfn{Stream Head}.
+@dfn{Stream} using @command{ioctl} commands to the @dfn{Stream Head}.  A @dfn{Module} can refer to a
+linkable kernel component (kernel module), a @dfn{STREAMS} driver, module or mux (@dfn{STREAMS}
+module), or a pushable @dfn{STREAMS} module.
 
 @item Driver
 A @dfn{Driver} is a device or pseudo-device driver that sits at the @dfn{Stream End}.  @dfn{Drivers}
-are associated with device numbers and are opened by the User Process.
+are associated with device numbers and are opened by the User Process.  A @dfn{Driver} is a
+@dfn{STREAMS} module which sets at a @dfn{Stream End}, farthest from the user on a @dfn{Stream}.
 
 @item Messages
 A @dfn{Message} is a chain of data buffers used for passing data by reference between neighbouring
-@dfn{STREAMS} @dfn{Modules}, the @dfn{Stream Head} and the @dfn{Driver}.
+@dfn{STREAMS} @dfn{Modules}, the @dfn{Stream Head} and the @dfn{Driver}. A @dfn{Message} is a
+message containing data that is made up of a sequence of message blocks, data blocks and data.
 
 @item Queues
 Each @dfn{Stream Head}, @dfn{Stream End} and intervening @dfn{Module} consists of a pair of
 @dfn{Queues}: one downstream @dfn{Queue} for messages first written by the User Process, and one
-upstream @dfn{Queue} for messages ultimately read by the User Process.
+upstream @dfn{Queue} for messages ultimately read by the User Process.  A @dfn{Queue} is an ordered
+list of messages awaiting processing.  @dfn{STREAMS} modules form a full duplex connection by
+pairing queues as read and write queues.
 
 @item Stream I/O
 
 @item Multiplexing
 @dfn{Multiplexing} is a situation where multiple @dfn{Streams} can fan-in or fan-out from a
-@dfn{Module} or @dfn{Multiplexing Driver}.
+@dfn{Module} or @dfn{Multiplexing Driver}.  A @dfn{Multiplexing} driver or @dfn{mux} is a
+@dfn{STREAMS} module which has lower as well as upper queue pairs.
 
 @item Polling
 
 @item Flow Control
+A @dfn{Stream} is flow-controlled when it is congested and temporarily cannot pass messages in the
+band in which the stream is flow-controlled.
 
 @end table
 
@@ -1070,17 +1164,15 @@ upstream @dfn{Queue} for messages ultimately read by the User Process.
 @section Concepts
 @cindex concepts
 
-There are three types of @cite{STREAMS} entities: the stream head, modules and drivers.
-Stream heads are the kernel-space interface to the user process.  Modules are pushable streams
-protocol modules that are optionally placed between the user process (stream head) and the driver
-(stream end).  Drivers are device drivers or pseudo device drivers that can be opened using a
-character device special file.
+There are three types of @cite{STREAMS} entities: the stream head, modules and drivers.  Stream
+heads are the kernel-space interface to the user process.  Modules are pushable streams protocol
+modules that are optionally placed between the user process (stream head) and the driver (stream
+end).  Drivers are device drivers or pseudo device drivers that can be opened using a character
+device special file.
 
-A simple stream is illustrated in @cite{Figure 2-1}.
+A simple stream is illustrated in @figref{1}.
 
-@cartouche
-@image{SPG_fig01,4in} @center @b{Figure 2-1.  Simple Stream}
-@end cartouche
+@figuresized{SPG_fig01,1,Simple Stream,4in}
 
 In the simple stream, the @dfn{downstream} flow is the flow from the User Process to the Driver that
 passes through any optional intervening Modules; the @dfn{upstream} flow is the flow from the Driver
@@ -1089,17 +1181,13 @@ to the User Process, again through any intervening Modules.
 It is possible to have a stream that does not contain a module or driver.  There are two types of
 streams that do not contain a module or driver: a pipe and a fifo (named pipe).
 
-A @dfn{STREAMS}-based pipe is illustrated in @cite{Figure 2-2}.
+A @dfn{STREAMS}-based pipe is illustrated in @figref{2}.
 
-@cartouche
-@image{SPG_fig02,4in} @center @b{Figure 2-2.  @cite{STREAMS}-based Pipe}
-@end cartouche
+@figuresized{SPG_fig02,2,@cite{STREAMS}-based Pipe,4in}
 
-A @dfn{STREAMS}-based FIFO is illustrated in @cite{Figure 2-3}.
+A @dfn{STREAMS}-based FIFO is illustrated in @figref{3}.
 
-@cartouche
-@image{SPG_fig07,4in} @center @b{Figure 2-3.  @cite{STREAMS}-based FIFO (named pipe)}
-@end cartouche
+@figuresized{SPG_fig07,3,@cite{STREAMS}-based FIFO (named pipe),4in}
 
 Each @cite{STREAMS} driver or module has a number of constituent pieces.  Each @cite{STREAMS} driver
 or module contains a stream table, stream adminstration, module information, module statistics and
@@ -1113,13 +1201,9 @@ associated with the queue.
 Each @cite{STREAMS} queue and queue band can contain @cite{STREAMS} messages.  @cite{STREAMS}
 messages are composed of message blocks, data blocks and data buffers in a chain-buffer arrangement.
 
-@cartouche
-@image{SPG_fig03,4in} @center @b{Figure 2-4.  Stream to Communications Driver}
-@end cartouche
+@figuresized{SPG_fig03,4,Stream to Communications Driver,4in}
 
-@cartouche
-@image{SPG_fig04,0.5in} @center @b{Figure 2-5.  Queue Pair Allocation}
-@end cartouche
+@figuresized{SPG_fig04,5,Queue Pair Allocation,0.5in}
 
 @menu
 * Driver Switch Table::
@@ -1255,10 +1339,10 @@ buffer.  Message block can be chained together to form larger segmented messages
 
 Data blocks are a description of a data buffer external to the buffer itself.  Each data block
 describes the limits of the data buffer, its base, and size.  Each data block also hold a number of
-flags and contains a data block type describing the type of data contained in the data buffer.
-Data blocks also contain any necessary information concerning the functions and arguments necessary
-to free the data buffer.  Also, data blocks maintain reference counts of the number of message
-blocks that reference the data buffer.
+flags and contains a data block type describing the type of data contained in the data buffer.  Data
+blocks also contain any necessary information concerning the functions and arguments necessary to
+free the data buffer.  Also, data blocks maintain reference counts of the number of message blocks
+that reference the data buffer.
 
 @subsubsection Data Block Types
 @cindex Data Block Types
@@ -1296,94 +1380,135 @@ function or can be allocated externally and associated with a data and message b
 
 @subsection Messages
 
-@cartouche
-@image{SPG_fig05,5in} @center @b{Figure 2-6.  A Message}
-@end cartouche
+@figuresized{SPG_fig05,6,A Message,5in}
 
-@cartouche
-@image{SPG_fig06,5in} @center @b{Figure 2-7.  Messages on a Message Queue}
-@end cartouche
+@figuresized{SPG_fig06,7,Messages on a Message Queue,5in}
 
 @subsubsection Message Types
 
-@b{Normal Messages}
+@subsubheading Normal Messages
 
-@vtable @var
+@multitable @columnfractions .20 .80
 @item M_DATA
-Normal data.
+@vindex M_DATA
+@tab -- Normal data.
 @item M_PROTO
-Normal protocol information.
+@vindex M_PROTO
+@tab -- Normal protocol information.
 @item M_BREAK
-Break request.
+@vindex M_BREAK
+@tab -- Break request.
 @item M_PASSFP
-Passed file pointer.
+@vindex M_PASSFP
+@tab -- Passed file pointer.
 @item M_EVENT
-Normal event.
+@vindex M_EVENT
+@tab -- Normal event.
 @item M_SIG
-Signal.
+@vindex M_SIG
+@tab -- Signal.
 @item M_DELAY
-Delay request.
+@vindex M_DELAY
+@tab -- Delay request.
 @item M_CTL
-Normal inter-module control message.
+@vindex M_CTL
+@tab -- Normal inter-module control message.
 @item M_IOCTL
-Input-Output control.
+@vindex M_IOCTL
+@tab -- Input-Output control.
 @item M_SETOPTS
-Normal set queue options.
+@vindex M_SETOPTS
+@tab -- Normal set queue options.
 @item M_RSE
-Normal reserved.
+@vindex M_RSE
+@tab -- Normal reserved.
 @item M_TRAIL
+@vindex M_TRAIL
+@tab --
 @item M_BACKWASH
-@end vtable
+@vindex M_BACKWASH
+@tab --
+@end multitable
 
-@b{Priority Messages}
+@subsubheading Priority Messages
 
-@vtable @var
+@multitable @columnfractions .20 .80
 @item M_IOCACK
-Input-Output control acknowledgement (result).
+@vindex M_IOCACK
+@tab -- Input-Output control acknowledgement (result).
 @item M_IOCNAK
-Input-Output control negative acknowledgement (error).
+@vindex M_IOCNAK
+@tab -- Input-Output control negative acknowledgement (error).
 @item M_PCPROTO
-Priority protocol information.
+@vindex M_PCPROTO
+@tab -- Priority protocol information.
 @item M_PCSIG
-Priority signal.
+@vindex M_PCSIG
+@tab -- Priority signal.
 @item M_READ
-Read request.
+@vindex M_READ
+@tab -- Read request.
 @item M_FLUSH
-Flush queue request.
+@vindex M_FLUSH
+@tab -- Flush queue request.
 @item M_STOP
-Stop output request.
+@vindex M_STOP
+@tab -- Stop output request.
 @item M_START
-Start output request.
+@vindex M_START
+@tab -- Start output request.
 @item M_HANGUP
-Hangup.
+@vindex M_HANGUP
+@tab -- Hangup.
 @item M_ERROR
-Fatal error.
+@vindex M_ERROR
+@tab -- Fatal error.
 @item M_COPYIN
-Input-Output control copyin request.
+@vindex M_COPYIN
+@tab -- Input-Output control copyin request.
 @item M_COPYOUT
-Input-Output control copyout request.
+@vindex M_COPYOUT
+@tab -- Input-Output control copyout request.
 @item M_IOCDATA
-Input-Output control copied in data.
+@vindex M_IOCDATA
+@tab -- Input-Output control copied in data.
 @item M_PCRSE
-Priority reserved.
+@vindex M_PCRSE
+@tab -- Priority reserved.
 @item M_STOPI
-Stop input request.
+@vindex M_STOPI
+@tab -- Stop input request.
 @item M_STARTI
-Start input request.
+@vindex M_STARTI
+@tab -- Start input request.
 @item M_PCCTL
-Priority inter-module control message.
+@vindex M_PCCTL
+@tab -- Priority inter-module control message.
 @item M_PCSETOPTS
-Priority set queue options.
+@vindex M_PCSETOPTS
+@tab -- Priority set queue options.
 @item M_PCEVENT
-Priority event.
+@vindex M_PCEVENT
+@tab -- Priority event.
 @item M_UNHANGUP
-Hangup corrected.
+@vindex M_UNHANGUP
+@tab -- Hangup corrected.
 @item M_NOTIFY
+@vindex M_NOTIFY
+@tab --
 @item M_HPDATA
+@vindex M_HPDATA
+@tab --
 @item M_LETSPLAY
+@vindex M_LETSPLAY
+@tab --
 @item M_DONTPLAY
+@vindex M_DONTPLAY
+@tab --
 @item M_BACKDONE
-@end vtable
+@vindex M_BACKDONE
+@tab --
+@end multitable
 
 @subsection Message Queueing Priority
 
@@ -1393,13 +1518,174 @@ Hangup corrected.
 
 @subsection Multithreading
 
-The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric shared-memory
-multiprocessor computers.  All parts of the kernel, including @cite{STREAMS} modules and drivers,
-must ensure data integrity in a multiprocessing environment.  For the most part, developers must
-ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
-same time.  The @cite{STREAMS} framework provides multi-threaded (MT) @cite{STREAMS} perimeters,
-which allows the developer control over the level of concurrency allowed in a module.  The DDI/DKI
-provides several advisory locks for protecting data.
+@node Subsystems
+@section Subsystems
+@cindex subsystems, STREAMS
+@cindex STREAMS, subsystems
+
+@menu
+* Logging::			STREAMS Logging
+* Administration::		STREAMS Administration
+* Terminal I/O::		STREAMS Terminal I/O
+* Pipes::			STREAMS Pipes
+* FIFOs::			STREAMS FIFOs
+* Networking::			STREAMS Networking
+@end menu
+
+@node Logging
+@subsection Logging
+@cindex logging, STREAMS
+@cindex STREAMS, logging
+
+The kernel logger and system logger on a @b{Linux} system is the native logging implementation.
+These are BSD-style loggers. @dfn{@value{PACKAGE_TITLE}} provides a @dfn{STREAMS}-based logger as
+well.  The advantage of a @dfn{STREAMS}-based logger is for trace and error logging @dfn{STREAMS}
+drivers and modules using the @command{strlog} facility.  This facility includes a device driver
+(the @dfn{STREAMS} log device, @command{log}(4)), a kernel function (@command{strlog}(9)), and two
+user space daemon processes (@command{strace}(8)
+@pgindex strace(8)
+and @command{strerr}(8)).
+@pgindex strerr(8)
+The @dfn{STREAMS} logger has the unique capability that it can filter trace messages and only incur
+the cost of tracing and logging those messages that are filtered out (at the kernel level).  This
+allows a large degree of trace logging to be available, yet, only a small proportion of the
+available trace messages generated to logs.
+
+The @dfn{STREAMS} logger @command{log}(4), @command{strlog}(9) command, and @command{strace}(8)
+@pgindex strace(8)
+and @command{strerr}(8)
+@pgindex strerr(8)
+loggers are all available in the base @code{@value{PACKAGE}-@value{VERSION}} package.@footnote{I
+have been considering removing these facilities into a common @code{strutil-0.7a.1} package that
+could work with @cite{LiS} as well, perhaps.}
+
+@node Administration
+@subsection Administration
+@cindex administration, STREAMS
+@cindex STREAMS, administration
+
+@dfn{@value{PACKAGE_TITLE}} provides a @dfn{STREAMS} administration faciltiy.  This facility
+consists of a driver (the @dfn{STREAMS Administrative Driver}, @command{sad}(4)), several autopush
+kernel functions (@command{autopush_add}(9), @command{autopush_del}(9), @command{autopush_find}(9),
+@command{autopush_vml}(9)), and the @command{autopush}(8),
+@pgindex autopush(8)
+@command{insf}(8),
+@pgindex insf(8)
+@command{strload}(8),
+@pgindex strload(8)
+@command{strsetup}(8),
+@pgindex strsetup(8)
+@command{strinfo}(8),
+@pgindex strinfo(8)
+@command{scls}(8)
+@pgindex scls(8)
+and other administrative commands.
+
+@node Terminal I/O
+@subsection Terminal I/O
+@cindex terminal i/o, STREAMS
+@cindex STREAMS, terminal i/o
+
+By default, terminal I/O in a @b{Linux} system does not use @cite{STREAMS}.  It, in fact, uses a
+@cite{STREAMS} @samp{pty} emulation.  However, this is only an emulation and does not provide all
+@cite{STREAMS} facilities.  It is not possible, for example, on a @b{Linux} @samp{pty} to push or
+pop modules from a terminal.  The @b{Linux} @samp{pty} only provides emulation for read/write and
+ioctl calls.
+
+A separate auxiliary package for @dfn{@value{PACKAGE_TITLE}} that provides true @cite{STREAMS}-based
+@cite{UNIX'98} compliant pseudo terminals is available.  This is the @code{strpty-0.7a.1} package
+also available from @url{http://www.openss7.org/, The OpenSS7 Project}.@footnote{Actually, this
+package is not yet avilable.  I will work on it someday when it is necessary.}
+
+There are three user commands available in the @dfn{@value{PACKAGE_TITLE}} package that are useful
+for terminal input-output: these are the
+@command{strchg(1)}
+@pgindex strchg(1)
+@command{strconf(1)}
+@pgindex strconf(1)
+and
+@command{strreset(1)}
+@pgindex strreset(1)
+user commands.
+
+@node Pipes
+@subsection Pipes
+@cindex pipes, STREAMS
+@cindex STREAMS, pipes
+
+@dfn{@value{PACKAGE_TITLE}} supports @cite{STREMS}-based pipes as an optional feature.
+@cite{STREAMS}-based pipes operate as described in the @cite{UNIX SVR4.2 Operating System API
+Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
+
+By default, pipes created on @b{Linux} by the
+@iftex
+@b{pipe}(2)
+@end iftex
+@ifnottex
+@inforef{pipe(2), , *manpages*}
+@end ifnottex
+system call are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based pipes, configure @dfn{Linux
+Fast-STREAMS} with configuration parameter @code{--enable-streams-fifos}.
+
+@dfn{@value{PACKAGE_TITLE}} also provides a character device based pipe facility using the
+@iftex
+@b{spx}(4)
+@end iftex
+@ifnottex
+@inforef{spx(4), , *manpages*}
+@end ifnottex
+driver.
+@footnote{I am considering taking pipes and FIFOs out of the base
+@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
+package.}
+
+@node FIFOs
+@subsection FIFOs
+@cindex FIFOs, STREAMS
+@cindex STREAMS, FIFOs
+
+@dfn{@value{PACKAGE_TITLE}} supports @cite{STREAMS}-based FIFOs (named pipes) as an optional feature.
+@cite{STREAMS}-based FIFOs operate as described in the @cite{UNIX SVR4.2 Operating System API
+Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
+
+By default, FIFOs created on @b{Linux} with the
+@iftex
+@b{mknod}(8)
+@end iftex
+@ifnottex
+@inforef{mknod(8), , *manpages*}
+@end ifnottex
+@pgindex mknod(8)
+utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs, configure @dfn{Linux
+Fast-STREAMS} with configuration parameter @code{--enable-streams-fifos}.
+@footnote{I am considering taking pipes and FIFOs out of the base
+@code{@value{PACKAGE}-@value{VERSION}} package an placing them in their own @code{strpipe-0.7a.1}
+package.}
+
+@node Networking
+@subsection Networking
+@cindex networking, STREAMS
+@cindex STREAMS, networking
+
+By default, networking in a @b{Linux} system does not use @cite{STREAMS}.  It uses the native Linux
+@dfn{BSD Sockets} approach.  Some @b{GNU/Linux} distributions do provide an @cite{iBCS (Intel Binary
+Compatibility Suite)}
+@cindex iBCS
+@cindex Intel Binary Compatibility Suite
+that provides XTI/TLI networking, however, this is only a @dfn{STREAMS} emulation and cannot push or
+pop protocol modules from a stream.  Also, @b{Linux} @cite{iBCS} only provides emulation for
+read/write and ioctl calls.
+
+A separate auxiliary package for @dfn{@value{PACKAGE_TITLE}} that provides a true
+@cite{STREAMS}-based @cite{UNIX'98} compliant XTI/TLI library is available.  This is the
+@code{strxnet-0.9.2.5} package
+also available from @url{http://www.openss7.org/, The OpenSS7 Project}.
+
+To be able to open INET streams also requires the @code{strinet-0.9.2.1} package
+also available from @url{http://www.openss7.org/, The OpenSS7 Project}.  This package provides
+@dfn{STREAMS}-based networking by providing a specialized @dfn{STREAMS} driver that internally opens
+a @b{Linux} native @dfn{BSD Socket} and translates @dfn{STREAMS} messages to and from the internal
+@dfn{Socket}.
 
 @node Reference
 @chapter Reference
@@ -1408,8 +1694,6 @@ provides several advisory locks for protecting data.
 * Files::			STREAMS Files
 * Modules::			STREAMS Modules
 * Drivers::			STREAMS Drivers
-* Terminal I/O::		STREAMS Terminal I/O
-* Pipes::			STREAMS Pipes
 * System Calls::		STREAMS System Calls
 * Module Entry Points::		STREAMS Module Entry Points
 * Structures::			STREAMS Structures
@@ -1521,7 +1805,7 @@ User include file for the @cite{STREAMS Administrative Driver}.
 
 @item sys/ddi.h
 @pgindex sys/ddi.h
-DDI/DKI function declarations and defines for @dfn{Linux Fast-STREAMS}.  Extension definitions will
+DDI/DKI function declarations and defines for @dfn{@value{PACKAGE_TITLE}}.  Extension definitions will
 be included when one or more of
 @var{_LFS_SOURCE},
 @vindex _LFS_SOURCE
@@ -1735,61 +2019,6 @@ is defined.
 @cindex STREAMS Administrative Driver, driver
 @cindex drivers, STREAMS Administrative Driver
 
-
-@node Terminal I/O
-@section Terminal I/O
-@cindex terminal i/o
-
-By default, terminal I/O in a @b{Linux} system does not use @cite{STREAMS}.  It, in fact, uses a
-@cite{STREAMS} @samp{pty} emulation.  However, this is only an emulation and does not provide all
-@cite{STREAMS} facilities.  It is not possible, for example, on a @b{Linux} @samp{pty} to push or
-pop modules from a terminal.  The @b{Linux} @samp{pty} only provides emulation for read/write and
-ioctl calls.
-
-A separate auxiliary package for @dfn{@value{PACKAGE_TITLE}} that provides true @cite{STREAMS}-based
-@cite{UNIX'98} compliant pseudo terminals is available.  This is the @code{strtty-0.7a.1} package
-available from @url{http://www.openss7.org/, The OpenSS7 Project}.
-
-@node Pipes
-@section Pipes
-@cindex pipes
-
-@dfn{@value{PACKAGE_TITLE}} supports @cite{STREMS}-based pipes as an optional feature.
-@cite{STREAMS}-based pipes operate as described in the @cite{UNIX SVR4.2 Operating System API
-Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
-
-By default, pipes created on @b{Linux} by the
-@iftex
-@b{pipe}(2)
-@end iftex
-@ifnottex
-@inforef{pipe(2), , *manpages*}
-@end ifnottex
-system call are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based pipes, configure @b{Linux
-Fast-STREAMS} with configuration parameter @code{--enable-streams-fifos}.
-
-@dfn{@value{PACKAGE_TITLE}} also provides a character device based pipe facility using the
-@iftex
-@b{spx}(4)
-@end iftex
-@ifnottex
-@inforef{spx(4), , *manpages*}
-@end ifnottex
-driver.
-
-@dfn{@value{PACKAGE_TITLE}} supports @cite{STREAMS}-based FIFOs (named pipes) as an optional feature.
-@cite{STREAMS}-based FIFOs operate as described in the @cite{UNIX SVR4.2 Operating System API
-Reference} and the @cite{UNIX System V Release 4 Programmer's Guide: STREAMS}.
-
-By default, FIFOs created on @b{Linux} with the
-@iftex
-@b{mknod}(8)
-@end iftex
-@ifnottex
-@inforef{mknod(8), , *manpages*}
-@end ifnottex
-utility are not @cite{STREAMS}-based.  To get @cite{STREAMS}-based FIFOs, configure @b{Linux
-Fast-STREAMS} with configuration parameter @code{--enable-streams-fifos}.
 
 @node System Calls
 @section System Calls
@@ -3660,6 +3889,7 @@ interface, or using
 @ifnottex
 @inforef{sysctl(8), , *manpages*}.
 @end ifnottex
+@pgindex sysctl(8)
 
 The following STREAMS specific system controls are provided by @dfn{@value{PACKAGE_TITLE}}:
 
@@ -3999,22 +4229,22 @@ and number and are useful in boot scripts:
 
 @multitable @columnfractions .15 .85
 @item @dfn{@b{autopush}(8)}
-@findex autopush(8)
+@pgindex autopush(8)
 @tab -- verify modules and establish autopush lists
 @item @dfn{@b{insf}(8)}
-@findex insf(8)
+@pgindex insf(8)
 @tab -- install special device files
 @item @dfn{@b{scls}(8)}
-@findex scls(8)
+@pgindex scls(8)
 @tab -- list @dfn{STREAMS} drivers
 @item @dfn{@b{strinfo}(8)}
-@findex strinfo(8)
+@pgindex strinfo(8)
 @tab -- provide information on @dfn{STREAMS} drivers and modules
 @item @dfn{@b{strload}(8)}
-@findex strload(8)
+@pgindex strload(8)
 @tab -- load or unload @dfn{STREAMS} drviers and modules
 @item @dfn{@b{strsetup}(8)}
-@findex strsetup(8)
+@pgindex strsetup(8)
 @tab -- create @dfn{STREAMS} devices
 @end multitable
 
@@ -4138,12 +4368,14 @@ system.  The @b{specfs}(5) file system can be mounted to provide an in-kernel de
 similar to the @b{Linux} @file{devfs} file system and the @dfn{Solaris} devices file system.  The
 @b{spefs}(5) file system should normally be mounted on the @file{/dev/streams} subdirectory by
 system initialization scripts using a command such as: @command{mount -t specfs none /dev/streams}.
-See @b{mount}(8) for more information.  Once mounted over the @file{/dev/streams} subdirectory,
-subdirectories of @file{/dev/streams} corresponding to each loaded driver will appear.  So, for
-example, when the @b{inet}(4) driver is loaded, the ``inet'' subdirectory will appear at
-@file{/dev/streams/inet}.  Within each device subdirectory @file{/dev/streams/@i{devicename}/}, each
-instance of the device will appear as a character device named with the instance number of the
-device and having the eternal (real) major and external (real) minor device number.
+See @b{mount}(8)
+@pgindex mount(8)
+for more information.  Once mounted over the @file{/dev/streams} subdirectory, subdirectories of
+@file{/dev/streams} corresponding to each loaded driver will appear.  So, for example, when the
+@b{inet}(4) driver is loaded, the ``inet'' subdirectory will appear at @file{/dev/streams/inet}.
+Within each device subdirectory @file{/dev/streams/@i{devicename}/}, each instance of the device
+will appear as a character device named with the instance number of the device and having the
+eternal (real) major and external (real) minor device number.
 
 The mounted @b{specfs}(5) file system also has the characteristic that if a device subdirectory
 @file{/dev/streams/@i{devname}/} does not exist, but an attempt is made to read such a directory,
@@ -4185,15 +4417,245 @@ device name and instance number without concern for major device numbers.
 @cindex multi-threading
 @menu
 * Configuration::		MP STREAMS Configuration
-* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
 * Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
 * Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
+* Synchronous Callouts::	MP STREAMS Synchronous Callouts
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Asynchronous Callouts::	MP STREAMS Asynchronous Callouts
 @end menu
+
+The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric shared-memory
+multiprocessor computers.  All parts of the kernel, including @cite{STREAMS} modules and drivers,
+must ensure data integrity in a multiprocessing environment.  For the most part, developers must
+ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
+same time.  The @cite{STREAMS} framework provides multiprocessing @dfn{Syncrhonization Levels},
+which allows the developer control over the level of concurrency allowed in a module.  The @cite{SVR
+4.2 MP DDI/DKI} also provides locking mechanisms for protecting data.
+
+There are two types of entry points, callbacks and callouts in the @dfn{@value{PACKAGE_TITLE}}
+subsystem:
+
+@enumerate
+
+@item @emph{Synchronous.}
+These entry points, callbacks and callouts are referenced against a @dfn{STREAMS} queue structure.
+That is, they were invoked using a @dfn{STREAMS} queue structure as an argument.  These procedures
+are as follows:
+
+@multitable @columnfractions .20 .80
+@item put(9)
+@tab --
+@item srv(9)
+@tab --
+@item qopen(9)
+@tab --
+@item qclose(9)
+@tab --
+@item qbufcall(9)
+@tab --
+@item qtimeout(9)
+@tab --
+@item mi_bufcall(9)
+@tab --
+@item putq(9)
+@tab --
+@item putbq(9)
+@tab --
+@item putnext(9)
+@tab --
+@item qreply(9)
+@tab --
+@end multitable
+
+@item @emph{Asynchronous.}
+These entry points, callbacks and callouts are @emph{not} referenced against a @dfn{STREAMS} queue
+structure.  That is, they were invoked without a specific @dfn{STREAMS} queue structure as an
+argument.  These procedures are as follows:
+
+@multitable @columnfractions .20 .80
+@item bufcall(9)
+@tab --
+@item esbbufcall(9)
+@tab --
+@item timeout(9)
+@tab --
+@item esballoc(9)
+@tab -- (free routine)
+@end multitable
+
+@end enumerate
 
 @node Configuration
 @section Configuration
-@cindex conformance
+@cindex configuration
+
+@cite{SVR 4.2 MP} specifies a sycnrhonization mechanism that can be used during configuration of a
+@dfn{STREAMS} driver or module to specify the level of synchronization required by a module.  The
+@cite{SVR 4} synchronization levels are as follows:
+
+@multitable @columnfractions .30 .70
+@item @var{SQLVL_DEFAULT}
+@vindex SQLVL_DEFAULT
+@cindex synchronization, default
+@tab @emph{Default level synchronization.}
+Specifies that the module uses the default synchronization scheme.  This is the same as specifying
+@var{SQLVL_MODULE}.
+@vindex SQLVL_MODULE
+@item @var{SQLVL_GLOBAL}
+@vindex SQLVL_GLOBAL
+@cindex synchronization, global
+@tab @emph{Global (@dfn{STREAMS} scheduler) level synchronization.}
+Specifies that all of @dfn{STREAMS} can be access by only one thread at the same time.  The module
+is run with global synchronization.  This means that only one @dfn{STREAMS} executive thread will be
+permitted to enter any module.  This makes the entire @dfn{STREAMS} executive single threaded and is
+useful primarily for debugging.  This is the same as "Uniprocessor Emulation" on some systems, and
+reduces the @dfn{STREAMS} executive to running on a single processor at a time.  This option should
+normally be used only for debugging.
+@item @var{SQLVL_ELSEWHERE}
+@vindex SQLVL_ELSEWHERE
+@cindex synchronization, elsewhere
+@tab @emph{Module group level synchronization.}
+Specifies that the module is run with synchronization within a group of modules.  Only one thread of
+execution will be within the group of modules at a time.  The group is separately specified as a
+character string name.  This permits a group of modules to run single threaded as thorugh they are
+running on a single processor, without interfering with the concurrency of other modules outside the
+group.  This can be important for testing and for modules that implicitly share unprotected data
+structures.
+@item @var{SQLVL_MODULE}
+@vindex SQLVL_MODULE
+@cindex synchronization, module
+@tab @emph{Module level synchronization.}
+Specifies that all instances of a module can be accessed by only one thread at the same time.  This
+is the default value.
+The module is run with synchronization at the module.  Only one thread of execution will be
+permitted within the module.  Where the module does not share data structures between modules, this
+has a similar effect on running on a uniprocessor system.  This is the default and works best for
+non-multiprocessor-safe modules written in accordance with @dfn{STREAMS} guidelines.
+This level is roughly equivalent to @cite{Solaris} @var{D_MTPERMOD}
+@vindex D_MTPERMOD
+perimeters.
+@item @var{SQLVL_QUEUEPAIR}
+@vindex SQLVL_QUEUEPAIR
+@cindex synchronization, queue pair
+@tab @emph{Queue pair level synchronization.}
+Specifies that each queue pair can be accessed by only one thread at the same time.  Only one thread
+will be permitted to enter a given queue's procedures within a given queue pair.  Where the read and
+write side of the queue pair share the same private structure (@samp{q->q_ptr}), this provides
+multiprocessor protection of the common data structure to all synchronous entry points without an
+external lock.
+This level is roughly equivalent to @cite{Solaris} @var{D_MTAPAIR}
+@vindex D_MTAPAIR
+perimeters.
+@item @var{SQLVL_QUEUE}
+@vindex SQLVL_QUEUE
+@cindex synchronization, queue
+@tab @emph{Queue level synchronization.}
+Specifies that each queue can be accessed by only one thread at the same time.  The module is run
+with synchronization at the queue.  Only one thread of execution will be permitted to enter a given
+queue's procedures, however, another thread will be permitted to enter procedures of the other queue
+in the queue pair.  This is useful when the read and write side of a module are largely independent
+and do not require syncrhonization between sides of the queue pair.
+This level is roughly equivalent to @cite{Solaris} @var{D_MTPERQ}
+@vindex D_MTPERQ
+perimeters.
+@item @var{SQLVL_NOP}
+@vindex SQLVL_NOP
+@cindex synchronization, none
+@tab @emph{No synchronization.}
+Specifies that each queue can be accessed by more than one thread at a the same time.  The
+protection of internal data and of @b{put}(9) and @b{srv}(9) procedures against @b{timeout}(9) or
+@b{bufcall}(9) is done by the module or driver itself.  This synchronization level should be used
+essentially for multiprocessor-efficient modules.
+This level is roughly equivalent to @cite{Solaris} @var{D_MP}
+@vindex D_MP
+flag.
+@end multitable
+
+@node Synchronous Entry Points
+@section Synchronous Entry Points
+@cindex synchronous entry points
+
+@dfn{Synchronous Entry Points} are those entry points into the @dfn{STREAMS} driver or module that
+will be synchronized according to the specified synchronization level.
+
+@ftable @command
+@item put(9)
+@emph{Queue put procedure.}
+If the module has any synchronization level other than @var{SQLVL_NOP},
+@vindex SQLVL_NOP
+the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
+running within the synchronization level will result in the call being postponed until the thread
+currently in the synchronization level exits.
+@item srv(9)
+If the module has any synchronization level other than @var{SQLVL_NOP},
+@emph{Queue service procedure.}
+the service procedure will be exclusive.  Attempts to enter the service procedure while another
+thread is running within the synchronization level will result in the service procedure being
+postponed until the thread currently in the synchronization level exits.
+@item qopen(9)
+@emph{Queue open procedure.}
+The queue open procedure is synchronous and exclusive before the call to @command{qprocson}(9), or
+in any event, until return from the procedure.  If the module has synchronization level of global,
+elsewhere or per-module; the call to the qopen procedure is exclusive.
+@item qclose(9)
+@emph{Queue close procedure.}
+The queue close procedure is synchronous and exclusive after the call to @command{qprocsoff}(9), or
+in any event, after return from the procedure.  If the module has synchronization level of global,
+elsewhere or per-module; the call to the qclose procedure is exclusive.
+@item qprocson(9)
+@emph{Queue procedures on.}
+@item qprocsoff(9)
+@emph{Queue procedures off.}
+@item freezestr(9)
+@emph{Freeze stream.}
+@item unfreezestr(9)
+@emph{Thaw stream.}
+@item qwriter(9)
+@emph{Queue writer.}
+@end ftable
+
+@node Synchronous Callbacks
+@section Synchronous Callbacks
+@cindex synchronous callbacks
+
+@dfn{Synchronous Callbacks} are those callbacks into the @dfn{STREAMS} driver or module that
+will be synchronized according to the specified synchronization level.  Synchronous callbacks are an
+extension to the @cite{UNIX System V Release 4.2} specifications of @dfn{STREAMS}.  Syncrhonous
+callback extensions include @cite{Solaris} extensions and @cite{AIX} extensions.
+
+These include:
+
+@multitable @columnfractions .20 .80
+@item @command{qbufcall(9)}
+@findex qbufcall(9)
+@tab -- queue referenced buffer call
+@item @command{qtimeout(9)}
+@findex qtimeout(9)
+@tab -- queue referenced timeout
+@item @command{qunbufcall(9)}
+@findex qunbufcall(9)
+@tab -- queue referenced buffer call cancel
+@item @command{quntimeout(9)}
+@findex quntimeout(9)
+@tab -- queue referenced timeout cancel
+@item @command{mi_bufcall(9)}
+@findex mi_bufcall(9)
+@tab -- queue reference buffer call
+@end multitable
+
+@node Synchronous Callouts
+@section Synchronous Callouts
+@cindex synchronous callouts
+
+@multitable @columnfractions .20 .80
+@item @command{putnext(9)}
+@findex putnext(9)
+@tab --
+@item @command{qreply(9)}
+@findex qreply(9)
+@tab --
+@end multitable
 
 @node Asynchronous Entry Points
 @section Asynchronous Entry Points
@@ -4203,13 +4665,13 @@ device name and instance number without concern for major device numbers.
 @section Asynchronous Callbacks
 @cindex asynchronous callbacks
 
-@node Synchronous Entry Points
-@section Synchronous Entry Points
-@cindex synchronous entry points
+@dfn{Asynchronous Callbacks} are those callbacks into the @dfn{STREAMS} driver or module that will
+@emph{not} be synchronized according to the specified synchronization level.  Asynchronous callbacks
+are the basic @cite{UNIX System V Release 4.2} callbacks.
 
-@node Synchronous Callbacks
-@section Synchronous Callbacks
-@cindex synchronous callbacks
+@node Asynchronous Callouts
+@section Asynchronous Callouts
+@cindex asynchronous callouts
 
 @node Conformance
 @chapter Conformance
