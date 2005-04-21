@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: aixddi.h,v 0.9.2.2 2005/04/21 01:54:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AXIDDI_H__
 #define __SYS_AXIDDI_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/04/21 01:54:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -65,7 +65,7 @@
 #include <sys/strconf.h>
 
 #ifndef _AIX_SOURCE
-#warning "_AIX_SOURCE not defined but aixddi.h,v included"
+#warning "_AIX_SOURCE not defined but aixddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
@@ -87,7 +87,8 @@ __AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
 	// queue_t *rq = RD(q);
 	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q);
+	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
+		qenable(q);
 }
 
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))

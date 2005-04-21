@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/04/12 00:04:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/04/21 01:54:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/12 00:04:55 $ by $Author: brian $
+# Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -177,6 +177,9 @@ libLfS_streams_a_SOURCES	+= src/compat/hpux/hpuxcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 libLfS_streams_a_SOURCES	+= src/compat/lis/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+libLfS_streams_a_SOURCES	+= src/compat/mac/maccompat.c
 endif
 
 if CONFIG_STREAMS_STH
@@ -319,6 +322,9 @@ libLfS_compat_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+libLfS_compat_a_SOURCES		+= src/compat/mac/maccompat.c
 endif
 
 libLfS_compat_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -597,6 +603,7 @@ EXPORT_SRCFILES			= \
 				src/compat/aix/aixcompat.c \
 				src/compat/hpux/hpuxcompat.c \
 				src/compat/lis/liscompat.c \
+				src/compat/mac/maccompat.c \
 				src/compat/osf/osfcompat.c \
 				src/compat/sun/suncompat.c \
 				src/compat/svr4/svr4compat.c \
@@ -618,6 +625,7 @@ EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/aixcompat.ver \
 				$(PKGINCL)/versions/hpuxcompat.ver \
 				$(PKGINCL)/versions/liscompat.ver \
+				$(PKGINCL)/versions/maccompat.ver \
 				$(PKGINCL)/versions/osfcompat.ver \
 				$(PKGINCL)/versions/suncompat.ver \
 				$(PKGINCL)/versions/svr4compat.ver \

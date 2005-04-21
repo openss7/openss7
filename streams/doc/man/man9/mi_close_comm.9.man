@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_close_comm.9.man,v 0.9.2.13 2005/04/20 18:41:36 brian Exp $
+.\" @(#) $Id: mi_close_comm.9.man,v 0.9.2.14 2005/04/21 01:53:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/21 01:53:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -135,6 +135,12 @@ must have a previous corresponding call to
 .PP
 .BR mi_close_comm ()
 always returns zero (0).
+If the last module was closed and freed using
+.BR mi_close_comm ()
+then the pointer pointed to by
+.I statep
+will contain
+.BR NULL .
 .\"
 .\"
 .SH ERRORS
@@ -295,7 +301,8 @@ in support of
 devices are not supported.
 .PP
 See
-.BR aixcompat (9)
+.BR aixcompat (9),
+.BR maccompat (9)
 and
 .BR STREAMS (9)
 for additional compatibility information.
@@ -304,15 +311,21 @@ for additional compatibility information.
 .SH CONFORMANCE
 .PP
 .IR AIX \(rg
-and
-.IR MacOT \(rg
-DDI documentation.
 .[
 aixdoc
 .]
 .[
 aixspg
 .]
+and
+.IR MacOT \(rg
+.[
+macdoc
+.]
+.[
+macspg
+.]
+DDI documentation.
 .\"
 .\"
 .SH HISTORY

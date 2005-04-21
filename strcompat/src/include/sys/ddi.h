@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/03/31 06:53:23 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/04/21 01:54:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:23 $ by $Author: brian $
+ Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/03/31 06:53:23 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -371,6 +371,14 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #include <sys/lisddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS
+#endif
+#endif
+
+#ifdef _MAC_SOURCE
+#if defined(CONFIG_STREAMS_COMPAT_MAC) || defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
+#include <sys/macddi.h>
+#elif !defined(EXPORT_SYMTAB)
+#warning _MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC
 #endif
 #endif
 

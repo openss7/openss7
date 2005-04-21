@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_detach.9.man,v 0.9.2.1 2005/04/20 18:41:36 brian Exp $
+.\" @(#) $Id: mi_detach.9.man,v 0.9.2.2 2005/04/21 01:53:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/21 01:53:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -104,10 +104,27 @@ A pointer to the module or driver instance data.
 .SH DESCRIPTION
 .PP
 .BR mi_detach ()
+is called from a
+.I STREAMS
+driver or module
+.BR qclose (9)
+or
+.B I_UNLINK
+procedure to detach the instance data from the queue and to remove the driver or module from the
+global list of open drivers or modules.
+The instance data must have been previously allocated using
+.BR mi_open_comm (9).
+It does not; however, free the instance data.  The instance data must later be freed using
+.BR mi_close_detached (9).
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_detach (9)
+is typically used in conjunction with
+.BR mi_open_comm (9)
+and
+.BR mi_close_detached (9).
 .\"
 .\"
 .SH RETURN

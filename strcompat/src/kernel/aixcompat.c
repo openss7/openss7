@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:53 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:36:53 $ by $Author: brian $
+ Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:53 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:53 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,7 +115,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:53 $"
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -303,11 +303,11 @@ int wantio(queue_t *q, struct wantio *w)
 	queue_t *wq = WR(q);
 	struct stdata *sd = ((struct queinfo *) (wq - 1))->qu_str;
 	if (w) {
-		ctrace(qget(wq));
+		qget(wq);
 		xchg(&sd->sd_directio, w);
 	} else {
 		xchg(&sd->sd_directio, w);
-		ctrace(qput(&wq));
+		qput(&wq);
 	}
 	return (0);
 }

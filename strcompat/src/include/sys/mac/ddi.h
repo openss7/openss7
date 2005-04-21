@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.2 2005/04/21 01:54:41 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.1 2005/04/21 01:54:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,44 +45,41 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/04/21 01:54:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_AXIDDI_H__
-#define __SYS_AXIDDI_H__
+#ifndef __SYS_MACDDI_H__
+#define __SYS_MACDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/04/21 01:54:41 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
-#ifndef __AIX_EXTERN_INLINE
-#define __AIX_EXTERN_INLINE extern __inline__
+#ifndef __MAC_EXTERN_INLINE
+#define __MAC_EXTERN_INLINE extern __inline__
 #endif				/* __AIX_EXTERN_INLINE */
 
 #include <sys/strconf.h>
 
-#ifndef _AIX_SOURCE
-#warning "_AIX_SOURCE not defined but aixddi.h included"
+#ifndef _MAC_SOURCE
+#warning "_MAC_SOURCE not defined but macddi.h included"
 #endif
 
-#if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
+#if defined(CONFIG_STREAMS_COMPAT_MAC) || defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
 
 #ifndef dev_t
 #define dev_t __streams_dev_t
 #endif
 
-extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag,
-			cred_t *credp);
+#if !defined _AIX_SOURCE
+extern int mi_open_comm(caddr_t *mi_list, size_t size, queue_t *q, dev_t *dev, int flag, int sflag, cred_t *credp);
 extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
 extern caddr_t mi_next_ptr(caddr_t strptr);
 extern caddr_t mi_prev_ptr(caddr_t strptr);
-
-extern int wantio(queue_t *q, struct wantio *w);
-
-__AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
+__MAC_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 {
 	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
 	// queue_t *rq = RD(q);
@@ -90,18 +87,20 @@ __AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
 		qenable(q);
 }
-
-__AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
-{
-	if (!q->q_qinfo->qi_srvp) {
-		q->q_ftmsg = func;
-		return (1);
-	}
-	return (0);
-}
-
-#elif defined(_AIX_SOURCE)
-#warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
 #endif
 
-#endif				/* __SYS_AXIDDI_H__ */
+extern mblk_t *mi_timer_alloc(queue_t *q, size_t size);
+extern void mi_timer(mblk_t *mp, unsigned long msec);
+extern void mi_timer_cancel(mblk_t *mp);
+extern void mi_timer_free(mblk_t *mp);
+extern int mi_timer_valid(mblk_t *mp);
+
+extern void mi_detach(queue_t *q, caddr_t ptr);
+extern void mi_close_detached(caddr_t *mi_list, caddr_t strptr);
+extern void mi_open_detached(caddr_t *mi_list, size_t size, dev_t *devp);
+
+#elif defined(_MAC_SOURCE)
+#warning "_MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC"
+#endif
+
+#endif				/* __SYS_MACDDI_H__ */

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/04/09 09:34:20 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/04/21 01:54:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:34:20 $ by $Author: brian $
+# Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -516,6 +516,12 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	[enable_compat_lis="$enableval"],
 	[enable_compat_lis='module'])
+    AC_ARG_ENABLE([compat-mac],
+	AS_HELP_STRING([--enable-compat-mac],
+	    [enable source compatibility with MacOT variants.
+	    @<:@default=module@:>@]),
+	[enable_compat_mac="$enableval"],
+	[enable_compat_mac='module'])
     AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 4.2 compatibility], [lfs_compat_svr4], [dnl
 	lfs_compat_svr4="${enable_compat_svr4:-module}"
 	if test :$lfs_compat_svr4 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -570,6 +576,11 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	lfs_compat_lis="${enable_compat_lis:-module}"
 	if test :$lfs_compat_lis = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_lis='yes'
+	fi])
+    AC_CACHE_CHECK([for STREAMS MacOT compatibility], [lfs_compat_mac], [dnl
+	lfs_compat_mac="${enable_compat_mac:-module}"
+	if test :$lfs_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_compat_mac='yes'
 	fi])
     case ${lfs_compat_svr4:-module} in
 	(yes)
@@ -701,6 +712,24 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
+    case ${lfs_compat_mac:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MAC], [], [When defined, Linux Fast STREAMS
+	    will attempt to be as compatible as possible (without replicating any bugs) with the
+	    MacOT(R) release so that STREAMS drivers and modules written for MacOT(R) will compile
+	    with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+	    MacOT(R) will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled and linkable with Linux Fast-STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MAC_MODULE], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the MacOT(R) release so that STREAMS drivers and modules written for MacOT(R) will
+	    compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written
+	    for MacOT(R) will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+	    ;;
+    esac
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${lfs_compat_svr4:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${lfs_compat_svr4:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${lfs_compat_sol8:-module} = :yes])
@@ -715,6 +744,8 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${lfs_compat_hpux:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${lfs_compat_lis:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${lfs_compat_lis:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${lfs_compat_mac:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${lfs_compat_mac:-module} = :module])
 ])# _LFS_SETUP_COMPAT
 # =============================================================================
 

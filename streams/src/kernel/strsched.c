@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/01 09:52:19 $ by $Author: brian $
+ Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/01 09:52:19 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -135,7 +135,6 @@ static void mdbblock_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	}
 }
 
-#if defined CONFIG_STREAMS_DEBUG
 /* use the current queue being processed by the thread as a guess as to which queue the thing
    (message block, bufcall callback, timout callback) belongs to, but, if we are at irq, then we
    will only used the supplied value, even if null. */
@@ -144,9 +143,8 @@ static queue_t *queue_guess(queue_t *q)
 	queue_t *guess;
 	if ((guess = q) == NULL && current_context() == CTX_STREAMS)
 		guess = this_thread->currentq;
-	return (ctrace(qget(guess)));
+	return (guess);
 }
-#endif
 
 /**
  *  mdbblock_alloc: - allocate a combined message/data block
@@ -205,7 +203,7 @@ mblk_t *mdbblock_alloc(uint priority, void *func)
 		struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 		struct mdbblock *md = (struct mdbblock *) mp;
 		md->msgblk.m_func = func;
-		md->msgblk.m_queue = queue_guess(NULL);
+		md->msgblk.m_queue = qget(queue_guess(NULL));
 		write_lock_irqsave(&smi->si_rwlock, flags);
 		list_add_tail(&md->msgblk.m_list, &smi->si_head);
 		list_add_tail(&md->datablk.db_list, &sdi->si_head);
@@ -715,7 +713,7 @@ void flushq(queue_t *q, int flag)
 	backenable = __flushq(q, flag, &mpp);
 	qwunlock(q, &flags);
 	if (backenable)
-		ctrace(qbackenable(q));
+		qbackenable(q);
 	/* we want to free messages with the locks off so that other CPUs can process this queue
 	   and we don't block interrupts too long */
 	freechain(mp, mpp);
@@ -1023,7 +1021,7 @@ static inline struct strevent *event_alloc(int type, queue_t *q)
 #if defined CONFIG_STREAMS_DEBUG
 			{
 				unsigned long flags;
-				s->s_queue = queue_guess(q);
+				s->s_queue = qget(queue_guess(q));
 				write_lock_irqsave(&si->si_rwlock, flags);
 				list_add_tail(&s->s_list, &si->si_head);
 				write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -1042,7 +1040,7 @@ static inline void event_free(struct strevent *se)
 #if defined CONFIG_STREAMS_DEBUG
 	unsigned long flags;
 	struct seinfo *s = (struct seinfo *) se;
-	ctrace(qput(&s->s_queue));
+	qput(&s->s_queue);
 	write_lock_irqsave(&si->si_rwlock, flags);
 	list_del_init(&s->s_list);
 	write_unlock_irqrestore(&si->si_rwlock, flags);
@@ -1067,7 +1065,8 @@ static struct strevent *find_event(int event_id)
 }
 
 #if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
-    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE && \
+    !defined CONFIG_STREAMS_COMPAT_MAC_MODULE
 STATIC INLINE
 #endif
 /*
@@ -1089,7 +1088,7 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 	struct strevent *se;
 	if ((se = event_alloc(SE_BUFCALL, q))) {
 		struct strthread *t = this_thread;
-		se->x.b.queue = ctrace(qget(q));	/* hold a reference */
+		se->x.b.queue = qget(q);	/* hold a reference */
 		se->x.b.func = function;
 		se->x.b.arg = arg;
 		se->x.b.size = size;
@@ -1099,7 +1098,8 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 	return (bcid);
 }
 #if defined CONFIG_STREAMS_COMPAT_SUN_MODULE || \
-    defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+    defined CONFIG_STREAMS_COMPAT_AIX_MODULE || \
+    defined CONFIG_STREAMS_COMPAT_MAC_MODULE
 EXPORT_SYMBOL_GPL(__bufcall);
 #endif
 
@@ -1112,7 +1112,7 @@ EXPORT_SYMBOL_GPL(__bufcall);
  */
 bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
-	return __bufcall(NULL, size, priority, function, arg);
+	return __bufcall(queue_guess(NULL), size, priority, function, arg);
 }
 EXPORT_SYMBOL(bufcall);
 
@@ -1164,7 +1164,7 @@ toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsi
 	struct strevent *se;
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
 		init_timer(&se->x.t.timer);
-		se->x.t.queue = ctrace(qget(q));	/* hold a reference */
+		se->x.t.queue = qget(q);	/* hold a reference */
 		se->x.t.func = timo_fcn;
 		se->x.t.arg = arg;
 		se->x.t.cpu = cpu;
@@ -1192,7 +1192,7 @@ EXPORT_SYMBOL_GPL(__timeout);
  */
 toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
-	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
+	return __timeout(queue_guess(NULL), timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 EXPORT_SYMBOL(timeout);
 
@@ -1206,7 +1206,7 @@ clock_t untimeout(toid_t toid)
 	clock_t rem = 0;
 	if ((se = find_event(toid))) {
 		xchg(&se->x.t.func, NULL);
-		ctrace(qput(&se->x.t.queue));
+		qput(&se->x.t.queue);
 		rem = se->x.t.timer.expires - jiffies;
 		if (rem < 0)
 			rem = 0;
@@ -1236,13 +1236,13 @@ static int __weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_
 	struct strevent *se;
 	if ((se = event_alloc(type, protq))) {
 		struct strthread *t = this_thread;
-		se->x.w.queue = ctrace(qget(protq));
+		se->x.w.queue = qget(protq);
 		se->x.w.func = func;
 		se->x.w.arg = arg;
-		se->x.w.q1 = ctrace(qget(q1));
-		se->x.w.q2 = ctrace(qget(q2));
-		se->x.w.q3 = ctrace(qget(q3));
-		se->x.w.q4 = ctrace(qget(q4));
+		se->x.w.q1 = qget(q1);
+		se->x.w.q2 = qget(q2);
+		se->x.w.q3 = qget(q3);
+		se->x.w.q4 = qget(q4);
 		*xchg(&t->strevents_tail, &se->se_next) = se;
 		if (!test_and_set_bit(strevents, &t->flags))
 			raise_softirq(STREAMS_SOFTIRQ);
@@ -1343,7 +1343,7 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 	struct strevent *se;
 	if ((se = event_alloc(type, q))) {
 		struct strthread *t = this_thread;
-		se->x.p.queue = ctrace(qget(q));
+		se->x.p.queue = qget(q);
 		se->x.p.func = func;
 		se->x.p.arg = arg;
 		se->x.p.perim = perim;
@@ -1367,7 +1367,7 @@ void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp)
 	/* must be called with sq locked */
 	struct strevent *se;
 	if ((se = event_alloc(SE_STRPUT, q))) {
-		se->x.p.queue = ctrace(qget(q));
+		se->x.p.queue = qget(q);
 		se->x.p.func = (void *) put;
 		se->x.p.arg = q;
 		se->x.p.perim = PERIM_INNER | PERIM_OUTER;
@@ -1463,11 +1463,11 @@ static void sq_weldq(struct strevent *se)
 				__hwlock(se->x.w.q3);
 			if (se->x.w.q1) {
 				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = ctrace(qget(se->x.w.q2));
+				se->x.w.q1->q_next = qget(se->x.w.q2);
 			}
 			if (se->x.w.q3) {
 				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = ctrace(qget(se->x.w.q4));
+				se->x.w.q3->q_next = qget(se->x.w.q4);
 			}
 			if (se->x.w.q3)
 				__hwunlock(se->x.w.q3);
@@ -1475,13 +1475,13 @@ static void sq_weldq(struct strevent *se)
 				__hwunlock(se->x.w.q1);
 			local_irq_restore(flags);
 			leave_exclus(isq);
-			ctrace(qput(&se->x.w.q1));
-			ctrace(qput(&se->x.w.q2));
-			ctrace(qput(&se->x.w.q3));
-			ctrace(qput(&se->x.w.q4));
+			qput(&se->x.w.q1);
+			qput(&se->x.w.q2);
+			qput(&se->x.w.q3);
+			qput(&se->x.w.q4);
 			event_free(se);
-			ctrace(qput(&qn1));
-			ctrace(qput(&qn3));
+			qput(&qn1);
+			qput(&qn3);
 		} else
 			defer_event(isq, se, &flags);
 		leave_shared(osq);
@@ -1508,11 +1508,11 @@ static void sq_unweldq(struct strevent *se)
 				__hwlock(se->x.w.q3);
 			if (se->x.w.q1) {
 				qn1 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q1->q_next = ctrace(qget(se->x.w.q2));
+				se->x.w.q1->q_next = qget(se->x.w.q2);
 			}
 			if (se->x.w.q3) {
 				qn3 = xchg(&se->x.w.q1->q_next, NULL);
-				se->x.w.q3->q_next = ctrace(qget(se->x.w.q4));
+				se->x.w.q3->q_next = qget(se->x.w.q4);
 			}
 			if (se->x.w.q3)
 				__hwunlock(se->x.w.q3);
@@ -1520,13 +1520,13 @@ static void sq_unweldq(struct strevent *se)
 				__hwunlock(se->x.w.q1);
 			local_irq_restore(flags);
 			leave_exclus(isq);
-			ctrace(qput(&se->x.w.q1));
-			ctrace(qput(&se->x.w.q2));
-			ctrace(qput(&se->x.w.q3));
-			ctrace(qput(&se->x.w.q4));
+			qput(&se->x.w.q1);
+			qput(&se->x.w.q2);
+			qput(&se->x.w.q3);
+			qput(&se->x.w.q4);
 			event_free(se);
-			ctrace(qput(&qn1));
-			ctrace(qput(&qn3));
+			qput(&qn1);
+			qput(&qn3);
 		} else
 			defer_event(isq, se, &flags);
 		leave_shared(osq);
@@ -1703,7 +1703,7 @@ static inline void timeouts(struct strthread *t)
 						qprunlock(q);
 						hrunlock(q);
 					}
-					ctrace(qput(&se->x.t.queue));
+					qput(&se->x.t.queue);
 				} else {
 					func(se->x.t.arg);
 				}
@@ -1747,16 +1747,16 @@ static inline void doevents(struct strthread *t)
 					hwlock(se->x.w.q1, &flags);
 					se->x.w.q1->q_next = se->x.w.q2;
 					hwunlock(se->x.w.q1, &flags);
-					ctrace(qput(&se->x.w.q1));
-					ctrace(qput(&se->x.w.q2));
+					qput(&se->x.w.q1);
+					qput(&se->x.w.q2);
 				}
 				if (se->x.w.q3) {
 					unsigned long flags;
 					hwlock(se->x.w.q3, &flags);
 					se->x.w.q3->q_next = se->x.w.q4;
 					hwunlock(se->x.w.q3, &flags);
-					ctrace(qput(&se->x.w.q3));
-					ctrace(qput(&se->x.w.q4));
+					qput(&se->x.w.q3);
+					qput(&se->x.w.q4);
 				}
 				if (se->x.w.func) {
 					t->currentq = q;
@@ -1765,7 +1765,7 @@ static inline void doevents(struct strthread *t)
 				}
 				if (q) {
 					hwunlock(q, &flags);
-					ctrace(qput(&q));
+					qput(&q);
 				}
 				event_free(se);
 				continue;;
@@ -1779,7 +1779,7 @@ static inline void doevents(struct strthread *t)
 					se->x.p.func(se->x.p.arg, se->x.p.mp);
 				qpwunlock(se->x.p.queue);
 				hwunlock(se->x.p.queue, &flags);
-				ctrace(qput(&se->x.p.queue));
+				qput(&se->x.p.queue);
 				event_free(se);
 				continue;;
 			}
@@ -1882,7 +1882,7 @@ static inline void bufcalls(struct strthread *t)
 						qprunlock(q);
 						hrunlock(q);
 					}
-					ctrace(qput(&q));
+					qput(&q);
 				} else {
 					func(se->x.b.arg);
 				}
@@ -1957,7 +1957,7 @@ static void qschedule(queue_t *q)
 	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		struct strthread *t = this_thread;
 		/* put ourselves on the run list */
-		*xchg(&t->qtail, &q->q_link) = ctrace(qget(q));
+		*xchg(&t->qtail, &q->q_link) = qget(q);
 		setqsched();
 	}
 }
@@ -2040,7 +2040,7 @@ static inline void freechains(struct strthread *t)
 		while ((mp = mp_next)) {
 			mp_next = xchg(&mp->b_next, NULL);
 			/* fake out freeb */
-			ctrace(qput(&mp->b_queue));
+			qput(&mp->b_queue);
 			bput(&mp->b_bandp);
 			mp->b_next = mp->b_prev = NULL;
 			freemsg(mp);
