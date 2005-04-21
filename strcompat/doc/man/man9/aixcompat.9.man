@@ -1,0 +1,528 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: aixcompat.9.man,v 0.9.2.3 2005/04/20 18:41:32 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/20 18:41:32 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH AIXCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B aixcompat
+\- AIX \fISTREAMS\fP Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _AIX_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B Linux Fast-STREAMS
+provides a compatibility module,
+.BR streams-aixcompat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I AIX 5L Version 5.1
+.I STREAMS
+environment to
+.BR "Linux Fast-STREAMS" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.IR AIX \(rg
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "Linux Fast-STREAMS" .
+Other
+.IR AIX \(rg-specific
+functions are provided by the
+.B streams-aixcompat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast STREAMS
+are as follows:
+.HP
+.BR adjmsg (9)\ \-\ \c
+trim bytes from the front or back of a \fISTREAMS\fP message
+.PD 0
+.HP
+.BR allocb (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block
+.HP
+.BR backq (9)\ \-\ \c
+find the upstream or downstream queue
+.HP
+.BR bcanput (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR bufcall (9)\ \-\ \c
+install a buffer callback
+.HP
+.BR canput (9)\ \-\ \c
+test flow control on a message queue
+.HP
+.BR copyb (9)\ \-\ \c
+copy a \fISTREAMS\fP message block
+.HP
+.BR copymsg (9)\ \-\ \c
+copy a \fISTREAMS\fP message
+.HP
+.BR datamsg (9)\ \-\ \c
+tests a \fISTREAMS\fP message type for data
+.HP
+.BR dupb (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message block
+.HP
+.BR dupmsg (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message
+.HP
+.BR enableok (9)\ \-\ \c
+allows a \fISTREAMS\fP message queue to be scheduled
+.HP
+.BR esballoc (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
+.HP
+.BR flushband (9)\ \-\ \c
+flushes band \fISTREAMS\fP messages from a message queue
+.HP
+.BR flushq (9)\ \-\ \c
+flushes messages from a \fISTREAMS\fP message queue
+.HP
+.BR freeb (9)\ \-\ \c
+frees a \fISTREAMS\fP message block
+.HP
+.BR freemsg (9)\ \-\ \c
+frees a \fISTREAMS\fP message
+.HP
+.BR getadmin (9)\ \-\ \c
+get the administration function pointer for a \fISTREAMS\fP module
+.HP
+.BR getmid (9)\ \-\ \c
+get the \fISTREAMS\fP module id for a name
+.HP
+.BR getq (9)\ \-\ \c
+gets a message from a \fISTREAMS\fP message queue
+.HP
+.BR insq (9)\ \-\ \c
+inserts a message into a \fISTREAMS\fP message queue
+.HP
+.BR linkb (9)\ \-\ \c
+link a message block to a \fISTREAMS\fP message
+.HP
+.BR msgdsize (9)\ \-\ \c
+calculate the size of the data in a \fISTREAMS\fP message
+.HP
+.BR noenable (9)\ \-\ \c
+disables a \fISTREAMS\fP message queue from being scheduled
+.HP
+.BR OTHERQ (9)\ \-\ \c
+return the other queue of a \fISTREAMS\fP queue pair
+.HP
+.BR pullupmsg (9)\ \-\ \c
+pull up the bytes in a \fISTREAMS\fP message
+.HP
+.BR putbq (9)\ \-\ \c
+put a message back on a \fISTREAMS\fP message queue
+.HP
+.BR putctl1 (9)\ \-\ \c
+put a 1 byte control message on a \fISTREAMS\fP message queue
+.HP
+.BR putctl (9)\ \-\ \c
+put a control message on a \fISTREAMS\fP message queue
+.HP
+.BR putnext (9)\ \-\ \c
+put a message on the downstream \fISTREAMS\fP message queue
+.HP
+.BR putq (9)\ \-\ \c
+put a message on a \fISTREAMS\fP message queue
+.HP
+.BR qenable (9)\ \-\ \c
+schedules a \fISTREAMS\fP message queue service routine
+.HP
+.BR qreply (9)\ \-\ \c
+replys to a message from a \fISTREAMS\fP message queue
+.HP
+.BR qsize (9)\ \-\ \c
+return the number of messages on a queue
+.HP
+.BR RD (9)\ \-\ \c
+return the read queue of a \fISTREAMS\fP queue pair
+.HP
+.BR rmvb (9)\ \-\ \c
+remove a message block from a \fISTREAMS\fP message
+.HP
+.BR rmvq (9)\ \-\ \c
+remove a message from a \fISTREAMS\fP message queue
+.HP
+.BR splstr (9)\ \-\ \c
+set priority levels
+.HP
+.BR splx (9)\ \-\ \c
+restore priority levels
+.HP
+.BR strlog (9)\ \-\ \c
+pass a message to the \fISTREAMS\fP logger
+.HP
+.BR strqget (9)\ \-\ \c
+gets information about a \fISTREAMS\fP message queue
+.HP
+.BR testb (9)\ \-\ \c
+test if a \fISTREAMS\fP message can be allocated
+.HP
+.BR timeout (9)\ \-\ \c
+start a timer
+.HP
+.BR unbufcall (9)\ \-\ \c
+removes a \fISTREAMS\fP buffer callback
+.HP
+.BR unlinkb (9)\ \-\ \c
+unlink a message block from a \fISTREAMS\fP message
+.HP
+.BR untimeout (9)\ \-\ \c
+stop a timer
+.HP
+.BR unweldq (9)\ \-\ \c
+unweld two queues
+.HP
+.BR weldq (9)\ \-\ \c
+weld two (or four) queues together
+.HP
+.BR WR (9)\ \-\ \c
+return the write queue of a \fISTREAMS\fP queue pair
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B Linux Fast-STREAMS
+.IR AIX \(rg
+compatibility module,
+.BR streams-aixcompat.o ,
+are as follows:
+.HP
+.BR mi_bufcall (9)\ \-\ \c
+reliable alternative to \fBbufcall\fP(9)
+.PD 0
+.HP
+.BR mi_close_comm (9)\ \-\ \c
+\fISTREAMS\fP common minor device close utility
+.HP
+.BR mi_next_ptr (9)\ \-\ \c
+\fISTREAMS\fP minor device list traversal
+.HP
+.BR mi_open_comm (9)\ \-\ \c
+\fISTREAMS\fP common minor device open utility
+.HP
+.BR mi_prev_ptr (9)\ \-\ \c
+\fISTREAMS\fP minor device list traversal
+.HP
+.BR str_install (9)\ \-\ \c
+install or uninstall a \fISTREAMS\fP module or driver
+.HP
+.BR str_install_AIX (9)\ \-\ \c
+install or uninstall a \fISTREAMS\fP module or driver
+.HP
+.BR wantio (9)\ \-\ \c
+perform direct I/O from a \fISTREAMS\fP driver
+.HP
+.BR wantmsg (9)\ \-\ \c
+provide a filter of wanted message for a \fISTREAMS\fP module
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.B _AIX_SOURCE
+must be defined before including DDI/DKI include files to expose
+.IR AIX \(rg-specific
+symbols.
+To use
+.IR AIX \(rg-specific
+functions,
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_AIX
+or
+.B CONFIG_STREAMS_COMPAT_AIX_MODULE
+defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_AIX
+defined,
+.IR AIX \(rg
+compatibility will become part of the
+.B Linux Fast-STREAMS
+.B streams.o
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_AIX_MODULE
+defined,
+.IR AIX \(rg
+compatibility will be placed in a separate
+.B streams-aixcompat.o
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR AIX \(rg-specific
+functions loads.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.BR adjmsg (9),
+.BR allocb (9),
+.BR backq (9),
+.BR bcanput (9),
+.BR bufcall (9),
+.BR canput (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR datamsg (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR enableok (9),
+.BR esballoc (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR getadmin (9),
+.BR getmid (9),
+.BR getq (9),
+.BR insq (9),
+.BR linkb (9),
+.BR msgdsize (9),
+.BR noenable (9),
+.BR OTHERQ (9),
+.BR pullupmsg (9),
+.BR putbq (9),
+.BR putctl1 (9),
+.BR putctl (9),
+.BR putnext (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR RD (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR splstr (9),
+.BR splx (9),
+.BR strlog (9),
+.BR strqget (9),
+.BR testb (9),
+.BR timeout (9),
+.BR unbufcall (9),
+.BR unlinkb (9),
+.BR untimeout (9),
+.BR unweldq (9),
+.BR weldq (9),
+.BR WR (9).
+
+.PP
+Compatibility functions:
+.BR mi_bufcall (9),
+.BR mi_close_comm (9),
+.BR mi_next_ptr (9),
+.BR mi_open_comm (9),
+.BR mi_prev_ptr (9),
+.BR str_install (9),
+.BR str_install_AIX (9),
+.BR wantio (9),
+.BR wantmsg (9).
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg-specific
+functions should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+.IR AIX \(rg-specific
+functions are provided for source level compatibility with
+.IR AIX \(rg
+for the purpose of porting
+.IR AIX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR AIX \(rg,
+binaries are incompatible.
+.IP \(em
+.IR AIX \(rg-specific
+functions only provide functionality comparable to
+.IR AIX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.IR AIX \(rg-specific
+functions in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+DDI documentation.
+.[
+aixdoc
+.]
+.[
+aixspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR AIX \(rg.
+Functions with name starting with
+.I mi_
+are probably
+.I Mentat, Inc.
+functions that goes all the way back to the
+.I Mentat OSF/1
+implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

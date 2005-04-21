@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.14 2005/04/13 07:51:04 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.15 2005/04/20 18:41:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B bcanputnext
-\- test flow control on a message queue
+\- test flow control on a \fISTREAMS\fP message queue
 .\"
 .\"
 .SH SYNOPSIS

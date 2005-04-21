@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.11 2005/04/05 02:02:32 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.12 2005/04/20 18:41:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/05 02:02:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -174,7 +174,8 @@ always succeed.
 .BR drv_usectohz ()
 and
 .BR drv_msectohz ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

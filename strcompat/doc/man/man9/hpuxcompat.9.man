@@ -1,0 +1,685 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.2 2005/04/20 18:41:34 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH HPUXCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B hpuxcompat
+\- HP-UX \fISTREAMS\fR Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _HPUX_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B Linux Fast-STREAMS
+provides a compatibility module,
+.BR streams-hpuxcompat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I HP-UX 11i v2
+.I STREAMS/UX
+environment to
+.BR "Linux Fast-STREAMS" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.IR HP-UX \(rg
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "Linux Fast-STREAMS" .
+Other
+.IR HP-UX \(rg-specific
+functions are provided by the
+.B streams-hpuxcompat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast STREAMS
+are as follows:
+.PD 0
+.HP
+.BR adjmsg (9)\ \-\ \c
+trim bytes from the front or back of a \fISTREAMS\fP message
+.HP
+.BR allocb (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block
+.HP
+.BR backq (9)\ \-\ \c
+find the upstream or downstream queue
+.HP
+.BR bcanput (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR bcanputnext (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR bcopy (9)\ \-\ \c
+copy byte strings
+.HP
+.BR bufcall (9)\ \-\ \c
+install a buffer callback
+.HP
+.BR bzero (9)\ \-\ \c
+zero a byte string
+.HP
+.BR canput (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR canputnext (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR cmn_err (9)\ \-\ \c
+print a kernel command error
+.HP
+.BR copyb (9)\ \-\ \c
+copy a \fISTREAMS\fP message block
+.HP
+.BR copymsg (9)\ \-\ \c
+copy a \fISTREAMS\fP message
+.HP
+.BR datamsg (9)\ \-\ \c
+tests a \fISTREAMS\fP message type for data
+.HP
+.BR delay (9)\ \-\ \c
+postpone the calling process for a number of clock ticks
+.HP
+.BR drv_getparm (9)\ \-\ \c
+driver retrieve kernel parameter
+.HP
+.BR drv_priv (9)\ \-\ \c
+check if the current process is priviledged
+.HP
+.BR dupb (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message block
+.HP
+.BR dupmsg (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message
+.HP
+.BR enableok (9)\ \-\ \c
+allows a \fISTREAMS\fP message queue to be scheduled
+.HP
+.BR esballoc (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
+.HP
+.BR esbbcall (9)\ \-\ \c
+install a buffer callback for an extended \fISTREAMS\fR message block
+.HP
+.BR flushband (9)\ \-\ \c
+flushes band \fISTREAMS\fP messages from a message queue
+.HP
+.BR flushq (9)\ \-\ \c
+flushes messages from a \fISTREAMS\fP message queue
+.HP
+.BR freeb (9)\ \-\ \c
+frees a \fISTREAMS\fP message block
+.HP
+.BR freemsg (9)\ \-\ \c
+frees a \fISTREAMS\fP message
+.HP
+.BR freezestr (9)\ \-\ \c
+freeze the state of a stream queue
+.HP
+.BR getadmin (9)\ \-\ \c
+get the administration function pointer for a \fISTREAMS\fP module
+.HP
+.BR getmid (9)\ \-\ \c
+get the \fISTREAMS\fP module id for a name
+.HP
+.BR getmajor (9)\ \-\ \c
+get the internal major device number for a device.
+.HP
+.BR getminor (9)\ \-\ \c
+get the extended minor device number for a device.
+.HP
+.BR getq (9)\ \-\ \c
+gets a message from a \fISTREAMS\fP message queue
+.HP
+.BR insq (9)\ \-\ \c
+inserts a message into a \fISTREAMS\fP message queue
+.HP
+.BR itimeout (9)\ \-\ \c
+start a timer at a specified priority level
+.HP
+.BR kmem_alloc (9)\ \-\ \c
+allocate kernel memory
+.HP
+.BR kmem_free (9)\ \-\ \c
+deallocates kernel memory
+.HP
+.BR linkb (9)\ \-\ \c
+link a message block to a \fISTREAMS\fP message
+.HP
+.BR LOCK (9)\ \-\ \c
+acquire a basic lock
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+allocate and initialize a basic lock
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+deallocate a dynamically allocated basic lock
+.HP
+.BR major (9)\ \-\ \c
+get the major device number for a device
+.HP
+.BR makedev (9)\ \-\ \c
+make a device number from a major and minor device number
+.HP
+.BR makedevice (9)\ \-\ \c
+create a device from major and minor device numbers
+.HP
+.BR max (9)\ \-\ \c
+determine the maximum of two integers
+.HP
+.BR min (9)\ \-\ \c
+determine the minimum of two integers
+.HP
+.BR minor (9)\ \-\ \c
+get the minor device number for a device
+.HP
+.BR msgdsize (9)\ \-\ \c
+calculate the size of the data in a \fISTREAMS\fP message
+.HP
+.BR msgppullup (9)\ \-\ \c
+pull up bytes in a \fISTREAMS\fR message
+.HP
+.BR noenable (9)\ \-\ \c
+disables a \fISTREAMS\fP message queue from being scheduled
+.HP
+.BR OTHERQ (9)\ \-\ \c
+return the other queue of a \fISTREAMS\fP queue pair
+.HP
+.BR pcmsg (9)\ \-\ \c
+test a data block message type for priority control
+.HP
+.BR pullupmsg (9)\ \-\ \c
+pull up the bytes in a \fISTREAMS\fP message
+.HP
+.BR put (9)\ \-\ \c
+invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.HP
+.BR putbq (9)\ \-\ \c
+put a message back on a \fISTREAMS\fP message queue
+.HP
+.BR putctl (9)\ \-\ \c
+put a control message on a \fISTREAMS\fP message queue
+.HP
+.BR putctl1 (9)\ \-\ \c
+put a 1 byte control message on a \fISTREAMS\fP message queue
+.HP
+.BR putctl2 (9)\ \-\ \c
+put a two byte control message on a \fISTREAMS\fR message queue
+.HP
+.BR putnext (9)\ \-\ \c
+put a message on the downstream \fISTREAMS\fP message queue
+.HP
+.BR putnextctl (9)\ \-\ \c
+put a control message on the downstream \fISTREAMS\fR message queue
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+put a 1 byte control message on the downstream \fISTREAMS\fR message queue
+.HP
+.BR putnextctl2 (9)\ \-\ \c
+put a two byte control message on the downstream \fISTREAMS\fR message queue
+.HP
+.BR putq (9)\ \-\ \c
+put a message on a \fISTREAMS\fP message queue
+.HP
+.BR qenable (9)\ \-\ \c
+schedules a \fISTREAMS\fP message queue service routine
+.HP
+.BR qprocsoff (9)\ \-\ \c
+disables \fISTREAMS\fR message queue processing for multi-processing
+.HP
+.BR qprocon (9)\ \-\ \c
+enables a \fISTREAMS\fR message queue for multi-processing
+.HP
+.BR qreply (9)\ \-\ \c
+replys to a message from a \fISTREAMS\fP message queue
+.HP
+.BR qsize (9)\ \-\ \c
+return the number of messages on a queue
+.HP
+.BR RD (9)\ \-\ \c
+return the read queue of a \fISTREAMS\fP queue pair
+.HP
+.BR rmvb (9)\ \-\ \c
+remove a message block from a \fISTREAMS\fP message
+.HP
+.BR rmvq (9)\ \-\ \c
+remove a message from a \fISTREAMS\fP message queue
+.HP
+.BR SAMESTR (9)\ \-\ \c
+test for \fISTREAMS\fR pipe or fifo
+.HP
+.BR sleep (9)\ \-\ \c
+put a process to sleep
+.HP
+.BR spln (9)\ \-\ \c
+restore priority levels
+.HP
+.BR splstr (9)\ \-\ \c
+set priority levels
+.HP
+.BR strlog (9)\ \-\ \c
+pass a message to the \fISTREAMS\fP logger
+.HP
+.BR strqget (9)\ \-\ \c
+gets information about a \fISTREAMS\fP message queue
+.HP
+.BR strqset (9)\ \-\ \c
+sets attributes of a \fISTREAMS\fR message queue
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+allocate and initialize a synchronization variable
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+wake one or all processes sleeping on a synchronization variable
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+deallocate a synchronization variable
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+wait on a sychronization variable or signal
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+wait on a sychronization variable or signal
+.HP
+.BR testb (9)\ \-\ \c
+test if a \fISTREAMS\fP message can be allocated
+.HP
+.BR timeout (9)\ \-\ \c
+start a timer
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+attempt to acquire a basic lock
+.HP
+.BR unbufcall (9)\ \-\ \c
+removes a \fISTREAMS\fP buffer callback
+.HP
+.BR unfreezestr (9)\ \-\ \c
+thaw the state of a stream queue
+.HP
+.BR unlinkb (9)\ \-\ \c
+unlink a message block from a \fISTREAMS\fP message
+.HP
+.BR UNLOCK (9)\ \-\ \c
+release a basic lock
+.HP
+.BR untimeout (9)\ \-\ \c
+stop a timer
+.HP
+.BR unweldq  (9)\ \-\ \c
+unweld two queues
+.HP
+.BR vtop (9)\ \-\ \c
+.HP
+.BR wakeup (9)\ \-\ \c
+.HP
+.BR weldq  (9)\ \-\ \c
+weld two (or four) queues together
+.HP
+.BR WR (9)\ \-\ \c
+return the write queue of a \fISTREAMS\fR queue pair
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B Linux Fast-STREAMS
+.IR HP-UX \(rg
+compatibility module,
+.BR streams-hpuxcompat.o ,
+are as follows:
+.HP
+.BR get_sleep_lock (9)\ \-\ \c
+provide access to the global sleep lock
+.PD 0
+.HP
+.BR streams_put (9)\ \-\ \c
+invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.HP
+.BR str_install_HPUX (9)\ \-\ \c
+install or uninstall a \fISTREAMS\fP module or driver
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.B _HPUX_SOURCE
+must be defined before including DDI/DKI include files to expose
+.IR HP-UX \(rg-specific
+symbols.
+To use
+.IR HP-UX \(rg-specific
+functions,
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_HPUX
+or
+.B CONFIG_STREAMS_COMPAT_HPUX_MODULE
+defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_HPUX
+defined,
+.IR HP-UX \(rg
+compatibility will become part of the
+.B Linux Fast-STREAMS
+.B streams.o
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_HPUX_MODULE
+defined,
+.IR HP-UX \(rg
+compatibility will be placed in a separate
+.B streams-hpuxcompat.o
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR HP-UX \(rg-specific
+functions loads.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.BR adjmsg (9),
+.BR allocb (9),
+.BR backq (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bcopy (9),
+.BR bufcall (9),
+.BR bzero (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR cmn_err (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR datamsg (9),
+.BR delay (9),
+.BR drv_getparm (9),
+.BR drv_priv (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR enableok (9),
+.BR esballoc (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR freezestr (9),
+.BR getadmin (9),
+.BR getmid (9),
+.BR getmajor (9),
+.BR getminor (9),
+.BR getq (9),
+.BR insq (9),
+.BR itimeout (9),
+.BR kmem_alloc (9),
+.BR kmem_free (9),
+.BR linkb (9),
+.BR LOCK (9),
+.BR LOCK_ALLOC (9),
+.BR LOCK_DEALLOC (9),
+.BR major (9),
+.BR makedev (9),
+.BR makedevice (9),
+.BR max (9),
+.BR min (9),
+.BR minor (9),
+.BR msgdsize (9),
+.BR msgppullup (9),
+.BR noenable (9),
+.BR OTHERQ (9),
+.BR pcmsg (9),
+.BR pullupmsg (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putnext (9),
+.BR putnextctl (9),
+.BR putnextctl1 (9),
+.BR putnextctl2 (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocon (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR RD (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR SAMESTR (9),
+.BR sleep (9),
+.BR spln (9),
+.BR splstr (9),
+.BR strlog (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR SV_ALLOC (9),
+.BR SV_BROADCAST (9),
+.BR SV_DEALLOC (9),
+.BR SV_WAIT (9),
+.BR SV_WAIT_SIG (9),
+.BR testb (9),
+.BR timeout (9),
+.BR TRYLOCK (9),
+.BR unbufcall (9),
+.BR unfreezestr (9),
+.BR unlinkb (9),
+.BR UNLOCK (9),
+.BR untimeout (9),
+.BR unweldq  (9),
+.BR vtop (9),
+.BR wakeup (9),
+.BR weldq  (9),
+.BR WR (9).
+.PP
+Compatibility functions:
+.BR get_sleep_lock (9),
+.BR streams_put (9),
+.BR str_install_HPUX (9).
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR HP-UX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR HP-UX \(rg-specific
+functions should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+.IR HP-UX \(rg-specific
+functions are provided for source level compatibility with
+.IR HP-UX \(rg
+for the purpose of porting
+.IR HP-UX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR HP-UX \(rg,
+binaries are incompatible.
+.IP \(em
+.IR HP-UX \(rg-specific
+functions only provide functionality comparable to
+.IR HP-UX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.IR HP-UX \(rg-specific
+functions in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+DDI documentation.
+.[
+hpuxdoc
+.]
+.[
+hpuxspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR HP-UX \(rg.
+Functions with name starting with
+.I mi_
+are probably
+.I Mentat, Inc.
+functions that goes all the way back to the
+.I Mentat OSF/1
+implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

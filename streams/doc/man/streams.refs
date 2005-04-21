@@ -3415,12 +3415,24 @@ Part 1: Protocol Specification
 %L MACOTR
 %R Mac OS 9
 %K macotr
+%K macdoc
 %T Open Transport Reference
 %D 2003
 %Q Apple Computer, Inc.
 %I Apple
 %C Cupertino, California
-%U http://developer.apple.com/macros/opentransport/
+%U http://developer.apple.com/macos/opentransport/
+
+%L MACOTDN
+%R Revision 1.5d2
+%K macmdn
+%K macspg
+%T Open Transport Module Developer Note
+%D June 18, 1996
+%Q Apple Computer, Inc.
+%I Apple
+%C Cupertino, California
+%U http://developer.apple.com/macos/opentransport/
 
 %L OSFSPG
 %R Digital\(rg UNIX (OSF/1.2)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_next_ptr.9.man,v 0.9.2.3 2005/04/13 04:30:14 brian Exp $
+.\" @(#) $Id: mi_next_ptr.9.man,v 0.9.2.4 2005/04/20 18:41:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -82,6 +82,8 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .B #define _AIX_SOURCE
+.br
+.B #define _MAC_SOURCE
 .br
 .B #include <sys/stream.h>
 .br
@@ -136,7 +138,8 @@ fails when it hits the end of the list.
 .SH CONTEXT
 .PP
 .BR mi_next_ptr ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
@@ -152,14 +155,20 @@ caller to protect the list from deletions between calls to
 .BR mi_next_ptr ()
 is a
 .IR AIX \(rg-specific
+and
+.IR MacOT \(rg-specific
 function:
 .B _AIX_SOURCE
+or
+.B _MAC_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
 must also have been compiled with
-.B CONFIG_STREAMS_COMPAT_AIX
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.B CONFIG_STREAMS_COMPAT_MAC
 or
-.B CONFIG_STREAMS_COMPAT_AIX_MODULE
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
 .\"
 .\"
@@ -215,11 +224,15 @@ has no known bugs.
 .BR mi_next_ptr ()
 is compatible with
 .IR AIX \(rg
+and
+.IR MacOT \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_next_ptr ()
 is an
 .IR AIX \(rg-specific
+and
+.IR MacOT \(rg-specific
 function and it should not be used by portable
 .I STREAMS
 drivers and modules.
@@ -232,7 +245,9 @@ requires different include file sequences on
 lfs
 .]
 than on
-.IR AIX \(rg.
+.IR AIX \(rg
+or
+.IR MacOT \(rg.
 .IR AIX \(rg
 includes
 .B <pse/mi.h>
@@ -243,8 +258,12 @@ only.
 .BR mi_next_ptr ()
 is provided for source level compatibility with
 .IR AIX \(rg
+and
+.IR MacOT \(rg
 for the purpose of porting
 .IR AIX \(rg
+and
+.IR MacOT \(rg
 drivers to
 .BR Linux .
 Because internal structures and definitions for
@@ -253,12 +272,16 @@ Because internal structures and definitions for
 lfs
 .]
 differ from that of
-.IR AIX \(rg,
+.IR AIX \(rg
+and
+.IR MacOT \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_next_ptr ()
 only provides functionality comparable to
 .IR AIX \(rg
+and
+.IR MacOT \(rg
 for use by
 .I STREAMS
 drivers and modules.
@@ -269,20 +292,31 @@ in support of
 devices are not supported.
 .PP
 See
-.BR aixcompat (9)
+.BR aixcompat (9),
+.BR maccompat (9)
+and
+.BR STREAMS (9)
 for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 .IR AIX \(rg
-DDI documentation.
 .[
 aixdoc
 .]
 .[
 aixspg
 .]
+and
+.IR MacOT \(rg
+.[
+macotr
+.]
+.[
+macspg
+.]
+DDI documentation.
 .\"
 .\"
 .SH HISTORY

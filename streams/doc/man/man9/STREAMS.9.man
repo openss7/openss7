@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.12 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.13 2005/04/20 18:41:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:32 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -120,13 +120,13 @@ sort-adjacent-labels
 .HP
 .BR <sys/dki.h> " \-\ kernel definitions
 .HP
-.BR <sys/stropts.h> " \-\ user STREAMS ioctl include file
+.BR <sys/stropts.h> " \-\ user \fISTREAMS\fP ioctl include file
 .HP
-.BR <sys/stream.h> " \-\ STREAMS structures and utilities
+.BR <sys/stream.h> " \-\ \fISTREAMS\fP structures and utilities
 .HP
-.BR <sys/strconf.h> " \-\ STREAMS module configuration
+.BR <sys/strconf.h> " \-\ \fISTREAMS\fP module configuration
 .HP
-.BR <sys/kmem.h> " \-\ STREAMS aware memory allocators
+.BR <sys/kmem.h> " \-\ \fISTREAMS\fP aware memory allocators
 .HP
 .BR <sys/cmn_err.h> " \-\ SVR4 style
 .BR printk (9).
@@ -140,23 +140,23 @@ for more information.
 .PP
 .PD 0
 .HP
-.BR pipe "(4)\ \-\ STREAMS-based software pipes
+.BR pipe "(4)\ \-\ \fISTREAMS\fP-based software pipes
 .HP
-.BR fifo "(4)\ \-\ STREAMS-based first-in first-out special file, named pipe
+.BR fifo "(4)\ \-\ \fISTREAMS\fP-based first-in first-out special file, named pipe
 .HP
-.BR clone "(4)\ \-\ the STREAMS clone driver
+.BR clone "(4)\ \-\ the \fISTREAMS\fP clone driver
 .HP
-.BR sad "(4)\ \-\ the STREAMS administrative driver
+.BR sad "(4)\ \-\ the \fISTREAMS\fP administrative driver
 .HP
-.BR socksys "(4)\ \-\ STREAMS XTI/TLI access to sockets.
+.BR socksys "(4)\ \-\ \fISTREAMS\fP XTI/TLI access to sockets.
 .HP
-.BR ticlts "(4)\ \-\ STREAMS XTI/TLI connectionless local transport provider
+.BR ticlts "(4)\ \-\ \fISTREAMS\fP XTI/TLI connectionless local transport provider
 .HP
-.BR ticots "(4)\ \-\ STREAMS XTI/TLI connection-oriented local transport provider
+.BR ticots "(4)\ \-\ \fISTREAMS\fP XTI/TLI connection-oriented local transport provider
 .HP
-.BR ticotsord "(4)\ \-\ STREAMS XTI/TLI connection-oriented orderly release local transport provider
+.BR ticotsord "(4)\ \-\ \fISTREAMS\fP XTI/TLI connection-oriented orderly release local transport provider
 .HP
-.BR spx "(4)\ \-\ STREAMS bi-directional pipe device
+.BR spx "(4)\ \-\ \fISTREAMS\fP bi-directional pipe device
 .PD
 .PP
 .SS "Common Modules"
@@ -164,18 +164,18 @@ for more information.
 .PP
 .PD 0
 .HP
-.BR pipemod "(4)\ \-\ STREAMS module supporting flush handling in STREAMS fifos and pipes
+.BR pipemod "(4)\ \-\ \fISTREAMS\fP module supporting flush handling in \fISTREAMS\fP fifos and pipes
 .HP
-.BR ldl "(4)\ \-\ a STREAMS DLPI interface to Linux network devices
+.BR ldl "(4)\ \-\ a \fISTREAMS\fP DLPI interface to Linux network devices
 .HP
-.BR connld "(4)\ \-\ STREAMS module supporting the generation of unique new STREAMS pipes from
+.BR connld "(4)\ \-\ \fISTREAMS\fP module supporting the generation of unique new \fISTREAMS\fP pipes from
 an existing pipe end
 .HP
-.BR timod "(4)\ \-\ a STREAMS XTI/TLI compatibility interface
+.BR timod "(4)\ \-\ a \fISTREAMS\fP XTI/TLI compatibility interface
 .HP
-.BR tirdwr "(4)\ \-\ a STREAMS XTI/TLI read write comptibility interface
+.BR tirdwr "(4)\ \-\ a \fISTREAMS\fP XTI/TLI read write comptibility interface
 .HP
-.BR sockmod "(4)\ \-\ a STREAMS TPI to sockets compatibility module
+.BR sockmod "(4)\ \-\ a \fISTREAMS\fP TPI to sockets compatibility module
 .PD
 .PP
 .SS "System Calls"
@@ -183,21 +183,21 @@ an existing pipe end
 .PP
 .PD 0
 .HP
-.BR getmsg "(2)\ \-\ get next message from a STREAMS character device
+.BR getmsg "(2)\ \-\ get next message from a \fISTREAMS\fP character device
 .HP
-.BR getpmsg "(2s)\ \-\ get next message from a STREAMS character device
+.BR getpmsg "(2s)\ \-\ get next message from a \fISTREAMS\fP character device
 .HP
-.BR putmsg "(2)\ \-\ put a message to a STREAMS character device
+.BR putmsg "(2)\ \-\ put a message to a \fISTREAMS\fP character device
 .HP
-.BR putpmsg "(2s)\ \-\ put a message to a STREAMS character device
+.BR putpmsg "(2s)\ \-\ put a message to a \fISTREAMS\fP character device
 .HP
-.BR poll "(2)\ \-\ wait for some event on a STREAMS character device
+.BR poll "(2)\ \-\ wait for some event on a \fISTREAMS\fP character device
 .HP
-.BR fattach "(3)\ \-\ attach a STREAMS open file to a path name in the file system
+.BR fattach "(3)\ \-\ attach a \fISTREAMS\fP open file to a path name in the file system
 .HP
-.BR fdetach "(3)\ \-\ detach a STREAMS file from a path name in the file system
+.BR fdetach "(3)\ \-\ detach a \fISTREAMS\fP file from a path name in the file system
 .HP
-.BR isastream "(2)\ \-\ determine whether an open file is a STREAMS character device
+.BR isastream "(2)\ \-\ determine whether an open file is a \fISTREAMS\fP character device
 .HP
 .BR open "(2)\ \-\ open and possibly create a file or device
 .HP
@@ -211,24 +211,24 @@ an existing pipe end
 .HP
 .BR writev "(2)\ \-\ write to a file descriptor
 .HP
-.BR pipe "(2)\ \-\ create a STREAMS pipe
+.BR pipe "(2)\ \-\ create a \fISTREAMS\fP pipe
 .HP
 .BR ioctl "(2)\ \-\ control device
 .HP
-.BR streamio "(7)\ \-\ STREAMS ioctl commands
+.BR streamio "(7)\ \-\ \fISTREAMS\fP ioctl commands
 .PD
 .PP
 .SS "STREAMS Module Entry Points"
 .PP
 .PD 0
 .HP
-.BR qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.BR qopen "(9)\ \-\ call a \fISTREAMS\fP module or driver open routine
 .HP
-.BR qclose "(9)\ \-\ closes a STREAMS module or driver
+.BR qclose "(9)\ \-\ closes a \fISTREAMS\fP module or driver
 .HP
-.BR put "(9)\ \-\ invokes a STREAMS message queue put procedure
+.BR put "(9)\ \-\ invokes a \fISTREAMS\fP message queue put procedure
 .HP
-.BR srv "(9)\ \-\ invokes a STREAMS message queue service procedure
+.BR srv "(9)\ \-\ invokes a \fISTREAMS\fP message queue service procedure
 .PD
 .PP
 .SS "STREAMS Structures"
@@ -239,23 +239,23 @@ an existing pipe end
 .HP
 .BR cred_t "(9)\ \-\ SVR4-style credentials
 .HP
-.BR datab "(9)\ \-\ STREAMS data block
+.BR datab "(9)\ \-\ \fISTREAMS\fP data block
 .HP
 .BR fmodsw "(9)\ \-\ module switch table entry
 .HP
-.BR module_info "(9)\ \-\ STREAMS module information
+.BR module_info "(9)\ \-\ \fISTREAMS\fP module information
 .HP
-.BR msgb "(9)\ \-\ STREAMS message block
+.BR msgb "(9)\ \-\ \fISTREAMS\fP message block
 .HP
-.BR qband "(9)\ \-\ STREAMS queue band structure
+.BR qband "(9)\ \-\ \fISTREAMS\fP queue band structure
 .HP
-.BR qinit "(9)\ \-\ STREAMS queue initilization structures
+.BR qinit "(9)\ \-\ \fISTREAMS\fP queue initilization structures
 .HP
-.BR queinfo "(9)\ \-\ STREAMS queue info structure
+.BR queinfo "(9)\ \-\ \fISTREAMS\fP queue info structure
 .HP
-.BR queue "(9)\ \-\ STREAMS queue structure
+.BR queue "(9)\ \-\ \fISTREAMS\fP queue structure
 .HP
-.BR streamtab "(9)\ \-\ STREAMS stream table structure
+.BR streamtab "(9)\ \-\ \fISTREAMS\fP stream table structure
 .PP
 .PD
 .PP
@@ -263,45 +263,45 @@ an existing pipe end
 .PP
 .PD 0
 .HP
-.BR autopush_add "(9)\ \-\ add STREAMS autopush configuration"
+.BR autopush_add "(9)\ \-\ add \fISTREAMS\fP autopush configuration"
 .HP
-.BR autopush_del "(9)\ \-\ delete STREAMS autopush configuration"
+.BR autopush_del "(9)\ \-\ delete \fISTREAMS\fP autopush configuration"
 .HP
-.BR autopush_find "(9)\ \-\ find STREAMS autopush configuration"
+.BR autopush_find "(9)\ \-\ find \fISTREAMS\fP autopush configuration"
 .HP
-.BR autopush_vml "(9)\ \-\ verify a STREAMS module list"
+.BR autopush_vml "(9)\ \-\ verify a \fISTREAMS\fP module list"
 .HP
-.BR getadmin "(9)\ \-\ get the adminstration function pointer for a STREAMS module
+.BR getadmin "(9)\ \-\ get the adminstration function pointer for a \fISTREAMS\fP module
 .HP
-.BR getmid "(9)\ \-\ get the STREAMS module id for a name
+.BR getmid "(9)\ \-\ get the \fISTREAMS\fP module id for a name
 .HP
-.BR register_inode "(9)\ \-\ register a STREAMS special filesystem node
+.BR register_inode "(9)\ \-\ register a \fISTREAMS\fP special filesystem node
 .HP
 .BR register_inode_major "(9)\ \-\ register a STREAM head to a major device number
 .HP
 .BR register_inode_minor "(9)\ \-\ register a STREAM head to a minor device number
 .HP
-.BR register_strdev "(9)\ \-\ register a STREAMS device
+.BR register_strdev "(9)\ \-\ register a \fISTREAMS\fP device
 .HP
-.BR register_strdev_major "(9)\ \-\ register a STREAMS device to a major device number
+.BR register_strdev_major "(9)\ \-\ register a \fISTREAMS\fP device to a major device number
 .HP
-.BR register_strdev_minor "(9)\ \-\ register a STREAMS device to a minor device number
+.BR register_strdev_minor "(9)\ \-\ register a \fISTREAMS\fP device to a minor device number
 .HP
-.BR register_strmod "(9)\ \-\ register a STREAMS module to a module id
+.BR register_strmod "(9)\ \-\ register a \fISTREAMS\fP module to a module id
 .HP
-.BR unregister_inode "(9)\ \-\ unregister a STREAMS special filesystem node
+.BR unregister_inode "(9)\ \-\ unregister a \fISTREAMS\fP special filesystem node
 .HP
 .BR unregister_inode_major "(9)\ \-\ unregister a STREAM head from a major device number
 .HP
 .BR unregister_inode_minor "(9)\ \-\ unregister a STREAM head from a minor device number
 .HP
-.BR unregister_strdev "(9)\ \-\ unregister a STREAMS device
+.BR unregister_strdev "(9)\ \-\ unregister a \fISTREAMS\fP device
 .HP
-.BR unregister_strdev_major "(9)\ \-\ unregister a STREAMS device from a major device number
+.BR unregister_strdev_major "(9)\ \-\ unregister a \fISTREAMS\fP device from a major device number
 .HP
-.BR unregister_strdev_minor "(9)\ \-\ unregister a STREAMS device from a minor device number
+.BR unregister_strdev_minor "(9)\ \-\ unregister a \fISTREAMS\fP device from a minor device number
 .HP
-.BR unregister_strmod "(9)\ \-\ unregister a STREAMS module from a module id
+.BR unregister_strmod "(9)\ \-\ unregister a \fISTREAMS\fP module from a module id
 .PD
 .PP
 .SS "Message Handling Functions"
@@ -309,45 +309,45 @@ an existing pipe end
 .PP
 .PD 0
 .HP
-.BR adjmsg "(9)\ \-\ trim bytes from the front or back of a STREAMS message
+.BR adjmsg "(9)\ \-\ trim bytes from the front or back of a \fISTREAMS\fP message
 .HP
-.BR allocb "(9)\ \-\ allocate a STREAMS message and data block
+.BR allocb "(9)\ \-\ allocate a \fISTREAMS\fP message and data block
 .HP
-.BR bufcall "(9)\ \-\ install a STREAMS buffer callback
+.BR bufcall "(9)\ \-\ install a \fISTREAMS\fP buffer callback
 .HP
-.BR copyb "(9)\ \-\ copy a STREAMS message block
+.BR copyb "(9)\ \-\ copy a \fISTREAMS\fP message block
 .HP
-.BR copymsg "(9)\ \-\ copy a STREAMS message
+.BR copymsg "(9)\ \-\ copy a \fISTREAMS\fP message
 .HP
-.BR datamsg "(9)\ \-\ tests a STREAMS message type for data
+.BR datamsg "(9)\ \-\ tests a \fISTREAMS\fP message type for data
 .HP
-.BR dupb "(9)\ \-\ duplicate a STREAMS message block
+.BR dupb "(9)\ \-\ duplicate a \fISTREAMS\fP message block
 .HP
-.BR dupmsg "(9)\ \-\ duplicate a STREAMS message
+.BR dupmsg "(9)\ \-\ duplicate a \fISTREAMS\fP message
 .HP
-.BR esballoc "(9)\ \-\ allocate a STREAMS message and data block with a caller supplied data buffer
+.BR esballoc "(9)\ \-\ allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
 .HP
-.BR freeb "(9)\ \-\ frees a STREAMS message block
+.BR freeb "(9)\ \-\ frees a \fISTREAMS\fP message block
 .HP
-.BR freemsg "(9)\ \-\ frees a STREAMS message
+.BR freemsg "(9)\ \-\ frees a \fISTREAMS\fP message
 .HP
-.BR linkb "(9)\ \-\ link a message block to a STREAMS message
+.BR linkb "(9)\ \-\ link a message block to a \fISTREAMS\fP message
 .HP
-.BR msgdsize "(9)\ \-\ calculate the size of the data in a STREAMS message
+.BR msgdsize "(9)\ \-\ calculate the size of the data in a \fISTREAMS\fP message
 .HP
-.BR msgpullup "(9)\ \-\ pull up bytes in a STREAMS message
+.BR msgpullup "(9)\ \-\ pull up bytes in a \fISTREAMS\fP message
 .HP
-.BR pcmsg "(9)\ \-\ determine priority of a STREAMS message
+.BR pcmsg "(9)\ \-\ determine priority of a \fISTREAMS\fP message
 .HP
-.BR pullupmsg "(9)\ \-\ pull up the bytes in a STREAMS message
+.BR pullupmsg "(9)\ \-\ pull up the bytes in a \fISTREAMS\fP message
 .HP
-.BR rmvb "(9)\ \-\ remove a message block from a STREAMS message
+.BR rmvb "(9)\ \-\ remove a message block from a \fISTREAMS\fP message
 .HP
-.BR testb "(9)\ \-\ test is a STREAMS message can be allocated
+.BR testb "(9)\ \-\ test is a \fISTREAMS\fP message can be allocated
 .HP
-.BR unbufcall "(9)\ \-\ removes a STREAMS buffer callback
+.BR unbufcall "(9)\ \-\ removes a \fISTREAMS\fP buffer callback
 .HP
-.BR unlinkb "(9)\ \-\ unlink a message block from a STREAMS message
+.BR unlinkb "(9)\ \-\ unlink a message block from a \fISTREAMS\fP message
 .PD
 .PP
 .SS "Queue Handling Functions"
@@ -356,78 +356,78 @@ an existing pipe end
 .PP
 .PD 0
 .HP
-.BR backq "(9)\ \-\ find the upstream or downstream STREAMS queue
+.BR backq "(9)\ \-\ find the upstream or downstream \fISTREAMS\fP queue
 .HP
-.BR bcanput "(9)\ \-\ test flow control on a STREAMS message queue
+.BR bcanput "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.BR canenable "(9)\ \-\ test whether a \fISTREAMS\fP message queue can be scheduled
 .HP
-.BR canput "(9)\ \-\ test flow control on a STREAMS message queue
+.BR canput "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.BR enableok "(9)\ \-\ allows a \fISTREAMS\fP message queue to be scheduled
 .HP
-.BR flushband "(9)\ \-\ flushes band STREAMS messages from a message queue
+.BR flushband "(9)\ \-\ flushes band \fISTREAMS\fP messages from a message queue
 .HP
-.BR flushq "(9)\ \-\ flushes messages from a STREAMS message queue
+.BR flushq "(9)\ \-\ flushes messages from a \fISTREAMS\fP message queue
 .HP
-.BR getq "(9)\ \-\ gets a message from a STREAMS message queue
+.BR getq "(9)\ \-\ gets a message from a \fISTREAMS\fP message queue
 .HP
-.BR insq "(9)\ \-\ inserts a message into a STREAMS message queue
+.BR insq "(9)\ \-\ inserts a message into a \fISTREAMS\fP message queue
 .HP
-.BR noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.BR noenable "(9)\ \-\ disables a \fISTREAMS\fP message queue from being scheduled
 .HP
-.BR OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.BR OTHERQ "(9)\ \-\ return the other queue of a \fISTREAMS\fP queue pair
 .HP
-.BR putbq "(9)\ \-\ puts a message back on a STREAMS message queue
+.BR putbq "(9)\ \-\ puts a message back on a \fISTREAMS\fP message queue
 .HP
-.BR putctl "(9)\ \-\ puts a control message on a STREAMS message queue
+.BR putctl "(9)\ \-\ puts a control message on a \fISTREAMS\fP message queue
 .HP
-.BR putctl1 "(9)\ \-\ puts a 1 byte control message on a STREAMS message queue
+.BR putctl1 "(9)\ \-\ puts a 1 byte control message on a \fISTREAMS\fP message queue
 .HP
-.BR putq "(9)\ \-\ puts a message on a STREAMS message queue
+.BR putq "(9)\ \-\ puts a message on a \fISTREAMS\fP message queue
 .HP
-.BR qenable "(9)\ \-\ schedules a STREAMS message queue service routine
+.BR qenable "(9)\ \-\ schedules a \fISTREAMS\fP message queue service routine
 .HP
-.BR qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.BR qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
 .HP
 .BR qsize "(9)\ \-\ return the number of messages on a queue
 .HP
-.BR RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.BR RD "(9)\ \-\ return the read queue of a \fISTREAMS\fP queue pair
 .HP
-.BR rmvq "(9)\ \-\ remove a message from a STREAMS message queue
+.BR rmvq "(9)\ \-\ remove a message from a \fISTREAMS\fP message queue
 .HP
-.BR SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.BR SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
 .HP
-.BR WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.BR WR "(9)\ \-\ return the write queue of a \fISTREAMS\fP queue pair
 .PD
 .PP
 .B MP Queue Handling Functions
 .PP
 .PD 0
 .HP
-.BR bcanputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.BR bcanputnext "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR canputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.BR canputnext "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR freezestr "(9)\ \-\ freeze a STREAMS stream
+.BR freezestr "(9)\ \-\ freeze a \fISTREAMS\fP stream
 .HP
-.BR put "(9)\ \-\ invokes a STREAMS message queue put procedure
+.BR put "(9)\ \-\ invokes a \fISTREAMS\fP message queue put procedure
 .HP
-.BR putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.BR putnext "(9)\ \-\ puts a message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream STREAMS message queue
+.BR putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR putnextctl "(9)\ \-\ puts a control message on the downstream STREAMS message queue
+.BR putnextctl "(9)\ \-\ puts a control message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR qprocsoff "(9)\ \-\ disables STREAMS message queue processing for multi-processing
+.BR qprocsoff "(9)\ \-\ disables \fISTREAMS\fP message queue processing for multi-processing
 .HP
-.BR qprocson "(9)\ \-\ enables a STREAMS message queue for multi-processing
+.BR qprocson "(9)\ \-\ enables a \fISTREAMS\fP message queue for multi-processing
 .HP
-.BR strqget "(9)\ \-\ gets information about a STREAMS message queue
+.BR strqget "(9)\ \-\ gets information about a \fISTREAMS\fP message queue
 .HP
-.BR strqset "(9)\ \-\ sets attributes of a STREAMS message queue
+.BR strqset "(9)\ \-\ sets attributes of a \fISTREAMS\fP message queue
 .HP
-.BR unfreezestr "(9)\ \-\ thaw a STREAMS stream
+.BR unfreezestr "(9)\ \-\ thaw a \fISTREAMS\fP stream
 .PP
 .PD
 .PP
@@ -482,7 +482,7 @@ an existing pipe end
 .HP
 .BR mount "(9)\ \-\ mount a file system
 .HP
-.BR strlog "(9)\ \-\ pass a message to the STREAMS logger
+.BR strlog "(9)\ \-\ pass a message to the \fISTREAMS\fP logger
 .HP
 .BR timeout "(9)\ \-\ start a timer
 .HP
@@ -506,15 +506,15 @@ usldk
 .PP
 .PD 0
 .HP
-.BR linkmsg "(9)\ \-\ link a message block to a STREAMS message
+.BR linkmsg "(9)\ \-\ link a message block to a \fISTREAMS\fP message
 .HP
-.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a \fISTREAMS\fP message queue
 .HP
-.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream STREAMS message queue
+.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR weldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .HP
-.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR unweldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .PD
 .PP
 .SS "Linux Fast-STREAMS Extensions"
@@ -529,23 +529,23 @@ internal functions listed below:
 .PP
 .PD 0
 .HP
-.BR allocq "(9)\ \-\ allocate a STREAMS queue pair
+.BR allocq "(9)\ \-\ allocate a \fISTREAMS\fP queue pair
 .HP
-.BR bcanget "(9)\ \-\ test retrieval on a STREAMS message queue
+.BR bcanget "(9)\ \-\ test retrieval on a \fISTREAMS\fP message queue
 .HP
-.BR canget "(9)\ \-\ test retreival on a STREAMS message queue
+.BR canget "(9)\ \-\ test retreival on a \fISTREAMS\fP message queue
 .HP
-.BR freeq "(9)\ \-\ deallocate a STREAMS queue pair
+.BR freeq "(9)\ \-\ deallocate a \fISTREAMS\fP queue pair
 .HP
-.BR qattach "(9)\ \-\ attach a module onto a STREAMS file
+.BR qattach "(9)\ \-\ attach a module onto a \fISTREAMS\fP file
 .HP
-.BR qclose "(9)\ \-\ closes a STREAMS module or driver
+.BR qclose "(9)\ \-\ closes a \fISTREAMS\fP module or driver
 .HP
-.BR qdetach "(9)\ \-\ detach a module from a STREAMS file
+.BR qdetach "(9)\ \-\ detach a module from a \fISTREAMS\fP file
 .HP
-.BR qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.BR qopen "(9)\ \-\ call a \fISTREAMS\fP module or driver open routine
 .HP
-.BR setq "(9)\ \-\ asign a queue pair to a STREAMS module
+.BR setq "(9)\ \-\ asign a queue pair to a \fISTREAMS\fP module
 .PD
 .PP
 .SH "Linux Fast-STREAMS Extensions from LiS"
@@ -553,21 +553,21 @@ internal functions listed below:
 .PP
 .PD 0
 .HP
-.BR appq "(9)\ \-\ append a STREAMS message after another
+.BR appq "(9)\ \-\ append a \fISTREAMS\fP message after another
 .HP
-.BR esbbcall "(9)\ \-\ installs a buffer callback for an extended STREAMS message block
+.BR esbbcall "(9)\ \-\ installs a buffer callback for an extended \fISTREAMS\fP message block
 .HP
-.BR isdatablk "(9)\ \-\ tests a STREAMS data block for data type
+.BR isdatablk "(9)\ \-\ tests a \fISTREAMS\fP data block for data type
 .HP
-.BR isdatamsg "(9)\ \-\ tests a STREAMS data block for data type
+.BR isdatamsg "(9)\ \-\ tests a \fISTREAMS\fP data block for data type
 .HP
 .BR kmem_zalloc_node "(9)\ \-\ allocate kernel memory
 .HP
-.BR msgsize "(9)\ \-\ calculate the size of the message blocks in a STREAMS message
+.BR msgsize "(9)\ \-\ calculate the size of the message blocks in a \fISTREAMS\fP message
 .HP
 .BR qcountstrm "(9)\ \-\ return the downstream message count on a stream
 .HP
-.BR xmsgsize "(9)\ \-\ calculate the size of message blocks in a STREAMS message
+.BR xmsgsize "(9)\ \-\ calculate the size of message blocks in a \fISTREAMS\fP message
 .PD
 .PP
 .SH COMPATIBILITY
@@ -644,7 +644,7 @@ internal functions listed below:
 .HP
 .BR mi_open_comm "(9)\ \-\ \fISTREAMS\fP common minor device open utility
 .HP
-.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a \fISTREAMS\fP message queue
 .HP
 .BR splstr "(9)\ \-\ 
 .HP
@@ -652,22 +652,22 @@ internal functions listed below:
 .HP
 .BR str_install "(9)\ \-\ 
 .HP
-.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR unweldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .HP
 .BR wantio "(9)\ \-\ perform direct I/O from a \fISTREAMS\fR driver
 .HP
 .BR wantmsg "(9)\ \-\ provide a filter of wanted messages for a \fISTREAMS\fP module
 .HP
-.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR weldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .PD
 .PP
 .SS "HP-UX\(rg 11.0i v2 Compatibility Functions"
 .PP
 .PD 0
 .HP
-.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a STREAMS message queue
+.BR putctl2 "(9)\ \-\ puts a 2 byte control message on a \fISTREAMS\fP message queue
 .HP
-.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream STREAMS message queue
+.BR putnextctl2 "(9)\ \-\ puts a 2 byte control message on the downstream \fISTREAMS\fP message queue
 .HP
 .BR str_install "(9)\ \-\ 
 .HP
@@ -677,9 +677,9 @@ internal functions listed below:
 .HP
 .BR streams_put "(9)\ \-\ 
 .HP
-.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR unweldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .HP
-.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR weldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .PD
 .PP
 .SS "OSF/1 1.2\(emDigial UNIX\(rg Compatibility Functions"
@@ -702,16 +702,16 @@ internal functions listed below:
 .HP
 .BR time "(9)\ \-\ 
 .HP
-.BR unweldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR unweldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .HP
-.BR weldq "(9)\ \-\ weld two pairs of STREAMS queues together"
+.BR weldq "(9)\ \-\ weld two pairs of \fISTREAMS\fP queues together"
 .PD
 .PP
 .SS "UnixWare\(rg 7.1.3 (OpenUnix 8) Compatibility Functions"
 .PP
 .PD 0
 .HP
-.BR allocb_physreq "(9)\ \-\ allocate a STREAMS message and data block
+.BR allocb_physreq "(9)\ \-\ allocate a \fISTREAMS\fP message and data block
 .HP
 .BR ATOMIC_INT_ADD "(9)\ \-\ 
 .HP
@@ -859,6 +859,93 @@ internal functions listed below:
 .BR qwriter "(9)\ \-\ 
 .PD
 .PP
+.SS "MacOT 1.5r2 Compatibility Functions"
+.PP
+.PD 0
+.HP
+.BR mi_bufcall "(9)\ \-\ 
+.HP
+.BR drv_priv "(9)\ \-\ 
+.HP
+.BR esballoca "(9)\ \-\ 
+.HP
+.BR mpnotify "(9)\ \-\ 
+.HP
+.BR putctl2 "(9)\ \-\ 
+.HP
+.BR puthere "(9)\ \-\ 
+.HP
+.BR mi_allocq "(9)\ \-\ 
+.HP
+.BR mi_bcmp "(9)\ \-\ 
+.HP
+.BR mi_bufcall "(9)\ \-\ 
+.HP
+.BR mi_close_comm "(9)\ \-\ 
+.HP
+.BR mi_close_detached "(9)\ \-\ 
+.HP
+.BR mi_copy_done "(9)\ \-\ 
+.HP
+.BR mi_copyin "(9)\ \-\ 
+.HP
+.BR mi_copyout "(9)\ \-\ 
+.HP
+.BR mi_copyout_alloc "(9)\ \-\ 
+.HP
+.BR mi_copy_set_rval "(9)\ \-\ 
+.HP
+.BR mi_copy_state "(9)\ \-\ 
+.HP
+.BR mi_detach "(9)\ \-\ 
+.HP
+.BR mi_freeq "(9)\ \-\ 
+.HP
+.BR mi_next_ptr "(9)\ \-\ 
+.HP
+.BR mi_offset_param "(9)\ \-\ 
+.HP
+.BR mi_offset_paramc "(9)\ \-\ 
+.HP
+.BR mi_open_comm "(9)\ \-\ 
+.HP
+.BR mi_open_detached "(9)\ \-\ 
+.HP
+.BR mi_prev_ptr "(9)\ \-\ 
+.HP
+.BR mi_reallocb "(9)\ \-\ 
+.HP
+.BR mi_reuse_proto "(9)\ \-\ 
+.HP
+.BR mi_set_sth_hiwat "(9)\ \-\ 
+.HP
+.BR mi_set_sth_lowat "(9)\ \-\ 
+.HP
+.BR mi_set_sth_maxblk "(9)\ \-\ 
+.HP
+.BR mi_set_sth_wroff "(9)\ \-\ 
+.HP
+.BR mi_sprintf "(9)\ \-\ 
+.HP
+.BR mi_timer "(9)\ \-\ 
+.HP
+.BR mi_timer_alloc "(9)\ \-\ 
+.HP
+.BR mi_timer_cancel "(9)\ \-\ 
+.HP
+.BR mi_timer_free "(9)\ \-\ 
+.HP
+.BR mi_timer_q_switch "(9)\ \-\ 
+.HP
+.BR mi_timer_valid "(9)\ \-\ 
+.HP
+.BR mps_become_writer "(9)\ \-\ 
+.HP
+.BR mps_intr_disable "(9)\ \-\ 
+.HP
+.BR mps_intr_enable "(9)\ \-\ 
+.PD
+.PP
 .SS "LiS 2.16 Compatibility Functions"
 .PP
 .PD 0
@@ -876,161 +963,161 @@ internal functions listed below:
 .PP
 .PD 0
 .HP
-.BR lis_adjmsg "(9)\ \-\ trim bytes from the front or back of a STREAMS message
+.BR lis_adjmsg "(9)\ \-\ trim bytes from the front or back of a \fISTREAMS\fP message
 .HP
-.BR lis_allocb "(9)\ \-\ allocate a STREAMS message and data block
+.BR lis_allocb "(9)\ \-\ allocate a \fISTREAMS\fP message and data block
 .HP
-.BR lis_allocb_physreq "(9)\ \-\ allocate a STREAMS message and data block
+.BR lis_allocb_physreq "(9)\ \-\ allocate a \fISTREAMS\fP message and data block
 .HP
-.BR lis_allocq "(9)\ \-\ allocate a STREAMS queue pair
+.BR lis_allocq "(9)\ \-\ allocate a \fISTREAMS\fP queue pair
 .HP
-.BR lis_appq "(9)\ \-\ append a STREAMS message after another
+.BR lis_appq "(9)\ \-\ append a \fISTREAMS\fP message after another
 .HP
-.BR lis_backq "(9)\ \-\ find the upstream or downstream STREAMS queue
+.BR lis_backq "(9)\ \-\ find the upstream or downstream \fISTREAMS\fP queue
 .HP
-.BR lis_bcanput "(9)\ \-\ test flow control on a STREAMS message queue
+.BR lis_bcanput "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR lis_bcanputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.BR lis_bcanputnext "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
 .BR lis_bcopy "(9)\ \-\ copy byte strings
 .HP
-.BR lis_bufcall "(9)\ \-\ install a STREAMS buffer callback
+.BR lis_bufcall "(9)\ \-\ install a \fISTREAMS\fP buffer callback
 .HP
 .BR lis_bzero "(9)\ \-\ zero a byte string
 .HP
-.BR lis_canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.BR lis_canenable "(9)\ \-\ test whether a \fISTREAMS\fP message queue can be scheduled
 .HP
-.BR lis_canput "(9)\ \-\ test flow control on a STREAMS message queue
+.BR lis_canput "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR lis_canputnext "(9)\ \-\ test flow control on a STREAMS message queue
+.BR lis_canputnext "(9)\ \-\ test flow control on a \fISTREAMS\fP message queue
 .HP
 .BR lis_cmn_err "(9)\ \-\ print a kernel command error
 .HP
-.BR lis_copyb "(9)\ \-\ copy a STREAMS message block
+.BR lis_copyb "(9)\ \-\ copy a \fISTREAMS\fP message block
 .HP
-.BR lis_copymsg "(9)\ \-\ copy a STREAMS message
+.BR lis_copymsg "(9)\ \-\ copy a \fISTREAMS\fP message
 .HP
-.BR lis_datamsg "(9)\ \-\ tests a STREAMS message type for data
+.BR lis_datamsg "(9)\ \-\ tests a \fISTREAMS\fP message type for data
 .HP
-.BR lis_date "(9)\ \-\ the version and release date of STREAMS
+.BR lis_date "(9)\ \-\ the version and release date of \fISTREAMS\fP
 .HP
-.BR lis_dupb "(9)\ \-\ duplicate a STREAMS message block
+.BR lis_dupb "(9)\ \-\ duplicate a \fISTREAMS\fP message block
 .HP
-.BR lis_dupmsg "(9)\ \-\ duplicate a STREAMS message
+.BR lis_dupmsg "(9)\ \-\ duplicate a \fISTREAMS\fP message
 .HP
-.BR lis_enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.BR lis_enableok "(9)\ \-\ allows a \fISTREAMS\fP message queue to be scheduled
 .HP
-.BR lis_esballoc "(9)\ \-\ allocate a STREAMS message and data block with a caller supplied data buffer
+.BR lis_esballoc "(9)\ \-\ allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
 .HP
-.BR lis_esbbcall "(9)\ \-\ installs a buffer callback for an extended STREAMS message block
+.BR lis_esbbcall "(9)\ \-\ installs a buffer callback for an extended \fISTREAMS\fP message block
 .HP
 .BR lis_find_strdev "(9)\ \-\ finds a streamtab entry for a device
 .HP
-.BR lis_flushband "(9)\ \-\ flushes band STREAMS messages from a message queue
+.BR lis_flushband "(9)\ \-\ flushes band \fISTREAMS\fP messages from a message queue
 .HP
-.BR lis_flushq "(9)\ \-\ flushes messages from a STREAMS message queue
+.BR lis_flushq "(9)\ \-\ flushes messages from a \fISTREAMS\fP message queue
 .HP
-.BR lis_freeb "(9)\ \-\ frees a STREAMS message block
+.BR lis_freeb "(9)\ \-\ frees a \fISTREAMS\fP message block
 .HP
-.BR lis_freemsg "(9)\ \-\ frees a STREAMS message
+.BR lis_freemsg "(9)\ \-\ frees a \fISTREAMS\fP message
 .HP
-.BR lis_freeq "(9)\ \-\ deallocate a STREAMS queue pair
+.BR lis_freeq "(9)\ \-\ deallocate a \fISTREAMS\fP queue pair
 .HP
-.BR lis_getq "(9)\ \-\ gets a message from a STREAMS message queue
+.BR lis_getq "(9)\ \-\ gets a message from a \fISTREAMS\fP message queue
 .HP
-.BR lis_insq "(9)\ \-\ inserts a message into a STREAMS message queue
+.BR lis_insq "(9)\ \-\ inserts a message into a \fISTREAMS\fP message queue
 .HP
-.BR lis_isdatablk "(9)\ \-\ tests a STREAMS data block for data type
+.BR lis_isdatablk "(9)\ \-\ tests a \fISTREAMS\fP data block for data type
 .HP
-.BR lis_isdatamsg "(9)\ \-\ tests a STREAMS data block for data type
+.BR lis_isdatamsg "(9)\ \-\ tests a \fISTREAMS\fP data block for data type
 .HP
-.BR lis_linkb "(9)\ \-\ link a message block to a STREAMS message
+.BR lis_linkb "(9)\ \-\ link a message block to a \fISTREAMS\fP message
 .HP
 .BR lis_mknod "(9)\ \-\ create a special or ordinary file
 .HP
 .BR lis_mount "(9)\ \-\ mount a file system
 .HP
-.BR lis_msgdsize "(9)\ \-\ calculate the size of the data in a STREAMS message
+.BR lis_msgdsize "(9)\ \-\ calculate the size of the data in a \fISTREAMS\fP message
 .HP
-.BR lis_msgpullup "(9)\ \-\ pull up bytes in a STREAMS message
+.BR lis_msgpullup "(9)\ \-\ pull up bytes in a \fISTREAMS\fP message
 .HP
-.BR lis_msgsize "(9)\ \-\ calculate the size of message blocks in a STREAMS message
+.BR lis_msgsize "(9)\ \-\ calculate the size of message blocks in a \fISTREAMS\fP message
 .HP
-.BR lis_noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.BR lis_noenable "(9)\ \-\ disables a \fISTREAMS\fP message queue from being scheduled
 .HP
-.BR lis_OTHER "(9)\ \-\ return the other queue of a STREAMS queue pair
+.BR lis_OTHER "(9)\ \-\ return the other queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.BR lis_OTHERQ "(9)\ \-\ return the other queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_pullupmsg "(9)\ \-\ pull up the bytes in a STREAMS message
+.BR lis_pullupmsg "(9)\ \-\ pull up the bytes in a \fISTREAMS\fP message
 .HP
-.BR lis_putbq "(9)\ \-\ puts a message back on a STREAMS message queue
+.BR lis_putbq "(9)\ \-\ puts a message back on a \fISTREAMS\fP message queue
 .HP
-.BR lis_putctl1 "(9)\ \-\ puts a 1 byte control message on a STREAMS message queue
+.BR lis_putctl1 "(9)\ \-\ puts a 1 byte control message on a \fISTREAMS\fP message queue
 .HP
-.BR lis_putctl "(9)\ \-\ puts a control message on a STREAMS message queue
+.BR lis_putctl "(9)\ \-\ puts a control message on a \fISTREAMS\fP message queue
 .HP
-.BR lis_putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.BR lis_putnext "(9)\ \-\ puts a message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR lis_putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream STREAMS message queue
+.BR lis_putnextctl1 "(9)\ \-\ puts a 1 byte control message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR lis_putnextctl "(9)\ \-\ puts a control message on the downstream STREAMS message queue
+.BR lis_putnextctl "(9)\ \-\ puts a control message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR lis_putq "(9)\ \-\ puts a message on a STREAMS message queue
+.BR lis_putq "(9)\ \-\ puts a message on a \fISTREAMS\fP message queue
 .HP
-.BR lis_qattach "(9)\ \-\ attach a module onto a STREAMS file
+.BR lis_qattach "(9)\ \-\ attach a module onto a \fISTREAMS\fP file
 .HP
-.BR lis_qclose "(9)\ \-\ closes a STREAMS module or driver
+.BR lis_qclose "(9)\ \-\ closes a \fISTREAMS\fP module or driver
 .HP
-.BR lis_qdetach "(9)\ \-\ detach a module from a STREAMS file
+.BR lis_qdetach "(9)\ \-\ detach a module from a \fISTREAMS\fP file
 .HP
-.BR lis_qenable "(9)\ \-\ schedules a STREAMS message queue service routine
+.BR lis_qenable "(9)\ \-\ schedules a \fISTREAMS\fP message queue service routine
 .HP
-.BR lis_qopen "(9)\ \-\ call a STREAMS module or driver open routine
+.BR lis_qopen "(9)\ \-\ call a \fISTREAMS\fP module or driver open routine
 .HP
-.BR lis_qprocsoff "(9)\ \-\ disables STREAMS message queue processing for multi-processing
+.BR lis_qprocsoff "(9)\ \-\ disables \fISTREAMS\fP message queue processing for multi-processing
 .HP
-.BR lis_qprocson "(9)\ \-\ enables a STREAMS message queue for multi-processing
+.BR lis_qprocson "(9)\ \-\ enables a \fISTREAMS\fP message queue for multi-processing
 .HP
-.BR lis_qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.BR lis_qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
 .HP
 .BR lis_qsize "(9)\ \-\ return the number of messages on a queue
 .HP
-.BR lis_RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.BR lis_RD "(9)\ \-\ return the read queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_register_strdev "(9)\ \-\ register a STREAMS device
+.BR lis_register_strdev "(9)\ \-\ register a \fISTREAMS\fP device
 .HP
-.BR lis_register_strmod "(9)\ \-\ register a STREAMS module
+.BR lis_register_strmod "(9)\ \-\ register a \fISTREAMS\fP module
 .HP
-.BR lis_rmvb "(9)\ \-\ remove a message block from a STREAMS message
+.BR lis_rmvb "(9)\ \-\ remove a message block from a \fISTREAMS\fP message
 .HP
-.BR lis_rmvq "(9)\ \-\ remove a message from a STREAMS message queue
+.BR lis_rmvq "(9)\ \-\ remove a message from a \fISTREAMS\fP message queue
 .HP
-.BR lis_safe_canenable "(9)\ \-\ test whether a STREAMS message queue can be scheduled
+.BR lis_safe_canenable "(9)\ \-\ test whether a \fISTREAMS\fP message queue can be scheduled
 .HP
-.BR lis_safe_enableok "(9)\ \-\ allows a STREAMS message queue to be scheduled
+.BR lis_safe_enableok "(9)\ \-\ allows a \fISTREAMS\fP message queue to be scheduled
 .HP
-.BR lis_safe_noenable "(9)\ \-\ disables a STREAMS message queue from being scheduled
+.BR lis_safe_noenable "(9)\ \-\ disables a \fISTREAMS\fP message queue from being scheduled
 .HP
-.BR lis_safe_OTHERQ "(9)\ \-\ return the other queue of a STREAMS queue pair
+.BR lis_safe_OTHERQ "(9)\ \-\ return the other queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_safe_putnext "(9)\ \-\ puts a message on the downstream STREAMS message queue
+.BR lis_safe_putnext "(9)\ \-\ puts a message on the downstream \fISTREAMS\fP message queue
 .HP
-.BR lis_safe_qreply "(9)\ \-\ replys to a message from a STREAMS message queue
+.BR lis_safe_qreply "(9)\ \-\ replys to a message from a \fISTREAMS\fP message queue
 .HP
-.BR lis_safe_RD "(9)\ \-\ return the read queue of a STREAMS queue pair
+.BR lis_safe_RD "(9)\ \-\ return the read queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_safe_SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.BR lis_safe_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
 .HP
-.BR lis_safe_WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.BR lis_safe_WR "(9)\ \-\ return the write queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_SAMESTR "(9)\ \-\ test for STREAMS pipe or fifo
+.BR lis_SAMESTR "(9)\ \-\ test for \fISTREAMS\fP pipe or fifo
 .HP
-.BR lis_strqget "(9)\ \-\ gets information about a STREAMS message queue
+.BR lis_strqget "(9)\ \-\ gets information about a \fISTREAMS\fP message queue
 .HP
-.BR lis_strqset "(9)\ \-\ sets attributes of a STREAMS message queue
+.BR lis_strqset "(9)\ \-\ sets attributes of a \fISTREAMS\fP message queue
 .HP
-.BR lis_testb "(9)\ \-\ test is a STREAMS message can be allocated
+.BR lis_testb "(9)\ \-\ test is a \fISTREAMS\fP message can be allocated
 .HP
 .BR lis_timeout "(9)\ \-\ start a timer
 .HP
@@ -1038,23 +1125,23 @@ internal functions listed below:
 .HP
 .BR lis_umount "(9)\ \-\ unmount a filesystem
 .HP
-.BR lis_unbufcall "(9)\ \-\ removes a STREAMS buffer callback
+.BR lis_unbufcall "(9)\ \-\ removes a \fISTREAMS\fP buffer callback
 .HP
 .BR lis_unlink "(9)\ \-\ remove a file
 .HP
-.BR lis_unlinkb "(9)\ \-\ unlink a message block from a STREAMS message
+.BR lis_unlinkb "(9)\ \-\ unlink a message block from a \fISTREAMS\fP message
 .HP
-.BR lis_unregister_strdev "(9)\ \-\ unregister a STREAMS device
+.BR lis_unregister_strdev "(9)\ \-\ unregister a \fISTREAMS\fP device
 .HP
-.BR lis_unregister_strmod "(9)\ \-\ deregister a STREAMS module
+.BR lis_unregister_strmod "(9)\ \-\ deregister a \fISTREAMS\fP module
 .HP
 .BR lis_untimeout "(9)\ \-\ stop a timer
 .HP
-.BR lis_version "(9)\ \-\ the version and release date of STREAMS
+.BR lis_version "(9)\ \-\ the version and release date of \fISTREAMS\fP
 .HP
-.BR lis_WR "(9)\ \-\ return the write queue of a STREAMS queue pair
+.BR lis_WR "(9)\ \-\ return the write queue of a \fISTREAMS\fP queue pair
 .HP
-.BR lis_xmsgsize "(9)\ \-\ calculate the size of the message blocks in a STREAMS message
+.BR lis_xmsgsize "(9)\ \-\ calculate the size of the message blocks in a \fISTREAMS\fP message
 .PD
 .PP
 .\"
@@ -1097,7 +1184,7 @@ interface, or using
 .BR sysctl (8).
 .PP
 The following
-.B STREAMS
+.I STREAMS
 specific system controls are provided by
 .BR "Linux Fast-STREAMS" :
 .TP
@@ -1270,7 +1357,9 @@ IO controls of
 .BR streamio (7).
 .TP
 .B sys.streams.strctlsz
-Defines the maximum STREAMS control part size.
+Defines the maximum
+.I STREAMS
+control part size.
 Valid values are zero (0) or greater (MAXINT).
 The default value is 2^12.
 This is the system wide maximum.  Existing allocations are unaffected by
@@ -1279,7 +1368,9 @@ Changing this value can have an impact on users of
 .BR putpmsg (2s).
 .TP
 .B sys.streams.strmsgsz
-Defines the maximum STREAMS message size.
+Defines the maximum
+.I STREAMS
+message size.
 Valid values are zero (0) or greater (MAXINT).
 The default value is 2^18.
 This is the system wide maximum.  Existing allocations are unaffected by
@@ -1299,11 +1390,14 @@ or
 .BR kmem_zalloc (9),
 or indirectly using
 .BR allocb (9)
-or allocating other STREAMS data structures.
+or allocating other
+.I STREAMS
+data structures.
 Valid values are zero (0) or greater (MAXINT).
 This is the system wide maximum.  Existing allocations are unaffected by
 lowering this value.
-Changing this value to a low value may have some use in debugging STREAMS
+Changing this value to a low value may have some use in debugging
+.I STREAMS
 drivers and modules.
 .\"
 .\"

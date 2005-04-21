@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.13 2005/04/13 07:51:05 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.14 2005/04/20 18:41:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,7 +149,8 @@ could not be allocated.
 .SH CONTEXT
 .PP
 .BR insq ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

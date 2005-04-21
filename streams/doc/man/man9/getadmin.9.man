@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: getadmin.9.man,v 0.9.2.9 2005/03/30 13:38:47 brian Exp $
+.\" @(#) $Id: getadmin.9.man,v 0.9.2.10 2005/04/20 18:41:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -125,7 +125,8 @@ fails when there is no module or driver for the given module Id.
 .SH CONTEXT
 .PP
 .BR getadmin ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 When called from a blocking context,
 .BR getadmin ()
 has the side-effect that the identified module may be loaded by module

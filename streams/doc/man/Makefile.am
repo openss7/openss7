@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/04/13 07:53:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/20 18:41:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/13 07:53:11 $ by $Author: brian $
+# Last Modified $Date: 2005/04/20 18:41:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -149,6 +149,42 @@ lis_deprec_pages = \
 	man9/lis_strwrite.9 \
 	man9/lis_umount2.9 \
 	man9/lis_valid_mod_list.9
+
+mac_compat_pages = \
+	man9/maccompat.9 \
+	man9/allocbi.9 \
+	man9/esballoca.9 \
+	man9/mpnotify.9 \
+	man9/mi_allocq.9 \
+	man9/mi_bcmp.9 \
+	man9/mi_close_detached.9 \
+	man9/mi_copy_done.9 \
+	man9/mi_copyin.9 \
+	man9/mi_copyout.9 \
+	man9/mi_copyout_alloc.9 \
+	man9/mi_copy_set_rval.9 \
+	man9/mi_copy_state.9 \
+	man9/mi_detach.9 \
+	man9/mi_freeq.9 \
+	man9/mi_offset_param.9 \
+	man9/mi_offset_paramc.9 \
+	man9/mi_open_detached.9 \
+	man9/mi_reallocb.9 \
+	man9/mi_reuse_proto.9 \
+	man9/mi_set_sth_hiwat.9 \
+	man9/mi_set_sth_lowat.9 \
+	man9/mi_set_sth_maxblk.9 \
+	man9/mi_set_sth_wroff.9 \
+	man9/mi_sprintf.9 \
+	man9/mi_timer.9 \
+	man9/mi_timer_alloc.9 \
+	man9/mi_timer_cancel.9 \
+	man9/mi_timer_free.9 \
+	man9/mi_timer_q_switch.9 \
+	man9/mi_timer_valid.9 \
+	man9/mps_become_writer.9 \
+	man9/mps_intr_disable.9 \
+	man9/mps_intr_enable.9
 
 man_MANS = \
 	man1/strchg.1 \
@@ -828,8 +864,11 @@ man_MANS = \
 	man9/wantmsg.9 \
 	man9/weldq.9 \
 	man9/WR.9 \
-	man9/xmsgsize.9 \
-	$(lis_deprec_pages)
+	man9/xmsgsize.9
+
+man_MANS += $(lis_deprec_pages)
+
+man_MANS += $(mac_compat_pages)
 
 dist_noinst_lis_deprec_pages = \
 	man9/lisdeprec.9.man \
@@ -923,6 +962,43 @@ dist_noinst_lis_deprec_pages = \
 	man9/lis_strwrite.9.man \
 	man9/lis_umount2.9.man \
 	man9/lis_valid_mod_list.9.man
+
+dist_noinst_mac_compat_pages = \
+	man9/maccompat.9.man \
+	man9/allocbi.9.man \
+	man9/esballoca.9.man \
+	man9/mpnotify.9.man \
+	man9/mi_allocq.9.man \
+	man9/mi_bcmp.9.man \
+	man9/mi_close_detached.9.man \
+	man9/mi_copy_done.9.man \
+	man9/mi_copyin.9.man \
+	man9/mi_copyout.9.man \
+	man9/mi_copyout_alloc.9.man \
+	man9/mi_copy_set_rval.9.man \
+	man9/mi_copy_state.9.man \
+	man9/mi_detach.9.man \
+	man9/mi_freeq.9.man \
+	man9/mi_offset_param.9.man \
+	man9/mi_offset_paramc.9.man \
+	man9/mi_open_detached.9.man \
+	man9/mi_reallocb.9.man \
+	man9/mi_reuse_proto.9.man \
+	man9/mi_set_sth_hiwat.9.man \
+	man9/mi_set_sth_lowat.9.man \
+	man9/mi_set_sth_maxblk.9.man \
+	man9/mi_set_sth_wroff.9.man \
+	man9/mi_sprintf.9.man \
+	man9/mi_timer.9.man \
+	man9/mi_timer_alloc.9.man \
+	man9/mi_timer_cancel.9.man \
+	man9/mi_timer_free.9.man \
+	man9/mi_timer_q_switch.9.man \
+	man9/mi_timer_valid.9.man \
+	man9/mps_become_writer.9.man \
+	man9/mps_intr_disable.9.man \
+	man9/mps_intr_enable.9.man
+
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
@@ -1602,8 +1678,11 @@ dist_noinst_MANS = \
 	man9/wantmsg.9.man \
 	man9/weldq.9.man \
 	man9/WR.9.man \
-	man9/xmsgsize.9.man \
-	$(dist_noinst_lis_deprec_pages)
+	man9/xmsgsize.9.man
+
+dist_noinst_MANS += $(dist_noinst_lis_deprec_pages)
+
+dist_noinst_MANS += $(dist_noinst_mac_compat_pages)
 
 ## PKG_BUILD_INDEP
 endif

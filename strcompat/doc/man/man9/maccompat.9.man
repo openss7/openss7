@@ -1,0 +1,711 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: maccompat.9.man,v 0.9.2.1 2005/04/20 18:41:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/20 18:41:35 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MACCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B maccompat
+\- MacOT 1.5r2 \fISTREAMS\fP Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MAC_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B Linux Fast-STREAMS
+provides a compatibility module,
+.BR streams-maccompat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I Mac OpenTransport 1.5r2
+.I STREAMS
+environment to
+.BR "Linux Fast-STREAMS" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.I MacOT
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "Linux Fast-STREAMS" .
+Other
+.IR MacOT \(rg-specific
+functions are provided by the
+.B streams-maccompat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.BR Linux Fast STREAMS
+are as follows:
+.HP
+.PD 0
+.BR adjmsg (9)\ \-\ \c
+trim bytes from the front or back of a \fISTREAMS\fP message
+.HP
+.BR allocb (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block
+.HP
+.BR allocq (9)\ \-\ \c
+allocate a \fISTREAMS\fP queue pair
+.HP
+.BR backq (9)\ \-\ \c
+find the upstream or downstream queue
+.HP
+.BR bcanput (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR bcanputnext (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR bufcall (9)\ \-\ \c
+install a buffer callback
+.HP
+.BR canput (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR canputnext (9)\ \-\ \c
+test flow control on a \fISTREAMS\fP message queue
+.HP
+.BR cmn_err (9)\ \-\ \c
+print a kernel command error
+.HP
+.BR copyb (9)\ \-\ \c
+copy a \fISTREAMS\fP message block
+.HP
+.BR copymsg (9)\ \-\ \c
+copy a \fISTREAMS\fP message
+.HP
+.BR drv_priv (9)\ \-\ \c
+check if the current process is priviledged
+.HP
+.BR dupb (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message block
+.HP
+.BR dupmsg (9)\ \-\ \c
+duplicate a \fISTREAMS\fP message
+.HP
+.BR esballoc (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block with a caller supplied data buffer
+.HP
+.BR esbbcall (9)\ \-\ \c
+install a buffer callback for an extended \fISTREAMS\fR message block
+.HP
+.BR flushband (9)\ \-\ \c
+flushes band \fISTREAMS\fP messages from a message queue
+.HP
+.BR flushq (9)\ \-\ \c
+flushes messages from a \fISTREAMS\fP message queue
+.HP
+.BR freeb (9)\ \-\ \c
+frees a \fISTREAMS\fP message block
+.HP
+.BR freemsg (9)\ \-\ \c
+frees a \fISTREAMS\fP message
+.HP
+.BR freeq (9)\ \-\ \c
+deallocate a \fISTREAMS\fR queue pair
+.HP
+.BR freezestr (9)\ \-\ \c
+freeze the state of a stream queue
+.HP
+.BR getadmin (9)\ \-\ \c
+get the administration function pointer for a \fISTREAMS\fP module
+.HP
+.BR getmid (9)\ \-\ \c
+get the \fISTREAMS\fP module id for a name
+.HP
+.BR getq (9)\ \-\ \c
+gets a message from a \fISTREAMS\fP message queue
+.HP
+.BR insq (9)\ \-\ \c
+inserts a message into a \fISTREAMS\fP message queue
+.HP
+.BR linkb (9)\ \-\ \c
+link a message block to a \fISTREAMS\fP message
+.HP
+.BR msgdsize (9)\ \-\ \c
+calculate the size of the data in a \fISTREAMS\fP message
+.HP
+.BR msgpullup (9)\ \-\ \c
+pull up bytes in a \fISTREAMS\fR message
+.HP
+.BR pullupmsg (9)\ \-\ \c
+pull up the bytes in a \fISTREAMS\fP message
+.HP
+.BR put (9)\ \-\ \c
+invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.HP
+.BR putbq (9)\ \-\ \c
+put a message back on a \fISTREAMS\fP message queue
+.HP
+.BR putctl1 (9)\ \-\ \c
+put a 1 byte control message on a \fISTREAMS\fP message queue
+.HP
+.BR putctl2 (9)\ \-\ \c
+put a two byte control message on a \fISTREAMS\fR message queue
+.HP
+.BR putctl (9)\ \-\ \c
+put a control message on a \fISTREAMS\fP message queue
+.HP
+.BR putnext (9)\ \-\ \c
+put a message on the downstream \fISTREAMS\fP message queue
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+put a 1 byte control message on the downstream \fISTREAMS\fR message queue
+.HP
+.BR putnextctl (9)\ \-\ \c
+put a control message on the downstream \fISTREAMS\fR message queue
+.HP
+.BR putq (9)\ \-\ \c
+put a message on a \fISTREAMS\fP message queue
+.HP
+.BR qenable (9)\ \-\ \c
+schedules a \fISTREAMS\fP message queue service routine
+.HP
+.BR qprocsoff (9)\ \-\ \c
+disables \fISTREAMS\fR message queue processing for multi-processing
+.HP
+.BR qprocson (9)\ \-\ \c
+enables a \fISTREAMS\fR message queue for multi-processing
+.HP
+.BR qreply (9)\ \-\ \c
+replys to a message from a \fISTREAMS\fP message queue
+.HP
+.BR qsize (9)\ \-\ \c
+return the number of messages on a queue
+.HP
+.BR rmvb (9)\ \-\ \c
+remove a message block from a \fISTREAMS\fP message
+.HP
+.BR rmvq (9)\ \-\ \c
+remove a message from a \fISTREAMS\fP message queue
+.HP
+.BR strlog (9)\ \-\ \c
+pass a message to the \fISTREAMS\fP logger
+.HP
+.BR strqget (9)\ \-\ \c
+gets information about a \fISTREAMS\fP message queue
+.HP
+.BR strqset (9)\ \-\ \c
+sets attributes of a \fISTREAMS\fR message queue
+.HP
+.BR testb (9)\ \-\ \c
+test if a \fISTREAMS\fP message can be allocated
+.HP
+.BR unbufcall (9)\ \-\ \c
+removes a \fISTREAMS\fP buffer callback
+.HP
+.BR unfreezestr (9)\ \-\ \c
+thaw the state of a stream queue
+.HP
+.BR unlinkb (9)\ \-\ \c
+unlink a message block from a \fISTREAMS\fP message
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B Linux Fast-STREAMS
+.I MacOT \(rg
+compatibility module,
+.BR streams-maccompat.o ,
+are as follows:
+.HP
+.BR allocbi (9)\ \-\ \c
+.PD 0
+.HP
+.BR esballoca (9)\ \-\ \c
+.HP
+.BR mpnotify (9)\ \-\ \c
+assign notification callback to a \fISTREAMS\fR message
+.HP
+.BR puthere (9)\ \-\ \c
+invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.HP
+.BR mi_allocq (9)\ \-\ \c
+allocate a \fISTREAMS\fP queue pair
+.HP
+.BR mi_bcmp (9)\ \-\ \c
+compare byte strings
+.HP
+.BR mi_bufcall (9)\ \-\ \c
+reliable alternative to \fBbufcall\fP(9)
+.HP
+.BR mi_close_comm (9)\ \-\ \c
+\fISTREAMS\fP common minor device close utility
+.HP
+.BR mi_close_detached (9)\ \-\ \c
+release instance data from the \fISTREAMS\fR queue and perform close cleanup
+.HP
+.BR mi_copy_done (9)\ \-\ \c
+\fBioctl\fR(2) complete
+.HP
+.BR mi_copyin (9)\ \-\ \c
+copy data from a user buffer
+.HP
+.BR mi_copyout (9)\ \-\ \c
+copy data from a user buffer
+.HP
+.BR mi_copyout_alloc (9)\ \-\ \c
+allocate a buffer to be copied out using \fBmi_copyout\fR(9)
+.HP
+.BR mi_copy_set_rval (9)\ \-\ \c
+set return value for input-output control
+.HP
+.BR mi_copy_state (9)\ \-\ \c
+current state of the input-output control process
+.HP
+.BR mi_detach (9)\ \-\ \c
+disassociate instance data from the \fISTREAMS\fR queue
+.HP
+.BR mi_freeq (9)\ \-\ \c
+deallocate a \fISTREAMS\fR queue pair
+.HP
+.BR mi_next_ptr (9)\ \-\ \c
+\fISTREAMS\fP minor device list traversal
+.HP
+.BR mi_offset_param (9)\ \-\ \c
+.HP
+.BR mi_offset_paramc (9)\ \-\ \c
+.HP
+.BR mi_open_comm (9)\ \-\ \c
+\fISTREAMS\fP common minor device open utility
+.HP
+.BR mi_open_detached (9)\ \-\ \c
+\fISTREAMS\fP create detached instance data
+.HP
+.BR mi_prev_ptr (9)\ \-\ \c
+\fISTREAMS\fP minor device list traversal
+.HP
+.BR mi_reallocb (9)\ \-\ \c
+.HP
+.BR mi_reuse_proto (9)\ \-\ \c
+.HP
+.BR mi_set_sth_hiwat (9)\ \-\ \c
+.HP
+.BR mi_set_sth_lowat (9)\ \-\ \c
+.HP
+.BR mi_set_sth_maxblk (9)\ \-\ \c
+.HP
+.BR mi_set_sth_wroff (9)\ \-\ \c
+.HP
+.BR mi_sprintf (9)\ \-\ \c
+.HP
+.BR mi_timer (9)\ \-\ \c
+.HP
+.BR mi_timer_alloc (9)\ \-\ \c
+.HP
+.BR mi_timer_cancel (9)\ \-\ \c
+.HP
+.BR mi_timer_free (9)\ \-\ \c
+.HP
+.BR mi_timer_q_switch (9)\ \-\ \c
+.HP
+.BR mi_timer_valid (9)\ \-\ \c
+.HP
+.BR mps_become_writer (9)\ \-\ \c
+.HP
+.BR mps_intr_disable (9)\ \-\ \c
+.HP
+.BR mps_intr_enable (9)\ \-\ \c
+.PD
+.\"
+.SS "Transport Functions"
+.PP
+.HP
+.BR mi_tpi_ack_alloc (9)\ \-\ \c
+.PD 0
+.HP
+.BR mi_tpi_conn_con (9)\ \-\ \c
+.HP
+.BR mi_tpi_conn_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_conn_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_data_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_data_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_discon_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_discon_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_err_ack_alloc (9)\ \-\ \c
+.HP
+.BR mi_tpi_exdata_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_exdata_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_info_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_ok_ack_alloc (9)\ \-\ \c
+.HP
+.BR mi_tpi_ordrel_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_ordrel_req (9)\ \-\ \c
+.HP
+.BR mi_tpi_uderror_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_unitdata_ind (9)\ \-\ \c
+.HP
+.BR mi_tpi_unitdata_req (9)\ \-\ \c
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose
+.IR MacOT \(rg-specific
+symbols.
+To use
+.IR MacOT \(rg-specific
+functions,
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_MAC
+defined,
+.IR MacOT \(rg
+compatibility will become part of the
+.B Linux Fast-STREAMS
+.B streams.o
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined,
+.IR MacOT \(rg
+compatibility will be placed in a separate
+.B streams-maccompat.o
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR MacOT \(rg-specific
+functions loads.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.BR adjmsg (9),
+.BR allocb (9),
+.BR allocq (9),
+.BR backq (9),
+.BR bcanput (9),
+.BR bcanputnext (9),
+.BR bufcall (9),
+.BR canput (9),
+.BR canputnext (9),
+.BR cmn_err (9),
+.BR copyb (9),
+.BR copymsg (9),
+.BR drv_priv (9),
+.BR dupb (9),
+.BR dupmsg (9),
+.BR esballoc (9),
+.BR esbbcall (9),
+.BR flushband (9),
+.BR flushq (9),
+.BR freeb (9),
+.BR freemsg (9),
+.BR freeq (9),
+.BR freezestr (9),
+.BR getadmin (9),
+.BR getmid (9),
+.BR getq (9),
+.BR insq (9),
+.BR linkb (9),
+.BR msgdsize (9),
+.BR msgpullup (9),
+.BR pullupmsg (9),
+.BR put (9),
+.BR putbq (9),
+.BR putctl1 (9),
+.BR putctl2 (9),
+.BR putctl (9),
+.BR putnext (9),
+.BR putnextctl1 (9),
+.BR putnextctl (9),
+.BR putq (9),
+.BR qenable (9),
+.BR qprocsoff (9),
+.BR qprocson (9),
+.BR qreply (9),
+.BR qsize (9),
+.BR rmvb (9),
+.BR rmvq (9),
+.BR strlog (9),
+.BR strqget (9),
+.BR strqset (9),
+.BR testb (9),
+.BR unbufcall (9),
+.BR unfreezestr (9),
+.BR unlinkb (9).
+.PP
+Compatibility functions:
+.BR allocbi (9),
+.BR esballoca (9),
+.BR mpnotify (9),
+.BR puthere (9),
+.BR mi_allocq (9),
+.BR mi_bcmp (9),
+.BR mi_bufcall (9),
+.BR mi_close_comm (9),
+.BR mi_close_detached (9),
+.BR mi_copy_done (9),
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_set_rval (9),
+.BR mi_copy_state (9),
+.BR mi_detach (9),
+.BR mi_freeq (9),
+.BR mi_next_ptr (9),
+.BR mi_offset_param (9),
+.BR mi_offset_paramc (9),
+.BR mi_open_comm (9),
+.BR mi_open_detached (9),
+.BR mi_prev_ptr (9),
+.BR mi_reallocb (9),
+.BR mi_reuse_proto (9),
+.BR mi_set_sth_hiwat (9),
+.BR mi_set_sth_lowat (9),
+.BR mi_set_sth_maxblk (9),
+.BR mi_set_sth_wroff (9),
+.BR mi_sprintf (9),
+.BR mi_timer (9),
+.BR mi_timer_alloc (9),
+.BR mi_timer_cancel (9),
+.BR mi_timer_free (9),
+.BR mi_timer_q_switch (9),
+.BR mi_timer_valid (9),
+.BR mps_become_writer (9),
+.BR mps_intr_disable (9),
+.BR mps_intr_enable (9).
+.PP
+Transport functions:
+.BR mi_tpi_ack_alloc (9),
+.BR mi_tpi_conn_con (9),
+.BR mi_tpi_conn_ind (9),
+.BR mi_tpi_conn_req (9),
+.BR mi_tpi_data_ind (9),
+.BR mi_tpi_data_req (9),
+.BR mi_tpi_discon_ind (9),
+.BR mi_tpi_discon_req (9),
+.BR mi_tpi_err_ack_alloc (9),
+.BR mi_tpi_exdata_ind (9),
+.BR mi_tpi_exdata_req (9),
+.BR mi_tpi_info_req (9),
+.BR mi_tpi_ok_ack_alloc (9),
+.BR mi_tpi_ordrel_ind (9),
+.BR mi_tpi_ordrel_req (9),
+.BR mi_tpi_uderror_ind (9),
+.BR mi_tpi_unitdata_ind (9),
+.BR mi_tpi_unitdata_req (9),
+.BR mps_become_writer (9),
+.BR mps_intr_disable (9),
+.BR mps_intr_enable (9).
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR MacOT \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR MacOT \(rg-specific
+functions should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+.IR MacOT \(rg-specific
+functions are provided for source level compatibility with
+.IR MacOT \(rg
+for the purpose of porting
+.IR MacOT \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR MacOT \(rg,
+binaries are incompatible.
+.IP \(em
+.IR MacOT \(rg-specific
+functions only provide functionality comparable to
+.IR MacOT \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.IR MacOT \(rg-specific
+functions in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MacOT \(rg
+DDI documentation.
+.[
+macotr
+.]
+.[
+macspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR MacOT \(rg.
+Functions with name starting with
+.I mi_
+are probably
+.I Mentat, Inc.
+functions that goes all the way back to the
+.I Mentat OSF/1
+implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

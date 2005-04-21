@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.23 2005/04/19 06:18:09 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.24 2005/04/20 18:42:09 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/19 06:18:09 $ by $Author: brian $
+% Last Modified $Date: 2005/04/20 18:42:09 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -261,7 +261,6 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Conformance::
 * Portability::
 * Copying::
-* Documentation License::
 * Index::
 
  --- The Detailed Node Listing ---
@@ -355,6 +354,11 @@ Portability
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
 * LiS Portability::		Porting from LiS 2.18.1
+
+Copying
+
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
 
 @end menu
 
@@ -2765,7 +2769,7 @@ is defined.
 @menu
 * Stream Head Module ("sth")::
 * Connect Line Discipline Module ("connld")::
-* Pipe Module ("pipe")::
+* Pipe Module ("pipemod")::
 * STREAMS Configuration Module ("sc")::
 @end menu
 
@@ -2894,74 +2898,88 @@ by @cite{STREAMS}.  Therefore, these system calls are implemented as library cal
 @file{libsttreams} library instead of as system calls in the @file{libc} library.
 
 @multitable @columnfractions .20 .80
-@item @command{getmsg(2)} @tab
+@item @command{getmsg(2)}
 @findex getmsg(2)
 @command{getmsg(2)}
 @findex getmsg(2)
-is not normally implemented as a system call: it is a library call that calls
+@tab is not normally implemented as a system call: it is a library call that calls
 @command{getpmsg(2)}.
 @findex getpmsg(2)
-@item @command{getpmsg(2)} @tab --
+@item @command{getpmsg(2)}
 @findex getpmsg(2)
-@item @command{putmsg(2)} @tab
+@tab --
+@item @command{putmsg(2)}
 @findex putmsg(2)
 @command{putmsg(2)}
 @findex putmsg(2)
-is not normally implemented as a system call: it is a library call that calls
+@tab is not normally implemented as a system call: it is a library call that calls
 @command{putpmsg(2)}.
 @findex putpmsg(2)
-@item @command{putpmsg(2)} @tab --
+@item @command{putpmsg(2)}
 @findex putpmsg(2)
-@item @command{fattach(2)} @tab --
+@tab --
+@item @command{fattach(2)}
 @findex fattach(2)
-@item @command{fdetach(2)} @tab
+@tab --
+@item @command{fdetach(2)}
 @findex fdetach(2)
-(Note: HP-UX mentions a fdetach system call: I do not know why.)
-@item @command{isastream(2)} @tab --
+@tab (Note: HP-UX mentions a fdetach system call: I do not know why.)
+@item @command{isastream(2)}
 @findex isastream(2)
+@tab --
 @end multitable
 
 @subsection Modifications to Old System Calls
 
 @multitable @columnfractions .20 .80
-@item @command{pipe(2)} @tab --
+@item @command{pipe(2)}
 @findex pipe(2)
-@item @command{open(2)} @tab --
+@tab --
+@item @command{open(2)}
 @findex open(2)
-@item @command{fcntl(2)} @tab --
+@tab --
+@item @command{fcntl(2)}
 @findex fcntl(2)
-@item @command{ioctl(2)} @tab --
+@tab --
+@item @command{ioctl(2)}
 @findex ioctl(2)
-@item @command{signal(2)} @tab --
+@tab --
+@item @command{signal(2)}
 @findex signal(2)
-@item @command{poll(2)} @tab --
+@tab --
+@item @command{poll(2)}
 @findex poll(2)
-@item @command{select(2)} @tab --
+@tab --
+@item @command{select(2)}
 @findex select(2)
-@item @command{read(2)} @tab
+@tab --
+@item @command{read(2)}
 @findex read(2)
 The @command{read(2)}
 @findex read(2)
-system call is overloaded with an invalid length to implement the @command{getmsg(2)}
+@tab system call is overloaded with an invalid length to implement the @command{getmsg(2)}
 @findex getmsg(2)
 and @command{getpmsg(2)}
 @findex getpmsg(2)
 system calls.
-@item @command{readv(2)} @tab --
+@item @command{readv(2)}
 @findex readv(2)
-@item @command{write(2)} @tab
+@tab --
+@item @command{write(2)}
 @findex write(2)
-The @command{write(2)}
+@tab The @command{write(2)}
 @findex write(2)
 system call is overloaded with an invalid length to implement the @command{putmsg(2)}
 @findex putmsg(2)
 and @command{putpmsg(2)}
 @findex putpmsg(2)
 system calls.
-@item @command{writev(2)} @tab --
+@item @command{writev(2)}
 @findex writev(2)
-@item @command{close(2)} @tab --
+@tab --
+@item @command{close(2)}
 @findex close(2)
+@tab --
 @end multitable
 
 @node Input-Output Controls
@@ -2970,96 +2988,141 @@ system calls.
 @cindex input-output controls, STREAMS
 
 @multitable @columnfractions .20 .80
-@item @var{I_NREAD} @tab --
+@item @var{I_NREAD}
 @vindex I_NREAD
-@item @var{I_PUSH} @tab --
+@tab --
+@item @var{I_PUSH}
 @vindex I_PUSH
-@item @var{I_POP} @tab --
+@tab --
+@item @var{I_POP}
 @vindex I_POP
-@item @var{I_LOOK} @tab --
+@tab --
+@item @var{I_LOOK}
 @vindex I_LOOK
-@item @var{I_FLUSH} @tab --
+@tab --
+@item @var{I_FLUSH}
 @vindex I_FLUSH
-@item @var{I_SRDOPT} @tab --
+@tab --
+@item @var{I_SRDOPT}
 @vindex I_SRDOPT
-@item @var{I_GRDOPT} @tab --
+@tab --
+@item @var{I_GRDOPT}
 @vindex I_GRDOPT
-@item @var{I_STR} @tab --
+@tab --
+@item @var{I_STR}
 @vindex I_STR
-@item @var{I_SETSIG} @tab --
+@tab --
+@item @var{I_SETSIG}
 @vindex I_SETSIG
-@item @var{I_GETSIG} @tab --
+@tab --
+@item @var{I_GETSIG}
 @vindex I_GETSIG
-@item @var{I_FIND} @tab --
+@tab --
+@item @var{I_FIND}
 @vindex I_FIND
-@item @var{I_LINK} @tab --
+@tab --
+@item @var{I_LINK}
 @vindex I_LINK
-@item @var{I_UNLINK} @tab --
+@tab --
+@item @var{I_UNLINK}
 @vindex I_UNLINK
-@item @var{I_RECVFD} @tab non-EFT definition
+@tab --
+@item @var{I_RECVFD}
 @vindex I_RECVFD
-@item @var{I_PEEK} @tab --
+@tab non-EFT definition
+@item @var{I_PEEK}
 @vindex I_PEEK
-@item @var{I_FDINSERT} @tab --
+@tab --
+@item @var{I_FDINSERT}
 @vindex I_FDINSERT
-@item @var{I_SENDFD} @tab --
+@tab --
+@item @var{I_SENDFD}
 @vindex I_SENDFD
-@item @var{I_E_RECVFD} @tab @cite{Unixware}: EFT definition
+@tab --
+@item @var{I_E_RECVFD}
 @vindex I_E_RECVFD
-@item @var{I_SWROPT} @tab --
+@tab @cite{Unixware}: EFT definition
+@item @var{I_SWROPT}
 @vindex I_SWROPT
-@item @var{I_GWROPT} @tab --
+@tab --
+@item @var{I_GWROPT}
 @vindex I_GWROPT
-@item @var{I_LIST} @tab --
+@tab --
+@item @var{I_LIST}
 @vindex I_LIST
-@item @var{I_PLINK} @tab --
+@tab --
+@item @var{I_PLINK}
 @vindex I_PLINK
-@item @var{I_PUNLINK} @tab --
+@tab --
+@item @var{I_PUNLINK}
 @vindex I_PUNLINK
-@item @var{I_FLUSHBAND} @tab --
+@tab --
+@item @var{I_FLUSHBAND}
 @vindex I_FLUSHBAND
-@item @var{I_CKBAND} @tab --
+@tab --
+@item @var{I_CKBAND}
 @vindex I_CKBAND
-@item @var{I_GETBAND} @tab --
+@tab --
+@item @var{I_GETBAND}
 @vindex I_GETBAND
-@item @var{I_ATMARK} @tab --
+@tab --
+@item @var{I_ATMARK}
 @vindex I_ATMARK
-@item @var{I_SETCLTIME} @tab --
+@tab --
+@item @var{I_SETCLTIME}
 @vindex I_SETCLTIME
-@item @var{I_GETCLTIME} @tab --
+@tab --
+@item @var{I_GETCLTIME}
 @vindex I_GETCLTIME
-@item @var{I_CANPUT} @tab --
+@tab --
+@item @var{I_CANPUT}
 @vindex I_CANPUT
-@item @var{I_SERROPT} @tab @cite{Solaris} only
+@tab --
+@item @var{I_SERROPT}
 @vindex I_SERROPT
-@item @var{I_GERROPT} @tab @cite{Solaris} only
+@tab @cite{Solaris} only
+@item @var{I_GERROPT}
 @vindex I_GERROPT
-@item @var{I_ANCHOR} @tab @cite{Solaris} only
+@tab @cite{Solaris} only
+@item @var{I_ANCHOR}
 @vindex I_ANCHOR
-@item @var{I_S_RECVFD} @tab @cite{UnixWare} only
+@tab @cite{Solaris} only
+@item @var{I_S_RECVFD}
 @vindex I_S_RECVFD
-@item @var{I_STATS} @tab @cite{UnixWare} only
+@tab @cite{UnixWare} only
+@item @var{I_STATS}
 @vindex I_STATS
-@item @var{I_BIGPIPE} @tab @cite{UnixWare} only
+@tab @cite{UnixWare} only
+@item @var{I_BIGPIPE}
 @vindex I_BIGPIPE
-@item @var{I_GETTP} @tab @cite{UnixWare} only
+@tab @cite{UnixWare} only
+@item @var{I_GETTP}
 @vindex I_GETTP
-@item @var{I_AUTOPUSH} @tab @cite{Mac OT} only
+@tab @cite{UnixWare} only
+@item @var{I_AUTOPUSH}
 @vindex I_AUTOPUSH
-@item @var{I_HEAP_REPORT} @tab @cite{Mac OT} only
+@tab @cite{Mac OT} only
+@item @var{I_HEAP_REPORT}
 @vindex I_HEAP_REPORT
-@item @var{I_FIFO} @tab @cite{Mac OT} only
+@tab @cite{Mac OT} only
+@item @var{I_FIFO}
 @vindex I_FIFO
-@item @var{I_PUTPMSG} @tab @cite{LiS} and @cite{Mac OT}
+@tab @cite{Mac OT} only
+@item @var{I_PUTPMSG}
 @vindex I_PUTPMSG
-@item @var{I_GETPMSG} @tab @cite{LiS} and @cite{Mac OT}
+@tab @cite{LiS} and @cite{Mac OT}
+@item @var{I_GETPMSG}
 @vindex I_GETPMSG
-@item @var{I_FATTACH} @tab @cite{LiS} only
+@tab @cite{LiS} and @cite{Mac OT}
+@item @var{I_FATTACH}
 @vindex I_FATTACH
-@item @var{I_FDETACH} @tab @cite{LiS} only
+@tab @cite{LiS} only
+@item @var{I_FDETACH}
 @vindex I_FDETACH
-@item @var{I_PIPE} @tab @cite{LiS} and @cite{Mac OT}
+@tab @cite{LiS} only
+@item @var{I_PIPE}
 @vindex I_PIPE
+@tab @cite{LiS} and @cite{Mac OT}
 @end multitable
 
 @node Module Entry Points
@@ -3067,39 +3130,39 @@ system calls.
 @cindex module entry points
 
 @multitable @columnfractions .20 .80
-@item @command{qopen(9)} @tab
+@item @command{qopen(9)}
 @findex qopen(9)
-Module queue open procedure.
-@item @command{put(9)} @tab
+@tab Module queue open procedure.
+@item @command{put(9)}
 @findex put(9)
-Module queue put procedure.
-@item @command{srv(9)} @tab
+@tab Module queue put procedure.
+@item @command{srv(9)}
 @findex srv(9)
-Module queue service procedure.
-@item @command{qadmin(9)} @tab
+@tab Module queue service procedure.
+@item @command{qadmin(9)}
 @findex qadmin(9)
-Module queue administrative procedure.
-@item @command{qclose(9)} @tab
+@tab Module queue administrative procedure.
+@item @command{qclose(9)}
 @findex qclose(9)
-Module queue close procedure.
-@item @command{timeout(9)} @tab
+@tab Module queue close procedure.
+@item @command{timeout(9)}
 @findex timeout(9)
-Timeout callback.
-@item @command{qtimeout(9)} @tab
+@tab Timeout callback.
+@item @command{qtimeout(9)}
 @findex qtimeout(9)
-Timeout callback.
-@item @command{bufcall(9)} @tab
+@tab Timeout callback.
+@item @command{bufcall(9)}
 @findex bufcall(9)
-Buffer callback.
-@item @command{qbufcall(9)} @tab
+@tab Buffer callback.
+@item @command{qbufcall(9)}
 @findex qbufcall(9)
-Buffer callback.
-@item @command{mi_bufcall(9)} @tab
+@tab Buffer callback.
+@item @command{mi_bufcall(9)}
 @findex mi_bufcall(9)
-Buffer callback.
-@item @command{freemsg(9)} @tab
+@tab Buffer callback.
+@item @command{freemsg(9)}
 @findex freemsg(9)
-Buffer free routine callout.
+@tab Buffer free routine callout.
 @end multitable
 
 @node Structures
@@ -3111,108 +3174,108 @@ Buffer free routine callout.
 @unnumberedsubsubsec Driver Structures
 
 @multitable @columnfractions .20 .80
-@item @code{cdevsw(9)} @tab
+@item @code{cdevsw(9)}
 @tpindex cdevsw(9)
-Character device switch table.
-@item @code{devinfo(9)} @tab
+@tab Character device switch table.
+@item @code{devinfo(9)}
 @tpindex devinfo(9)
-Device information structure.
+@tab Device information structure.
 @end multitable
 
 @unnumberedsubsubsec Module Structures
 
 @multitable @columnfractions .20 .80
-@item @code{fmodsw(9)} @tab
+@item @code{fmodsw(9)}
 @tpindex fmodsw(9)
-Module switch table.
-@item @code{modinfo(9)} @tab
+@tab Module switch table.
+@item @code{modinfo(9)}
 @tpindex modinfo(9)
-Module information structure.
-@item @code{module_info(9)} @tab
+@tab Module information structure.
+@item @code{module_info(9)}
 @tpindex module_info(9)
-Module information structure.
-@item @code{module_stat(9)} @tab
+@tab Module information structure.
+@item @code{module_stat(9)}
 @tpindex module_stat(9)
-Module statistics structure.
+@tab Module statistics structure.
 @end multitable
 
 @unnumberedsubsubsec Stream Structures
 
 @multitable @columnfractions .20 .80
-@item @code{streamtab(9)} @tab
+@item @code{streamtab(9)}
 @tpindex streamtab(9)
-Stream information table.
-@item @code{streamadm(9)} @tab
+@tab Stream information table.
+@item @code{streamadm(9)}
 @tpindex streamadm(9)
-Stream administration table.
-@item @code{stdata(9)} @tab
+@tab Stream administration table.
+@item @code{stdata(9)}
 @tpindex stdata(9)
-Stream head data structure.
-@item @code{shinfo(9)} @tab
+@tab Stream head data structure.
+@item @code{shinfo(9)}
 @tpindex shinfo(9)
-Stream head information structure.
+@tab Stream head information structure.
 @end multitable
 
 @unnumberedsubsubsec Queue Structures
 
 @multitable @columnfractions .20 .80
-@item @code{queue(9)} @tab
+@item @code{queue(9)}
 @tpindex queue(9)
-Message queue.
-@item @code{qband(9)} @tab
+@tab Message queue.
+@item @code{qband(9)}
 @tpindex qband(9)
-Message queue band.
-@item @code{bandinfo(9)} @tab
+@tab Message queue band.
+@item @code{bandinfo(9)}
 @tpindex bandinfo(9)
-Message queue band information structure.
-@item @code{qinit(9)} @tab
+@tab Message queue band information structure.
+@item @code{qinit(9)}
 @tpindex qinit(9)
-Message queue initialization.
-@item @code{queinfo(9)} @tab
+@tab Message queue initialization.
+@item @code{queinfo(9)}
 @tpindex queinfo(9)
-Message queue information structure.
+@tab Message queue information structure.
 @end multitable
 
 @unnumberedsubsubsec Message Structures
 
 @multitable @columnfractions .20 .80
-@item @code{msgb(9)} @tab
+@item @code{msgb(9)}
 @tpindex msgb(9)
-Message block.
-@item @code{datab(9)} @tab
+@tab Message block.
+@item @code{datab(9)}
 @tpindex datab(9)
-Data block.
-@item @code{mbinfo(9)} @tab
+@tab Data block.
+@item @code{mbinfo(9)}
 @tpindex mbinfo(9)
-Message block information structure.
-@item @code{dbinfo(9)} @tab
+@tab Message block information structure.
+@item @code{dbinfo(9)}
 @tpindex dbinfo(9)
-Data block information structure.
+@tab Data block information structure.
 @end multitable
 
 @unnumberedsubsubsec Ancilliary Structures
 
 @multitable @columnfractions .20 .80
-@item @code{strevent(9)} @tab
+@item @code{strevent(9)}
 @tpindex strevent(9)
-STREAMS event structure.
-@item @code{seinfo(9)} @tab
+@tab STREAMS event structure.
+@item @code{seinfo(9)}
 @tpindex seinfo(9)
-STREAMS event information structure.
-@item @code{strapush(9)} @tab
+@tab STREAMS event information structure.
+@item @code{strapush(9)}
 @tpindex strapush(9)
-STREAMS autopush structure.
-@item @code{apinfo(9)} @tab
+@tab STREAMS autopush structure.
+@item @code{apinfo(9)}
 @tpindex apinfo(9)
-STREAMS autopush information structure.
+@tab STREAMS autopush information structure.
 @end multitable
 
 @unnumberedsubsubsec Additional Structures
 
 @multitable @columnfractions .20 .80
-@item @code{cred_t(9)} @tab
+@item @code{cred_t(9)}
 @tpindex cred_t(9)
-User credentials.
+@tab User credentials.
 @end multitable
 
 @node Registration
@@ -3224,70 +3287,70 @@ User credentials.
 @unnumberedsubsubsec Registration
 
 @multitable @columnfractions .30 .70
-@item @command{register_clone(9)} @tab
+@item @command{register_clone(9)}
 @findex register_clone(9)
-Register a clone minor device number for a @cite{STREAMS} driver.
-@item @command{unregister_clone(9)} @tab
+@tab Register a clone minor device number for a @cite{STREAMS} driver.
+@item @command{unregister_clone(9)}
 @findex unregister_clone(9)
-Unregister a clone minor device number for a @cite{STREAMS} driver.
-@item @command{register_cmajor(9)} @tab
+@tab Unregister a clone minor device number for a @cite{STREAMS} driver.
+@item @command{register_cmajor(9)}
 @findex register_cmajor(9)
-Register file operations against a major device number.
-@item @command{unregister_cmajor(9)} @tab
+@tab Register file operations against a major device number.
+@item @command{unregister_cmajor(9)}
 @findex unregister_cmajor(9)
-Unregister file operations against a major device number.
-@item @command{register_strdev(9)} @tab
+@tab Unregister file operations against a major device number.
+@item @command{register_strdev(9)}
 @findex register_strdev(9)
-Register a @cite{STREAMS} device against a device major number.
-@item @command{unregister_strdev(9)} @tab
+@tab Register a @cite{STREAMS} device against a device major number.
+@item @command{unregister_strdev(9)}
 @findex unregister_strdev(9)
-Unregister a @cite{STREAMS} device against a device major number.
-@item @command{register_strdrv(9)} @tab
+@tab Unregister a @cite{STREAMS} device against a device major number.
+@item @command{register_strdrv(9)}
 @findex register_strdrv(9)
-Register a @cite{STREAMS} driver.
-@item @command{unregister_strdrv(9)} @tab
+@tab Register a @cite{STREAMS} driver.
+@item @command{unregister_strdrv(9)}
 @findex unregister_strdrv(9)
-Unregister a @cite{STREAMS} driver.
-@item @command{register_strmod(9)} @tab
+@tab Unregister a @cite{STREAMS} driver.
+@item @command{register_strmod(9)}
 @findex register_strmod(9)
-Register a @cite{STREAMS} module.
-@item @command{unregister_strmod(9)} @tab
+@tab Register a @cite{STREAMS} module.
+@item @command{unregister_strmod(9)}
 @findex unregister_strmod(9)
-Unregister a @cite{STREAMS} module.
-@item @command{register_strnod(9)} @tab
+@tab Unregister a @cite{STREAMS} module.
+@item @command{register_strnod(9)}
 @findex register_strnod(9)
-Register a @cite{STREAMS} minor device node.
-@item @command{unregister_strnod(9)} @tab
+@tab Register a @cite{STREAMS} minor device node.
+@item @command{unregister_strnod(9)}
 @findex unregister_strnod(9)
-Unregister a @cite{STREAMS} minor device node.
+@tab Unregister a @cite{STREAMS} minor device node.
 @end multitable
 
 @unnumberedsubsubsec Autopush
 
 @multitable @columnfractions .25 .75
-@item @command{autopush_add(9)} @tab
+@item @command{autopush_add(9)}
 @findex autopush_add(9)
-Add an autopush list entry for a given @cite{STREAMS} device number.
-@item @command{autopush_del(9)} @tab
+@tab Add an autopush list entry for a given @cite{STREAMS} device number.
+@item @command{autopush_del(9)}
 @findex autopush_del(9)
-Delete an autopush list entry for a given @cite{STREAMS} device number.
-@item @command{autopush_find(9)} @tab
+@tab Delete an autopush list entry for a given @cite{STREAMS} device number.
+@item @command{autopush_find(9)}
 @findex autopush_find(9)
-Find an autopush list entry for a given @cite{STREAMS} device number.
-@item @command{autopush_vml(9)} @tab
+@tab Find an autopush list entry for a given @cite{STREAMS} device number.
+@item @command{autopush_vml(9)}
 @findex autopush_vml(9)
-Verify an autopush @cite{STREAMS} module list.
+@tab Verify an autopush @cite{STREAMS} module list.
 @end multitable
 
 @unnumberedsubsubsec Administration
 
 @multitable @columnfractions .20 .80
-@item @command{getadmin(9)} @tab
+@item @command{getadmin(9)}
 @findex getadmin(9)
-Get the administration function pointer for a @cite{STREAMS} module.
-@item @command{getmid(9)} @tab
+@tab Get the administration function pointer for a @cite{STREAMS} module.
+@item @command{getmid(9)}
 @findex getmid(9)
-Get the @cite{STREAMS} module identifier by module name.
+@tab Get the @cite{STREAMS} module identifier by module name.
 @end multitable
 
 @node Message Handling
@@ -3297,66 +3360,66 @@ Get the @cite{STREAMS} module identifier by module name.
 @subsection STREAMS Message Handling Utilities
 
 @multitable @columnfractions .20 .80
-@item @command{allocb(9)} @tab
+@item @command{allocb(9)}
 @findex allocb(9)
-Allocate a @cite{STREAMS} message and data block.
-@item @command{esballoc(9)} @tab
+@tab Allocate a @cite{STREAMS} message and data block.
+@item @command{esballoc(9)}
 @findex esballoc(9)
-Allocate a @cite{STREAMS} message and data block with a caller supplied data buffer.
-@item @command{testb(9)} @tab
+@tab Allocate a @cite{STREAMS} message and data block with a caller supplied data buffer.
+@item @command{testb(9)}
 @findex testb(9)
-Test if a @cite{STREAMS} message can be allocated.
-@item @command{bufcall(9)} @tab
+@tab Test if a @cite{STREAMS} message can be allocated.
+@item @command{bufcall(9)}
 @findex bufcall(9)
-Install a @cite{STREAMS} buffer callback.
-@item @command{unbufcall(9)} @tab
+@tab Install a @cite{STREAMS} buffer callback.
+@item @command{unbufcall(9)}
 @findex unbufcall(9)
-Remove a @cite{STREAMS} buffer callback.
-@item @command{copyb(9)} @tab
+@tab Remove a @cite{STREAMS} buffer callback.
+@item @command{copyb(9)}
 @findex copyb(9)
-Copy a @cite{STREAMS} message block.
-@item @command{copymsg(9)} @tab
+@tab Copy a @cite{STREAMS} message block.
+@item @command{copymsg(9)}
 @findex copymsg(9)
-Copy a @cite{STREAMS} message.
-@item @command{dupb(9)} @tab
+@tab Copy a @cite{STREAMS} message.
+@item @command{dupb(9)}
 @findex dupb(9)
-Duplicate a @cite{STREAMS} message block.
-@item @command{dupmsg(9)} @tab
+@tab Duplicate a @cite{STREAMS} message block.
+@item @command{dupmsg(9)}
 @findex dupmsg(9)
-Duplicate a @cite{STREAMS} message.
-@item @command{linkb(9)} @tab
+@tab Duplicate a @cite{STREAMS} message.
+@item @command{linkb(9)}
 @findex linkb(9)
-Link a message block into a @cite{STREAMS} message.
-@item @command{unlinkb(9)} @tab
+@tab Link a message block into a @cite{STREAMS} message.
+@item @command{unlinkb(9)}
 @findex unlinkb(9)
-Unlink a message block from a @cite{STREAMS} message.
-@item @command{rmvb(9)} @tab
+@tab Unlink a message block from a @cite{STREAMS} message.
+@item @command{rmvb(9)}
 @findex rmvb(9)
-Remove a message block from a @cite{STREAMS} message.
-@item @command{adjmsg(9)} @tab
+@tab Remove a message block from a @cite{STREAMS} message.
+@item @command{adjmsg(9)}
 @findex adjmsg(9)
-Trim bytes from the front or back of a @cite{STREAMS} message.
-@item @command{msgpullup(9)} @tab
+@tab Trim bytes from the front or back of a @cite{STREAMS} message.
+@item @command{msgpullup(9)}
 @findex msgpullup(9)
-Pull up bytes in a @cite{STREAMS} message.
-@item @command{pullupmsg(9)} @tab
+@tab Pull up bytes in a @cite{STREAMS} message.
+@item @command{pullupmsg(9)}
 @findex pullupmsg(9)
-Pull up the bytes in a @cite{STREAMS} message.
-@item @command{freeb(9)} @tab
+@tab Pull up the bytes in a @cite{STREAMS} message.
+@item @command{freeb(9)}
 @findex freeb(9)
-Frees a @cite{STREAMS} message block.
-@item @command{freemsg(9)} @tab
+@tab Frees a @cite{STREAMS} message block.
+@item @command{freemsg(9)}
 @findex freemsg(9)
-Frees a @cite{STREAMS} message.
-@item @command{datamsg(9)} @tab
+@tab Frees a @cite{STREAMS} message.
+@item @command{datamsg(9)}
 @findex datamsg(9)
-Tests a @cite{STREAMS} message type for data.
-@item @command{msgdsize(9)} @tab
+@tab Tests a @cite{STREAMS} message type for data.
+@item @command{msgdsize(9)}
 @findex msgdsize(9)
-Calculates the size of the data in a @cite{STREAMS} message.
-@item @command{pcmsg(9)} @tab
+@tab Calculates the size of the data in a @cite{STREAMS} message.
+@item @command{pcmsg(9)}
 @findex pcmsg(9)
-Test a @cite{STREAMS} data block message type for priority control.
+@tab Test a @cite{STREAMS} data block message type for priority control.
 @end multitable
 
 @node Queue Handling
@@ -3366,119 +3429,119 @@ Test a @cite{STREAMS} data block message type for priority control.
 @subsection UP Queue Handling Functions
 
 @multitable @columnfractions .20 .80
-@item @command{backq(9)} @tab
+@item @command{backq(9)}
 @findex backq(9)
-Find the upstream or downstream @cite{STREAMS} message queue.
-@item @command{RD(9)} @tab
+@tab Find the upstream or downstream @cite{STREAMS} message queue.
+@item @command{RD(9)}
 @findex RD(9)
-Return the read queue of a @cite{STREAMS} queue pair.
-@item @command{WR(9)} @tab
+@tab Return the read queue of a @cite{STREAMS} queue pair.
+@item @command{WR(9)}
 @findex WR(9)
-Return the write queue of a @cite{STREAMS} queue pair.
-@item @command{OTHERQ(9)} @tab
+@tab Return the write queue of a @cite{STREAMS} queue pair.
+@item @command{OTHERQ(9)}
 @findex OTHERQ(9)
-Return the other queue of a @cite{STREAMS} queue pair.
-@item @command{SAMESTR(9)} @tab
+@tab Return the other queue of a @cite{STREAMS} queue pair.
+@item @command{SAMESTR(9)}
 @findex SAMESTR(9)
-Test for @cite{STREAMS} pipe or FIFO.
-@item @command{qsize(9)} @tab
+@tab Test for @cite{STREAMS} pipe or FIFO.
+@item @command{qsize(9)}
 @findex qsize(9)
-Return the number of messages on a @cite{STREAMS} message queue.
-@item @command{bcanput(9)} @tab
+@tab Return the number of messages on a @cite{STREAMS} message queue.
+@item @command{bcanput(9)}
 @findex bcanput(9)
-Test banded flow control on a @cite{STREAMS} message queue.
-@item @command{canput(9)} @tab
+@tab Test banded flow control on a @cite{STREAMS} message queue.
+@item @command{canput(9)}
 @findex canput(9)
-Test flow control on a @cite{STREAMS} message queue.
-@item @command{qenable(9)} @tab
+@tab Test flow control on a @cite{STREAMS} message queue.
+@item @command{qenable(9)}
 @findex qenable(9)
-Schedule a @cite{STREAMS} message queue service routine.
-@item @command{canenable(9)} @tab
+@tab Schedule a @cite{STREAMS} message queue service routine.
+@item @command{canenable(9)}
 @findex canenable(9)
-Test whether a @cite{STREAMS} message queue can be scheduled.
-@item @command{enableok(9)} @tab
+@tab Test whether a @cite{STREAMS} message queue can be scheduled.
+@item @command{enableok(9)}
 @findex enableok(9)
-Allow a @cite{STREAMS} message queue to be scheduled.
-@item @command{noenable(9)} @tab
+@tab Allow a @cite{STREAMS} message queue to be scheduled.
+@item @command{noenable(9)}
 @findex noenable(9)
-Disable a @cite{STREAMS} message queue from being scheduled.
-@item @command{flushband(9)} @tab
+@tab Disable a @cite{STREAMS} message queue from being scheduled.
+@item @command{flushband(9)}
 @findex flushband(9)
-Flushes band @cite{STREAMS} messages from a @cite{STREAMS} message queue.
-@item @command{flushq(9)} @tab
+@tab Flushes band @cite{STREAMS} messages from a @cite{STREAMS} message queue.
+@item @command{flushq(9)}
 @findex flushq(9)
-Flushes messages from a @cite{STREAMS} message queue.
-@item @command{getq(9)} @tab
+@tab Flushes messages from a @cite{STREAMS} message queue.
+@item @command{getq(9)}
 @findex getq(9)
-Gets a message from a @cite{STREAMS} message queue.
-@item @command{insq(9)} @tab
+@tab Gets a message from a @cite{STREAMS} message queue.
+@item @command{insq(9)}
 @findex insq(9)
-Insert a message into a @cite{STREAMS} message queue.
-@item @command{rmvq(9)} @tab
+@tab Insert a message into a @cite{STREAMS} message queue.
+@item @command{rmvq(9)}
 @findex rmvq(9)
-Remove a message from a @cite{STREAMS} message queue.
-@item @command{qreply(9)} @tab
+@tab Remove a message from a @cite{STREAMS} message queue.
+@item @command{qreply(9)}
 @findex qreply(9)
-Reply to a message from a @cite{STREAMS} message queue.
-@item @command{putq(9)} @tab
+@tab Reply to a message from a @cite{STREAMS} message queue.
+@item @command{putq(9)}
 @findex putq(9)
-Put a message onto a @cite{STREAMS} message queue.
-@item @command{putbq(9)} @tab
+@tab Put a message onto a @cite{STREAMS} message queue.
+@item @command{putbq(9)}
 @findex putbq(9)
-Put a message back on a @cite{STREAMS} message queue.
-@item @command{putctl(9)} @tab
+@tab Put a message back on a @cite{STREAMS} message queue.
+@item @command{putctl(9)}
 @findex putctl(9)
-Put a control message on a @cite{STREAMS} message queue.
-@item @command{putctl1(9)} @tab
+@tab Put a control message on a @cite{STREAMS} message queue.
+@item @command{putctl1(9)}
 @findex putctl1(9)
-Put a 1 byte control message on a @cite{STREAMS} message queue.
+@tab Put a 1 byte control message on a @cite{STREAMS} message queue.
 @end multitable
 
 @subsection MP Queue Handling Functions
 
 @multitable @columnfractions .20 .80
-@item @command{bcanputnext(9)} @tab
+@item @command{bcanputnext(9)}
 @findex bcanputnext(9)
-Test for banded flow control beyond a @cite{STREAMS} message queue.
-@item @command{canputnext(9)} @tab
+@tab Test for banded flow control beyond a @cite{STREAMS} message queue.
+@item @command{canputnext(9)}
 @findex canputnext(9)
-Test for flow control beyond a @cite{STREAMS} message queue.
-@item @command{put(9)} @tab
+@tab Test for flow control beyond a @cite{STREAMS} message queue.
+@item @command{put(9)}
 @findex put(9)
-Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
-@item @command{putnext(9)} @tab
+@tab Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+@item @command{putnext(9)}
 @findex putnext(9)
-Put a message beyond a @cite{STREAMS} message queue.
-@item @command{putnextctl1(9)} @tab
+@tab Put a message beyond a @cite{STREAMS} message queue.
+@item @command{putnextctl1(9)}
 @findex putnextctl1(9)
-Put a one byte control message beyond a @cite{STREAMS} message queue.
-@item @command{putnextctl(9)} @tab
+@tab Put a one byte control message beyond a @cite{STREAMS} message queue.
+@item @command{putnextctl(9)}
 @findex putnextctl(9)
-Put a control message beyond a @cite{STREAMS} message queue.
-@item @command{qprocsoff(9)} @tab
+@tab Put a control message beyond a @cite{STREAMS} message queue.
+@item @command{qprocsoff(9)}
 @findex qprocsoff(9)
-Disable a @cite{STREAMS} message queue for multi-processing.
-@item @command{qprocson(9)} @tab
+@tab Disable a @cite{STREAMS} message queue for multi-processing.
+@item @command{qprocson(9)}
 @findex qprocson(9)
-Enable a @cite{STREAMS} message queue for multi-processing.
-@item @command{freezestr(9)} @tab
+@tab Enable a @cite{STREAMS} message queue for multi-processing.
+@item @command{freezestr(9)}
 @findex freezestr(9)
-Freeze the state of a @cite{STREAMS} message queue.
-@item @command{unfreezestr(9)} @tab
+@tab Freeze the state of a @cite{STREAMS} message queue.
+@item @command{unfreezestr(9)}
 @findex unfreezestr(9)
-Thaw the state of a @cite{STREAMS} message queue.
-@item @command{strqget(9)} @tab
+@tab Thaw the state of a @cite{STREAMS} message queue.
+@item @command{strqget(9)}
 @findex strqget(9)
-Gets information about a @cite{STREAMS} message queue.
+@tab Gets information about a @cite{STREAMS} message queue.
 In the non-@i{MP} environment, it was typical to directly access the elements of the @var{queue}
 structure.  In the @i{MP} environment, it is no longer safe to directly access elements of the
 @var{queue} structure in this fashion.  The @command{strqget(9)}
 @findex strqget(9)
 function provides the ability to retrieve information about @cite{STREAMS} message queues in the
 @i{MP} environment.
-@item @command{strqset(9)} @tab
+@item @command{strqset(9)}
 @findex strqset(9)
-Sets attributes of a @cite{STREAMS} message queue.
+@tab Sets attributes of a @cite{STREAMS} message queue.
 In the non-@i{MP} environment, it was typical to directly access the elements of the @var{queue}
 structure.  In the @i{MP} environment, it is no longer safe to directly access elements of the
 @var{queue} structure in this fashion.  The @command{strqset(9)}
@@ -3496,126 +3559,126 @@ function provides the ability to set attributes for @cite{STREAMS} message queue
 @unnumberedsubsubsec Memory Functions
 
 @multitable @columnfractions .25 .75
-@item @command{kmem_alloc(9)} @tab
+@item @command{kmem_alloc(9)}
 @findex kmem_alloc(9)
-Allocate kernel memory.
-@item @command{kmem_free(9)} @tab
+@tab Allocate kernel memory.
+@item @command{kmem_free(9)}
 @findex kmem_free(9)
-Deallocate kernel memory.
-@item @command{kmem_zalloc(9)} @tab
+@tab Deallocate kernel memory.
+@item @command{kmem_zalloc(9)}
 @findex kmem_zalloc(9)
-Allocate and zero kernel memory.
-@item @command{kmem_fast_alloc(9)} @tab
+@tab Allocate and zero kernel memory.
+@item @command{kmem_fast_alloc(9)}
 @findex kmem_fast_alloc(9)
-Allocate kernel memory, fast.
-@item @command{kmem_fast_free(9)} @tab
+@tab Allocate kernel memory, fast.
+@item @command{kmem_fast_free(9)}
 @findex kmem_fast_free(9)
-Deallocate kernel memory, fast.
+@tab Deallocate kernel memory, fast.
 @end multitable
 
 @unnumberedsubsubsec Data Movement and Comparison
 
 @multitable @columnfractions .20 .80
-@item @command{bcopy(9)} @tab
+@item @command{bcopy(9)}
 @findex bcopy(9)
-Copy byte strings.
-@item @command{bzero(9)} @tab
+@tab Copy byte strings.
+@item @command{bzero(9)}
 @findex bzero(9)
-Zero a byte string.
-@item @command{copyin(9)} @tab
+@tab Zero a byte string.
+@item @command{copyin(9)}
 @findex copyin(9)
-Copy user data in from user space to kernel space.
-@item @command{copyout(9)} @tab
+@tab Copy user data in from user space to kernel space.
+@item @command{copyout(9)}
 @findex copyout(9)
-Copy user data out to user space from kernel space.
-@item @command{max(9)} @tab
+@tab Copy user data out to user space from kernel space.
+@item @command{max(9)}
 @findex max(9)
-Determine the maximum of two integers.
-@item @command{min(9)} @tab
+@tab Determine the maximum of two integers.
+@item @command{min(9)}
 @findex min(9)
-Determine the minimum of two integers.
+@tab Determine the minimum of two integers.
 @end multitable
 
 @unnumberedsubsubsec Device Numbers
 
 @multitable @columnfractions .20 .80
-@item @command{getmajor(9)} @tab
+@item @command{getmajor(9)}
 @findex getmajor(9)
-Get the internal major device number for a device.
-@item @command{getminor(9)} @tab
+@tab Get the internal major device number for a device.
+@item @command{getminor(9)}
 @findex getminor(9)
-Get the internal minor device number for a device.
-@item @command{makedevice(9)} @tab
+@tab Get the internal minor device number for a device.
+@item @command{makedevice(9)}
 @findex makedevice(9)
-Create a device from major and minor device numbers.
+@tab Create a device from major and minor device numbers.
 @end multitable
 
 @unnumberedsubsubsec Timers
 
 @multitable @columnfractions .20 .80
-@item @command{delay(9)} @tab
+@item @command{delay(9)}
 @findex delay(9)
-Postpone the calling process for a number of clock ticks.
-@item @command{timeout(9)} @tab
+@tab Postpone the calling process for a number of clock ticks.
+@item @command{timeout(9)}
 @findex timeout(9)
-Start a timer.
-@item @command{untimeout(9)} @tab
+@tab Start a timer.
+@item @command{untimeout(9)}
 @findex untimeout(9)
-Stop a timer.
+@tab Stop a timer.
 @end multitable
 
 @unnumberedsubsubsec Time, Process and Privilege
 
 @multitable @columnfractions .20 .80
-@item @command{drv_getparm(9)} @tab
+@item @command{drv_getparm(9)}
 @findex drv_getparm(9)
-Driver retrieval of kernel parameters.
-@item @command{drv_hztomsec(9)} @tab
+@tab Driver retrieval of kernel parameters.
+@item @command{drv_hztomsec(9)}
 @findex drv_hztomsec(9)
-Convert kernel tick time between microseconds or milliseconds.
-@item @command{drv_hztousec(9)} @tab
+@tab Convert kernel tick time between microseconds or milliseconds.
+@item @command{drv_hztousec(9)}
 @findex drv_hztousec(9)
-Convert kernel tick time between microseconds or milliseconds.
-@item @command{drv_msectohz(9)} @tab
+@tab Convert kernel tick time between microseconds or milliseconds.
+@item @command{drv_msectohz(9)}
 @findex drv_msectohz(9)
-Convert kernel tick time between microseconds or milliseconds.
-@item @command{drv_priv(9)} @tab
+@tab Convert kernel tick time between microseconds or milliseconds.
+@item @command{drv_priv(9)}
 @findex drv_priv(9)
-Check if the current process is privileged.
-@item @command{drv_usectohz(9)} @tab
+@tab Check if the current process is privileged.
+@item @command{drv_usectohz(9)}
 @findex drv_usectohz(9)
-Convert kernel tick time between microseconds or milliseconds.
-@item @command{drv_usecwait(9)} @tab
+@tab Convert kernel tick time between microseconds or milliseconds.
+@item @command{drv_usecwait(9)}
 @findex drv_usecwait(9)
-Delay for a number of microseconds.
+@tab Delay for a number of microseconds.
 @end multitable
 
 @unnumberedsubsubsec Error Logging
 
 @multitable @columnfractions .20 .80
-@item @command{cmn_err(9)} @tab
+@item @command{cmn_err(9)}
 @findex cmn_err(9)
-Print a kernel command error.
-@item @command{strlog(9)} @tab
+@tab Print a kernel command error.
+@item @command{strlog(9)}
 @findex strlog(9)
-Pass a message to the @cite{STREAMS} logger.
+@tab Pass a message to the @cite{STREAMS} logger.
 @end multitable
 
 @unnumberedsubsubsec File Manipulation
 
 @multitable @columnfractions .20 .80
-@item @command{mknod(9)} @tab
+@item @command{mknod(9)}
 @findex mknod(9)
-Create a device node.
-@item @command{mount(9)} @tab
+@tab Create a device node.
+@item @command{mount(9)}
 @findex mount(9)
-Mount a file system.
-@item @command{umount(9)} @tab
+@tab Mount a file system.
+@item @command{umount(9)}
 @findex umount(9)
-Unmount a file system.
-@item @command{unlink(9)} @tab
+@tab Unmount a file system.
+@item @command{unlink(9)}
 @findex unlink(9)
-Unlink a file.
+@tab Unlink a file.
 @end multitable
 
 @node Extensions
@@ -3632,21 +3695,21 @@ set of @cite{STREAMS} functions.
 @subsection Common Extensions
 
 @multitable @columnfractions .20 .80
-@item @command{linkmsg(9)} @tab
+@item @command{linkmsg(9)}
 @findex linkmsg(9)
-Link a message block to a @cite{STREAMS} message.
-@item @command{putctl2(9)} @tab
+@tab Link a message block to a @cite{STREAMS} message.
+@item @command{putctl2(9)}
 @findex putctl2(9)
-Put a two byte control message on a @cite{STREAMS} message queue.
-@item @command{putnextctl2(9)} @tab
+@tab Put a two byte control message on a @cite{STREAMS} message queue.
+@item @command{putnextctl2(9)}
 @findex putnextctl2(9)
-Put a two byte control message on the next @cite{STREAMS} message queue.
-@item @command{weldq(9)} @tab
+@tab Put a two byte control message on the next @cite{STREAMS} message queue.
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld two (or four) @cite{STREAMS} message queues together.
-@item @command{unweldq(9)} @tab
+@tab Weld two (or four) @cite{STREAMS} message queues together.
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two (or four) @cite{STREAMS} message queues.
+@tab Unweld two (or four) @cite{STREAMS} message queues.
 @end multitable
 
 @subsection @value{PACKAGE_TITLE} Extensions
@@ -3654,38 +3717,38 @@ Unweld two (or four) @cite{STREAMS} message queues.
 @unnumberedsubsubsec Internal Queue Functions
 
 @multitable @columnfractions .20 .80
-@item @command{allocq(9)} @tab
+@item @command{allocq(9)}
 @findex allocq(9)
-Allocate a @cite{STREAMS} queue pair.
-@item @command{setq(9)} @tab
+@tab Allocate a @cite{STREAMS} queue pair.
+@item @command{setq(9)}
 @findex setq(9)
-Set sizes and procedures associated with a @cite{STREAMS} message queue.
-@item @command{qattach(9)} @tab
+@tab Set sizes and procedures associated with a @cite{STREAMS} message queue.
+@item @command{qattach(9)}
 @findex qattach(9)
-Attach a module onto a @cite{STREAMS} file.
-@item @command{qopen(9)} @tab
+@tab Attach a module onto a @cite{STREAMS} file.
+@item @command{qopen(9)}
 @findex qopen(9)
-Call a @cite{STREAMS} module or driver open routine.
-@item @command{qclose(9)} @tab
+@tab Call a @cite{STREAMS} module or driver open routine.
+@item @command{qclose(9)}
 @findex qclose(9)
-Closes a @cite{STREAMS} module or driver.
-@item @command{qdetach(9)} @tab
+@tab Closes a @cite{STREAMS} module or driver.
+@item @command{qdetach(9)}
 @findex qdetach(9)
-Detach a module from a @cite{STREAMS} file.
-@item @command{freeq(9)} @tab
+@tab Detach a module from a @cite{STREAMS} file.
+@item @command{freeq(9)}
 @findex freeq(9)
-Deallocate a @cite{STREAMS} queue pair.
+@tab Deallocate a @cite{STREAMS} queue pair.
 @end multitable
 
 @unnumberedsubsubsec Flow Control
 
 @multitable @columnfractions .20 .80
-@item @command{bcanget(9)} @tab
+@item @command{bcanget(9)}
 @findex bcanget(9)
-Test for message arrival on a band on a stream.
-@item @command{canget(9)} @tab
+@tab Test for message arrival on a band on a stream.
+@item @command{canget(9)}
 @findex canget(9)
-Test for message arrival on a stream.
+@tab Test for message arrival on a stream.
 @end multitable
 
 @subsection Extensions from LiS 2.18.1
@@ -3696,30 +3759,30 @@ Test for message arrival on a stream.
 @cindex Linux STREAMS (LiS)
 
 @multitable @columnfractions .30 .70
-@item @command{appq(9)} @tab
+@item @command{appq(9)}
 @findex appq(9)
-Append on @cite{STREAMS} message after another.
-@item @command{esbbcall(9)} @tab
+@tab Append on @cite{STREAMS} message after another.
+@item @command{esbbcall(9)}
 @findex esbbcall(9)
-Install a buffer callback for an extended @cite{STREAMS} message block.
-@item @command{isdatablk(9)} @tab
+@tab Install a buffer callback for an extended @cite{STREAMS} message block.
+@item @command{isdatablk(9)}
 @findex isdatablk(9)
-Test a @cite{STREAMS} data block for data type.
-@item @command{isdatamsg(9)} @tab
+@tab Test a @cite{STREAMS} data block for data type.
+@item @command{isdatamsg(9)}
 @findex isdatamsg(9)
-Test a @cite{STREAMS} data block for data type.
-@item @command{kmem_zalloc_node(9)} @tab
+@tab Test a @cite{STREAMS} data block for data type.
+@item @command{kmem_zalloc_node(9)}
 @findex kmem_zalloc_node(9)
-(undoc).
-@item @command{msgsize(9)} @tab
+@tab (undoc).
+@item @command{msgsize(9)}
 @findex msgsize(9)
-Calculate the size of the message blocks in a @cite{STREAMS} message.
-@item @command{qcountstrm(9)} @tab
+@tab Calculate the size of the message blocks in a @cite{STREAMS} message.
+@item @command{qcountstrm(9)}
 @findex qcountstrm(9)
-Add all counts on all @cite{STREAMS} message queues in a stream.
-@item @command{xmsgsize(9)} @tab
+@tab Add all counts on all @cite{STREAMS} message queues in a stream.
+@item @command{xmsgsize(9)}
 @findex xmsgsize(9)
-Calculate the size of message blocks in a @cite{STREAMS} message.
+@tab Calculate the size of message blocks in a @cite{STREAMS} message.
 @end multitable
 
 @node Compatibility
@@ -3737,7 +3800,7 @@ Calculate the size of message blocks in a @cite{STREAMS} message.
 @cindex SVR 4.2 MP
 
 @multitable @columnfractions .20 .80
-@item @command{lbolt(9)} @tab
+@item @command{lbolt(9)}
 @findex lbolt(9)
 Time in ticks since reboot.
 @end multitable
@@ -3748,27 +3811,27 @@ Time in ticks since reboot.
 @cindex SVR 4.2 MP
 
 @multitable @columnfractions .20 .80
-@item @command{itimeout(9)} @tab
+@item @command{itimeout(9)}
 @findex itimeout(9)
-Perform a timeout at an interrupt level.
-@item @command{major(9)} @tab
+@tab Perform a timeout at an interrupt level.
+@item @command{major(9)}
 @findex major(9)
-Get the internal major number of a device.
-@item @command{makedev(9)} @tab
+@tab Get the internal major number of a device.
+@item @command{makedev(9)}
 @findex makedev(9)
-Make a device number from internal major and minor device numbers.
-@item @command{minor(9)} @tab
+@tab Make a device number from internal major and minor device numbers.
+@item @command{minor(9)}
 @findex minor(9)
-Get the internal minor number of a device.
-@item @command{sleep(9)} @tab
+@tab Get the internal minor number of a device.
+@item @command{sleep(9)}
 @findex sleep(9)
-Put a process to sleep.
-@item @command{vtop(9)} @tab
+@tab Put a process to sleep.
+@item @command{vtop(9)}
 @findex vtop(9)
-Convert virtual to physical address.
-@item @command{wakeup(9)} @tab
+@tab Convert virtual to physical address.
+@item @command{wakeup(9)}
 @findex wakeup(9)
-Wake a process.
+@tab Wake a process.
 @end multitable
 
 @unnumberedsubsubsec Atomic Integers
@@ -3786,33 +3849,33 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{ATOMIC_INT_ADD(9)} @tab
+@item @command{ATOMIC_INT_ADD(9)}
 @findex ATOMIC_INT_ADD(9)
-Add an integer value to an atomic integer.
-@item @command{ATOMIC_INT_ALLOC(9)} @tab
+@tab Add an integer value to an atomic integer.
+@item @command{ATOMIC_INT_ALLOC(9)}
 @findex ATOMIC_INT_ALLOC(9)
-Allocate and initialize an atomic integer.
-@item @command{ATOMIC_INT_DEALLOC(9)} @tab
+@tab Allocate and initialize an atomic integer.
+@item @command{ATOMIC_INT_DEALLOC(9)}
 @findex ATOMIC_INT_DEALLOC(9)
-Deallocate an atomic integer.
-@item @command{ATOMIC_INT_DECR(9)} @tab
+@tab Deallocate an atomic integer.
+@item @command{ATOMIC_INT_DECR(9)}
 @findex ATOMIC_INT_DECR(9)
-Decrement and test an atomic integer.
-@item @command{ATOMIC_INT_INCR(9)} @tab
+@tab Decrement and test an atomic integer.
+@item @command{ATOMIC_INT_INCR(9)}
 @findex ATOMIC_INT_INCR(9)
-Increment an atomic integer.
-@item @command{ATOMIC_INT_INIT(9)} @tab
+@tab Increment an atomic integer.
+@item @command{ATOMIC_INT_INIT(9)}
 @findex ATOMIC_INT_INIT(9)
-Initialize an atomic integer.
-@item @command{ATOMIC_INT_READ(9)} @tab
+@tab Initialize an atomic integer.
+@item @command{ATOMIC_INT_READ(9)}
 @findex ATOMIC_INT_READ(9)
-Read an atomic integer.
-@item @command{ATOMIC_INT_SUB(9)} @tab
+@tab Read an atomic integer.
+@item @command{ATOMIC_INT_SUB(9)}
 @findex ATOMIC_INT_SUB(9)
-Subtract and integer value from an atomic integer.
-@item @command{ATOMIC_INT_WRITE(9)} @tab
+@tab Subtract and integer value from an atomic integer.
+@item @command{ATOMIC_INT_WRITE(9)}
 @findex ATOMIC_INT_WRITE(9)
-Write an integer value to an atomic integer.
+@tab Write an integer value to an atomic integer.
 @end multitable
 
 @unnumberedsubsubsec Basic Locks
@@ -3830,24 +3893,24 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{LOCK(9)} @tab
+@item @command{LOCK(9)}
 @findex LOCK(9)
-Lock a basic lock.
-@item @command{LOCK_ALLOC(9)} @tab
+@tab Lock a basic lock.
+@item @command{LOCK_ALLOC(9)}
 @findex LOCK_ALLOC(9)
-Allocate a basic lock.
-@item @command{LOCK_DEALLOC(9)} @tab
+@tab Allocate a basic lock.
+@item @command{LOCK_DEALLOC(9)}
 @findex LOCK_DEALLOC(9)
-Deallocate a basic lock.
-@item @command{LOCK_OWNED(9)} @tab
+@tab Deallocate a basic lock.
+@item @command{LOCK_OWNED(9)}
 @findex LOCK_OWNED(9)
-Determine whether a basic lock is head by the caller.
-@item @command{TRYLOCK(9)} @tab
+@tab Determine whether a basic lock is head by the caller.
+@item @command{TRYLOCK(9)}
 @findex TRYLOCK(9)
-Try to lock a basic lock.
-@item @command{UNLOCK(9)} @tab
+@tab Try to lock a basic lock.
+@item @command{UNLOCK(9)}
 @findex UNLOCK(9)
-Unlock a basic lock.
+@tab Unlock a basic lock.
 @end multitable
 
 @unnumberedsubsubsec STREAMS Locks
@@ -3864,18 +3927,18 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{MPSTR_QLOCK(9)} @tab
+@item @command{MPSTR_QLOCK(9)}
 @findex MPSTR_QLOCK(9)
-Release a queue from exclusive access.
-@item @command{MPSTR_QRELE(9)} @tab
+@tab Release a queue from exclusive access.
+@item @command{MPSTR_QRELE(9)}
 @findex MPSTR_QRELE(9)
-Acquire a queue for exclusive access.
-@item @command{MPSTR_STPLOCK(9)} @tab
+@tab Acquire a queue for exclusive access.
+@item @command{MPSTR_STPLOCK(9)}
 @findex MPSTR_STPLOCK(9)
-Acquire a stream head for exclusive access.
-@item @command{MPSTR_STPRELE(9)} @tab
+@tab Acquire a stream head for exclusive access.
+@item @command{MPSTR_STPRELE(9)}
 @findex MPSTR_STPRELE(9)
-Release a stream head from exclusive access.
+@tab Release a stream head from exclusive access.
 @end multitable
 
 @unnumberedsubsubsec Read/Write Locks
@@ -3893,62 +3956,62 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{RW_ALLOC(9)} @tab
+@item @command{RW_ALLOC(9)}
 @findex RW_ALLOC(9)
-Allocate and initialize a read/write lock.
-@item @command{RW_DEALLOC(9)} @tab
+@tab Allocate and initialize a read/write lock.
+@item @command{RW_DEALLOC(9)}
 @findex RW_DEALLOC(9)
-Deallocate a read/write lock.
-@item @command{RW_RDLOCK(9)} @tab
+@tab Deallocate a read/write lock.
+@item @command{RW_RDLOCK(9)}
 @findex RW_RDLOCK(9)
-Acquire a read/write lock in read mode.
-@item @command{RW_TRYRDLOCK(9)} @tab
+@tab Acquire a read/write lock in read mode.
+@item @command{RW_TRYRDLOCK(9)}
 @findex RW_TRYRDLOCK(9)
-Attempt to acquire a read/write lock in read mode.
-@item @command{RW_TRYWRLOCK(9)} @tab
+@tab Attempt to acquire a read/write lock in read mode.
+@item @command{RW_TRYWRLOCK(9)}
 @findex RW_TRYWRLOCK(9)
-Attempt to acquire a read/write lock in write mode.
-@item @command{RW_UNLOCK(9)} @tab
+@tab Attempt to acquire a read/write lock in write mode.
+@item @command{RW_UNLOCK(9)}
 @findex RW_UNLOCK(9)
-Release a read/write lock.
-@item @command{RW_WRLOCK(9)} @tab
+@tab Release a read/write lock.
+@item @command{RW_WRLOCK(9)}
 @findex RW_WRLOCK(9)
-Acquire a read/write lock in write mode.
+@tab Acquire a read/write lock in write mode.
 @end multitable
 
 @unnumberedsubsubsec Priority Levels
 
 @multitable @columnfractions .20 .80
-@item @command{spl0(9)} @tab
+@item @command{spl0(9)}
 @findex spl0(9)
-Set priority level 0.
-@item @command{spl1(9)} @tab
+@tab Set priority level 0.
+@item @command{spl1(9)}
 @findex spl1(9)
-Set priority level 1.
-@item @command{spl2(9)} @tab
+@tab Set priority level 1.
+@item @command{spl2(9)}
 @findex spl2(9)
-Set priority level 2.
-@item @command{spl3(9)} @tab
+@tab Set priority level 2.
+@item @command{spl3(9)}
 @findex spl3(9)
-Set priority level 3.
-@item @command{spl4(9)} @tab
+@tab Set priority level 3.
+@item @command{spl4(9)}
 @findex spl4(9)
-Set priority level 4.
-@item @command{spl5(9)} @tab
+@tab Set priority level 4.
+@item @command{spl5(9)}
 @findex spl5(9)
-Set priority level 5.
-@item @command{spl7(9)} @tab
+@tab Set priority level 5.
+@item @command{spl7(9)}
 @findex spl6(9)
-Set priority level 6.
-@item @command{spl7(9)} @tab
+@tab Set priority level 6.
+@item @command{spl7(9)}
 @findex spl7(9)
-Set priority level 7.
-@item @command{spl(9)} @tab
+@tab Set priority level 7.
+@item @command{spl(9)}
 @findex spl(9)
-Set priority level.
-@item @command{splx(9)} @tab
+@tab Set priority level.
+@item @command{splx(9)}
 @findex splx(9)
-Set priority level x.
+@tab Set priority level x.
 @end multitable
 
 @unnumberedsubsubsec Sleep Locks
@@ -3966,30 +4029,30 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{SLEEP_ALLOC(9)} @tab
+@item @command{SLEEP_ALLOC(9)}
 @findex SLEEP_ALLOC(9)
-Allocate a sleep lock.
-@item @command{SLEEP_DEALLOC(9)} @tab
+@tab Allocate a sleep lock.
+@item @command{SLEEP_DEALLOC(9)}
 @findex SLEEP_DEALLOC(9)
-Deallocate a sleep lock.
-@item @command{SLEEP_LOCK(9)} @tab
+@tab Deallocate a sleep lock.
+@item @command{SLEEP_LOCK(9)}
 @findex SLEEP_LOCK(9)
-Acquire a sleep lock.
-@item @command{SLEEP_LOCKAVAIL(9)} @tab
+@tab Acquire a sleep lock.
+@item @command{SLEEP_LOCKAVAIL(9)}
 @findex SLEEP_LOCKAVAIL(9)
-Determine whether a sleep lock is available.
-@item @command{SLEEP_LOCKOWNED(9)} @tab
+@tab Determine whether a sleep lock is available.
+@item @command{SLEEP_LOCKOWNED(9)}
 @findex SLEEP_LOCKOWNED(9)
-Determine whether a sleep lock is held by the caller.
-@item @command{SLEEP_LOCK_SIG(9)} @tab
+@tab Determine whether a sleep lock is held by the caller.
+@item @command{SLEEP_LOCK_SIG(9)}
 @findex SLEEP_LOCK_SIG(9)
-Acquire a sleep lock.
-@item @command{SLEEP_TRYLOCK(9)} @tab
+@tab Acquire a sleep lock.
+@item @command{SLEEP_TRYLOCK(9)}
 @findex SLEEP_TRYLOCK(9)
-Attempt to acquire a sleep lock.
-@item @command{SLEEP_UNLOCK(9)} @tab
+@tab Attempt to acquire a sleep lock.
+@item @command{SLEEP_UNLOCK(9)}
 @findex SLEEP_UNLOCK(9)
-Release a sleep lock.
+@tab Release a sleep lock.
 @end multitable
 
 @unnumberedsubsubsec Synchronization Variables
@@ -4007,59 +4070,59 @@ functions, these functions have been added to the @cite{SVR 4.2 MP}
 Compatibility Module.
 
 @multitable @columnfractions .30 .70
-@item @command{SV_ALLOC(9)} @tab
+@item @command{SV_ALLOC(9)}
 @findex SV_ALLOC(9)
-Allocate a basic condition variable.
-@item @command{SV_BROADCAST(9)} @tab
+@tab Allocate a basic condition variable.
+@item @command{SV_BROADCAST(9)}
 @findex SV_BROADCAST(9)
-Broadcast a basic condition variable.
-@item @command{SV_DEALLOC(9)} @tab
+@tab Broadcast a basic condition variable.
+@item @command{SV_DEALLOC(9)}
 @findex SV_DEALLOC(9)
-Deallocate a basic condition variable.
-@item @command{SV_SIGNAL(9)} @tab
+@tab Deallocate a basic condition variable.
+@item @command{SV_SIGNAL(9)}
 @findex SV_SIGNAL(9)
-Signal a basic condition variable.
-@item @command{SV_WAIT(9)} @tab
+@tab Signal a basic condition variable.
+@item @command{SV_WAIT(9)}
 @findex SV_WAIT(9)
-Wait on a basic condition variable.
-@item @command{SV_WAIT_SIG(9)} @tab
+@tab Wait on a basic condition variable.
+@item @command{SV_WAIT_SIG(9)}
 @findex SV_WAIT_SIG(9)
-Interruptible wait on a basic condition variable.
+@tab Interruptible wait on a basic condition variable.
 @end multitable
 
 @unnumberedsubsubsec Resource Allocation
 
 @multitable @columnfractions .30 .70
-@item @command{rmalloc(9)} @tab
+@item @command{rmalloc(9)}
 @findex rmalloc(9)
-Allocate a number of units from a resource map.
-@item @command{rmallocmap(9)} @tab
+@tab Allocate a number of units from a resource map.
+@item @command{rmallocmap(9)}
 @findex rmallocmap(9)
-Allocated a resource map.
-@item @command{rmallocmap_wait(9)} @tab
+@tab Allocated a resource map.
+@item @command{rmallocmap_wait(9)}
 @findex rmallocmap_wait(9)
-Allocated a resource map.
-@item @command{rmalloc_wait(9)} @tab
+@tab Allocated a resource map.
+@item @command{rmalloc_wait(9)}
 @findex rmalloc_wait(9)
-Allocate a number of units from a resource map.
-@item @command{rmfree(9)} @tab
+@tab Allocate a number of units from a resource map.
+@item @command{rmfree(9)}
 @findex rmfree(9)
-Free a number of units from a resource map.
-@item @command{rmfreemap(9)} @tab
+@tab Free a number of units from a resource map.
+@item @command{rmfreemap(9)}
 @findex rmfreemap(9)
-Free a resource map.
-@item @command{rmget(9)} @tab
+@tab Free a resource map.
+@item @command{rmget(9)}
 @findex rmget(9)
-Allocated a number of units from a resource map.
-@item @command{rminit(9)} @tab
+@tab Allocated a number of units from a resource map.
+@item @command{rminit(9)}
 @findex rminit(9)
-Initialize a resource map.
-@item @command{rmsetwant(9)} @tab
+@tab Initialize a resource map.
+@item @command{rmsetwant(9)}
 @findex rmsetwant(9)
-Wait for resources on a resource map.
-@item @command{rmwanted(9)} @tab
+@tab Wait for resources on a resource map.
+@item @command{rmwanted(9)}
 @findex rmwanted(9)
-Waiters on a resource map.
+@tab Waiters on a resource map.
 @end multitable
 
 @subsection AIX 5L Version 5.1 Compatibility Functions
@@ -4081,9 +4144,9 @@ The functions in this section are provided as part of the core functions provide
 Fast-STREASM} @cite{STREAMS} subsystem:
 
 @multitable @columnfractions .20 .80
-@item @command{putctl2(9)} @tab
+@item @command{putctl2(9)}
 @findex putctl2(9)
-Put a 2 byte control message on a @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on a @cite{STREAMS} message queue.
 Many @cite{STREAMS} implementations provide this function.  When the errors that can be delivered to
 the Stream Head in a @var{M_ERROR} message were broken from a single read/write error condition to a
 separate read and write error condition, the
@@ -4116,9 +4179,9 @@ does: the @cite{AIX Portable STREAMS Environment (PSE)} is essentially single th
 @cite{AIX PSE} does not implement @var{QHLIST} meaning that the synchronization for protecting
 dereferencing of @samp{q->q_next} pointers is not present.
 
-@item @command{splstr(9)} @tab
+@item @command{splstr(9)}
 @findex splstr(9)
-Set or restore priority levels.
+@tab Set or restore priority levels.
 Although @dfn{@value{PACKAGE_TITLE}} does not interpret priority levels in the same fashion as @cite{SVR
 4.2 MP}, the
 @command{splstr(9)}
@@ -4132,9 +4195,9 @@ and
 @findex splx(9)
 functions in support of @cite{STREAMS}.
 
-@item @command{splx(9)} @tab
+@item @command{splx(9)}
 @findex splx(9)
-Set or restore priority levels.
+@tab Set or restore priority levels.
 Although @dfn{@value{PACKAGE_TITLE}} does not interpret priority levels in the same fashion as @cite{SVR
 4.2 MP}, the
 @command{splx(9)}
@@ -4148,12 +4211,12 @@ and
 @findex splx(9)
 functions in support of @cite{STREAMS}.
 
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of @cite{STREAMS} message queues.
-@item @command{weldq(9)} @tab
+@tab Unweld two pairs of @cite{STREAMS} message queues.
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of @cite{STREAMS} message queues.
+@tab Weld together two pairs of @cite{STREAMS} message queues.
 @end multitable
 
 
@@ -4166,9 +4229,9 @@ The functions in this section are provided as part of the @cite{AIX Compatibilit
 in the @file{streams-aixcompat.o} kernel module.
 
 @multitable @columnfractions .30 .70
-@item @command{mi_bufcall(9)} @tab
+@item @command{mi_bufcall(9)}
 @findex mi_bufcall(9)
-Reliable alternative to @command{buffcall(9)}.
+@tab Reliable alternative to @command{buffcall(9)}.
 @command{mi_bufcall(9)}
 @findex mi_bufcall(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4177,9 +4240,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{mi_close_comm(9)} @tab
+@item @command{mi_close_comm(9)}
 @findex mi_close_comm(9)
-@cite{STREAMS} common minor device close utility.
+@tab @cite{STREAMS} common minor device close utility.
 @command{mi_close_comm(9)}
 @findex mi_close_comm(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4188,9 +4251,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{mi_next_ptr(9)} @tab
+@item @command{mi_next_ptr(9)}
 @findex mi_next_ptr(9)
-@cite{STREAMS} minor device list traversal.
+@tab @cite{STREAMS} minor device list traversal.
 @command{mi_next_ptr(9)}
 @findex mi_next_ptr(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4199,9 +4262,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{mi_open_comm(9)} @tab
+@item @command{mi_open_comm(9)}
 @findex mi_open_comm(9)
-@cite{STREAMS} common minor device open utility.
+@tab @cite{STREAMS} common minor device open utility.
 @command{mi_open_comm(9)}
 @findex mi_open_comm(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4210,9 +4273,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{mi_prev_ptr(9)} @tab
+@item @command{mi_prev_ptr(9)}
 @findex mi_prev_ptr(9)
-@cite{STREAMS} minor device list traversal.
+@tab @cite{STREAMS} minor device list traversal.
 @command{mi_prev_ptr(9)}
 @findex mi_prev_ptr(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4221,9 +4284,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{str_install(9)} @tab
+@item @command{str_install(9)}
 @findex str_install(9)
-Install a @cite{STREAMS} module or driver.
+@tab Install a @cite{STREAMS} module or driver.
 @command{str_install(9)}
 @findex str_install(9)
 is the @cite{AIX}-specific driver and module registration and deregistration facility.  This
@@ -4233,9 +4296,9 @@ Only the @cite{SVR 4.2 MP} version of this function will be used by portable @ci
 and drivers intended to be portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{wantio(9)} @tab
+@item @command{wantio(9)}
 @findex wantio(9)
-Perform direct I/O from a @cite{STREAMS} driver.
+@tab Perform direct I/O from a @cite{STREAMS} driver.
 @command{wantio(9)}
 @findex wantio(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4244,9 +4307,9 @@ This function will not be used by portable @cite{STREAMS} modules and drivers in
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{wantmsg(9)} @tab
+@item @command{wantmsg(9)}
 @findex wantmsg(9)
-Provide a filter of wanted messages from a @cite{STREAMS} module.
+@tab Provide a filter of wanted messages from a @cite{STREAMS} module.
 @command{wantmsg(9)}
 @findex wantmsg(9)
 is an @cite{AIX}-specific function.  @dfn{@value{PACKAGE_TITLE}} provides this function in support of
@@ -4275,9 +4338,9 @@ The following functions are provided by @dfn{@value{PACKAGE_TITLE}} for compatib
 @cindex HP-UX 11.0i v2, STREAMS/UX
 
 @multitable @columnfractions .20 .80
-@item @command{putctl2(9)} @tab
+@item @command{putctl2(9)}
 @findex putctl2(9)
-Put a 2 byte control message on a @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on a @cite{STREAMS} message queue.
 Many @cite{STREAMS} implementations provide this function.  When the errors that can be delivered to
 the Stream Head in a @var{M_ERROR} message were broken from a single read/write error condition to a
 separate read and write error condition, the
@@ -4299,9 +4362,9 @@ and other @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 based @cite{STREAMS} implementations.
 
-@item @command{putnextctl2(9)} @tab
+@item @command{putnextctl2(9)}
 @findex putnextctl2(9)
-Put a 2 byte control message on the downstream @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on the downstream @cite{STREAMS} message queue.
 Many @cite{STREAMS} @i{MP} implementations provide this function.  When the errors that can be
 delivered to the Stream Head in a @var{M_ERROR}
 @vindex M_ERROR
@@ -4325,12 +4388,12 @@ and other @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 based @cite{STREAMS} implementations.
 
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of @cite{STREAMS} message queues.
-@item @command{weldq(9)} @tab
+@tab Unweld two pairs of @cite{STREAMS} message queues.
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of @cite{STREAMS} message queues.
+@tab Weld together two pairs of @cite{STREAMS} message queues.
 @end multitable
 
 @subsubheading @cite{HP-UX} Compatibility Module
@@ -4342,9 +4405,9 @@ The functions in this section are provided as part of the @cite{HP-UX Compatibil
 in the @file{streams-hpuxcompat.o} kernel module.
 
 @multitable @columnfractions .20 .80
-@item @command{str_install(9)} @tab
+@item @command{str_install(9)}
 @findex str_install(9)
-Install a @cite{STREAMS} module or driver.
+@tab Install a @cite{STREAMS} module or driver.
 @command{str_install(9)}
 @findex str_install(9)
 is the @cite{HP-UX}-specific
@@ -4359,9 +4422,9 @@ version of this function will be used by portable @cite{STREAMS} modules and dri
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{str_uninstall(9)} @tab
+@item @command{str_uninstall(9)}
 @findex str_uninstall(9)
-Uninstall a @cite{STREAMS} module or driver.
+@tab Uninstall a @cite{STREAMS} module or driver.
 @command{str_uninstall(9)}
 @findex str_uninstall(9)
 is the @cite{HP-UX}-specific
@@ -4377,12 +4440,12 @@ version of this function will be used by portable @cite{STREAMS} modules and dri
 portable across @cite{STREAM} implementations based on @cite{SVR 4.2 MP}.
 @cindex SVR 4.2 MP
 
-@item @command{streams_get_sleep_lock(9)} @tab
+@item @command{streams_get_sleep_lock(9)}
 @findex streams_get_sleep_lock(9)
-Provide access to the global sleep lock.
-@item @command{streams_put(9)} @tab
+@tab Provide access to the global sleep lock.
+@item @command{streams_put(9)}
 @findex streams_put(9)
-Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+@tab Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
 @end multitable
 
 @subsection OSF/1 1.2/Digital UNIX Compatibility Functions
@@ -4400,12 +4463,12 @@ The following functions are provided by @dfn{@value{PACKAGE_TITLE}} for compatib
 @cite{OSF/1 1.2/Digital UNIX}:
 
 @multitable @columnfractions .20 .80
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of @cite{STREAMS} message queues.
-@item @command{weldq(9)} @tab
+@tab Unweld two pairs of @cite{STREAMS} message queues.
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of @cite{STREAMS} message queues.
+@tab Weld together two pairs of @cite{STREAMS} message queues.
 @end multitable
 
 @subsubheading @cite{OSF/1} Compatibility Module
@@ -4417,30 +4480,30 @@ The functions in this section are provided as part of the @cite{OSF/1 Compatibil
 in the @file{streams-osfcompat.o} kernel module.
 
 @multitable @columnfractions .30 .70
-@item @command{lbolt(9)} @tab
+@item @command{lbolt(9)}
 @findex lbolt(9)
-Time in ticks since reboot.
-@item @command{puthere(9)} @tab
+@tab Time in ticks since reboot.
+@item @command{puthere(9)}
 @findex puthere(9)
-Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
-@item @command{streams_close_comm(9)} @tab
+@tab Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+@item @command{streams_close_comm(9)}
 @findex streams_close_comm(9)
-Common minor device close utility.
-@item @command{streams_open_comm(9)} @tab
+@tab Common minor device close utility.
+@item @command{streams_open_comm(9)}
 @findex streams_open_comm(9)
-Common minor device open utility.
-@item @command{streams_open_ocomm(9)} @tab
+@tab Common minor device open utility.
+@item @command{streams_open_ocomm(9)}
 @findex streams_open_ocomm(9)
-Common minor device open utility.
-@item @command{strmod_add(9)} @tab
+@tab Common minor device open utility.
+@item @command{strmod_add(9)}
 @findex strmod_add(9)
-Add a @cite{STREAMS} module.
-@item @command{strmod_del(9)} @tab
+@tab Add a @cite{STREAMS} module.
+@item @command{strmod_del(9)}
 @findex strmod_del(9)
-Delete a @cite{STREAMS} module or driver from the kernel.
-@item @command{time(9)} @tab
+@tab Delete a @cite{STREAMS} module or driver from the kernel.
+@item @command{time(9)}
 @findex time(9)
-(undoc).
+@tab (undoc).
 @end multitable
 
 @subsection UnixWare 7.1.3 (OpenUnix 8) Compatibility Functions
@@ -4469,42 +4532,42 @@ The functions in this section are provided as part of the @cite{UnixWare Compati
 in the @file{streams-uw7compat.o} kernel module.
 
 @multitable @columnfractions .30 .70
-@item @command{allocb_physreq(9)} @tab
+@item @command{allocb_physreq(9)}
 @findex allocb_physreq(9)
-Allocate a @cite{STREAMS} message and data block.
-@item @command{emajor(9)} @tab
+@tab Allocate a @cite{STREAMS} message and data block.
+@item @command{emajor(9)}
 @findex emajor(9)
-Get the external (real) major device number from the device number.
-@item @command{eminor(9)} @tab
+@tab Get the external (real) major device number from the device number.
+@item @command{eminor(9)}
 @findex eminor(9)
-Get the external extended minor device number from the device number.
-@item @command{etoimajor(9)} @tab
+@tab Get the external extended minor device number from the device number.
+@item @command{etoimajor(9)}
 @findex etoimajor(9)
-Convert an external major device number to an internal major device number.
-@item @command{getemajor(9)} @tab
+@tab Convert an external major device number to an internal major device number.
+@item @command{getemajor(9)}
 @findex getemajor(9)
-Get the external (real) major device number.
-@item @command{geteminor(9)} @tab
+@tab Get the external (real) major device number.
+@item @command{geteminor(9)}
 @findex geteminor(9)
-Get the external minor device number.
-@item @command{itoemajor(9)} @tab
+@tab Get the external minor device number.
+@item @command{itoemajor(9)}
 @findex itoemajor(9)
-Convert an internal major device number to an external major device number.
-@item @command{msgphysreq(9)} @tab
+@tab Convert an internal major device number to an external major device number.
+@item @command{msgphysreq(9)}
 @findex msgphysreq(9)
-Cause a message block to meet physical requirements.
-@item @command{msgpullup_physreq(9)} @tab
+@tab Cause a message block to meet physical requirements.
+@item @command{msgpullup_physreq(9)}
 @findex msgpullup_physreq(9)
-Pull up bytes in a @cite{STREAMS} message.
-@item @command{msgscgth(9)} @tab
+@tab Pull up bytes in a @cite{STREAMS} message.
+@item @command{msgscgth(9)}
 @findex msgscgth(9)
-(undoc).
-@item @command{printf(9)} @tab
+@tab (undoc).
+@item @command{printf(9)}
 @findex printf(9)
-(undoc).
-@item @command{strioccall(9)} @tab
+@tab (undoc).
+@item @command{strioccall(9)}
 @findex strioccall(9)
-(undoc).
+@tab (undoc).
 @end multitable
 
 @subsection Solaris 9/SunOS 5.9 Compatibility Functions
@@ -4534,108 +4597,126 @@ The functions in this section are provided as part of the @cite{Solaris Compatib
 in the @file{streams-suncompat.o} kernel module.
 
 @multitable @columnfractions .40 .60
-@item @command{_fini(9)} @tab
+@item @command{_fini(9)}
 @findex _fini(9)
-@item @command{_info(9)} @tab
+@tab
+@item @command{_info(9)}
 @findex _info(9)
-@item @command{_init(9)} @tab
+@tab
+@item @command{_init(9)}
 @findex _init(9)
-@item @command{attach(9)} @tab
+@tab
+@item @command{attach(9)}
 @findex attach(9)
-attach a device to the system or resume a suspended device
-@item @command{ddi_create_minor_node(9)} @tab
+@tab attach a device to the system or resume a suspended device
+@item @command{ddi_create_minor_node(9)}
 @findex ddi_create_minor_node(9)
-create a minor node for this device
-@item @command{ddi_driver_major(9)} @tab
+@tab create a minor node for this device
+@item @command{ddi_driver_major(9)}
 @findex ddi_driver_major(9)
-find the major device number associated with a driver
-@item @command{ddi_driver_name(9)} @tab
+@tab find the major device number associated with a driver
+@item @command{ddi_driver_name(9)}
 @findex ddi_driver_name(9)
-return normalized driver name
-@item @command{ddi_get_cred(9)} @tab
+@tab return normalized driver name
+@item @command{ddi_get_cred(9)}
 @findex ddi_get_cred(9)
-get a reference to the credentials of the current user
-@item @command{ddi_getiminor(9)} @tab
+@tab get a reference to the credentials of the current user
+@item @command{ddi_getiminor(9)}
 @findex ddi_getiminor(9)
-@item @command{ddi_get_instance(9)} @tab
+@tab
+@item @command{ddi_get_instance(9)}
 @findex ddi_get_instance(9)
-get device instance number
-@item @command{ddi_get_lbolt(9)} @tab
+@tab get device instance number
+@item @command{ddi_get_lbolt(9)}
 @findex ddi_get_lbolt(9)
-get the current value of the system tick clock
-@item @command{ddi_get_pid(9)} @tab
+@tab get the current value of the system tick clock
+@item @command{ddi_get_pid(9)}
 @findex ddi_get_pid(9)
-@item @command{ddi_get_soft_state(9)} @tab
+@tab
+@item @command{ddi_get_soft_state(9)}
 @findex ddi_get_soft_state(9)
-@item @command{ddi_get_time(9)} @tab
+@tab
+@item @command{ddi_get_time(9)}
 @findex ddi_get_time(9)
-get the current time in seconds since the epoch
-@item @command{ddi_remove_minor_node(9)} @tab
+@tab get the current time in seconds since the epoch
+@item @command{ddi_remove_minor_node(9)}
 @findex ddi_remove_minor_node(9)
-remove a minor node for a device
-@item @command{ddi_removing_power(9)} @tab
+@tab remove a minor node for a device
+@item @command{ddi_removing_power(9)}
 @findex ddi_removing_power(9)
-@item @command{ddi_soft_state(9)} @tab
+@tab
+@item @command{ddi_soft_state(9)}
 @findex ddi_soft_state(9)
-@item @command{ddi_soft_state_fini(9)} @tab
+@tab
+@item @command{ddi_soft_state_fini(9)}
 @findex ddi_soft_state_fini(9)
-@item @command{ddi_soft_state_free(9)} @tab
+@tab
+@item @command{ddi_soft_state_free(9)}
 @findex ddi_soft_state_free(9)
-@item @command{ddi_soft_state_init(9)} @tab
+@tab
+@item @command{ddi_soft_state_init(9)}
 @findex ddi_soft_state_init(9)
-@item @command{ddi_soft_state_zalloc(9)} @tab
+@tab
+@item @command{ddi_soft_state_zalloc(9)}
 @findex ddi_soft_state_zalloc(9)
-@item @command{ddi_umem_alloc(9)} @tab
+@tab
+@item @command{ddi_umem_alloc(9)}
 @findex ddi_umem_alloc(9)
-allocate page aligned kernel memory
-@item @command{ddi_umem_free(9)} @tab
+@tab allocate page aligned kernel memory
+@item @command{ddi_umem_free(9)}
 @findex ddi_umem_free(9)
-@item @command{detach(9)} @tab
+@tab
+@item @command{detach(9)}
 @findex detach(9)
-detach a device from the system or suspend a device
-@item @command{getinfo(9)} @tab
+@tab detach a device from the system or suspend a device
+@item @command{getinfo(9)}
 @findex getinfo(9)
-@item @command{identify(9)} @tab
+@tab
+@item @command{identify(9)}
 @findex identify(9)
-determine if a driver is associated with a device
-@item @command{install_driver(9)} @tab
+@tab determine if a driver is associated with a device
+@item @command{install_driver(9)}
 @findex install_driver(9)
-install a device driver
-@item @command{mod_info(9)} @tab
+@tab install a device driver
+@item @command{mod_info(9)}
 @findex mod_info(9)
-provides information on a loadable kernel module to the @cite{STREAMS} executive
-@item @command{mod_install(9)} @tab
+@tab provides information on a loadable kernel module to the @cite{STREAMS} executive
+@item @command{mod_install(9)}
 @findex mod_install(9)
-installs a loadable kernel module in the @cite{STREAMS} executive
-@item @command{mod_remove(9)} @tab
+@tab installs a loadable kernel module in the @cite{STREAMS} executive
+@item @command{mod_remove(9)}
 @findex mod_remove(9)
-removes a loadable module from the @cite{STREAMS} executive
-@item @command{power(9)} @tab
+@tab removes a loadable module from the @cite{STREAMS} executive
+@item @command{power(9)}
 @findex power(9)
-power a device attached to the system
-@item @command{probe(9)} @tab
+@tab power a device attached to the system
+@item @command{probe(9)}
 @findex probe(9)
-@item @command{qbufcall(9)} @tab
+@tab
+@item @command{qbufcall(9)}
 @findex qbufcall(9)
-install a buffer callback
-@item @command{qtimeout(9)} @tab
+@tab install a buffer callback
+@item @command{qtimeout(9)}
 @findex qtimeout(9)
-start a timer associated with a queue
-@item @command{queclass(9)} @tab
+@tab start a timer associated with a queue
+@item @command{queclass(9)}
 @findex queclass(9)
-@item @command{qunbufcall(9)} @tab
+@tab
+@item @command{qunbufcall(9)}
 @findex qunbufcall(9)
-Cancel a @cite{STREAMS} buffer callback.
-@item @command{quntimeout(9)} @tab
+@tab Cancel a @cite{STREAMS} buffer callback.
+@item @command{quntimeout(9)}
 @findex quntimeout(9)
-@item @command{qwait(9)} @tab
+@tab
+@item @command{qwait(9)}
 @findex qwait(9)
-wait for a queue message
-@item @command{qwait_sig(9)} @tab
+@tab wait for a queue message
+@item @command{qwait_sig(9)}
 @findex qwait_sig(9)
-wait for a queue message or signal
-@item @command{qwriter(9)} @tab
+@tab wait for a queue message or signal
+@item @command{qwriter(9)}
 @findex qwriter(9)
+@tab
 @end multitable
 
 @subsection LiS 2.18.1 Compatibility Functions
@@ -4646,199 +4727,294 @@ wait for a queue message or signal
 @cindex Linux STREAMS (LiS)
 
 @multitable @columnfractions .40 .60
-@item @command{lis_register_strdev(9)} @tab
+@item @command{lis_register_strdev(9)}
 @findex lis_register_strdev(9)
-@item @command{lis_register_strmod(9)} @tab
+@tab
+@item @command{lis_register_strmod(9)}
 @findex lis_register_strmod(9)
-@item @command{lis_unregister_strdev(9)} @tab
+@tab
+@item @command{lis_unregister_strdev(9)}
 @findex lis_unregister_strdev(9)
-@item @command{lis_unregister_strmod(9)} @tab
+@tab
+@item @command{lis_unregister_strmod(9)}
 @findex lis_unregister_strmod(9)
+@tab
 @end multitable
 
 @multitable @columnfractions .40 .60
-@item @command{lis_adjmsg(9)} @tab
+@item @command{lis_adjmsg(9)}
 @findex lis_adjmsg(9)
-@item @command{lis_allocb(9)} @tab
+@tab
+@item @command{lis_allocb(9)}
 @findex lis_allocb(9)
-@item @command{lis_allocb_physreq(9)} @tab
+@tab
+@item @command{lis_allocb_physreq(9)}
 @findex lis_allocb_physreq(9)
-@item @command{lis_allocq(9)} @tab
+@tab
+@item @command{lis_allocq(9)}
 @findex lis_allocq(9)
-@item @command{lis_appq(9)} @tab
+@tab
+@item @command{lis_appq(9)}
 @findex lis_appq(9)
-@item @command{lis_backq(9)} @tab
+@tab
+@item @command{lis_backq(9)}
 @findex lis_backq(9)
-@item @command{lis_bcanput(9)} @tab
+@tab
+@item @command{lis_bcanput(9)}
 @findex lis_bcanput(9)
-@item @command{lis_bcanputnext(9)} @tab
+@tab
+@item @command{lis_bcanputnext(9)}
 @findex lis_bcanputnext(9)
-@item @command{lis_bcopy(9)} @tab
+@tab
+@item @command{lis_bcopy(9)}
 @findex lis_bcopy(9)
-@item @command{lis_bufcall(9)} @tab
+@tab
+@item @command{lis_bufcall(9)}
 @findex lis_bufcall(9)
-@item @command{lis_bzero(9)} @tab
+@tab
+@item @command{lis_bzero(9)}
 @findex lis_bzero(9)
-@item @command{lis_canenable(9)} @tab
+@tab
+@item @command{lis_canenable(9)}
 @findex lis_canenable(9)
-@item @command{lis_canput(9)} @tab
+@tab
+@item @command{lis_canput(9)}
 @findex lis_canput(9)
-@item @command{lis_canputnext(9)} @tab
+@tab
+@item @command{lis_canputnext(9)}
 @findex lis_canputnext(9)
-@item @command{lis_cmn_err(9)} @tab
+@tab
+@item @command{lis_cmn_err(9)}
 @findex lis_cmn_err(9)
-@item @command{lis_copyb(9)} @tab
+@tab
+@item @command{lis_copyb(9)}
 @findex lis_copyb(9)
-@item @command{lis_copymsg(9)} @tab
+@tab
+@item @command{lis_copymsg(9)}
 @findex lis_copymsg(9)
-@item @command{lis_datamsg(9)} @tab
+@tab
+@item @command{lis_datamsg(9)}
 @findex lis_datamsg(9)
-@item @command{lis_date(9)} @tab
+@tab
+@item @command{lis_date(9)}
 @findex lis_date(9)
-@item @command{lis_dupb(9)} @tab
+@tab
+@item @command{lis_dupb(9)}
 @findex lis_dupb(9)
-@item @command{lis_dupmsg(9)} @tab
+@tab
+@item @command{lis_dupmsg(9)}
 @findex lis_dupmsg(9)
-@item @command{lis_enableok(9)} @tab
+@tab
+@item @command{lis_enableok(9)}
 @findex lis_enableok(9)
-@item @command{lis_esballoc(9)} @tab
+@tab
+@item @command{lis_esballoc(9)}
 @findex lis_esballoc(9)
-@item @command{lis_esbbcall(9)} @tab
+@tab
+@item @command{lis_esbbcall(9)}
 @findex lis_esbbcall(9)
-@item @command{lis_find_strdev(9)} @tab
+@tab
+@item @command{lis_find_strdev(9)}
 @findex lis_find_strdev(9)
-@item @command{lis_flushband(9)} @tab
+@tab
+@item @command{lis_flushband(9)}
 @findex lis_flushband(9)
-@item @command{lis_flushq(9)} @tab
+@tab
+@item @command{lis_flushq(9)}
 @findex lis_flushq(9)
-@item @command{lis_freeb(9)} @tab
+@tab
+@item @command{lis_freeb(9)}
 @findex lis_freeb(9)
-@item @command{lis_freemsg(9)} @tab
+@tab
+@item @command{lis_freemsg(9)}
 @findex lis_freemsg(9)
-@item @command{lis_freeq(9)} @tab
+@tab
+@item @command{lis_freeq(9)}
 @findex lis_freeq(9)
-@item @command{lis_getq(9)} @tab
+@tab
+@item @command{lis_getq(9)}
 @findex lis_getq(9)
-@item @command{lis_insq(9)} @tab
+@tab
+@item @command{lis_insq(9)}
 @findex lis_insq(9)
-@item @command{lis_isdatablk(9)} @tab
+@tab
+@item @command{lis_isdatablk(9)}
 @findex lis_isdatablk(9)
-@item @command{lis_isdatamsg(9)} @tab
+@tab
+@item @command{lis_isdatamsg(9)}
 @findex lis_isdatamsg(9)
-@item @command{lis_linkb(9)} @tab
+@tab
+@item @command{lis_linkb(9)}
 @findex lis_linkb(9)
-@item @command{lis_mknod(9)} @tab
+@tab
+@item @command{lis_mknod(9)}
 @findex lis_mknod(9)
-@item @command{lis_mount(9)} @tab
+@tab
+@item @command{lis_mount(9)}
 @findex lis_mount(9)
-@item @command{lis_msgdsize(9)} @tab
+@tab
+@item @command{lis_msgdsize(9)}
 @findex lis_msgdsize(9)
-@item @command{lis_msgpullup(9)} @tab
+@tab
+@item @command{lis_msgpullup(9)}
 @findex lis_msgpullup(9)
-@item @command{lis_msgsize(9)} @tab
+@tab
+@item @command{lis_msgsize(9)}
 @findex lis_msgsize(9)
-@item @command{lis_noenable(9)} @tab
+@tab
+@item @command{lis_noenable(9)}
 @findex lis_noenable(9)
-@item @command{lis_OTHER(9)} @tab
+@tab
+@item @command{lis_OTHER(9)}
 @findex lis_OTHER(9)
-@item @command{lis_OTHERQ(9)} @tab
+@tab
+@item @command{lis_OTHERQ(9)}
 @findex lis_OTHERQ(9)
-@item @command{lis_pullupmsg(9)} @tab
+@tab
+@item @command{lis_pullupmsg(9)}
 @findex lis_pullupmsg(9)
-@item @command{lis_putbq(9)} @tab
+@tab
+@item @command{lis_putbq(9)}
 @findex lis_putbq(9)
-@item @command{lis_putctl1(9)} @tab
+@tab
+@item @command{lis_putctl1(9)}
 @findex lis_putctl1(9)
-@item @command{lis_putctl(9)} @tab
+@tab
+@item @command{lis_putctl(9)}
 @findex lis_putctl(9)
-@item @command{lis_putnext(9)} @tab
+@tab
+@item @command{lis_putnext(9)}
 @findex lis_putnext(9)
-@item @command{lis_putnextctl1(9)} @tab
+@tab
+@item @command{lis_putnextctl1(9)}
 @findex lis_putnextctl1(9)
-@item @command{lis_putnextctl(9)} @tab
+@tab
+@item @command{lis_putnextctl(9)}
 @findex lis_putnextctl(9)
-@item @command{lis_putq(9)} @tab
+@tab
+@item @command{lis_putq(9)}
 @findex lis_putq(9)
-@item @command{lis_qattach(9)} @tab
+@tab
+@item @command{lis_qattach(9)}
 @findex lis_qattach(9)
-@item @command{lis_qclose(9)} @tab
+@tab
+@item @command{lis_qclose(9)}
 @findex lis_qclose(9)
-@item @command{lis_qdetach(9)} @tab
+@tab
+@item @command{lis_qdetach(9)}
 @findex lis_qdetach(9)
-@item @command{lis_qenable(9)} @tab
+@tab
+@item @command{lis_qenable(9)}
 @findex lis_qenable(9)
-@item @command{lis_qopen(9)} @tab
+@tab
+@item @command{lis_qopen(9)}
 @findex lis_qopen(9)
-@item @command{lis_qprocsoff(9)} @tab
+@tab
+@item @command{lis_qprocsoff(9)}
 @findex lis_qprocsoff(9)
-@item @command{lis_qprocson(9)} @tab
+@tab
+@item @command{lis_qprocson(9)}
 @findex lis_qprocson(9)
-@item @command{lis_qreply(9)} @tab
+@tab
+@item @command{lis_qreply(9)}
 @findex lis_qreply(9)
-@item @command{lis_qsize(9)} @tab
+@tab
+@item @command{lis_qsize(9)}
 @findex lis_qsize(9)
-@item @command{lis_RD(9)} @tab
+@tab
+@item @command{lis_RD(9)}
 @findex lis_RD(9)
-@item @command{lis_register_strdev(9)} @tab
+@tab
+@item @command{lis_register_strdev(9)}
 @findex lis_register_strdev(9)
-@item @command{lis_register_strmod(9)} @tab
+@tab
+@item @command{lis_register_strmod(9)}
 @findex lis_register_strmod(9)
-@item @command{lis_rmvb(9)} @tab
+@tab
+@item @command{lis_rmvb(9)}
 @findex lis_rmvb(9)
-@item @command{lis_rmvq(9)} @tab
+@tab
+@item @command{lis_rmvq(9)}
 @findex lis_rmvq(9)
-@item @command{lis_safe_canenable(9)} @tab
+@tab
+@item @command{lis_safe_canenable(9)}
 @findex lis_safe_canenable(9)
-@item @command{lis_safe_enableok(9)} @tab
+@tab
+@item @command{lis_safe_enableok(9)}
 @findex lis_safe_enableok(9)
-@item @command{lis_safe_noenable(9)} @tab
+@tab
+@item @command{lis_safe_noenable(9)}
 @findex lis_safe_noenable(9)
-@item @command{lis_safe_OTHERQ(9)} @tab
+@tab
+@item @command{lis_safe_OTHERQ(9)}
 @findex lis_safe_OTHERQ(9)
-@item @command{lis_safe_putnext(9)} @tab
+@tab
+@item @command{lis_safe_putnext(9)}
 @findex lis_safe_putnext(9)
-@item @command{lis_safe_qreply(9)} @tab
+@tab
+@item @command{lis_safe_qreply(9)}
 @findex lis_safe_qreply(9)
-@item @command{lis_safe_RD(9)} @tab
+@tab
+@item @command{lis_safe_RD(9)}
 @findex lis_safe_RD(9)
-@item @command{lis_safe_SAMESTR(9)} @tab
+@tab
+@item @command{lis_safe_SAMESTR(9)}
 @findex lis_safe_SAMESTR(9)
-@item @command{lis_safe_WR(9)} @tab
+@tab
+@item @command{lis_safe_WR(9)}
 @findex lis_safe_WR(9)
-@item @command{lis_SAMESTR(9)} @tab
+@tab
+@item @command{lis_SAMESTR(9)}
 @findex lis_SAMESTR(9)
-@item @command{lis_stream_utils(9)} @tab
+@tab
+@item @command{lis_stream_utils(9)}
 @findex lis_stream_utils(9)
-@item @command{lis_strqget(9)} @tab
+@tab
+@item @command{lis_strqget(9)}
 @findex lis_strqget(9)
-@item @command{lis_strqset(9)} @tab
+@tab
+@item @command{lis_strqset(9)}
 @findex lis_strqset(9)
-@item @command{lis_testb(9)} @tab
+@tab
+@item @command{lis_testb(9)}
 @findex lis_testb(9)
-@item @command{lis_timeout(9)} @tab
+@tab
+@item @command{lis_timeout(9)}
 @findex lis_timeout(9)
-@item @command{lis_umount2(9)} @tab
+@tab
+@item @command{lis_umount2(9)}
 @findex lis_umount2(9)
-@item @command{lis_umount(9)} @tab
+@tab
+@item @command{lis_umount(9)}
 @findex lis_umount(9)
-@item @command{lis_unbufcall(9)} @tab
+@tab
+@item @command{lis_unbufcall(9)}
 @findex lis_unbufcall(9)
-@item @command{lis_unlink(9)} @tab
+@tab
+@item @command{lis_unlink(9)}
 @findex lis_unlink(9)
-@item @command{lis_unlinkb(9)} @tab
+@tab
+@item @command{lis_unlinkb(9)}
 @findex lis_unlinkb(9)
-@item @command{lis_unregister_strdev(9)} @tab
+@tab
+@item @command{lis_unregister_strdev(9)}
 @findex lis_unregister_strdev(9)
-@item @command{lis_unregister_strmod(9)} @tab
+@tab
+@item @command{lis_unregister_strmod(9)}
 @findex lis_unregister_strmod(9)
-@item @command{lis_untimeout(9)} @tab
+@tab
+@item @command{lis_untimeout(9)}
 @findex lis_untimeout(9)
-@item @command{lis_version(9)} @tab
+@tab
+@item @command{lis_version(9)}
 @findex lis_version(9)
-@item @command{lis_WR(9)} @tab
+@tab
+@item @command{lis_WR(9)}
 @findex lis_WR(9)
-@item @command{lis_xmsgsize(9)} @tab
+@tab
+@item @command{lis_xmsgsize(9)}
 @findex lis_xmsgsize(9)
+@tab
 @end multitable
 
 @node Examples
@@ -4932,18 +5108,24 @@ A number of administrative utilities are provided that assist with the assignmen
 and number and are useful in boot scripts: (@pxref{Administrative Utilities})
 
 @multitable @columnfractions .15 .85
-@item @command{autopush(8)} @tab -- verify modules and establish autopush lists
+@item @command{autopush(8)}
 @pgindex autopush(8)
-@item @command{insf(8)} @tab -- install special device files
+@tab -- verify modules and establish autopush lists
+@item @command{insf(8)}
 @pgindex insf(8)
-@item @command{scls(8)} @tab -- list @dfn{STREAMS} drivers
+@tab -- install special device files
+@item @command{scls(8)}
 @pgindex scls(8)
-@item @command{strinfo(8)} @tab -- provide information on @dfn{STREAMS} drivers and modules
+@tab -- list @dfn{STREAMS} drivers
+@item @command{strinfo(8)}
 @pgindex strinfo(8)
-@item @command{strload(8)} @tab -- load or unload @dfn{STREAMS} drviers and modules
+@tab -- provide information on @dfn{STREAMS} drivers and modules
+@item @command{strload(8)}
 @pgindex strload(8)
-@item @command{strsetup(8)} @tab -- create @dfn{STREAMS} devices
+@tab -- load or unload @dfn{STREAMS} drviers and modules
+@item @command{strsetup(8)}
 @pgindex strsetup(8)
+@tab -- create @dfn{STREAMS} devices
 @end multitable
 
 Another approach to establishment of dynamically allocated major device numbers is to use the @cite{LiS}
@@ -5245,28 +5427,39 @@ That is, they were invoked using a @dfn{STREAMS} queue structure as an argument.
 are as follows:
 
 @multitable @columnfractions .20 .80
-@item @command{put(9)} @tab --
+@item @command{put(9)}
 @findex put(9)
-@item @command{srv(9)} @tab --
+@tab --
+@item @command{srv(9)}
 @findex srv(9)
-@item @command{qopen(9)} @tab --
+@tab --
+@item @command{qopen(9)}
 @findex qopen(9)
-@item @command{qclose(9)} @tab --
+@tab --
+@item @command{qclose(9)}
 @findex qclose(9)
-@item @command{qbufcall(9)} @tab --
+@tab --
+@item @command{qbufcall(9)}
 @findex qbufcall(9)
-@item @command{qtimeout(9)} @tab --
+@tab --
+@item @command{qtimeout(9)}
 @findex qtimeout(9)
-@item @command{mi_bufcall(9)} @tab --
+@tab --
+@item @command{mi_bufcall(9)}
 @findex mi_bufcall(9)
-@item @command{putq(9)} @tab --
+@tab --
+@item @command{putq(9)}
 @findex putq(9)
-@item @command{putbq(9)} @tab --
+@tab --
+@item @command{putbq(9)}
 @findex putbq(9)
-@item @command{putnext(9)} @tab --
+@tab --
+@item @command{putnext(9)}
 @findex putnext(9)
-@item @command{qreply(9)} @tab --
+@tab --
+@item @command{qreply(9)}
 @findex qreply(9)
+@tab --
 @end multitable
 
 @item @emph{Asynchronous.}
@@ -5275,14 +5468,18 @@ structure.  That is, they were invoked without a specific @dfn{STREAMS} queue st
 argument.  These procedures are as follows:
 
 @multitable @columnfractions .20 .80
-@item @command{bufcall(9)} @tab --
+@item @command{bufcall(9)}
 @findex bufcall(9)
-@item @command{esbbufcall(9)} @tab --
+@tab --
+@item @command{esbbufcall(9)}
 @findex esbbufcall(9)
-@item @command{timeout(9)} @tab --
+@tab --
+@item @command{timeout(9)}
 @findex timeout(9)
-@item @command{esballoc(9)} @tab (free routine)
+@tab --
+@item @command{esballoc(9)}
 @findex esballoc(9)
+@tab (free routine)
 @end multitable
 
 @end enumerate
@@ -5398,54 +5595,59 @@ flag.
 will be synchronized according to the specified synchronization level.
 
 @multitable @columnfractions .20 .80
-@item @command{put(9)} @tab
+@item @command{put(9)}
 @findex put(9)
-@emph{Queue put procedure.}
+@tab @emph{Queue put procedure.}
 If the module has any synchronization level other than @var{SQLVL_NOP},
 @vindex SQLVL_NOP
 the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
 running within the synchronization level will result in the call being postponed until the thread
 currently in the synchronization level exits.
 
-@item @command{srv(9)} @tab
+@item @command{srv(9)}
 @findex srv(9)
-If the module has any synchronization level other than @var{SQLVL_NOP},
+@tab If the module has any synchronization level other than @var{SQLVL_NOP},
 @vindex SQLVL_NOP
 @emph{Queue service procedure.}
 the service procedure will be exclusive.  Attempts to enter the service procedure while another
 thread is running within the synchronization level will result in the service procedure being
 postponed until the thread currently in the synchronization level exits.
 
-@item @command{qopen(9)} @tab
+@item @command{qopen(9)}
 @findex qopen(9)
-@emph{Queue open procedure.}
+@tab @emph{Queue open procedure.}
 The queue open procedure is synchronous and exclusive before the call to @command{qprocson(9)},
 @findex qprocson(9)
 or in any event, until return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the qopen procedure is exclusive.
 
-@item @command{qclose(9)} @tab
+@item @command{qclose(9)}
 @findex qclose(9)
-@emph{Queue close procedure.}
+@tab @emph{Queue close procedure.}
 The queue close procedure is synchronous and exclusive after the call to @command{qprocsoff(9)},
 @findex qprocsoff(9)
 or in any event, after return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the qclose procedure is exclusive.
 
-@item @command{qprocson(9)} @tab
+@item @command{qprocson(9)}
 @findex qprocson(9)
+@tab
 @emph{Queue procedures on.}
-@item @command{qprocsoff(9)} @tab
+@item @command{qprocsoff(9)}
 @findex qprocsoff(9)
+@tab
 @emph{Queue procedures off.}
-@item @command{freezestr(9)} @tab
+@item @command{freezestr(9)}
 @findex freezestr(9)
+@tab
 @emph{Freeze stream.}
-@item @command{unfreezestr(9)} @tab
+@item @command{unfreezestr(9)}
 @findex unfreezestr(9)
+@tab
 @emph{Thaw stream.}
-@item @command{qwriter(9)} @tab
+@item @command{qwriter(9)}
 @findex qwriter(9)
+@tab
 @emph{Queue writer.}
 @end multitable
 
@@ -5527,34 +5729,48 @@ are the basic @cite{UNIX System V Release 4.2} callbacks.
 @cindex administrative utilities
 
 @multitable @columnfractions 0.25 0.75
-@item @command{autopush(8)} @tab control the autopush module list for a @cite{STREAMS} device
+@item @command{autopush(8)}
 @pgindex autopush(8)
-@item @command{fattach(8)} @tab name a @cite{STREAMS} file
+@tab control the autopush module list for a @cite{STREAMS} device
+@item @command{fattach(8)}
 @pgindex fattach(8)
-@item @command{fdetach(8)} @tab unlink a named @cite{STREAMS} file
+@tab name a @cite{STREAMS} file
+@item @command{fdetach(8)}
 @pgindex fdetach(8)
-@item @command{insf(8)} @tab install special device files
+@tab unlink a named @cite{STREAMS} file
+@item @command{insf(8)}
 @pgindex insf(8)
-@item @command{scls(8)} @tab produce a list of module and driver names
+@tab install special device files
+@item @command{scls(8)}
 @pgindex scls(8)
-@item @command{strace(8)} @tab write @cite{STREAMS} event trace messages to the standard output
+@tab produce a list of module and driver names
+@item @command{strace(8)}
 @pgindex strace(8)
-@item @command{strclean(8)} @tab clean up after the @cite{STREAMS} error and trace loggers
+@tab write @cite{STREAMS} event trace messages to the standard output
+@item @command{strclean(8)}
 @pgindex strclean(8)
-@item @command{strconf(8)} @tab @cite{STREAMS} configuration utility
+@tab clean up after the @cite{STREAMS} error and trace loggers
+@item @command{strconf(8)}
 @pgindex strconf(8)
-@item @command{streams_mknod(8)} @tab create or remove @cite{STREAMS} device nodes
+@tab @cite{STREAMS} configuration utility
+@item @command{streams_mknod(8)}
 @pgindex streams_mknod(8)
-@item @command{strerr(8)} @tab receive error log messages from the @cite{STREAMS} @command{log(4)} driver
+@tab create or remove @cite{STREAMS} device nodes
+@item @command{strerr(8)}
 @pgindex strerr(8)
-@item @command{strinfo(8)} @tab display information about @cite{STREAMS} devices
+@tab receive error log messages from the @cite{STREAMS} @command{log(4)} driver
+@item @command{strinfo(8)}
 @pgindex strinfo(8)
-@item @command{strload(8)} @tab loads the @cite{STREAMS} subsystem
+@tab display information about @cite{STREAMS} devices
+@item @command{strload(8)}
 @pgindex strload(8)
-@item @command{strsetup(8)} @tab @cite{STREAMS} setup command
+@tab loads the @cite{STREAMS} subsystem
+@item @command{strsetup(8)}
 @pgindex strsetup(8)
-@item @command{strvf(8)} @tab @cite{STREAMS} verification tool
+@tab @cite{STREAMS} setup command
+@item @command{strvf(8)}
 @pgindex strvf(8)
+@tab @cite{STREAMS} verification tool
 @end multitable
 
 @menu
@@ -6217,66 +6433,66 @@ Porting information is organized into sections as follows:
 @cindex core message functions
 
 @multitable @columnfractions .20 .80
-@item @command{adjmsg(9)} @tab
+@item @command{adjmsg(9)}
 @findex adjmsg(9)
-trim bytes from the front or back of a @cite{STREAMS} message
-@item @command{allocb(9)} @tab
+@tab trim bytes from the front or back of a @cite{STREAMS} message
+@item @command{allocb(9)}
 @findex allocb(9)
-allocate a @cite{STREAMS} message and data block
-@item @command{bufcall(9)} @tab
+@tab allocate a @cite{STREAMS} message and data block
+@item @command{bufcall(9)}
 @findex bufcall(9)
-install a buffer callback
-@item @command{copyb(9)} @tab
+@tab install a buffer callback
+@item @command{copyb(9)}
 @findex copyb(9)
-copy a @cite{STREAMS} message block
-@item @command{copymsg(9)} @tab
+@tab copy a @cite{STREAMS} message block
+@item @command{copymsg(9)}
 @findex copymsg(9)
-copy a @cite{STREAMS} message
-@item @command{datamsg(9)} @tab
+@tab copy a @cite{STREAMS} message
+@item @command{datamsg(9)}
 @findex datamsg(9)
-tests a @cite{STREAMS} message type for data
-@item @command{dupb(9)} @tab
+@tab tests a @cite{STREAMS} message type for data
+@item @command{dupb(9)}
 @findex dupb(9)
-duplicate a @cite{STREAMS} message block
-@item @command{dupmsg(9)} @tab
+@tab duplicate a @cite{STREAMS} message block
+@item @command{dupmsg(9)}
 @findex dupmsg(9)
-duplicate a @cite{STREAMS} message
-@item @command{esballoc(9)} @tab
+@tab duplicate a @cite{STREAMS} message
+@item @command{esballoc(9)}
 @findex esballoc(9)
-allocate a @cite{STREAMS} message and data block with a caller supplied data buffer
-@item @command{freeb(9)} @tab
+@tab allocate a @cite{STREAMS} message and data block with a caller supplied data buffer
+@item @command{freeb(9)}
 @findex freeb(9)
-frees a @cite{STREAMS} message block
-@item @command{freemsg(9)} @tab
+@tab frees a @cite{STREAMS} message block
+@item @command{freemsg(9)}
 @findex freemsg(9)
-frees a @cite{STREAMS} message
-@item @command{linkb(9)} @tab
+@tab frees a @cite{STREAMS} message
+@item @command{linkb(9)}
 @findex linkb(9)
-link a message block to a @cite{STREAMS} message
-@item @command{msgdsize(9)} @tab
+@tab link a message block to a @cite{STREAMS} message
+@item @command{msgdsize(9)}
 @findex msgdsize(9)
-calculate the size of the data in a @cite{STREAMS} message
-@item @command{msgpullup(9)} @tab
+@tab calculate the size of the data in a @cite{STREAMS} message
+@item @command{msgpullup(9)}
 @findex msgpullup(9)
-pull up bytes in a @cite{STREAMS} message
-@item @command{pcmsg(9)} @tab
+@tab pull up bytes in a @cite{STREAMS} message
+@item @command{pcmsg(9)}
 @findex pcmsg(9)
-test a data block message type for priority control
-@item @command{pullupmsg(9)} @tab
+@tab test a data block message type for priority control
+@item @command{pullupmsg(9)}
 @findex pullupmsg(9)
-pull up the bytes in a @cite{STREAMS} message
-@item @command{rmvb(9)} @tab
+@tab pull up the bytes in a @cite{STREAMS} message
+@item @command{rmvb(9)}
 @findex rmvb(9)
-remove a message block from a @cite{STREAMS} message
-@item @command{testb(9)} @tab
+@tab remove a message block from a @cite{STREAMS} message
+@item @command{testb(9)}
 @findex testb(9)
-test if a @cite{STREAMS} message can be allocated
-@item @command{unbufcall(9)} @tab
+@tab test if a @cite{STREAMS} message can be allocated
+@item @command{unbufcall(9)}
 @findex unbufcall(9)
-remove a @cite{STREAMS} buffer callback
-@item @command{unlinkb(9)} @tab
+@tab remove a @cite{STREAMS} buffer callback
+@item @command{unlinkb(9)}
 @findex unlinkb(9)
-unlink a message block from a @cite{STREAMS} message
+@tab unlink a message block from a @cite{STREAMS} message
 @end multitable
 
 @node Core UP Queue Functions
@@ -6284,69 +6500,69 @@ unlink a message block from a @cite{STREAMS} message
 @cindex core queue functions, UP
 
 @multitable @columnfractions .20 .80
-@item @command{backq(9)} @tab
+@item @command{backq(9)}
 @findex backq(9)
-find the upstream or downstream queue
-@item @command{bcanput(9)} @tab
+@tab find the upstream or downstream queue
+@item @command{bcanput(9)}
 @findex bcanput(9)
-test flow control on a @cite{STREAMS} message queue
-@item @command{canenable(9)} @tab
+@tab test flow control on a @cite{STREAMS} message queue
+@item @command{canenable(9)}
 @findex canenable(9)
-test whether a @cite{STREAMS} message queue can be scheduled
-@item @command{enableok(9)} @tab
+@tab test whether a @cite{STREAMS} message queue can be scheduled
+@item @command{enableok(9)}
 @findex enableok(9)
-allow a @cite{STREAMS} message queue to be scheduled
-@item @command{flushband(9)} @tab
+@tab allow a @cite{STREAMS} message queue to be scheduled
+@item @command{flushband(9)}
 @findex flushband(9)
-flushes band @cite{STREAMS} messages from a message queue
-@item @command{flushq(9)} @tab
+@tab flushes band @cite{STREAMS} messages from a message queue
+@item @command{flushq(9)}
 @findex flushq(9)
-flushes messages from a @cite{STREAMS} message queue
-@item @command{getq(9)} @tab
+@tab flushes messages from a @cite{STREAMS} message queue
+@item @command{getq(9)}
 @findex getq(9)
-gets a message from a @cite{STREAMS} message queue
-@item @command{insq(9)} @tab
+@tab gets a message from a @cite{STREAMS} message queue
+@item @command{insq(9)}
 @findex insq(9)
-inserts a message into a @cite{STREAMS} message queue
-@item @command{noenable(9)} @tab
+@tab inserts a message into a @cite{STREAMS} message queue
+@item @command{noenable(9)}
 @findex noenable(9)
-disable a @cite{STREAMS} message queue from being scheduled
-@item @command{OTHERQ(9)} @tab
+@tab disable a @cite{STREAMS} message queue from being scheduled
+@item @command{OTHERQ(9)}
 @findex OTHERQ(9)
-return the other queue of a @cite{STREAMS} queue pair
-@item @command{putbq(9)} @tab
+@tab return the other queue of a @cite{STREAMS} queue pair
+@item @command{putbq(9)}
 @findex putbq(9)
-put a message back on a @cite{STREAMS} message queue
-@item @command{putctl(9)} @tab
+@tab put a message back on a @cite{STREAMS} message queue
+@item @command{putctl(9)}
 @findex putctl(9)
-put a control message on a @cite{STREAMS} message queue
-@item @command{putctl1(9)} @tab
+@tab put a control message on a @cite{STREAMS} message queue
+@item @command{putctl1(9)}
 @findex putctl1(9)
-put a 1 byte control message on a @cite{STREAMS} message queue
-@item @command{putq(9)} @tab
+@tab put a 1 byte control message on a @cite{STREAMS} message queue
+@item @command{putq(9)}
 @findex putq(9)
-put a message on a @cite{STREAMS} message queue
-@item @command{qenable(9)} @tab
+@tab put a message on a @cite{STREAMS} message queue
+@item @command{qenable(9)}
 @findex qenable(9)
-schedules a @cite{STREAMS} message queue service routine
-@item @command{qreply(9)} @tab
+@tab schedules a @cite{STREAMS} message queue service routine
+@item @command{qreply(9)}
 @findex qreply(9)
-replies to a message from a @cite{STREAMS} message queue
-@item @command{qsize(9)} @tab
+@tab replies to a message from a @cite{STREAMS} message queue
+@item @command{qsize(9)}
 @findex qsize(9)
-return the number of message on a queue
-@item @command{RD(9)} @tab
+@tab return the number of message on a queue
+@item @command{RD(9)}
 @findex RD(9)
-return the read queue of a @cite{STREAMS} queue pair
-@item @command{rmvq(9)} @tab
+@tab return the read queue of a @cite{STREAMS} queue pair
+@item @command{rmvq(9)}
 @findex rmvq(9)
-remove a message from a @cite{STREAMS} message queue
-@item @command{SAMESTR(9)} @tab
+@tab remove a message from a @cite{STREAMS} message queue
+@item @command{SAMESTR(9)}
 @findex SAMESTR(9)
-test for @cite{STREAMS} pipe or FIFO
-@item @command{WR(9)} @tab
+@tab test for @cite{STREAMS} pipe or FIFO
+@item @command{WR(9)}
 @findex WR(9)
-return the write queue of a @cite{STREAMS} queue pair
+@tab return the write queue of a @cite{STREAMS} queue pair
 @end multitable
 
 @node Core MP Queue Functions
@@ -6354,42 +6570,42 @@ return the write queue of a @cite{STREAMS} queue pair
 @cindex core queue functions, MP
 
 @multitable @columnfractions .20 .80
-@item @command{canputnext(9)} @tab
+@item @command{canputnext(9)}
 @findex bcanputnext(9)
-test flow control on a message queue
-@item @command{canputnext(9)} @tab
+@tab test flow control on a message queue
+@item @command{canputnext(9)}
 @findex canputnext(9)
-test flow control on a message queue
-@item @command{freezestr(9)} @tab
+@tab test flow control on a message queue
+@item @command{freezestr(9)}
 @findex freezestr(9)
-freeze the state of a stream queue
-@item @command{put(9)} @tab
+@tab freeze the state of a stream queue
+@item @command{put(9)}
 @findex put(9)
-invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
-@item @command{putnext(9)} @tab
+@tab invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message
+@item @command{putnext(9)}
 @findex putnext(9)
-put a message on the downstream @cite{STREAMS} message queue
-@item @command{putnextctl1(9)} @tab
+@tab put a message on the downstream @cite{STREAMS} message queue
+@item @command{putnextctl1(9)}
 @findex putnextctl1(9)
-put a 1 byte control message on the downstream @cite{STREAMS} message queue
-@item @command{putnextctl(9)} @tab
+@tab put a 1 byte control message on the downstream @cite{STREAMS} message queue
+@item @command{putnextctl(9)}
 @findex putnextctl(9)
-put a control message on the downstream @cite{STREAMS} message queue
-@item @command{qprocsoff(9)} @tab
+@tab put a control message on the downstream @cite{STREAMS} message queue
+@item @command{qprocsoff(9)}
 @findex qprocsoff(9)
-disables @cite{STREAMS} message queue processing for multi-processing
-@item @command{qprocson(9)} @tab
+@tab disables @cite{STREAMS} message queue processing for multi-processing
+@item @command{qprocson(9)}
 @findex qprocson(9)
-enables @cite{STREAMS} message queue processing for multi-processing
-@item @command{strqget(9)} @tab
+@tab enables @cite{STREAMS} message queue processing for multi-processing
+@item @command{strqget(9)}
 @findex strqget(9)
-gets information about a @cite{STREAMS} message queue
-@item @command{strqset(9)} @tab
+@tab gets information about a @cite{STREAMS} message queue
+@item @command{strqset(9)}
 @findex strqset(9)
-sets attributes of a @cite{STREAMS} message queue
-@item @command{unfreezestr(9)} @tab
+@tab sets attributes of a @cite{STREAMS} message queue
+@item @command{unfreezestr(9)}
 @findex unfreezestr(9)
-thaw the state of a stream queue
+@tab thaw the state of a stream queue
 @end multitable
 
 @node Core DDI/DKI Functions
@@ -6398,93 +6614,93 @@ thaw the state of a stream queue
 @cindex DDI/DKI
 
 @multitable @columnfractions .20 .80
-@item @command{kmem_alloc(9)} @tab
+@item @command{kmem_alloc(9)}
 @findex kmem_alloc(9)
-allocate kernel memory
-@item @command{kmem_free(9)} @tab
+@tab allocate kernel memory
+@item @command{kmem_free(9)}
 @findex kmem_free(9)
-deallocates kernel memory
-@item @command{kmem_zalloc(9)} @tab
+@tab deallocates kernel memory
+@item @command{kmem_zalloc(9)}
 @findex kmem_zalloc(9)
-allocate and zero kernel memory
-@item @command{cmn_err(9)} @tab
+@tab allocate and zero kernel memory
+@item @command{cmn_err(9)}
 @findex cmn_err(9)
-print a kernel command error
-@item @command{bcopy(9)} @tab
+@tab print a kernel command error
+@item @command{bcopy(9)}
 @findex bcopy(9)
-copy byte strings
-@item @command{bzero(9)} @tab
+@tab copy byte strings
+@item @command{bzero(9)}
 @findex bzero(9)
-zero a byte string
-@item @command{copyin(9)} @tab
+@tab zero a byte string
+@item @command{copyin(9)}
 @findex copyin(9)
-copy user data in from user space to kernel space
-@item @command{copyout(9)} @tab
+@tab copy user data in from user space to kernel space
+@item @command{copyout(9)}
 @findex copyout(9)
-copy user data in from kernel space to user space
-@item @command{delay(9)} @tab
+@tab copy user data in from kernel space to user space
+@item @command{delay(9)}
 @findex delay(9)
-postpone the calling process for a number of clock ticks
-@item @command{drv_getparm(9)} @tab
+@tab postpone the calling process for a number of clock ticks
+@item @command{drv_getparm(9)}
 @findex drv_getparm(9)
-driver retrieve kernel parameter
-@item @command{drv_hztomsec(9)} @tab
+@tab driver retrieve kernel parameter
+@item @command{drv_hztomsec(9)}
 @findex drv_hztomsec(9)
-convert kernel tick time between microseconds or milliseconds
-@item @command{drv_htztousec(9)} @tab
+@tab convert kernel tick time between microseconds or milliseconds
+@item @command{drv_htztousec(9)}
 @findex drv_htztousec(9)
-convert kernel tick time between microseconds or milliseconds
-@item @command{drv_msectohz(9)} @tab
+@tab convert kernel tick time between microseconds or milliseconds
+@item @command{drv_msectohz(9)}
 @findex drv_msectohz(9)
-convert kernel tick time between microseconds or milliseconds
-@item @command{drv_priv(9)} @tab
+@tab convert kernel tick time between microseconds or milliseconds
+@item @command{drv_priv(9)}
 @findex drv_priv(9)
-check if the current process is privileged
-@item @command{drv_usectohz(9)} @tab
+@tab check if the current process is privileged
+@item @command{drv_usectohz(9)}
 @findex drv_usectohz(9)
-convert kernel tick time between microseconds or milliseconds
-@item @command{drv_usecwait(9)} @tab
+@tab convert kernel tick time between microseconds or milliseconds
+@item @command{drv_usecwait(9)}
 @findex drv_usecwait(9)
-delay for a number of microseconds
-@item @command{min(9)} @tab
+@tab delay for a number of microseconds
+@item @command{min(9)}
 @findex min(9)
-determine the minimum of two integers
-@item @command{max(9)} @tab
+@tab determine the minimum of two integers
+@item @command{max(9)}
 @findex max(9)
-determine the maximum of two integers
-@item @command{getmajor(9)} @tab
+@tab determine the maximum of two integers
+@item @command{getmajor(9)}
 @findex getmajor(9)
-get the internal major device number for a device
-@item @command{getminor(9)} @tab
+@tab get the internal major device number for a device
+@item @command{getminor(9)}
 @findex getminor(9)
-get the extended minor device number for a device
-@item @command{makedevice(9)} @tab
+@tab get the extended minor device number for a device
+@item @command{makedevice(9)}
 @findex makedevice(9)
-create a device from a major and minor device numbers
-@item @command{strlog(9)} @tab
+@tab create a device from a major and minor device numbers
+@item @command{strlog(9)}
 @findex strlog(9)
-pass a message to the @cite{STREAMS} logger
-@item @command{timeout(9)} @tab
+@tab pass a message to the @cite{STREAMS} logger
+@item @command{timeout(9)}
 @findex timeout(9)
-start a timer
-@item @command{untimeout(9)} @tab
+@tab start a timer
+@item @command{untimeout(9)}
 @findex untimeout(9)
-stop a timer
+@tab stop a timer
 @end multitable
 
 @multitable @columnfractions .20 .80
-@item @command{mknod(9)} @tab
+@item @command{mknod(9)}
 @findex mknod(9)
-make block or character special files
-@item @command{mount(9)} @tab
+@tab make block or character special files
+@item @command{mount(9)}
 @findex mount(9)
-mount and unmount file systems
-@item @command{umount(9)} @tab
+@tab mount and unmount file systems
+@item @command{umount(9)}
 @findex umount(9)
-mount and unmount file systems
-@item @command{unlink(9)} @tab
+@tab mount and unmount file systems
+@item @command{unlink(9)}
 @findex unlink(9)
-remove a file
+@tab remove a file
 @end multitable
 
 @node Some Common Extension Functions
@@ -6492,21 +6708,21 @@ remove a file
 @cindex common extension functions
 
 @multitable @columnfractions .20 .80
-@item @command{linkmsg(9)} @tab
+@item @command{linkmsg(9)}
 @findex linkmsg(9)
-link a message block to a @cite{STREAMS} message
-@item @command{putctl2(9)} @tab
+@tab link a message block to a @cite{STREAMS} message
+@item @command{putctl2(9)}
 @findex putctl2(9)
-put a two byte control message on a @cite{STREAMS} message queue
-@item @command{putnextctl2(9)} @tab
+@tab put a two byte control message on a @cite{STREAMS} message queue
+@item @command{putnextctl2(9)}
 @findex putnextctl2(9)
-put a two byte control message on the downstream @cite{STREAMS} message queue
-@item @command{weldq(9)} @tab
+@tab put a two byte control message on the downstream @cite{STREAMS} message queue
+@item @command{weldq(9)}
 @findex weldq(9)
-weld two (or four) queues together
-@item @command{unweldq(9)} @tab
+@tab weld two (or four) queues together
+@item @command{unweldq(9)}
 @findex unweldq(9)
-unweld two (or four) queues
+@tab unweld two (or four) queues
 @end multitable
 
 @node Some Internal Functions
@@ -6514,33 +6730,33 @@ unweld two (or four) queues
 @cindex internal functions
 
 @multitable @columnfractions .20 .80
-@item @command{allocq(9)} @tab
+@item @command{allocq(9)}
 @findex allocq(9)
-allocate a @cite{STREAMS} queue pair
-@item @command{bcanget(9)} @tab
+@tab allocate a @cite{STREAMS} queue pair
+@item @command{bcanget(9)}
 @findex bcanget(9)
-test for message arrival on a band on a stream
-@item @command{canget(9)} @tab
+@tab test for message arrival on a band on a stream
+@item @command{canget(9)}
 @findex canget(9)
-test for message arrival on a stream
-@item @command{freeq(9)} @tab
+@tab test for message arrival on a stream
+@item @command{freeq(9)}
 @findex freeq(9)
-deallocate a @cite{STREAMS} queue pair
-@item @command{qattach(9)} @tab
+@tab deallocate a @cite{STREAMS} queue pair
+@item @command{qattach(9)}
 @findex qattach(9)
-attach a module onto a @cite{STREAMS} file
-@item @command{qclose(9)} @tab
+@tab attach a module onto a @cite{STREAMS} file
+@item @command{qclose(9)}
 @findex qclose(9)
-close a @cite{STREAMS} module or driver
-@item @command{qdetach(9)} @tab
+@tab close a @cite{STREAMS} module or driver
+@item @command{qdetach(9)}
 @findex qdetach(9)
-detach a module from a @cite{STREAMS} file
-@item @command{qopen(9)} @tab
+@tab detach a module from a @cite{STREAMS} file
+@item @command{qopen(9)}
 @findex qopen(9)
-call a @cite{STREAMS} module or driver open routine
-@item @command{setq(9)} @tab
+@tab call a @cite{STREAMS} module or driver open routine
+@item @command{setq(9)}
 @findex setq(9)
-set sizes and procedures associated with a @cite{STREAMS} message queue
+@tab set sizes and procedures associated with a @cite{STREAMS} message queue
 @end multitable
 
 @node Some Oddball Functions
@@ -6548,29 +6764,29 @@ set sizes and procedures associated with a @cite{STREAMS} message queue
 @cindex oddball functions
 
 @multitable @columnfractions .20 .80
-@item @command{appq(9)} @tab
+@item @command{appq(9)}
 @findex appq(9)
-append one @cite{STREAMS} message after another
-@item @command{esbbcall(9)} @tab
+@tab append one @cite{STREAMS} message after another
+@item @command{esbbcall(9)}
 @findex esbbcall(9)
-install a buffer callback for an extended @cite{STREAMS} message block
-@item @command{isdatablk(9)} @tab
+@tab install a buffer callback for an extended @cite{STREAMS} message block
+@item @command{isdatablk(9)}
 @findex isdatablk(9)
-test a @cite{STREAMS} data block for data type
-@item @command{isdatamsg(9)} @tab
+@tab test a @cite{STREAMS} data block for data type
+@item @command{isdatamsg(9)}
 @findex isdatamsg(9)
-test a @cite{STREAMS} data block for data type
-@item @command{kmem_zalloc_node(9)} @tab
+@tab test a @cite{STREAMS} data block for data type
+@item @command{kmem_zalloc_node(9)}
 @findex kmem_zalloc_node(9)
-@item @command{msgsize(9)} @tab
+@item @command{msgsize(9)}
 @findex msgsize(9)
-calculate the size of the message blocks in a @cite{STREAMS} message
-@item @command{qcountstrm(9)} @tab
+@tab calculate the size of the message blocks in a @cite{STREAMS} message
+@item @command{qcountstrm(9)}
 @findex qcountstrm(9)
-add all counts on all @cite{STREAMS} message queues in a stream
-@item @command{xmsgsize(9)} @tab
+@tab add all counts on all @cite{STREAMS} message queues in a stream
+@item @command{xmsgsize(9)}
 @findex xmsgsize(9)
-calculate the size of message blocks in a @cite{STREAMS} message
+@tab calculate the size of message blocks in a @cite{STREAMS} message
 @end multitable
 
 @node SVR 4.2 Portability
@@ -6616,21 +6832,21 @@ included in the @cite{SVR 4.2 MP} compatibility module, @file{streams-svr4compat
 @cindex SVR 4.2 MP
 
 @multitable @columnfractions .20 .80
-@item @command{itimeout(9)} @tab
+@item @command{itimeout(9)}
 @findex itimeout(9)
-Perform a timeout at an interrupt level.
-@item @command{lbolt(9)} @tab
+@tab Perform a timeout at an interrupt level.
+@item @command{lbolt(9)}
 @findex lbolt(9)
-Time in ticks since reboot.
-@item @command{sleep(9)} @tab
+@tab Time in ticks since reboot.
+@item @command{sleep(9)}
 @findex sleep(9)
-Put a process to sleep.
-@item @command{wakeup(9)} @tab
+@tab Put a process to sleep.
+@item @command{wakeup(9)}
 @findex wakeup(9)
-Wake a process.
-@item @command{vtop(9)} @tab
+@tab Wake a process.
+@item @command{vtop(9)}
 @findex vtop(9)
-Convert virtual to physical address.
+@tab Convert virtual to physical address.
 @end multitable
 
 @subsubsection Priority Levels
@@ -6681,235 +6897,235 @@ This priority level exists in all kernels.
 @end enumerate
 
 @multitable @columnfractions .20 .80
-@item @command{spl0(9)} @tab
+@item @command{spl0(9)}
 @findex spl0(9)
-Set priority level 0.
-@item @command{spl1(9)} @tab
+@tab Set priority level 0.
+@item @command{spl1(9)}
 @findex spl1(9)
-Set priority level 1.
-@item @command{spl2(9)} @tab
+@tab Set priority level 1.
+@item @command{spl2(9)}
 @findex spl2(9)
-Set priority level 2.
-@item @command{spl3(9)} @tab
+@tab Set priority level 2.
+@item @command{spl3(9)}
 @findex spl3(9)
-Set priority level 3.
-@item @command{spl4(9)} @tab
+@tab Set priority level 3.
+@item @command{spl4(9)}
 @findex spl4(9)
-Set priority level 4.
-@item @command{spl5(9)} @tab
+@tab Set priority level 4.
+@item @command{spl5(9)}
 @findex spl5(9)
-Set priority level 5.
-@item @command{spl7(9)} @tab
+@tab Set priority level 5.
+@item @command{spl7(9)}
 @findex spl6(9)
-Set priority level 6.
-@item @command{spl7(9)} @tab
+@tab Set priority level 6.
+@item @command{spl7(9)}
 @findex spl7(9)
-Set priority level 7.
-@item @command{spl(9)} @tab
+@tab Set priority level 7.
+@item @command{spl(9)}
 @findex spl(9)
-Set priority level.
-@item @command{splx(9)} @tab
+@tab Set priority level.
+@item @command{splx(9)}
 @findex splx(9)
-Set priority level x.
+@tab Set priority level x.
 @end multitable
 
 @subsubsection Atomic Integers
 
 @multitable @columnfractions .30 .70
-@item @command{ATOMIC_INT_ADD(9)} @tab
+@item @command{ATOMIC_INT_ADD(9)}
 @findex ATOMIC_INT_ADD(9)
-Add an integer value to an atomic integer.
-@item @command{ATOMIC_INT_ALLOC(9)} @tab
+@tab Add an integer value to an atomic integer.
+@item @command{ATOMIC_INT_ALLOC(9)}
 @findex ATOMIC_INT_ALLOC(9)
-Allocate and initialize an atomic integer.
-@item @command{ATOMIC_INT_DEALLOC(9)} @tab
+@tab Allocate and initialize an atomic integer.
+@item @command{ATOMIC_INT_DEALLOC(9)}
 @findex ATOMIC_INT_DEALLOC(9)
-Deallocate an atomic integer.
-@item @command{ATOMIC_INT_DECR(9)} @tab
+@tab Deallocate an atomic integer.
+@item @command{ATOMIC_INT_DECR(9)}
 @findex ATOMIC_INT_DECR(9)
-Decrement and test an atomic integer.
-@item @command{ATOMIC_INT_INCR(9)} @tab
+@tab Decrement and test an atomic integer.
+@item @command{ATOMIC_INT_INCR(9)}
 @findex ATOMIC_INT_INCR(9)
-Increment an atomic integer.
-@item @command{ATOMIC_INT_INIT(9)} @tab
+@tab Increment an atomic integer.
+@item @command{ATOMIC_INT_INIT(9)}
 @findex ATOMIC_INT_INIT(9)
-Initialize an atomic integer.
-@item @command{ATOMIC_INT_READ(9)} @tab
+@tab Initialize an atomic integer.
+@item @command{ATOMIC_INT_READ(9)}
 @findex ATOMIC_INT_READ(9)
-Read an atomic integer.
-@item @command{ATOMIC_INT_SUB(9)} @tab
+@tab Read an atomic integer.
+@item @command{ATOMIC_INT_SUB(9)}
 @findex ATOMIC_INT_SUB(9)
-Subtract and integer value from an atomic integer.
-@item @command{ATOMIC_INT_WRITE(9)} @tab
+@tab Subtract and integer value from an atomic integer.
+@item @command{ATOMIC_INT_WRITE(9)}
 @findex ATOMIC_INT_WRITE(9)
-Write an integer value to an atomic integer.
+@tab Write an integer value to an atomic integer.
 @end multitable
 
 @subsubsection Basic Locks
 
 @multitable @columnfractions .30 .70
-@item @command{LOCK(9)} @tab
+@item @command{LOCK(9)}
 @findex LOCK(9)
-Lock a basic lock.
-@item @command{LOCK_ALLOC(9)} @tab
+@tab Lock a basic lock.
+@item @command{LOCK_ALLOC(9)}
 @findex LOCK_ALLOC(9)
-Allocate a basic lock.
-@item @command{LOCK_DEALLOC(9)} @tab
+@tab Allocate a basic lock.
+@item @command{LOCK_DEALLOC(9)}
 @findex LOCK_DEALLOC(9)
-Deallocate a basic lock.
-@item @command{LOCK_OWNED(9)} @tab
+@tab Deallocate a basic lock.
+@item @command{LOCK_OWNED(9)}
 @findex LOCK_OWNED(9)
-Determine whether a basic lock is head by the caller.
-@item @command{TRYLOCK(9)} @tab
+@tab Determine whether a basic lock is head by the caller.
+@item @command{TRYLOCK(9)}
 @findex TRYLOCK(9)
-Try to lock a basic lock.
-@item @command{UNLOCK(9)} @tab
+@tab Try to lock a basic lock.
+@item @command{UNLOCK(9)}
 @findex UNLOCK(9)
-Unlock a basic lock.
+@tab Unlock a basic lock.
 @end multitable
 
 @subsubsection STREAMS Locks
 
 @multitable @columnfractions .30 .70
-@item @command{MPSTR_QLOCK(9)} @tab
+@item @command{MPSTR_QLOCK(9)}
 @findex MPSTR_QLOCK(9)
-Release a queue from exclusive access.
-@item @command{MPSTR_QRELE(9)} @tab
+@tab Release a queue from exclusive access.
+@item @command{MPSTR_QRELE(9)}
 @findex MPSTR_QRELE(9)
-Acquire a queue for exclusive access.
-@item @command{MPSTR_STPLOCK(9)} @tab
+@tab Acquire a queue for exclusive access.
+@item @command{MPSTR_STPLOCK(9)}
 @findex MPSTR_STPLOCK(9)
-Acquire a stream head for exclusive access.
-@item @command{MPSTR_STPRELE(9)} @tab
+@tab Acquire a stream head for exclusive access.
+@item @command{MPSTR_STPRELE(9)}
 @findex MPSTR_STPRELE(9)
-Release a stream head from exclusive access.
+@tab Release a stream head from exclusive access.
 @end multitable
 
 @subsubsection Read/Write Locks
 
 @multitable @columnfractions .30 .70
-@item @command{RW_ALLOC(9)} @tab
+@item @command{RW_ALLOC(9)}
 @findex RW_ALLOC(9)
-Allocate and initialize a read/write lock.
-@item @command{RW_DEALLOC(9)} @tab
+@tab Allocate and initialize a read/write lock.
+@item @command{RW_DEALLOC(9)}
 @findex RW_DEALLOC(9)
-Deallocate a read/write lock.
-@item @command{RW_RDLOCK(9)} @tab
+@tab Deallocate a read/write lock.
+@item @command{RW_RDLOCK(9)}
 @findex RW_RDLOCK(9)
-Acquire a read/write lock in read mode.
-@item @command{RW_TRYRDLOCK(9)} @tab
+@tab Acquire a read/write lock in read mode.
+@item @command{RW_TRYRDLOCK(9)}
 @findex RW_TRYRDLOCK(9)
-Attempt to acquire a read/write lock in read mode.
-@item @command{RW_TRYWRLOCK(9)} @tab
+@tab Attempt to acquire a read/write lock in read mode.
+@item @command{RW_TRYWRLOCK(9)}
 @findex RW_TRYWRLOCK(9)
-Attempt to acquire a read/write lock in write mode.
-@item @command{RW_UNLOCK(9)} @tab
+@tab Attempt to acquire a read/write lock in write mode.
+@item @command{RW_UNLOCK(9)}
 @findex RW_UNLOCK(9)
-Release a read/write lock.
-@item @command{RW_WRLOCK(9)} @tab
+@tab Release a read/write lock.
+@item @command{RW_WRLOCK(9)}
 @findex RW_WRLOCK(9)
-Acquire a read/write lock in write mode.
+@tab Acquire a read/write lock in write mode.
 @end multitable
 
 @subsubsection Sleep Locks
 
 @multitable @columnfractions .30 .70
-@item @command{SLEEP_ALLOC(9)} @tab
+@item @command{SLEEP_ALLOC(9)}
 @findex SLEEP_ALLOC(9)
-Allocate a sleep lock.
-@item @command{SLEEP_DEALLOC(9)} @tab
+@tab Allocate a sleep lock.
+@item @command{SLEEP_DEALLOC(9)}
 @findex SLEEP_DEALLOC(9)
-Deallocate a sleep lock.
-@item @command{SLEEP_LOCK(9)} @tab
+@tab Deallocate a sleep lock.
+@item @command{SLEEP_LOCK(9)}
 @findex SLEEP_LOCK(9)
-Acquire a sleep lock.
-@item @command{SLEEP_LOCKAVAIL(9)} @tab
+@tab Acquire a sleep lock.
+@item @command{SLEEP_LOCKAVAIL(9)}
 @findex SLEEP_LOCKAVAIL(9)
-Determine whether a sleep lock is available.
-@item @command{SLEEP_LOCKOWNED(9)} @tab
+@tab Determine whether a sleep lock is available.
+@item @command{SLEEP_LOCKOWNED(9)}
 @findex SLEEP_LOCKOWNED(9)
-Determine whether a sleep lock is held by the caller.
-@item @command{SLEEP_LOCK_SIG(9)} @tab
+@tab Determine whether a sleep lock is held by the caller.
+@item @command{SLEEP_LOCK_SIG(9)}
 @findex SLEEP_LOCK_SIG(9)
-Acquire a sleep lock.
-@item @command{SLEEP_TRYLOCK(9)} @tab
+@tab Acquire a sleep lock.
+@item @command{SLEEP_TRYLOCK(9)}
 @findex SLEEP_TRYLOCK(9)
-Attempt to acquire a sleep lock.
-@item @command{SLEEP_UNLOCK(9)} @tab
+@tab Attempt to acquire a sleep lock.
+@item @command{SLEEP_UNLOCK(9)}
 @findex SLEEP_UNLOCK(9)
-Release a sleep lock.
+@tab Release a sleep lock.
 @end multitable
 
 @subsubsection Synchronization Variables
 
 @multitable @columnfractions .30 .70
-@item @command{SV_ALLOC(9)} @tab
+@item @command{SV_ALLOC(9)}
 @findex SV_ALLOC(9)
-Allocate a basic condition variable.
-@item @command{SV_BROADCAST(9)} @tab
+@tab Allocate a basic condition variable.
+@item @command{SV_BROADCAST(9)}
 @findex SV_BROADCAST(9)
-Broadcast a basic condition variable.
-@item @command{SV_DEALLOC(9)} @tab
+@tab Broadcast a basic condition variable.
+@item @command{SV_DEALLOC(9)}
 @findex SV_DEALLOC(9)
-Deallocate a basic condition variable.
-@item @command{SV_SIGNAL(9)} @tab
+@tab Deallocate a basic condition variable.
+@item @command{SV_SIGNAL(9)}
 @findex SV_SIGNAL(9)
-Signal a basic condition variable.
-@item @command{SV_WAIT(9)} @tab
+@tab Signal a basic condition variable.
+@item @command{SV_WAIT(9)}
 @findex SV_WAIT(9)
-Wait on a basic condition variable.
-@item @command{SV_WAIT_SIG(9)} @tab
+@tab Wait on a basic condition variable.
+@item @command{SV_WAIT_SIG(9)}
 @findex SV_WAIT_SIG(9)
-Interruptible wait on a basic condition variable.
+@tab Interruptible wait on a basic condition variable.
 @end multitable
 
 @subsubsection Resource Allocation
 
 @multitable @columnfractions .30 .70
-@item @command{rmalloc(9)} @tab
+@item @command{rmalloc(9)}
 @findex rmalloc(9)
-Allocate a number of units from a resource map.
-@item @command{rmallocmap(9)} @tab
+@tab Allocate a number of units from a resource map.
+@item @command{rmallocmap(9)}
 @findex rmallocmap(9)
-Allocated a resource map.
-@item @command{rmallocmap_wait(9)} @tab
+@tab Allocated a resource map.
+@item @command{rmallocmap_wait(9)}
 @findex rmallocmap_wait(9)
-Allocated a resource map.
-@item @command{rmalloc_wait(9)} @tab
+@tab Allocated a resource map.
+@item @command{rmalloc_wait(9)}
 @findex rmalloc_wait(9)
-Allocate a number of units from a resource map.
-@item @command{rmfree(9)} @tab
+@tab Allocate a number of units from a resource map.
+@item @command{rmfree(9)}
 @findex rmfree(9)
-Free a number of units from a resource map.
-@item @command{rmfreemap(9)} @tab
+@tab Free a number of units from a resource map.
+@item @command{rmfreemap(9)}
 @findex rmfreemap(9)
-Free a resource map.
-@item @command{rmget(9)} @tab
+@tab Free a resource map.
+@item @command{rmget(9)}
 @findex rmget(9)
-Allocated a number of units from a resource map.
-@item @command{rminit(9)} @tab
+@tab Allocated a number of units from a resource map.
+@item @command{rminit(9)}
 @findex rminit(9)
-Initialize a resource map.
-@item @command{rmsetwant(9)} @tab
+@tab Initialize a resource map.
+@item @command{rmsetwant(9)}
 @findex rmsetwant(9)
-Wait for resources on a resource map.
-@item @command{rmwanted(9)} @tab
+@tab Wait for resources on a resource map.
+@item @command{rmwanted(9)}
 @findex rmwanted(9)
-Waiters on a resource map.
+@tab Waiters on a resource map.
 @end multitable
 
 @subsubsection Device Numbering
 
 @multitable @columnfractions .20 .80
-@item @command{major(9)} @tab
+@item @command{major(9)}
 @findex major(9)
-Get the internal major number of a device.
-@item @command{makedev(9)} @tab
+@tab Get the internal major number of a device.
+@item @command{makedev(9)}
 @findex makedev(9)
-Make a device number from internal major and minor device numbers.
-@item @command{minor(9)} @tab
+@tab Make a device number from internal major and minor device numbers.
+@item @command{minor(9)}
 @findex minor(9)
-Get the internal minor number of a device.
+@tab Get the internal minor number of a device.
 @end multitable
 
 @node Configuration ala SVR 4.2 MP
@@ -6957,65 +7173,65 @@ Get the internal minor number of a device.
 @subsubsection Core Extensions
 
 @multitable @columnfractions .20 .80
-@item @command{putctl2(9)} @tab
+@item @command{putctl2(9)}
 @findex putctl2(9)
-Put a 2 byte control message on a @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on a @cite{STREAMS} message queue.
 @command{putctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{splstr(9)} @tab
+@item @command{splstr(9)}
 @findex splstr(9)
-Set or restore priority levels.
+@tab Set or restore priority levels.
 @command{splstr(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{splx(9)} @tab
+@item @command{splx(9)}
 @findex splx(9)
-Set or restore priority levels.
+@tab Set or restore priority levels.
 @command{splx(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{weldq(9)} @tab
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of @cite{STREAMS} message queues.
+@tab Weld together two pairs of @cite{STREAMS} message queues.
 @command{weldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of @cite{STREAMS} message queues.
+@tab Unweld two pairs of @cite{STREAMS} message queues.
 @command{unweldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
 @end multitable
 
 @subsubsection Common Module Utilities
 
 @multitable @columnfractions .30 .70
-@item @command{mi_bufcall(9)} @tab
+@item @command{mi_bufcall(9)}
 @findex mi_bufcall(9)
-Reliable alternative to @command{buffcall(9)}.
-@item @command{mi_close_comm(9)} @tab
+@tab Reliable alternative to @command{buffcall(9)}.
+@item @command{mi_close_comm(9)}
 @findex mi_close_comm(9)
-@cite{STREAMS} common minor device close utility.
-@item @command{mi_next_ptr(9)} @tab
+@tab @cite{STREAMS} common minor device close utility.
+@item @command{mi_next_ptr(9)}
 @findex mi_next_ptr(9)
-@cite{STREAMS} minor device list traversal.
-@item @command{mi_open_comm(9)} @tab
+@tab @cite{STREAMS} minor device list traversal.
+@item @command{mi_open_comm(9)}
 @findex mi_open_comm(9)
-@cite{STREAMS} common minor device open utility.
-@item @command{mi_prev_ptr(9)} @tab
+@tab @cite{STREAMS} common minor device open utility.
+@item @command{mi_prev_ptr(9)}
 @findex mi_prev_ptr(9)
-@cite{STREAMS} minor device list traversal.
+@tab @cite{STREAMS} minor device list traversal.
 @end multitable
 
 @subsubsection Registration
 
 @multitable @columnfractions .20 .80
-@item @command{str_install(9)} @tab
+@item @command{str_install(9)}
 @findex str_install(9)
-Install a @cite{STREAMS} module or driver.
+@tab Install a @cite{STREAMS} module or driver.
 @end multitable
 
 @subsubsection Message Filtering
 
 @multitable @columnfractions .20 .80
-@item @command{wantio(9)} @tab
+@item @command{wantio(9)}
 @findex wantio(9)
-Perform direct I/O from a @cite{STREAMS} driver.
-@item @command{wantmsg(9)} @tab
+@tab Perform direct I/O from a @cite{STREAMS} driver.
+@item @command{wantmsg(9)}
 @findex wantmsg(9)
-Provide a filter of wanted messages from a @cite{STREAMS} module.
+@tab Provide a filter of wanted messages from a @cite{STREAMS} module.
 @end multitable
 
 @node Configuration ala AIX 5L Version 5.1
@@ -7063,9 +7279,9 @@ Provide a filter of wanted messages from a @cite{STREAMS} module.
 @subsubsection Core Extensions
 
 @multitable @columnfractions .20 .80
-@item @command{streams_put(9)} @tab
+@item @command{streams_put(9)}
 @findex streams_put(9)
-Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+@tab Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
 @command{streams_put(9)}
 @findex streams_put(9)
 is implemented using @command{put(9)}.
@@ -7073,41 +7289,41 @@ is implemented using @command{put(9)}.
 @command{put(9)}
 @findex put(9)
 is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{putctl2(9)} @tab
+@item @command{putctl2(9)}
 @findex putctl2(9)
-Put a 2 byte control message on a @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on a @cite{STREAMS} message queue.
 @command{putctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{putnextctl2(9)} @tab
+@item @command{putnextctl2(9)}
 @findex putnextctl2(9)
-Put a 2 byte control message on the downstream @cite{STREAMS} message queue.
+@tab Put a 2 byte control message on the downstream @cite{STREAMS} message queue.
 @command{putnextctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of streams queues.
+@tab Unweld two pairs of streams queues.
 @command{unweldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{weldq(9)} @tab
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of streams queues.
+@tab Weld together two pairs of streams queues.
 @command{weldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
 @end multitable
 
 @subsubsection Registration
 
 @multitable @columnfractions .20 .80
-@item @command{str_install(9)} @tab
+@item @command{str_install(9)}
 @findex str_install(9)
-Install a @cite{STREAMS} module or driver.
-@item @command{str_uninstall(9)} @tab
+@tab Install a @cite{STREAMS} module or driver.
+@item @command{str_uninstall(9)}
 @findex str_uninstall(9)
-Uninstall a @cite{STREAMS} module or driver.
+@tab Uninstall a @cite{STREAMS} module or driver.
 @end multitable
 
 @subsubsection Sleeping
 
 @multitable @columnfractions .20 .80
-@item @command{streams_get_sleep_lock(9)} @tab
+@item @command{streams_get_sleep_lock(9)}
 @findex streams_get_sleep_lock(9)
-Provide access to the global sleep lock.
+@tab Provide access to the global sleep lock.
 @end multitable
 
 @node Configuration ala HP-UX 11.0i v2
@@ -7156,13 +7372,13 @@ Provide access to the global sleep lock.
 @subsubsection Core Extensions
 
 @multitable @columnfractions .20 .80
-@item @command{lbolt(9)} @tab
+@item @command{lbolt(9)}
 @findex lbolt(9)
-Time in ticks since reboot
+@tab Time in ticks since reboot
 @command{lbolt(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{puthere(9)} @tab
+@item @command{puthere(9)}
 @findex puthere(9)
-Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
+@tab Invoke the put procedure for a @cite{STREAMS} module or driver with a @cite{STREAMS} message.
 @command{puthere(9)}
 @findex puthere(9)
 is implemented using @command{put(9)}.
@@ -7170,47 +7386,47 @@ is implemented using @command{put(9)}.
 @command{put(9)}
 @findex put(9)
 is a  @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{weldq(9)} @tab
+@item @command{weldq(9)}
 @findex weldq(9)
-Weld together two pairs of streams queues.
+@tab Weld together two pairs of streams queues.
 @command{weldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
-@item @command{unweldq(9)} @tab
+@item @command{unweldq(9)}
 @findex unweldq(9)
-Unweld two pairs of streams queues.
+@tab Unweld two pairs of streams queues.
 @command{unweldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
 @end multitable
 
 @subsubsection Common Module Utilities
 
 @multitable @columnfractions .30 .70
-@item @command{streams_close_comm(9)} @tab
+@item @command{streams_close_comm(9)}
 @findex streams_close_comm(9)
-Common minor device close utility.
-@item @command{streams_open_comm(9)} @tab
+@tab Common minor device close utility.
+@item @command{streams_open_comm(9)}
 @findex streams_open_comm(9)
-Common minor device open utility.
-@item @command{streams_open_ocomm(9)} @tab
+@tab Common minor device open utility.
+@item @command{streams_open_ocomm(9)}
 @findex streams_open_ocomm(9)
-Common minor device open utility.
+@tab Common minor device open utility.
 @end multitable
 
 @subsubsection Registration
 
 @multitable @columnfractions .20 .80
-@item @command{strmod_add(9)} @tab
+@item @command{strmod_add(9)}
 @findex strmod_add(9)
-Add a @cite{STREAMS} module.
-@item @command{strmod_del(9)} @tab
+@tab Add a @cite{STREAMS} module.
+@item @command{strmod_del(9)}
 @findex strmod_del(9)
-Delete a @cite{STREAMS} module or driver from the kernel.
+@tab Delete a @cite{STREAMS} module or driver from the kernel.
 @end multitable
 
 @subsubsection Others
 
 @multitable @columnfractions .20 .80
-@item @command{time(9)} @tab
+@item @command{time(9)}
 @findex time(9)
-(undoc).
+@tab (undoc).
 @end multitable
 
 @node Configuration ala OSF/1 1.2/Digital UNIX
@@ -7274,24 +7490,24 @@ drivers that were written for the older system.  These are core functions in the
 @dfn{@value{PACKAGE_TITLE}} implementation.
 
 @multitable @columnfractions .20 .80
-@item @command{emajor(9)} @tab
+@item @command{emajor(9)}
 @findex emajor(9)
-Get the external (real) major device number from the device number.
-@item @command{eminor(9)} @tab
+@tab Get the external (real) major device number from the device number.
+@item @command{eminor(9)}
 @findex eminor(9)
-Get the external extended minor device number from the device number.
-@item @command{etoimajor(9)} @tab
+@tab Get the external extended minor device number from the device number.
+@item @command{etoimajor(9)}
 @findex etoimajor(9)
-Convert an external major device number to an internal major device number.
-@item @command{getemajor(9)} @tab
+@tab Convert an external major device number to an internal major device number.
+@item @command{getemajor(9)}
 @findex getemajor(9)
-Get the external (real) major device number.
-@item @command{geteminor(9)} @tab
+@tab Get the external (real) major device number.
+@item @command{geteminor(9)}
 @findex geteminor(9)
-Get the external minor device number.
-@item @command{itoemajor(9)} @tab
+@tab Get the external minor device number.
+@item @command{itoemajor(9)}
 @findex itoemajor(9)
-Convert an internal major device number to an external major device number.
+@tab Convert an internal major device number to an external major device number.
 @end multitable
 
 @subsubsection Memory Alignment
@@ -7312,26 +7528,26 @@ meet specific physical requirements.
 requirements provided are ignored.
 
 @multitable @columnfractions .30 .70
-@item @command{allocb_physreq(9)} @tab
+@item @command{allocb_physreq(9)}
 @findex allocb_physreq(9)
-Allocate a @cite{STREAMS} message and data block.
-@item @command{msgphysreq(9)} @tab
+@tab Allocate a @cite{STREAMS} message and data block.
+@item @command{msgphysreq(9)}
 @findex msgphysreq(9)
-Cause a message block to meet physical requirements.
-@item @command{msgpullup_physreq(9)} @tab
+@tab Cause a message block to meet physical requirements.
+@item @command{msgpullup_physreq(9)}
 @findex msgpullup_physreq(9)
-Pull up bytes in a @cite{STREAMS} message.
-@item @command{msgscgth(9)} @tab
+@tab Pull up bytes in a @cite{STREAMS} message.
+@item @command{msgscgth(9)}
 @findex msgscgth(9)
-(undoc).
+@tab (undoc).
 @end multitable
 
 @subsubsection Direct @cite{STREAMS} Input-Output Controls
 
 @multitable @columnfractions .20 .80
-@item @command{strioccall(9)} @tab
+@item @command{strioccall(9)}
 @findex strioccall(9)
-(undoc).
+@tab (undoc).
 @end multitable
 
 @node Configuration ala UnixWare 7.1.3 (OpenUnix 8)
@@ -7384,35 +7600,47 @@ Pull up bytes in a @cite{STREAMS} message.
 @subsubsection STREAMS Queue Referenced Callbacks
 
 @multitable @columnfractions .20 .80
-@item @command{qbufcall(9)} @tab
-Install a @cite{STREAMS} buffer callback.
-@item @command{qunbufcall(9)} @tab
-Cancel a @cite{STREAMS} buffer callback.
-@item @command{qtimeout(9)} @tab
-Start a timer associated with a queue.
-@item @command{quntimeout(9)} @tab
-Stop a timer associated with a queue.
-@item @command{qwait(9)} @tab
-Wait for a queue message.
-@item @command{qwait_sig(9)} @tab
-Wait for a queue message or signal.
-@item @command{queclass(9)} @tab
-Return the class of a @cite{STREAMS} message.
-@item @command{qwriter(9)} @tab
-@cite{STREAMS} mutex upgrade.
+@item @command{qbufcall(9)}
+@findex qbufcall(9)
+@tab Install a @cite{STREAMS} buffer callback.
+@item @command{qunbufcall(9)}
+@findex qunbufcall(9)
+@tab Cancel a @cite{STREAMS} buffer callback.
+@item @command{qtimeout(9)}
+@findex qtimeout(9)
+@tab Start a timer associated with a queue.
+@item @command{quntimeout(9)}
+@findex quntimeout(9)
+@tab Stop a timer associated with a queue.
+@item @command{qwait(9)}
+@findex qwait(9)
+@tab Wait for a queue message.
+@item @command{qwait_sig(9)}
+@findex qwait_sig(9)
+@tab Wait for a queue message or signal.
+@item @command{queclass(9)}
+@findex queclass(9)
+@tab Return the class of a @cite{STREAMS} message.
+@item @command{qwriter(9)}
+@findex qwriter(9)
+@tab @cite{STREAMS} mutex upgrade.
 @end multitable
 
 @subsubsection STREAMS Registration
 
 @multitable @columnfractions .20 .80
-@item @command{install_driver(9)} @tab
-Install a device driver.
-@item @command{mod_info(9)} @tab
-Provides information on a loadable kernel module to the @cite{STREAMS} executive.
-@item @command{mod_install(9)} @tab
-Installs a loadable kernel module in the @cite{STREAMS} executive.
-@item @command{mod_remove(9)} @tab
-Removes a loadable module from the @cite{STREAMS} executive.
+@item @command{install_driver(9)}
+@findex install_driver(9)
+@tab Install a device driver.
+@item @command{mod_info(9)}
+@findex mod_info(9)
+@tab Provides information on a loadable kernel module to the @cite{STREAMS} executive.
+@item @command{mod_install(9)}
+@findex mod_install(9)
+@tab Installs a loadable kernel module in the @cite{STREAMS} executive.
+@item @command{mod_remove(9)}
+@findex mod_remove(9)
+@tab Removes a loadable module from the @cite{STREAMS} executive.
 @end multitable
 
 @subsubsection DDI
@@ -7427,55 +7655,95 @@ many of these functions have no @cite{SVR 4.2 MP}
 equivalents.
 
 @multitable @columnfractions .40 .60
-@item @command{ddi_create_minor_node(9)} @tab
-Create a minor node for this device.
-@item @command{ddi_remove_minor_node(9)} @tab
-Remove a minor node for a device.
-@item @command{ddi_driver_major(9)} @tab
-Find the major device number associated with a driver.
-@item @command{ddi_getiminor(9)} @tab
-Get the internal minor device number.
-@item @command{ddi_driver_name(9)} @tab
-Return normalized driver name.
-@item @command{ddi_get_cred(9)} @tab
-Get a reference to the credentials of the current user.
-@item @command{ddi_get_instance(9)} @tab
-Get device instance number.
-@item @command{ddi_get_lbolt(9)} @tab
-Get the current value of the system tick clock.
-@item @command{ddi_get_pid(9)} @tab
-Get the process id of the current process.
-@item @command{ddi_get_time(9)} @tab
-Get the current time in seconds since the epoch.
-@item @command{ddi_removing_power(9)} @tab
-@item @command{ddi_get_soft_state(9)} @tab
-@item @command{ddi_soft_state(9)} @tab
-@item @command{ddi_soft_state_fini(9)} @tab
-@item @command{ddi_soft_state_free(9)} @tab
-@item @command{ddi_soft_state_init(9)} @tab
-@item @command{ddi_soft_state_zalloc(9)} @tab
-@item @command{ddi_umem_alloc(9)} @tab
-Allocate page aligned kernel memory.
-@item @command{ddi_umem_free(9)} @tab
-Free page aligned kernel memory.
+@item @command{ddi_create_minor_node(9)}
+@findex ddi_create_minor_node(9)
+@tab Create a minor node for this device.
+@item @command{ddi_remove_minor_node(9)}
+@findex ddi_remove_minor_node(9)
+@tab Remove a minor node for a device.
+@item @command{ddi_driver_major(9)}
+@findex ddi_driver_major(9)
+@tab Find the major device number associated with a driver.
+@item @command{ddi_getiminor(9)}
+@findex ddi_getiminor(9)
+@tab Get the internal minor device number.
+@item @command{ddi_driver_name(9)}
+@findex ddi_driver_name(9)
+@tab Return normalized driver name.
+@item @command{ddi_get_cred(9)}
+@findex ddi_get_cred(9)
+@tab Get a reference to the credentials of the current user.
+@item @command{ddi_get_instance(9)}
+@findex ddi_get_instance(9)
+@tab Get device instance number.
+@item @command{ddi_get_lbolt(9)}
+@findex ddi_get_lbolt(9)
+@tab Get the current value of the system tick clock.
+@item @command{ddi_get_pid(9)}
+@findex ddi_get_pid(9)
+@tab Get the process id of the current process.
+@item @command{ddi_get_time(9)}
+@findex ddi_get_time(9)
+@tab Get the current time in seconds since the epoch.
+@item @command{ddi_removing_power(9)}
+@findex ddi_removing_power(9)
+@tab
+@item @command{ddi_get_soft_state(9)}
+@findex ddi_get_soft_state(9)
+@tab
+@item @command{ddi_soft_state(9)}
+@findex ddi_soft_state(9)
+@tab
+@item @command{ddi_soft_state_fini(9)}
+@findex ddi_soft_state_fini(9)
+@tab
+@item @command{ddi_soft_state_free(9)}
+@findex ddi_soft_state_free(9)
+@tab
+@item @command{ddi_soft_state_init(9)}
+@findex ddi_soft_state_init(9)
+@tab
+@item @command{ddi_soft_state_zalloc(9)}
+@findex ddi_soft_state_zalloc(9)
+@tab
+@item @command{ddi_umem_alloc(9)}
+@findex ddi_umem_alloc
+@tab Allocate page aligned kernel memory.
+@item @command{ddi_umem_free(9)}
+@findex ddi_umem_free
+@tab Free page aligned kernel memory.
 @end multitable
 
 @subsubsection Loadable Module Interface
 
 @multitable @columnfractions .20 .80
-@item @command{_fini(9)} @tab
-@item @command{_info(9)} @tab
-@item @command{_init(9)} @tab
-@item @command{attach(9)} @tab
-Attach a device to the system or resume a suspended device.
-@item @command{getinfo(9)} @tab
-@item @command{identify(9)} @tab
-Determine if a driver is associated with a device.
-@item @command{detach(9)} @tab
-Detach a device from the system or suspend a device.
-@item @command{power(9)} @tab
-Power a device attached to the system.
-@item @command{probe(9)} @tab
+@item @command{_fini(9)}
+@findex _fini(9)
+@tab
+@item @command{_info(9)}
+@findex _info(9)
+@tab
+@item @command{_init(9)}
+@findex _init(9)
+@tab
+@item @command{attach(9)}
+@findex attach(9)
+@tab Attach a device to the system or resume a suspended device.
+@item @command{getinfo(9)}
+@findex getinfo(9)
+@tab
+@item @command{identify(9)}
+@findex identify(9)
+@tab Determine if a driver is associated with a device.
+@item @command{detach(9)}
+@findex detach(9)
+@tab Detach a device from the system or suspend a device.
+@item @command{power(9)}
+@findex power(9)
+@tab Power a device attached to the system.
+@item @command{probe(9)}
+@findex probe(9)
+@tab
 @end multitable
 
 @node Configuration ala Solaris 9/SunOS 5.9
@@ -7519,8 +7787,8 @@ Power a device attached to the system.
 @cindex Super/UX
 
 @multitable @columnfractions .20 .80
-@item @command{lbolt(9)} @tab
-time in ticks since reboot
+@item @command{lbolt(9)}
+@tab time in ticks since reboot
 @end multitable
 
 @node Configuration ala Super/UX
@@ -7610,48 +7878,67 @@ time in ticks since reboot
 @subsubsection Extensions
 
 @multitable @columnfractions .40 .60
-@item @command{lis_appq(9)} @tab
-Append one @cite{STREAMS} message after another.
-@item @command{lis_date(9)} @tab
-@item @command{lis_esbbcall(9)} @tab
-Install a buffer callback for an extended @cite{STREAMS} message block.
-@item @command{lis_find_strdev(9)} @tab
-@item @command{lis_OTHER(9)} @tab
-Return the other queue of a @cite{STREAMS} queue pair..
+@item @command{lis_appq(9)}
+@findex lis_appq(9)
+@tab Append one @cite{STREAMS} message after another.
+@item @command{lis_date(9)}
+@findex lis_date(9)
+@tab
+@item @command{lis_esbbcall(9)}
+@findex lis_esbbcall(9)
+@tab Install a buffer callback for an extended @cite{STREAMS} message block.
+@item @command{lis_find_strdev(9)}
+@findex lis_find_strdev(9)
+@tab
+@item @command{lis_OTHER(9)}
+@findex lis_OTHER(9)
+@tab Return the other queue of a @cite{STREAMS} queue pair..
 This function is intended to accommodate a common miss-spelling of
 @command{OTHERQ(9)}.
 @findex OTHERQ(9)
-@item @command{lis_version(9)} @tab
-@item @command{lis_xmsgsize(9)} @tab
-Calculate the size of message blocks in a @cite{STREAMS} message.
+@item @command{lis_version(9)}
+@findex lis_version(9)
+@tab
+@item @command{lis_xmsgsize(9)}
+@findex lis_xmsgsize(9)
+@tab Calculate the size of message blocks in a @cite{STREAMS} message.
 @end multitable
 
 @subsubsection Device Creation and Deletion
 
 @multitable @columnfractions .40 .60
-@item @command{lis_mknod(9)} @tab
-Make block or character special files.
-@item @command{lis_unlink(9)} @tab
-Remove a file.
-@item @command{lis_mount(9)} @tab
-Mount a file system.
-@item @command{lis_umount2(9)} @tab
-Unmount a file system.
-@item @command{lis_umount(9)} @tab
-Unmount a file system.
+@item @command{lis_mknod(9)}
+@findex lis_mknod(9)
+@tab Make block or character special files.
+@item @command{lis_unlink(9)}
+@findex lis_unlink(9)
+@tab Remove a file.
+@item @command{lis_mount(9)}
+@findex lis_mount(9)
+@tab Mount a file system.
+@item @command{lis_umount2(9)}
+@findex lis_umount2(9)
+@tab Unmount a file system.
+@item @command{lis_umount(9)}
+@findex lis_umount(9)
+@tab Unmount a file system.
 @end multitable
 
 @subsubsection Registration
 
 @multitable @columnfractions .40 .60
-@item @command{lis_register_strdev(9)} @tab
-Register a @cite{STREAMS} device.
-@item @command{lis_register_strmod(9)} @tab
-Register a @cite{STREAMS} module.
-@item @command{lis_unregister_strdev(9)} @tab
-Unregister a @cite{STREAMS} device.
-@item @command{lis_unregsiter_strmod(9)} @tab
-Unregister a @cite{STREAMS} module.
+@item @command{lis_register_strdev(9)}
+@findex lis_register_strdev(9)
+@tab Register a @cite{STREAMS} device.
+@item @command{lis_register_strmod(9)}
+@findex lis_register_strmod(9)
+@tab Register a @cite{STREAMS} module.
+@item @command{lis_unregister_strdev(9)}
+@findex lis_unregister_strdev(9)
+@tab Unregister a @cite{STREAMS} device.
+@item @command{lis_unregsiter_strmod(9)}
+@findex lis_unregister_strmod(9)
+@tab Unregister a @cite{STREAMS} module.
 @end multitable
 
 @node Configuration ala LiS 2.18.1
@@ -7981,28 +8268,31 @@ clone device or direct access to the mounted @file{specfs} shadow special charac
 file system).
 
 @multitable @columnfractions .20 .80
-@item @command{etoimajor(9)} @tab
+@item @command{etoimajor(9)}
 @findex etoimajor(9)
-change external to internal major device number
-@item @command{getemajor(9)} @tab
+@tab change external to internal major device number
+@item @command{getemajor(9)}
 @findex getemajor(9)
-get external major device number
-@item @command{geteminor(9)} @tab
+@tab get external major device number
+@item @command{geteminor(9)}
 @findex geteminor(9)
-get external minor device number
-@item @command{itoemajor(9)} @tab
+@tab get external minor device number
+@item @command{itoemajor(9)}
 @findex itoemajor(9)
-change internal to external major device number
+@tab change internal to external major device number
 @end multitable
-
 
 
 @node Copying
 @appendix Copying
+
+@menu
+* GNU General Public License::		GPL
+* GNU Free Documentation License::	FDL
+@end menu
+
 @include texi/gpl.texi
 
-@node Documentation License
-@appendix Documentation License
 @include texi/fdl.texi
 
 @node Index

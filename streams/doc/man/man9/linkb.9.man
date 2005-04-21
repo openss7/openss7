@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: linkb.9.man,v 0.9.2.7 2005/03/30 13:38:48 brian Exp $
+.\" @(#) $Id: linkb.9.man,v 0.9.2.8 2005/04/20 18:41:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -122,7 +122,8 @@ are
 .SH CONTEXT
 .PP
 .BR linkb ()
-can be called from any context.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
