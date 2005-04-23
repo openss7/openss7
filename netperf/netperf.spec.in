@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.23 $) $Date: 2005/04/09 09:34:58 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.24 $) $Date: 2005/04/22 22:50:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:34:58 $ by $Author: brian $
+# Last Modified $Date: 2005/04/22 22:50:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -133,7 +133,7 @@ Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
 %{?_xpm_icon:Icon:           %{_xpm_icon}}
 %{?_gif_icon:Icon:           %{_gif_icon}}
-ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
@@ -376,6 +376,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.24  2005/04/22 22:50:42  brian
+# - remove noarch
+#
 # Revision 1.1.2.23  2005/04/09 09:34:58  brian
 # - update spec files
 #

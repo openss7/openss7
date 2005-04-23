@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.3 2005/04/22 22:49:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:49:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+
+#include <sys/tpi.h>	/* common definitions */
 
 /* 
  * The following are the events returned from t_look().
@@ -112,7 +114,11 @@ struct t_bind {
  */
 struct t_optmgmt {
 	struct netbuf opt;
+#if __SVID
+	long flags;
+#else					/* __SVID */
 	t_scalar_t flags;
+#endif					/* __SVID */
 };
 
 /* 
@@ -149,7 +155,11 @@ struct t_unitdata {
 struct t_uderr {
 	struct netbuf addr;		/* address */
 	struct netbuf opt;		/* options */
+#if __SVID
+	long error;			/* error code */
+#else					/* __SVID */
 	t_scalar_t error;		/* error code */
+#endif					/* __SVID */
 };
 
 /* 

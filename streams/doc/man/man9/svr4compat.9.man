@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: svr4compat.9.man,v 0.9.2.3 2005/04/20 18:41:39 brian Exp $
+.\" @(#) $Id: svr4compat.9.man,v 0.9.2.4 2005/04/22 22:47:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,7 +92,7 @@ sort-adjacent-labels
 provides a compatibility module,
 .BR streams-svr4compat.o ,
 that provides compatibility functions that smooth porting of drivers from the
-.I Mac OpenTransport 1.5r2
+.I UNIX System V Release 4.2 MP
 .I STREAMS
 environment to
 .BR "Linux Fast-STREAMS" .
@@ -130,17 +130,688 @@ Functions that are available in the
 compatibility module,
 .BR streams-svr4compat.o ,
 are as follows:
-.PD 0
-.PD
-.\"
-.SS "Transport Functions"
 .PP
+Basic locks:
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+allocate and initialize a basic lock
 .PD 0
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+deallocate a dynamically allocated basic lock
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+attempt to acquire a basic lock
+.HP
+.BR UNLOCK (9)\ \-\ \c
+release a basic lock
+.PD
+.PP
+Synchronization variables:
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+allocate and initialize a synchronization variable
+.PD 0
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+wake all processes sleeping on a synchronization variable
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+deallocate a synchronization variable
+.HP
+.BR SV_SIGNAL (9)\ \-\ \c
+wake one process sleeping on a synchronization variable
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+wait on a sychronization variable
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+wait on a sychronization variable or signal
+.PD
+.PP
+Priority levels:
+.HP
+.BR spl0 (9)\ \-\ \c
+set priority levels
+.PD 0
+.HP
+.BR spl1 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl2 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl3 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl4 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl5 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl6 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl7 (9)\ \-\ \c
+set priority levels
+.HP
+.BR spl (9)\ \-\ \c
+set priority levels
+.HP
+.BR splx (9)\ \-\ \c
+restore priority levels
 .PD
 .\"
 .\"
 .SH USAGE
 .PP
+.IR UNIX \(rg
+.I System V Release 4 STREAMS
+functions were as follows:
+.HP
+.BR adjmsg (9)\ \-\ \c
+remove bytes from a \fISTREAMS\fP message
+.PD 0
+.HP
+.BR allocb (9)\ \-\ \c
+allocate a \fISTREAMS\fP message
+.HP
+.BR backq (9)\ \-\ \c
+point to the previous queue
+.HP
+.BR bcanput (9)\ \-\ \c
+check for priority band flow-control
+.HP
+.BR bufcall (9)\ \-\ \c
+hand failure of \fBallocb\fP(9)
+.HP
+.BR canput (9)\ \-\ \c
+check for space in a message queue
+.HP
+.BR copyb (9)\ \-\ \c
+copy contents of message block to another message block
+.HP
+.BR copymsg (9)\ \-\ \c
+copy contents of message to another message
+.HP
+.BR datamsg (9)\ \-\ \c
+check that the message is a data message
+.HP
+.BR dupb (9)\ \-\ \c
+duplicate the header of a message
+.HP
+.BR dupmsg (9)\ \-\ \c
+create a duplicate of a message
+.HP
+.BR enableok (9)\ \-\ \c
+allow a queue to be scheduled
+.HP
+.BR esballoc (9)\ \-\ \c
+create a message using user supplied buffer
+.HP
+.BR esbbcall (9)\ \-\ \c
+handle failure of \fBesballoc\fR(9)
+.HP
+.BR flushband (9)\ \-\ \c
+remove messages from a priority band
+.HP
+.BR flushq (9)\ \-\ \c
+delete messages held on a queue
+.HP
+.BR freeb (9)\ \-\ \c
+deallocate a message
+.HP
+.BR freemsg (9)\ \-\ \c
+deallocate all the messages in a message block
+.HP
+.BR getadmin (9)\ \-\ \c
+.HP
+.BR getmid (9)\ \-\ \c
+.HP
+.BR getq (9)\ \-\ \c
+retrieve message at the head of a queue
+.HP
+.BR insq (9)\ \-\ \c
+place a message into a queue
+.HP
+.BR linkb (9)\ \-\ \c
+.HP
+.BR msgdsize (9)\ \-\ \c
+say how much data is in a message
+.HP
+.BR noenable (9)\ \-\ \c
+stop a queue from being scheduled
+.HP
+.BR OTHERQ (9)\ \-\ \c
+return a pointer to a queue's partner
+.HP
+.BR pullupmsg (9)\ \-\ \c
+combine multiple message blocks into a single message
+.HP
+.BR putbq (9)\ \-\ \c
+replace a message on the front of a queue
+.HP
+.BR putctl (9)\ \-\ \c
+send a control message
+.HP
+.BR putctl1 (9)\ \-\ \c
+send a single-byte control message
+.HP
+.BR putnext (9)\ \-\ \c
+pass a message along a stream
+.HP
+.BR putq (9)\ \-\ \c
+place message at the back of a queue
+.HP
+.BR qenable (9)\ \-\ \c
+schedule a queue
+.HP
+.BR qreply (9)\ \-\ \c
+send a message in the opposite direction along a stream
+.HP
+.BR qsize (9)\ \-\ \c
+give the number of bytes queued
+.HP
+.BR RD (9)\ \-\ \c
+find read queue for a given queue
+.HP
+.BR rmvb (9)\ \-\ \c
+unlink a message block from a message
+.HP
+.BR rmvq (9)\ \-\ \c
+take a message out of a queue
+.HP
+.BR strlog (9)\ \-\ \c
+pass a message to the \fISTREAMS\fP logger
+.HP
+.BR strqget (9)\ \-\ \c
+get information from \fISTREAMS\fP data structures
+.HP
+.BR strqset (9)\ \-\ \c
+set information in \fISTREAMS\fP data structures
+.HP
+.BR testb (9)\ \-\ \c
+find out if \fBallocb\fP(9) might succeed
+.HP
+.BR unbufcall (9)\ \-\ \c
+.HP
+.BR unlinkb (9)\ \-\ \c
+delete message block from start of message
+.HP
+.BR WR (9)\ \-\ \c
+find write queue for a given queue
+.PD
+.\"
+.\"
+.PP
+.I STREAMS
+functions added in
+.IR UNIX \(rg
+.IR "System V Release 4.0 MP" :
+.HP
+.BR bcanputnext (9)\ \-\ \c
+.PD 0
+.HP
+.BR canputnext (9)\ \-\ \c
+.HP
+.BR freezestr (9)\ \-\ \c
+.HP
+.BR MPSTR_QLOCK (9)\ \-\ \c
+lock a \fISTREAMS\fP queue for mutual exclusion
+.HP
+.BR MPSTR_QRELE (9)\ \-\ \c
+release lock on a \fISTREAMS\fP queue
+.HP
+.BR MPSTR_STPLOCK (9)\ \-\ \c
+lock \fISTREAMS\fP stream head in multithreaded code
+.HP
+.BR MPSTR_STPRELE (9)\ \-\ \c
+release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
+.HP
+.BR msgpullup (9)\ \-\ \c
+.HP
+.BR pcmsg (9)\ \-\ \c
+.HP
+.BR put (9)\ \-\ \c
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+.HP
+.BR putnextctl (9)\ \-\ \c
+.HP
+.BR qprocsoff (9)\ \-\ \c
+.HP
+.BR qprocson (9)\ \-\ \c
+.HP
+.BR unfreezestr (9)\ \-\ \c
+.PD
+.\"
+.\"
+.PP
+.IR UNIX \(rg
+.I System V Release 4.0 D3DK
+functions were as follows:
+.HP
+.BR ASSERT (9)\ \-\ \c
+.PD 0
+.HP
+.BR bcopy (9)\ \-\ \c
+kernel byte-copy function
+.HP
+.BR biodone (9)\ \-\ \c
+buffer processing after I/O completes
+.HP
+.BR biowait (9)\ \-\ \c
+wait for I/O to complete
+.HP
+.BR bp_mapin (9)\ \-\ \c
+allocate kernel virtual address for I/O
+.HP
+.BR bp_mapout (9)\ \-\ \c
+deallocate kernel virtual address for I/O
+.HP
+.BR brelse (9)\ \-\ \c
+free I/O buffer
+.HP
+.BR btop (9)\ \-\ \c
+convert bytes to pages (rounds down)
+.HP
+.BR btopr (9)\ \-\ \c
+convert bytes to pages (rounds up)
+.HP
+.BR bzero (9)\ \-\ \c
+zero memory
+.HP
+.BR clrbuf (9)\ \-\ \c
+clear files in I/O buffer
+.HP
+.BR cmn_err (9)\ \-\ \c
+log message or panic
+.HP
+.BR copyin (9)\ \-\ \c
+user-space to kernel data copy
+.HP
+.BR copyout (9)\ \-\ \c
+kernel to user-space copy
+.HP
+.BR delay (9)\ \-\ \c
+sleep for specified time
+.HP
+.BR dma_disable (9)\ \-\ \c
+.HP
+.BR dma_enable (9)\ \-\ \c
+.HP
+.BR dma_free_buf (9)\ \-\ \c
+.HP
+.BR dma_free_cb (9)\ \-\ \c
+.HP
+.BR dma_get_best_mode (9)\ \-\ \c
+.HP
+.BR dma_get_buf (9)\ \-\ \c
+.HP
+.BR dma_get_cb (9)\ \-\ \c
+.HP
+.BR dma_pageio (9)\ \-\ \c
+.HP
+.BR dma_prog (9)\ \-\ \c
+.HP
+.BR dma_stop (9)\ \-\ \c
+.HP
+.BR dma_swsetup (9)\ \-\ \c
+.HP
+.BR dma_swstart (9)\ \-\ \c
+.HP
+.BR drv_getparm (9)\ \-\ \c
+read kernel variables
+.HP
+.BR drv_hztousec (9)\ \-\ \c
+convert HZ to microseconds
+.HP
+.BR drv_priv (9)\ \-\ \c
+get user credentials
+.HP
+.BR drv_setparm (9)\ \-\ \c
+set kernel state information
+.HP
+.BR drv_usectohz (9)\ \-\ \c
+convert microseconds to HZ
+.HP
+.BR drv_usecwait (9)\ \-\ \c
+busy-wait for a short interval
+.HP
+.BR etoimajor (9)\ \-\ \c
+.HP
+.BR freerbuf (9)\ \-\ \c
+deallocate buffer header for raw I/O
+.HP
+.BR geteblk (9)\ \-\ \c
+.HP
+.BR getemajor (9)\ \-\ \c
+.HP
+.BR geteminor (9)\ \-\ \c
+.HP
+.BR geterror (9)\ \-\ \c
+extract error number from I/O buffer
+.HP
+.BR getmajor (9)\ \-\ \c
+extract major device number from \fBdev_t\fP
+.HP
+.BR getminor (9)\ \-\ \c
+extract minor device number from \fBdev_t\fP
+.HP
+.BR getrbuf (9)\ \-\ \c
+allocate buffer header for raw I/O
+.HP
+.BR hat_getkpfnum (9)\ \-\ \c
+.HP
+.BR hat_getppfnum (9)\ \-\ \c
+.HP
+.BR inb (9)\ \-\ \c
+.HP
+.BR inl (9)\ \-\ \c
+.HP
+.BR inw (9)\ \-\ \c
+.HP
+.BR itoemajor (9)\ \-\ \c
+.HP
+.BR kmem_alloc (9)\ \-\ \c
+kernel memory allocator
+.HP
+.BR kmem_free (9)\ \-\ \c
+deallocate memory
+.HP
+.BR kmem_zalloc (9)\ \-\ \c
+allocate zeroed kernel memory
+.HP
+.BR makedevice (9)\ \-\ \c
+convert major and minor to \fBdev_t\fP
+.HP
+.BR max (9)\ \-\ \c
+determine the maximum of two numbers
+.HP
+.BR min (9)\ \-\ \c
+determine the minimum of two numbers
+.HP
+.BR ngeteblk (9)\ \-\ \c
+.HP
+.BR outb (9)\ \-\ \c
+.HP
+.BR outl (9)\ \-\ \c
+.HP
+.BR outw (9)\ \-\ \c
+.HP
+.BR page_numtopp ()\ \-\ \c
+get page pointer for given page number
+.HP
+.BR page_pptonum ()\ \-\ \c
+get page frame number for given page
+.HP
+.BR physiock (9)\ \-\ \c
+.HP
+.BR physmap (9)\ \-\ \c
+.HP
+.BR physmap_free (9)\ \-\ \c
+.HP
+.BR pollwakeup (9)\ \-\ \c
+.HP
+.BR pptophys (9)\ \-\ \c
+.HP
+.BR psignal (9)\ \-\ \c
+.HP
+.BR ptob (9)\ \-\ \c
+convert pages to bytes
+.HP
+.BR rdma_filter (9)\ \-\ \c
+.HP
+.BR repinsb (9)\ \-\ \c
+.HP
+.BR repinsd (9)\ \-\ \c
+.HP
+.BR repinsw (9)\ \-\ \c
+.HP
+.BR repoutsb (9)\ \-\ \c
+.HP
+.BR repoutsd (9)\ \-\ \c
+.HP
+.BR repoutsw (9)\ \-\ \c
+.HP
+.BR rmalloc (9)\ \-\ \c
+allocate memory from private buffer
+.HP
+.BR rmfree (9)\ \-\ \c
+deallocate private memory buffer
+.HP
+.BR rminit (9)\ \-\ \c
+initialize private memory allocator
+.HP
+.BR rmsetwant (9)\ \-\ \c
+set wake up flag in memory pool
+.HP
+.BR sleep (9)\ \-\ \c
+sleep
+.HP
+.BR spl (9)\ \-\ \c
+shut-out interrupts
+.HP
+.BR timeout (9)\ \-\ \c
+call funcation at a later time
+.HP
+.BR uiomove (9)\ \-\ \c
+move data between user and kernel
+.HP
+.BR untimeout (9)\ \-\ \c
+cancel a timeout
+.HP
+.BR ureadc (9)\ \-\ \c
+place a character into \fBuio\fP structure
+.HP
+.BR useracc ()\ \-\ \c
+find out if user is allowed to access memory
+.HP
+.BR uwritec (9)\ \-\ \c
+get a character from a \fBuio\fP structure
+.HP
+.BR vtop (9)\ \-\ \c
+.HP
+.BR wakeup (9)\ \-\ \c
+wake a process up
+.PD
+
+.PP
+.IR UNIX \(rg
+.I System V Release 4.0 MP D3DK
+functions were as follows:
+.HP
+.BR bioerror (9)\ \-\ \c
+.PD 0
+.HP
+.BR dtimeout (9)\ \-\ \c
+.HP
+.BR getnextpg (9)\ \-\ \c
+.HP
+.BR itimeout (9)\ \-\ \c
+.HP
+.BR kvtoppid (9)\ \-\ \c
+.HP
+.BR phalloc (9)\ \-\ \c
+.HP
+.BR phfree (9)\ \-\ \c
+.HP
+.BR phystoppid (9)\ \-\ \c
+.HP
+.BR proc_ref (9)\ \-\ \c
+.HP
+.BR proc_signal (9)\ \-\ \c
+.HP
+.BR proc_unref (9)\ \-\ \c
+.HP
+.BR rmallocmap (9)\ \-\ \c
+.HP
+.BR rmalloc_wait (9)\ \-\ \c
+.HP
+.BR rmfreemap (9)\ \-\ \c
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+.PD
+
+.PP
+.IR UNIX \(rg
+.I System V Release 4.2 D3DK
+functions added are as follows:
+bioreset.D3.html
+.HP
+.BR drv_gethardware (9)\ \-\ \c
+.PD 0
+.HP
+.BR mod_drvattach (9)\ \-\ \c
+.HP
+.BR mod_drvdetach (9)\ \-\ \c
+.PD
+
+.PP
+.IR UNIX \(rg
+.I System V Release 4.2 MP D3DK
+functions added are as follows:
+.HP
+.BR bcb_alloc (9)\ \-\ \c
+.PD 0
+.HP
+.BR bcb_free (9)\ \-\ \c
+.HP
+.BR bcmp (9)\ \-\ \c
+.HP
+.BR buf_breakup (9)\ \-\ \c
+.HP
+.BR cm_addval (9)\ \-\ \c
+.HP
+.BR cm_AT_putconf (9)\ \-\ \c
+.HP
+.BR cm_delval (9)\ \-\ \c
+.HP
+.BR cm_devconfig_size (9)\ \-\ \c
+.HP
+.BR cm_getbrdkey (9)\ \-\ \c
+.HP
+.BR cm_getnbrd (9)\ \-\ \c
+.HP
+.BR cm_getval (9)\ \-\ \c
+.HP
+.BR cm_getversion (9)\ \-\ \c
+.HP
+.BR cm_intr_attach (9)\ \-\ \c
+.HP
+.BR cm_intr_detach (9)\ \-\ \c
+.HP
+.BR cm_read_devconfig (9)\ \-\ \c
+.HP
+.BR cm_write_devconfig (9)\ \-\ \c
+.HP
+.BR dma_cascade (9)\ \-\ \c
+.HP
+.BR dma_physreq (9)\ \-\ \c
+.HP
+.BR drv_mmap (9)\ \-\ \c
+.HP
+.BR drv_munmap (9)\ \-\ \c
+.HP
+.BR getpl (9)\ \-\ \c
+.HP
+.BR iobitmapctl (9)\ \-\ \c
+.HP
+.BR kmem_alloc_physcontig (9)\ \-\ \c
+.HP
+.BR kmem_free_physcontig (9)\ \-\ \c
+.HP
+.BR KS_HOLD0LOCKS (9)\ \-\ \c
+.HP
+.BR LOCK (9)\ \-\ \c
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+.HP
+.BR LOCK_OWNED (9)\ \-\ \c
+.HP
+.BR met_ds_alloc_stats (9)\ \-\ \c
+.HP
+.BR met_ds_dealloc_stats (9)\ \-\ \c
+.HP
+.BR met_ds_dequeued (9)\ \-\ \c
+.HP
+.BR met_ds_hist_stats (9)\ \-\ \c
+.HP
+.BR met_ds_iodone (9)\ \-\ \c
+.HP
+.BR met_ds_queued (9)\ \-\ \c
+.HP
+.BR ovbcopy (9)\ \-\ \c
+.HP
+.BR physreq_alloc (9)\ \-\ \c
+.HP
+.BR physreq_free (9)\ \-\ \c
+.HP
+.BR physreq_prep (9)\ \-\ \c
+.HP
+.BR proc_valid (9)\ \-\ \c
+.HP
+.BR RW_ALLOC (9)\ \-\ \c
+.HP
+.BR RW_DEALLOC (9)\ \-\ \c
+.HP
+.BR RW_RDLOCK (9)\ \-\ \c
+.HP
+.BR RW_TRYRDLOCK (9)\ \-\ \c
+.HP
+.BR RW_TRYWRLOCK (9)\ \-\ \c
+.HP
+.BR RW_UNLOCK (9)\ \-\ \c
+.HP
+.BR RW_WRLOCK (9)\ \-\ \c
+.HP
+.BR SLEEP_ALLOC (9)\ \-\ \c
+.HP
+.BR SLEEP_DEALLOC (9)\ \-\ \c
+.HP
+.BR SLEEP_LOCK (9)\ \-\ \c
+.HP
+.BR SLEEP_LOCKAVAIL (9)\ \-\ \c
+.HP
+.BR SLEEP_LOCKOWNED (9)\ \-\ \c
+.HP
+.BR SLEEP_LOCK_SIG (9)\ \-\ \c
+.HP
+.BR SLEEP_TRYLOCK (9)\ \-\ \c
+.HP
+.BR SLEEP_UNLOCK (9)\ \-\ \c
+.HP
+.BR strcat (9)\ \-\ \c
+.HP
+.BR strcmp (9)\ \-\ \c
+.HP
+.BR strcpy (9)\ \-\ \c
+.HP
+.BR strlen (9)\ \-\ \c
+.HP
+.BR strncat (9)\ \-\ \c
+.HP
+.BR strncmp (9)\ \-\ \c
+.HP
+.BR strncpy (9)\ \-\ \c
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+.HP
+.BR SV_SIGNAL (9)\ \-\ \c
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+.HP
+.BR UNLOCK (9)\ \-\ \c
+.PD
 .\"
 .\"
 .SH RETURN
@@ -191,8 +862,26 @@ defined.
 Core functions:
 .PP
 Compatibility functions:
-.PP
-Transport functions:
+.BR LOCK_ALLOC (9),
+.BR LOCK_DEALLOC (9),
+.BR SV_ALLOC (9),
+.BR SV_BROADCAST (9),
+.BR SV_DEALLOC (9),
+.BR SV_SIGNAL (9),
+.BR SV_WAIT (9),
+.BR SV_WAIT_SIG (9),
+.BR TRYLOCK (9),
+.BR UNLOCK (9),
+.BR spl0 (9),
+.BR spl1 (9),
+.BR spl2 (9),
+.BR spl3 (9),
+.BR spl4 (9),
+.BR spl5 (9),
+.BR spl6 (9),
+.BR spl7 (9),
+.BR spl (9),
+.BR splx (9).
 .PP
 General:
 .BR STREAMS (9).
@@ -257,7 +946,7 @@ for additional compatibility considerations.
 .IR SVR\ 4.2\ MP \(rg
 DDI documentation.
 .[
-svr4doc
+svr4dk
 .]
 .[
 svr4spg

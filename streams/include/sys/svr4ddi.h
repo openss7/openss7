@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr4ddi.h,v 0.9.2.8 2005/03/30 11:35:43 brian Exp $
+ @(#) $Id: svr4ddi.h,v 0.9.2.9 2005/04/22 22:50:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 11:35:43 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:50:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/03/30 11:35:43 $"
+#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/22 22:50:15 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -71,6 +71,13 @@
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
+
+/* don't use these functions, they are way too dangerous */
+struct stdata;
+extern long MPSTR_QLOCK(queue_t *q);
+extern void MPSTR_QRELE(queue_t *q, long s);
+extern long MPSTR_STPLOCK(struct stdata *stp);
+extern void MPSTR_STPRELE(struct stdata *stp, long s);
 
 typedef spinlock_t lock_t;
 
@@ -112,6 +119,18 @@ extern pl_t spl7(void);
 #define spldisk	    spl6
 #define splhi	    spl7
 
+typedef int processorid_t;
+__SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, processor);
+}
+__SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl)
+{
+	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
+	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
+}
+
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC
 #endif
@@ -130,6 +149,14 @@ __SVR4_EXTERN_INLINE lock_t *LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lk
 __SVR4_EXTERN_INLINE void LOCK_DEALLOC(lock_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
+}
+
+#ifdef LOCK_OWNED
+#undef LOCK_OWNED
+#endif
+__SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp)
+{
+	return (1);
 }
 
 #ifdef TRYLOCK
@@ -161,6 +188,115 @@ __SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl)
 	pl_t old_pl = spl(pl);
 	spin_lock(lockp);
 	return (old_pl);
+}
+
+__SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
+				       int flag)
+{
+	rwlock_t *lockp;
+	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
+		rwlock_init(lockp);
+	return (lockp);
+}
+__SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp)
+{
+	kmem_free(lockp, sizeof(*lockp));
+}
+__SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+	read_lock(lockp);
+	return (old_pl);
+}
+__SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+#if HAVE_READ_TRYLOCK
+	if (read_trylock(lockp))
+		return (old_pl);
+#else
+#if HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
+	if (!spin_is_locked(lockp)) {
+		read_lock(lockp);
+		return (old_pl);
+	}
+#endif
+#endif
+	splx(old_pl);
+	return (invpl);
+}
+__SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+#if HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+	/* this will jam up sometimes */
+	if (!spin_is_locked(lockp)) {
+		write_lock(lockp);
+		return (old_pl);
+	}
+#endif
+	splx(old_pl);
+	return (invpl);
+}
+__SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl)
+{
+	read_unlock(lockp);
+	splx(pl);
+}
+__SVR4_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+	write_lock(lockp);
+	return (old_pl);
+}
+
+typedef struct semaphore sleep_t;
+
+__SVR4_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
+{
+	sleep_t *lockp;
+	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
+		init_MUTEX(lockp);
+	return (lockp);
+}
+__SVR4_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp)
+{
+	kmem_free(lockp, sizeof(*lockp));
+}
+__SVR4_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp)
+{
+	if (!down_trylock(lockp)) {
+		up(lockp);
+		return (1);
+	}
+	return (0);
+}
+__SVR4_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority)
+{
+	down(lockp);
+}
+__SVR4_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp)
+{
+	return (1);
+}
+__SVR4_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority)
+{
+	return down_interruptible(lockp);
+}
+__SVR4_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp)
+{
+	return (down_trylock(lockp) == 0);
+}
+__SVR4_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp)
+{
+	up(lockp);
 }
 
 __SVR4_EXTERN_INLINE sv_t *SV_ALLOC(int flag)

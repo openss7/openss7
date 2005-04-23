@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canenable.9.man,v 0.9.2.11 2005/04/13 07:51:04 brian Exp $
+.\" @(#) $Id: canenable.9.man,v 0.9.2.12 2005/04/22 22:47:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,9 +89,8 @@ sort-adjacent-labels
 .SH ARGUMENTS
 .TP
 .I q
-the queue to test whether a subsequent
-.BR qenable (9)
-can be successful.
+the queue to test whether placing a (normal) message on the queue can result in scheduling of the
+queue.
 .\"
 .\"
 .SH DESCRIPTION
@@ -101,15 +100,19 @@ tests whether the queue pointed to by
 .I q
 can be enabled (service procedure scheduled for execution by
 .BR runqueues (9))
-by
-.BR qenable (9).
+by placing a (normal) message on the queue.
 .PP
 This function is typically called before a call to
-.BR qenable (9)
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9)
 when the caller wishes to determine whether
-.BR qenable (9)
-will indeed result in the scheduling of the queue's
-service procedure.
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9)
+will can result in the scheduling of the queue's service procedure.
 .\"
 .\"
 .SH RETURN
@@ -118,13 +121,21 @@ service procedure.
 returns true (1) if the queue pointed to by
 .I q
 can be enabled with
-.BR qenable (9).
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9),
+or backenabled by the previous queue.
 .PP
 .BR canenable ()
 returns false (0) if the queue pointed to by
 .I q
 cannot be enabled with
-.BR qenable (9).
+.BR appq (9),
+.BR putq (9),
+or
+.BR insq (9),
+or backenabled by the previous queue.
 .\"
 .\"
 .SH ERRORS
@@ -146,7 +157,9 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 is not MP-safe.
 Consideration should be given that the return may change before the condition
 is tested if
-.BR noenable (9)
+.BR noenable (9),
+.BR enableok (9),
+.BR qprocson (9)
 or
 .BR qprocsoff (9)
 are allowed to execute concurrent with
@@ -154,6 +167,14 @@ are allowed to execute concurrent with
 .\"
 .\"
 .SH NOTICES
+.PP
+If
+.B LiS
+.[
+LiS
+.]
+.BR qenable ()
+encounters an error, it returns false (0).
 .PP
 .BR canenable ()
 simply returns the result of testing the
@@ -173,6 +194,8 @@ Therefore, there is always a race condition possible between
 .BR canenable ()
 and
 .BR noenable (9),
+.BR enableok (9),
+.BR qprocson (9),
 .BR qprocsoff (9),
 (or other utilities affecting the
 .B QNOENB
@@ -192,9 +215,14 @@ modules and drivers.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR putq (9),
+.BR insq (9),
+.BR appq (9),
 .BR qenable (9),
 .BR noenable (9),
-.BR enableok (9).
+.BR enableok (9),
+.BR qprocson (9),
+.BR qprocsoff (9).
 .\"
 .\"
 .SH BUGS
@@ -207,12 +235,7 @@ has no known bugs.
 .PP
 .BR canenable ()
 is compatible with
-.IR "SVR 3 SPG"
-.[
-svr3spg
-.]
-and
-.IR LiS,
+.I LiS
 .[
 LiS
 .]
@@ -251,34 +274,40 @@ None of
 .IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg,
-.IR Solaris \(rg
-or
+.IR MacOT \(rg,
+.IR Solaris \(rg,
+.IR Super-UX \(rg
 .IR UnixWare \(rg
+or
+.IR UXP/V \(rg
 provide this function.
 Portable
 .I STREAMS
 modules and drivers should not call this function.
 .PP
 See
+.BR liscompat (9)
+and
 .BR STREAMS (9)
 for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 3 SPG" .
+.I LiS
 .[
-svr3spg
+lis
 .]
+source code.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR canenable ()
-first appeared in
-.IR "SVR 3" .
+first appeared in early versions of
+.IR LiS .
 .[
-svr3spg
+lis
 .]
 .\"
 .\"

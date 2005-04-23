@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.2 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.3 2005/04/22 22:47:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -114,15 +114,171 @@ functions are provided by the
 compatibility kernel module.
 .\"
 .\"
-.SS "Core Functions"
+.SS "Kernel Functions"
 .PP
-Functions that are already available in
-.B Linux Fast STREAMS
+Kernel functions available in
+.IR HP-UX \(rg
+that are already available in
+.B Linux
 are as follows:
+.HP
+.BR bcopy (9)\ \-\ \c
+copy byte strings
 .PD 0
+.HP
+.BR bzero (9)\ \-\ \c
+zero a byte string
+.HP
+.BR max (9)\ \-\ \c
+determine the maximum of two integers
+.HP
+.BR min (9)\ \-\ \c
+determine the minimum of two integers
+.PD
+.\"
+.PP
+Kernel functions available in
+.IR HP-UX \(rg
+that are available in
+.B Linux Fast-STREAMS
+(in the core
+.I streams
+kernel module) are as folllows:
+.HP
+.BR cmn_err (9)\ \-\ \c
+print a kernel command error
+.PD 0
+.HP
+.BR delay (9)\ \-\ \c
+postpone the calling process for a number of clock ticks
+.HP
+.BR drv_getparm (9)\ \-\ \c
+driver retrieve kernel parameter
+.HP
+.BR drv_priv (9)\ \-\ \c
+check if the current process is priviledged
+.HP
+.BR getmajor (9)\ \-\ \c
+get the internal major device number for a device.
+.HP
+.BR getminor (9)\ \-\ \c
+get the extended minor device number for a device.
+.HP
+.BR kmem_alloc (9)\ \-\ \c
+allocate kernel memory
+.HP
+.BR kmem_free (9)\ \-\ \c
+deallocates kernel memory
+.HP
+.BR makedevice (9)\ \-\ \c
+create a device from major and minor device numbers
+.PD
+.\"
+.SS "\fISVR 4.2 MP\fP Kernel Functions"
+.PP
+Kernel functions available in
+.IR HP-UX \(rg
+that are available in
+.B Linux Fast-STREAMS
+(in the
+.I "SVR 4.2 MP"
+compatibility kernel module,
+.IR streams-svr4compat )
+are as folllows:
+.HP
+.BR itimeout (9)\ \-\ \c
+start a timer at a specified priority level
+.PD 0
+.HP
+.BR LOCK (9)\ \-\ \c
+acquire a basic lock
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+allocate and initialize a basic lock
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+deallocate a dynamically allocated basic lock
+.HP
+.BR major (9)\ \-\ \c
+get the major device number for a device
+.HP
+.BR makedev (9)\ \-\ \c
+make a device number from a major and minor device number
+.HP
+.BR minor (9)\ \-\ \c
+get the minor device number for a device
+.HP
+.BR sleep (9)\ \-\ \c
+put a process to sleep
+.HP
+.BR spl0 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl1 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl2 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl3 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl4 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl5 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl6 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl7 (9)\ \-\ \c
+set priority level
+.HP
+.BR spl (9)\ \-\ \c
+set priority level
+.HP
+.BR splx (9)\ \-\ \c
+set priority level
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+allocate and initialize a synchronization variable
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+wake one or all processes sleeping on a synchronization variable
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+deallocate a synchronization variable
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+wait on a sychronization variable or signal
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+wait on a sychronization variable or signal
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+attempt to acquire a basic lock
+.HP
+.BR UNLOCK (9)\ \-\ \c
+release a basic lock
+.HP
+.BR vtop (9)\ \-\ \c
+.HP
+.BR wakeup (9)\ \-\ \c
+.PD
+.\"
+.SS "Core \fISTREAMS\fP Functions"
+.PP
+.I STREAMS
+functions that are already available in
+.B Linux Fast STREAMS
+(in the core
+.I streams
+kernel module) are as follows:
 .HP
 .BR adjmsg (9)\ \-\ \c
 trim bytes from the front or back of a \fISTREAMS\fP message
+.PD 0
 .HP
 .BR allocb (9)\ \-\ \c
 allocate a \fISTREAMS\fP message and data block
@@ -136,23 +292,14 @@ test flow control on a \fISTREAMS\fP message queue
 .BR bcanputnext (9)\ \-\ \c
 test flow control on a \fISTREAMS\fP message queue
 .HP
-.BR bcopy (9)\ \-\ \c
-copy byte strings
-.HP
 .BR bufcall (9)\ \-\ \c
 install a buffer callback
-.HP
-.BR bzero (9)\ \-\ \c
-zero a byte string
 .HP
 .BR canput (9)\ \-\ \c
 test flow control on a \fISTREAMS\fP message queue
 .HP
 .BR canputnext (9)\ \-\ \c
 test flow control on a \fISTREAMS\fP message queue
-.HP
-.BR cmn_err (9)\ \-\ \c
-print a kernel command error
 .HP
 .BR copyb (9)\ \-\ \c
 copy a \fISTREAMS\fP message block
@@ -162,15 +309,6 @@ copy a \fISTREAMS\fP message
 .HP
 .BR datamsg (9)\ \-\ \c
 tests a \fISTREAMS\fP message type for data
-.HP
-.BR delay (9)\ \-\ \c
-postpone the calling process for a number of clock ticks
-.HP
-.BR drv_getparm (9)\ \-\ \c
-driver retrieve kernel parameter
-.HP
-.BR drv_priv (9)\ \-\ \c
-check if the current process is priviledged
 .HP
 .BR dupb (9)\ \-\ \c
 duplicate a \fISTREAMS\fP message block
@@ -208,56 +346,14 @@ get the administration function pointer for a \fISTREAMS\fP module
 .BR getmid (9)\ \-\ \c
 get the \fISTREAMS\fP module id for a name
 .HP
-.BR getmajor (9)\ \-\ \c
-get the internal major device number for a device.
-.HP
-.BR getminor (9)\ \-\ \c
-get the extended minor device number for a device.
-.HP
 .BR getq (9)\ \-\ \c
 gets a message from a \fISTREAMS\fP message queue
 .HP
 .BR insq (9)\ \-\ \c
 inserts a message into a \fISTREAMS\fP message queue
 .HP
-.BR itimeout (9)\ \-\ \c
-start a timer at a specified priority level
-.HP
-.BR kmem_alloc (9)\ \-\ \c
-allocate kernel memory
-.HP
-.BR kmem_free (9)\ \-\ \c
-deallocates kernel memory
-.HP
 .BR linkb (9)\ \-\ \c
 link a message block to a \fISTREAMS\fP message
-.HP
-.BR LOCK (9)\ \-\ \c
-acquire a basic lock
-.HP
-.BR LOCK_ALLOC (9)\ \-\ \c
-allocate and initialize a basic lock
-.HP
-.BR LOCK_DEALLOC (9)\ \-\ \c
-deallocate a dynamically allocated basic lock
-.HP
-.BR major (9)\ \-\ \c
-get the major device number for a device
-.HP
-.BR makedev (9)\ \-\ \c
-make a device number from a major and minor device number
-.HP
-.BR makedevice (9)\ \-\ \c
-create a device from major and minor device numbers
-.HP
-.BR max (9)\ \-\ \c
-determine the maximum of two integers
-.HP
-.BR min (9)\ \-\ \c
-determine the minimum of two integers
-.HP
-.BR minor (9)\ \-\ \c
-get the minor device number for a device
 .HP
 .BR msgdsize (9)\ \-\ \c
 calculate the size of the data in a \fISTREAMS\fP message
@@ -334,12 +430,6 @@ remove a message from a \fISTREAMS\fP message queue
 .BR SAMESTR (9)\ \-\ \c
 test for \fISTREAMS\fR pipe or fifo
 .HP
-.BR sleep (9)\ \-\ \c
-put a process to sleep
-.HP
-.BR spln (9)\ \-\ \c
-restore priority levels
-.HP
 .BR splstr (9)\ \-\ \c
 set priority levels
 .HP
@@ -352,29 +442,11 @@ gets information about a \fISTREAMS\fP message queue
 .BR strqset (9)\ \-\ \c
 sets attributes of a \fISTREAMS\fR message queue
 .HP
-.BR SV_ALLOC (9)\ \-\ \c
-allocate and initialize a synchronization variable
-.HP
-.BR SV_BROADCAST (9)\ \-\ \c
-wake one or all processes sleeping on a synchronization variable
-.HP
-.BR SV_DEALLOC (9)\ \-\ \c
-deallocate a synchronization variable
-.HP
-.BR SV_WAIT (9)\ \-\ \c
-wait on a sychronization variable or signal
-.HP
-.BR SV_WAIT_SIG (9)\ \-\ \c
-wait on a sychronization variable or signal
-.HP
 .BR testb (9)\ \-\ \c
 test if a \fISTREAMS\fP message can be allocated
 .HP
 .BR timeout (9)\ \-\ \c
 start a timer
-.HP
-.BR TRYLOCK (9)\ \-\ \c
-attempt to acquire a basic lock
 .HP
 .BR unbufcall (9)\ \-\ \c
 removes a \fISTREAMS\fP buffer callback
@@ -385,18 +457,11 @@ thaw the state of a stream queue
 .BR unlinkb (9)\ \-\ \c
 unlink a message block from a \fISTREAMS\fP message
 .HP
-.BR UNLOCK (9)\ \-\ \c
-release a basic lock
-.HP
 .BR untimeout (9)\ \-\ \c
 stop a timer
 .HP
 .BR unweldq  (9)\ \-\ \c
 unweld two queues
-.HP
-.BR vtop (9)\ \-\ \c
-.HP
-.BR wakeup (9)\ \-\ \c
 .HP
 .BR weldq  (9)\ \-\ \c
 weld two (or four) queues together
@@ -405,7 +470,7 @@ weld two (or four) queues together
 return the write queue of a \fISTREAMS\fR queue pair
 .PD
 .\"
-.SS "Specific Functions"
+.SS "Specific \fISTREAMS\fP Functions"
 .PP
 Functions that are available in the
 .B Linux Fast-STREAMS
@@ -418,8 +483,28 @@ are as follows:
 provide access to the global sleep lock
 .PD 0
 .HP
+.BR streams_get_sleep_lock (9)\ \-\ \c
+provide access to the global sleep lock
+.HP
+.BR streams_mpsleep (9)\ \-\ \c
+put a process to sleep
+.HP
 .BR streams_put (9)\ \-\ \c
 invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
+.PD
+.\"
+.\".SS "\fISTREAMS\fP Configuration and Registration Functions"
+.PP
+Module and driver configuration functions that are available in the
+.B Linux Fast-STREAMS
+.IR HP-UX \(rg
+compatibility module,
+.IR streams-hpuxcompat ,
+are as follows:
+.HP
+.BR str_install (9)\ \-\ \c
+install or uninstall a \fISTREAMS\fP module or driver
+.PD 0
 .HP
 .BR str_install_HPUX (9)\ \-\ \c
 install or uninstall a \fISTREAMS\fP module or driver
@@ -428,22 +513,46 @@ install or uninstall a \fISTREAMS\fP module or driver
 .\"
 .SH USAGE
 .PP
-.\"
-.\"
-.SH RETURN
-.PP
-.\"
-.\"
-.SH ERRORS
-.PP
+For usage an example on the various functions, see the individual manual pages.
 .\"
 .\"
 .SH CONTEXT
 .PP
+These functions can be executed from various contexts as described in each separate manual page.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+Most of these functions are MP-safe; however,
+.IR HP-UX \(rg
+only provides stubs for some of the
+.I SVR 4.2 MP
+functions, such as:
+.HP
+.BR qprocson (9)\ \-\ \c
+enables a \fISTREAMS\fR message queue for multi-processing
+.PD 0
+.HP
+.BR qprocsoff (9)\ \-\ \c
+disables \fISTREAMS\fR message queue processing for multi-processing
+.HP
+.BR freezestr (9)\ \-\ \c
+freeze the state of a stream queue
+.HP
+.BR unfreezestr (9)\ \-\ \c
+thaw the state of a stream queue
+.PD
+.PP
+.IR HP-UX \(rg
+expects that the apporpriate level of synchronization be used instead.
+Because of this, it is recommended that
+.IR HP-UX \(rg
+modules and drivers port directly to the
+.B Linux Fast-STREAMS
+environment, not be run at synchronization level
+.BR SQLVL_NOP .
+See
+.BR str_install_HPUX (9).
 .\"
 .\"
 .SH NOTICES
@@ -484,14 +593,12 @@ functions loads.
 .\"
 .SH IMPLEMENTATION
 .PP
-.\"
-.\"
-.SH IOCTLS
 .PP
-.\"
-.\"
-.SH SYSCTLS
-.PP
+Core functions are implemented within the
+.B Linux Fast-STREAMS
+framework.
+.IR AIX \(rg-specific
+functions are implemented as described in the separate manual pages describing each facility.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -595,6 +702,8 @@ Core functions:
 .PP
 Compatibility functions:
 .BR get_sleep_lock (9),
+.BR streams_get_sleep_lock (9),
+.BR streams_mpsleep (9),
 .BR streams_put (9),
 .BR str_install_HPUX (9).
 .PP
@@ -604,6 +713,9 @@ General:
 .\"
 .SH BUGS
 .PP
+The
+.IR HP-UX \(rg
+compatibility suite has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY

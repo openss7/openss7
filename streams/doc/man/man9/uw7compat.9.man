@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: uw7compat.9.man,v 0.9.2.3 2005/04/20 18:41:39 brian Exp $
+.\" @(#) $Id: uw7compat.9.man,v 0.9.2.4 2005/04/22 22:47:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -130,17 +130,1207 @@ Functions that are available in the
 compatibility module,
 .BR streams-uw7compat.o ,
 are as follows:
+.PP
+Physical memory requirements:
+.HP
+.BR allocb_physreq (9)\ \-\ \c
+allocate a \fISTREAMS\fP message and data block
 .PD 0
+.HP
+.BR msgphysreq (9)\ \-\ \c
+cause a message block to meet physical requirements
+.HP
+.BR msgpullup_physreq (9)\ \-\ \c
+pull up bytes in a \fISTREAMS\fP message to meet physical requirements
+.PD
+.PP
+Atomic integers:
+.HP
+.BR ATOMIC_INT_ADD (9)\ \-\ \c
+add an integer value to an atomic integer
+.PD 0
+.HP
+.BR ATOMIC_INT_ALLOC (9)\ \-\ \c
+allocate and initialize an atomic integer
+.HP
+.BR ATOMIC_INT_DEALLOC (9)\ \-\ \c
+deallocates an atomic integer
+.HP
+.BR ATOMIC_INT_DECR (9)\ \-\ \c
+decrement and test an atomic integer
+.HP
+.BR ATOMIC_INT_INCR (9)\ \-\ \c
+increment an atomic integer
+.HP
+.BR ATOMIC_INT_INIT (9)\ \-\ \c
+initialize an atomic integer
+.HP
+.BR ATOMIC_INT_READ (9)\ \-\ \c
+read an atomic integer
+.HP
+.BR ATOMIC_INT_SUB (9)\ \-\ \c
+subtract an integer value from an atomic integer
+.HP
+.BR ATOMIC_INT_WRITE (9)\ \-\ \c
+write an integer value to an atomic integer
+.PD
+.PP
+Device numbers:
+.HP
+.BR emajor (9)\ \-\ \c
+get the external (real) major device number from the device number
+.PD 0
+.HP
+.BR eminor (9)\ \-\ \c
+get the external extended minor device number from the device number
+.HP
+.BR etoimajor (9)\ \-\ \c
+convert an external major device number to an internal major device number
+.HP
+.BR getemajor (9)\ \-\ \c
+get the external (real) major device number
+.HP
+.BR geteminor (9)\ \-\ \c
+get the external minor device number
+.HP
+.BR itoemajor (9)\ \-\ \c
+convert an internal major device number to an external major device number
+.PD
+.PP
+Basic locks:
+.HP
+.BR LOCK_OWNED (9)\ \-\ \c
+determine whether a basic lock is held by the caller
+.PD 0
+.PD
+.PP
+Debugging:
+.HP
+.BR printf_UW7 (9)\ \-\ \c
+.PD 0
+.PD
+.PP
+Read-write locks:
+.HP
+.BR RW_ALLOC (9)\ \-\ \c
+allocated an initialize a read/write lock
+.PD 0
+.HP
+.BR RW_DEALLOC (9)\ \-\ \c
+deallocate a read/write lock
+.HP
+.BR RW_TRYRDLOCK (9)\ \-\ \c
+attempt to acquire a read/write lock in read mode
+.HP
+.BR RW_TRYWRLOCK (9)\ \-\ \c
+attempt to acquire a read/write lock in write mode
+.HP
+.BR RW_UNLOCK (9)\ \-\ \c
+release a read/write lock
+.HP
+.BR RW_WRLOCK (9)\ \-\ \c
+acquire a read/write lock in write mode
+.PD
+.PP
+Sleep locks:
+.HP
+.BR SLEEP_ALLOC (9)\ \-\ \c
+allocate and initialize a sleep lock
+.PD 0
+.HP
+.BR SLEEP_DEALLOC (9)\ \-\ \c
+deallocate a sleep lock
+.HP
+.BR SLEEP_LOCK (9)\ \-\ \c
+acquire a sleep lock
+.HP
+.BR SLEEP_LOCKAVAIL (9)\ \-\ \c
+determine whether a sleep lock is available
+.HP
+.BR SLEEP_LOCKOWNED (9)\ \-\ \c
+determine whether a sleep lock is held by the caller
+.HP
+.BR SLEEP_LOCK_SIG (9)\ \-\ \c
+acquire a sleep lock
+.HP
+.BR SLEEP_TRYLOCK (9)\ \-\ \c
+attempt to acquire a sleep lock
+.HP
+.BR SLEEP_UNLOCK (9)\ \-\ \c
+release a sleep lock
 .PD
 .\"
-.SS "Transport Functions"
-.PP
+.\"
+
+.HP
+.BR adjmsg (9)\ \-\ \c
+trim bytes from a message
 .PD 0
+.HP
+.BR allocb (9)\ \-\ \c
+allocate a message block
+.HP
+.BR allocb_physreq (9)\ \-\ \c
+allocate a STREAMS message block with physical requirements
+.HP
+.BR backq (9)\ \-\ \c
+get pointer to the queue behind a given queue
+.HP
+.BR bcanput (9)\ \-\ \c
+test for flow control in a specified priority band
+.HP
+.BR bcanputnext (9)\ \-\ \c
+test for flow control in a specified priority band
+.HP
+.BR bufcall (9)\ \-\ \c
+call a function when a buffer becomes available
+.HP
+.BR canput (9)\ \-\ \c
+test for room in a message queue
+.HP
+.BR canputnext (9)\ \-\ \c
+test for flow control in a stream
+.HP
+.BR copyb (9)\ \-\ \c
+copy a message block
+.HP
+.BR copymsg (9)\ \-\ \c
+copy a message
+.HP
+.BR datamsg (9)\ \-\ \c
+test whether a message is a data message
+.HP
+.BR dupb (9)\ \-\ \c
+duplicate a message block descriptor
+.HP
+.BR dupmsg (9)\ \-\ \c
+duplicate a message
+.HP
+.BR enableok (9)\ \-\ \c
+allow a queue to be serviced
+.HP
+.BR esballoc (9)\ \-\ \c
+allocate a message block using an externally-supplied buffer
+.HP
+.BR esbbcall (9)\ \-\ \c
+call a function when an externally-supplied buffer can be allocated
+.HP
+.BR flushband (9)\ \-\ \c
+flush messages in a specified priority band
+.HP
+.BR flushq (9)\ \-\ \c
+flush messages on a queue
+.HP
+.BR freeb (9)\ \-\ \c
+free a message block
+.HP
+.BR freemsg (9)\ \-\ \c
+free a message
+.HP
+.BR freezestr (9)\ \-\ \c
+freeze the state of a stream
+.HP
+.BR getadmin (9)\ \-\ \c
+return given module identifier to administration function
+.HP
+.BR getmid (9)\ \-\ \c
+given the driver or module name, return module identifier
+.HP
+.BR getq (9)\ \-\ \c
+get the next message from a queue
+.HP
+.BR insq (9)\ \-\ \c
+insert a message into a queue
+.HP
+.BR linkb (9)\ \-\ \c
+concatenate two message blocks
+.HP
+.BR msgdsize (9)\ \-\ \c
+return number of bytes of data in a message
+.HP
+.BR msgphysreq (9)\ \-\ \c
+ensure that a message meets physical requirements
+.HP
+.BR msgpullup (9)\ \-\ \c
+concatenate bytes in a message
+.HP
+.BR msgpullup_physreq (9)\ \-\ \c
+concatenate bytes in a message with physical requirements
+.HP
+.BR msgscgth (9)\ \-\ \c
+construct a DMA scatter/gather list for a message block
+.HP
+.BR noenable (9)\ \-\ \c
+prevent a queue from being scheduled
+.HP
+.BR OTHERQ (9)\ \-\ \c
+get a pointer to queue's partner queue
+.HP
+.BR pcmsg (9)\ \-\ \c
+test whether a message is a priority control message
+.HP
+.BR pullupmsg (9)\ \-\ \c
+concatenate bytes in a message
+.HP
+.BR put (9)\ \-\ \c
+call a put procedure
+.HP
+.BR putbq (9)\ \-\ \c
+place a message at the head of a queue
+.HP
+.BR putctl (9)\ \-\ \c
+send a control message to a queue
+.HP
+.BR putctl1 (9)\ \-\ \c
+send a control message with a one-byte parameter to a queue
+.HP
+.BR putnext (9)\ \-\ \c
+send a message to the next queue
+.HP
+.BR putnextctl (9)\ \-\ \c
+send a control message to a queue
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+send a control message with a one byte parameter to a queue
+.HP
+.BR putq (9)\ \-\ \c
+put a message on a queue
+.HP
+.BR qenable (9)\ \-\ \c
+schedule a queue's service routine to be run
+.HP
+.BR qprocsoff (9)\ \-\ \c
+disable put and service routines
+.HP
+.BR qprocson (9)\ \-\ \c
+enable put and service routines
+.HP
+.BR qreply (9)\ \-\ \c
+send a message in the opposite direction in a stream
+.HP
+.BR qsize (9)\ \-\ \c
+find the number of messages on a queue
+.HP
+.BR RD (9)\ \-\ \c
+get a pointer to the read queue
+.HP
+.BR rmvb (9)\ \-\ \c
+remove a message block from a message
+.HP
+.BR rmvq (9)\ \-\ \c
+remove a message from a queue
+.HP
+.BR SAMESTR (9)\ \-\ \c
+test if next queue is of the same type
+.HP
+.BR strioccall (9)\ \-\ \c
+Invoke function as completion of an M_IOCTL operation
+.HP
+.BR strlog (9)\ \-\ \c
+submit messages to the log driver
+.HP
+.BR strqget (9)\ \-\ \c
+get information about a queue or band of the queue
+.HP
+.BR strqset (9)\ \-\ \c
+change information about a queue or band of the queue
+.HP
+.BR testb (9)\ \-\ \c
+test for an available buffer
+.HP
+.BR unbufcall (9)\ \-\ \c
+cancel a pending bufcall request
+.HP
+.BR unfreezestr (9)\ \-\ \c
+unfreeze the state of a stream
+.HP
+.BR unlinkb (9)\ \-\ \c
+remove a message block from the head of a message
+.HP
+.BR WR (9)\ \-\ \c
+get a pointer to the write queue
 .PD
+
+.\"
+.\"
+
+.HP
+.BR ASSERT (9)\ \-\ \c
+verify assertion
+.PD 0
+.HP
+.BR ATOMIC_INT_ADD (9)\ \-\ \c
+add to an ATOMIC_INT value
+.HP
+.BR ATOMIC_INT_ALLOC (9)\ \-\ \c
+allocate an ATOMIC_INT structure
+.HP
+.BR ATOMIC_INT_DEALLOC (9)\ \-\ \c
+free an ATOMIC_INT object
+.HP
+.BR ATOMIC_INT_DECR (9)\ \-\ \c
+decrement an ATOMIC_INT value
+.HP
+.BR ATOMIC_INT_INCR (9)\ \-\ \c
+increment an ATOMIC_INT value
+.HP
+.BR ATOMIC_INT_INIT (9)\ \-\ \c
+initialize an ATOMIC_INT object
+.HP
+.BR ATOMIC_INT_READ (9)\ \-\ \c
+read the value stored within an ATOMIC_INT
+.HP
+.BR ATOMIC_INT_SUB (9)\ \-\ \c
+subtract from an ATOMIC_INT value
+.HP
+.BR ATOMIC_INT_WRITE (9)\ \-\ \c
+write a value into an ATOMIC_INT
+.HP
+.BR bcb_alloc (9)\ \-\ \c
+allocate a breakup control block
+.HP
+.BR bcb_free (9)\ \-\ \c
+free a breakup control block
+.HP
+.BR bcb_prep (9)\ \-\ \c
+prepare a breakup control block structure for use
+.HP
+.BR bcmp (9)\ \-\ \c
+compare data between two kernel address locations
+.HP
+.BR bcopy (9)\ \-\ \c
+copy data between address locations in the kernel
+.HP
+.BR biocanblock (9)\ \-\ \c
+ensure that a b_iodone handler is executing in a blockable context
+.HP
+.BR biodone (9)\ \-\ \c
+release buffer after block I/O and wakeup processes
+.HP
+.BR bioerror (9)\ \-\ \c
+manipulate error fields within a buffer header
+.HP
+.BR bioreset (9)\ \-\ \c
+reset a private buffer for reuse after completed I/O
+.HP
+.BR biowait (9)\ \-\ \c
+suspend execution pending completion of block I/O
+.HP
+.BR biowait_sig (9)\ \-\ \c
+suspend execution pending completion of block I/O or signal
+.HP
+.BR bp_mapin (9)\ \-\ \c
+allocate virtual address space for buffer page list
+.HP
+.BR bp_mapout (9)\ \-\ \c
+deallocate virtual address space for buffer page list
+.HP
+.BR brelse (9)\ \-\ \c
+return a buffer to the system's free list
+.HP
+.BR bs_getval (9)\ \-\ \c
+Get value of a boot parameter
+.HP
+.BR btop (9)\ \-\ \c
+convert size in bytes to size in pages (round down)
+.HP
+.BR btopr (9)\ \-\ \c
+convert size in bytes to size in pages (round up)
+.HP
+.BR buf_breakup (9)\ \-\ \c
+unified I/O breakup routine
+.HP
+.BR bzero (9)\ \-\ \c
+clear memory for a given number of bytes
+.HP
+.BR call_demon (9)\ \-\ \c
+invoke current kernel debugger
+.HP
+.BR clrbuf (9)\ \-\ \c
+erase the contents of a buffer
+.HP
+.BR cm_abort_trans (9)\ \-\ \c
+terminate a resource manager transaction
+.HP
+.BR cm_addval (9)\ \-\ \c
+add an entry to the resource manager database
+.HP
+.BR cm_AT_putconf (9)\ \-\ \c
+store standard parameters in resource manager database
+.HP
+.BR cm_begin_trans (9)\ \-\ \c
+begin a resource manager transaction
+.HP
+.BR cm_delkey (9)\ \-\ \c
+delete a resource manager record
+.HP
+.BR cm_delval (9)\ \-\ \c
+delete entries from the resource manager database
+.HP
+.BR cm_devconfig_size (9)\ \-\ \c
+get the size of device configuration space
+.HP
+.BR cm_end_trans (9)\ \-\ \c
+complete a resource manager transaction
+.HP
+.BR cm_getbrdkey (9)\ \-\ \c
+retrieve the resource manager key for a particular driver/board
+.HP
+.BR cm_getnbrd (9)\ \-\ \c
+determine number of boards supported by driver
+.HP
+.BR cm_getval (9)\ \-\ \c
+retrieve an entry from the resource manager database
+.HP
+.BR cm_getversion (9)\ \-\ \c
+get configuration manager version number
+.HP
+.BR cm_intr_attach (9)\ \-\ \c
+attach device interrupts
+.HP
+.BR cm_intr_detach (9)\ \-\ \c
+detach device interrupts
+.HP
+.BR cmn_err (9)\ \-\ \c
+display an error message or panic the system
+.HP
+.BR cm_newkey (9)\ \-\ \c
+create a new resource manager record
+.HP
+.BR cm_read_devconfig (9)\ \-\ \c
+read a board's NVRAM extension information
+.HP
+.BR cm_read_devconfig16 (9)\ \-\ \c
+read word from board's NVRAM extension information
+.HP
+.BR cm_read_devconfig32 (9)\ \-\ \c
+read double word from board's NVRAM extension information
+.HP
+.BR cm_read_devconfig8 (9)\ \-\ \c
+read byte from board's NVRAM extension information
+.HP
+.BR cm_write_devconfig (9)\ \-\ \c
+write a board's NVRAM extension information
+.HP
+.BR cm_write_devconfig16 (9)\ \-\ \c
+write byte to board's NVRAM extension information
+.HP
+.BR cm_write_devconfig32 (9)\ \-\ \c
+write byte to board's NVRAM extension information
+.HP
+.BR cm_write_devconfig8 (9)\ \-\ \c
+write byte to board's NVRAM extension information
+.HP
+.BR copyin (9)\ \-\ \c
+copy data from a user buffer to a driver buffer
+.HP
+.BR copyout (9)\ \-\ \c
+copy data from a driver buffer to a user buffer
+.HP
+.BR delay (9)\ \-\ \c
+delay process execution for a specified number of clock ticks
+.HP
+.BR devmem_mapin (9)\ \-\ \c
+obtain virtual address mapping for physical offsets within device memory
+.HP
+.BR devmem_mapout (9)\ \-\ \c
+free virtual address mapping for physical offsets within device memory
+.HP
+.BR devmem_ppid (9)\ \-\ \c
+get physical page ID for physical offsets within device memory
+.HP
+.BR devmem_size (9)\ \-\ \c
+obtain the size of a device memory block
+.HP
+.BR dma_cascade (9)\ \-\ \c
+program a DMA channel for cascade mode
+.HP
+.BR dma_disable (9)\ \-\ \c
+disable recognition of hardware requests on a DMA channel
+.HP
+.BR dma_enable (9)\ \-\ \c
+enable recognition of hardware requests on a DMA channel
+.HP
+.BR dma_free_buf (9)\ \-\ \c
+free a previously allocated DMA buffer descriptor
+.HP
+.BR dma_free_cb (9)\ \-\ \c
+free a previously allocated DMA command block
+.HP
+.BR dma_get_best_mode (9)\ \-\ \c
+determine best transfer mode for DMA command
+.HP
+.BR dma_get_buf (9)\ \-\ \c
+allocate a DMA buffer descriptor
+.HP
+.BR dma_get_cb (9)\ \-\ \c
+allocate a DMA command block
+.HP
+.BR dma_pageio (9)\ \-\ \c
+break up an I/O request into manageable units
+.HP
+.BR dma_physreq (9)\ \-\ \c
+apply constraints for DMA channel and path size
+.HP
+.BR dma_prog (9)\ \-\ \c
+program a DMA operation for a subsequent hardware request
+.HP
+.BR dma_stop (9)\ \-\ \c
+stop software-initiated DMA operation on a channel and release it
+.HP
+.BR dma_swsetup (9)\ \-\ \c
+program a DMA operation for a subsequent software request
+.HP
+.BR dma_swstart (9)\ \-\ \c
+initiate a DMA operation via software request
+.HP
+.BR do_biostart (9)\ \-\ \c
+invoke another driver's biostart(D2) entry point routine
+.HP
+.BR do_devinfo (9)\ \-\ \c
+invoke another driver's devinfo(D2) entry point routine
+.HP
+.BR do_drvctl (9)\ \-\ \c
+call another driver's drvctl(D2) entry point routine
+.HP
+.BR do_ioctl (9)\ \-\ \c
+invoke another driver's ioctl(D2) entry point routine
+.HP
+.BR drv_attach (9)\ \-\ \c
+register a driver and its entry points
+.HP
+.BR drv_callback (9)\ \-\ \c
+call a function when an exceptional event happens
+.HP
+.BR drv_close (9)\ \-\ \c
+obtain a channel handle for subsequent access by layered driver
+.HP
+.BR drv_detach (9)\ \-\ \c
+deregister a driver registered by drv_attach(D3)
+.HP
+.BR drv_gethardware (9)\ \-\ \c
+retrieve hardware information
+.HP
+.BR drv_getparm (9)\ \-\ \c
+retrieve kernel state information
+.HP
+.BR drv_hztousec (9)\ \-\ \c
+convert clock ticks to microseconds
+.HP
+.BR drv_mmap (9)\ \-\ \c
+map device memory into user space
+.HP
+.BR drv_munmap (9)\ \-\ \c
+release user mapping of kernel virtual or physical addresses
+.HP
+.BR drv_open (9)\ \-\ \c
+obtain a channel handle for subsequent access by layered driver
+.HP
+.BR drv_priv (9)\ \-\ \c
+determine whether credentials are privileged
+.HP
+.BR drv_setparm (9)\ \-\ \c
+set kernel state information
+.HP
+.BR drv_shutdown (9)\ \-\ \c
+initiate a system shutdown
+.HP
+.BR drv_usectohz (9)\ \-\ \c
+convert microseconds to clock ticks
+.HP
+.BR drv_usecwait (9)\ \-\ \c
+busy-wait for specified interval
+.HP
+.BR dtimeout (9)\ \-\ \c
+execute a function on a specified processor after a specified length of time
+.HP
+.BR eisa_parse_devconfig (9)\ \-\ \c
+parse EISA device configuration space
+.HP
+.BR etoimajor (9)\ \-\ \c
+convert external to internal major device number
+.HP
+.BR freerbuf (9)\ \-\ \c
+free a raw buffer header
+.HP
+.BR geteblk (9)\ \-\ \c
+get an empty buffer
+.HP
+.BR getemajor (9)\ \-\ \c
+get external major device number
+.HP
+.BR geteminor (9)\ \-\ \c
+get external minor device number
+.HP
+.BR geterror (9)\ \-\ \c
+retrieve error number from a buffer header
+.HP
+.BR getmajor (9)\ \-\ \c
+get internal major device number
+.HP
+.BR getminor (9)\ \-\ \c
+get internal minor device number
+.HP
+.BR getnextpg (9)\ \-\ \c
+get next page pointer
+.HP
+.BR getpl (9)\ \-\ \c
+get current interrupt priority level
+.HP
+.BR getrbuf (9)\ \-\ \c
+get a raw buffer header
+.HP
+.BR hat_getkpfnum (9)\ \-\ \c
+get physical page ID for kernel virtual address
+.HP
+.BR hat_getppfnum (9)\ \-\ \c
+get physical page ID for physical address
+.HP
+.BR ifstats_attach (9)\ \-\ \c
+register a network interface statistics structure
+.HP
+.BR ifstats_detach (9)\ \-\ \c
+un-register a network interface statistics structure
+.HP
+.BR inb (9)\ \-\ \c
+read a byte from an 8 bit I/O port
+.HP
+.BR inl (9)\ \-\ \c
+read a 32 bit word from a 32 bit I/O port
+.HP
+.BR inw (9)\ \-\ \c
+read a 16 bit short word from a 16 bit I/O port
+.HP
+.BR iobitmapctl (9)\ \-\ \c
+enable/disable/check user access to I/O ports
+.HP
+.BR itimeout (9)\ \-\ \c
+execute a function after a specified length of time
+.HP
+.BR itoemajor (9)\ \-\ \c
+convert internal to external major device number
+.HP
+.BR kmem_alloc (9)\ \-\ \c
+allocate space from kernel free memory
+.HP
+.BR kmem_alloc_phys (9)\ \-\ \c
+allocate DMA-addressable, driver-accessible memory
+.HP
+.BR kmem_alloc_physcontig (9)\ \-\ \c
+allocate physically contiguous memory
+.HP
+.BR kmem_alloc_physreq (9)\ \-\ \c
+allocate memory with specified physical properties
+.HP
+.BR kmem_free (9)\ \-\ \c
+free previously allocated kernel memory
+.HP
+.BR kmem_free_physcontig (9)\ \-\ \c
+free kernel memory previously allocated with kmem_alloc_physcontig
+.HP
+.BR kmem_zalloc (9)\ \-\ \c
+allocate and clear space from kernel free memory
+.HP
+.BR kmem_zalloc_physreq (9)\ \-\ \c
+allocate and clear memory with specified physical properties
+.HP
+.BR KS_HOLD0LOCKS (9)\ \-\ \c
+determine that the current context holds no basic or read/write locks
+.HP
+.BR kthread_exit (9)\ \-\ \c
+cause current thread to exit
+.HP
+.BR kthread_spawn (9)\ \-\ \c
+spawn a new kernel thread
+.HP
+.BR kthread_wait (9)\ \-\ \c
+wait for a specified thread to exit
+.HP
+.BR kvtoppid (9)\ \-\ \c
+get physical page ID for kernel virtual address
+.HP
+.BR LOCK (9)\ \-\ \c
+acquire a basic lock
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+allocate and initialize a basic lock
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+deallocate an instance of a basic lock
+.HP
+.BR LOCK_OWNED (9)\ \-\ \c
+determine if the current context owns a basic lock
+.HP
+.BR makedevice (9)\ \-\ \c
+make device number from major and minor numbers
+.HP
+.BR max (9)\ \-\ \c
+return the larger of two integers
+.HP
+.BR met_ds_alloc_stats (9)\ \-\ \c
+allocate a disk statistics structure
+.HP
+.BR met_ds_dealloc_stats (9)\ \-\ \c
+deallocate a disk statistics structure
+.HP
+.BR met_ds_dequeued (9)\ \-\ \c
+update disk statistics after a failed attempt to put a request on the queue
+.HP
+.BR met_ds_hist_stats (9)\ \-\ \c
+update disk access and response time histograms when a request completes
+.HP
+.BR met_ds_iodone (9)\ \-\ \c
+update disk statistics when a read or write request completes
+.HP
+.BR met_ds_queued (9)\ \-\ \c
+update disk statistics when a read or write request is added to the queue
+.HP
+.BR min (9)\ \-\ \c
+return the lesser of two integers
+.HP
+.BR mod_drvattach (9)\ \-\ \c
+install interrupts for a loadable device driver
+.HP
+.BR mod_drvdetach (9)\ \-\ \c
+remove interrupts for a loadable device driver
+.HP
+.BR ngeteblk (9)\ \-\ \c
+get an empty buffer of the specified size
+.HP
+.BR numtos (9)\ \-\ \c
+convert an unsigned long number to an ASCII string in base 10
+.HP
+.BR outb (9)\ \-\ \c
+write a byte to an 8 bit I/O port
+.HP
+.BR outl (9)\ \-\ \c
+write a 32 bit long word to a 32 bit I/O port
+.HP
+.BR outw (9)\ \-\ \c
+write a 16 bit short word to a 16 bit I/O port
+.HP
+.BR ovbcopy (9)\ \-\ \c
+copy data between overlapping address locations in the kernel
+.HP
+.BR phalloc (9)\ \-\ \c
+allocate and initialize a pollhead structure
+.HP
+.BR phfree (9)\ \-\ \c
+free a pollhead structure
+.HP
+.BR physiock (9)\ \-\ \c
+validate and issue a raw I/O request
+.HP
+.BR physmap (9)\ \-\ \c
+obtain virtual address mapping for physical addresses
+.HP
+.BR physmap_free (9)\ \-\ \c
+free virtual address mapping for physical addresses
+.HP
+.BR physreq_alloc (9)\ \-\ \c
+allocate a physical alignment requirements structure
+.HP
+.BR physreq_free (9)\ \-\ \c
+free a physical alignment requirements structure
+.HP
+.BR physreq_prep (9)\ \-\ \c
+prepare a physical alignment requirements structure for use
+.HP
+.BR phystoppid (9)\ \-\ \c
+get physical page ID for physical address
+.HP
+.BR pollwakeup (9)\ \-\ \c
+inform polling processes that an event has occurred
+.HP
+.BR pptophys (9)\ \-\ \c
+convert page pointer to physical address
+.HP
+.BR proc_ref (9)\ \-\ \c
+obtain a reference to a process for signaling
+.HP
+.BR proc_signal (9)\ \-\ \c
+send a signal to a process
+.HP
+.BR proc_unref (9)\ \-\ \c
+release a reference to a process
+.HP
+.BR proc_valid (9)\ \-\ \c
+check whether a referenced process has exited
+.HP
+.BR psignal (9)\ \-\ \c
+send signal to a process
+.HP
+.BR ptob (9)\ \-\ \c
+convert size in pages to size in bytes
+.HP
+.BR rdma_filter (9)\ \-\ \c
+filter transfers to use only DMA-able memory
+.HP
+.BR repinsb (9)\ \-\ \c
+read bytes from I/O port to buffer
+.HP
+.BR repinsd (9)\ \-\ \c
+read 32 bit words from I/O port to buffer
+.HP
+.BR repinsw (9)\ \-\ \c
+read 16 bit words from I/O port to buffer
+.HP
+.BR repoutsb (9)\ \-\ \c
+write bytes from buffer to an I/O port
+.HP
+.BR repoutsd (9)\ \-\ \c
+write 32 bit words from buffer to an I/O port
+.HP
+.BR repoutsw (9)\ \-\ \c
+write 16 bit words from buffer to an I/O port
+.HP
+.BR rmalloc (9)\ \-\ \c
+allocate space from a private space management map
+.HP
+.BR rmallocmap (9)\ \-\ \c
+allocate and initialize a private space management map
+.HP
+.BR rmalloc_wait (9)\ \-\ \c
+allocate space from a private space management map
+.HP
+.BR rmfree (9)\ \-\ \c
+free space into a private space management map
+.HP
+.BR rmfreemap (9)\ \-\ \c
+free a private space management map
+.HP
+.BR rminit (9)\ \-\ \c
+initialize a private space management map
+.HP
+.BR rmsetwant (9)\ \-\ \c
+set the map's wait flag for a wakeup
+.HP
+.BR RW_ALLOC (9)\ \-\ \c
+allocate and initialize a read/write lock
+.HP
+.BR RW_DEALLOC (9)\ \-\ \c
+deallocate an instance of a read/write lock
+.HP
+.BR RW_RDLOCK (9)\ \-\ \c
+acquire a read/write lock in read mode
+.HP
+.BR RW_TRYRDLOCK (9)\ \-\ \c
+try to acquire a read/write lock in read mode
+.HP
+.BR RW_TRYWRLOCK (9)\ \-\ \c
+try to acquire a read/write lock in write mode
+.HP
+.BR RW_UNLOCK (9)\ \-\ \c
+release a read/write lock
+.HP
+.BR RW_WRLOCK (9)\ \-\ \c
+acquire a read/write lock in write mode
+.HP
+.BR scgth_free (9)\ \-\ \c
+free a scatter/gather structure
+.HP
+.BR sleep (9)\ \-\ \c
+suspend process execution pending occurrence of an event
+.HP
+.BR SLEEP_ALLOC (9)\ \-\ \c
+allocate and initialize a sleep lock
+.HP
+.BR SLEEP_DEALLOC (9)\ \-\ \c
+deallocate an instance of a sleep lock
+.HP
+.BR SLEEP_LOCK (9)\ \-\ \c
+acquire a sleep lock
+.HP
+.BR SLEEP_LOCKAVAIL (9)\ \-\ \c
+query whether a sleep lock is available
+.HP
+.BR SLEEP_LOCKOWNED (9)\ \-\ \c
+query whether a sleep lock is held by the caller
+.HP
+.BR SLEEP_LOCK_SIG (9)\ \-\ \c
+acquire a sleep lock
+.HP
+.BR SLEEP_TRYLOCK (9)\ \-\ \c
+try to acquire a sleep lock
+.HP
+.BR SLEEP_UNLOCK (9)\ \-\ \c
+release a sleep lock
+.HP
+.BR spl (9)\ \-\ \c
+block/allow interrupts on a processor
+.HP
+.BR spl0 (9)\ \-\ \c
+block no interrupts (equivalent to splbase)
+.HP
+.BR spl6 (9)\ \-\ \c
+block interrupts from the clock (SCO OpenServer only)
+.HP
+.BR spl7 (9)\ \-\ \c
+block all interrupts (equivalent to splhi) on Intel processors
+.HP
+.BR splbase (9)\ \-\ \c
+block no interrupts
+.HP
+.BR spldisk (9)\ \-\ \c
+block disk devie interrupts
+.HP
+.BR splhi (9)\ \-\ \c
+block all interrupts, including the clock
+.HP
+.BR splstr (9)\ \-\ \c
+block STREAMS interrupts
+.HP
+.BR spltimeout (9)\ \-\ \c
+block functions scheduled by itimeout and dtimeout
+.HP
+.BR spltty (9)\ \-\ \c
+protect critical code in TTY driver; mapped to splstr
+.HP
+.BR splx (9)\ \-\ \c
+restore priority level
+.HP
+.BR strcat (9)\ \-\ \c
+concatenate strings
+.HP
+.BR strchr (9)\ \-\ \c
+find first or last occurence of a character in a string
+.HP
+.BR strcmp (9)\ \-\ \c
+compare strings
+.HP
+.BR strcpy (9)\ \-\ \c
+copy a string
+.HP
+.BR strlen (9)\ \-\ \c
+determine the length of a string
+.HP
+.BR strncat (9)\ \-\ \c
+concatenate strings appending a specified number of characters
+.HP
+.BR strncmp (9)\ \-\ \c
+compare strings using a specified number of characters
+.HP
+.BR strncpy (9)\ \-\ \c
+copy a string using a specified number of characters
+.HP
+.BR strtoul (9)\ \-\ \c
+convert string to an unsigned long integer
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+allocate and initialize a synchronization variable
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+wake up all processes sleeping on a synchronization variable
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+deallocate an instance of a synchronization variable
+.HP
+.BR SV_SIGNAL (9)\ \-\ \c
+wake up one process sleeping on a synchronization variable
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+block on a synchronization variable
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+sleep on a synchronization variable
+.HP
+.BR TICKS (9)\ \-\ \c
+macros for lbolt values
+.HP
+.BR TICKS_BETWEEN (9)\ \-\ \c
+determine time interval in ticks between two lbolt times
+.HP
+.BR TICKS_FARFUTURE (9)\ \-\ \c
+determine lbolt value for far future time
+.HP
+.BR TICKS_FARPAST (9)\ \-\ \c
+determine lbolt value for far past time
+.HP
+.BR TICKS_LATER (9)\ \-\ \c
+determine which of two lbolt times is later
+.HP
+.BR TICKS_SINCE (9)\ \-\ \c
+determine time interval in ticks since an lbolt time
+.HP
+.BR timeout (9)\ \-\ \c
+execute a function after a specified length of time
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+try to acquire a basic lock
+.HP
+.BR uiobuf (9)\ \-\ \c
+set buffer address type to BA_UIO for a specified uio structure
+.HP
+.BR uiomove (9)\ \-\ \c
+copy data using uio structure
+.HP
+.BR UNLOCK (9)\ \-\ \c
+release a basic lock
+.HP
+.BR untimeout (9)\ \-\ \c
+cancel previous timeout request
+.HP
+.BR ureadc (9)\ \-\ \c
+copy a character to space described by uio structure
+.HP
+.BR uwritec (9)\ \-\ \c
+return a character from space described by uio structure
+.HP
+.BR vtop (9)\ \-\ \c
+convert virtual address to physical address
+.HP
+.BR wakeup (9)\ \-\ \c
+resume suspended process execution
+.PD
+
 .\"
 .\"
 .SH USAGE
 .PP
+.I UnixWare 7
+.I STREAMS
+functions in addition to
+.IR "SVR 4.2 MP" :
+.HP
+.BR allocb_physreq (9)\ \-\ \c
+.PD 0
+.HP
+.BR msgphysreq (9)\ \-\ \c
+.HP
+.BR msgpullup_physreq (9)\ \-\ \c
+.HP
+.BR msgscgth (9)\ \-\ \c
+.HP
+.BR strioccall (9)\ \-\ \c
+.PD
+.PP
+.I UnixWare 7
+specific D3DK functions in addition to
+.IR "SVR 4.2 MP" :
+.HP
+.BR ATOMIC_INT_ADD (9)\ \-\ \c
+.PD 0
+.HP
+.BR ATOMIC_INT_ALLOC (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_DEALLOC (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_DECR (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_INCR (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_INIT (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_READ (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_SUB (9)\ \-\ \c
+.HP
+.BR ATOMIC_INT_WRITE (9)\ \-\ \c
+.HP
+.BR biowait_sig (9)\ \-\ \c
+.HP
+.BR drv_callback (9)\ \-\ \c
+.HP
+.BR drv_shutdown (9)\ \-\ \c
+.HP
+.BR eisa_parse_devconfig (9)\ \-\ \c
+.HP
+.BR ifstats_attach (9)\ \-\ \c
+.HP
+.BR ifstats_detach (9)\ \-\ \c
+.HP
+.BR kmem_alloc_physreq (9)\ \-\ \c
+.HP
+.BR kmem_zalloc_physreq (9)\ \-\ \c
+.PD
+.PP
+.I UnixWare 7.1
+specific D3DK functions in addition to
+.IR "UnixWare 7" :
+.HP
+.BR cm_read_devconfig16 (9)\ \-\ \c
+.PD 0
+.HP
+.BR cm_read_devconfig32 (9)\ \-\ \c
+.HP
+.BR cm_read_devconfig8 (9)\ \-\ \c
+.HP
+.BR cm_write_devconfig16 (9)\ \-\ \c
+.HP
+.BR cm_write_devconfig32 (9)\ \-\ \c
+.HP
+.BR cm_write_devconfig8 (9)\ \-\ \c
+.HP
+.BR drv_callback (9)\ \-\ \c
+.PD
+.PP
+.I UnixWare 7
+specific DDI8 functions in addition to
+.IR "UnixWare 7 D3DK" :
+.HP
+.BR bcb_prep (9)\ \-\ \c
+.PD 0
+.HP
+.BR biocanblock (9)\ \-\ \c
+.HP
+.BR bs_getval (9)\ \-\ \c
+.HP
+.BR call_demon (9)\ \-\ \c
+.HP
+.BR cm_abort_trans (9)\ \-\ \c
+.HP
+.BR cm_begin_trans (9)\ \-\ \c
+.HP
+.BR cm_delkey (9)\ \-\ \c
+.HP
+.BR cm_end_trans (9)\ \-\ \c
+.HP
+.BR cm_newkey (9)\ \-\ \c
+.HP
+.BR devmem_mapin (9)\ \-\ \c
+.HP
+.BR devmem_mapout (9)\ \-\ \c
+.HP
+.BR devmem_ppid (9)\ \-\ \c
+.HP
+.BR devmem_size (9)\ \-\ \c
+.HP
+.BR do_biostart (9)\ \-\ \c
+.HP
+.BR do_devinfo (9)\ \-\ \c
+.HP
+.BR do_drvctl (9)\ \-\ \c
+.HP
+.BR do_ioctl (9)\ \-\ \c
+.HP
+.BR drv_attach (9)\ \-\ \c
+.HP
+.BR drv_close (9)\ \-\ \c
+.HP
+.BR drv_detach (9)\ \-\ \c
+.HP
+.BR drv_open (9)\ \-\ \c
+.HP
+.BR kmem_alloc_phys (9)\ \-\ \c
+.HP
+.BR kthread_exit (9)\ \-\ \c
+.HP
+.BR kthread_spawn (9)\ \-\ \c
+.HP
+.BR kthread_wait (9)\ \-\ \c
+.HP
+.BR numtos (9)\ \-\ \c
+.HP
+.BR scgth_free (9)\ \-\ \c
+.HP
+.BR strchr (9)\ \-\ \c
+.HP
+.BR strtoul (9)\ \-\ \c
+.HP
+.BR TICKS (9)\ \-\ \c
+.HP
+.BR uiobuf (9)\ \-\ \c
+.PD
 .\"
 .\"
 .SH RETURN
@@ -161,17 +1351,38 @@ are as follows:
 .\"
 .SH NOTICES
 .PP
-These are
-.IR UnixWare \(rg-specific
-functions:
 .B _UW7_SOURCE
-must be defined before including DDI/DKI include files to expose these symbols.
+must be defined before including DDI/DKI include files to expose
+.IR UnixWare \(rg-specific
+symbols.
+To use
+.IR UnixWare \(rg-specific
+functions,
 .B Linux Fast-STREAMS
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_UW7
 or
 .B CONFIG_STREAMS_COMPAT_UW7_MODULE
 defined.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_UW7
+defined,
+.IR UnixWare \(rg
+compatibility will become part of the
+.B Linux Fast-STREAMS
+.B streams.o
+kernel module.
+When compiled with
+.B CONFIG_STREAMS_COMPAT_UW7_MODULE
+defined,
+.IR UnixWare \(rg
+compatibility will be placed in a separate
+.B streams-uw7compat.o
+kernel module that will demand load when any
+.I STREAMS
+driver or module that uses the
+.IR UnixWare \(rg-specific
+functions loads.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -191,8 +1402,40 @@ defined.
 Core functions:
 .PP
 Compatibility functions:
-.PP
-Transport functions:
+.BR allocb_physreq (9),
+.BR ATOMIC_INT_ADD (9),
+.BR ATOMIC_INT_ALLOC (9),
+.BR ATOMIC_INT_DEALLOC (9),
+.BR ATOMIC_INT_DECR (9),
+.BR ATOMIC_INT_INCR (9),
+.BR ATOMIC_INT_INIT (9),
+.BR ATOMIC_INT_READ (9),
+.BR ATOMIC_INT_SUB (9),
+.BR ATOMIC_INT_WRITE (9),
+.BR emajor (9),
+.BR eminor (9),
+.BR etoimajor (9),
+.BR getemajor (9),
+.BR geteminor (9),
+.BR itoemajor (9),
+.BR LOCK_OWNED (9),
+.BR msgphysreq (9),
+.BR msgpullup_physreq (9),
+.BR printf_UW7 (9),
+.BR RW_ALLOC (9),
+.BR RW_DEALLOC (9),
+.BR RW_TRYRDLOCK (9),
+.BR RW_TRYWRLOCK (9),
+.BR RW_UNLOCK (9),
+.BR RW_WRLOCK (9),
+.BR SLEEP_ALLOC (9),
+.BR SLEEP_DEALLOC (9),
+.BR SLEEP_LOCK (9),
+.BR SLEEP_LOCKAVAIL (9),
+.BR SLEEP_LOCKOWNED (9),
+.BR SLEEP_LOCK_SIG (9),
+.BR SLEEP_TRYLOCK (9),
+.BR SLEEP_UNLOCK (9).
 .PP
 General:
 .BR STREAMS (9).
@@ -208,19 +1451,16 @@ These functions are compatible with
 .IR UnixWare \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
-.IP \(em
-These are
 .IR UnixWare \(rg-specific
-functions and should not be used by portable
+functions should not be used by portable
 .I STREAMS
 drivers and modules.
 The more common
 .I SVR 4.2 MP
 functions should be used in their stead.
 .IP \(em
-These functions
-are provided for source level compatibility with
+.IR UnixWare \(rg-specific
+functions are provided for source level compatibility with
 .IR UnixWare \(rg
 for the purpose of porting
 .IR UnixWare \(rg
@@ -235,15 +1475,15 @@ differ from that of
 .IR UnixWare \(rg,
 binaries are incompatible.
 .IP \(em
-These functions
-only provide functionality comparable to
+.IR UnixWare \(rg-specific
+functions only provide functionality comparable to
 .IR UnixWare \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-these functions
-in support of
+.IR UnixWare \(rg-specific
+functions in support of
 .RI non- STREAMS
 devices are not supported.
 .PP

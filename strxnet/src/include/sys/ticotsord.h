@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticotsord.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
+ @(#) $Id: ticotsord.h,v 0.9.2.3 2005/04/22 22:49:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:49:27 $ by $Author: brian $
 
  $Log: ticotsord.h,v $
+ Revision 0.9.2.3  2005/04/22 22:49:27  brian
+ - move tpi documentation to strxnet
+
  Revision 0.9.2.2  2005/01/11 08:47:24  brian
  - Minor additions and corrections.
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_TICOTSORD_H
 #define _SYS_TICOTSORD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _TICOTSORD_H && !defined __KERNEL__
@@ -77,11 +80,20 @@
 #endif				/* !defined _TICOTSORD_H && !defined __KERNEL__ */
 #endif
 
+#if __SVID
+#define TCOO_NOPEER		1	/* destiniation address is not listening */
+#define TCOO_PEERNOROMMONQ	2	/* no room on connection indication queue */
+#define TCOO_PEERBADSTATE	3	/* transport peer in incorrect state */
+#define TCOO_PEERINITIATED	4	/* transport peer user-initiated disconnect */
+#define TCOO_PROVIDERINITIATED	5	/* transport peer provider-initiated disconnect */
+#define TCOO_DEFAULTADDRSZ	4
+#else				/* __SVID */
 #define TCOO_NOPEER		ECONNREFUSED	/* destiniation address is not listening */
 #define TCOO_PEERNOROMMONQ	ECONNREFUSED	/* no room on connection indication queue */
 #define TCOO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
 #define TCOO_PEERINITIATED	ECONNRESET	/* transport peer user-initiated disconnect */
 #define TCOO_PROVIDERINITIATED	ECONNABORTED	/* transport peer provider-initiated disconnect */
 #define TCOO_DEFAULTADDRSZ	4
+#endif				/* __SVID */
 
 #endif				/* _SYS_TICOTSORD_H */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.13 2005/04/13 07:51:05 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.14 2005/04/22 22:47:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:05 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -725,9 +725,10 @@ usldk
 .PP
 A version of
 .BR freezestr ()
-first appeared in SVR 4 MP.
+first appeared in
+.IR "SVR 4.0 MP" .
 .[
-svr42
+svr4dk
 .]
 .\"
 .\"

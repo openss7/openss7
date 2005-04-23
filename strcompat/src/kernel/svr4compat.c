@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:37:11 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:11 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:50:18 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:37:11 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:37:11 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:37:11 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -143,6 +143,36 @@ MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
 
+/* don't use these functions, they are way too dangerous */
+long MPSTR_QLOCK(queue_t *q)
+{
+	unsigned long flags;
+	qwlock(q, &flags);
+	return (flags);
+}
+
+EXPORT_SYMBOL(MPSTR_QLOCK);	/* svr4ddi.h */
+void MPSTR_QRELE(queue_t *q, long s)
+{
+	qwunlock(q, (unsigned long *) &s);
+}
+
+EXPORT_SYMBOL(MPSTR_QRELE);	/* svr4ddi.h */
+long MPSTR_STPLOCK(struct stdata *stp)
+{
+	unsigned long flags;
+	swlock(stp, &flags);
+	return (flags);
+}
+
+EXPORT_SYMBOL(MPSTR_STPLOCK);	/* svr4ddi.h */
+void MPSTR_STPRELE(struct stdata *stp, long s)
+{
+	swunlock(stp, (unsigned long *) &s);
+}
+
+EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4ddi.h */
+
 static pl_t current_spl[NR_CPUS] __cacheline_aligned;
 
 pl_t spl0(void)
@@ -152,6 +182,11 @@ pl_t spl0(void)
 	local_bh_enable();
 	return (old_level);
 }
+
+__SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
+EXPORT_SYMBOL(dtimeout);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
+EXPORT_SYMBOL(itimeout);	/* svr4ddi.h */
 
 EXPORT_SYMBOL(spl0);		/* svr4ddi.h */
 
@@ -268,6 +303,40 @@ __SVR4_EXTERN_INLINE pl_t TRYLOCK(lock_t * lockp, pl_t pl);
 EXPORT_SYMBOL(TRYLOCK);		/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl);
 EXPORT_SYMBOL(UNLOCK);		/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
+EXPORT_SYMBOL(LOCK_OWNED);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag);
+EXPORT_SYMBOL(RW_ALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
+EXPORT_SYMBOL(RW_DEALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_RDLOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_TRYRDLOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
+EXPORT_SYMBOL(RW_UNLOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *, pl_t pl);
+EXPORT_SYMBOL(RW_WRLOCK);	/* svr4ddi.h */
+
+__SVR4_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag);
+EXPORT_SYMBOL(SLEEP_ALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_DEALLOC);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_LOCKAVAIL);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority);
+EXPORT_SYMBOL(SLEEP_LOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_LOCKOWNED);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority);
+EXPORT_SYMBOL(SLEEP_LOCK_SIG);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_TRYLOCK);	/* svr4ddi.h */
+__SVR4_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp);
+EXPORT_SYMBOL(SLEEP_UNLOCK);	/* svr4ddi.h */
+
 __SVR4_EXTERN_INLINE sv_t *SV_ALLOC(int flag);
 EXPORT_SYMBOL(SV_ALLOC);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void SV_BROADCAST(sv_t * svp, int flags);
@@ -280,6 +349,43 @@ __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
 EXPORT_SYMBOL(SV_WAIT);		/* svr4ddi.h */
 __SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
 EXPORT_SYMBOL(SV_WAIT_SIG);	/* svr4ddi.h */
+
+int ts_kmdpris[] = {
+	60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+	70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+	80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+	90, 91, 92, 93, 94, 95, 96, 97, 98, 99
+};
+
+int ts_maxkmdpri = 39;
+
+#define PSWP	     0
+#define PMEM	     0
+#define PINOD	    10
+#define PRIBIO	    20
+#define PZERO	    25
+#define PPIPE	    26
+#define PVFS	    27
+#define TTIPRI	    28
+#define TTOPRIO	    29
+#define PWAIT	    30
+#define PSLEP	    39
+
+#define PCATCH	    0x8000
+#define PNOSTOP	    0x4000
+
+
+int sleep(caddr_t event, pl_t pl)
+{
+	return 1;
+}
+EXPORT_SYMBOL(sleep);		/* svr4ddi.h */
+
+void wakeup(caddr_t event)
+{
+	return;
+}
+EXPORT_SYMBOL(wakeup);		/* svr4ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 static

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/04/09 09:35:29 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/04/22 22:49:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:35:29 $ by $Author: brian $
+# Last Modified $Date: 2005/04/22 22:49:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,7 +89,7 @@
 #global preloads    
 %global libraries   xnet
 %global tools       strxnet_mknod test-xnet test-xnet_thr
-%global infofiles   %{name} libxnet
+%global infofiles   %{name} libxnet tpi
 #global initfiles
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
@@ -1022,6 +1022,7 @@ fi
 %defattr(-,root,root)
 %doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc doc/specs
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -1450,9 +1451,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
-# Revision 0.9.2.85  2005/04/09 09:35:29  brian
-# - update spec files
+# Revision 0.9.2.86  2005/04/22 22:49:10  brian
+# - move tpi documentation to strxnet
 #
+
+* Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.85  2005/04/09 09:35:29  brian
+- update spec files
 
 * Tue Apr  5 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.84  2005/04/05 01:57:07  brian

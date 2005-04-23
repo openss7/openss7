@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.2 2005/01/11 08:47:24 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.3 2005/04/22 22:49:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 08:47:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:49:27 $ by $Author: brian $
 
  $Log: ticlts.h,v $
+ Revision 0.9.2.3  2005/04/22 22:49:27  brian
+ - move tpi documentation to strxnet
+
  Revision 0.9.2.2  2005/01/11 08:47:24  brian
  - Minor additions and corrections.
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_TICLTS_H
 #define _SYS_TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _TICLTS_H && !defined __KERNEL__
@@ -77,10 +80,18 @@
 #endif				/* !defined _TICLTS_H && !defined __KERNEL__ */
 #endif
 
+#if __SVID
+#define TCL_BADADDR	    1	/* bad address format or illegal address values */
+#define TCL_BADOPT	    2	/* bad options format or illegal options values */
+#define TCL_NOPEER	    3	/* destination address is not bound */
+#define TCL_PEERBADSTATE    4	/* transport peer in incorrect state */
+#define TCL_DEFAULTADDRSZ   4
+#else				/* __SVID */
 #define TCL_BADADDR	    EINVAL	/* bad address format or illegal address values */
 #define TCL_BADOPT	    EINVAL	/* bad options format or illegal options values */
 #define TCL_NOPEER	    EFAULT	/* destination address is not bound */
 #define TCL_PEERBADSTATE    EPROTO	/* transport peer in incorrect state */
 #define TCL_DEFAULTADDRSZ   4
+#endif				/* __SVID */
 
 #endif				/* _SYS_TICLTS_H */

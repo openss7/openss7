@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgpullup_physreq.9.man,v 0.9.2.6 2005/04/20 18:41:38 brian Exp $
+.\" @(#) $Id: msgpullup_physreq.9.man,v 0.9.2.7 2005/04/22 22:47:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B msgpullup_physreq
-\-
+\- pull up bytes in a \fISTREAMS\fP message to meet physical requirements
 .\"
 .\"
 .SH SYNOPSIS

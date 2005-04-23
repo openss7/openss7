@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2005/04/02 13:23:34 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/04/22 22:46:03 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 13:23:34 $ by $Author: brian $
+## Last Modified $Date: 2005/04/22 22:46:03 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -228,7 +228,7 @@ srpm: $(redhat_src_file)
 # current target, we also build any defined AM_RPMTARGETS
 ##
 each-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
-	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $<
+	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $< || :
 
 ##
 # This below is pretty obfuscated, but it is what we need to rebujild an rpm once for LiS and
@@ -239,16 +239,16 @@ each-rpm: $(redhat_spec_file) $(redhat_source_files) $(redhat_directories)
 # instead.
 ##
 one-rpm:
-@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_indep --without-indep"' each-rpm
+@WITH_LIS_FALSE@@WITH_LFS_FALSE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_indep --without-indep"' each-rpm || :
 
 lis-rpm:
-@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis" --define "_without_indep --without-indep"' each-rpm
+@WITH_LIS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lis --with-lis" --define "_without_indep --without-indep"' each-rpm || :
 
 lfs-rpm:
-@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs" --define "_without_indep --without-indep"' each-rpm
+@WITH_LFS_TRUE@	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_with_lfs --with-lfs" --define "_without_indep --without-indep"' each-rpm || :
 
 noa-rpm:
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm || :
 
 rpms: noa-rpm lis-rpm lfs-rpm one-rpm
 

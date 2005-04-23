@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.8 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.9 2005/04/22 22:50:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:50:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STROPTS_H__
 #define __SYS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/22 22:50:15 $"
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -179,9 +179,9 @@
 #define WERRNONPERSIST	(1<<1)
 
 #define ANYMARK		(1<<0)
-#define LASTMARK	(1<<2)
+#define LASTMARK	(1<<1)
 
-#define MUXID_ALL	(-1UL)
+#define MUXID_ALL	(-1)
 
 #define MSG_HIPRI	(1<<0)
 #define MSG_ANY		(1<<1)
@@ -228,7 +228,7 @@ struct strrecvfd {
 	int fd;
 	uid_t uid;
 	gid_t gid;
-	char __fill[8];			/* UnixWare/Solaris compatibility */
+	char fill[8];			/* UnixWare/Solaris compatibility */
 };
 
 struct str_mlist {

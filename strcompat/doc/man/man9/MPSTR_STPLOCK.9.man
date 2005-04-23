@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: MPSTR_STPLOCK.9.man,v 0.9.2.4 2005/04/13 04:30:12 brian Exp $
+.\" @(#) $Id: MPSTR_STPLOCK.9.man,v 0.9.2.5 2005/04/22 22:47:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/22 22:47:35 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -356,9 +356,9 @@ uslspg
 .PP
 .BR MPSTR_STPLOCK ()
 first appeared in
-.IR "SVR 4" .
+.IR "SVR 4.0 MP" .
 .[
-svr4
+svr4dk
 .]
 .\"
 .\"

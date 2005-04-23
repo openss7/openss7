@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:37:13 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:13 $ by $Author: brian $
+ Last Modified $Date: 2005/04/22 22:50:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:37:13 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:37:13 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:37:13 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -136,41 +136,6 @@ MODULE_ALIAS("streams-uw7compat");
 #endif
 #endif
 
-
-__UW7_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
-EXPORT_SYMBOL(dtimeout);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
-EXPORT_SYMBOL(itimeout);	/* uw7ddi.h */
-
-/* don't use these functions, they are way too dangerous */
-long MPSTR_QLOCK(queue_t *q)
-{
-	unsigned long flags;
-	qwlock(q, &flags);
-	return (flags);
-}
-
-EXPORT_SYMBOL(MPSTR_QLOCK);	/* uw7ddi.h */
-void MPSTR_QRELE(queue_t *q, long s)
-{
-	qwunlock(q, (unsigned long *) &s);
-}
-
-EXPORT_SYMBOL(MPSTR_QRELE);	/* uw7ddi.h */
-long MPSTR_STPLOCK(struct stdata *stp)
-{
-	unsigned long flags;
-	swlock(stp, &flags);
-	return (flags);
-}
-
-EXPORT_SYMBOL(MPSTR_STPLOCK);	/* uw7ddi.h */
-void MPSTR_STPRELE(struct stdata *stp, long s)
-{
-	swunlock(stp, (unsigned long *) &s);
-}
-
-EXPORT_SYMBOL(MPSTR_STPRELE);	/* uw7ddi.h */
 
 /* don't use these - these are fakes */
 /**
@@ -283,8 +248,9 @@ int itoemajor(major_t imajor, int prevemaj)
 
 EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
 
-int printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-int printf(char *fmt, ...)
+#undef printf
+int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+int printf_UW7(char *fmt, ...)
 {
 	va_list args;
 	int n;
@@ -296,26 +262,7 @@ int printf(char *fmt, ...)
 	return (n);
 }
 
-EXPORT_SYMBOL(printf);                        /* uw7ddi.h */
-
-__UW7_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
-EXPORT_SYMBOL(LOCK_OWNED);	/* uw7ddi.h */
-
-__UW7_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
-				       int flag);
-EXPORT_SYMBOL(RW_ALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
-EXPORT_SYMBOL(RW_DEALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
-EXPORT_SYMBOL(RW_RDLOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
-EXPORT_SYMBOL(RW_TRYRDLOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
-EXPORT_SYMBOL(RW_TRYWRLOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
-EXPORT_SYMBOL(RW_UNLOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *, pl_t pl);
-EXPORT_SYMBOL(RW_WRLOCK);	/* uw7ddi.h */
+EXPORT_SYMBOL(printf_UW7);                        /* uw7ddi.h */
 
 __UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value);
 EXPORT_SYMBOL(ATOMIC_INT_ADD);	/* uw7ddi.h */
@@ -335,23 +282,6 @@ __UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value);
 EXPORT_SYMBOL(ATOMIC_INT_SUB);	/* uw7ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
 EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7ddi.h */
-
-__UW7_EXTERN_INLINE sleep_t *SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag);
-EXPORT_SYMBOL(SLEEP_ALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void SLEEP_DEALLOC(sleep_t * lockp);
-EXPORT_SYMBOL(SLEEP_DEALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int SLEEP_LOCKAVAIL(sleep_t * lockp);
-EXPORT_SYMBOL(SLEEP_LOCKAVAIL);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void SLEEP_LOCK(sleep_t * lockp, int priority);
-EXPORT_SYMBOL(SLEEP_LOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int SLEEP_LOCKOWNED(sleep_t * lockp);
-EXPORT_SYMBOL(SLEEP_LOCKOWNED);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int SLEEP_LOCK_SIG(sleep_t * lockp, int priority);
-EXPORT_SYMBOL(SLEEP_LOCK_SIG);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int SLEEP_TRYLOCK(sleep_t * lockp);
-EXPORT_SYMBOL(SLEEP_TRYLOCK);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void SLEEP_UNLOCK(sleep_t * lockp);
-EXPORT_SYMBOL(SLEEP_UNLOCK);	/* uw7ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 static
