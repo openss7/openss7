@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/23 07:31:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/22 22:50:21 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 07:31:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/23 07:31:52 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/23 07:31:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/22 22:50:21 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/23 07:31:52 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -248,7 +248,6 @@ int itoemajor(major_t imajor, int prevemaj)
 
 EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
 
-#undef printf
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 int printf_UW7(char *fmt, ...)
 {

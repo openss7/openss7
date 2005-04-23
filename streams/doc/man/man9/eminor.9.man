@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: eminor.9.man,v 0.9.2.7 2005/04/20 18:41:33 brian Exp $
+.\" @(#) $Id: eminor.9.man,v 0.9.2.8 2005/04/23 07:30:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/23 07:30:05 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -151,8 +151,8 @@ is MP-safe.
 .PP
 .BR eminor ()
 is a
-.IR SCO \(rg-specific
-function:
+.I SVR 3
+specific function:
 .BR _UW7_SOURCE
 must be defined before including DDI/DKI include files to expose this symbol.
 .B Linux Fast-STREAMS
@@ -187,25 +187,28 @@ defined.
 .\"
 .SH BUGS
 .PP
+.PP
+.BR eminor ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
 .BR eminor ()
 is compatible with
-.IR SCO \(rg
+.I SVR 4.2 DDI/DKI
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR eminor ()
 is an
 .B extern inline
 function call.
-.IR SCO \(rg
+.I SVR 4
 implements
 .BR eminor ()
 as a system dependent macro.
 .IP \(em
-.IR SCO \(rg
+.I SVR 3
 includes
 .B sys/sysmacros.h
 instead of
@@ -213,9 +216,9 @@ instead of
 .IP \(em
 .BR eminor ()
 is provided for source level compatibility with
-.IR SCO \(rg
+.I SVR 3
 for the purpose of porting
-.IR SCO \(rg
+.I SVR 3
 drivers from
 .BR Linux .
 Because internal structures and definitions for
@@ -224,12 +227,12 @@ Because internal structures and definitions for
 lfs
 .]
 differ from that of
-.IR SCO \(rg,
+.I SVR 3
 binaries are incompatible.
 .IP \(em
 .BR eminor ()
 only provides functionality comparable to
-.IR SCO \(rg
+.I SVR 3
 for use by
 .I STREAMS
 drivers and modules.  Any and all functionality provided by
@@ -245,6 +248,10 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
+.IR "SVR 4.2 DDI/DKI" ,
+.[
+usldk
+.]
 .IR SCO \(rg
 ODDI documentation.
 .[
@@ -259,7 +266,10 @@ uw7spg
 .PP
 .BR eminor ()
 first appeared in
-.IR SCO \(rg.
+.IR "SVR 3".
+.[
+svr3
+.]
 .\"
 .\"
 .[

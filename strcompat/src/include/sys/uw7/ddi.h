@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/04/22 22:50:15 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/04/23 07:31:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/22 22:50:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 07:31:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/22 22:50:15 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/23 07:31:52 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -141,8 +141,6 @@ extern int etoimajor(major_t emajor);
 extern int itoemajor(major_t imajor, int prevemaj);
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-#undef printf
-#define printf printf_UW7
 
 typedef atomic_t atomic_int_t;
 

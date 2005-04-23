@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: SPG.9.man,v 0.9.2.10 2005/03/30 13:38:34 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 0.9.2.11 2005/04/23 07:30:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/23 07:30:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -340,6 +340,119 @@ sort-adjacent-labels
 .\"
 .\"
 .SS "Device Numbering"
+.PP
+.BR "UNIX\(rg Device Numbering" :\-
+.PP
+.RS
+In versions of
+.I UNIX\(rg System V
+previous to
+.IR "Release 4" ,
+the major and minor device numbers were each 8 bit, and they were packed into a 16 bit word
+(usually a C Language SHORT variable).  Under
+.IR "UNIX\(rg System V Release 4" ,
+the device number are held in a
+.B dev_t
+variable, which is often implemented as a 32 bit integer.  The major device number is held as 14
+bits, and a further 18 bits are used for the minor device number.
+.B dev_t
+is often referred to as the \*(lqexpanded device type\*(rq, since it allows many more minor devices
+than before.
+.PP
+Many drivers were written for earlier releases, and may eventually be ported to
+.IR "UNIX\(rg System V Release 4" .
+In earlier releases, some manufacturers got around the 256 minor device number limit by using
+multiple major device numers for a device.  Devices were created with different major device numbers
+(the external major device number) but they all mapped to the same device driver entry in the device
+switch tables (the internal device number).  Even under this scheme, each major device could only
+support 256 minor devices, but the driver could support amny more.  This has been recognized in
+.IR "UNIX\(rg System V Relesae 4" ,
+and functions are provided to do this mapping; for example, the function
+.BR etoimajor ()
+and so on, give a machine independent interface to the device number mapping.
+.[
+magic
+.]
+.RE
+.PP
+(Actually, the major device number for
+.I UNIX\(rg System V Release 3.2
+were 7 bit instead of 8 bit.)
+.PP
+.BR "Linux Device Numbering" :\-
+Versions of the
+.B Linux
+kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit major device number and an 8
+bit minor device number grouped into a 16-bit combined device number.
+.B  Linux 2.6
+kernels (and some patched 2.4 kernels) now have larger device numbers.  These extended device
+numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits for
+the combined device number.
+.PP
+.BR "LiS Device Numbering" :\-
+.I LiS
+.[
+lis
+.]
+prior to the 2.18.0 release was incapable of providing an internal representation of the device
+number and the number of minor device numbers for a device driver was restricted to 256, just as in
+@cite{UNIX System V Release 3.2}.@footnote{Actually, 255 as the kernel reserved minor device number
+255 for expansion.}  Many @url{http://www.openss7.org/, OpenSS7} device drivers written for
+.I LiS
+.[
+lis
+.]
+would allocate additional major device numbers if required.  Good examples of devices that require
+more than 255 minor device numbers are INET clone devices, SCTP streams, SS7 signalling link
+streams, MG media channels, etc.  These streams are often
+.BR I_PLINK ed
+under a multiplexing driver and do not even consume a system file descriptor.
+.PP
+.BR "Linux Fast-STREAMS Device Numbering" :\-
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+began with extended device numbering.  The
+.I specfs
+shadow special character device file system used by
+.B Linux Fast-STREAMS
+uses the
+.B inode
+number to hold the
+.B dev_t
+device number instead of the
+.IR inode->i_rdev ,
+which on older kernels is only a 16-bit
+.BR short .
+
+In earlier versions of
+.BR "Linux Fast-STREAMS" ,
+the internal device numbering is 16-bits for major device number and 16-bits for minor device
+number.  This will soon be changed to 12-bits for major device number and 20-bits for minor device
+number to accommodate the newer
+.B Linux
+scheme.
+
+On 2.6
+.B Linux
+kernels that support the newer extended device numbers, external device numbers and internal device
+numbers will be the same.  On 2.4
+.B Linux
+kernels with the older 16-bit device numbers, external device number and internal device numbers
+will differ.  In some situations, an internal device number can exists with no corresponding
+external device number (accessed only via a clone device or direct access to the mounted
+.I specfs
+shadow special character device file system).
+.PP
+.TS
+tab(:);
+lbcl.
+etoimajor:(9):change external to internal major device number
+getemajor:(9):tab get external major device number
+geteminor:(9):get external minor device number
+itoemajor:(9):change internal to external major device number
+.TE
 .PP
 .B Linux Fast-STREAMS
 uses several device numbering schemes intended to be compatible with
