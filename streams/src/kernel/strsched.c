@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/21 01:54:07 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2126,7 +2126,7 @@ static void shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
-struct stdata *allocsd(void)
+struct stdata *allocstr(void)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct stdata *sd;
@@ -2147,10 +2147,9 @@ struct stdata *allocsd(void)
 	}
 	return (sd);
 }
-#ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(allocsd);
-#endif
-static void __freesd(struct stdata *sd)
+EXPORT_SYMBOL_GPL(allocstr);
+
+static void __freestr(struct stdata *sd)
 {
 	struct strinfo *si = &Strinfo[DYN_STREAM];
 	struct shinfo *sh = (struct shinfo *) sd;
@@ -2167,11 +2166,13 @@ static void __freesd(struct stdata *sd)
 	atomic_dec(&si->si_cnt);
 	kmem_cache_free(si->si_cache, sh);
 }
-void freesd(struct stdata *sd)
+void freestr(struct stdata *sd)
 {
 	/* FIXME: need to deallocate anything attached to the stream head */
 	sd_put(sd);
 }
+EXPORT_SYMBOL_GPL(freestr);
+
 struct stdata *sd_get(struct stdata *sd)
 {
 	if (sd) {
@@ -2196,7 +2197,7 @@ void sd_put(struct stdata *sd)
 				freeq(sd->sd_rq);
 			if (sd->sd_iocblk)
 				freemsg(sd->sd_iocblk);
-			__freesd(sd);
+			__freestr(sd);
 		}
 	} else
 		swerr();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/09 09:37:26 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/23 16:48:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:26 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/09 09:37:26 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/23 16:48:54 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/09 09:37:26 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/23 16:48:54 $";
 
 //#define __NO_VERSION__
 
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/kernel/strsched.h"	/* for allocsd */
+#include "src/kernel/strsched.h"	/* for allocstr */
 #include "src/kernel/strreg.h"	/* for spec_open() */
 #include "src/kernel/strlookup.h"	/* for cmin_get() */
 #include "sth.h"		/* extern verification */
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/09 09:37:26 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/23 16:48:54 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2051,7 +2051,7 @@ int stropen(struct inode *inode, struct file *file)
 		}
 		printd(("%s: creating stream head for %s\n", __FUNCTION__, cdev->d_name));
 		/* FIXME: need to find/create and attach syncq. */
-		if (!(sd = allocsd())) {
+		if (!(sd = allocstr())) {
 			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
 			cdrv_put(cdev);
 			freeq(q);

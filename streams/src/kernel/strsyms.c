@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -292,9 +292,9 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 #if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) || \
 	defined(CONFIG_STREAMS_FIFO_MODULE) || \
 	defined(CONFIG_STREAMS_PIPE_MODULE)
-//EXPORT_SYMBOL_GPL(allocsd);	/* strsched.h */
+//EXPORT_SYMBOL_GPL(allocstr);	/* strsched.h */
 //EXPORT_SYMBOL_GPL(autopush);	/* sth.h */
-//EXPORT_SYMBOL_GPL(freesd);	/* strsched.h */
+//EXPORT_SYMBOL_GPL(freestr);	/* strsched.h */
 //EXPORT_SYMBOL_GPL(sd_get);	/* strsched.h */
 //EXPORT_SYMBOL_GPL(sd_put);	/* strsched.h */
 //EXPORT_SYMBOL_GPL(strclose);	/* sth.h */

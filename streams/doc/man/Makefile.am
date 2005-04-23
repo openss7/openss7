@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/20 18:41:50 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/04/23 16:47:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/20 18:41:50 $ by $Author: brian $
+# Last Modified $Date: 2005/04/23 16:47:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -245,7 +245,7 @@ man_MANS = \
 	man9/alloclk.9 \
 	man9/alloc_proto.9 \
 	man9/allocq.9 \
-	man9/allocsd.9 \
+	man9/allocstr.9 \
 	man9/appq.9 \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
@@ -379,6 +379,7 @@ man_MANS = \
 	man9/freelk.9 \
 	man9/freemsg.9 \
 	man9/freeq.9 \
+	man9/freestr.9 \
 	man9/freezestr.9 \
 	man9/freezestr_SUN.9 \
 	man9/getadmin.9 \
@@ -1059,7 +1060,7 @@ dist_noinst_MANS = \
 	man9/alloclk.9.man \
 	man9/alloc_proto.9.man \
 	man9/allocq.9.man \
-	man9/allocsd.9.man \
+	man9/allocstr.9.man \
 	man9/appq.9.man \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
@@ -1193,6 +1194,7 @@ dist_noinst_MANS = \
 	man9/freelk.9.man \
 	man9/freemsg.9.man \
 	man9/freeq.9.man \
+	man9/freestr.9.man \
 	man9/freezestr.9.man \
 	man9/freezestr_SUN.9.man \
 	man9/getadmin.9.man \

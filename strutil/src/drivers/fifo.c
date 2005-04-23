@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/23 16:48:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/23 16:48:48 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/23 16:48:48 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -68,14 +68,14 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #include "sys/config.h"
-#include "src/kernel/strsched.h"	/* for allocsd */
+#include "src/kernel/strsched.h"	/* for allocstr */
 #include "src/kernel/strsad.h"	/* for autopush */
 #include "src/modules/sth.h"
 #include "fifo.h"		/* extern verification */
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
+#define FIFO_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/04/23 16:48:48 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.2 2005/04/23 16:48:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:45 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_KMEM_H__
 #define __SYS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/04/23 16:48:45 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -65,8 +65,10 @@
 #define __EXTERN_INLINE extern __inline__
 #endif				/* __EXTERN_INLINE */
 
-#define KM_SLEEP    0
-#define KM_NOSLEEP  1
+#define KM_SLEEP	0
+#define KM_NOSLEEP	1
+#define KM_PHYSCONTIG	2   /* IRIX 6.5 */
+#define KM_CACHEALIGN	4   /* IRIX 6.5 */
 
 typedef unsigned short cnodeid_t;
 

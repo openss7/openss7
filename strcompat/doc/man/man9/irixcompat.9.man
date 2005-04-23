@@ -1,0 +1,1825 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: irixcompat.9.man,v 0.9.2.1 2005/04/23 16:47:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/23 16:47:52 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH UXPCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B irixcompat
+\- IRIX \fISTREAMS\fR Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _UXP_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B Linux Fast-STREAMS
+provides a compatibility module,
+.BR streams-irixcompat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I Mac OpenTransport 1.5r2
+.I STREAMS
+environment to
+.BR "Linux Fast-STREAMS" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.IR IRIX \(rg
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "Linux Fast-STREAMS" .
+Other
+.IR IRIX \(rg-specific
+functions are provided by the
+.B streams-irixcompat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast STREAMS
+are as follows:
+.PD 0
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B Linux Fast-STREAMS
+.IR IRIX \(rg
+compatibility module,
+.BR streams-irixcompat.o ,
+are as follows:
+.PD 0
+.PD
+.\"
+.SS "Transport Functions"
+.PP
+.PD 0
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.I STREAMS
+Functions:
+
+
+
+.\"   Link: home
+.\"   Link: up
+.\"   Link: previous
+.\"   Link: next
+.\"
+.\"                       Appendix A. SGI Driver/Kernel API
+.\"   Prev                                                                  Next 
+.\"
+.\"     ----------------------------------------------------------------------
+.\"
+.\"Appendix A. SGI Driver/Kernel API
+.\"
+.\"   This appendix summarizes the SGI Driver/Kernel Authorized Programming
+.\"   Interface in tabular form. The data structures, entry points, and kernel
+.\"   functions are listed alphabetically with with clickable links to
+.\"   discussions in this book and to their reference pages. The tables also
+.\"   show which functions and structures are compatible with SVR4 and which are
+.\"   unique to IRIX.
+.\"
+.\"   The tables in this appendix are based on the reference pages in volume D.
+.\"   The reference pages in volume D constitute the formal, engineering
+.\"   definition of the Driver/Kernel API. When discussion in this book
+.\"   disagrees with the contents of a reference page, the reference page takes
+.\"   precedence (however, any such disagreement should be reported by using the
+.\"   Feedback menu of the Insight viewer).
+.\"
+.\"     o "Driver Exported Names" tabulates the names of data and functions that
+.\"       a driver must export.
+.\"
+.\"     o "Kernel Data Structures and Declarations" tabulates the objects used
+.\"       in the interface.
+.\"
+.\"     o "Kernel Functions" tabulates the IRIX kernel services used by drivers.
+.\"
+.\"   Each table in this appendix has a column headed "Versions." The codes in
+.\"   this column have the following meanings:
+.\"
+.\"   SV   Syntactically and semantically portable from SVR4 UNIX, as documented 
+.\"        in the UNIX SVR4.2 Device Driver Reference.                           
+.\"   SV*  Syntactically portable from UNIX SVR4, but semantics may differ. Read 
+.\"        the discussion and reference page carefully when porting.             
+.\"   5.3  Portable from IRIX version 5.3.                                       
+.\"   5.3* Portable from IRIX 5.3, but interface has changed in some detail or   
+.\"        new ability has been added.                                           
+.\"   6.2  Portable from IRIX version 6.2.                                       
+.\"   6.4  Introduced in IRIX 6.4.                                               
+.\"
+
+.HP
+.BR adjmsg (9)\ \-\ \c
+Trim bytes from a message.
+SV, 5.3
+.PD 0
+.HP
+.BR alenlist_append ()\ \-\ \c
+Add a specified address and length
+as an item to an existing alenlist.
+6.4
+.HP
+.BR alenlist_clear ()\ \-\ \c
+Empty an alenlist.
+6.4
+.HP
+.BR alenlist_create ()\ \-\ \c
+Create an empty alenlist.
+6.4
+.HP
+.BR alenlist_cursor_create ()\ \-\ \c
+Create an alenlist cursor and associate
+it with a specified list.
+6.4
+.HP
+.BR alenlist_cursor_destroy ()\ \-\ \c
+Release memory of a cursor.
+6.4
+.HP
+.BR alenlist_cursor_init ()\ \-\ \c
+Set a cursor to point at a specified list item.
+6.4
+.HP
+.BR alenlist_cursor_offset ()\ \-\ \c
+Query the effective byte offset of a cursor in the buffer described by
+a list.
+6.4
+.HP
+.BR alenlist_destroy ()\ \-\ \c
+Release memory of an alenlist.
+6.4
+.HP
+.BR alenlist_get ()\ \-\ \c
+Retrieve the next sequential address
+and length from a list.
+6.4
+.HP
+.BR allocb (9)\ \-\ \c
+Allocate a message block.
+SV, 5.3
+.HP
+.BR ASSERT (9)\ \-\ \c
+Debugging macro designed for use
+in the kernel (compare to assert(3X) ).
+5.3
+.HP
+.BR badaddr (9)\ \-\ \c
+Test physical address for input.
+5.3
+.HP
+.BR badaddr_val (9)\ \-\ \c
+Test physical address for input and return the input value received.
+6.2
+.HP
+.BR bcanput (9)\ \-\ \c
+Test for flow control in a specified priority band.
+SV, 5.3
+.HP
+.BR bcanputnext (9)\ \-\ \c
+Test for flow control in a specified priority band.
+SV, 5.3
+.HP
+.BR bcmp (9)\ \-\ \c
+Compare data between kernel
+locations.
+SV, 5.3
+.HP
+.BR bcopy (9)\ \-\ \c
+Copy data between locations in the kernel.
+SV, 5.3
+.HP
+.BR biodone (9)\ \-\ \c
+Mark a buf_t as complete and wake
+any process waiting for it.
+SV, 5.3
+.HP
+.BR bioerror (9)\ \-\ \c
+Manipulate error fields within a
+buf_t.
+SV, 5.3
+.HP
+.BR biowait (9)\ \-\ \c
+Suspend process pending completion of block I/O.
+SV, 5.3
+.HP
+.BR bp_mapin (9)\ \-\ \c
+Map buffer pages into kernel virtual address space.
+SV, 5.3
+.HP
+.BR bp_mapout (9)\ \-\ \c
+Release mapping of buffer pages.
+SV, 5.3
+.HP
+.BR bptophys (9)\ \-\ \c
+Get physical address of buffer data.
+5.3
+.HP
+.BR brelse (9)\ \-\ \c
+Return a buffer to the system's free
+list.
+SV, 5.3
+.HP
+.BR btod (9)\ \-\ \c
+Return number of 512-byte "sectors"
+in a byte count (round up).
+5.3
+.HP
+.BR btop (9)\ \-\ \c
+Return number of I/O pages in a byte count (truncate).
+SV, 5.3
+.HP
+.BR btopr (9)\ \-\ \c
+Return number of I/O pages in a byte count (round up).
+SV, 5.3
+.HP
+.BR bufcall (9)\ \-\ \c
+Call a function when a buffer becomes available.
+SV, 5.3
+.HP
+.BR buf_to_alenlist ()\ \-\ \c
+Fill an alenlist with entries that
+describe the buffer controlled by a buf_t object.
+6.4
+.HP
+.BR bzero (9)\ \-\ \c
+Clear kernel memory for a specified size.
+SV, 5.3
+.HP
+.BR canput (9)\ \-\ \c
+Test for room in a message queue.
+SV, 5.3
+.HP
+.BR canputnext (9)\ \-\ \c
+Test for room in a message queue.
+SV, 5.3
+.HP
+.BR clrbuf (9)\ \-\ \c
+Erase the contents of a buffer described by a buf_t.
+SV, 5.3
+.HP
+.BR cmn_err (9)\ \-\ \c
+Display an error message or panic the system.
+SV*, 5.3
+.HP
+.BR copyb (9)\ \-\ \c
+Copy a message block.
+SV, 5.3
+.HP
+.BR copyin (9)\ \-\ \c
+Copy data from user address space.
+SV, 5.3
+.HP
+.BR copymsg (9)\ \-\ \c
+Copy a message.
+SV, 5.3
+.HP
+.BR copyout (9)\ \-\ \c
+Copy data to user address space.
+SV, 5.3
+.HP
+.BR cpsema (9)\ \-\ \c
+Conditionally decrement a
+semaphore's state.
+5.3
+.HP
+.BR cvsema (9)\ \-\ \c
+Conditionally increment a
+semaphore's state.
+5.3
+.HP
+.BR datamsg (9)\ \-\ \c
+Test whether a message is a data message.
+SV, 5.3
+.HP
+.BR delay (9)\ \-\ \c
+Delay for a specified number of clock ticks.
+SV, 5.3
+.HP
+.BR device_admin_info_get ()\ \-\ \c
+Retrieve value set with DEVICE_ADMIN statement.
+6.4
+.HP
+.BR device_controller_num_get ()\ \-\ \c
+Get controller number from first inventory record in a vertex.
+6.4
+.HP
+.BR device_controller_num_get ()\ \-\ \c
+Set controller number field only in
+first inventory record in a vertex.
+6.4
+.HP
+.BR device_driver_admin_info_get ()\ \-\ \c
+Retrieve value set with DRIVER_ADMIN statement.
+6.4
+.HP
+.BR device_info_get ()\ \-\ \c
+Return device info pointer stored in vertex.
+6.4
+.HP
+.BR device_info_set ()\ \-\ \c
+Store the address of device
+information in a vertex.
+6.4
+.HP
+.BR device_inventory_add ()\ \-\ \c
+Add hardware inventory data to a vertex.
+6.4
+.HP
+.BR device_inventory_get_next ()\ \-\ \c
+Read out inventory data from a
+vertex.
+.HP
+.BR disable_sysad_parity ()\ \-\ \c
+Disable memory parity checking on SysAD bus.
+5.3
+.HP
+.BR dki_dcache_inval (9)\ \-\ \c
+Invalidate the data cache for a given range of virtual addresses.
+5.3
+.HP
+.BR dki_dcache_wb (9)\ \-\ \c
+Write back the data cache for a given range of virtual addresses.
+5.3
+.HP
+.BR dki_dcache_wbinval (9)\ \-\ \c
+Write back and invalidate the data
+cache for a given range of virtual addresses.
+5.3
+.HP
+.BR dma_map (9)\ \-\ \c
+Load DMA mapping registers for an imminent transfer.
+5.3
+.HP
+.BR dma_mapbp (9)\ \-\ \c
+Load DMA mapping registers for an imminent transfer.
+5.3
+.HP
+.BR dma_mapaddr (9)\ \-\ \c
+Return the "bus virtual" address for a given map and address.
+5.3
+.HP
+.BR dma_mapalloc (9)\ \-\ \c
+Allocate a DMA map.
+5.3
+.HP
+.BR dma_mapfree (9)\ \-\ \c
+Free a DMA map.
+5.3
+.HP
+.BR drv_getparm (9)\ \-\ \c
+Retrieve kernel state information.
+SV*, 5.3
+.HP
+.BR drv_hztousec (9)\ \-\ \c
+Convert clock ticks to microseconds.
+SV, 5.3
+.HP
+.BR drv_priv (9)\ \-\ \c
+Test for privileged user.
+SV, 5.3
+.HP
+.BR drv_setparm (9)\ \-\ \c
+Set kernel state information.
+SV, 5.3
+.HP
+.BR drv_usectohz (9)\ \-\ \c
+Convert microseconds to clock ticks.
+SV, 5.3
+.HP
+.BR drv_usecwait (9)\ \-\ \c
+Busy-wait for a specified interval.
+SV, 5.3
+.HP
+.BR dtimeout (9)\ \-\ \c
+Schedule a function execute on a specified processor after a specified
+length of time.
+5.3
+.HP
+.BR dupb (9)\ \-\ \c
+Duplicate a message block.
+SV, 5.3
+.HP
+.BR dupmsg (9)\ \-\ \c
+Duplicate a message.
+SV, 5.3
+.HP
+.BR eisa_dma_disable (9)\ \-\ \c
+Disable recognition of hardware requests on EISA DMA channel.
+5.3
+.HP
+.BR eisa_dma_enable (9)\ \-\ \c
+Enable recognition of hardware
+requests on EISA DMA channel.
+5.3
+.HP
+.BR eisa_dma_free_buf (9)\ \-\ \c
+Free a previously allocated EISA DMA buffer descriptor.
+5.3
+.HP
+.BR eisa_dma_free_cb (9)\ \-\ \c
+Free a previously allocated EISA DMA command block.
+5.3
+.HP
+.BR eisa_dma_get_buf (9)\ \-\ \c
+Allocate EISA DMA buffer descriptor.
+5.3
+.HP
+.BR eisa_dma_get_cb (9)\ \-\ \c
+Allocate EISA DMA command block.
+5.3
+.HP
+.BR eisa_dma_prog (9)\ \-\ \c
+Program EISA DMA operation for a subsequent software request.
+5.3
+.HP
+.BR eisa_dma_stop (9)\ \-\ \c
+Stop software-initiated EISA DMA operation and release channel.
+5.3
+.HP
+.BR eisa_dma_swstart (9)\ \-\ \c
+Initiate EISA DMA operation via software request.
+5.3
+.HP
+.BR eisa_dmachan_alloc ()\ \-\ \c
+Allocate a DMA channel for EISA
+slave DMA.
+5.3
+.HP
+.BR eisa_ivec_alloc ()\ \-\ \c
+Allocate an IRQ level for EISA.
+5.3
+.HP
+.BR eisa_ivec_set ()\ \-\ \c
+Associate a handler with an EISA
+IRQ.
+5.3
+.HP
+.BR enableok (9)\ \-\ \c
+Allow a queue to be serviced.
+SV, 5.3
+.HP
+.BR enable_sysad_parity ()\ \-\ \c
+Reenable parity checking on SysAD
+bus.
+5.3
+.HP
+.BR esballoc (9)\ \-\ \c
+Allocate a message block using an externally-supplied buffer.
+SV, 5.3
+.HP
+.BR esbbcall (9)\ \-\ \c
+Call a function when an externally-supplied buffer can be allocated.
+SV, 5.3
+.HP
+.BR etoimajor (9)\ \-\ \c
+Convert external to internal major device number.
+SV, 5.3
+.HP
+.BR fast_itimeout (9)\ \-\ \c
+.HP
+.BR Same as itimeout () but takes an\ \-\ \c
+interval in "fast ticks."
+6.2
+.HP
+.BR fasthzto (9)\ \-\ \c
+Returns the value of a struct timeval as
+a count of "fast ticks."
+6.2
+.HP
+.BR flushband (9)\ \-\ \c
+Flush messages in a specified priority band.
+SV, 5.3
+.HP
+.BR flushbus (9)\ \-\ \c
+Make sure contents of the write buffer are flushed to the system bus.
+5.3
+.HP
+.BR flushq (9)\ \-\ \c
+Flush messages on a queue.
+SV, 5.3
+.HP
+.BR freeb (9)\ \-\ \c
+Free a message block.
+SV, 5.3
+.HP
+.BR freemsg (9)\ \-\ \c
+Free a message.
+SV, 5.3
+.HP
+.BR freerbuf (9)\ \-\ \c
+Free a buf_t with no buffer.
+SV, 5.3
+.HP
+.BR freesema (9)\ \-\ \c
+Free the resources associated with a semaphore.
+5.3*
+.HP
+.BR freezestr (9)\ \-\ \c
+Freeze the state of a stream.
+SV, 5.3
+.HP
+.BR fubyte (9)\ \-\ \c
+Load a byte from user space.
+5.3
+.HP
+.BR fuword (9)\ \-\ \c
+Load a word from user space.
+5.3
+.HP
+.BR geteblk (9)\ \-\ \c
+Get a buf_t with no buffer.
+SV, 5.3
+.HP
+.BR getemajor (9)\ \-\ \c
+Get external major device number.
+SV, 5.3
+.HP
+.BR geteminor (9)\ \-\ \c
+Get external minor device number.
+SV, 5.3
+.HP
+.BR geterror (9)\ \-\ \c
+retrieve error number from a buffer header.
+SV, 5.3
+.HP
+.BR getmajor (9)\ \-\ \c
+Get internal major device number (obsolete).
+SV, 5.3
+.HP
+.BR getminor (9)\ \-\ \c
+Get internal minor device number (obsolete).
+SV, 5.3
+.HP
+.BR getnextpg (9)\ \-\ \c
+Return pfdat structure for next page.
+5.3
+.HP
+.BR getq (9)\ \-\ \c
+Get the next message from a queue.
+SV, 5.3
+.HP
+.BR getrbuf (9)\ \-\ \c
+Allocate a buf_t with no buffer.
+SV, 5.3
+.HP
+.BR hwcpin (9)\ \-\ \c
+Copy data from device registers to kernel memory.
+5.3
+.HP
+.BR hwcpout (9)\ \-\ \c
+Copy data from kernel memory to device registers.
+5.3
+.HP
+.BR hwgraph_block_device_add ()\ \-\ \c
+Create block device special file under a specified vertex.
+6.4
+.HP
+.BR hwgraph_char_device_add ()\ \-\ \c
+Create a character device special file under a specified vertex.
+6.4
+.HP
+.BR hwgraph_edge_add ()\ \-\ \c
+Add a labelled edge between two vertexes.
+6.4
+.HP
+.BR hwgraph_edge_get ()\ \-\ \c
+Retrieve the vertex destination of a labelled edge (follow edge).
+6.4
+.HP
+.BR hwgraph_edge_remove ()\ \-\ \c
+Delete a labelled edge between two vertexes.
+6.4
+.HP
+.BR hwgraph_info_add_LBL ()\ \-\ \c
+Attach a labelled attribute to a vertex.
+6.4
+.HP
+.BR hwgraph_info_export_LBL ()\ \-\ \c
+Make an attribute visible to
+attr_get(2) .
+6.4
+.HP
+.BR hwgraph_info_get_LBL ()\ \-\ \c
+Retrieve an attribute by name.
+6.4
+.HP
+.BR hwgraph_info_remove_LBL ()\ \-\ \c
+Remove an attribute from a vertex.
+6.4
+.HP
+.BR hwgraph_info_replace_LBL ()\ \-\ \c
+Replace the value of an attribute by name.
+6.4
+.HP
+.BR hwgraph_info_unexport_LBL ()\ \-\ \c
+Make an attribute invisible.
+6.4
+.HP
+.BR hwgraph_traverse ()\ \-\ \c
+Follow a path of edges starting from
+a given vertex.
+6.4
+.HP
+.BR hwgraph_vertex_create ()\ \-\ \c
+Create a new, empty vertex, and
+return its handle.
+6.4
+.HP
+.BR hwgraph_vertex_destroy ()\ \-\ \c
+Deallocate a vertex.
+6.4
+.HP
+.BR hwgraph_vertex_ref ()\ \-\ \c
+Increase the reference count of a vertex.
+6.4
+.HP
+.BR hwgraph_vertex_unref ()\ \-\ \c
+Decrease the reference count of a vertex.
+6.4
+.HP
+.BR initnsema (9)\ \-\ \c
+Initialize a semaphore to a specified count.
+5.3
+.HP
+.BR initnsema_mutex (9)\ \-\ \c
+Initialize a semaphore to a count of 1.
+5.3
+.HP
+.BR insq (9)\ \-\ \c
+Insert a message into a queue.
+SV, 5.3
+.HP
+.BR ip26_enable_ucmem (9)\ \-\ \c
+Change memory mode on IP26 processor.
+6.2
+.HP
+.BR ip26_return_ucmem (9)\ \-\ \c
+Change memory mode on IP26 processor.
+SV, 5.3
+.HP
+.BR is_sysad_parity_enabled ()\ \-\ \c
+Test for parity checking on SysAD bus.
+5.3
+.HP
+.BR itimeout (9)\ \-\ \c
+Schedule a function to be executed
+after a specified number of clock ticks.
+SV, 5.3
+.HP
+.BR itoemajor (9)\ \-\ \c
+Convert internal to external major device number.
+SV, 5.3
+.HP
+.BR kern_calloc (9)\ \-\ \c
+Allocate and clear space from kernel memory.
+5.3
+.HP
+.BR kern_free (9)\ \-\ \c
+Free kernel memory space.
+5.3
+.HP
+.BR kern_malloc (9)\ \-\ \c
+Allocate kernel virtual memory.
+5.3
+.HP
+.BR kmem_alloc (9)\ \-\ \c
+Allocate space from kernel free
+memory.
+SV, 5.3
+.HP
+.BR kmem_free (9)\ \-\ \c
+Free previously allocated kernel memory.
+SV, 5.3
+.HP
+.BR kmem_zalloc (9)\ \-\ \c
+Allocate and clear space from kernel free memory.
+SV, 5.3
+.HP
+.BR kvaddr_to_alenlist ()\ \-\ \c
+Fill an alenlist with entries that
+describe a buffer in kernel virtual address space.
+6.2
+.HP
+.BR kvtophys (9)\ \-\ \c
+Get physical address of kernel data.
+5.3
+.HP
+.BR linkb (9)\ \-\ \c
+Concatenate two message blocks.
+SV*, 5.3*
+.HP
+.BR LOCK (9)\ \-\ \c
+Acquire a basic lock, waiting if necessary.
+SV*, 5.3*
+.HP
+.BR LOCK_ALLOC (9)\ \-\ \c
+Allocate and initialize a basic lock.
+SV*, 5.3*
+.HP
+.BR LOCK_DEALLOC (9)\ \-\ \c
+Deallocate an instance of a basic lock.
+SV*, 5.3*
+.HP
+.BR LOCK_INIT (9)\ \-\ \c
+Initialize a basic lock that was allocated statically, or reinitialize
+an allocated lock.
+6.2
+.HP
+.BR LOCK_DESTROY (9)\ \-\ \c
+Uninitialize a basic lock that was allocated statically.
+6.2
+.HP
+.BR makedevice (9)\ \-\ \c
+Make device number from major and minor numbers.
+SV, 5.3
+.HP
+.BR max (9)\ \-\ \c
+Return the larger of two integers.
+SV, 5.3
+.HP
+.BR min (9)\ \-\ \c
+Return the lesser of two integers.
+SV, 5.3
+.HP
+.BR msgdsize (9)\ \-\ \c
+Return number of bytes of data in a message.
+SV, 5.3
+.HP
+.BR msgpullup (9)\ \-\ \c
+Concatenate bytes in a message.
+SV, 5.3
+.HP
+.BR MUTEX_ALLOC (9)\ \-\ \c
+Allocate and initialize a mutex lock.
+6.2
+.HP
+.BR MUTEX_DEALLOC (9)\ \-\ \c
+Deinitialize and free a dynamically allocated mutex lock.
+6.2
+.HP
+.BR MUTEX_DESTROY (9)\ \-\ \c
+Deinitialize a mutex lock.
+6.2
+.HP
+.BR MUTEX_INIT (9)\ \-\ \c
+Initialize an existing mutex lock.
+6.2
+.HP
+.BR MUTEX_LOCK (9)\ \-\ \c
+Claim a mutex lock.
+6.2
+.HP
+.BR MUTEX_MINE (9)\ \-\ \c
+Test if a mutex lock is owned by this process.
+6.2
+.HP
+.BR MUTEX_OWNED (9)\ \-\ \c
+Query if a mutex lock is available.
+6.5
+.HP
+.BR MUTEX_TRYLOCK (9)\ \-\ \c
+Conditionally claim a mutex lock.
+6.2
+.HP
+.BR MUTEX_UNLOCK (9)\ \-\ \c
+Release a mutex lock.
+6.2
+.HP
+.BR ngeteblk (9)\ \-\ \c
+Allocate a buf_t and a buffer of
+specified size.
+SV, 5.3
+.HP
+.BR noenable (9)\ \-\ \c
+Prevent a queue from being scheduled.
+SV, 5.3
+.HP
+.BR OTHERQ (9)\ \-\ \c
+Get a pointer to queue's partner queue.
+SV, 5.3
+.HP
+.BR pciio_dma_dev_get (9)\ \-\ \c
+Get device vertex from DMA map.
+6.4
+.HP
+.BR pciio_dma_slot_get ()\ \-\ \c
+Get slot number from DMA map.
+6.4
+.HP
+.BR pciio_dmaaddr_drain (9)\ \-\ \c
+Ensure DMA is complete.
+6.5
+.HP
+.BR pciio_dmalist_drain (9)\ \-\ \c
+Ensure DMA is complete.
+6.5
+.HP
+.BR pciio_dmamap_addr ()\ \-\ \c
+Set up DMA mapping for an address.
+6.3
+.HP
+.BR pciio_dmamap_alloc ()\ \-\ \c
+Allocate DMA map object.
+6.3
+.HP
+.BR pciio_dmamap_done ()\ \-\ \c
+Release mapping hardware associated with a map object.
+6.3
+.HP
+.BR pciio_dmamap_drain ()\ \-\ \c
+Ensure DMA is complete.
+6.5
+.HP
+.BR pciio_dmamap_free ()\ \-\ \c
+Release DMA map object.
+6.3
+.HP
+.BR pciio_dmamap_list ()\ \-\ \c
+Set up DMA mapping for a list of addresses.
+6.3
+.HP
+.BR pciio_dmatrans_addr ()\ \-\ \c
+Set up DMA mapping using fixed resources if available.
+6.3
+.HP
+.BR pciio_dmatrans_list ()\ \-\ \c
+Set up DMA mapping using fixed resources if available.
+6.3
+.HP
+.BR pciio_driver_register ()\ \-\ \c
+Register driver to handle specific devices.
+6.3
+.HP
+.BR pciio_driver_unregister ()\ \-\ \c
+Unregister driver as device handler.
+6.4
+.HP
+.BR pciio_error_register ()\ \-\ \c
+Register error handler for device.
+6.4
+.HP
+.BR pciio_info_bus_get ()\ \-\ \c
+Query PCI bus number for device.
+6.4
+.HP
+.BR pciio_info_dev_get ()\ \-\ \c
+Query connection vertex for device.
+6.4
+.HP
+.BR pciio_info_device_id_get ()\ \-\ \c
+Query PCI device ID for device.
+6.4
+.HP
+.BR pciio_info_func_get ()\ \-\ \c
+Query interrupt function for device.
+6.4
+.HP
+.BR pciio_info_get ()\ \-\ \c
+Get PCI info object for use in queries.
+6.4
+.HP
+.BR pciio_info_slot_get ()\ \-\ \c
+Query bus slot number for device.
+6.4
+.HP
+.BR pciio_info_vendor_id_get ()\ \-\ \c
+Query PCI vendor ID for device.
+6.4
+.HP
+.BR pciio_intr_alloc ()\ \-\ \c
+Allocate interrupt object.
+6.3
+.HP
+.BR pciio_intr_connect ()\ \-\ \c
+Enable interrupt and set handler.
+6.3
+.HP
+.BR pciio_intr_cpu_get ()\ \-\ \c
+Query CPU handling interrupt from device.
+6.4
+.HP
+.BR pciio_intr_dev_get ()\ \-\ \c
+Get device vertex from interrupt object.
+6.4
+.HP
+.BR pciio_intr_disconnect ()\ \-\ \c
+Disable interrupt and unregister handler.
+6.3
+.HP
+.BR pciio_intr_free ()\ \-\ \c
+Release interrupt object.
+6.4
+.HP
+.BR pciio_iterate ()\ \-\ \c
+Call function for every attached device.
+6.4
+.HP
+.BR pciio_pio_addr ()\ \-\ \c
+Set up PIO mapping using map object.
+6.3
+.HP
+.BR pciio_pio_dev_get ()\ \-\ \c
+Get device vertex from PIO map.
+6.4
+.HP
+.BR pciio_pio_mapsz_get ()\ \-\ \c
+Get map size from PIO map object.
+6.4
+.HP
+.BR pciio_pio_pciaddr_get ()\ \-\ \c
+Get target bus address from PIO map object.
+6.4
+.HP
+.BR pciio_pio_slot_get ()\ \-\ \c
+Query bus slot number from PIO map.
+6.4
+.HP
+.BR pciio_pio_space_get ()\ \-\ \c
+Query target bus address space from PIO map.
+6.4
+.HP
+.BR pciio_piomap_addr ()\ \-\ \c
+Set up PIO mapping using map object.
+6.3
+.HP
+.BR pciio_piomap_alloc ()\ \-\ \c
+Allocate PIO map object.
+6.3
+.HP
+.BR pciio_piomap_done ()\ \-\ \c
+Release mapping hardware associated with a PIO map.
+6.4
+.HP
+.BR pciio_piomap_free ()\ \-\ \c
+Release a PIO map object.
+6.3
+.HP
+.BR pciio_piospace_alloc ()\ \-\ \c
+Reserve PCI bus address space for a device.
+6.4
+.HP
+.BR pciio_piospace_free ()\ \-\ \c
+Release PCI bus address space.
+6.4
+.HP
+.BR pciio_piotrans_addr ()\ \-\ \c
+Set up PIO mapping using fixed resources if available.
+6.3
+.HP
+.BR pciio_reset ()\ \-\ \c
+Activate reset line of PCI card.
+6.4
+.HP
+.BR pcmsg (9)\ \-\ \c
+Test whether a message is a priority control message.
+SV, 5.3
+.HP
+.BR phalloc (9)\ \-\ \c
+Allocate and initialize a pollhead structure.
+SV, 5.3
+.HP
+.BR phfree (9)\ \-\ \c
+Free a pollhead structure.
+SV, 5.3
+.HP
+.BR physiock (9)\ \-\ \c
+Validate and issue a raw I/O request.
+SV, 5.3
+.HP
+.BR pio_andb_rmw (9)\ \-\ \c
+Byte read-and-write.
+5.3
+.HP
+.BR pio_andh_rmw (9)\ \-\ \c
+16-bit read-and-write.
+5.3
+.HP
+.BR pio_andw_rmw (9)\ \-\ \c
+32-bit read-and-write.
+5.3
+.HP
+.BR pio_badaddr (9)\ \-\ \c
+Check for bus error when reading an address.
+5.3
+.HP
+.BR pio_badaddr_val (9)\ \-\ \c
+Check for bus error when reading an address and return the value read.
+5.3
+.HP
+.BR pio_bcopyin (9)\ \-\ \c
+Copy data from a bus address to kernel's virtual space.
+5.3
+.HP
+.BR pio_bcopyout (9)\ \-\ \c
+Copy data from kernel's virtual space to a bus address.
+5.3
+.HP
+.BR pio_mapaddr (9)\ \-\ \c
+Convert a bus address to a virtual address.
+5.3
+.HP
+.BR pio_mapalloc (9)\ \-\ \c
+Allocate a PIO map.
+5.3
+.HP
+.BR pio_mapfree (9)\ \-\ \c
+Free a PIO map.
+5.3
+.HP
+.BR pio_orb_rmw (9)\ \-\ \c
+Byte read-or-write.
+5.3
+.HP
+.BR pio_orh_rmw (9)\ \-\ \c
+16-bit read-or-write.
+5.3
+.HP
+.BR pio_orw_rmw (9)\ \-\ \c
+32-bit read-or-write.
+5.3
+.HP
+.BR pio_wbadaddr (9)\ \-\ \c
+Check for bus error when writing to an address.
+5.3
+.HP
+.BR pio_wbadaddr_val (9)\ \-\ \c
+Check for bus error when writing a specified value to an address.
+5.3
+.HP
+.BR pollwakeup (9)\ \-\ \c
+Inform polling processes that an event has occurred.
+SV, 5.3
+.HP
+.BR pptophys (9)\ \-\ \c
+Convert page pointer to physical address.
+SV, 5.3
+.HP
+.BR proc_ref (9)\ \-\ \c
+Obtain a reference to a process for signaling.
+SV, 5.3
+.HP
+.BR proc_signal (9)\ \-\ \c
+Send a signal to a process.
+SV, 5.3
+.HP
+.BR proc_unref (9)\ \-\ \c
+Release a reference to a process.
+SV, 5.3
+.HP
+.BR psema (9)\ \-\ \c
+Perform a "P" or wait semaphore operation.
+SV, 5.3
+.HP
+.BR ptob (9)\ \-\ \c
+Convert size in pages to size in bytes.
+SV, 5.3
+.HP
+.BR pullupmsg (9)\ \-\ \c
+Concatenate bytes in a message.
+SV, 5.3
+.HP
+.BR putbq (9)\ \-\ \c
+Place a message at the head of a queue.
+SV, 5.3
+.HP
+.BR putctl (9)\ \-\ \c
+Send a control message to a queue.
+SV, 5.3
+.HP
+.BR putctl1 (9)\ \-\ \c
+Send a control message with a one-byte parameter to a queue.
+SV, 5.3
+.HP
+.BR putnext (9)\ \-\ \c
+Send a message to the next queue.
+SV, 5.3
+.HP
+.BR putnextctl (9)\ \-\ \c
+Send a control message to a queue.
+SV, 5.3
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+Send a control message with a one-byte parameter to a queue.
+SV, 5.3
+.HP
+.BR putq (9)\ \-\ \c
+Put a message on a queue.
+SV, 5.3
+.HP
+.BR qenable (9)\ \-\ \c
+Schedule a queue's service routine to be run.
+SV, 5.3
+.HP
+.BR qprocsoff (9)\ \-\ \c
+Enable put and service routines.
+SV, 5.3
+.HP
+.BR qprocson (9)\ \-\ \c
+Disable put and service routines.
+SV, 5.3
+.HP
+.BR qreply (9)\ \-\ \c
+Send a message in the opposite direction in a stream.
+SV, 5.3
+.HP
+.BR qsize (9)\ \-\ \c
+Find the number of messages on a queue.
+SV, 5.3
+.HP
+.BR RD (9)\ \-\ \c
+Get a pointer to the read queue.
+SV, 5.3
+.HP
+.BR rmvb (9)\ \-\ \c
+Remove a message block from a message.
+SV, 5.3
+.HP
+.BR rmvq (9)\ \-\ \c
+Remove a message from a queue.
+SV, 5.3
+.HP
+.BR RW_ALLOC (9)\ \-\ \c
+Allocate and initialize a reader/writer lock.
+SV*, 5.3*
+.HP
+.BR RW_DEALLOC (9)\ \-\ \c
+Deallocate a reader/writer lock.
+SV*, 5.3*
+.HP
+.BR RW_DESTROY (9)\ \-\ \c
+Deinitialize an existing reader/writer lock.
+6.2
+.HP
+.BR RW_INIT (9)\ \-\ \c
+Initialize an existing reader/writer
+lock.
+6.2
+.HP
+.BR RW_RDLOCK (9)\ \-\ \c
+Acquire a reader/writer lock as reader, waiting if necessary.
+SV*, 5.3*
+.HP
+.BR RW_TRYRDLOCK (9)\ \-\ \c
+Try to acquire a reader/writer lock as reader, returning a code if it
+is not free.
+SV*, 5.3*
+.HP
+.BR RW_TRYWRLOCK (9)\ \-\ \c
+Try to acquire a reader/writer lock as writer, returning a code if it
+is not free.
+SV*, 5.3*
+.HP
+.BR RW_UNLOCK (9)\ \-\ \c
+Release a reader/writer lock as reader or writer.
+SV*, 5.3*
+.HP
+.BR RW_WRLOCK (9)\ \-\ \c
+Acquire a reader/writer lock as writer, waiting if necessary.
+SV*, 5.3*
+.HP
+.BR SAMESTR (9)\ \-\ \c
+Test if next queue is of the same type.
+SV, 5.3
+.HP
+.BR scsi_abort ()\ \-\ \c
+Transmits a SCSI ABORT command.
+5.3*
+.HP
+.BR scsi_alloc (9)\ \-\ \c
+Open a connection between a driver and a target device.
+5.3*
+.HP
+.BR scsi_command (9)\ \-\ \c
+Transmit a SCSI command on the bus and return results.
+5.3*
+.HP
+.BR scsi_free (9)\ \-\ \c
+Release connection to target device.
+5.3*
+.HP
+.BR scsi_info (9)\ \-\ \c
+Issue the SCSI Inquiry command and return the results.
+5.3*
+.HP
+.BR scsi_reset ()\ \-\ \c
+Resets the SCSI adapter or bus.
+5.3*
+.HP
+.BR setgiovector ()\ \-\ \c
+Register a GIO interrupt handler.
+5.3
+.HP
+.BR setgioconfig ()\ \-\ \c
+Prepare a GIO slot for use.
+5.3
+.HP
+.BR sgset (9)\ \-\ \c
+Assign physical addresses to a vector of software scatter-gather
+registers.
+5.3
+.HP
+.BR sleep (9)\ \-\ \c
+Suspend process execution pending occurrence of an event.
+SV, 5.3
+.HP
+.BR SLEEP_ALLOC (9)\ \-\ \c
+Allocate and initialize a sleep lock.
+SV*, 5.3*
+.HP
+.BR SLEEP_DEALLOC (9)\ \-\ \c
+Deinitialize and deallocate a dynamically allocated sleep lock.
+SV*, 5.3*
+.HP
+.BR SLEEP_DESTROY (9)\ \-\ \c
+Deinitialize a sleep lock.
+6.2
+.HP
+.BR SLEEP_INIT (9)\ \-\ \c
+Initialize an existing sleep lock.
+6.2
+.HP
+.BR SLEEP_LOCK (9)\ \-\ \c
+Acquire a sleep lock, waiting if necessary until the lock is free.
+SV*, 5.3*
+.HP
+.BR SLEEP_LOCKAVAIL (9)\ \-\ \c
+Query whether a sleep lock is
+available.
+SV*, 5.3*
+.HP
+.BR SLEEP_LOCK_SIG (9)\ \-\ \c
+Acquire a sleep lock, waiting if necessary until the lock is free or a
+signal is received.
+SV*, 5.3*
+.HP
+.BR SLEEP_TRYLOCK (9)\ \-\ \c
+Try to acquire a sleep lock, returning a code if it is not free.
+SV*, 5.3*
+.HP
+.BR SLEEP_UNLOCK (9)\ \-\ \c
+Release a sleep lock.
+SV*, 5.3*
+.HP
+.BR splbase (9)\ \-\ \c
+Block no interrupts.
+SV, 5.3
+.HP
+.BR spltimeout (9)\ \-\ \c
+Block only timeout interrupts.
+SV, 5.3
+.HP
+.BR spldisk (9)\ \-\ \c
+Block disk interrupts.
+SV, 5.3
+.HP
+.BR splstr (9)\ \-\ \c
+Block STREAMS interrupts.
+SV, 5.3
+.HP
+.BR spltty (9)\ \-\ \c
+Block disk, VME, serial interrupts.
+SV, 5.3
+.HP
+.BR splhi (9)\ \-\ \c
+Block all I/O interrupts.
+SV, 5.3
+.HP
+.BR spl0 (9)\ \-\ \c
+.HP
+.BR Same as splbase ().\ \-\ \c
+SV, 5.3
+.HP
+.BR splx (9)\ \-\ \c
+Restore previous interrupt level.
+SV, 5.3
+.HP
+.BR strcat (9)\ \-\ \c
+Append one string to another.
+SV, 5.3
+.HP
+.BR strcpy (9)\ \-\ \c
+Copy a string.
+SV, 5.3
+.HP
+.BR streams_interrupt (9)\ \-\ \c
+Synchronize interrupt-level function with STREAMS mechanism.
+5.3
+.HP
+.BR STREAMS_TIMEOUT (9)\ \-\ \c
+Synchronize timeout with STREAMS mechanism.
+5.3
+.HP
+.BR strlen (9)\ \-\ \c
+Return length of a string.
+SV, 5.3
+.HP
+.BR strlog (9)\ \-\ \c
+Submit messages to the log driver.
+SV, 5.3
+.HP
+.BR strncmp (9)\ \-\ \c
+Compare two strings for a specified length.
+SV, 5.3
+.HP
+.BR strncpy (9)\ \-\ \c
+Copy a string for a specified length.
+SV, 5.3
+.HP
+.BR strqget (9)\ \-\ \c
+Get information about a queue or band of the queue.
+SV, 5.3
+.HP
+.BR strqset (9)\ \-\ \c
+Change information about a queue or band of the queue.
+SV, 5.3
+.HP
+.BR subyte (9)\ \-\ \c
+Store a byte to user space.
+5.3
+.HP
+.BR suword (9)\ \-\ \c
+Store a word to user space.
+5.3
+.HP
+.BR SV_ALLOC (9)\ \-\ \c
+Allocate and initialize a
+synchronization variable.
+SV*, 5.3*
+.HP
+.BR SV_BROADCAST (9)\ \-\ \c
+Wake all processes sleeping on a synchronization variable.
+SV*, 5.3*
+.HP
+.BR SV_DEALLOC (9)\ \-\ \c
+Deinitialize and deallocate a synchronization variable.
+SV*, 5.3*
+.HP
+.BR SV_DESTROY (9)\ \-\ \c
+Deinitialize a synchronization
+variable.
+6.2
+.HP
+.BR SV_INIT (9)\ \-\ \c
+Initialize an existing synchronization variable.
+6.2
+.HP
+.BR SV_SIGNAL (9)\ \-\ \c
+Wake one process sleeping on a synchronization variable.
+SV*, 5.3*
+.HP
+.BR SV_WAIT (9)\ \-\ \c
+Sleep until a synchronization
+variable is signalled.
+SV*, 5.3*
+.HP
+.BR SV_WAIT_SIG (9)\ \-\ \c
+Sleep until a synchronization
+variable is signalled or a signal is received.
+SV*, 5.3*
+.HP
+.BR timeout (9)\ \-\ \c
+Schedule a function to be executed
+after a specified number of clock ticks.
+SV, 5.3
+.HP
+.BR TRYLOCK (9)\ \-\ \c
+Try to acquire a basic lock, returning a code if the lock is not
+currently free.
+SV*, 5.3*
+.HP
+.BR uiomove (9)\ \-\ \c
+Copy data using uio_t.
+SV, 5.3
+.HP
+.BR uiophysio (9)\ \-\ \c
+Validate a raw I/O request and pass
+to a strategy function.
+5.3
+.HP
+.BR unbufcall (9)\ \-\ \c
+Cancel a pending bufcall request.
+SV, 5.3
+.HP
+.BR undma (9)\ \-\ \c
+Unlock physical memory in user
+space.
+5.3
+.HP
+.BR unfreezestr (9)\ \-\ \c
+Unfreeze the state of a stream.
+SV, 5.3
+.HP
+.BR unlinkb (9)\ \-\ \c
+Remove a message block from the
+head of a message.
+SV, 5.3
+.HP
+.BR UNLOCK (9)\ \-\ \c
+Release a basic lock.
+SV*, 5.3*
+.HP
+.BR untimeout (9)\ \-\ \c
+Cancel a previous itimeout or fast_itimeout request.
+SV*, 5.3*
+.HP
+.BR ureadc (9)\ \-\ \c
+Copy a character to space described by uio_t.
+SV, 5.3
+.HP
+.BR userdma (9)\ \-\ \c
+Lock physical memory in user space.
+5.3
+.HP
+.BR userabi ()\ \-\ \c
+Get data sizes for the ABI of the user process (32- or 64-bit).
+6.2
+.HP
+.BR uvaddr_to_alenlist ()\ \-\ \c
+Fill an alenlists with entries that describe a buffer in a user
+virtual address space.
+6.4
+.HP
+.BR uwritec (9)\ \-\ \c
+Return a character from space
+described by uio_t.
+SV, 5.3
+.HP
+.BR v_getaddr (9)\ \-\ \c
+Get the user virtual address
+associated with a vhandl_t.
+5.3
+.HP
+.BR v_gethandle (9)\ \-\ \c
+Get a unique identifier associated
+with a vhandl_t.
+5.3
+.HP
+.BR v_getlen (9)\ \-\ \c
+Get the length of user address space associated with a vhandl_t.
+5.3
+.HP
+.BR v_mapphys (9)\ \-\ \c
+Map kernel address space into user address space.
+5.3
+.HP
+.BR valusema (9)\ \-\ \c
+Return the value associated with a semaphore.
+5.3
+.HP
+.BR vme_adapter (9)\ \-\ \c
+Determine VME adapter that corresponds to a given memory address.
+5.3
+.HP
+.BR vme_ivec_alloc (9)\ \-\ \c
+Allocate a VME bus interrupt vector.
+5.3
+.HP
+.BR vme_ivec_free (9)\ \-\ \c
+Free a VME bus interrupt vector.
+5.3
+.HP
+.BR vme_ivec_set (9)\ \-\ \c
+Register a VME bus interrupt vector.
+5.3
+.HP
+.BR vsema (9)\ \-\ \c
+Perform a "V" or signal semaphore operation.
+5.3
+.HP
+.BR wakeup (9)\ \-\ \c
+Waken a process waiting for an
+event.
+SV, 5.3
+.HP
+.BR wbadaddr (9)\ \-\ \c
+Test physical address for output.
+SV, 5.3
+.HP
+.BR wbadaddr_val (9)\ \-\ \c
+Test physical address for output of specific value.
+SV, 5.3
+.HP
+.BR WR (9)\ \-\ \c
+Get a pointer to the write queue.
+SV, 5.3
+.PD 0
+
+
+
+.PP
+The following
+.I SVR 4
+kernel functions are not implemented in
+.IR IRIX \(rg:
+.HP
+.BR bioreset (9)\ \-\ \c
+.PD 0
+.HP
+.BR dma_disable (9)\ \-\ \c
+.HP
+.BR dma_enable (9)\ \-\ \c
+.HP
+.BR dma_free_buf (9)\ \-\ \c
+.HP
+.BR dma_free_cb (9)\ \-\ \c
+.HP
+.BR dma_get_best_mode (9)\ \-\ \c
+.HP
+.BR dma_get_buf (9)\ \-\ \c
+.HP
+.BR dma_get_cb (9)\ \-\ \c
+.HP
+.BR dma_pageio (9)\ \-\ \c
+.HP
+.BR dma_prog (9)\ \-\ \c
+.HP
+.BR dma_swstart (9)\ \-\ \c
+.HP
+.BR dma_swsetup (9)\ \-\ \c
+.HP
+.BR drv_gethardware (9)\ \-\ \c
+.HP
+.BR hat_getkpfnum (9)\ \-\ \c
+.HP
+.BR hat_getppfnum (9)\ \-\ \c
+.HP
+.BR inb (9)\ \-\ \c
+.HP
+.BR inl (9)\ \-\ \c
+.HP
+.BR inw (9)\ \-\ \c
+.HP
+.BR kvtoppid (9)\ \-\ \c
+.HP
+.BR mod_drvattach (9)\ \-\ \c
+.HP
+.BR mod_drvdetach (9)\ \-\ \c
+.HP
+.BR outb (9)\ \-\ \c
+.HP
+.BR outl (9)\ \-\ \c
+.HP
+.BR outw (9)\ \-\ \c
+.HP
+.BR physmap (9)\ \-\ \c
+.HP
+.BR physmap_free (9)\ \-\ \c
+.HP
+.BR phystoppid (9)\ \-\ \c
+.HP
+.BR psignal (9)\ \-\ \c
+.HP
+.BR rdma_filter (9)\ \-\ \c
+.HP
+.BR repinsb (9)\ \-\ \c
+.HP
+.BR repinsd (9)\ \-\ \c
+.HP
+.BR repinsw (9)\ \-\ \c
+.HP
+.BR repoutsb (9)\ \-\ \c
+.HP
+.BR repoutsd (9)\ \-\ \c
+.HP
+.BR repoutsw (9)\ \-\ \c
+.HP
+.BR rminit (9)\ \-\ \c
+.HP
+.BR rmsetwant (9)\ \-\ \c
+.HP
+.BR SLEEP_LOCKOWNED (9)\ \-\ \c
+.HP
+.BR strncat (9)\ \-\ \c
+.HP
+.BR vtop (9)\ \-\ \c
+.PD
+
+
+
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+These are
+.IR IRIX \(rg-specific
+functions:
+.B _UXP_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_UXP
+or
+.B CONFIG_STREAMS_COMPAT_UXP_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.PP
+Compatibility functions:
+.PP
+Transport functions:
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR IRIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+These are
+.IR IRIX \(rg-specific
+functions and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+These functions
+are provided for source level compatibility with
+.IR IRIX \(rg
+for the purpose of porting
+.IR IRIX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR IRIX \(rg,
+binaries are incompatible.
+.IP \(em
+These functions
+only provide functionality comparable to
+.IR IRIX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+these functions
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR IRIX \(rg
+DDI documentation.
+.[
+irixdoc
+.]
+.[
+irixspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR IRIX \(rg.
+Functions with name starting with
+.I mi_
+are probably
+.I Mentat, Inc.
+functions that goes all the way back to the
+.I Mentat OSF/1
+implementation.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

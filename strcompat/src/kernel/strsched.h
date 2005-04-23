@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/03/30 02:24:36 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/23 16:48:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:36 $ by $Author: brian $
+ Last Modified $Date: 2005/04/23 16:48:51 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -77,8 +77,8 @@ extern struct qband *allocqb(void);
 extern void freeqb(struct qband *qb);
 
 /* ctors and dtors for stream heads */
-extern struct stdata *allocsd(void);
-extern void freesd(struct stdata *sd);
+extern struct stdata *allocstr(void);
+extern void freestr(struct stdata *sd);
 extern struct stdata *sd_get(struct stdata *sd);
 extern void sd_put(struct stdata *sd);
 
