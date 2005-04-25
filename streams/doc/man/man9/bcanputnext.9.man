@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.16 2005/04/22 22:47:36 brian Exp $
+.\" @(#) $Id: bcanputnext.9.man,v 0.9.2.17 2005/04/24 23:09:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -98,15 +98,6 @@ the priority band within which to test for flow control.
 .\"
 .SH DESCRIPTION
 .PP
-It is the responsibility of a
-.I STREAMS
-module putting a banded non-priority
-message to a subsequent queue to check for flow control on that queue using
-.BR bcanputnext ()
-for the band associated with the message before placing a message on that
-queue with
-.BR putnext (9).
-.PP
 .BR bcanputnext ()
 checks whether the stream is flow controlled starting at the specified queue,
 .IR q ,
@@ -149,6 +140,25 @@ backward up the queues when the flow controlled
 is no longer full.
 .\"
 .\"
+.SH USAGE
+.PP
+It is the responsibility of a
+.I STREAMS
+module or driver putting a banded non-priority
+message to a subsequent queue to check for flow control on that queue using
+.BR bcanputnext ()
+for the band associated with the message before placing a message on that
+queue with
+.BR putnext (9).
+A
+.I STREAMS
+module is only required to check for flow control if it has a
+.BR srv (9)
+procedure for the specified queue: otherwise, it was the responsibility of a previous
+.I STREAMS
+module, stream head or stream end to check flow control.
+.\"
+.\"
 .SH RETURN
 .PP
 .BR bcanputnext ()
@@ -178,6 +188,15 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 .BR bcanputnext ()
 is an MP-safe version of
 .BI bcanput( q->q_next ).
+.PP
+It is possible, due to race conditions in a multiprocessor (MP) system, that
+.BR bcanputnext ()
+can be called for a queue and return true (1) and yet the stream becomes flow controlled before a
+call to
+.BR putnext (9).
+The caller to
+.BR putnext (9)
+is then in violation of flow-control rules; however, the extent of this violation is bounded.
 .\"
 .\"
 .SH NOTICES

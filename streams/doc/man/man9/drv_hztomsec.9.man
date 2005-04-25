@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.12 2005/04/20 18:41:33 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.13 2005/04/24 23:09:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -212,6 +212,20 @@ This makes these functions safe for use with
 .BR timeout (9)
 and
 .BR qtimeout (9).
+.PP
+Care should be taken with the
+.BR drv_hztousec ()
+function, as coverted value can easily overflow a
+.BR clock_t .
+Portable
+.I STREAMS
+modules and drivers will only convert differences between successive calls to
+.BR drv_getparm (9)
+or retrieval of
+.BR lbolt (9)
+with
+.BR drv_hztousec ()
+instead of converting each value and then taking the difference.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -238,12 +252,17 @@ LfS
 .BR drv_usectohz ()
 and
 .BR drv_msectohz ()
-are source-level compatible with SVR 4.2 MP DDI/DKI and
-.IR Solaris \(rg.
-They are provided for the purpose of porting SVR 4.2 and
-.IR Solaris \(rg
-drivers to
-.BR Linux .
+are source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .I LiS
 .[
@@ -262,7 +281,7 @@ Of these,
 and
 .BR lis_milli_to_ticks (9)
 are equivalent to
-.BR drv_usectohz ().
+.BR drv_usectohz ()
 and
 .BR drv_msectohz ().
 .IP \(em
@@ -291,13 +310,10 @@ for additional compatibility information.
 .PP
 .BR drv_hztousec "() and " drv_usectohz ()
 conform to
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-and
-.IR Solaris \(rg
-documentation.
 .PP
 .BR drv_hztomsec "() and " drv_msectohz ()
 are

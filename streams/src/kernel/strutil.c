@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
+ Last Modified $Date: 2005/04/24 23:10:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/21 01:54:07 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2576,25 +2576,33 @@ static spinlock_t cmn_err_lock = SPIN_LOCK_UNLOCKED;
 void vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	unsigned long flags;
-	static char cmn_err_buf[1024];
+	static char cmn_err_buf[1024], *cmn_err_ptr = cmn_err_buf;
 	spin_lock_irqsave(&cmn_err_lock, flags);
 	vsnprintf(cmn_err_buf, sizeof(cmn_err_buf), fmt, args);
+	if (cmn_err_buf[0] == '^' || cmn_err_buf[0] == '!')
+		cmn_err_ptr++;
 	switch (err_lvl) {
 	case CE_CONT:
-		printk("%s", cmn_err_buf);
+		printk("%s", cmn_err_ptr);
 		break;
 	default:
 	case CE_NOTE:
 		/* gets default log level */
-		printk(KERN_NOTICE "%s\n", cmn_err_buf);
+		printk(KERN_NOTICE "%s\n", cmn_err_ptr);
 		break;
 	case CE_WARN:
-		printk(KERN_WARNING "%s\n", cmn_err_buf);
+		printk(KERN_WARNING "%s\n", cmn_err_ptr);
 		break;
 	case CE_PANIC:
 		spin_unlock_irqrestore(&cmn_err_lock, flags);
-		panic("%s\n", cmn_err_buf);
+		panic("%s\n", cmn_err_ptr);
 		return;
+	case CE_DEBUG:		/* IRIX 6.5 */
+		printk(KERN_DEBUG "%s\n", cmn_err_ptr);
+		break;
+	case CE_ALERT:		/* IRIX 6.5 */
+		printk(KERN_ALERT "%s \n", cmn_err_ptr);
+		break;
 	}
 	spin_unlock_irqrestore(&cmn_err_lock, flags);
 	return;

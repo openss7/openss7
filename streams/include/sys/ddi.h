@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.13 2005/04/21 01:54:41 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2005/04/24 23:10:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/04/24 23:10:15 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/04/21 01:54:41 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/04/24 23:10:15 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -230,7 +230,10 @@ __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p)
 }
 __EXTERN_INLINE int drv_priv(cred_t *crp)
 {
-	return (crp->cr_uid == 0 || crp->cr_ruid == 0);
+	/* FIXME: also need to check for capabilities */
+	if (crp->cr_uid == 0 || crp->cr_ruid == 0)
+		return (0);
+	return (EPERM);
 }
 __EXTERN_INLINE void drv_usecwait(unsigned long usec)
 {

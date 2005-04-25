@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocstr.9.man,v 0.9.2.1 2005/04/23 16:47:51 brian Exp $
+.\" @(#) $Id: allocstr.9.man,v 0.9.2.2 2005/04/24 23:09:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/23 16:47:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,6 +149,24 @@ is MP-safe.  The caller has exclusive access to the returned stream head.
 is an internal function, and is not recommended for usage by
 .I STREAMS
 modules and drivers.
+.BR allocstr ()
+is only made available for use by specialized modules distributed with this
+.I STREAMS
+package (such as
+.BR connld (4)),
+and for compatibility with
+.I SVR 3
+systems predating the
+.IR "SVR 4 DDI/DKI" .
+Unlike
+.BR allocq (9),
+(which makes some sense for private queue pairs),
+.BR allocstr ()
+poses no useful portable purpose.
+.BR allocstr ()
+will not be called by portable
+.I STREAMS
+modules and drivers.
 .\"
 .\"
 .\".SH IMPLEMENTATION
@@ -199,9 +217,8 @@ should not be called by normal
 modules or drivers and is implementation specific.
 .IP \(em
 This function is not exported by
-.IR "SVR 4.2 MP DDI/DKI" or
-any other UNIX directly.
-It is declared in some earlier
+.I "SVR 4.2 MP DDI/DKI"
+or any other UNIX directly.  It is declared in some earlier
 .I SVR 3
 .I <sys/stream.h>
 header files.

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esbbcall.9.man,v 0.9.2.15 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: esbbcall.9.man,v 0.9.2.16 2005/04/24 23:09:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,19 +83,21 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "int esbbcall(int " priority ", void (*" function ")(long), long " arg );
+.BI "bcid_t esbbcall(int " priority ", void (*" function ")(long), long " arg );
 .\"
 .\"
 .SH ARGUMENTS
 .TP \w'\ priority\ 'u
 .I priority
 the priority of the request for a message block.
+.PD 0
 .TP
 .I function
 the function to call when a block of the requested priority is available.
 .TP
 .I arg
 the argument to pass the callback function.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -407,6 +409,7 @@ and
 .IR UXP/V \(rg
 do not document this function.
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR LiS ,
 .IR MacOT \(rg,
 .IR Solaris \(rg,
@@ -416,7 +419,12 @@ and
 document this function.
 Portable
 .I STREAMS
-drivers will call
+drivers concerned with portability to or from
+.IR AIX \(rg,
+.IR OSF/1 \(rg
+or
+.IR UXP/V \(rg
+will call
 .BR bufcall (9)
 with a
 .I size
@@ -505,6 +513,42 @@ is provided for compatibility with
 .BR lis_esbbcall ()
 returns
 .BR int .
+.IP \(em
+Depending on the system,
+.BR esbbcall ()
+returns
+.BR int ", " bcid_t ", " bufcall_id_t " or even " toid_t .
+.B Linux Fast-STREAMS
+assigns a type of
+.B int
+to
+.BR bcid_t ", " bufcall_id_t " and " toid_t 
+to avoid compatibility issues.
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+.BR esbbcall ()
+as returning
+.BR toid_t .
+.B Linux Fast-STREAMS
+also defines a
+.B toid_t
+as
+.BR int .
+See
+.BR timeout (9).
+.IP \(em
+.IR IRIX \(rg
+documents
+.[
+irixdoc
+.]
+that the callback function will be called with local
+.I STREAMS
+driver interrupts disabled.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

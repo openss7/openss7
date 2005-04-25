@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 0.9.2.11 2005/03/30 13:38:35 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 0.9.2.12 2005/04/24 23:09:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -129,8 +129,8 @@ succeeds but does nothing.
 During the trimming process, blocks are trimmed by advancing the
 .I b_rptr
 for head trims
-.RI ( len "> 0), or ,
-decreasing the
+.RI ( len "> 0),
+or decreasing the
 .I b_wptr
 for tail trims
 .RI ( len "< 0),
@@ -268,7 +268,12 @@ trimming process.
 .[
 uw7doc
 .]
-does not free zero length message blocks encountered during the trimming
+and
+.IR IRIX \(rg
+.[
+irixdoc
+.]
+do not free zero length message blocks encountered during the trimming
 process.
 .IP \(em
 .BR adjmsg ()

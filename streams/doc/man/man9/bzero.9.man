@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bzero.9.man,v 0.9.2.12 2005/04/22 22:47:36 brian Exp $
+.\" @(#) $Id: bzero.9.man,v 0.9.2.13 2005/04/24 23:09:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -172,6 +172,7 @@ is source-level compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
 .IR AIX \(rg,
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
@@ -191,6 +192,7 @@ usldk
 .]
 .IR AIX \(rg,
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg
 and
@@ -201,6 +203,9 @@ aixdoc
 .]
 .[
 hpuxdoc
+.]
+.[
+irixdoc
 .]
 .[
 osfdoc

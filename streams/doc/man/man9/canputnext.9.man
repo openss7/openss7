@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 0.9.2.15 2005/04/22 22:47:36 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 0.9.2.16 2005/04/24 23:09:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -139,6 +139,26 @@ queue is no longer full (i.e. message have been read from the queue to reduce
 the queue size below the low water mark for the queue).
 .\"
 .\"
+.SH USAGE
+.PP
+It is the responsibility of all
+.I STREAMS
+modules to properly check for flow control before passing a
+normal (band 0) message (e.g.
+.BR M_DATA (9)
+or
+.BR M_PROTO (9))
+.I STREAMS
+message on a stream.
+Each module with a service procedure is responsible for checking flow control before passing a
+message along on a stream using
+.BR putnext (q).
+Flow control is checked using
+.BR canputnext ()
+or
+.BR bcanputnext (9).
+.\"
+.\"
 .SH RETURN
 .PP
 .BR canputnext ()
@@ -167,7 +187,7 @@ is MP-safe.
 Although
 .BI canput( q->q_next )
 is functionally equivalent to
-.BI bcanputnext( q ),
+.BI canputnext( q ),
 for the
 .BR canput (9)
 form, the dereference of the
@@ -186,16 +206,14 @@ should always be called instead.
 .\"
 .SH NOTICES
 .PP
-Under LiS, if
-.BR canputnext ()
-suffers an internal error, it will return false (0).
-.PP
-LiS implements
-\fB\)canput(\fI\)q\fB\))\fR\),
-\fB\)canputnext(\fI\)q\fB\))\fR\) and
-\fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
-with a macros that call
-\fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
+.BR canputnext (9)
+and
+.BR bcanputnext (9)
+should always be used instead of
+.BI canput( q->q_next )
+and
+.BI bcanput( q->q_next )
+on multiprocessor (MP) implementations.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -208,6 +226,17 @@ can be called for a
 .I q
 that is frozen with
 .BR freezestr (9).
+.PP
+.BR canput (9)
+and
+.BR canputnext ()
+are the equivalent of
+.BR bcanput (9)
+and
+.BR bcanputnext (9)
+with a zero
+.IR band :
+and in fact can be implemented as such.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -300,6 +329,17 @@ drivers and modules should not call
 .BR canputnext ()
 on a stream frozen with
 .BR freezestr (9).
+.IP \(em
+Under LiS, if
+.BR canputnext ()
+suffers an internal error, it will return false (0).
+.IP \(em
+LiS implements
+\fB\)canput(\fI\)q\fB\))\fR\),
+\fB\)canputnext(\fI\)q\fB\))\fR\) and
+\fB\)bcanputnext(\fI\)q\fB\), \fI\)band\fB\))\fR\)
+with a macros that call
+\fB\)bcanput(\fI\)q\fB\), \fI\)band\fB\))\fR\).
 .IP \(em
 Symbol
 .BR lis_bcanput ()

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: esballoc.9.man,v 0.9.2.14 2005/04/20 18:41:33 brian Exp $
+.\" @(#) $Id: esballoc.9.man,v 0.9.2.15 2005/04/24 23:09:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -154,6 +154,15 @@ other than
 the request will be treated as
 .BR BPRI_LO .
 .PP
+The
+.I priority
+argument is ignored by
+.I SVR 4
+.[
+svr4spg
+.]
+and later implementations.
+.PP
 The data buffer of length
 .I size
 and with the necessary physical memory type has already been allocated by the
@@ -187,6 +196,27 @@ is freed with
 .PP
 The allocated message block will have a data block type of
 .BR M_DATA .
+.\"
+.\"
+.SH USAGE
+.PP
+Priority
+.B BPRI_WAITOK
+is added for
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+compatibility and should not be used by portable
+.I STREAMS
+drivers or modules.
+.PP
+Portable
+.I STREAMS
+drivers and modules should not rely on any setting of priority and should
+assume that the implementation ignores the
+.I priority
+argument.
 .\"
 .\"
 .SH RETURN
@@ -549,7 +579,8 @@ usldk
 .SH HISTORY
 .PP
 .BR esballoc ()
-first appeared in SVR 4 DDI/DKI.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4dk
 .]

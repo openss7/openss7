@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.4 2005/04/20 18:41:33 brian Exp $
+.\" @(#) $Id: drv_getparm.9.man,v 0.9.2.5 2005/04/24 23:09:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,9 +91,11 @@ sort-adjacent-labels
 .TP
 .I parm
 the system parameter to retrieve.
+.PD 0
 .TP
 .I valp
 is a pointer to the area to place the returned value.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -107,35 +109,34 @@ into the area pointed to by
 can be one of the following values:
 .TP \w'MW_PROVIDER\(em'u
 .B LBOLT
-Returns the value of the Linux jiffies clock.
+Read the value of the Linux jiffies clock.
+.PD 0
 .TP
 .B PPGRP
-Returns the process group identifier.
-.TP
-.B UPROCP
-Reads the process table pointer.
+Read the process group identification number.
 .TP
 .B PPID
-Reads the process id.
+Read the process identification number.
 .TP
 .B PSID
-Reads the session id.
+Read the session identification number.
 .TP
 .B TIME
-Reads the current time in seconds.
+Read the current time in seconds since epoch.
 .TP
 .B UCRED
-Returns a pointer to the callers credential structure.
+Read a pointer to the callers credential structure.
 .TP
 .B UPROCP
-Returns a pointer to the caller's user task structure.
+Read a pointer to the caller's user task structure.
 .TP
 .B STRMSGSIZE
-Returns the maximum streams message size.
+Read the maximum streams message size.
 .TP
 .B HW_PROVIDER
-Returns the OEM provider string, in this case
-.BR "\*(lqLinux \*(rq UTS_RELEASE" .
+Read the OEM provider string, in this case
+.RB \*(lq Linux \*(rq " UTS_RELEASE" .
+.PD
 .PP
 .BR drv_getparm ()
 provides an architecture independent means of accessing these system
@@ -159,7 +160,9 @@ is the preferred method of accessing these primary variables.
 .BR drv_getparm ()
 can be called from any context, including user context, module procedures,
 callouts, callbacks, soft interrupts and interrupt service routines.
-The task structure returned by
+The credentials returned by
+.B UCRED
+and the task structure returned by
 .B UPROCP
 is only valid when called in user context.
 .\"
@@ -269,14 +272,21 @@ however,
 always returns minus one (1) for these symbols.
 .IP \(em
 .IR AIX \(rg,
+.IR MacOT \(rg,
 .IR OSF/1 \(rg
+.IR SUPER-UX \(rg,
 and
-.IR SUPER-UX \(rg
+.IR UXP/V \(rg
 do not document
-.BR drv_getparm ().
-.IP \(em
+.BR drv_getparm ();
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+do.
 .I LiS
-does not provide
+does not provide (or document)
 .BR drv_getparm ().
 .IP \(em
 Binary compatibility is not guaranteed.
@@ -293,6 +303,7 @@ for additional compatibility information.
 usldk
 .]
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR Solaris \(rg,
 .IR UnixWare \(rg
 and
