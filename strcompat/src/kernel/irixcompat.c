@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:41 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/25 07:21:41 $ by $Author: brian $
+ Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:41 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:41 $";
+    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
  *  modules that don't use them.
  */
 
-#define __UW7_EXTERN_INLINE inline
+#define __IRIX_EXTERN_INLINE inline
 
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
@@ -99,7 +99,7 @@ static char const ident[] =
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _UW7_SOURCE
+#define _IRIX_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -112,142 +112,57 @@ static char const ident[] =
 #include "src/modules/sth.h"
 #include "src/kernel/strsad.h"
 
-#define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:41 $"
-#define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
-#define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define UW7COMP_LICENSE		"GPL"
-#define UW7COMP_BANNER		UW7COMP_DESCRIP		"\n" \
-				UW7COMP_COPYRIGHT	"\n" \
-				UW7COMP_REVISION	"\n" \
-				UW7COMP_DEVICE		"\n" \
-				UW7COMP_CONTACT		"\n"
-#define UW7COMP_SPLASH		UW7COMP_DEVICE		" - " \
-				UW7COMP_REVISION	"\n"
+#define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define IRIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $"
+#define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
+#define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define IRIXCOMP_LICENSE	"GPL"
+#define IRIXCOMP_BANNER		IRIXCOMP_DESCRIP	"\n" \
+				IRIXCOMP_COPYRIGHT	"\n" \
+				IRIXCOMP_REVISION	"\n" \
+				IRIXCOMP_DEVICE		"\n" \
+				IRIXCOMP_CONTACT	"\n"
+#define IRIXCOMP_SPLASH		IRIXCOMP_DEVICE		" - " \
+				IRIXCOMP_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
-MODULE_AUTHOR(UW7COMP_CONTACT);
-MODULE_DESCRIPTION(UW7COMP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(UW7COMP_DEVICE);
-MODULE_LICENSE(UW7COMP_LICENSE);
+#ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
+MODULE_AUTHOR(IRIXCOMP_CONTACT);
+MODULE_DESCRIPTION(IRIXCOMP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(IRIXCOMP_DEVICE);
+MODULE_LICENSE(IRIXCOMP_LICENSE);
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-uw7compat");
+MODULE_ALIAS("streams-irixcompat");
 #endif
 #endif
 
 
-/* don't use these - these are fakes */
-/**
- *  allocb_physreq:	- allocate a message block with physical requirements
- *  @size:		number of bytes to allocate
- *  @priority:		priority of the allocation
- *  @physreq_ptr:	physical requirements of the message block
- */
-mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
-{
-	if (prp->phys_align > 8)
-		return (NULL);
-	if (prp->phys_boundary != 0)
-		return (NULL);
-	if (prp->phys_dmasize != 0)
-		return (NULL);
-	if (prp->phys_flags & PREQ_PHYSCONTIG)
-		return (NULL);
-	return (allocb(size, priority));
-}
-
-EXPORT_SYMBOL(allocb_physreq);	/* uw7ddi.h */
-mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
-{
-	if (prp->phys_align > 8)
-		return (NULL);
-	if (prp->phys_boundary != 0)
-		return (NULL);
-	if (prp->phys_dmasize != 0)
-		return (NULL);
-	if (prp->phys_flags & PREQ_PHYSCONTIG)
-		return (NULL);
-	return (mp);
-}
-
-EXPORT_SYMBOL(msgphysreq);	/* uw7ddi.h */
-mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
-{
-	if (prp->phys_align > 8)
-		return (NULL);
-	if (prp->phys_boundary != 0)
-		return (NULL);
-	if (prp->phys_dmasize != 0)
-		return (NULL);
-	if (prp->phys_flags & PREQ_PHYSCONTIG)
-		return (NULL);
-	return msgpullup(mp, len);
-}
-
-EXPORT_SYMBOL(msgpullup_physreq);	/* uw7ddi.h */
-mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
-{
-	return (NULL);
-}
-
-EXPORT_SYMBOL(msgscgth);	/* uw7ddi.h */
-
-int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-int printf_UW7(char *fmt, ...)
-{
-	va_list args;
-	int n;
-	char printf_buf[1024];
-	va_start(args, fmt);
-	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);
-	va_end(args);
-	printk("%s", printf_buf);
-	return (n);
-}
-
-EXPORT_SYMBOL(printf_UW7);                        /* uw7ddi.h */
-
-__UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value);
-EXPORT_SYMBOL(ATOMIC_INT_ADD);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag);
-EXPORT_SYMBOL(ATOMIC_INT_ALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter);
-EXPORT_SYMBOL(ATOMIC_INT_DEALLOC);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t * counter);
-EXPORT_SYMBOL(ATOMIC_INT_DECR);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t * counter);
-EXPORT_SYMBOL(ATOMIC_INT_INCR);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t * counter, int value);
-EXPORT_SYMBOL(ATOMIC_INT_INIT);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t * counter);
-EXPORT_SYMBOL(ATOMIC_INT_READ);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value);
-EXPORT_SYMBOL(ATOMIC_INT_SUB);	/* uw7ddi.h */
-__UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
-EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7ddi.h */
-
-#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
+#ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 static
 #endif
-int __init uw7comp_init(void)
+int __init irixcomp_init(void)
 {
-#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
-	printk(KERN_INFO UW7COMP_BANNER);
+#ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
+	printk(KERN_INFO IRIXCOMP_BANNER);
 #else
-	printk(KERN_INFO UW7COMP_SPLASH);
+	printk(KERN_INFO IRIXCOMP_SPLASH);
 #endif
 	return (0);
 }
-#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
+#ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 static
 #endif
-void __exit uw7comp_exit(void)
+void __exit irixcomp_exit(void)
 {
 	return;
 }
 
-#ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
-module_init(uw7comp_init);
-module_exit(uw7comp_exit);
+__IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args);
+EXPORT_SYMBOL(icmn_err);	/* irixddi.h */
+__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
+EXPORT_SYMBOL(cmn_err_tag);	/* irixddi.h */
+
+#ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
+module_init(irixcomp_init);
+module_exit(irixcomp_exit);
 #endif

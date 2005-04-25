@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/23 16:48:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/04/25 07:21:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/23 16:48:42 $ by $Author: brian $
+# Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,6 +66,7 @@ nobase_pkginclude_HEADERS = \
 	sys/debug.h \
 	sys/dki.h \
 	sys/hpuxddi.h \
+	sys/irixddi.h \
 	sys/kmem.h \
 	sys/lisddi.h \
 	sys/log.h \
@@ -81,6 +82,7 @@ nobase_pkginclude_HEADERS = \
 	sys/stropts.h \
 	sys/strsubr.h \
 	sys/sunddi.h \
+	sys/svr3ddi.h \
 	sys/svr4ddi.h \
 	sys/uw7ddi.h
 

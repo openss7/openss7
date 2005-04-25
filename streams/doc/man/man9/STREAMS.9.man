@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.16 2005/04/23 16:47:51 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.17 2005/04/25 07:21:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/23 16:47:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/25 07:21:39 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1607,11 +1607,11 @@ _
 Function/Macro      :Sec:LfS:AIX:HUX:MOT:OSF:SGI:Sun:SUX:UW7:UXP:LiS
 _
 cmpdev              :(9): - : - : - : - : - : - :yes: - : - :yes: - \"4.0\"sysmacros.h
-emajor              :(9):uw7: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
-eminor              :(9):uw7: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
-etoimajor           :(9):uw7: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
+emajor              :(9):svr: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
+eminor              :(9):svr: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
+etoimajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
 expdev              :(9): - : - : - : - : - : - :yes: - : - :yes: - \"4.0\"sysmacros.h
-itoemajor           :(9):uw7: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
+itoemajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
 major               :(9): - : - :yes: - :yes: - :yes:yes: - : - :yes\"3.0\"sysmacros.h
 makedev             :(9): - : - :yes: - :yes: - :yes: - : - :yes: - \"3.0\"sysmacros.h
 minor               :(9): - : - :yes: - :yes: - :yes:yes: - : - : - \"3.0\"sysmacros.h
@@ -1667,8 +1667,8 @@ drv_usectohz        :(9):yes: - : - : - : - :yes:yes: - :yes: - : - \"4.0
 drv_usecwait        :(9):yes: - : - : - : - :yes:yes: - :yes: - : - \"4.0
 freerbuf            :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4.0
 geteblk             :(9): - :yes: - : - : - :yes: - : - :yes: - : - \"4.0
-getemajor           :(9):uw7: - : - : - : - :yes:yes: - :yes:yes: - \"4.0
-geteminor           :(9):uw7: - : - : - : - :yes:yes: - :yes:yes: - \"4.0
+getemajor           :(9):svr: - : - : - : - :yes:yes: - :yes:yes: - \"4.0
+geteminor           :(9):svr: - : - : - : - :yes:yes: - :yes:yes: - \"4.0
 geterror            :(9): - :yes: - : - : - :yes:yes: - :yes: - : - \"4.0
 getmajor            :(9):yes: - :yes: - : - :yes:yes: - :yes:yes:yes\"4.0
 getminor            :(9):yes: - :yes: - : - :yes:yes: - :yes:yes:yes\"4.0

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/04/21 01:54:41 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/04/25 07:21:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/04/25 07:21:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -474,6 +474,12 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 # _LFS_SETUP_COMPAT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
+    AC_ARG_ENABLE([compat-svr3],
+	AS_HELP_STRING([--enable-compat-svr3],
+	    [enable source compatibility with SVR 4.2 MP variants.
+	    @<:@default=module@:>@]),
+	    [enable_compat_svr3="$enableval"],
+	    [enable_compat_svr3='module'])
     AC_ARG_ENABLE([compat-svr4],
 	AS_HELP_STRING([--enable-compat-svr4],
 	    [enable source compatibility with SVR 4.2 MP variants.
@@ -510,6 +516,12 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	[enable_compat_hpux="$enableval"],
 	[enable_compat_hpux='module'])
+    AC_ARG_ENABLE([compat-irix],
+	AS_HELP_STRING([--enable-compat-irix],
+	    [enable source compatibility with IRIX variants.
+	    @<:@default=module@:>@]),
+	[enable_compat_irix="$enableval"],
+	[enable_compat_irix='module'])
     AC_ARG_ENABLE([compat-lis],
 	AS_HELP_STRING([--enable-compat-lis],
 	    [enable source compatibility with LiS variants.
@@ -522,6 +534,11 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	[enable_compat_mac="$enableval"],
 	[enable_compat_mac='module'])
+    AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 3.2 compatibility], [lfs_compat_svr3], [dnl
+	lfs_compat_svr3="${enable_compat_svr3:-module}"
+	if test :$lfs_compat_svr3 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_compat_svr3='yes'
+	fi])
     AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 4.2 compatibility], [lfs_compat_svr4], [dnl
 	lfs_compat_svr4="${enable_compat_svr4:-module}"
 	if test :$lfs_compat_svr4 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -572,6 +589,15 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	if test :$lfs_compat_hpux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_hpux='yes'
 	fi])
+    AC_CACHE_CHECK([for STREAMS IRIX(R) compatibility], [lfs_compat_irix], [dnl
+	case ${enable_compat_irix:-module} in
+	    (yes) lfs_compat_svr4=yes ;;
+	    (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+	esac
+	lfs_compat_irix="${enable_compat_irix:-module}"
+	if test :$lfs_compat_irix = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_compat_irix='yes'
+	fi])
     AC_CACHE_CHECK([for STREAMS LiS compatibility], [lfs_compat_lis], [dnl
 	lfs_compat_lis="${enable_compat_lis:-module}"
 	if test :$lfs_compat_lis = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -582,6 +608,26 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	if test :$lfs_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_mac='yes'
 	fi])
+    case ${lfs_compat_svr3:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR3], [], [When defined, Linux Fast STREAMS
+	    will attempt to be as compatible as possible (without replicating any bugs) with the
+	    UNIX(R) SVR 3.2 docs so that STREAMS drivers and modules written to UNIX(R) SVR 3.2
+	    specs will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and
+	    modules written for UNIX(R) SVR 3.2 will require porting in more respects.  This
+	    symbol determines whether compatibility will be compiled and linkable with Linux
+	    Fast-STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR3_MODULE], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the UNIX(R) SVR 3.2 docs so that STREAMS drivers and modules written to UNIX(R) SVR
+	    3.2 specs will compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and
+	    modules written for UNIX(R) SVR 3.2 will require porting in more respects.  This
+	    symbol determines whether compatibility will be compiled as a loadable module to Linux
+	    Fast-STREAMS.])
+	    ;;
+    esac
     case ${lfs_compat_svr4:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4], [], [When defined, Linux Fast STREAMS
@@ -694,6 +740,24 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
+    case ${lfs_compat_irix:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_IRIX], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the IRIX(R) release so that STREAMS drivers and modules written for IRIX(R) will compile
+	    with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+	    IRIX(R) will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled and linkable with Linux Fast-STREAMS.  ])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the IRIX(R) release so that STREAMS drivers and modules written for IRIX(R) will compile
+	    with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+	    IRIX(R) will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+	    ;;
+    esac
     case ${lfs_compat_lis:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined, Linux Fast
@@ -730,6 +794,8 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${lfs_compat_svr3:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${lfs_compat_svr3:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${lfs_compat_svr4:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${lfs_compat_svr4:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${lfs_compat_sol8:-module} = :yes])
@@ -742,6 +808,8 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE],	[test :${lfs_compat_aix:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX],	[test :${lfs_compat_hpux:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${lfs_compat_hpux:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${lfs_compat_irix:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${lfs_compat_irix:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${lfs_compat_lis:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${lfs_compat_lis:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${lfs_compat_mac:-module} = :yes])

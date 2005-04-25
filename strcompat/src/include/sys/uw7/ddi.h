@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/04/23 07:31:52 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/04/25 07:21:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/23 07:31:52 $ by $Author: brian $
+ Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/23 07:31:52 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/25 07:21:40 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -119,26 +119,6 @@ extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
 extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 
 int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
-
-__UW7_EXTERN_INLINE major_t getemajor(dev_t dev)
-{
-	return (getmajor(dev) + MAJOR(getminor(dev)));
-}
-__UW7_EXTERN_INLINE minor_t geteminor(dev_t dev)
-{
-	return (MINOR(getminor(dev)));
-}
-__UW7_EXTERN_INLINE major_t emajor(dev_t dev)
-{
-	return (getmajor(dev) + MAJOR(getminor(dev)));
-}
-__UW7_EXTERN_INLINE minor_t eminor(dev_t dev)
-{
-	return (MINOR(getminor(dev)));
-}
-
-extern int etoimajor(major_t emajor);
-extern int itoemajor(major_t imajor, int prevemaj);
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 

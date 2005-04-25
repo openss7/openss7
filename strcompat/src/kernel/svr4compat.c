@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/22 22:50:18 $ by $Author: brian $
+ Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/22 22:50:18 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -291,6 +291,58 @@ void splx(const pl_t level)
 }
 
 EXPORT_SYMBOL(splx);		/* svr4ddi.h */
+
+__SVR4_EXTERN_INLINE major_t getemajor(dev_t dev);
+EXPORT_SYMBOL(getemajor);	/* uw7ddi.h */
+__SVR4_EXTERN_INLINE minor_t geteminor(dev_t dev);
+EXPORT_SYMBOL(geteminor);	/* uw7ddi.h */
+
+int etoimajor(major_t emajor)
+{
+	struct cdevsw *cdev;
+#ifdef NODEV
+	major_t major = NODEV;
+#else
+	major_t major = 0;
+#endif
+	if ((cdev = cdev_get(emajor))) {
+		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+		major = cdev->d_modid;
+		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+		cdev_put(cdev);
+	}
+	return (major);
+}
+
+EXPORT_SYMBOL(etoimajor);	/* uw7ddi.h */
+int itoemajor(major_t imajor, int prevemaj)
+{
+	struct cdevsw *cdev;
+	if ((cdev = cdrv_get(imajor)) && cdev->d_majors.next && !list_empty(&cdev->d_majors)) {
+		struct list_head *pos;
+#ifdef NODEV
+		int found_previous = (prevemaj == NODEV) ? 1 : 0;
+#else
+		int found_previous = (prevemaj == 0) ? 1 : 0;
+#endif
+		printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
+		list_for_each(pos, &cdev->d_majors) {
+			struct devnode *cmaj = list_entry(pos, struct devnode, n_list);
+			if (found_previous)
+				return (cmaj->n_major);
+			if (prevemaj == cmaj->n_major)
+				found_previous = 1;
+		}
+	}
+#ifdef NODEV
+	return (NODEV);
+#else
+	return (0);
+#endif
+}
+
+EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
+
 
 //__SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl);
 //EXPORT_SYMBOL(LOCK);          /* svr4ddi.h */

@@ -1,0 +1,98 @@
+/*****************************************************************************
+
+ @(#) $Id: irixddi.h,v 0.9.2.1 2005/04/25 07:21:40 brian Exp $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
+
+ *****************************************************************************/
+
+#ifndef __SYS_IRIXDDI_H__
+#define __SYS_IRIXDDI_H__
+
+#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $"
+
+#ifndef __KERNEL__
+#error "Do not use kernel headers for user space programs"
+#endif				/* __KERNEL__ */
+
+#ifndef __IRIX_EXTERN_INLINE
+#define __IRIX_EXTERN_INLINE extern __inline__
+#endif				/* __IRIX_EXTERN_INLINE */
+
+#include <sys/strconf.h>
+#include <sys/cmn_err.h>	/* for vcmn_err */
+
+#ifndef _IRIX_SOURCE
+#warning "_IRIX_SOURCE not defined but irixddi.h,v included"
+#endif
+
+#if defined(CONFIG_STREAMS_COMPAT_IRIX) || defined(CONFIG_STREAMS_COMPAT_IRIX_MODULE)
+
+#ifndef _SVR4_SOURCE
+#define _SVR4_SOURCE
+#endif
+#include <sys/svr4ddi.h>	/* for lock_t */
+
+__IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
+{
+	return vcmn_err(err_lvl, fmt, args);
+}
+
+__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 2, 3)));
+__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
+{
+	va_list args;
+	va_start(args, fmt);
+	icmn_err(err_lvl, fmt, args);
+	va_end(args);
+	return;
+}
+
+#elif defined(_IRIX_SOURCE)
+#warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"
+#endif				/* CONFIG_STREAMS_COMPAT_IRIX */
+
+#endif				/* __SYS_IRIXDDI_H__ */

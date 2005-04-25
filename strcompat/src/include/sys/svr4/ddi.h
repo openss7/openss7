@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/04/22 22:50:15 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/04/25 07:21:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/22 22:50:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/22 22:50:15 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/25 07:21:40 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -130,6 +130,17 @@ __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long tic
 	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
 }
+
+__SVR4_EXTERN_INLINE major_t getemajor(dev_t dev)
+{
+	return (getmajor(dev) + MAJOR(getminor(dev)));
+}
+__SVR4_EXTERN_INLINE minor_t geteminor(dev_t dev)
+{
+	return (MINOR(getminor(dev)));
+}
+extern int etoimajor(major_t emajor);
+extern int itoemajor(major_t imajor, int prevemaj);
 
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC

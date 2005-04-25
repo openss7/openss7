@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/04/21 01:54:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/04/25 07:21:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
+# Last Modified $Date: 2005/04/25 07:21:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -157,6 +157,9 @@ libLfS_streams_a_SOURCES		= \
 				src/kernel/strsad.h \
 				src/kernel/strargs.h
 
+if CONFIG_STREAMS_COMPAT_SVR3
+libLfS_streams_a_SOURCES	+= src/compat/svr3/svr3compat.c
+endif
 if CONFIG_STREAMS_COMPAT_SVR4
 libLfS_streams_a_SOURCES	+= src/compat/svr4/svr4compat.c
 endif
@@ -174,6 +177,9 @@ libLfS_streams_a_SOURCES	+= src/compat/aix/aixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_HPUX
 libLfS_streams_a_SOURCES	+= src/compat/hpux/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+libLfS_streams_a_SOURCES	+= src/compat/irix/irixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 libLfS_streams_a_SOURCES	+= src/compat/lis/liscompat.c
@@ -302,6 +308,9 @@ $(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)
 
 libLfS_compat_a_SOURCES		= 
 
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+libLfS_compat_a_SOURCES		+= src/compat/svr3/svr3compat.c
+endif
 if CONFIG_STREAMS_COMPAT_SVR4_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/svr4/svr4compat.c
 endif
@@ -319,6 +328,9 @@ libLfS_compat_a_SOURCES		+= src/compat/aix/aixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_HPUX_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+libLfS_compat_a_SOURCES		+= src/compat/irix/irixcompat.c
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
@@ -602,10 +614,12 @@ AUTOCONFIG_H			= include/sys/config.h
 EXPORT_SRCFILES			= \
 				src/compat/aix/aixcompat.c \
 				src/compat/hpux/hpuxcompat.c \
+				src/compat/irix/irixcompat.c \
 				src/compat/lis/liscompat.c \
 				src/compat/mac/maccompat.c \
 				src/compat/osf/osfcompat.c \
 				src/compat/sun/suncompat.c \
+				src/compat/svr3/svr3compat.c \
 				src/compat/svr4/svr4compat.c \
 				src/compat/uw7/uw7compat.c \
 				src/drivers/clone.c \
@@ -624,10 +638,12 @@ EXPORT_SRCFILES			= \
 EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/aixcompat.ver \
 				$(PKGINCL)/versions/hpuxcompat.ver \
+				$(PKGINCL)/versions/irixcompat.ver \
 				$(PKGINCL)/versions/liscompat.ver \
 				$(PKGINCL)/versions/maccompat.ver \
 				$(PKGINCL)/versions/osfcompat.ver \
 				$(PKGINCL)/versions/suncompat.ver \
+				$(PKGINCL)/versions/svr3compat.ver \
 				$(PKGINCL)/versions/svr4compat.ver \
 				$(PKGINCL)/versions/uw7compat.ver \
 				$(PKGINCL)/versions/clone.ver \
