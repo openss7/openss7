@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: untimeout.9.man,v 0.9.2.12 2005/04/13 07:51:13 brian Exp $
+.\" @(#) $Id: untimeout.9.man,v 0.9.2.13 2005/04/27 09:27:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -227,7 +227,7 @@ usldk
 and systems based on
 .IR "SVR 4"
 .[
-svr4spg
+svr4dk
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -353,7 +353,8 @@ usldk
 .SH HISTORY
 .PP
 .BR untimeout ()
-first appeared in SVR 2.
+first appeared in
+.IR "SVR 2" .
 .[
 svr2
 .]

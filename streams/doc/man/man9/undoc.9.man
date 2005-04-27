@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: undoc.9.man,v 0.9.2.6 2005/04/20 18:41:39 brian Exp $
+.\" @(#) $Id: undoc.9.man,v 0.9.2.7 2005/04/27 09:46:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:46:18 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,14 +75,15 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B autopush, __bufcall, ddi_prop_op, defer_func, di_alloc,
-.B di_put, do_fattach, do_fdetach, do_spipe, freelk, kmem_alloc_node, kmem_zalloc_node,
-.B mknod, mod_strmops, mount, msgscgth, nochpoll, nodev,
-.B nulldev, pipe, printf, qpop, qpush, register_clone, register_cmajor, register_strdrv,
-.B register_strnod, sd_get, sd_put, setqsched, spec_dentry, spec_open,
-.B strgetpmsg, strioccall, strm_f_ops, strputpmsg, strrput, str_uninstall,
+.B autopush, __bufcall, ddi_prop_op, defer_func, di_alloc, di_put, do_fattach, do_fdetach, do_spipe,
+.B esballoca, findlinks, freelk, freestr, getendq, getf, kmem_alloc_node, kmem_alloc_physcontig,
+.B kmem_alloc_physreq, kmem_free_physcontig, kmem_free_physreq, kmem_zalloc_node, kmem_zalloc_physreq,
+.B mi_sprintf, mknod, mod_strmops, mount, msgscgth, nochpoll, nodev, nulldev, physreq_alloc,
+.B physreq_free, physreq_prep, pipe, printf, qpop, qpush, register_clone, register_cmajor,
+.B register_strdrv, register_strnod, rmsetwant, rmwanted, sd_get, sd_put, sealloc, sefree, setqsched,
+.B spec_dentry, spec_open, strgetpmsg, strioccall, strm_f_ops, strputpmsg, strrput, str_uninstall,
 .B strwsrv, sysctl_str_strctlsz, sysctl_str_strmsgsz, __timeout, udelay, unregister_clone,
-.B unregister_cmajor, unregister_strdrv, unregister_strnod, vcmn_err, vtop, wakeup, lis_umount
+.B unregister_cmajor, unregister_strdrv, unregister_strnod, vtop, wakeup
 \- undocumented functions
 .\"
 .\"

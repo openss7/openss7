@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.13 2005/04/20 18:41:39 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.14 2005/04/27 09:27:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,6 +94,7 @@ sort-adjacent-labels
 specifies the
 .I STREAMS
 module id
+.PD 0
 .TP
 .I sid
 specifies the
@@ -117,6 +118,7 @@ style format string.
 provides the arguments for the
 .BR printf (3)
 style format string.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -270,6 +272,13 @@ facilities apply.
 .PP
 .BR strlog ()
 always returns success.
+.PP
+.B Linux Fast-STREAMS
+has a partial implementation of a full
+.I STREAMS
+logger waiting in the wings.  This full
+.I STREAMS
+logger will function an filter properly.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -297,26 +306,131 @@ below.
 .SH COMPATIBILITY
 .PP
 .BR strlog ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg
-and
-.IR UXP/V \(rg
-with the portability considerations:
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.BR strlog ()
+supports all
+.BR printf (3)
+conversion specifiers in the format string.
 .IR AIX \(rg
-does not document the
-.I flags
-argument.
+states that conversion specifiers
+.IR %s ", " %f ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string.
+.[
+aixdoc
+.]
+.IR HP-UX \(rg
+states that conversion specifiers
+.IR %x ", " %l ", " %o ", " %u ", " %d ", " %c " and " %s
+are handled in the format string.
+.[
+hpuxdoc
+.]
+.IR IRIX \(rg
+and
+.IR OSF/1 \(rg
+state that conversion specifiers
+.IR %s ", " %e ", " %g " and " %G
+are not allowed in the format string.
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.IR Solaris \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string in the log(7) manual page, but states that
+.IR %e ", " %g " and " %G
+are not allowed, but
+.I %s
+is supported in the strlog(9F) manual page.
+.[
+soldoc
+.]
+.IR UnixWare \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %g " and " %G
+are not handled in the format string in the log(7) manual page, but states that
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string in the strlog(D3str) manual page.
+.[
+uw7doc
+.]
+.IR UXP/V \(rg
+states that conversion specifiers
+.IR %s ", " %e ", " %E ", " %g " and " %G
+are not handled in the format string.
+.[
+uxpdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use
+.IR %s ", " %f ", " %e ", " %E ", " %g " or " %G
+conversion specifiers in the format string.
+.IP \(em
+.IR AIX \(rg
+states that no more than
+.B NLOGARGS
+arguments can be passed, and that
+.B NLOGARGS
+defaults to four (4).
+.[
+aixdoc
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+state that no more than
+.B NLOGARGS
+arguments can be passed, and that
+.B NLOGARGS
+defaults to three (3).
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.IR UXP/V \(rg
+states that no more than
+.B NLOGARGS
+argumnets can be passed, but does not state a default for
+.BR NLOGARGS .
+.[
+uxpdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will pass more than
+.B NLOGARGS
+arguments to
+.BR strlog (),
+and will not expect a
+.B NLOGARGS
+value of greater than three (3).
 .IP \(em
 .IR AIX \(rg,
 .IR HP-UX \(rg,
+.IR IRIX \(rg,
 .IR OSF/1 \(rg,
 .IR Solaris \(rg
 and
@@ -324,14 +438,40 @@ and
 do not document the
 .B SL_NOPUTBUF
 flag.
-.IP \(em
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uxpdoc
+.]
 The
 .B SL_NOPUTBUF
 flag is provided for
 .IR UnixWare \(rg
 source compatibility.
+.[
+uw7doc
+.]
 .BR strlog ()
 ignores this flag.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.B SL_NOPUBUF
+flag.
 .IP \(em
 .IR OSF/1 \(rg
 does not document the
@@ -354,6 +494,13 @@ should be used instead.
 Therefore,
 .BR strlog ()
 ignores this flag.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will consider that additional configuration may be necessary for messages logged
+with the
+.B SL_NOTIFY
+flag to the system administrator.
 .IP \(em
 .BR strlog ()
 takes a global spin lock to protect generation of the log buffer and
@@ -373,12 +520,27 @@ thing that normally distinguishes
 .BR strlog ()
 from
 .BR cmn_err (9).
-.PP
+.IP ""
+.B Linux Fast-STREAMS
+has a partial implementation of a full
+.I STREAMS
+logger.
+.IP \(em
 .I LiS
 .[
 LiS
 .]
 does not provide this function.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+instead of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -389,42 +551,17 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI;
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
-.]
-.IR AIX \(rg,
-.IR HP-UX \(rg,
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg,
-and
-.IR UXP/V \(rg
-documentation.
-.[
-aixdoc
-.]
-.[
-hpuxdoc
-.]
-.[
-osfdoc
-.]
-.[
-soldoc
-.]
-.[
-uw7doc
-.]
-.[
-uxpdoc
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR strlog ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]

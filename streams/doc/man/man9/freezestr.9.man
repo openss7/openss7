@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.14 2005/04/22 22:47:36 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.15 2005/04/27 09:27:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -81,7 +81,7 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #undef _SOL_SOURCE
+.B #undef _SUN_SOURCE
 .br
 .B #undef _LIS_SOURCE
 .br
@@ -92,7 +92,7 @@ sort-adjacent-labels
 .BI "pl_t freezestr(queue_t *" q );
 .sp 2
 .PP
-.B #define _SOL_SOURCE
+.B #define _SUN_SOURCE
 .br
 .B #define _LIS_SOURCE
 .br
@@ -204,7 +204,7 @@ and
 lis
 .]
 if
-.B _SOL_SOURCE
+.B _SUN_SOURCE
 or
 .B _LIS_SOURCE
 are defined before including the
@@ -231,7 +231,7 @@ and
 uw7spg
 .]
 if
-.B _SOL_SOURCE
+.B _SUN_SOURCE
 and
 .B _LIS_SOURCE
 are undefined before including the
@@ -480,50 +480,65 @@ usldk
 .]
 and systems based on
 .IR "SVR 4 MP" ,
+.[
+svr4dk
+.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR "SVR 4.2 MP DDI/DKI" ,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg,
+and
+.IR LiS
+provide this function.
 .[
 usldk
 .]
-.IR Solaris \(rg,
 .[
 solspg
 .]
-.IR SUPER-UX \(rg,
 .[
 suxspg
 .]
-.IR UnixWare \(rg,
 .[
 uw7spg
 .]
-and
-.IR LiS
 .[
 lis
 .]
-provide this function.
+.IR IRIX \(rg
+documents support for the function
+.[
+irixspg
+.]
+but does not document the function.
+.[
+irixdoc
+.]
 .IP \(em
 .IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+and
+.IR UXP/V \(rg
+do not provide this function.
 .[
 aixspg
 .]
-.IR HP-UX \(rg,
 .[
 hpuxspg
 .]
-.IR OSF/1 \(rg,
 .[
 osfspg
 .]
-and
-.IR UXP/V \(rg
 .[
 uxpspg
 .]
-do not provide this function.
 .RI ( HP-UX \(rg
+.[
+hpuxspg
+.]
 provides the symbols, but they do nothing.)
 .IP \(em
 .IR Solaris \(rg
@@ -531,6 +546,12 @@ and
 .IR LiS
 provide the function prototype:
 .BI "void freezestr(queue_t *" q ).
+.[
+soldoc
+.]
+.[
+lis
+.]
 All the others provide the prototype
 .BI "pl_t freezestr(queue_t *" q ).
 For compatibility with
@@ -540,6 +561,12 @@ and
 the software priority level otherwise returned by
 .BR freezestr ()
 is stored internally as well as being returned.
+.[
+soldoc
+.]
+.[
+lis
+.]
 .BR unfreezestr (9)
 will access this internal software priority level to restore when the
 .IR Solaris \(rg
@@ -548,22 +575,38 @@ or
 version of
 .BR unfreezestr (9)
 is called.
+.[
+soldoc
+.]
+.[
+lis
+.]
 .IP \(em
+.BR freezestr ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
 .IR LiS
-has a particularly broken version of this function.  Under
+has a particularly broken version of this function.
+.[
+lis
+.]
+Under
 .IR LiS ,
 .BR freezestr ()
 only sets a flag (in a non-MP-safe way) on each stream head and queue in the
 stream.  It does not stop the stream from being closed, flushed, or other
 actions taken as a result of timeouts, callbacks or buffer calls.
-.BR freezestr ()
-in
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
 .B Linux Fast-STREAMS
-does not recreate these
-.I LiS
-bugs, but provides a 
-.BR freezestr ()
-that functions properly.
+.[
+lfs
+.]
+in place of
+.IR LiS .
 .IP \(em
 .BR freezestr ()
 does not result in single-party deadlock on the calling processor when called
@@ -575,6 +618,7 @@ and
 .IR UnixWare \(rg
 will result in single-party deadlock on the calling processor in the same
 circumstance.
+.IP ""
 Portable
 .I STREAMS
 drivers and modules will not call
@@ -616,6 +660,16 @@ deadlock of the calling processor.
 and
 .IR UnixWare \(rg
 will result in single-party deadlock in the same circumstance.
+.[
+uslspg
+.]
+.[
+solspg
+.]
+.[
+suxspg
+.]
+.IP ""
 Portable
 .I STREAMS
 drivers and modules will not attempt to call any of these restricted functions
@@ -634,6 +688,15 @@ state that any thread currently within the stream will be blocked if it
 attempts to put messages onto or take messages off of
 .B any
 queue within the stream (with the sole exception of the caller).
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
 If the
 .IR Solaris \(rg,
 .IR SUPER-UX \(rg
@@ -674,11 +737,20 @@ specify that the following functions cannot be called on a frozen stream:
 .BR qreply (9),
 .BR qsize (9),
 .BR SAMESTR (9).
+.[
+uslspg
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
 .IP \(em
 .IR "SVR 4.2 MP DDI/DKI" ,
-.[
-usldk
-.]
 .IR SUPER-UX \(rg
 and
 .IR UnixWare \(rg
@@ -688,23 +760,32 @@ call:
 .BR rmvq (9),
 .BR strqget (9),
 .BR strqset (9).
+.[
+usldk
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
 .IR Solaris \(rg
 specifies that these functions must have the queue protected with
 .I STREAMS
 functions or some other locking mechanism.
+.[
+soldoc
+.]
 .IP \(em
 .IR SUPER-UX \(rg
+states that the stream cannot be frozen while calling
+.BR rmvq (9),
 .[
 suxspg
 .]
-states that the stream cannot be frozen while calling
-.BR rmvq (9),
 but this is probably an error in the
 .IR SUPER-UX \(rg
 documentation.
-.[
-suxspg
-.]
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -715,7 +796,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI.
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]

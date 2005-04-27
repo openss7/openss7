@@ -1,0 +1,8 @@
+
+Things to do:
+
+- Finish the documentation.
+
+- Finish the full STREAMS logger and proper implementation of the strlog()
+  utility.
+

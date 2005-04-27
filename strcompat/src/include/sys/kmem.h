@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.3 2005/04/26 18:56:52 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.4 2005/04/27 09:35:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/26 18:56:52 $ by $Author: brian $
+ Last Modified $Date: 2005/04/27 09:35:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_KMEM_H__
 #define __SYS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/26 18:56:52 $"
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/27 09:35:25 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -81,7 +81,7 @@ __EXTERN_INLINE void *kmem_alloc(size_t size, int flags)
 #if ((L1_CACHE_BYTES > 32) && (PAGE_SIZE == 4096)) || ((L1_CACHE_BYTES > 64) && (PAGE_SIZE != 4096))
 	/* all we have to do is pad to a cacheline to get cacheline aligment, as long as a
 	   cacheline is a power of 2 */
-	if (flags & KM_CACHEALIGN && size <= (L1_CACHES_BYTES >> 1))
+	if (flags & KM_CACHEALIGN && size <= (L1_CACHE_BYTES >> 1))
 		size = L1_CACHE_BYTES;
 #endif
 	/* KM_PHYSCONTIG is ignored because kmalloc'ed memory is always physically contiguous. */

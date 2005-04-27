@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.5 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.6 2005/04/27 09:27:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/04/27 09:27:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRLOG_H__
 #define __SYS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/27 09:27:59 $"
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -62,6 +62,8 @@
 #define SL_WARN	    0x0020
 #define SL_NOTE	    0x0040
 #define SL_NOPUTBUF 0x0080	/* uw7 src compatibility (does nothing) */
+
+#define NLOGARGS    3		/* max number of arguments (really unlimited) */
 
 #define I_ERRLOG	(__SID | 65)	/* error log */
 #define I_TRCLOG	(__SID | 66)	/* trace log */

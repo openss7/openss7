@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strqset.9.man,v 0.9.2.12 2005/04/22 22:47:37 brian Exp $
+.\" @(#) $Id: strqset.9.man,v 0.9.2.13 2005/04/27 09:27:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -91,6 +91,7 @@ int \fBstrqset\fR(queue_t *\fIq\fR, qfields_t \fIwhat\fR, unsigned char \fIband\
 .TP
 .I q
 the queue for which to set values.
+.PD 0
 .TP
 .I what
 what values of the associated queue to set.
@@ -100,6 +101,7 @@ the band for the specified settings.
 .TP
 .I val
 the value to set.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -138,12 +140,13 @@ specifies the queue (or queue band if
 is non-zero) attribute to be set.
 .I what
 can be one of the following values.
-.TP \w'\ QMINPSZ\ 'u
+.TP \w'QMAXPSZ\(em'u
 .B QHIWAT
 Sets the high water mark associated with the
 .I q
 or queue
 .IR band .
+.PD 0
 .TP
 .B QLOWAT
 Sets the low water mark associated with the
@@ -164,6 +167,7 @@ Sets the minimum packet size associated with the
 For this operation
 .I band
 must be zero (0).
+.PD
 .PP
 .BR strqset ()
 provides a mechanism whereby a
@@ -188,6 +192,7 @@ structure contains at least the following members:
 .HP
 .BI "size_t " q_hiwat
 \- the high water mark for the queue.
+.PD 0
 .HP
 .BI "size_t " q_lowat
 \- the low water mark for the queue.
@@ -197,6 +202,7 @@ structure contains at least the following members:
 .HP
 .BI "ssize_t " q_minpsz
 \- the minimum message size accepted by the queue.
+.PD
 .PP
 The
 .B qband
@@ -204,9 +210,11 @@ structure contains at least the following members:
 .HP
 .BI "size_t " qb_hiwat
 \- the high water mark for the band.
+.PD 0
 .HP
 .BI "size_t " qb_lowat
 \- the low water mark for the band.
+.PD
 .\"
 .\"
 .\".SH USAGE
@@ -227,7 +235,7 @@ When
 .BR strqset ()
 fails, the requested attribute remains unchanged, and
 it returns one of the following errors:
-.TP \w'\ [EINVAL]\ 'u
+.TP \w'[ENOMEM]\(em'u
 .RB [ EINVAL ]
 The queue pointer
 .I q
@@ -235,9 +243,6 @@ is
 .BR NULL;
 .I q
 does not point to a valid queue structure;
-the queue band specified in
-.I band
-does not exist;
 .BR QMAXPSZ " or " QMINPSZ
 was specified for
 .I what
@@ -246,6 +251,13 @@ and
 was non-zero;
 .I what
 is not a valid queue or queue band attribute.
+.TP
+.RB [ ENOMEM ]
+the queue band specified in
+.I band
+does not exist and a
+.BR qband (9)
+structure could not be immediately allocated.
 .TP
 .RB [ EPERM ]
 .I what
@@ -346,7 +358,8 @@ usldk
 .SH HISTORY
 .PP
 .BR strqset ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4spg
 .]

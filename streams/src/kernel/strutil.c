@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/27 09:28:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/27 00:33:25 $ by $Author: brian $
+ Last Modified $Date: 2005/04/27 09:28:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/27 09:28:08 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/04/27 09:28:08 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2417,8 +2417,8 @@ int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 		unsigned long flags;
 		qrlock(q, &flags);
 		do {
-			if (!(qb = __find_qband(q, band)))
-				goto einval;
+			if (!(qb = __get_qband(q, band)))
+				goto enomem;
 			switch (what) {
 			case QHIWAT:
 				*val = qb->qb_hiwat;
@@ -2445,10 +2445,12 @@ int strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
 				*val = q->q_flag;
 				break;
 			default:
-			      einval:
 				err = -EINVAL;
 				break;
 			}
+			break;
+		      enomem:
+			err = -ENOMEM;
 			break;
 		} while (0);
 		qrunlock(q, &flags);

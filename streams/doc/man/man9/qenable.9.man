@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.13 2005/04/27 00:32:53 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.14 2005/04/27 09:27:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B qenable, enableq
+.B qenable
 \- schedules a \fISTREAMS\fR message queue service routine
 .\"
 .\"
@@ -105,14 +105,10 @@ has been disabled with a call to
 .BR noenable (9),
 then
 .BR qenable ()
-will silently fail.
-Whether the queue can be scheduled with
-.BR qenable ()
-can be determined to some degree with a call to
-.BR canenable (9).
+will still succeed in enabling the queue.
 .PP
 .BR qenable ()
-is normally called to indirectly invoke the execution of
+is normally called to invoke the execution of
 .IR q 's
 service procedure.
 .\"
@@ -127,12 +123,7 @@ returns
 .SH ERRORS
 .PP
 .BR qenable ()
-fails silently if the
-.B QNOENB
-flag was set by
-.BR noenable
-for the queue,
-.IR q .
+is always successful.
 .\"
 .\"
 .SH CONTEXT
@@ -151,10 +142,12 @@ If the queue was not already enabled
 .RB ( srv (9)
 procedure already scheduled to run) on a different CPU,
 .BR qenable ()
-schedules the service procedure of
-.I q
-on the current CPU.  In this case, the queue service procedure for
-.I q
+schedules the service procedure of the queue,
+.IR q ,
+using
+.BR scheduleq (9)
+on the current CPU.  In this case, the queue service procedure for the queue,
+.IR q ,
 will not execute until after
 .BR qenable ()
 returns and the function that called
@@ -182,10 +175,7 @@ with execution of the service procedure.
 .SH NOTICES
 .PP
 .BR qenable ()
-has no effect if
-.B QNOENB
-is set,
-the queue has already been enabled due to internal
+has no effect if the queue has already been enabled due to internal
 .I STREAMS
 scheduler actions, or a previous call to
 .BR qenable ()
@@ -198,9 +188,12 @@ procedure will not reschedule the service procedure.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR freezestr (9),
-.BR canenable (9),
+.BR runqueues (9),
 .BR noenable (9),
+.BR srv (9),
+.BR scheduleq (9),
+.BR qclose (9),
+.BR freezestr (9),
 .BR enableok (9).
 .\"
 .\"
@@ -224,24 +217,48 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR qenable ()
 only schedules the queue for later service.
-.IP \(em
 .BR qenable ()
 schedules a queue regardless of whether the
 .B QNOENB
 flag is set, or whether
 .BR noenable (9)
 has been called for the queue,
+For a version of this function that considers the
+.B QNOENB
+flag, see
+.BR enableq (9).
+Even as far back as
+.IR "SVR 3.1" ,
+.[
+svr3spg
+.]
+the
+.BR noenable (9),
+.BR enableok (9)
+and
+.BR canenable (9)
+functions affecting the
+.B QNOENB
+flag have only affected
+.BR putq (9)
+scheduling the queue,
 .IR q .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will expect that
+.BR qenable ()
+will enable a queue regardless of the state of the
+.B QNOENB
+flag and the calling of
+.BR noenable (9).
 .IP \(em
 .BR qenable ()
 is not bug for bug compatible with
 .IR LiS .
 .IP ""
-Under
+Under older versions of
 .IR LiS ,
-.[
-LiS
-.]
 .BR qenable ()
 will not enable a queue previously disabled with
 .BR enableok ()
@@ -250,6 +267,31 @@ or
 This is an
 .I LiS
 bug.
+Under current versions of
+.IR LiS ,
+this is not the case, but current versions of
+.I LiS
+have their own bugs: for example,
+.BR qenable ()
+will not enable a queue that is closing (i.e. had the
+.B QCLOSING
+flag set), which is before module and driver
+.BR qclose (9)
+procedures get called.
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use
+.IR LiS ,
+but will use
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+in its place.
 .IP \(em
 .BR qenable ()
 may be called on a stream frozen with
@@ -275,6 +317,7 @@ do not permit
 .BR qenable ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
 drivers and modules should not call
@@ -284,22 +327,40 @@ on a stream frozen with
 .IP \(em
 .BR qenable ()
 enables the queue regardless of the settings of other flags.
+.IR IRIX \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
 .IR UnixWare \(rg
 documentation
-.[
-uw7doc
-.]
-explicitly states that
+explicitly state that
 .BR qenable ()
 schedules the queue regardless of whether
 .BR noenable (9)
 was invoked on the queue previously.
-.IR AIX
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.IR AIX \(rg,
 .IR HP-UX \(rg,
 .IR OSF/1 \(rg
 and
-.IR Solaris \(rg
+.IR UXP/V \(rg
 documentation
+does not say that
+.BR noenable (9)
+defeats
+.BR qenable ()
+either.
 .[
 aixdoc
 .]
@@ -309,32 +370,34 @@ hpuxdoc
 .[
 osfdoc
 .]
-do not say that
-.BR noenable (9)
-defeats
-.BR qenable ()
-either.
+.[
+uxpdoc
+.]
+Older versions of
 .I LiS
 source code,
-.[
-LiS
-.]
-on the other hand shows that no queue will be enabled while the
+on the other hand, shows that no queue will be enabled while the
 .BR QNOENB ", "  QPROCSOFF " or " QCLOSING
 flags are set.
 This is an
 .I LiS
 bug.
-.IP \(em
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely on
 .BR qenable ()
-is not bug-for-bug compatible with
-.IR LiS .
-.I LiS
-has a nasty bug in
-.BR qenable ()
-requiring the non-standard
-.BR canenable (9)
-function.
+to enable a stream that is disabled previously with
+.BR noenable (9);
+instead, it will reenable the stream with
+.BR enableok (9)
+before calling
+.BR qenable ().
+See
+.RI \*(lq EXAMPLES \*(rq
+under
+.BR enableok (9)
+for an example.
 .IP \(em
 Symbol
 .BR lis_qenable ()
@@ -365,7 +428,8 @@ usldk
 .SH HISTORY
 .PP
 .BR qenable ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

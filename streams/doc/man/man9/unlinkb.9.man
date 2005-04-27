@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unlinkb.9.man,v 0.9.2.9 2005/04/13 07:51:13 brian Exp $
+.\" @(#) $Id: unlinkb.9.man,v 0.9.2.10 2005/04/27 09:27:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 09:27:54 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -101,6 +101,7 @@ removes the first message block from the message pointed to by
 and returns a pointer to the next message block in the message (or
 .B NULL
 if there are no remaining message blocks in the message).
+The removed message block is not freed.
 .\"
 .\"
 .SH RETURN

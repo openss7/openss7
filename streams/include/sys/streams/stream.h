@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.27 2005/04/26 18:56:52 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.29 2005/04/27 09:35:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/26 18:56:52 $ by $Author: brian $
+ Last Modified $Date: 2005/04/27 09:35:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/04/26 18:56:52 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/04/27 09:35:25 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -879,6 +879,7 @@ typedef enum qfields {
 	QFIRST,				/* first message in queue */
 	QLAST,				/* last message in queue */
 	QFLAG,				/* state */
+	QBAD,				/* last (AIX and SUPER-UX) */
 } qfields_t;
 
 extern bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg);
@@ -990,7 +991,7 @@ __EXTERN_INLINE int pcmsg(unsigned char type)
 __EXTERN_INLINE int putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(0, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
 		return (1);
@@ -1000,7 +1001,7 @@ __EXTERN_INLINE int putctl(queue_t *q, int type)
 __EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(1, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
 		put(q, mp);
@@ -1011,7 +1012,7 @@ __EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(2, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
 		*mp->b_wptr++ = (unsigned char) param2;
@@ -1023,7 +1024,7 @@ __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 __EXTERN_INLINE int putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(0, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
 		return (1);
@@ -1033,7 +1034,7 @@ __EXTERN_INLINE int putnextctl(queue_t *q, int type)
 __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(1, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
 		putnext(q, mp);
@@ -1044,7 +1045,7 @@ __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
-	if (likely(ctlmsg(type) && (mp = allocb(2, BPRI_HI)))) {
+	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
 		*mp->b_wptr++ = (unsigned char) param2;
@@ -1079,15 +1080,13 @@ __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2)
 __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp)
 {
 	mblk_t **mpp;
-	if (bp) {
+	if (likely(bp != NULL)) {
 		for (mpp = &mp; *mpp && *mpp != bp; mpp = &(*mpp)->b_cont) ;
-		if (!*mpp)
-			goto error;
-		*mpp = bp->b_cont;
-		bp->b_cont = NULL;
+		if (likely(*mpp != NULL)) {
+			*mpp = xchg(&bp->b_cont, NULL);
+			return (mp);
+		}
 	}
-	return (mp);
-      error:
 	return ((mblk_t *) (-1));
 }
 __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp)
