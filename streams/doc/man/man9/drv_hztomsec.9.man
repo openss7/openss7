@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.13 2005/04/24 23:09:23 brian Exp $
+.\" @(#) $Id: drv_hztomsec.9.man,v 0.9.2.14 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -84,10 +84,9 @@ sort-adjacent-labels
 .B #include <sys/types.h>
 .br
 .B #include <sys/dki.h>
-.sp
-.PD 0
 .HP
 .BI "clock_t drv_hztousec(clock_t " hertz );
+.PD 0
 .HP
 .BI "clock_t drv_hztomsec(clock_t " hertz );
 .HP

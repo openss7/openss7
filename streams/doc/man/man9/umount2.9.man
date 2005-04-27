@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: umount2.9.man,v 0.9.2.10 2005/04/13 07:51:13 brian Exp $
+.\" @(#) $Id: umount2.9.man,v 0.9.2.11 2005/04/27 00:32:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,17 +92,19 @@ int \fBumount2\fR(char *\fIpathname\fR, int \fIflags\fR);
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\ pathname\ 'u
 .I pathname
 is the path to the directory to which the file system is attached.
+.PD 0
 .TP
 .I flags
 can be one of the following:
 .RS
-.TP
+.TP \w'\ MTP_FORCE\ 'u
 .B MTP_FORCE
 force unmount the file system
 .RE
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -211,28 +213,35 @@ has no known bugs.
 .BR umount2 ()
 is compatible with
 .I LiS
-with the following portability considerations:
-.IP \(em \w'\(em\(em'u
-.BR umount2 ()
-is not bug-for-bug compatible with
-.IR LiS .
 .[
 lis
 .]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR umount2 ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
 .I LiS
 synthesizes system calls from inside the kernel that is incompatible with
 architectures that do not support in-kernel system calls.
+.[
+lis
+.]
 .BR umount2 ()
 performs a direct function call to
 .BR sys_umount (9)
 within the kernel and does not suffer from this deficiency.
-.IP \(em
-The symbol
-.B lis_umount2
-is provided for source compatibility.
-.BR lis_umount2 ()
-simply calls
-.BR umount2 ().
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+in place of
+.IR LiS .
 .IP \(em
 .BR umount2 ()
 is provided for source level compatibility with
@@ -249,14 +258,6 @@ lfs
 differ from that of
 .IR LiS ,
 binaries are incompatible.
-.sp
-Note that
-.BR lis_umount2 ()
-was deprecated as of
-.IR "LiS 2.18.0" .
-See
-.BR lisdeprec (9)
-for more information.
 .IP \(em
 .BR umount2 ()
 only provides functionality comparable to
@@ -269,6 +270,21 @@ Any and all functionality provided by
 in support of
 .RI non- STREAMS
 devices are not supported.
+.IP \(em
+Symbol
+.B lis_umount2
+is provided for compatibility with
+.IR LiS .
+.BR lis_umount2 ()
+simply calls
+.BR umount2 ().
+Note that
+.BR lis_umount2 ()
+was deprecated as of
+.IR "LiS 2.18.0" .
+See
+.BR lisdeprec (9)
+for more information.
 .PP
 See
 .BR STREAMS (9)

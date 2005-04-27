@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copyin.9.man,v 0.9.2.5 2005/04/13 07:51:04 brian Exp $
+.\" @(#) $Id: copyin.9.man,v 0.9.2.6 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:04 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -198,7 +198,7 @@ is provided for compatibility with LiS.  See
 calls
 .BR copyin ()
 directly.
-.sp
+.IP ""
 Note that
 .BR lis_copyin ()
 was deprecated as of

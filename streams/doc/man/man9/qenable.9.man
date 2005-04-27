@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.12 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.13 2005/04/27 00:32:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -232,6 +232,11 @@ flag is set, or whether
 .BR noenable (9)
 has been called for the queue,
 .IR q .
+.IP \(em
+.BR qenable ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
 Under
 .IR LiS ,
 .[

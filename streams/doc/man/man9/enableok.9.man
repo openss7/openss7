@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: enableok.9.man,v 0.9.2.13 2005/04/24 23:09:23 brian Exp $
+.\" @(#) $Id: enableok.9.man,v 0.9.2.14 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -265,37 +265,28 @@ and systems based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR enableok ()
+may be called on a stream frozen with
+.BR freezestr (9).
+.BR enableok ()
 uses atomic bit operations and does not take the queue write lock.
 This makes
 .BR enableok ()
 safe to call while the queue is locked (e.g. while the queue is frozen
 with
 .BR freezestr (9)).
-Under
-.IR LiS ,
-.BR enableok ()
-takes the queue spin lock and uses normal bit operations to set the flag.
-.IP \(em
-.BR enableok ()
-may be called on a stream frozen with
-.BR freezestr (9).
-.IR "SVR 4.2MP DDI/DKI" ,
-.[
-usldk
-.]
 .IR SUPER-UX \(rg
-.[
-suxspg
-.]
 and
 .IR UnixWare \(rg
-.[
-uw7spg
-.]
 do not permit
 .BR enableok ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
 .IR Solaris \(rg
 .[
 solspg
@@ -304,9 +295,17 @@ permits
 .BR enableok ()
 to be called on a stream frozen with
 .BR freezestr (9).
+Under
+.IR LiS ,
+.[
+lis
+.]
+.BR enableok ()
+takes the queue spin lock and uses normal bit operations to set the flag.
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not invoke
+modules and drivers will not invoke
 .BR enableok ()
 on a stream that has previously been frozen with
 .BR freezestr (9).
@@ -327,13 +326,41 @@ coding error.  Repaired versions of
 will make
 .BR enableok ()
 fail silently in these situations.
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should never invoke
+modules and drivers will not invoke
 .BR enableok ()
 with an invalid
 .I q
 argument.
+.IP \(em
+.BR enableok ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+.I LiS
+incorrectly schedules a queue that would have otherwise been enabled had
+.BR nonenable (9)
+not been in effect, whenever
+.BR enableok ()
+is called.  This is not consistent with
+.I SVR 4
+descriptions of treatment of the
+.B QNOENB
+flag and is an
+.I LiS
+bug.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+instead of
+.IR LiS .
 .IP \(em
 Symbol
 .BR lis_safe_enableok ()
@@ -345,20 +372,6 @@ See
 calls
 .BR enableok ()
 directly.
-.I LiS
-incorrectly schedules a queue that would have otherwise been enabled had
-.BR nonenable (9)
-not been in effect, whenever
-.BR enableok ()
-is called.  This is not consistent with
-.I SVR 4
-descriptions of treatment of the
-.B QNOENB
-flag.
-This is an
-.I LiS
-bug not recreated by
-.BR "Linux Fast-STREAMS" .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

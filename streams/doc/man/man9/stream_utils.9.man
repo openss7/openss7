@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: stream_utils.9.man,v 0.9.2.5 2005/03/30 13:38:53 brian Exp $
+.\" @(#) $Id: stream_utils.9.man,v 0.9.2.6 2005/04/27 00:32:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -78,10 +78,9 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .B #include <sys/stream.h>
-.sp
-.PD 0
 .HP
 \fRvoid \fBlinkb\fR(mblk_t *\fImp1\fR, mblk_t *\fImp2\fR);
+.PD 0
 .HP
 \fRmblk_t *\fBunlinkb\fR(mblk_t *\fImp\fR);
 .PD

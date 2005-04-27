@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocq.9.man,v 0.9.2.13 2005/04/23 16:47:51 brian Exp $
+.\" @(#) $Id: allocq.9.man,v 0.9.2.14 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/23 16:47:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -240,7 +240,7 @@ is provided for compatibility with
 simply calls
 .BR allocq ()
 directly.
-.sp
+.IP ""
 Note that
 .BR lis_allocq ()
 was deprecated as of
