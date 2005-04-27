@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putbq.9.man,v 0.9.2.12 2005/04/20 18:41:38 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 0.9.2.14 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue onto which to put back the message.
+.PD 0
 .TP
 .I mp
 the message to put back on the queue.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -105,8 +107,10 @@ back onto the queue pointed to by
 When the message is placed back on the queue, it is placed on the head of the
 queue, rather than the tail of the queue as would result from a call to
 .BR putq (9).
-The message is placed in the proper order at the head of the priority, normal
-or specified band, queue counts are adjusted and queue enabling is performed.
+The message is placed in the proper order at the head of the priority, normal or specified band,
+queue counts are adjusted and queue enabling is performed if the message is a high priority message
+or if the queue has not been disabled with a call to
+.BR noenable (9).
 .PP
 .BR putbq ()
 is normally called from within queue service routines to place a message back
@@ -131,13 +135,11 @@ Upon success,
 returns true (1) after placing the message
 .I mp
 back on the head of the queue.
-.PP
 Upon failure,
 .BR putbq ()
 returns false (0) and the message pointed to by
 .I mp
 is unaltered.
-.PP
 The return value from
 .BR putbq ()
 should always be examined.
@@ -179,13 +181,15 @@ will not fail for the same
 for which the message was obtained with
 .BR getq (9).
 Otherwise, it can be ensured that the queue band exists by calling
+.BR getqstr (9)
+or
 .BR setqstr (9)
 for the band in question before calling
 .BR putbq ().
 .PP
 Care should be taken not to return with
 .BR putbq ()
-a priority message take off of a queue in a service procedure with
+a priority message taken off of a queue in a service procedure with
 .BR getq (9).
 This is because placing the priority message back on the queue will cause the
 service procedure to re-execute at the earliest opportunity resulting in
@@ -194,9 +198,15 @@ possible indefinite looping.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR freezestr (9),
+.BR putq (9),
+.BR noenable (9),
 .BR getq (9),
-.BR putq (9).
+.BR canput (9),
+.BR bcanput (9),
+.BR getqstr (9),
+.BR setqstr (9),
+.BR qprocsoff (9),
+.BR freezestr (9).
 .\"
 .\"
 .SH BUGS
@@ -209,12 +219,15 @@ has no known bugs.
 .PP
 .BR putbq ()
 is compatible with
-.IR "SVR 4.2 DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
 and implementations based on
-.IR "SVR 4" ,
+.IR "SVR 4"
+.[
+svr4dk
+.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 If
@@ -222,7 +235,8 @@ If
 is passed an invalid
 .IR q " or " mp
 argument, the result is undefined.
-Under LiS,
+Under
+.IR LiS ,
 .BR putbq ()
 fails if the passed in message pointer
 .I mp
@@ -232,25 +246,49 @@ or, the passed in queue pointer
 .I q
 is
 .BR NULL ,
-points to a structure other than a queue structure, or refers to a queue that
-is closing or for which
-put and service routine processing has been
-turned off (e.g. with
+points to a structure other than a queue structure, or refers to a queue that is closing or for
+which put and service routine processing has been turned off (e.g. with
 .BR qprocsoff (9)).
+.IP ""
+Porable
+.I STREAMS
+modules and drivers will not pass
+.B NULL
+or invalid pointers to
+.BR putbq ().
 .IP \(em
 .BR putbq ()
 only fails if
 .I mp->b_band
-refers to a non-existent queue band and a queue band structure could not be
-allocated.  When
+refers to a non-existent queue band and a queue band structure could not be allocated.  When
 .BR putbq ()
 returns failure,
 .I mp
 is unchanged.
-This is consistent with SVR 4.2 DDI/DKI and
+This is consistent with
+.IR "SVR 4.2 DDI/DKI" ,
+.IR IRIX \(rg,
 .IR Solaris \(rg
+and
+.IR UnixWare \(rg
 documentation.
-Under LiS, regardless of whether
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.IP \(em
+.BR putbq ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+Under older versions of
+.IR LiS ,
+regardless of whether
 .BR putbq ()
 returns success or failure, the message pointed to by
 .I mp
@@ -261,45 +299,62 @@ or freed, so that the caller to
 always loses ownership of the message pointed to by
 .I mp
 upon return from the call.
-This is inconsistent with SVR 4.2 DDI/DKI and
-.IR Solaris \(rg
-documentation.
-This is an LiS bug.
+This was inconsistent with
+.IR "SVR 4.2 DDI/DKI" ,
+and was an
+.I LiS
+bug.
+Current versions of
+.I LiS
+do not free the message.
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B Linux Fast-STREAMS
+in place of
+.IR LiS .
 .IP \(em
 .BR putbq ()
 may be called on a stream frozen with
 .BR freezestr (9).
 .IR "SVR 4.2 MP DDI/DKI" ,
-.[
-usldk
-.]
 .IR Solaris \(rg,
-.[
-solspg
-.]
 .IR SUPER-UX \(rg
-.[
-suxspg
-.]
 and
 .IR UnixWare \(rg
-.[
-uw7spg
-.]
 do not permit
 .BR putbq ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.[
+usldk
+.]
+.[
+solspg
+.]
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not call
+modules and drivers will not call
 .BR putbq ()
 on a stream frozen with
 .BR freezestr (9).
 .IP \(em
 Symbol
 .BR lis_putbq ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .BR lis_putbq ()
 simply calls
@@ -315,7 +370,7 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
@@ -324,7 +379,8 @@ usldk
 .SH HISTORY
 .PP
 .BR putbq ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.10 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.12 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,11 @@ sort-adjacent-labels
 .TP
 .I mp
 the message to pull up.
+.PD 0
 .TP
 .I len
 the number of bytes to pull up.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -108,20 +110,21 @@ If
 .I len
 is -1,
 .BR pullupmsg ()
-attempts to merge all of the leading data blocks of the same type from the
-passed in message pointed to by
+attempts to merge all of the leading data blocks of the same type from the passed in message pointed
+to by
 .I mp
 into a single data block.
 .PP
-If there is nothing to alter (that is, the initial data block contains greater than or 
-equal to
+If there is nothing to alter (that is, the initial data block contains greater than or equal to
 .I len
 bytes, or there is only one data block in the message),
 .BR pullupmsg ()
-returns success without altering the message.
+returns success without altering the message.  (This is also true in the case where the passed in
+length,
+.IR len ,
+is zero (0).)
 .PP
-If the number of bytes in the initial blocks of the passed in message pointed
-to by
+If the number of bytes in the initial blocks of the passed in message pointed to by
 .I mp
 is less than the number of bytes specified in
 .IR len ,
@@ -129,25 +132,59 @@ is less than the number of bytes specified in
 will fail.
 .PP
 .BR pullupmsg ()
-does not allocate a new message block, but attaches the altered data block to
-the existing initial message block.
+does not allocate a new message block, but attaches the altered data block to the existing initial
+message block.
 .BR pullupmsg ()
-does not deallocate the message blocks or data blocks that were absorbed into
-the new data block: instead,
+does not deallocate the message blocks or data blocks that were absorbed into the new data block:
+instead,
 .BR pullupmsg ()
 sets the
 .I b_wptr
 to the
 .I b_rptr
 in the message blocks of all absorbed data blocks.
+.\"
+.\"
+.SH USAGE
 .PP
 .BR pullupmsg ()
 is typically used where it is necessary for the first number of bytes in a
 .I STREAMS
-message be contiguous to meet the needs of the routines processing
-the bytes contained in the message.  In this case,
+message be contiguous to meet the needs of the routines processing the bytes contained in the
+message.  In this case,
 .BR pullupmsg ()
 is called before processing the bytes.
+.PP
+The primary difference between
+.BR pullupmsg ()
+and
+.BR msgpullup (9)
+is that
+.BR pullupmsg ()
+reuses the message blocks and data blocks where possible,
+.BR msgpullup (9)
+always copies.  This is similar to the differences between
+.BR dupmsg (9)
+and
+.BR copymsg (9)
+in that
+.BR pullupmsg ()
+is more efficient under many circumstances.  Nevertheless,
+.BR pullupmsg ()
+can be problematic in a multiprocessor (MP) environment in that it may be difficult to ensure that
+the caller has exclusive access to the passed in message.  Because
+.BR msgpullup (9)
+treats the passed in message as read-only, there are fewer difficulties on MP architectures.  This
+is probably why
+.BR msgpullup (9)
+was originally added to
+.IR "SVR 4.0 MP STREAMS" .
+.PP
+Perhaps it is because
+.BR pullupmsg ()
+has the notion of architectural alignment, whereas
+.BR msgpullup (9)
+does not.
 .\"
 .\"
 .SH RETURN
@@ -157,7 +194,6 @@ Upon success,
 returns true (1), and the message pointed to by
 .I mp
 is altered.
-.PP
 Upon failure,
 .BR pullupmsg ()
 returns false (0), and the passed in message is unaltered.
@@ -166,49 +202,61 @@ returns false (0), and the passed in message is unaltered.
 .SH ERRORS
 .PP
 .BR pullupmsg ()
-fails and returns false (0) when
-the number bytes in the initial data blocks of the same type in the passed in
-message pointed to by
+fails and returns false (0) when the number bytes in the initial data blocks of the same type in the
+passed in message pointed to by
 .I mp
 is less than the number of bytes specified in
 .IR len ;
-or, when the passed in message point
-.I mp
+or, when the passed in message pointer,
+.IR mp ,
 is
 .BR NULL ;
-or, when allocation of the necessary blocks fails.
+when the passed in length,
+.IR len ,
+is less than minus one; or, when allocation of the necessary blocks fails.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR pullupmsg ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, callouts, callbacks, soft
+interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR pullupmsg ()
-is MP-safe; however, the caller is responsible for ensuring exclusive access
-to the passed in message.
+is MP-safe; however, the caller is responsible for ensuring exclusive access to all components of
+the passed in message.
 .\"
 .\"
 .SH NOTICES
 .PP
-It is not always necessary to allocate a new data block to contain the pulled
-up bytes: if there is sufficient room in the initial data block, the initial
-data block can be reused.
+It is not always necessary to allocate a new data block to contain the pulled up bytes: if there is
+sufficient room in the initial data block, and the initial data block is properly aligned (it is
+aligned to the layer 1 cache line for the architecture), the initial data block can be reused.
 .BR pullupmsg ()
-checks for this possibility and efficiently reuses the initial data block
-where possible.
-.\"
-.\"
-.SH NOTICES
+checks for this possibility and efficiently reuses the initial data block where possible.
 .PP
-The DKI function
-.BR msgpullup (9)
-should be used in preference to
-.BR pullupmsg ().
+If the data block is not reused and a new data block is allocated and attached onto the initial
+message block, then the existing inital data block is freed.  This has the side effect that any free
+routine callback is also executed.  Also, any message blocks that are subsumed into the initial data
+block are also freed, possibly excuting the free routine callbacks of their associated data blocks
+as well.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Data blocks allocated during the pullup operation are allocated with priority
+.BR BPRI_MED .
+See
+.BR allocb (9)
+for more information on block allocation priorities.  Data buffers allocated during the pullup
+operation are allocated with flag
+.BR KM_NOSLEEP ", " KM_CACHEALIGN " and " KM_DMA .
+See
+.BR kmem_alloc (9)
+for more information on memory allocation flags.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -225,20 +273,159 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR pullupmsg ()
-is source-level compatible to SVR 4.2 DDI/DKI
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" , 
 .[
 usldk
 .]
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.] 
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR Super-UX \(rg,
+.IR UnixWare \(rg,
+and
+.IR UXP/V \(rg
+all document
+.BR pullupmsg ().
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+irixspg
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
+Whereas, only
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR Solaris \(rg,
+.IR Super-UX \(rg,
+and
+.IR UnixWare \(rg,
+document
+.BR msgpullup (9).
+.IR Solaris \(rg
+states that
+.BR msgpullup (9)
+is a \*(lq\)DKI-compliant replacement for the older
+.BR pullupmsg ()
+routine,\*(rq that is \*(lq\)not included in the DKI and will be removed form the system in a future
+release\*(rq and that users \*(lq\)are strongly encouraged to use
+.BR msgpullup (9)
+instead of
+.BR pullupmsg ().\*(rq
+.[
+soldoc
+.]
+.IR UnixWare \(rg
+documentation indicates that
+.IR "SCO OpenServer" \(rg
+is stuck with
+.BR pullupmsg ().
+.[
+uw7doc
+.]
+.IR UnixWare \(rg
+documentation
+indicates that
+.BR pullupmsg ()
+was only applicable to
+.IR "SVR 4.0" ,
+.IR "SVR 4.1 ES" ,
+and
+.IR "SVR 4.2" .
+That is, no multiprocessor (MP) releases support
+.BR pullupmsg ().
+.IR UnixWare \(rg
+documentation also indicates that use of
+.BR pullupmsg ()
+can panic a multiprocessor (MP)
+.IR UnixWare \(rg " 7
+system, and yet is suitable for a multiprocessor (MP)
+.IR "SCO OpenServer" \(rg
+system.
+.[
+uw7doc
+.]
+So, although
+.BR msgpullup (9)
+is recommended by
 .IR Solaris \(rg
 and
-LiS.
+.IR UnixWare \(rg
+instead of
+.BR pullupmsg (),
+.BR pullupmsg ()
+is by far the more popular interface and has the widest support.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers may use
+.BR pullupmsg ()
+instead of
+.BR msgpullup (9).
+.B Linux Fast-STREAMS
+supports both in an MP-safe way.
+.IP \(em
+.IR UnixWare \(rg
+indicates that the memory for data buffers returned by both
+.BR pullupmsg ()
+and
+.BR msgpullup (9)
+(through
+.IR "SVR 4.2 MP DDI/DKI" )
+are suitable for worst-case DMA and are phsysically contiguous.
 .[
-LiS
+uw7doc
 .]
-.PP
+.B Linux Fast-STREAMS
+also exhibits this behaviour.  Physical contiguous data buffers, aligned on a layer 1 cache boundary
+and suitable for worst-case DMA are allocated by
+.BR pullupmsg ()
+but not
+.BR msgpullup (9).
+If no data buffer is allocated, the characteristics of the existing data buffer prevail.  If
+worst-case DMA suitable memory is necessary, it must be allocated as such in the first place.  You
+cannot use
+.BR pullupmsg ()
+to change the character of the data buffer.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will no make any assumptions about the phsyical contiguity or suitability for
+worst-case DMA of data buffers allocated via
+.BR msgpullup (9).
+.IP \(em
 Symbol
 .BR lis_pullupmsg ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .BR lis_pullupmsg ()
 simply calls
@@ -253,21 +440,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
-.]
-.IR Solaris \(rg
-documentation.
-.[
-soldoc
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR pullupmsg ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

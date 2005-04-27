@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnext.9.man,v 0.9.2.13 2005/04/13 23:45:19 brian Exp $
+.\" @(#) $Id: putnext.9.man,v 0.9.2.15 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 23:45:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,9 +83,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue beyond which to put the message.
+.PD 0
 .TP
 .I mp
 the message to put beyond the queue.
+.PD
 .\"
 .\"
 .SH SYNOPSIS
@@ -189,7 +191,10 @@ procedure,
 .BR qbufcall (9),
 .BR timeout (9),
 .BR qtimeout (9),
-callback function or interrupt service routine.  The
+callback function or interrupt service routine.
+Either the module or driver muswt be synchronized using
+.I STREAMS
+synchronization levels, or the
 .BR put (9)
 procedure itself must perform its own mutual exclusion.
 .\"
@@ -233,23 +238,24 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR putnext ()
-is source-level compatible with SVR 4.2 DDI/DKI,
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
 usldk
 .]
-.IR Solaris \(rg
-and
-LiS
+and implementations based on
+.I SVR 4
 .[
-LiS
+svr4dk
 .]
-with the following exceptions:
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR putnext ()
 results are undefined if the arguments
 .IR q " or " mp
 is invalid.
-Under LiS,
+Under
+.IR LiS ,
 .BR putnext ()
 fails silently if
 .I q->q_next
@@ -271,7 +277,8 @@ is MP-safe across pushes and pops of modules and other stream reconfiguration
 because it protects dereference of the
 .I q->q_next
 pointer with the stream head read lock.
-Under LiS,
+Under
+.IR LiS ,
 .BR putnext ()
 simply calls
 .BR put ()
@@ -290,31 +297,36 @@ flag set or with the
 .B D_MTPUTSHARED
 flag set.
 .IP ""
-LiS holds an exclusive nesting queue procedures lock while calling
+.I LiS
+holds an exclusive nesting queue procedures lock while calling
 .BR putnext ()
-executes.  LiS
+executes.
+.I LiS
 .BR lis_safe_putnext ()
 and
 .BR lis_safe_qreply (9)
 call the
 .BR lis_safe_putmsg (9)
-function, meaning that all message passing functions in LiS lock out
-interrupts until the entire thread of execution completes.  LiS drivers and
-modules calling
+function, meaning that all message passing functions in
+.I LiS
+lock out interrupts until the entire thread of execution completes.
+.I LiS
+drivers and modules calling
 .BR putnext ()
-should notice superior interrupt service routine latency and performance.  It
-is normally the case that put procedures and MP-safe as then normally use only
-MP-safe queue and message utility functions.  Also, most put procedures and
-MP-safe as they normally use only MP-safe queue and message utility functions.
-Also, most put procedures are inherently invoke single threaded (from a
-single-threaded service procedure).  Lack of locking should not present a
-problem.
+should notice superior interrupt service routine latency and performance.  It is normally the case
+that put procedures are MP-safe as they normally use only MP-safe queue and message utility
+functions.  Also, most put procedures are inherently invoked single threaded (from a single-threaded
+service procedure).  Lack of locking should not present a problem.
 .IP ""
-Because LiS also uses this lock for service procedures, this means that while
-the LiS schedule is running (at kernel thread priority 50), interrupts,
-timeouts, bottom halves, hi tasklets and soft interrupts are indefinitely
-postponed.  This is not acceptable for soft real-time performance.  Rewrite
-LiS put procedures to be MP-safe.
+Because
+.I LiS
+also uses this lock for service procedures, this means that while the
+.I LiS
+scheduler is running (at kernel thread priority 50), interrupts, timeouts, bottom halves, hi
+tasklets and soft interrupts are indefinitely postponed.  This is not acceptable for soft real-time
+performance.  Rewrite
+.I LiS
+put procedures to be MP-safe.
 .IP \(em
 .IR UnixWare \(rg
 .[
@@ -329,10 +341,19 @@ do not permit
 .BR putnext ()
 to be called on a stream frozen with
 .BR freezestr (9).
-.PP
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not call
+.BR putnext ()
+on a stream frozen by the caller with
+.BR freezestr (9).
+.IP \(em
 Symbol
 .BR lis_safe_putnext ()
-is provided for binary compatibility with LiS.  See
+is provided for binary compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .BR lis_safe_putnext ()
 simply calls
@@ -347,35 +368,34 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+.IR SVR 4.2 MP DDI/DKI" .
 .[
 usldk
-.]
-SVID,
-.[
-svid
-.]
-XID.
-.[
-xbd5
 .]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR putnext ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]
 In SVR 3,
-.[
-svr3spg
-.]
 4 and 4.2,
 .BR putnext ()
 returned
 .BR int .
+.[
+svr3spg
+.]
+.[
+svr4dk
+.]
+.[
+usldk
+.]
 C compilers at the time did not support
 .B void
 as a return value, and the value returned by

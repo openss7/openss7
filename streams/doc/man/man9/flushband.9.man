@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: flushband.9.man,v 0.9.2.14 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: flushband.9.man,v 0.9.2.16 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,19 +83,21 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "flushband(queue_t *" q ", unsigned char " band ", int " flag );
+.BI "void flushband(queue_t *" q ", unsigned char " band ", int " flag );
 .\"
 .\"
 .SH ARGUMENTS
 .TP
 .I q
 the queue to flush.
+.PD 0
 .TP
 .I band
 the band to flush within the queue.
 .TP
 .I flag
 how to flush the band within the queue.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -132,6 +134,17 @@ is other than
 .BR flushband ()
 will perform
 .BR FLUSHALL .
+.PP
+If
+.B QB_WANTW
+is set for the band and the flush causes the band's count to fall below the low water mark, or if
+the band's count is reduced to zero, the nearest feeding queue with a service procedure or that is a
+stream head or stream end (including a multiplexing driver) will be enabled.  That is, back-enabling
+will be performed.  The
+.B QB_FULL
+and
+.B QB_WANTW
+flags will also be cleared.
 .\"
 .\"
 .SH RETURN
@@ -178,12 +191,33 @@ will not result in single-party deadlock.
 .SH NOTICES
 .PP
 .BR flushband ()
-performs fast flushes by linking all band messages into the per-thread free
-messages list.  These messages will then later be broken into individual
-message blocks and freed to the per-thread free list and finally to the
+is a widely supported
+.I STREAMS
+function.
+Portable
+.I STREAMS
+modules and drivers may use
+.BR flushband ();
+however, portable
+.I STREAMS
+modules and drivers
+will not call
+.BR flushband ()
+with a band of zero (0).
+See
+.RI \(lq COMPATIBILITY \(rq,
+below.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR flushband ()
+performs fast flushes by linking all band messages into the per-thread free messages list.  These
+messages will then later be broken into individual message blocks and freed to the per-thread free
+list and finally to the
 .B mdbblock
-memory cache at the end of any queue run.  A new queue service run will be
-scheduled if one is not already running.
+memory cache at the end of any queue run.  A new queue service run will be scheduled if one is not
+already running.
 .PP
 .BR flushband ()
 is well optimized to handle the initial stage of
@@ -206,7 +240,7 @@ module or driver as follows:
 int x_w_flush(queue_t *q, mblk_t *mp)
 {
    if (*mp->b_rptr & FLUSHW) {
-      if (*mp->b_rptr & FLUSHBAND)
+      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
          flushband(WR(q), mp->b_rptr[1], FLUSHALL);
       else
          flushq(WR(q), FLUSHALL);
@@ -217,7 +251,7 @@ int x_w_flush(queue_t *q, mblk_t *mp)
       *mp->b_rptr &= ~FLUSHW;
    }
    if (*mp->b_rptr & FLUSHR) {
-      if (*mp->b_rptr & FLUSHBAND)
+      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
          flushband(RD(q), mp->b_rptr[1], FLUSHALL);
       else
          flushq(RD(q), FLUSHALL);
@@ -233,7 +267,7 @@ int x_w_flush(queue_t *q, mblk_t *mp)
 int x_r_flush(queue_t *q, mblk_t *mp)
 {
    if (*mp->b_rptr & FLUSHR) {
-      if (*mp->b_rptr & FLUSHBAND)
+      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
          flushband(RD(q), mp->b_rptr[1], FLUSHALL);
       else
          flushq(RD(q), FLUSHALL);
@@ -244,7 +278,7 @@ int x_r_flush(queue_t *q, mblk_t *mp)
       *mp->b_rptr &= ~FLUSHR;
    }
    if (*mp->b_rptr & FLUSHW) {
-      if (*mp->b_rptr & FLUSHBAND)
+      if (*mp->b_rptr & FLUSHBAND && mp->b_rptr[1] != 0)
          flushband(WR(q), mp->b_rptr[1], FLUSHALL);
       else
          flushq(WR(q), FLUSHALL);
@@ -259,6 +293,14 @@ int x_r_flush(queue_t *q, mblk_t *mp)
 }
 \s+2\fR
 .fi
+.PP
+Note in the example that the band is checked for band zero (0) before calling
+.BR flushband ().
+If the band is zero (0), then
+.BR flushq (9)
+is call instead.  This is consistent with portability recommendations listed under
+.RI \(lq COMPATIBILITY \(rq,
+below.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -294,15 +336,16 @@ pass frees message blocks from the flush to the per-CPU free blocks list for
 use by service procedures in the pass.
 .BR runqueues (9)
 runs at normal soft interrupt priority.
-LiS removes all messages from the queue and then rebuilds the queue one
-message at a time while freeing those to be flushed.  This is a rather
-inefficient way to do things, and with LiS running at higher priority than
-soft interrupts, bottom halves and timeouts, all these are locked out until
-the flush is complete.
+.I LiS
+removes all messages from the queue and then rebuilds the queue one message at a time while freeing
+those to be flushed.  This is a rather inefficient way to do things, and with
+.I LiS
+running at higher priority than soft interrupts, bottom halves and timeouts, all these are locked
+out until the flush is complete.
 .B Linux Fast-STREAMS
 .BR flushband ()
 should have far less of an impact on system latency and performance as that of
-LiS.
+.IR LiS .
 .IP \(em
 .BR flushband ()
 holds the queue write lock while removing selected messages or unlinking
@@ -314,21 +357,20 @@ entire bands.  Order is preserved across concurrent attempts to perform
 or
 .BR putbq (9)
 functions.
-LiS empties the queue and unlocks the queue and then goes about adding
-messages back onto the queue that need to remain using normal utility
-functions.  This means that order is not necessarily preserved (even for messages
-that were on the queue) with concurrent calls to
+.I LiS
+empties the queue and unlocks the queue and then goes about adding messages back onto the queue that
+need to remain using normal utility functions.  This means that order is not necessarily preserved
+(even for messages that were on the queue) with concurrent calls to
 .BR putq (9),
 .BR insq (9),
 .BR appq (9),
 .BR rmvq (9)
 or
 .BR putbq (9)
-functions.
-Also, queue enabling and back-enabling will not necessary be performed
-correctly.
-There doesn't seem to be any excuse for the LiS approach, removing messages
-from the queue,
+functions.  Also, queue enabling and back-enabling will not necessary be performed correctly.  There
+doesn't seem to be any excuse for the
+.I LiS
+approach, removing messages from the queue,
 .BR rmvq (9),
 is no more difficult than inserting them,
 .BR insq (9).
@@ -349,6 +391,10 @@ uxpspg
 state that a
 .I band
 of zero (0) will only flush ordinary messages.
+.IR IRIX \(rg,
+.[
+irixdoc
+.]
 .IR OSF/1 \(rg,
 .[
 osfspg
@@ -375,10 +421,9 @@ of zero (0) flushes normal priority (band 0) messages.
 .IR LiS ,
 when
 .I band
-is zero (0),
-will only flush normal priority messages from band zero and will leave high
-priority messages on the queue.
-.sp
+is zero (0), will only flush normal priority messages from band zero and will leave high priority
+messages on the queue.
+.IP ""
 Portable
 .I STREAMS
 modules and drivers should never call
@@ -397,7 +442,8 @@ flag when flushing an empty queue.  This is an indication to the
 scheduler that
 .BR getq (9)
 read an empty queue and back-enabling has already been performed for the queue.
-LiS clears the
+.I LiS
+clears the
 .B QWANTR
 flag when flushing an empty queue.  This means that the next call to
 .BR getq (9)
@@ -427,6 +473,7 @@ do not permit
 .BR flushband ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
 drivers and modules should not call
@@ -444,8 +491,8 @@ calls
 directly.
 See
 .BR liscompat (9).
-LiS appears to be rather buggy with regard to flushing queues and the
-compatible
+.I LiS
+appears to be rather buggy with regard to flushing queues and the compatible
 .BR lis_flushband ()
 may behave rather different from that of
 .IR LiS .

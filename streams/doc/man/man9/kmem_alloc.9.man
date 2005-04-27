@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.14 2005/04/23 16:47:52 brian Exp $
+.\" @(#) $Id: kmem_alloc.9.man,v 0.9.2.16 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/23 16:47:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -92,9 +92,11 @@ sort-adjacent-labels
 .TP
 .I size
 the size of the contiguous region of kernel memory to allocate.
+.PD 0
 .TP
 .I flag
 whether to sleep or not.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -122,7 +124,59 @@ allocate contiguous physical memory
 .TP
 .B KM_CACHEALIGN
 allocate the requested memory starting at a cache line boundary and padded out to a full cache line
+.TP
+.B KM_DMA
+allocate the requested memory as suitable for worst case DMA.
 .PD
+.\"
+.\"
+.SH USAGE
+.PP
+.BR kmem_alloc ()
+allocates pinned kernel memory which is a precious kernel resource.  Allocation of large blocks of
+pinned kernel memory can impair system performance.
+.PP
+.BR kmem_alloc ()
+should not be used to allocated memory that will not later be freed: doing so can have an impact on
+memory allocation algorithm performance.  Static allocation should be used in this case wherever
+possible.
+.PP
+.BR kmem_alloc ()
+should not be used to allocated fundamental system data structures.  Fundamental system data
+structures should always be allocated using that data structure's specific allocation function.
+For example, a
+.BR queue (9)
+structure should be allocated using
+.BR allocq (9):
+.RS
+.nf
+\fC\s-1
+queue_t *q;
+q = allocq();
+\s+1\fP
+.fi
+.RE
+instead of
+.BR kmem_alloc ():
+.RS
+.nf
+\fC\s-1
+queue_t *q;
+q = kmem_alloc(sizeof(*q), KM_SLEEP);
+\s+1\fP
+.fi
+.RE
+This is because sizes of fundamental system data structures may change and yet binary compatibility
+of
+.I STREAMS
+modules and drivers can be maintained.
+Also, the implementation of a fundamental structure might be larger than the public declaration of
+that structure: that is, there are additional fields hidden from the system programmer.
+Portable
+.I STREAMS
+modules and drivers will not allocate fundamental system datastructures using
+.BR kmem_alloc (),
+but will instead use the system-provided structure-specific allocator.
 .\"
 .\"
 .SH RETURN
@@ -148,7 +202,16 @@ should only fail and return
 if
 .I flag
 was set to
-.BR KM_NOSLEEP .
+.BR KM_NOSLEEP ;
+however,
+if
+.I size
+is zero (0), then
+.BR kmem_alloc ()
+will fail and return
+.B NULL
+regardless of the value of
+.IR flag .
 .\"
 .\"
 .SH CONTEXT
@@ -170,6 +233,77 @@ is MP-safe.
 .SH NOTICES
 .PP
 .BR kmem_alloc ()
+will not allocate memory extents larger than 131072 bytes.
+To obtain larger memory extents, use
+.BR __get_free_pages (9).
+.PP
+.BR kmem_alloc ()
+may allocate a larger extent of memory than is requested with the
+.I size
+argument.  The
+.B Linux
+kernel memory allocator
+.BR kmalloc (9)
+allocates to the enclosing power of two size.  Also,
+.BR kmalloc (9)
+will not allocate less than 32 bytes.
+Portable
+.I STREAMS
+modules and drivers will not make assuptions about the excess memory allocated by
+.BR kmem_alloc ().
+.PP
+.BR kmem_alloc ()
+uses the
+.B Linux
+memory allocator,
+.BR kmalloc (9)
+to allocate memory.  The
+.B Linux
+memory allocator will size the memory extent to the enclosing power of two size greater than or
+equal to 32, and this memory extent will be aligned to the enclosing power of two (minimum 32 byte)
+alignment boundary.  So, for example, if a
+.I size
+of 120 bytes is requested, 128 bytes will be allocated and the 128 bytes will be aligned to a
+128-byte boundary.  This also means that a request of a cacheline or larger will always be cacheline
+aligned.
+Portable
+.I STREAMS
+modules and drivers, however, will make no assumptions about the excess or the alignment of the
+memory returned by
+.BR kmem_alloc (),
+except that the
+.I STREAMS
+module or driver is assured that the alignment of the returned memory will be suitable for holding
+any basic data type or structure.
+.PP
+.BR kmem_alloc ()
+uses
+.BR kmalloc (9)
+allocates memory in power of two chunks between 32 bytes and 131072 bytes.
+.BR kmalloc (9)
+allocations are physically contiguous memory.
+Portable
+.I STREAMS
+modules and drivers make no assumptions about the physical contiguousness of memory allocated with
+.BR kmem_alloc ().
+.PP
+.BR kmem_alloc ()
+allocated memory contains random contents; however, these contents may contain secure kernel
+information that should not be exposed to users.  When allocating datastructures that will be passed
+to users using, for example,
+.BR copyout (9),
+the memory should be set to known contents or allocated using
+.BR kmem_zalloc (9)
+instead.  (Secure functions should know better than to deallocate memory without wiping it clean.)
+Portable
+.I STREAMS
+modules and drivers will always initialize the contents of the memory returned by
+.BR kmem_alloc ().
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR kmem_alloc ()
 is implemented as a function that calls
 .BR kmalloc (9)
 with flags
@@ -179,8 +313,12 @@ depending on the value of
 .\"
 .\"
 .SH "SEE ALSO"
+.BR kmalloc (9),
 .BR kmem_zalloc (9),
-.BR kmem_free (9).
+.BR kmem_free (9),
+.BR copyout (9),
+.BR queue (9),
+.BR allocq (9).
 .\"
 .\"
 .SH BUGS
@@ -200,19 +338,144 @@ with the following portability considerations exceptions:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg,
 .IR MacOT \(rg,
-.IR Super-UX \(rg
+.IR OSF/1 \(rg,
+.IR SUPER-UX \(rg
 and
 .IR UXP/V \(rg
 do not document this function.
+.[
+aixdoc
+.]
+.[
+osfdoc
+.]
+.[
+macdoc
+.]
+.[
+suxdoc
+.]
+.[
+uxpdoc
+.]
+.IR OSF/1 \(rg
+indicates that the
+.B MALLOC
+macro should be called instead.
+.[
+osfdoc
+.]
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR LiS
+document this function.
+.[
+hpuxdoc
+.]
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers may use
+.BR kmem_alloc ()
+for kernel memory allocation.
+.IP \(em
+.IR Solaris \(rg,
+.IR IRIX \(rg,
+.IR UnixWare \(rg,
+document that
+.BR kmem_alloc ()
+returns
+.B NULL
+when
+.I size
+is zero.
+.[
+soldoc
+.]
+.[
+irixdoc
+.]
+.[
+uw7doc
+.]
+.IR HP-UX \(rg
+and
+.I LiS
+try to allocate 32 bytes if the
+.I size
+argument is set to 0.
+.[
+hpuxdoc
+.]
+.[
+lis
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass a size of zero (0) in the
+.I size
+argument to
+.BR kmem_alloc ().
 .IP \(em
 .IR IRIX \(rg
 adds the
 .B KM_PHYSCONTIG
 and
 .B KM_CACHEALIGN
-flags.  No other implementation mentions these.
+flags.
+.[
+irixdoc
+.]
+No other implementation mentions these.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will only use the flags
+.BR KM_SLEEP " and " KM_NOSLEEP
+when calling
+.BR kmem_alloc ().
 .IP \(em
-Under LiS,
+.B Linux Fast-STREAMS
+adds the
+.B KM_DMA
+flag.
+This is for internal use by
+.BR pullupmsg (9)
+and should not be used by portable programs.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will only use the flags
+.BR KM_SLEEP " and " KM_NOSLEEP
+when calling
+.BR kmem_alloc ().
+.IP \(em
+.BR kmem_alloc ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+Under
+.IR LiS ,
 .BR kmem_alloc ()
 ignores the
 .I flag
@@ -235,13 +498,39 @@ Also, this means that when
 is set to
 .BR KM_SLEEP ,
 the calling process will neither wait nor reschedule.
-These are LiS bugs.
-.IP \(em
+These are
+.I LiS
+bugs.
+.\".IP \(em
+Under
+.IR LiS ,
+.BR kmem_alloc ()
+returns a pointer to zero-sized allocated memory when
+.I size
+is zero.
+This is incorrect behaviour and is an
+.I LiS
+bug.
+.\".IP \(em
+.I LiS
+destroys memory alignment by inserting hidden memory allocation management pointers at the
+beginningo of the
+.BR kmalloc (9)'ed
+extent.
+.\".IP \(em
 .BR kmem_alloc ()
 is implemented as a function call.
-LiS implements
+.I LiS
+implements
 .BR kmem_alloc ()
 as a macro.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will use
+.B Linux Fast-STREAMS
+in place of
+.IR LiS .
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

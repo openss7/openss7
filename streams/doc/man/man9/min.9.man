@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: min.9.man,v 0.9.2.6 2005/04/20 18:41:37 brian Exp $
+.\" @(#) $Id: min.9.man,v 0.9.2.7 2005/04/26 18:56:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/26 18:56:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -151,12 +151,31 @@ kernel.
 .PP
 .BR min ()
 should not be used to compare unsigned sequence numbers.
+.PP
+Portable
+.I STREAMS
+modules and drivers will only use
+.BR min ()
+to compare two integers.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
 .BR min ()
-is implemented as an extern inline.
+is implemented as an
+.B extern inline
+function as follows:
+.RS
+.nf
+\fC\s-1
+#undef min
+__EXTERN_INLINE int min(int a, int b)
+{
+    return ((a < b) ? a : b);
+}
+\s+1\fP
+.fi
+.RE
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.14 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.16 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,12 +90,14 @@ sort-adjacent-labels
 .TP
 .I q
 the queue into which to insert the message.
+.PD 0
 .TP
 .I emp
 the message before which to insert the message.
 .TP
 .I nmp
 the message to insert.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -118,6 +120,26 @@ This means that
 .BI insq( q ", NULL, " nmp )
 is equivalent to
 .BI putq( q ", " nmp ).
+.PP
+If a priority message is inserted into the queue, the queue will always be enabled, as with
+.BR qenable (9);
+that is, the queue's service procedure will be scheduled if it exists.
+.PP
+If a normal message is inserted into an empty queue and the 
+.B QWANTR
+flag is set for the queue, then the queue will be enabled, as with
+.BR enableq (9);
+that is, the queue's service procedure will be scheduled if it exists and the
+.B QNOENB
+flag has not been set for the queue with
+.BR noenable (9).
+.PP
+If the insertion of either message into the queue causes the queue or queue band's count to exceed
+the queue or queue band's high water mark, then the
+.B QFULL
+or
+.B QB_FULL
+bit will be set for the queue or queue band.
 .\"
 .\"
 .SH RETURN
@@ -127,13 +149,13 @@ Upon success,
 returns true (1) and the message pointed to by
 .I nmp
 has been inserted into the queue.
-.PP
 Upon failure,
 .BR insq ()
 returns false (0) and the message pointed to by
 .I nmp
 remains unaltered.  (See
-.BR \*(lqCOMPATIBILITY\*(rq " below.)"
+.RI \*(lq COMPATIBILITY \*(rq,
+below.)
 .\"
 .\"
 .SH ERRORS
@@ -144,6 +166,13 @@ fails, it returns false (0).
 .BR insq ()
 can fail because the insertion creates a queue band and a queue band structure
 could not be allocated.
+It is possible to ensure that
+.BR insq ()
+does not fail by first establishing the queue band structure using
+.BR strqset (9).
+.BR insq ()
+can also fail because the placement of the message would miss-order the queue with regard to the
+priority of messages.
 .\"
 .\"
 .SH CONTEXT
@@ -162,14 +191,74 @@ takes a write lock on the queue, so calling
 .BR insq ()
 while the queue is frozen with
 .BR freezestr (9)
-will result in single-party deadlock.
+will result in single-party deadlock on some systems.
+.\"
+.\"
+.SH NOTICES
+.PP
+Some implementations of
+.BR insq ()
+ignore the queue class (whether the message is a high priority or normal message) when considering
+ordering within the queue and some also when considering enabling of the queue (that is, for
+enabling all messages are treated as normal messages).
+Ignoring queue priority has some marginal performance advantages.
+.B Linux Fast-STREAMS
+does neither:
+.BR insq ()
+checks queue class when considering ordering within the queue, and it also checks queue class when
+applying queue flow control rules.  For additional information on flow control and
+.BR insq (),
+see
+.BR noenable (9).
+.PP
+.B Linux Fast-STREAMS
+uses recursive locks, so calling
+.BR insq ()
+while the queue is frozen with
+.BR freezestr (9)
+does not cause deadlock.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+If the existing message pointer,
+.IR emp ,
+is
+.BR NULL ,
+.BR insq ()
+simply executes
+.BR putq (9).
+If the existing message pointer,
+.IR emp ,
+is not
+.BR NULL ,
+then
+.BR insq ()
+checks to see that
+.I emp
+is indeed queued on the message queue,
+.IR q ,
+before proceeding.  Otherwise,
+.BR insq ()
+indicates failure and prints an error to the system logs.
+Some other implementations will panic in this situation.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR rmvq (9),
+.BR qenable (9),
+.BR enableq (9),
+.BR noenable (9),
+.BR strqset (9),
+.BR freezestr (9),
 .BR putq (9),
-.BR putbq (9).
+.BR appq (9),
+.BR rmvq (9),
+.BR putbq (9),
+.BR qprocsoff (9),
+.BR qclose (9),
+.BR qprocson (9),
+.BR qopen (9).
 .\"
 .\"
 .SH BUGS
@@ -181,35 +270,439 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR insq ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg
-and LiS
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-with the following exceptions:
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.BR insq ()
+is a very problematic function for portability: many implementations document subtle differences in
+the treatment of ordering of messages and enabling of queues under flow control rules.  Read
+carefully the following considerations.
+.IP \(em
+.IR AIX \(rg
+documents that queue class is ignored when considering ordering of the queue and only message band
+is considered.
+.[
+aixdoc
+.]
+.IR AIX \(rg
+does not document any failure case other than miss-ordering.
+.[
+aixdoc
+.]
+.\".IP \(em
+.IR HP-UX \(rg
+documents that queue class is disregarded when enabling queues with
+.BR insq ().
+.[
+hpuxdoc
+.]
+That is, the queue will not be enabled if the
+.B QNOENB
+flag is set, regardless of whether the message is a high priority or normal message.  That is,
+without regard to the queue class.
+.\".IP \(em
+.IR IRIX \(rg
+says that miss-ordering results in
+.BR insq ()
+failure; that failure to allocate a queue band structure can cause
+.BR insq ()
+to fail, but mentions nothing about ignoring queue class.
+.[
+irixdoc
+.]
+.IR IRIX \(rg
+description for
+.BR noenable (9)
+also lumps
+.BR insq ()
+in with
+.BR putbq "(9), and " putq (9).
+.[
+irixdoc
+.]
+.\".IP \(em
+.IR OSF/1 \(rg
+documents that queue class is disregarded by
+.BR insq ()
+and that the queue will be enabled unless the
+.B QNOENB
+flag is set, regardless of queue class.
+.[
+osfdoc
+.]
+Unfortunately, the
+.IR OSF/1 \(rg
+description for
+.BR noenable (9)
+lumps
+.BR insq ()
+in with
+.BR putbq "(9), and " putq (9).
+.[
+osfdoc
+.]
+.\".IP \(em
+.IR Solaris \(rg
+documents that the queue class (high priority or normal message) is ignored, and that the service
+procedure is always enabled unless the
+.B QNOENB
+flag is set.
+.[
+soldoc
+.]
+This would tend to indicate that, under
+.IR Solaris \(rg,
+when a high priority message (e.g.
+.BR M_PCPROTO (9))
+is inserted into the queue with
+.BR insq (),
+that the queue will not be scheduled for service if the
+.B QNOENB
+bit has been set with
+.BR noenable (9).
+Unfortunately, the
+.IR Solaris \(rg
+description for
+.BR noenable (9)
+lumps
+.BR insq ()
+in with
+.BR putbq "(9), and " putq (9).
+.[
+soldoc
+.]
+.IR Solaris \(rg
+does not document whether
+.BR insq ()
+will fail from an attempt to miss-order the queue.
+.[
+soldoc
+.]
+Also,
+.IR Solaris \(rg
+does not document any failure situations for
+.BR insq ().
+.[
+soldoc
+.]
+.\".IP \(em
+.IR SUPER-UX \(rg
+does not mention queue class.
+.[
+suxdoc
+.]
+It does say, however, that an attempt by
+.BR insq ()
+to miss-order the queue will fail.  Also, that failure to allocate a queue band structure will result
+in failure.  Also, the
+.IR SUPER-UX \(rg
+description for
+.BR noenable (9)
+lumps
+.BR insq ()
+in with
+.BR putbq "(9), and " putq (9).
+.[
+suxdoc
+.]
+.\".IP \(em
+.IR UnixWare \(rg
+documents that an attempt to miss-order the queue results in failure of
+.BR insq ().
+.[
+uw7doc
+.]
+.IR UnixWare \(rg
+does not indicate that queue class is in any way ignored when ordering or updating flow control
+parameters.
+.[
+uw7doc
+.]
+.IR UnixWare \(rg
+description for
+.BR noenable (9)
+lumps
+.BR insq ()
+in with
+.BR putbq "(9), and " putq (9).
+.[
+uw7doc
+.]
+.\".IP \(em
+.IR UXP/V \(rg
+documents that an attempt to miss-order the queue causes
+.BR insq ()
+to fail.
+.[
+uxpdoc
+.]
+.IR UXP/V \(rg
+also says that queue class is ignored, but the message band is considered for ordering.
+.[
+uxpdoc
+.]
+Also,
+.IR UXP/V \(rg
+description of
+.BR noenable (9)
+says that it controls
+.BR insq ()
+for any message, whether high priority or normal.
+.[
+uxpdoc
+.]
+.\".IP \(em
+.IR AIX \(rg,
+.IR IRIX \(rg
+and
+.IR UnixWare \(rg
+document that if an attempt is made to miss-order the queue,
+.BR insq ()
+fails and returns false (0).
+.[
+aixdoc
+.]
+.[
+irixdoc
+.]
+.[
+uw7doc
+.]
+.IP \(em
+.BR insq ()
+considers queue class both for ordering constraints as well as for queue scheduling with regard to
+flow control, following the
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+behaviour.
+.IP ""
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg
+and
+.IR UXP/V \(rg
+document that queue class is ignored by
+.BR insq ().
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uxpdoc
+.]
+.IR AIX \(rg,
+.IR HP-UX \(rg
+and
+.IR UXP/V \(rg
+indicate that queue scheduling is suppressed by
+.BR noenable (9)
+for both normal and high priority messages inserted with
+.BR insq ().
+.[
+aixdoc
+.]
+.[
+hpuxdoc
+.]
+.[
+uxpdoc
+.]
+Unfortunately, when describing
+.BR noenable (9),
+.IR Solaris \(rg
+and
+.IR OSF/1 \(rg
+lump
+.BR insq ()
+in with
+.BR putbq "(9) and " putq (9)
+when describing enabling when the
+.B QNOENB
+flag is set.
+.[
+soldoc
+.]
+.[
+osfdoc
+.]
+That is, scheduling is only suppressed for normal messages enqueued with
+.BR insq ().
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+do not mention ignoring message class when inserting message with
+.BR insq ().
+.[
+irixdoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+Also,
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+lump
+.BR insq ()
+in with
+.BR putbq "(9) and " putq (9)
+when describing enabling when the
+.B QNOENB
+flag is set.
+.[
+irixdoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+That is, scheduling is only suppressed for normal messages enqueued with
+.BR insq ().
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not insert high priority messages into queues.  If it is absolutely
+necessary to insert a high priority message into a queue,
+portable
+.I STREAMS
+modules and drivers will not rely upon
+.BR insq ()
+to schedule a queue when a high priority message is inserted into the queue:
+instead
+.BR qenable (9)
+will always be explicitly called after successfully inserting a high priority message into a queue
+with
+.BR insq ().
+This practice might result in an extra scheduling of the queue under some circumstances, however, an
+extra scheduling of the queue's service procedure is more acceptable than the loss of enabling a
+queue: the later can cause queue scheduling to postpone indefinitely.
+.IP \(em
+.BR insq ()
+fails if an attempt is made to miss-order the queue, even with regard to queue class.
+.IP ""
+.IR AIX \(rg,
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+document that an attempt to miss-order the queue will cause
+.BR insq ()
+to fail.
+.[
+aixdoc
+.]
+.[
+irixdoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.[
+uxpdoc
+.]
+.IR HP-UX \(rg
+and
+.IR OSF/1 \(rg
+do not mention failure of
+.BR insq ()
+due to attempts to miss-order the queue.
+.[
+hpuxdoc
+.]
+.[
+osfdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will consider that
+.BR insq ()
+may fail if an attempt is made to miss-order the queue; but, that an attempt may succeed if the
+miss-ordering is with regard to queue class.
+.IP \(em
+.I LiS
+checks queue class when considering ordering, but ignores it when considering flow control (that is,
+it does not permit
+.BR insq ()
+to enable the queue when the
+.B QNOENB
+flag is set, regardless of the queue class of the inserted message).
+.IP \(em
 .BR insq ()
 passed a
 .B NULL
 or invalid
 .IR q " or " nmp
-pointer will have undefined results.  Under LiS, a
+pointer will have undefined results.  Under
+.IR LiS ,
+a
 .B NULL
 .IR q " or " nmp
 pointer will return failure (0).
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass
+.BR insq ()
+a
+.B NULL
+.IR q " or " nmp
+pointer.
 .IP \(em
 .BR insq ()
 does not modify
 .IR q " or " nmp
-when it returns failure (0).  Under LiS, failure (0) modifies the
+when it returns failure (0).  Under older versions of
+.IR LiS ,
+failure (0) modifies the
 .I nmp
 message, freeing it with
 .BR freemsg (9)
-under some circumstances.  This is an LiS bug.  No passed in structures should
+under some circumstances.  This is an
+.I LiS
+bug.  No passed in structures should
 be modified on failure.
-.IP ""
-LiS incorrectly frees the message pointed to by
+Current versions of
+.I LiS
+.[
+lis
+.]
+do not have this problem.
+.IP \(em
+Older versions of
+.I LiS
+incorrectly free the message pointed to by
 .I nmp
 when the call to
 .BR insq ()
@@ -222,7 +715,9 @@ or when the queue pointer
 does not point to a valid queue structure, or when the queue pointer
 .I q
 points to a queue that is closing or has processing turned off.
-On the other hand, LiS does not free the message pointer pointed to by
+On the other hand, these versions of
+.I LiS
+do not free the message pointer pointed to by
 .I nmp
 when
 .BR insq ()
@@ -233,54 +728,109 @@ returns failure (0), it is difficult to determine whether the message
 pointed to by
 .I nmp
 has been freed or not.
+Current versions of
+.I LiS
+.[
+lis
+.]
+do not have this problem.
 .IP \(em
 .BR insq ()
 will insert messages into a queue that has had
 .BR qprocsoff (9)
 called or which is closing
 .RB ( qclose (9)
-has been called for the queue).  Under LiS,
+has been called for the queue).  Under
+.IR LiS ,
 .BR insq ()
-will return failure (0) in these cases and free the message pointed to by
+will return failure (0) in these cases and older versions will also free the message pointed to by
 .IR nmp .
-LiS behaviour is incorrect for these cases.
+(Current versions of
+.I LiS
+.[
+lis
+.]
+do not free the message.)
+Regardless,
+.I LiS
+behaviour is incorrect for these cases.
 .BR qprocsoff (9)
 only affects the running of queue procedures and should not affect
 .BR insq ().
 .BR qclose (9)
-may need to exchange messages with lower level queue pairs and manipulate
-queues: making
+may need to exchange messages with lower level queue pairs and manipulate queues: making
 .BR insq ()
 return
 .B NULL
-during close is an LiS bug.
+during close is an
+.I LiS
+bug.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers concerned about portability to
+.I LiS
+will not use
+.BR insq ()
+on a stream that is closing or for which
+.BR qprocsoff (9)
+has been called (presumably from the
+.BR qclose (9)
+procedure, anyway), or for which
+.BR qprocson (9)
+has yet to be called (from the
+.BR qopen (9)
+procedure).
 .IP \(em
-.BR insq ()
-will insert a message before another in the queue in any order: it is the
-caller's responsibility to ensure proper ordering of the queue.
-Under LiS,
-.BR insq ()
-will fail and return (0), not freeing
-.IR nmp ,
-if the insertion would misorder the queue.
+.IR IRIX \(rg
+and
+.IR UnixWare \(rg
+document that passing an
+.I emp
+pointer that is not on the queue,
+.IR q ,
+could result in a system panic.
+.[
+irixdoc
+.]
+.[
+uw7doc
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will only pass
+.RB non- NULL
+.I emp
+pointers that does point to a valid message that is already on the queue specified by
+.IR q .
 .IP \(em
 .IR UnixWare \(rg
-.[
-uw7spg
-.]
 and
 .IR SUPER-UX \(rg
-.[
-suxspg
-.]
 require that a stream be frozen with
 .BR freezestr (9)
 for the duration of the call to
 .BR insq ().
-.PP
+.[
+uw7doc
+.]
+.[
+suxdoc
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will freeze a stream with
+.BR freezestr (9)
+before calling
+.BR insq ().
+.IP \(em
 Symbol
 .BR lis_insq ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .IP \(em
 Binary compatibility is not guaranteed.
@@ -292,18 +842,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR insq ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

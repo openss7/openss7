@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.14 2005/04/23 16:47:52 brian Exp $
+.\" @(#) $Id: kmem_zalloc.9.man,v 0.9.2.16 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/23 16:47:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -169,10 +169,20 @@ is MP-safe.
 .\"
 .SH NOTICES
 .PP
+See
+.BR kmem_alloc (9)
+for additional considerations and notifications.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
 .BR kmem_zalloc ()
 is implemented as a function that calls
 .BR kmem_alloc (9)
 and then simply initialized the memory.
+For security purposes, the memory region initialized is the entire memory extent returned by
+.BR kmem_alloc (9)
+and not just the requested size.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -191,16 +201,84 @@ has no known bugs.
 .BR kmem_alloc ()
 is source-level compatible with
 .IR "SVR 4.2 MP DDI/DKI" ,
-and systems based on
-.I SVR
-with the following portability considerations exceptions:
+.[
+usldk
+.]
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IR AIX \(rg,
 .IR MacOT \(rg,
-.IR Super-UX \(rg
+.IR OSF/1 \(rg,
+.IR SUPER-UX \(rg
 and
 .IR UXP/V \(rg
 do not document this function.
+.[
+aixdoc
+.]
+.[
+osfdoc
+.]
+.[
+macdoc
+.]
+.[
+suxdoc
+.]
+.[
+uxpdoc
+.]
+.IR OSF/1 \(rg
+indicates that the
+.B MALLOC
+macro should be called instead.
+.[
+osfdoc
+.]
+.IP \(em
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR LiS
+document this function.
+.[
+hpuxdoc
+.]
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+lis
+.]
+.IP \(em
+.IR HP-UX \(rg
+tries to allocate 32 bytes if the
+.I size
+argument is set to 0.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass a size of zero (0) in the
+.I size
+argument to
+.BR kmem_alloc ().
 .IP \(em
 .IR IRIX \(rg
 adds the
@@ -208,9 +286,37 @@ adds the
 and
 .B KM_CACHEALIGN
 flags.  No other implementation mentions these.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will only use the flags
+.BR KM_SLEEP " and " KM_NOSLEEP
+when calling
+.BR kmem_zalloc ().
 .IP \(em
-Under LiS,
-.BR kmem_alloc ()
+.IR Solaris \(rg,
+.IR IRIX \(rg,
+.IR UnixWare \(rg,
+document that
+.BR kmem_zalloc ()
+returns
+.B NULL
+when
+.I size
+is zero.
+.[
+soldoc
+.]
+.[
+irixdoc
+.]
+.[
+uw7doc
+.]
+.IP \(em
+Under
+.IR LiS ,
+.BR kmem_zalloc ()
 ignores the
 .I flag
 argument and allocates memory using
@@ -232,13 +338,36 @@ Also, this means that when
 is set to
 .BR KM_SLEEP ,
 the calling process will neither wait nor reschedule.
-These are LiS bugs.
-.IP \(em
+These are
+.I LiS
+bugs.
+.\".IP \(em
+Under
+.IR LiS ,
+.BR kmem_zalloc ()
+returns a pointer to zero-sized allocated memory when
+.I size
+is zero.
+This is incorrect behaviour and is an
+.I LiS
+bug.
+.\".IP \(em
+.I LiS
+destroys memory alignment by inserting hidden memory allocation management pointers at the
+beginningo of the
+.BR kmalloc (9)'ed
+extent.
+.\".IP \(em
 .BR kmem_zalloc ()
 is implemented as a function call.
-LiS implements
+.I LiS
+implements
 .BR kmem_zalloc ()
 as a macro.
+.B Linux Fast-STREAMS
+does not perpetuate these
+.I LiS
+bugs.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP

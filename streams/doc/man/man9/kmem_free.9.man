@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_free.9.man,v 0.9.2.11 2005/04/22 22:47:36 brian Exp $
+.\" @(#) $Id: kmem_free.9.man,v 0.9.2.12 2005/04/26 18:56:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/26 18:56:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,11 @@ sort-adjacent-labels
 .TP
 .I ptr
 a pointer to the kernel memory area.
+.PD 0
 .TP
 .I size
 the size of the kernel memory area to free.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -101,6 +103,46 @@ Deallocates the memory previously allocated with
 .BR kmem_alloc (9)
 or
 .BR kmem_zalloc (9).
+.PP
+.BR kmem_free ()
+must be called with a pointer,
+.IR ptr ,
+that was returned by a call to
+.BR kmem_alloc "(9) or " kmem_zalloc (9),
+and the same size,
+.IR size ,
+that was passed in the corresponding call to
+.BR kmem_alloc "(9) or " kmem_zalloc (9).
+.\"
+.\"
+.SH RETURN
+.PP
+.BR kmem_free ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+If
+.BR kmem_free ()
+fails, it fails silently.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR kmem_free ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR kmem_free ()
+is MP-safe.
+.\"
+.\"
+.SH NOTICES
 .PP
 As a side-effect of freeing memory allocated with
 .BR kmem_alloc (9)
@@ -134,38 +176,13 @@ magic
 .]
 .\"
 .\"
-.SH RETURN
-.PP
-.BR kmem_free ()
-returns
-.BR void .
-.\"
-.\"
-.SH ERRORS
-.PP
-If
-.BR kmem_free ()
-fails, it fails silently.
-.\"
-.\"
-.SH CONTEXT
-.PP
-.BR kmem_free ()
-can be called from any context, including user context, module procedures,
-callouts, callbacks, soft interrupts and interrupt service routines.
-.\"
-.\"
-.SH MP-STREAMS
-.PP
-.BR kmem_free ()
-is MP-safe.
-.\"
-.\"
-.SH NOTICES
+.SH IMPLEMENTATION
 .PP
 .BR kmem_free ()
 is implemented as a function that calls
-.BR kfree (9),
+.BR kfree (9)
+or
+.BR free_pages (9)
 but which also performs the
 .I STREAMS
 scheduler related functions described above.
@@ -186,27 +203,80 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR kmem_free ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg
-and LiS
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-with the following exceptions:
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Under LiS,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+.IR SUPER-UX \(rg,
+and
+.IR UXP/V \(rg,
+do no document this function.
+.[
+aixdoc
+.]
+.[
+macdoc
+.]
+.[
+suxdoc
+.]
+.[
+uxpdoc
+.]
+.IP \(em
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR OSF/1 \(rg,
+.IR Solaris \(rg,
+.IR UnixWare \(rg
+and
+.IR LiS
+document this function;
+.[
+hpuxdoc
+.]
+.[
+irixdoc
+.]
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.[
+lis
+.]
+however, they do not describe behaviour of buffer calls under
+.IR STREAMS .
+.IP \(em
+Under
+.IR LiS ,
 .BR kmem_free ()
 ignores the
 .I size
-argument and frees memory using
-.BR lis_mfree()
-which always calls
-.BR kfree (9).
-LiS does not properly schedule buffer calls in accordance with
-SVR 4.2.
+argument when freeing memory.
+.I LiS
+does not properly schedule buffer calls in accordance with
+.IR "SVR 4.2" .
 .IP \(em
 .BR kmem_free ()
-is implemented as a function call.  LiS implements
+is implemented as a function call.
+.I LiS
+implements
 .BR kmem_free ()
 as a macro.
 .IP \(em
@@ -219,18 +289,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR kmem_free ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3
 .]

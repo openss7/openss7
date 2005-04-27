@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.26 2005/02/28 13:49:24 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.27 2005/04/26 18:56:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/28 13:49:24 $ by $Author: brian $
+ Last Modified $Date: 2005/04/26 18:56:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/02/28 13:49:24 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/04/26 18:56:52 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -173,7 +173,7 @@ typedef struct datab {
  *      O - OSF/1.2
  *      H - HP-UX
  *      M - Mac OT (AIX)
- *      L - LiS
+ *      L - LiS (2.16.18 only: 2.18.0+ is identical to this)
  *  Message direction:
  *      v - downwards only
  *      ^ - upwards only
@@ -967,9 +967,13 @@ __EXTERN_INLINE int datamsg(unsigned char type)
 {
 	unsigned char mod = (type & ~QPCTL);
 	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
-	return (((1 << mod) &
-		 ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY)))
-		!= 0);
+	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)) | (1 << M_DELAY))) != 0);
+}
+__EXTERN_INLINE int ctlmsg(unsigned char type)
+{
+	unsigned char mod = (type & ~QPCTL);
+	/* just so happens there is a gap in the QNORM messages right at M_PCPROTO */
+	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
 }
 __EXTERN_INLINE int isdatablk(dblk_t * db)
 {
@@ -986,7 +990,7 @@ __EXTERN_INLINE int pcmsg(unsigned char type)
 __EXTERN_INLINE int putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(0, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(0, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
 		return (1);
@@ -996,7 +1000,7 @@ __EXTERN_INLINE int putctl(queue_t *q, int type)
 __EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(1, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(1, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
 		put(q, mp);
@@ -1007,7 +1011,7 @@ __EXTERN_INLINE int putctl1(queue_t *q, int type, int param)
 __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(2, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(2, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
 		*mp->b_wptr++ = (unsigned char) param2;
@@ -1019,7 +1023,7 @@ __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2)
 __EXTERN_INLINE int putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(0, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(0, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
 		return (1);
@@ -1029,7 +1033,7 @@ __EXTERN_INLINE int putnextctl(queue_t *q, int type)
 __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(1, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(1, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param;
 		putnext(q, mp);
@@ -1040,7 +1044,7 @@ __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param)
 __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
-	if (!datamsg(type) && (mp = allocb(1, BPRI_HI))) {
+	if (likely(ctlmsg(type) && (mp = allocb(2, BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		*mp->b_wptr++ = (unsigned char) param1;
 		*mp->b_wptr++ = (unsigned char) param2;

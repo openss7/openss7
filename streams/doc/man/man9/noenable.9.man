@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: noenable.9.man,v 0.9.2.11 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: noenable.9.man,v 0.9.2.13 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -115,7 +115,7 @@ has no effect on the scheduling of queue service procedures when the queue is
 back-enabled,
 when
 .BR qenable (9)
-is called, or when a priority message is enqueued with
+is called explicitly, or when a priority message is enqueued with
 .BR appq (9),
 .BR insq (9),
 .BR putq (9)
@@ -288,9 +288,10 @@ permits
 .BR noenable ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not invoke
+drivers and modules will not invoke
 .BR noenable ()
 on a stream that has previously been frozen with
 .BR freezestr (9).
@@ -312,9 +313,10 @@ Repaired versions of
 will make
 .BR noenable ()
 fail silently in these situations.
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should never invoke
+drivers and modules will not invoke
 .BR noenable ()
 with an invalid
 .I q
@@ -337,9 +339,10 @@ As with
 .I LiS
 suppresses the scheduling of queues for any message enqueued with
 .BR appq (9).
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not use the
+drivers and modules will not use the
 .BR appq (9)
 function call.
 .I STREAMS
@@ -360,16 +363,11 @@ is explicitly called, or when priority messages are enqueued with
 .BR insq (9)
 or
 .BR appq (9).
-.IP \(em
-.IR AIX \(rg
-.[
-aixspg
-.]
+.\".IP \(em
+.IR AIX \(rg,
+.IR HP-UX \(rg
 and
 .IR UXP/V \(rg
-.[
-uxpspg
-.]
 state that
 .BR noenable ()
 disables the scheduling of queues resulting from a normal priority message
@@ -380,26 +378,43 @@ or
 and that it disables scheduling of queues resulting from any message being
 placed on the queue with
 .BR insq (9).
+.[
+aixdoc
+.]
+.[
+uxpdoc
+.]
 .I LiS
 also follows this behaviour.
-.IP \(em
+.[
+lis
+.]
+.\".IP \(em
+.IR OSF/1 \(rg
+and
+.IR Solaris \(rg
+state that queue class is ignored by
+.BR insq (9),
+but lump
+.BR insq (9)
+together with
+.BR putbq (9)
+and
+.BR putq (9)
+when describing
+.BR noenable ().
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.\".IP \(em
 .IR OSF/1 \(rg,
-.[
-osfspg
-.]
 .IR Solaris \(rg,
-.[
-solspg
-.]
 .IR SUPER-UX \(rg
-.[
-suxspg
-.]
 and
 .IR UnixWare \(rg
-.[
-uw7spg
-.]
 state that
 .BR noenable ()
 disables the scheduling of queues resulting from a normal priority message
@@ -411,7 +426,19 @@ or
 and that the scheduling of queues resulting from back-enabling or high
 priority messages being enqueued is never suppressed with
 .BR noenable ().
-.IP \(em
+.[
+osfdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.\".IP \(em
 .IR HP-UX \(rg
 .[
 hpuxspg
@@ -419,7 +446,8 @@ hpuxspg
 does not talk about
 .BR insq (9)
 behaviour.
-.IP \(em
+.\".IP \(em
+.IP ""
 Portable
 .I STREAMS
 drivers and modules should not rely upon the behaviour of
@@ -427,6 +455,11 @@ drivers and modules should not rely upon the behaviour of
 with regard to high-priority messages when
 .BR noenable ()
 is in effect.
+The best practice is to explicitly enable, using
+.BR qenable (9),
+the queue immediately after a high priority message is inserted into the queue with
+.BR insq (9);
+thus yeilding like behaviour across all these systems.
 .IP \(em
 Symbol
 .BR lis_safe_noenable ()

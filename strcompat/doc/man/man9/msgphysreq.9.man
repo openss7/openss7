@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgphysreq.9.man,v 0.9.2.6 2005/04/20 18:41:38 brian Exp $
+.\" @(#) $Id: msgphysreq.9.man,v 0.9.2.7 2005/04/26 18:56:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/26 18:56:47 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -89,7 +89,7 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .PD
 .HP
-int \fBmsgphysreq\fR(mblk_t *\fImp\fP, physreq_t *\fIprp\fP);
+.BI "mblk_t *msgphysreq(mblk_t *" mp ", phsyreq_t *" prp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -97,25 +97,37 @@ int \fBmsgphysreq\fR(mblk_t *\fImp\fP, physreq_t *\fIprp\fP);
 .TP
 .I mp
 a pointer to a message block that will be made to conform to the physical memory requirement.
+.PD 0
 .TP
 .I prp
 a pointer to a
 .B physreq_t
 structure that describes the physical memory request.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR msgphysreq ()
-creates, if necessary, and returns a message block that contains the information in the message
-block passed in argument
+creates, if necessary, and returns a message that contains the information in the message
+passed in argument
 .I mp
-and meets the physical memory requirements in the
+and whose data buffers meet the physical memory requirements in the
 .I prp
 argument.
+.PP
+Data will be copied into new data buffers and new message blocks and data blocks allocated as
+required.  Message blocks belonging to the passed in message,
+.IR mp ,
+that are copied into the new message are freed.  Message blocks in the existing message whose data
+buffers meet the physical requirements will be linked into the new message.  The message pointer
+returned might or might not be the same as the passed in message pointer,
+.IR mp ,
+depending upon the suitability of the data buffers in the passed in message.
+.PP
 The
 .I prp
-argument is a specification of the physical requirements and points ot a
+argument is a specification of the physical requirements and points to a
 .B physreq
 structure, with members as follows:
 .sp

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnextctl.9.man,v 0.9.2.13 2005/04/22 22:47:37 brian Exp $
+.\" @(#) $Id: putnextctl.9.man,v 0.9.2.15 2005/04/27 00:32:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/22 22:47:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -90,9 +90,11 @@ sort-adjacent-labels
 .TP
 .I q
 the queue from which to put the control message.
+.PD 0
 .TP
 .I type
 the type of the control message.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -100,15 +102,22 @@ the type of the control message.
 .BR putnextctl ()
 creates a zero-length control message of type
 .I type
-and invokes the put procedure of the queue next to the queue pointed to
-by
+and invokes the put procedure of the queue next to the queue pointed to by
 .I q
 to place the message on the subsequent queue.
 If
 .I type
-is a data message type and not a control message type,
+is a data message type
+.RB ( M_DATA ", " M_PROTO " or " M_PCPROTO )
+and not a control message type,
 .BR putnextctl ()
 will fail.
+Note that
+.BR putnextctl ()
+can succeed for message type
+.BR M_DELAY ,
+which is normally a data message type according to
+.BR datamsg (9).
 .\"
 .\"
 .SH RETURN
@@ -116,7 +125,6 @@ will fail.
 Upon success,
 .BR putnextctl ()
 returns true (1).
-.PP
 Upon failure,
 .BR putnextctl ()
 returns false (0).
@@ -127,37 +135,47 @@ returns false (0).
 .BR putnextctl ()
 fails and returns false (0) if the specified
 .I type
-is not a control message type, or if the passed in queue pointer
-.I q
-is
-.BR NULL ,
-or has a
-.I q_next
-pointer of
-.BR NULL ,
-or if allocation of the necessary message block fails.
+is not a control message type or if allocation of the necessary message blocks fails.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR putnextctl ()
-can be called from any context including user context,
-.BR qopen "(9), " qclose "(9), " put "(9), " srv (9)
-procedures,
-.BR esbbcall "(9), " bufcall "(9), " qbufcall "(9), " timeout "(9), " qtimeout (9)
-callback functions,
-and interrupt service routines.
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines;
+however, see the considerations listed under
+.BR putnext (9).
 .\"
 .\"
 .SH MP-STREAMS
 .PP
 .BR putnextctl ()
-is MP-safe.
+is MP-safe; however, see the considerations listed under
+.BR putnext (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR putnextctl ()
+can succeed with a
+.I type
+argument of
+.BR M_DELAY .
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Message blocks allocated by
+.BR putnextctl ()
+are allocated with priority
+.BR BPRI_HI .
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR datamsg (9),
 .BR freezestr (9),
+.BR put (9),
 .BR putctl (9),
 .BR putctl1 (9),
 .BR putnextctl1 (9).
@@ -179,9 +197,116 @@ usldk
 .]
 and implementations based on
 .IR "SVR 4" ,
+.[
+svr4dk
+.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Under LiS,
+.IR AIX \(rg,
+.IR UXP/V \(rg
+and
+.I LiS
+state that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DATA ", " M_PROTO ", " M_PCPROTO " or " M_DELAY .
+.[
+aixdoc
+.]
+.[
+uxpdoc
+.]
+.[
+lis
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg,
+.IR SUPER-UX \(rg
+and
+.IR UnixWare \(rg
+state that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DATA ", " M_PROTO " or " M_PCPROTO ", but  not " M_DELAY .
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+suxdoc
+.]
+.[
+uw7doc
+.]
+.IR IRIX \(rg,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+even show an example using
+.BR M_DELAY .
+.[
+irixdoc
+.]
+.[
+soldoc
+.]
+.[
+uw7doc
+.]
+.IR OSF/1 \(rg
+states that
+.BR putnextctl ()
+will fail if the
+.I type
+argument is
+.BR M_DELAY ", " M_PROTO " or " M_PCPROTO ", but not " M_DATA ,
+which is quite peculiar, and then goes on to give an example for
+.BR M_DELAY .
+.[
+osfdoc
+.]
+.BR M_DELAY " should probably be " M_DATA
+in the failure list.
+This means that
+.IR AIX \(rg
+.IR UXP/V \(rg
+and
+.I LiS
+are the oddballs in the documented behaviour.
+Otherwise,
+.BR putnextctl ()
+is fairly consistent on permitting
+.B M_DELAY
+messages.
+.B Linux Fast-STREAMS
+.BR putnextctl ()
+allows a
+.I type
+of
+.B M_DELAY
+to be specified.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass a type of
+.B M_DELAY
+to
+.BR putnextctl ().
+.IP \(em
+.BR putnextctl ()
+is not bug for bug compatible with
+.IR LiS .
+.IP ""
+.BR putnextctl ()
+returns failure when the operations fails.
+Under
+.IR LiS ,
 .BR putnextctl ()
 will return success even if the operation fails because of the following
 conditions:
@@ -199,16 +324,34 @@ pointer of
 .BR NULL ;
 the queue pointed to by
 .I q->q_next
+has no put procedure; or the queue pointed to by
+.I q->q_next
 is closing, or the queue has had put and service routine processing turned off
 (e.g. with
 .BR qprocsoff (9)).
-LiS should return failure when the operation fails.
+.I LiS
+should return failure when the operation fails.
 .IP \(em
 .BR putnextctl ()
 allocates a message block and calls
 .BR putnext (9).
-For differences from LiS, see
+For differences from
+.IR LiS ,
+see
 .BR putnext (9).
+.IP \(em
+.BR putnextctl ()
+protects dereferencing of the
+.I q->q_next
+pointer with the stream head read lock.
+.I LiS
+implements
+.BR putnextctl ()
+with a call to
+.BR putctl (9)
+using the
+.I q->q_next
+pointer for the queue.
 .IP \(em
 .BR putnextctl ()
 may be called on a stream frozen with
@@ -234,11 +377,12 @@ do not permit
 .BR putnextctl ()
 to be called on a stream frozen with
 .BR freezestr (9).
+.IP ""
 Portable
 .I STREAMS
-drivers and modules should not call
+modules and drivers will not call
 .BR putnextctl ()
-on a stream frozen with
+on a stream frozen by the caller with
 .BR freezestr (9).
 .IP \(em
 Symbol
@@ -260,14 +404,9 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
-.]
-.IR Solaris \(rg
-documentation.
-.[
-soldoc
 .]
 .\"
 .\"

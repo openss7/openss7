@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freemsg.9.man,v 0.9.2.13 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: freemsg.9.man,v 0.9.2.14 2005/04/26 18:56:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/26 18:56:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -148,38 +148,23 @@ is MP-safe.  It is the caller's responsibility to ensure that it has the last
 remaining reference to the message blocks in the passed in message.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
 .PP
-.BR freemsg (9)
+.BR freemsg ()
 is implemented with a looping call to
-.BR freeb ().
+.BR freeb (9),
+following along the
+.I b_cont
+pointer of each message block in the message block chain beginning with the passed in message block,
+.IR mp .
 .PP
-.I LiS
-.[
-LiS
-.]
-uses a complicated message block and data block binding scheme with embedded
-data buffers
-.B FASTBUF
-or less in size.  Determining the point at which a buffer is actually freed is
-rather complicated.
-.PP
-In addition,
-.I LiS
-.[
-LiS
-.]
-uses a free list to hold freed message blocks and data blocks.  It is
-particularly inefficient for cache performance to do this.
-.I LiS
-.[
-LiS
-.]
-should use kernel memory caches instead and should free the message blocks and
-data blocks when they are no longer used to allow existing cache slots to be
-reused.  Bypassing the kernel memory allocation and deallocation mechanisms
-by using a free list results in poorer performance than might be expected by
-those that do not understand kernel memory caching mechanisms.
+See
+.BR freeb (9)
+for more information.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -198,17 +183,39 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR freemsg ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg
-and LiS
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.I "SVR 4"
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+See
+.BR freeb (9)
+for additional compatibility information.
+.IP \(em
+In addition,
+.I LiS
 .[
 LiS
 .]
-with the following exceptions:
-.IP \(em \w'\(em\(em'u
+uses a free list to hold freed message blocks and data blocks.  It is
+particularly inefficient for cache performance to do this.
+.I LiS
+.[
+LiS
+.]
+should use kernel memory caches instead and should free the message blocks and
+data blocks when they are no longer used to allow existing cache slots to be
+reused.  Bypassing the kernel memory allocation and deallocation mechanisms
+by using a free list results in poorer performance than might be expected by
+those that do not understand kernel memory caching mechanisms.
 .IP \(em
-.IP \(em
-.PP
 Symbol
 .BR lis_freemsg ()
 is provided for compatibility with LiS.  See
@@ -227,18 +234,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR freemsg ()
-appeared first in SVR 3.
+appeared first in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

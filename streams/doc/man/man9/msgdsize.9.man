@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: msgdsize.9.man,v 0.9.2.10 2005/04/20 18:41:38 brian Exp $
+.\" @(#) $Id: msgdsize.9.man,v 0.9.2.12 2005/04/27 00:32:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:38 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -99,6 +99,21 @@ returns the number of data bytes in the
 .B M_DATA
 blocks contained in the message pointed to by
 .IR mp .
+The number of byte considered to be contained in an
+.B M_DATA
+block are the number of bytes between the
+.I b_rptr
+and
+.I b_wptr
+pointers.  If
+.I b_rptr
+is greater than or equal to
+.IR b_wptr ,
+then the
+.B M_DATA
+message block is considered to contain zero bytes.  Otherwise the number of bytes contained is the
+pointer difference:
+.IR "(b_wptr - b_rptr)" .
 .\"
 .\"
 .SH RETURN
@@ -108,7 +123,6 @@ Upon success,
 returns the number of bytes contained in
 .B M_DATA
 blocks in in the message.
-.PP
 Upon failure,
 .BR msgdsize ()
 returns zero (0).
@@ -137,6 +151,49 @@ is MP-safe; however, the caller must ensure exclusive access to the passed in
 message.
 .\"
 .\"
+.SH NOTICES
+.PP
+.BR msgdsize ()
+will fail and potentially panic the kernel if the passed in message pointer,
+.IR mp ,
+that is invalid.  If the passed in message pointer,
+.IR mp ,
+is
+.BR NULL ;
+however, the function will return zero (0).
+.PP
+Portable
+.I STREAMS
+modules and drivers will not pass
+.BR msgdsize ()
+a
+.B NULL
+or invalid message pointer as an argument.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR msgdsize ()
+is implemented as an
+.B extern inline
+for speed, as follows:
+.RS
+.nf
+\fC\s-1
+__EXTERN_INLINE size_t msgdsize(mblk_t *mp)
+{
+    size_t size = 0;
+    for (; mp; mp = mp->b_cont)
+        if (mp->b_datap->db_type == M_DATA)
+            if (mp->b_wptr > mp->b_rptr)
+                size += mp->b_wptr - mp->b_rptr;
+    return (size);
+}
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR msgsize (9),
@@ -152,20 +209,35 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR msgdsize ()
-is source-level compatible to SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg,
-.IR MacOT \(rg,
-and LiS,
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR msgdsize ()
+is a widely implemented
+.I STREAMS
+function that is compatible across many of the implementations discussed here.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers may use this function.
+.IP \(em
+.I LiS
 .[
 LiS
 .]
-with the following exceptions.
-.IP \(em \w'\(em\(em'u
-.I LiS
 places limits on the maximum size of a message block.
 .BR msgdsize ()
 does not.
-.PP
+.IP \(em
 Symbol
 .BR lis_msgdsize ()
 is provided for compatibility to
@@ -186,26 +258,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4.2 MP DDI/DKI" ,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR MacOT \(rg
-.[
-macdoc
-.]
-and
-.IR Solaris \(rg
-.[
-soldoc
-.]
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR msgdsize ()
-first appeared in SVR 3.
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

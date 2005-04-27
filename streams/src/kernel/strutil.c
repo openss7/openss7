@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/24 23:10:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/27 00:33:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/24 23:10:15 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/04/27 00:33:25 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -71,6 +71,7 @@ static char const ident[] =
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
+#include <asm/cache.h>		/* for L1_CACHE_BYTES */
 
 #include <sys/cmn_err.h>	/* for CE_ constants */
 #include <sys/strlog.h>		/* for SL_ constants */
@@ -472,7 +473,7 @@ __EXTERN_INLINE size_t msgdsize(mblk_t *mp);
  *  @mp:	message to pull up
  *  @length:	number of bytes to pull up
  *
- *  Pulls up @length  bytes into the returned message.  This is for handling heades as a contiguous
+ *  Pulls up @length  bytes into the returned message.  This is for handling headers as a contiguous
  *  range of bytes.
  */
 mblk_t *msgpullup(mblk_t *msg, ssize_t length)
@@ -549,7 +550,7 @@ __EXTERN_INLINE size_t msgsize(mblk_t *mp);
  *  @mp:	message to pull up
  *  @len:	number of bytes to pull up
  *
- *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling heades
+ *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling headers
  *  as a contiguous range of bytes.
  */
 int pullupmsg(mblk_t *mp, ssize_t len)
@@ -561,7 +562,11 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	struct mdbblock *md;
 	if (!mp || len < -1)
 		goto error;
-	if (!len || ((blen = mp->b_wptr - mp->b_rptr) >= len && len >= 0))
+	/* There actually is a way on 2.4 and 2.6 kernels to determine if the memory is suitable
+	   for DMA if it was allocated with kmalloc, but that's for later, and only if necessary.
+	   If you need ISA DMA memory, please use esballoc. */
+	if (!len || ((blen = mp->b_wptr - mp->b_rptr) >= len && len >= 0
+		     && !((ulong)(mp->b_rptr) & (L1_CACHE_BYTES - 1))))
 		return (1);	/* success */
 	size = 0;
 	type = mp->b_datap->db_type;
@@ -581,7 +586,7 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	db = mp->b_datap;
 	if (!(md = (struct mdbblock *) mdbblock_alloc(BPRI_MED, &pullupmsg)))
 		goto error;
-	if (!(base = kmem_alloc(size, KM_NOSLEEP)))
+	if (!(base = kmem_alloc(size, KM_NOSLEEP | KM_CACHEALIGN | KM_DMA)))
 		goto free_error;
 	/* msgb unused */
 	dp = &md->datablk.d_dblock;
@@ -597,9 +602,22 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	/* point old msgb at new datab */
 	mp->b_rptr = dp->db_base;
 	mp->b_wptr = mp->b_rptr + blen;
-	/* remove a reference from old initial datab */
 	mp->b_datap = dp;
-	db_dec(db);
+	/* remove a reference from old initial datab */
+	if (db_dec_and_test(db)) {
+		/* free data block */
+		mblk_t *mb = db_to_mb(db);
+		if (db->db_base != db_to_buf(db)) {
+			/* handle external data buffer */
+			if (!db->db_frtnp)
+				kmem_free(db->db_base, db->db_lim - db->db_base);
+			else
+				db->db_frtnp->free_func(db->db_frtnp->free_arg);
+		}
+		/* the entire mdbblock can go if the associated msgb is also unused */
+		if (!mb->b_datap)
+			mdbblock_free(mb);
+	}
 	for (mpp = &mp->b_cont; (bp = *mpp);) {
 		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0 &&
 		    bp->b_datap->db_type != type)
@@ -1274,13 +1292,19 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	if (q != emp->b_queue)
 		goto bug;
 	/* insert before emp */
-	size = msgsize(nmp);
 	if (nmp->b_datap->db_type >= QPCTL) {
+		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
+			goto out_of_order;
 		enable = 2;	/* always enable on high priority */
 		nmp->b_band = 0;
 		if (!q->q_pctl)
 			q->q_pctl = nmp;
 	} else {
+		if (emp->b_datap->db_type >= QPCTL || emp->b_band < nmp->b_band)
+			goto out_of_order;
+		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL
+		    && emp->b_prev->b_band > nmp->b_band)
+			goto out_of_order;
 		enable = q->q_first ? 0 : 1;	/* on empty queue */
 		if (unlikely(nmp->b_band)) {
 			if (!(nmp->b_bandp = qb = __get_qband(q, nmp->b_band)))
@@ -1300,6 +1324,7 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	nmp->b_queue = qget(q);
 	/* some adding to do */
 	q->q_msgs++;
+	size = msgsize(nmp);
 	if (!qb) {
 		if ((q->q_count += size) > q->q_hiwat)
 			set_bit(QFULL_BIT, &q->q_flag);
@@ -1314,6 +1339,11 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	swerr();
       enomem:
 	/* couldn't allocate a band structure! */
+	goto failure;
+      out_of_order:
+	/* insertion would misorder the queue */
+	goto failure;
+      failure:
 	return (0);		/* failure */
       putq:
 	/* insert at end */

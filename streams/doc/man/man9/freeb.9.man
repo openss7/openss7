@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freeb.9.man,v 0.9.2.12 2005/04/20 18:41:34 brian Exp $
+.\" @(#) $Id: freeb.9.man,v 0.9.2.13 2005/04/26 18:56:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:34 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/26 18:56:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -83,7 +83,7 @@ sort-adjacent-labels
 .PP
 .B #include <sys/stream.h>
 .HP
-.BI "freeb(mblk_t *" bp );
+.BI "void freeb(mblk_t *" bp );
 .\"
 .\"
 .SH ARGUMENTS
@@ -104,13 +104,27 @@ message block, data block or data buffer, depending upon the internal
 implementation, the binding of message blocks to data blocks and whether the
 buffer is an internal or external buffer.
 .PP
-For external data buffers that are to be freed, the
-.I function
-will be called with the
-.I arg
+Message blocks will be detached from the data block and the data block reference count,
+.IR mp->b_datap->db_refs ,
+decremented.  Message blocks that reside in a message-data block,
+.BR mdblock (9),
+in which the data block is unused will then be freed.
+.PP
+Data blocks will be detached from the data buffer when the data block reference count,
+.IR mp->b_datap->db_refs
+drops to zero as a result of the message block being detached.
+Data blocks that reside in a message-data block,
+.BR mdblock (9),
+in which the message block is unused will then be freed.
+.PP
+For external data buffers that are to be freed, the free function,
+.IR mp->b_datap->db_frtnp->free_func ,
+will be called with the free argument,
+.IR mp->b_datap->db_frtnp->free_arg ,
 provided previously to the
 .BR esballoc (9)
 call.
+This call will be made before either the message block or data block are freed.
 .\"
 .\"
 .SH RETURN
@@ -144,23 +158,51 @@ callouts, callbacks, soft interrupts and interrupt service routines.
 .BR freeb ()
 is MP-safe; however, the caller must ensure that it has the last remaining
 reference to the message block.
+See also
+.BR esballoc (9)
+for additional considerations.
 .\"
 .\"
-.SH NOTICES
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
 .PP
 .BR freemsg (9)
 is implemented with a looping call to
-.BR freeb ().
+.BR freeb (),
+following along the
+.I b_cont
+pointer of each message block in the message block chain beginning with the passed in message block,
+.IR mp .
 .PP
-.I LiS
-.[
-LiS
-.]
-uses a complicated message block and data block binding scheme with embedded
-data buffers
+.BR freeb ()
+checks whether the message block being free is a
+.B NULL
+pointer, whether the message block is still enqueued on a
+.I STREAMS
+message queue,
+and whether the message block is detached from a data block (one double free scenario).  If any of
+these are the case, an error message will be printed to the system logs and no further action will
+be taken.
+.PP
+.BR "Linux Fast-STREAMS" ,
+like most
+.IR "SVR 4"-based
+systems, allocates a message block,
+.BR mblk_t (9),
+and a data block,
+.BR dblk_t (9),
+in a single allocation of a message-data block,
+.BR mdblock (9).
+Also, buffers below the size
 .B FASTBUF
-or less in size.  Determining the point at which a buffer is actually freed is
-rather complicated.
+are allocated as an internal buffer as part of the message-data block,
+.BR mdblock (9),
+as well.  This speeds allocation of small messages and only causes slight overhead to the\
+.BR freeb ()
+function to detect when each of the elements many be freed.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -179,24 +221,46 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR freeb ()
-is source-level compatible with SVR 4.2 MP DDI/DKI,
-.IR Solaris \(rg
-and LiS
+is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
 .[
-LiS
+usldk
 .]
-with the following exceptions:
+and implementations based on
+.I SVR 4
+.[
+svr4dk
+.]
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.BR freeb ()
+is a widely implemented
+.I STREAMS
+function.
+Portable
+.I STREAMS
+modules and drivers may use this function.
 .IP \(em
-.PP
 Symbol
 .BR lis_freeb ()
-is provided for compatibility with LiS.  See
+is provided for compatibility with
+.IR LiS .
+See
 .BR liscompat (9).
 .BR lis_freeb ()
 calls
 .BR freeb ()
 directly.
+.IP \(em
+.I LiS
+.[
+LiS
+.]
+uses a complicated message block and data block binding scheme with embedded
+data buffers
+.B FASTBUF
+or less in size.  Determining the point at which a buffer is actually freed is
+rather complicated.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -207,18 +271,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR freeb ()
-appeared first in SVR 3.
+appeared first in
+.IR "SVR 3" .
 .[
 svr3spg
 .]
