@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: allocb.9.man,v 0.9.2.15 2005/04/28 01:25:51 brian Exp $
+.\" @(#) $Id: allocb.9.man,v 0.9.2.16 2005/04/28 11:36:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 01:25:51 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:36:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -182,7 +182,7 @@ return an
 .BR mblk_t (9)
 pointer to the allocated message block.
 The allocated message block will have a data block type of
-.BR M_DATA .
+.BR M_DATA (9).
 All bands and flags will be cleared.
 .I b_rptr
 and

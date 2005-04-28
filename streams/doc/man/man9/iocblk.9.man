@@ -1,0 +1,530 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.1 2005/04/28 11:36:37 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/28 11:36:37 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH IOCBLK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B iocblk
+\- \fISTREAMS\fP input-output control block structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1
+.B #include <sys/stream.h>
+
+struct iocblk {
+    int ioc_cmd;        /* command to perform */
+    cred_t *ioc_cr;     /* credentials */
+    uint ioc_id;        /* id of this ioctl */
+    caddr_t __pad1;     /* padding for alignment with copyreq and copyresp */
+    size_t ioc_count;   /* size of the data field */
+    int ioc_error;      /* ioctl error code (for errno) */
+    int ioc_rval;       /* system call return value */
+    uint ioc_flag;
+    mblk_t *__pad2;
+};
+
+#define ioc_uid         ioc_cr->cr_uid
+#define ioc_gid         ioc_cr->cr_gid
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B iocblk
+structure contains the following members:
+.TP \w'ioc_count\(em'u
+.I ioc_cmd
+This member is the input-output control command.
+.PD 0
+.TP
+.I ioc_cr
+This member is a
+pointer to the credentials structure for the user issuing the input-output control.
+.TP
+.I ioc_id
+This member is a unique input-output control identification number.
+.TP
+.I ioc_count
+This member is the
+count of the number of data byte in an attached
+.BR M_DATA (9)
+message block.
+.TP
+.I ioc_error
+This member is the
+error number.
+.TP
+.I ioc_rval
+This member is the
+return value.
+.TP
+.I ioc_flag
+This member is implementation specific.  Many implementations do not define this member.
+See
+.IR \(lq\)COMPATIBILITY\(rq\) ,
+below.
+.PD
+.PP
+The following two fields are for backwards compatibility with 
+.IR "SVR 3.2" .
+Under
+.IR "SVR 3.2"
+these were both of type
+.B ushort
+and occupied the same space as the
+.I ioc_cr
+pointer.  These are not real members but are macros with the same name as the old members.
+.TP \w'ioc_count\(em'u
+.I ioc_uid
+This member is the user identification number of the user requesting the input-output control.
+.PD 0
+.TP
+.I ioc_gid
+This member is the group identification number of the user requesting the input-output control.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B iocblk
+structure is one of a set of
+.BR ioctypes (9)
+structures including
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9),
+that are used for communicating between the stream head or an internal module or driver using
+.I STREAMS
+messages.  The messages used and the placement of these structures into messages is illustrated in
+the table below.
+.sp
+.TS
+center tab(:);
+lbllb.
+M_IOCTL\fR(9):downstream:iocblk\fR(9)
+M_COPYIN\fR(9):upstream:copyreq\fR(9)
+M_COPYOUT\fR(9):upstream:copyreq\fR(9)
+M_IOCDATA\fR(9):downstream:copyresp\fR(9)
+M_IOCACK\fR(9):upstream:iocblk\fR(9)
+M_IOCNAK\fR(9):upstream:iocblk\fR(9)
+M_CTL\fR(9):both:iocblk\fR(9)
+.TE
+.PP
+When the
+.B iocblk
+structure is part of a
+.BR M_IOCTL (9)
+message, the structure is associated with a command request; part of a
+.BR M_IOCACK (9)
+message, a positive acknowledgement of the command; and,
+.BR M_IOCNAK (9)
+message,
+a negative acknowledgement.
+When the structure is part of a
+.BR M_CTL (9)
+message (as with the
+.BR ldterm (4)
+.I STREAMS
+module),
+the
+.I ioc_cmd
+member itself will distinguish between an request and acknowledgement.  See
+.BR ldterm (4).
+.\"
+.SS M_IOCTL
+.PP
+The
+.BR M_IOCTL (9)
+is sent downstream from the stream head or module to request an input-output control.
+.PP
+The
+.I ioc_id
+is a unique input-output control identification number.  This identifier is established by the
+stream head.  Most
+.I STREAMS
+implementations only allow one input-output control to be active at a time.  However, an
+input-output control may be abandonned by the stream head if a response is not forthcoming within a
+time interval.  In that case, another input-output control may have been invoked.  This subsequent
+input-output control will have a different identifier.  By tracking the identifier, the
+.I STREAMS
+stream head or stream end can determine if requests, responses or acknowledgements belong to the
+same transaction.
+.PP
+For input, as part of a
+.BR M_IOCTL (9)
+or
+.BR M_CTL (9)
+message, the
+.I ioc_count
+member is only significant when the input-output control request derives from an internal module or
+driver, or if the request was generated from a
+.B I_STR
+input-output control (see
+.BR streamio (2))
+from the stream head.  The data in the
+.BR M_DATA (9)
+block contains
+.I ioc_count
+bytes of data that was copied in from the user or was supplied by the sending module or driver.
+.PP
+Otherwise, if the input-output control derives from a transparent input-output control (see
+.BR ioctl (2))
+from the stream head, then the value of the
+.I ioc_count
+member will be the special value,
+.BR TRANSPARENT .
+Transparent input-output controls require the use of the
+.BR M_COPYIN , (9)
+.BR M_COPYOUT (9)
+and
+.BR M_IOCDATA (9)
+messages, containing the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+data structures.
+.\".\"
+.\".SS M_COPYIN
+.\".PP
+.\"The
+.\".BR M_COPYIN (9)
+.\"message is sent upstream from the module or driver to the originator of the
+.\".BR M_IOCTL (9)
+.\"request, to request that the stream head copy in an amount of data from the user.  The same
+.\".I ioc_id
+.\"field is used in place in the
+.\".BR copyreq (9)
+.\"structure in the message.
+.\"For additional information on the
+.\".BR M_COPYIN (9)
+.\"operation, see
+.\".BR copyreq (9).
+.\".\"
+.\".SS M_COPYOUT
+.\".PP
+.\"The
+.\".BR M_COPYOUT (9)
+.\"message is sent upstream from the module or driver to the originator of the
+.\".BR M_IOCTL (9)
+.\"request, to request that the stream head copy out an amount of data to the user.  The same
+.\".I ioc_cmd
+.\"and
+.\".I ioc_id
+.\"fields are used in place in the
+.\".BR copyreq (9)
+.\"structure in the message.
+.\"For additional information on the
+.\".BR M_COPYOUT (9)
+.\"operation, see
+.\".BR copyreq (9).
+.\".\"
+.\".SS M_IOCDATA
+.\".PP
+.\"The
+.\".BR M_IOCDATA (9)
+.\"message is sent downtream from the stream head or module to indicate the success or failure of the
+.\".BR M_COPYIN (9)
+.\"or
+.\".BR M_COPYOUT (9)
+.\"operation.  The same
+.\".I ioc_cmd
+.\"and
+.\".I ioc_id
+.\"fields are used in place in the
+.\".BR copyresp (9)
+.\"structure in the message.
+.\"For additional information on the
+.\".BR M_IOCDATA (9)
+.\"operation, see
+.\".BR copyresp (9).
+.\"
+.SS M_IOCACK and M_IOCNAK
+.PP
+The
+.BR M_IOCACK (9)
+message is sent upstream to complete the input-output control operation with success and provide
+positive acknowledgement, return value and error value for the request.
+The
+.BR M_IOCNAK (9)
+message is sent upstream to complete the input-output control operation with failure and provide
+negative acknowledgement, return value and error value for the request.
+.PP
+On output, in a
+.BR M_IOCACK (9)
+or
+.BR M_CTL (9)
+message, the
+.I ioc_count
+member indicates the amount of data bytes in the attached
+.BR M_DATA (9)
+message that will be copyied out to the user upon return from the
+.BR streamio (2)
+call.
+This can only be used for internal controls using the
+.BR M_CTL (9)
+message, or for a
+.BR M_IOCACK (9)
+message in response to a
+.BR M_IOCTL (9)
+message that contained a
+.I ioc_count
+not equal to
+.BR TRANSPARENT .
+.PP
+The
+.I ioc_error
+member is the value that will be stored in the
+.IR errno (3)
+variable upon return from the
+.BR ioctl (2)
+call on both
+.BR M_IOCACK (9)
+and
+.BR M_IOCNAK (9)
+responses to
+.BR M_IOCTL . (9)
+The
+.I ioc_rval
+member is the value that will be the return value of the
+.BR ioctl (2)
+or
+.BR streamio (2)
+call on
+.BR M_IOCACK . (9)
+.\"
+.SS M_CTL
+.PP
+The
+.BR M_CTL (9)
+message is sent upstream or downstream between modules.  For an example, see
+.BR ldterm (4).
+When sent downstream, it operates in a manner similar to the
+.BR M_IOCTL (9)
+message described above.
+When sent upstream, it operates in a manner similar to the
+.BR M_IOCACK (9)
+and
+.BR M_IOCNAK (9)
+messages described above.
+.\"
+.\"
+.SH CONTEXT
+.PP
+Functions that operate on an input-output control block can be called from any context.  However, it
+is the caller's responsibility to ensure that the calling thread has exclusive access to the
+input-output control block.  When the input-output control block is contained in an
+.BR M_IOCTL (9)
+message that has just been removed from a
+.BR queue (9)
+in a
+.BR put (9)
+or
+.BR srv (9)
+procedure of the queue, input-output control block exclusivity is normally guaranteed.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+Functions that access the
+.B iocblk
+structure are MP-safe.  However, it is the caller's responsibility to ensure exclusive access to the
+structure before altering any of the members of the structure.
+.PP
+Because the input-output control block is normally stored in a
+.I STREAMS
+message, see
+.BR datab (9)
+for additional information.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR queue (9),
+.BR put (9),
+.BR srv (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B iocblk
+structure is compatible with
+.IR "SVR 4.2 MP EFT" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+documents the
+.I ioc_flags
+member.
+.[
+soldoc
+.]
+.IR IRIX \(rg,
+.IR SUPER-UX \(rg,
+.IR UnixWare \(rg
+and
+.IR UXP/V \(rg
+do not document the
+.I ioc_flags
+member.
+.[
+suxspg
+.]
+.[
+uw7spg
+.]
+.[
+uxpspg
+.]
+.IP \(em
+.IR UnixWare \(rg
+documents the
+.I ioc_uid
+and
+.I ioc_gid
+fields for
+.IR "SCO OpenServer" \(rg
+compatibility.
+.I ioc_uid
+and
+.I ioc_gid
+were present in
+.IR "SVR 3.2" .
+.[
+svr3
+.]
+.IP \(em
+Lining up these input-output control block data structures is tedious and uninteresting.  See
+.BR ioctypes (9)
+for more information.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B iocblk
+structure was combined with the
+.B copyreq (9)
+and
+.B copyresp (9)
+structures (see
+.B ioctypes (9))
+in
+.IR "SVR 4.0 STREAMS" .
+.PP
+The
+.B iocblk
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

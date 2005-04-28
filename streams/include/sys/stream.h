@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.30 2005/04/28 01:26:08 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.31 2005/04/28 11:37:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/28 01:26:08 $ by $Author: brian $
+ Last Modified $Date: 2005/04/28 11:37:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/28 01:26:08 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/28 11:37:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -167,6 +167,8 @@ typedef struct datab {
 
 /* 
  *  Message type compatibility:
+ *      3 - SVR 3
+ *      4 - SVR 4
  *      S - Solaris
  *      U - UnixWare
  *      A - AIX
@@ -185,37 +187,37 @@ typedef struct datab {
    the OSF number were interpreted in octal instead of hex, the numbering would be identical to the 
    others! Note that the MAC OT (AIX) did not make this error. */
 typedef enum msg_type {
-	QNORM = 0x00,			/* - S U O A H M L */
-	M_DATA = 0x00,			/* | S U O A H M L */
-	M_PROTO = 0x01,			/* | S U O A H M L */
-	M_BREAK = 0x08,			/* v S U O(0x10) A H M L(0x02) */
-	M_PASSFP = 0x09,		/* | S U O(0x11) A H M L(0x06) */
+	QNORM = 0x00,			/* - 3 4 S U O A H M L */
+	M_DATA = 0x00,			/* | 3 4 S U O A H M L */
+	M_PROTO = 0x01,			/* | 3 4 S U O A H M L */
+	M_BREAK = 0x08,			/* v 3 4 S U O(0x10) A H M L(0x02) */
+	M_PASSFP = 0x09,		/* | 3 4 S U O(0x11) A H M L(0x06) */
 	M_EVENT = 0x0a,			/* ? S */
-	M_SIG = 0x0b,			/* ^ S U O(0x13) A H M L(0x09) */
-	M_DELAY = 0x0c,			/* v S U O(0x14) A H M L(0x04) */
-	M_CTL = 0x0d,			/* | S U O(0x15) A H M L(0x03) */
-	M_IOCTL = 0x0e,			/* v S U O(0x16) A H M L(0x05) */
-	M_SETOPTS = 0x10,		/* ^ S U O(0x20) A H M L(0x08) */
-	M_RSE = 0x11,			/* | S U O(0x21) A H M L(0x07) */
+	M_SIG = 0x0b,			/* ^ 3 4 S U O(0x13) A H M L(0x09) */
+	M_DELAY = 0x0c,			/* v 3 4 S U O(0x14) A H M L(0x04) */
+	M_CTL = 0x0d,			/* | 3 4 S U O(0x15) A H M L(0x03) */
+	M_IOCTL = 0x0e,			/* v 3 4 S U O(0x16) A H M L(0x05) */
+	M_SETOPTS = 0x10,		/* ^ 3 4 S U O(0x20) A H M L(0x08) */
+	M_RSE = 0x11,			/* | 4 S U O(0x21) A H M L(0x07) */
 	M_TRAIL = 0x12,			/* ? U */
 	M_BACKWASH = 0x13,		/* v A */
-	QPCTL = 0x80,			/* - S U O A H M L(0x0a) */
-	M_IOCACK = 0x81,		/* ^ S U O A H M L(0x0f) */
-	M_IOCNAK = 0x82,		/* ^ S U O A H M L(0x10) */
-	M_PCPROTO = 0x83,		/* | S U O A H M L(0x12) */
-	M_PCSIG = 0x84,			/* ^ S U O A H M L(0x14) */
-	M_READ = 0x85,			/* v S U O(0x8b) A H(0x8b) M(0x8b) L(0x15) */
-	M_FLUSH = 0x86,			/* | S U O A H M L(0x0d) */
-	M_STOP = 0x87,			/* v S U O A H M L(0x16) */
-	M_START = 0x88,			/* v S U O A H M L(0x17) */
-	M_HANGUP = 0x89,		/* ^ S U O A H M L(0x0e) */
-	M_ERROR = 0x8a,			/* ^ S U O A H M L(0x0c) */
-	M_COPYIN = 0x8b,		/* ^ S U O(0x8d) A H(0x8d) M(0x8c) L(0x0a) */
-	M_COPYOUT = 0x8c,		/* ^ S U O(0x8e) A H(0x8e) M(0x8d) L(0x0b) */
-	M_IOCDATA = 0x8d,		/* v S U O(0x8f) A H(0x8f) M(0x8e) L(0x11) */
-	M_PCRSE = 0x8e,			/* | S U O(0x90) A H(0x90) M(0x90) L(0x13) */
-	M_STOPI = 0x8f,			/* v S U O(0x91) A H(0x91) M(0x91) L(0x19) */
-	M_STARTI = 0x90,		/* v S U O(0x92) A H(0x92) M(0x92) L(0x18) */
+	QPCTL = 0x80,			/* - 3 4 S U O A H M L(0x0a) */
+	M_IOCACK = 0x81,		/* ^ 3 4 S U O A H M L(0x0f) */
+	M_IOCNAK = 0x82,		/* ^ 3 4 S U O A H M L(0x10) */
+	M_PCPROTO = 0x83,		/* | 3 4 S U O A H M L(0x12) */
+	M_PCSIG = 0x84,			/* ^ 3 4 S U O A H M L(0x14) */
+	M_READ = 0x85,			/* v 4 S U O(0x8b) A H(0x8b) M(0x8b) L(0x15) */
+	M_FLUSH = 0x86,			/* | 3 4 S U O A H M L(0x0d) */
+	M_STOP = 0x87,			/* v 3 4 S U O A H M L(0x16) */
+	M_START = 0x88,			/* v 3 4 S U O A H M L(0x17) */
+	M_HANGUP = 0x89,		/* ^ 3 4 S U O A H M L(0x0e) */
+	M_ERROR = 0x8a,			/* ^ 3 4 S U O A H M L(0x0c) */
+	M_COPYIN = 0x8b,		/* ^ 4 S U O(0x8d) A H(0x8d) M(0x8c) L(0x0a) */
+	M_COPYOUT = 0x8c,		/* ^ 4 S U O(0x8e) A H(0x8e) M(0x8d) L(0x0b) */
+	M_IOCDATA = 0x8d,		/* v 4 S U O(0x8f) A H(0x8f) M(0x8e) L(0x11) */
+	M_PCRSE = 0x8e,			/* | 4 S U O(0x90) A H(0x90) M(0x90) L(0x13) */
+	M_STOPI = 0x8f,			/* v 3(0x8b) 4 S U O(0x91) A H(0x91) M(0x91) L(0x19) */
+	M_STARTI = 0x90,		/* v 3(0x8c) 4 S U O(0x92) A H(0x92) M(0x92) L(0x18) */
 	/* the rest of these are all over the board, only M_UNHANGUP is common, they have been
 	   renumbered so that at least they don't overlap */
 	M_PCCTL = 0x91,			/* | U */

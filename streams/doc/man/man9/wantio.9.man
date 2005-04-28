@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: wantio.9.man,v 0.9.2.11 2005/04/20 18:41:39 brian Exp $
+.\" @(#) $Id: wantio.9.man,v 0.9.2.12 2005/04/28 11:36:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:39 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:36:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -96,7 +96,7 @@ The driver queue pointer calling the function.
 .TP
 .I w
 a pointer to a
-.B waitio
+.B wantio
 structure that contains the IO functions to call directly from the stream
 head.
 .\"
@@ -275,7 +275,7 @@ for an active stream,
 the following steps should be performed by the driver:
 .IP (1) \w'(0)\(em'u
 Send a
-.B M_LETSPLAY
+.BR M_LETSPLAY (9)
 message upstream with a
 .B strlp
 structure in the message.  The
@@ -294,15 +294,15 @@ struct strlp {
 .I lp_count
 Initially set to zero by the driver, this count is incremented by each module
 that recognizes the
-.B M_LETSPLAY
+.BR M_LETSPLAY (9)
 message type and will permit direct IO to the driver.  Once the
-.B M_LETSPLAY
+.BR M_LETSPLAY (9)
 message reaches the stream head, the stream head compares this count with the
 number of modules pushed on the stream.  If the two are equal, the stream head
 returns an
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message.  If the two are different, the stream head returns an
-.B M_DONTPLAY
+.BR M_DONTPLAY (9)
 message.
 .TP
 .I lp_queue
@@ -310,38 +310,38 @@ A pointer to the driver's write queue.
 .RE
 .IP ""
 When an intervening module receives an
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message, it delivers all queued data as
-.B M_BACKWASH
+.BR M_BACKWASH (9)
 messages, and any
-.B M_BACKWASH
+.BR M_BACKWASH (9)
 messages received from upstream,
 and sends the
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message downstream.
 In this way, all queue data is delivered to the driver's write queue as
-.B M_BACKWASH
+.BR M_BACKWASH (9)
 messages followed by a
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message.
 .IP (2)
 Wait for an
-.B M_DONTPLAY
+.BR M_DONTPLAY (9)
 or
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message received on the write queue.
 .IP (3)
 If an
-.B M_DONTPLAY
+.BR M_DONTPLAY (9)
 message is received, the driver cannot call
-.BR waitio ().
+.BR wantio ().
 .IP (4)
 If an
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 message is received, the driver can handle any
-.B M_BACKWASH
+.BR M_BACKWASH (9)
 messages representing pushed data and call
-.BR waitio ().
+.BR wantio ().
 .\"
 .\"
 .SH "SEE ALSO"

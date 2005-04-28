@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datab.9.man,v 0.9.2.4 2005/04/20 18:41:33 brian Exp $
+.\" @(#) $Id: datab.9.man,v 0.9.2.6 2005/04/28 11:48:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/20 18:41:33 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:48:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -157,131 +157,174 @@ The type of data block.  The type can be one of the following values:
 .RS
 .PP
 The following are normal messages:
-.TP \w'\ M_PCSETOPTS\ 'u
+.TP \w'M_PCSETOPTS(9)\(em'u
 .B QNORM
 normal message start
+(SVR 3)
 .PD 0
 .TP
-.B M_DATA
+.BR M_DATA (9)
 data message
+(SVR 3)
 .TP
-.B M_PROTO
+.BR M_PROTO (9)
 normal protocol message
+(SVR 3)
 .TP
-.B M_BREAK
+.BR M_BREAK (9)
 break message
+(SVR 3)
 .TP
-.B M_PASSFP
+.BR M_PASSFP (9)
 pass file pointer message
+(SVR 3)
 .TP
-.B M_EVENT
+.BR M_EVENT (9)
 event message
 .TP
-.B M_SIG
+.BR M_SIG (9)
 signal message
+(SVR 3)
 .TP
-.B M_DELAY
+.BR M_DELAY (9)
 delay message
+(SVR 3)
 .TP
-.B M_CTL
+.BR M_CTL (9)
 control message
+(SVR 3)  See
+.BR iocblk (9).
 .TP
-.B M_IOCTL
+.BR M_IOCTL (9)
 IO control message
+(SVR 3)  See
+.BR iocblk (9).
 .TP
-.B M_SETOPTS
+.BR M_SETOPTS (9)
 set stream head options message
+(SVR 3)
 .TP
-.B M_RSE
+.BR M_RSE (9)
 normal reserved message
+(SVR 4)
 .TP
-.B M_TRAIL
+.BR M_TRAIL (9)
 trail message
 .TP
-.B M_BACKWASH
+.BR M_BACKWASH (9)
 backwash direct I/O message
+See
+.BR wantio (9).
 .PD
 .PP
 The following are priority messages:
-.TP \w'\ M_PCSETOPTS\ 'u
+.TP \w'M_PCSETOPTS(9)\(em'u
 .B QPCTL
 priority message start
+(SVR 3)
 .PD 0
 .TP
-.B M_IOCACK
+.BR M_IOCACK (9)
 IO control acknowledgement message
+(SVR 3)  See
+.BR iocblk (9).
 .TP
-.B M_IOCNAK
+.BR M_IOCNAK (9)
 IO control negative acknowledgement message
+(SVR 3)  See
+.BR iocblk (9).
 .TP
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 priority protocol message
+(SVR 3)
 .TP
-.B M_PCSIG
+.BR M_PCSIG (9)
 priority signal message
+(SVR 3)
 .TP
-.B M_READ
+.BR M_READ (9)
 read message
+(SVR 4)
 .TP
-.B M_FLUSH
+.BR M_FLUSH (9)
 flush message
+(SVR 3)
 .TP
-.B M_STOP
+.BR M_STOP (9)
 stop output message
+(SVR 3)
 .TP
-.B M_START
+.BR M_START (9)
 start output message
+(SVR 3)
 .TP
-.B M_HANGUP
+.BR M_HANGUP (9)
 hangup message
+(SVR 3)
 .TP
-.B M_ERROR
+.BR M_ERROR (9)
 error message
+(SVR 3)
 .TP
-.B M_COPYIN
+.BR M_COPYIN (9)
 copyin message
+(SVR 4)  See
+.BR copyreq (9).
 .TP
-.B M_COPYOUT
+.BR M_COPYOUT (9)
 copyout message
+(SVR 4)  See
+.BR copyreq (9).
 .TP
-.B M_IOCDATA
+.BR M_IOCDATA (9)
 IO control data message
+(SVR 4)  See
+.BR copyresp (9).
 .TP
-.B M_PCRSE
+.BR M_PCRSE (9)
 priority reserved message
+(SVR 4)
 .TP
-.B M_STOPI
+.BR M_STOPI (9)
 stop input message
+(SVR 3)
 .TP
-.B M_STARTI
+.BR M_STARTI (9)
 start input message
+(SVR 3)
 .TP
-.B M_PCCTL
+.BR M_PCCTL (9)
 priority control message
 .TP
-.B M_PCSETOPTS
+.BR M_PCSETOPTS (9)
 prioirity stream head set options message
 .TP
-.B M_PCEVENT
+.BR M_PCEVENT (9)
 prioirity event
 .TP
-.B M_UNHANGUP
+.BR M_UNHANGUP (9)
 undo hangup message
 .TP
-.B M_NOTIFY
+.BR M_NOTIFY (9)
 notification message
 .TP
-.B M_HPDATA
+.BR M_HPDATA (9)
 high priority data message
 .TP
-.B M_LETSPLAY
+.BR M_LETSPLAY (9)
 let's play direct I/O message
+See
+.BR wantio (9).
 .TP
-.B M_DONTPLAY
+.BR M_DONTPLAY (9)
 don't play direct I/O message
+See
+.BR wantio (9).
 .TP
-.B M_BACKDONE
+.BR M_BACKDONE (9)
 backwash done direct I/O message
+See
+.BR wantio (9).
 .PD
 .RE
 .TP
@@ -322,6 +365,35 @@ count, and then it is copied from here to
 .SH DESCRIPTION
 .PP
 .\"
+.SS Macros
+.PP
+Following are some
+.I Solaris \(rg
+implementation specific helper macros that are defined in the
+.B <sys/strsun.h>
+header file:
+.TP
+.BI DB_BASE( mp );
+Return the data buffer base pointer from a message block pointer.  This is the
+.I db_base
+member listed above.
+.TP
+.BI DB_LIM( mp );
+Return the data buffer limit pointer from a message block pointer.  This is the
+.I db_lim
+member listed above.
+.TP
+.BI DB_REF( mp );
+Return the data buffer reference count from a message block pointer.  A value of greater than one
+indicates that the data buffer is read-only as with the
+.I db_ref
+listed above.
+.TP
+.BI DB_TYPE( mp );
+Return the data buffer type from a message block pointer.  The type returned is one of the
+.I db_type
+values listed above.
+.\"
 .\"
 .SH CONTEXT
 .PP
@@ -341,29 +413,24 @@ procedure of the queue, message exclusivity is normally guaranteed.
 .PP
 Functions that access the
 .B datab
-structure are MP-safe.  However, it is the caller's responsibility to ensure
-that exclusive access to the structure before altering any of the members of
-the structure.
+structure are MP-safe.  However, it is the caller's responsibility to ensure exclusive access to the
+structure before altering any of the members of the structure.
 .PP
 Data blocks allocated with
 .BR esballoc (9)
-may also require the caller to ensure exclusive access to the external data
-buffer supplied to the
+may also require the caller to ensure exclusive access to the external data buffer supplied to the
 .BR esballoc (9)
 call.
 .PP
-Duplication of message blocks without copying the data block with functions
-such as
+Duplication of message blocks without copying the data block with functions such as
 .BR dupb (9)
 or
 .BR dupmsg (9),
-may result in multiple threads of execution holding a reference to the same
-data block.
-To ensure that this condition does not exist, the
-.I db_refs
-member can be examined to determine whether the reference count is one (1)
-indicating that no duplication has occurred, or greater, indicating that
-duplication has occurred.
+may result in multiple threads of execution holding a reference to the same data block.  To ensure
+that this condition does not exist, the
+.I db_ref
+member can be examined to determine whether the reference count is one (1) indicating that no
+duplication has occurred, or greater, indicating that duplication has occurred.
 .\"
 .\"
 .SH NOTICES
@@ -392,9 +459,10 @@ modules or drivers.
 .\"
 .SH "SEE ALSO"
 .PP
+.BR msgb (9).
 .\"
 .\"
-.SH COMPATIBLITY
+.SH COMPATIBILITY
 .PP
 The
 .B datab
@@ -416,7 +484,7 @@ Only
 solspg
 .]
 documents the
-.BR M_EVENT " and " M_PCEVENT
+.BR M_EVENT "(9) and " M_PCEVENT (9)
 data block types.
 These data block types are provided for source compatibility with drivers
 written for
@@ -432,6 +500,12 @@ It might be necessary to define
 before including
 .B sys/stream.h
 to expose these symbols.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_EVENT "(9) and " M_PCEVENT (9)
+data block types.
 .IP \(em
 Only
 .IR UnixWare \(rg
@@ -439,7 +513,7 @@ Only
 uw7spg
 .]
 documents the
-.BR M_TRAIL ", " M_PCCTL " and " M_PCSETOPTS
+.BR M_TRAIL "(9), " M_PCCTL "(9) and " M_PCSETOPTS (9)
 data block types.
 These data block types are provided for source compatibility with drivers
 written for
@@ -455,6 +529,12 @@ It might be necessary to defined
 before including
 .B sys/stream.h
 to expose these symbols.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_TRAIL "(9), " M_PCCTL "(9) or " M_PCSETOPTS (9)
+data block types.
 .IP \(em
 Only
 .IR AIX \(rg
@@ -462,7 +542,7 @@ Only
 aixspg
 .]
 documents the
-.BR M_BACKWASH ", " M_LETSPLAY ", " M_DONTPLAY " and " M_BACKDONE
+.BR M_BACKWASH "(9), " M_LETSPLAY "(9), " M_DONTPLAY "(9) and " M_BACKDONE (9)
 data block types.
 These data block types are provided for source compatibility with drivers
 written for
@@ -478,6 +558,12 @@ It might be necessary to define
 before including
 .B sys/stream.h
 to expose these symbols.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_BACKWASH "(9), " M_LETSPLAY "(9), " M_DONTPLAY "(9) or " M_BACKDONE (9)
+data block types.
 .IP \(em
 Only
 .IR OSF/1 \(rg
@@ -490,7 +576,7 @@ and
 hpuxspg
 .]
 document the
-.B M_NOTIFY
+.BR M_NOTIFY (9)
 data block type.
 This data block type is provided for source compatibility with drivers written
 for
@@ -513,13 +599,19 @@ or
 before including
 .B sys/stream.h
 to expose this symbol.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_NOTIFY (9)
+data block type.
 .IP \(em
 Only
 .IR HP-UX \(rg
 and
 .IR "Mac OT" \(rg
 document the
-.B M_HPDATA
+.BR M_HPDATA (9)
 data block type.
 This data block type is provided for source compatibility with drivers written
 for
@@ -534,13 +626,19 @@ It might be necessary to define
 before including
 .B sys/stream.h
 to expose this symbol.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_HPDATA (9)
+data block type.
 .IP \(em
 Only
 .IR OSF/1 \(rg
 and
 .IR Solaris \(rg
 document the
-.B M_UNHANGUP
+.BR M_UNHANGUP (9)
 data block type.
 This data block type is provided for source compatibility with drivers written
 for
@@ -557,10 +655,12 @@ or
 before including
 .B sys/stream.h
 to expose this symbol.
-.IP \(em
-.\"
-.\"
-.SH COMPATIBILITY
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_UNHANGUP (9)
+data block type.
 .PP
 See
 .BR STREAMS (9)
@@ -576,6 +676,14 @@ svr42
 .\"
 .\"
 .SH HISTORY
+.PP
+The data block types in the
+.I db_type
+field were extended in
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
 .PP
 The
 .B datab

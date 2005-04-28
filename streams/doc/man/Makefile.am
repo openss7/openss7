@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/04/23 16:47:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/04/28 11:55:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/23 16:47:47 $ by $Author: brian $
+# Last Modified $Date: 2005/04/28 11:55:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -269,6 +269,7 @@ man_MANS = \
 	man9/bcanget.9 \
 	man9/bcanput.9 \
 	man9/bcanputnext.9 \
+	man9/bcmp.9 \
 	man9/bcopy.9 \
 	man9/__bufcall.9 \
 	man9/bufcall.9 \
@@ -759,8 +760,19 @@ man_MANS = \
 	man9/register_strdrv.9 \
 	man9/register_strmod.9 \
 	man9/register_strnod.9 \
+	man9/rmalloc.9 \
+	man9/rmalloc_locked.9 \
+	man9/rmallocmap.9 \
+	man9/rmallocmap_wait.9 \
+	man9/rmalloc_wait.9 \
+	man9/rmfree.9 \
+	man9/rmfreemap.9 \
+	man9/rmget.9 \
+	man9/rminit.9 \
+	man9/rmsetwant.9 \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
+	man9/rmwanted.9 \
 	man9/RW_ALLOC.9 \
 	man9/RW_DEALLOC.9 \
 	man9/RW_RDLOCK.9 \
@@ -1084,6 +1096,7 @@ dist_noinst_MANS = \
 	man9/bcanget.9.man \
 	man9/bcanput.9.man \
 	man9/bcanputnext.9.man \
+	man9/bcmp.9.man \
 	man9/bcopy.9.man \
 	man9/__bufcall.9.man \
 	man9/bufcall.9.man \
@@ -1574,8 +1587,19 @@ dist_noinst_MANS = \
 	man9/register_strdrv.9.man \
 	man9/register_strmod.9.man \
 	man9/register_strnod.9.man \
+	man9/rmalloc.9.man \
+	man9/rmalloc_locked.9.man \
+	man9/rmallocmap.9.man \
+	man9/rmallocmap_wait.9.man \
+	man9/rmalloc_wait.9.man \
+	man9/rmfree.9.man \
+	man9/rmfreemap.9.man \
+	man9/rmget.9.man \
+	man9/rminit.9.man \
+	man9/rmsetwant.9.man \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
+	man9/rmwanted.9.man \
 	man9/RW_ALLOC.9.man \
 	man9/RW_DEALLOC.9.man \
 	man9/RW_RDLOCK.9.man \

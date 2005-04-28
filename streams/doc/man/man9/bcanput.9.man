@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.15 2005/04/28 01:25:52 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.16 2005/04/28 11:36:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 01:25:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:36:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -149,7 +149,7 @@ is no longer flow controlled (falls to its low water mark).
 It is the responsibility of a
 .I STREAMS
 driver puting a banded (non-priority) data message
-.RB ( M_PROTO ", " M_DATA )
+.RB ( M_PROTO "(9), " M_DATA (9))
 to a message queue to check for flow control using
 .BR bcanput ()
 for the band associated with the message before placing a message on the queue

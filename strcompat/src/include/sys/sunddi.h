@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.3 2005/03/02 17:41:27 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.4 2005/04/28 11:37:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/02 17:41:27 $ by $Author: brian $
+ Last Modified $Date: 2005/04/28 11:37:41 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/03/02 17:41:27 $"
+#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/04/28 11:37:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -161,6 +161,27 @@ __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t 
 	if (defer_func((void (*)(void *, mblk_t *)) func, qp, mp, qp, perimeter, SE_WRITER) == 0)
 		return;
 	// never();
+}
+
+__SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
+{
+	mblk_t *mp;
+	union ioctypes *iocp;
+	static atomic_t ioc_id = ATOMIC(0);
+	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
+		mp->b_datab->db_type = M_IOCTL;
+		mp->b_wptr += sizeof(*iocp);
+		mp->b_cont = NULL;
+		iocp = (typeof(iocp)) mp->b_rptr;
+		iocp->iocblk.ioc_cmd = command;
+		iocp->iocblk.ioc_id = atomic_inc(&ioc_id);	/* FIXME: need better unique id */
+		iocp->iocblk.ioc_cr = NULL;	/* FIXME: need maximum credentials pointer */
+		iocp->iocblk.ioc_count = 0;
+		iocp->iocblk.ioc_rval = 0;
+		iocp->iocblk.ioc_error = 0;
+		iocp->iocblk.ioc_flags = IOC_NATIVE;
+	}
+	return (mp);
 }
 
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void)

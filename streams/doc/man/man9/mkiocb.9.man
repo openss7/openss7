@@ -1,0 +1,5 @@
+.so man9/undoc.9.man
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "mblk_t *mkiocb(uint " command ");

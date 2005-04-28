@@ -1,0 +1,299 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: M_BACKWASH.9.man,v 0.9.2.1 2005/04/28 11:36:33 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/04/28 11:36:33 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH M_BACKWASH 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_BACKWASH
+\- \fISTREAMS\fP backwash direct I/O message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_BACKWASH
+message is a
+.BR datab (9)
+structure and associated data buffer that contains no data.
+Attached to the
+.B M_BACKWASH
+message is a normal
+.BR M_PROTO "(9) and " M_DATA (9)
+message or
+.BR M_PCPROTO "(9) and " M_DATA (9)
+message.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B M_BACKWASH
+is a message used in conjunction with
+.BR M_BACKDONE (9),
+.BR M_LETSPLAY (9),
+and
+.BR M_DONTPLAY (9)
+to coordinate the establishment of direct IO from the driver, bypassing the stream head and any
+pushed modules, using the
+.BR wantio (9)
+utility.  See
+.BR wantio (9).
+.\"
+.\"
+.SH USAGE
+.PP
+Before calling
+.BR wantio (9)
+for an active stream, and shifting from normal stream head IO to driver direct IO,
+the following steps should be performed by the driver:
+.IP (1) \w'(0)\(em'u
+Send a
+.BR M_LETSPLAY (9)
+message upstream with a
+.B strlp
+structure in the message.
+.IP ""
+Once the
+.BR M_LETSPLAY (9)
+message reaches the stream head, the stream head compares the
+.I lp_count
+count with the number of modules pushed on the stream.  If the two are equal, all modules pushed on
+the stream agree to driver direct IO, and the stream head returns an
+.BR M_BACKDONE (9)
+message.  If the two are different, some module pushed on the stream does not agree to driver direct
+IO, and the stream head returns an
+.BR M_DONTPLAY (9)
+message.
+.IP (2)
+Wait for an
+.BR M_DONTPLAY (9)
+or
+.BR M_BACKDONE (9)
+message received on the write queue.
+.IP ""
+When an intervening module receives an
+.BR M_BACKDONE (9)
+message, it delivers all queued data as
+.B M_BACKWASH
+messages, and any
+.B M_BACKWASH
+messages received from upstream,
+and sends the
+.BR M_BACKDONE (9)
+message downstream.
+In this way, all queue data is delivered to the driver's write queue as
+.B M_BACKWASH
+messages followed by a
+.BR M_BACKDONE (9)
+message.
+.IP (3)
+If an
+.BR M_DONTPLAY (9)
+message is received, the driver cannot call
+.BR wantio (9).
+.IP (4)
+If an
+.BR M_BACKDONE (9)
+message is received, the driver can handle any
+.B M_BACKWASH
+messages representing pushed data and then call
+.BR wantio (9).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B M_BACKWASH
+is an
+.IR AIX \(rg
+specific message.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+A canonical handling of
+.B M_BACKWASH
+messages in a module's write-side (downstream)
+.BR put (9)
+and
+.BR srv (9)
+procedure is as follows:
+.nf
+\fC\s-1
+/* module put procedure */
+int xxx_putp(queue_t *q, mblk_t *mp)
+{
+    switch (mp->b_datap->db_type) {
+    ...
+    case M_BACKWASH:
+    case M_BACKDONE:
+    case M_DONTPLAY:
+#if have_service_procedure
+        putq(q, mp);
+#else
+        putnext(q, mp);
+#endif
+        break;
+    ...
+    }
+}
+\s+1\fP
+.fi
+.PP
+.nf
+\fC\s-1
+/* driver put procedure */
+int xxx_putp(queue_t *q, mblk_t *mp)
+{
+    switch (mp->b_datap->db_type) {
+    ...
+    case M_BACKWASH:
+#if have_service_procedure
+        putq(q, xchg(&mp->b_cont, NULL));
+#else
+        /* process message */
+#endif
+        freeb(mp);
+        break;
+    case M_BACKDONE:
+        freemsg(mp);
+        /* now direct IO can be performed */
+        wantio(...);
+        break;
+    case M_DONTPLAY:
+        freemsg(mp);
+        /* cancel wantio */
+        break;
+    ...
+    }
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datab (9),
+.BR msgb (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_BACKWASH
+.I STREAMS
+message is compatible with
+.IR AIX \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.B M_BACKWASH
+is an
+.IR AIX \(rg
+specific message, provided for compatibility with
+.IR AIX \(rg.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use this message.
+.PP
+See
+.BR aixcompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+documentation.
+.[
+aixdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_BACKWASH
+message first appeared in
+.IR AIX \(rg.
+.[
+aixdoc
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

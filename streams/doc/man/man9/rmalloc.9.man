@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmalloc.9.man,v 0.9.2.2 2005/04/28 01:25:58 brian Exp $
+.\" @(#) $Id: rmalloc.9.man,v 0.9.2.3 2005/04/28 11:36:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/28 01:25:58 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:36:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -100,12 +100,14 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .HP
 .BI "unsigned long rmalloc(struct map *" map ", size_t " size ");
+.PD 0
 .HP
 .BI "unsigned long rmalloc_wait(struct map *" map ", size_t " size ");
 .HP
 .BI "unsigned long rmalloc_locked(struct map *" map ", size_t " size ");
 .HP
 .BI "ulong_t malloc(struct map *" map ", size_t " size );
+.PD
 .\"
 .\"
 .SH ARGUMENTS
@@ -116,9 +118,11 @@ a pointer to a
 .B struct map
 structure that was previously initialized by a call to
 .BR rminit (9).
+.PD 0
 .TP
 .I size
 the number of units to allocate.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -241,10 +245,18 @@ have no known bugs.
 .BR rmalloc ()
 and
 .BR rmalloc_wait ()
-are source-level compatible with
-.IR "SVR 4.2 MP DDI/DKI"
-and
-.IR Solaris \(rg
+are compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+including
+.IR Solaris \(rg,
 with the following exceptions:
 .IP \(em \w'\(em\(em'u
 .IR OSF/1 \(rg,
@@ -322,22 +334,17 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR OSF/1 \(rg,
-.IR Solaris \(rg,
-.IR UnixWare \(rg,
-and
-.IR UXP/V \(rg
-documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR rmalloc ()
-first appeared in SVR 4.
+first appeared in
+.IR "SVR 4" .
 .[
 svr4
 .]

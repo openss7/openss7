@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent noautoindent nosmartindent
 .\"
-.\" @(#) $Id: alloc_proto.9.man,v 0.9.2.4 2005/04/13 04:30:12 brian Exp $
+.\" @(#) $Id: alloc_proto.9.man,v 0.9.2.5 2005/04/28 11:36:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 11:36:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -117,7 +117,7 @@ and size
 .IR psize .
 The data part of the message is of
 type
-.B M_DATA
+.BR M_DATA (9)
 and of size
 .IR dsize .
 Both buffers are requested with priority
@@ -212,7 +212,7 @@ a data block type of
 and a size of
 .IR psize ;
 the second allocated message will have a data block type of
-.B M_DATA
+.BR M_DATA (9)
 and a size of
 .IR bsize .
 All bands and flags will be cleared on both message and data blocks.
