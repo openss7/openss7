@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: freezestr.9.man,v 0.9.2.15 2005/04/27 09:27:53 brian Exp $
+.\" @(#) $Id: freezestr.9.man,v 0.9.2.16 2005/04/28 01:25:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 09:27:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -799,6 +799,9 @@ for additional compatibility information.
 .IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
+.]
+.[
+uslspg
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmallocmap.9.man,v 0.9.2.1 2005/04/14 19:04:23 brian Exp $
+.\" @(#) $Id: rmallocmap.9.man,v 0.9.2.2 2005/04/28 01:25:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/14 19:04:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,8 +93,10 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .HP
 .BI "struct map *rmallocmap(size_t " mapsize ");
+.\" also unsigned long for mapsize
 .HP
 .BI "struct map *rmallocmap_wait(size_t " mapsize ");
+.\" also unsigned long for mapsize
 .HP
 .BI "void rmfreemap(struct map *" map ");
 .\"

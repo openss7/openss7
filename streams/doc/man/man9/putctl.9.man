@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putctl.9.man,v 0.9.2.12 2005/04/27 00:32:52 brian Exp $
+.\" @(#) $Id: putctl.9.man,v 0.9.2.13 2005/04/28 01:25:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -398,6 +398,13 @@ usldk
 .\"
 .\"
 .SH HISTORY
+.PP
+.BR putctl ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
 .PP
 .BR putctl ()
 first appeared in

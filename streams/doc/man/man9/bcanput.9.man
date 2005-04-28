@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: bcanput.9.man,v 0.9.2.14 2005/04/24 23:09:22 brian Exp $
+.\" @(#) $Id: bcanput.9.man,v 0.9.2.15 2005/04/28 01:25:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -515,11 +515,18 @@ usldk
 .PP
 .BR bcanput ()
 first appeared in
-.IR "SVR 4.0 DDI/DKI" .
+.IR "SVR 4.0 STREAMS" .
 .[
-svr4dk
+svr4spg
 .]
-Earlier versions did not have priority bands.
+.PP
+Earlier versions of
+.I STREAMS
+.RI (e.g. " SVR 3" )
+.[
+svr3spg
+.]
+did not have priority bands.
 .\"
 .\"
 .[

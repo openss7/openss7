@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: queue.9.man,v 0.9.2.12 2005/04/13 07:51:12 brian Exp $
+.\" @(#) $Id: queue.9.man,v 0.9.2.13 2005/04/28 01:25:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 07:51:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -75,7 +75,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B queue, queue_t
+.B queue, queue_t, queue_free
 \- \fISTREAMS\fR message queue structure
 .\"
 .\"
@@ -431,6 +431,11 @@ set a parameter for a queue
 \fBunfreezestr\fP(9) \-
 thaw the stream containing a queue
 .PD
+.PP
+.B queue_free
+is a per-thread pointer to the list of free queue structures for fast allocation or deallocation.
+This per-thread global does not really exist.  There is, instead, a global memory cache pointer for
+queinfo structures.
 .\"
 .\"
 .SH CONTEXT

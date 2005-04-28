@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: pcmsg.9.man,v 0.9.2.10 2005/04/27 00:32:52 brian Exp $
+.\" @(#) $Id: pcmsg.9.man,v 0.9.2.11 2005/04/28 01:25:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 00:32:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -323,15 +323,20 @@ for additional compatibility information.
 .[
 usldk
 .]
+.[
+uslspg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR pcmsg ()
-was introduced in
-.IR "SVR 4.0 MP" .
+.IR "SVR 4.0 MP" " and " "SVR 4.2 MP" .
 .[
 svr4dk
+.]
+.[
+usldk
 .]
 .\"
 .\"

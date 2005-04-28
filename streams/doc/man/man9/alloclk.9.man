@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: alloclk.9.man,v 0.9.2.6 2005/04/13 04:30:12 brian Exp $
+.\" @(#) $Id: alloclk.9.man,v 0.9.2.7 2005/04/28 01:25:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/13 04:30:12 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,6 +93,11 @@ link block
 none
 .\"
 .\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .BR alloclk ()
@@ -108,7 +113,6 @@ allocates a link block
 Upon success,
 .BR alloclk ()
 will return a link block.
-.HP
 Upon failure,
 .BR alloclk ()
 will return a 
@@ -130,7 +134,8 @@ fails when there is insufficient cache memory to satisfy the allocation request.
 .SH CONTEXT
 .PP
 .BR alloclk ()
-can be called from any context, including user context, module procedures, call outs, callbacks, soft interrupts and interrupt service routines.
+can be called from any context, including user context, module procedures, call outs, callbacks,
+soft interrupts and interrupt service routines.
 .\"
 .\"
 .SH MP-STREAMS

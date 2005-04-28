@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: unbufcall.9.man,v 0.9.2.11 2005/04/27 09:27:54 brian Exp $
+.\" @(#) $Id: unbufcall.9.man,v 0.9.2.12 2005/04/28 01:25:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 09:27:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:59 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -320,6 +320,13 @@ usldk
 .\"
 .\"
 .SH HISTORY
+.PP
+.BR unbufcall ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
 .PP
 .BR unbufcall ()
 first appeared in

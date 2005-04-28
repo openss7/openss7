@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: putnextctl.9.man,v 0.9.2.15 2005/04/27 00:32:53 brian Exp $
+.\" @(#) $Id: putnextctl.9.man,v 0.9.2.16 2005/04/28 01:25:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -408,15 +408,21 @@ for additional compatibility information.
 .[
 usldk
 .]
+.[
+uslspg
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
 .BR putnextctl ()
 first appeared in
-.IR "SVR 4.0 MP" .
+.IR "SVR 4.0 MP" " and " "SVR 4.2 MP" .
 .[
 svr4dk
+.]
+.[
+usldk
 .]
 .\"
 .\"

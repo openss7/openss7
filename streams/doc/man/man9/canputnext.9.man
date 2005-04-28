@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: canputnext.9.man,v 0.9.2.16 2005/04/24 23:09:22 brian Exp $
+.\" @(#) $Id: canputnext.9.man,v 0.9.2.17 2005/04/28 01:25:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -361,12 +361,12 @@ for additional compatibility information.
 .\"
 .SH CONFORMANCE
 .PP
-SVR 4.2 MP DDI/DKI,
+.IR "SVR 4.2 MP DDI/DKI" .
 .[
 usldk
 .]
-.IR Solaris \(rg
-documentation.
+.[
+uslspg
 .]
 .\"
 .\"
@@ -374,9 +374,12 @@ documentation.
 .PP
 .BR canputnext ()
 first appeared in
-.IR "SVR 4.0 MP" .
+.IR "SVR 4.0 MP" " and " "SVR 4.2 MP" .
 .[
 svr4dk
+.]
+.[
+usldk
 .]
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: copymsg.9.man,v 0.9.2.15 2005/04/24 23:09:23 brian Exp $
+.\" @(#) $Id: copymsg.9.man,v 0.9.2.16 2005/04/28 01:25:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:52 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -243,7 +243,15 @@ documentation.
 .SH HISTORY
 .PP
 .BR copymsg ()
-first appeared in SVR 3.
+appeared as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR copymsg ()
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

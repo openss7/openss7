@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: qenable.9.man,v 0.9.2.14 2005/04/27 09:27:53 brian Exp $
+.\" @(#) $Id: qenable.9.man,v 0.9.2.15 2005/04/28 01:25:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 09:27:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:57 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -426,6 +426,13 @@ usldk
 .\"
 .\"
 .SH HISTORY
+.PP
+.BR qenable ()
+appears as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
 .PP
 .BR qenable ()
 first appeared in

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: rmget.9.man,v 0.9.2.1 2005/04/14 19:04:23 brian Exp $
+.\" @(#) $Id: rmget.9.man,v 0.9.2.2 2005/04/28 01:25:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/14 19:04:23 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:58 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -88,6 +88,15 @@ sort-adjacent-labels
 .B #include <sys/ddi.h>
 .HP
 .BI "int rmget(struct map *" map ", long " size ", long " addr ");
+.sp 2
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/map.h>
+.br
+.B #include <sys/ddi.h>
+.HP
+.BI "int rmget(struct map *" map ", size_t " size ", unsigned long " index ");
 .\"
 .\"
 .SH ARGUMENTS

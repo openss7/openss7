@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/04/28 01:26:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/23 16:48:50 $ by $Author: brian $
+ Last Modified $Date: 2005/04/28 01:26:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/04/28 01:26:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/04/23 16:48:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/04/28 01:26:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1943,6 +1943,16 @@ void inline setqsched(void)
 		raise_softirq(STREAMS_SOFTIRQ);
 }
 EXPORT_SYMBOL_GPL(setqsched);
+
+/**
+ *  qready:	- test if queue procedures are scheduled
+ */
+int inline qready(void)
+{
+	struct strthread *t = this_thread;
+	return (test_bit(qrunflag, &t->flags) != 0);
+}
+EXPORT_SYMBOL_GPL(qready);
 
 /**
  *  qschedule:	- schedule a queue for service

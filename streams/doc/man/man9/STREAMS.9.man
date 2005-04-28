@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.19 2005/04/27 09:27:52 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.20 2005/04/28 01:25:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 09:27:52 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:49 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1197,6 +1197,7 @@ allocb              :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
 backq               :(9):yes:yes:yes:yes:yes: - :yes: - :yes:yes:yes\"4.0,3.1
 bcanput             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 bufcall             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
+canenable           :(9):yes: - : - : - :yes: - :yes: - : - : - :yes\"3.1
 canput              :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 copyb               :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
 copymsg             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
@@ -1244,6 +1245,13 @@ _
 .PP
 .B Notes:
 .IP \(em \w'\(em\(em'u
+.BR canenable ()
+is really an
+.I SVR 3.2
+compatibility function that should not be used with
+.I SVR 4 STREAMS
+programs.
+.IP \(em
 For the most part the
 .I UNIX\(rg System V Release 4.0 STREAMS
 functions are universally implemented.  Exceptions to this include
@@ -1310,10 +1318,6 @@ _
 bcanputnext         :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 canputnext          :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 freezestr           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
-MPSTR_QLOCK         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_QRELE         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_STPLOCK       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_STPRELE       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
 msgpullup           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 pcmsg               :(9):yes: - :yes: - : - :yes: - :yes:yes: - : - \"4mp
 put                 :(9):yes: - :yes:yes: - : - :yes:yes:yes: - :yes\"4mp
@@ -1323,12 +1327,29 @@ qprocsoff           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 qprocson            :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 unfreezestr         :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 _
+MPSTR_QLOCK         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
+MPSTR_QRELE         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
+MPSTR_STPLOCK       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
+MPSTR_STPRELE       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
+_
 .TE
 .PP
 .B Notes:
 .IP \(em \w'\(em\(em'u
-Nobody other than UnixWare mentions the MPSTR_ functions, so they are placed in the SVR4.2MP
-compatibility module.
+Although they are
+.I STREAMS
+functions, nobody other than
+.IR UnixWare \(rg
+mentions the
+.BI MPSTR_ *
+functions,
+.[
+uw7doc
+.]
+so they are placed in the
+.I SVR 4.2 MP
+compatibility module,
+.BR streams-svr4compat .
 .IP \(em
 The
 .BR pcmsg (9)
@@ -1374,7 +1395,6 @@ autopush_del        :(9):yes: - : - : - : - : - : - : - : - : - : -
 autopush_find       :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush_vml        :(9):yes: - : - : - : - : - : - : - : - : - : - 
 bcanget             :(9):yes: - : - : - : - : - : - : - : - : - : - 
-canenable           :(9):yes: - : - : - :yes: - :yes: - : - : - :yes
 canget              :(9):yes: - : - : - : - : - : - : - : - : - : - 
 defer_func          :(9):yes: - : - : - : - : - : - : - : - : - : - 
 di_alloc            :(9):yes: - : - : - : - : - : - : - : - : - : - 

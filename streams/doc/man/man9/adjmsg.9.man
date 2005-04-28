@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: adjmsg.9.man,v 0.9.2.12 2005/04/24 23:09:22 brian Exp $
+.\" @(#) $Id: adjmsg.9.man,v 0.9.2.13 2005/04/28 01:25:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/24 23:09:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/04/28 01:25:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -93,9 +93,11 @@ sort-adjacent-labels
 a pointer to the
 .I STREAMS
 initial message block representing the message to adjust.
+.PD 0
 .TP
 .I len
 the number of bytes to trim and the direction from which to trim.
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -157,7 +159,6 @@ Upon success,
 .BR adjmsg ()
 trims the requested number of bytes from the head or tail of the message and
 returns true (1).
-.PP
 Upon failure,
 .BR adjmsg ()
 returns false (0),
@@ -241,6 +242,26 @@ and systems based on
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR adjmsg ()
+will fail and return false (0) when passed a
+.B NULL
+message pointer,
+.IR mp ;
+or, if
+.BI | len |
+bytes does not exist at the head or the tail of the message within a contiguous range of like typed
+message blocks;
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass
+.B NULL
+or invalid message pointers to
+.BR adjmsg ().
+The return value from
+.BR adjmsg ()
+should always be examined to determine whether the operation was successful.
+.IP \(em
+.BR adjmsg ()
 does nothing and returns success (1) if the passed in length,
 .IR len ,
 is zero (0).
@@ -251,44 +272,46 @@ aixdoc
 does nothing if
 .I len
 is zero.
+.I LiS
+returns success (1) when
+.I len
+is zero (0).
+.[
+LiS
+.]
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not pass a zero (0) length to
+.BR adjmsg ().
 .IP \(em
 .BR adjmsg ()
 does not free zero length message blocks created or encountered during the
 trimming process.
 .IR Solaris \(rg
+may free zero length message blocks created or encountered during the trimming process.
 .[
 soldoc
 .]
-may free zero length message blocks created or encountered during the trimming process.
-.IP \(em
-.BR adjmsg ()
-does not free zero length message blocks created or encountered during the
-trimming process.
+.IR IRIX \(rg,
 .IR UnixWare \(rg
-.[
-uw7doc
-.]
 and
-.IR IRIX \(rg
+.I LiS
+do not free zero length message blocks encountered during the trimming
+process.
 .[
 irixdoc
 .]
-do not free zero length message blocks encountered during the trimming
-process.
-.IP \(em
-.BR adjmsg ()
-does not free zero length message blocks created or encountered during the
-trimming process, and returns success (1) when
-.I len
-is zero (0).
-.I LiS
+.[
+uw7doc
+.]
 .[
 LiS
 .]
-does not free zero length message blocks created or encountered during the
-trimming process, and returns success (1) when
-.I len
-is zero (0).
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not be affected if message blocks are freed interior to the message.
 .IP \(em
 Binary compatibility is not guaranteed.
 .PP
@@ -308,7 +331,15 @@ usldk
 .SH HISTORY
 .PP
 .BR adjmsg ()
-first appeared in SVR 3.
+appears as part of
+.I "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR adjmsg ()
+first appeared in
+.IR "SVR 3" .
 .[
 svr3spg
 .]

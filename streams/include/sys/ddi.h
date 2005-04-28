@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.14 2005/04/24 23:10:15 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.15 2005/04/28 01:26:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/24 23:10:15 $ by $Author: brian $
+ Last Modified $Date: 2005/04/28 01:26:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/04/24 23:10:15 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/04/28 01:26:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -71,6 +71,7 @@
 #include <linux/version.h>	/* for UTS_RELEASE */
 #include <asm/delay.h>		/* for udelay */
 #include <sys/dki.h>
+#include <sys/map.h>		/* for rm map definitions */
 
 #ifndef dev_t
 #define dev_t __streams_dev_t

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.29 2005/04/27 09:35:25 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.30 2005/04/28 01:26:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/27 09:35:25 $ by $Author: brian $
+ Last Modified $Date: 2005/04/28 01:26:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/04/27 09:35:25 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/04/28 01:26:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -904,6 +904,7 @@ extern int qclose(queue_t *q, int oflag, cred_t *credp);
 extern int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);
 extern int qpop(struct stdata *sd, int oflag, cred_t *crp);
 extern int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp);
+extern int qready(void);
 extern int qwait_sig(queue_t *q);
 extern int strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
 extern int strqset(queue_t *q, qfields_t what, unsigned char band, long val);
