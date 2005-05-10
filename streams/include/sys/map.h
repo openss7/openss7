@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: map.h,v 0.9.2.1 2005/04/28 01:26:08 brian Exp $
+ @(#) $Id: map.h,v 0.9.2.2 2005/05/10 09:48:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/28 01:26:08 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 09:48:35 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_MAP_H
 #define _SYS_MAP_H
 
-#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/28 01:26:08 $"
+#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/10 09:48:35 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -117,8 +117,7 @@ void rmsetwant(struct map *map);
 #if defined _OSF_SOURCE || defined _SUN_SOURCE
 #define rminit mapinit
 #define mapinit mapinit
-#endif
-#if defined _UW7_SOURCE || defined _UXP_SOURCE || defined _SUX_SOURCE
+#elif defined _UW7_SOURCE || defined _UXP_SOURCE || defined _SUX_SOURCE
 #define rminit rminit
 #define mapinit rminit
 #endif
