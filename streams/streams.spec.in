@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/04/09 09:35:19 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/05/10 19:04:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:35:19 $ by $Author: brian $
+# Last Modified $Date: 2005/05/10 19:04:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1467,6 +1467,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{_sysconfdir}/streams.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %{_modutildir}/*
@@ -1476,6 +1477,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{_sysconfdir}/streams.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1497,8 +1499,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.98  2005/04/09 09:35:19  brian
-# - update spec files
+# Revision 0.9.2.99  2005/05/10 19:04:35  brian
+# - add missing config file
+#
+# Revision 0.9.2.67  2005/05/10 19:04:35  brian
+# - add missing config file
 #
 # Revision 0.9.2.66  2005/04/09 09:35:19  brian
 # - update spec files
