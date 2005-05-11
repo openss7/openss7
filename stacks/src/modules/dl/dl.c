@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:35 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:35 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:35 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:48 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:35 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:48 $";
 
 #include "os7/compat.h"
 #include <linux/kmod.h>
@@ -63,8 +63,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.8 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:35 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.9 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:48 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2003  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -412,7 +412,7 @@ dlinit(void)
 		}
 		if (dl_majors[mindex] == 0)
 			dl_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(dl_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

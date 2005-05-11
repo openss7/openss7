@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:54 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:54 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:54 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:42:41 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:54 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21384,7 +21384,7 @@ sccpinit(void)
 		}
 		if (sccp_majors[mindex] == 0)
 			sccp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(sccp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

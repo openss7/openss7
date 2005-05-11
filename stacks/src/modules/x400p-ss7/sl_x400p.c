@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:58 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:44 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:58 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:44 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:58 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -10045,7 +10045,7 @@ sl_x400pinit(void)
 		}
 		if (xp_majors[mindex] == 0)
 			xp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

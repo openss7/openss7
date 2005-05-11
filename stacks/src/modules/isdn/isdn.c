@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:51 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:51 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:51 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -73,7 +73,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:51 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -16517,7 +16517,7 @@ isdninit(void)
 		}
 		if (isdn_majors[mindex] == 0)
 			isdn_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(isdn_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

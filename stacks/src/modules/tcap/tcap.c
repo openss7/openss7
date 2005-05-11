@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:27 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:56 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:56 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -94,7 +94,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:43:27 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:56 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -10230,7 +10230,7 @@ tcapinit(void)
 		}
 		if (tcap_majors[mindex] == 0)
 			tcap_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(tcap_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

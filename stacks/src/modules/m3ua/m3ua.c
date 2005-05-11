@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $";
 
 #include "os7/compat.h"
 
@@ -75,7 +75,7 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -329,7 +329,7 @@ m3uainit(void)
 		}
 		if (m3ua_majors[mindex] == 0)
 			m3ua_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(m3ua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

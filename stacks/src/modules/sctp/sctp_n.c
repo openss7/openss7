@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/31 06:53:13 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:55 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/31 06:53:13 $";
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:55 $";
 
 #define __NO_VERSION__
 
@@ -2208,7 +2208,7 @@ sctp_ninit(void)
 		}
 		if (sctp_majors[mindex] == 0)
 			sctp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(sctp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (n_major == 0)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:30 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:30 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -7523,7 +7523,7 @@ mtp_mininit(void)
 		}
 		if (mtp_majors[mindex] == 0)
 			mtp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(mtp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

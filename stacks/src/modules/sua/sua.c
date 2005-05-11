@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:56 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:20 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:56 $";
 
 #include "os7/compat.h"
 
@@ -336,7 +336,7 @@ suainit(void)
 		}
 		if (sua_majors[mindex] == 0)
 			sua_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(sua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

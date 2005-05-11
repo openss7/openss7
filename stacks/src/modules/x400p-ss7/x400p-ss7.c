@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:46 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:46 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:46 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:46 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:46 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -4758,7 +4758,7 @@ x400pinit(void)
 		}
 		if (xp_majors[mindex] == 0)
 			xp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

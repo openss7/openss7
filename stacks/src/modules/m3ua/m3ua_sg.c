@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.6 2005/04/09 09:42:20 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.7 2005/05/10 18:05:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2005/04/09 09:42:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.7  2005/05/10 18:05:52  brian
+ - do not set clone flag cause symbol no longer exported
+
  Revision 0.9.2.6  2005/04/09 09:42:20  brian
  - addition of module alias for ko modules
 
@@ -65,7 +68,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:20 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $";
 
 #include "os7/compat.h"
 
@@ -1106,7 +1109,7 @@ m3uainit(void)
 		}
 		if (m3ua_majors[mindex] == 0)
 			m3ua_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(m3ua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

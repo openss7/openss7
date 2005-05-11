@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:44:04 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/10 18:03:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:44:04 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:03:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:44:04 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/10 18:03:24 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:44:04 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/10 18:03:24 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -306,7 +306,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:44:04 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/10 18:03:24 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -14545,7 +14545,7 @@ ss_init(void)
 		}
 		if (ss_majors[mindex] == 0)
 			ss_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(ss_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/10 18:05:58 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:45 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/10 18:05:58 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/10 18:05:58 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/04/09 09:43:45 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/05/10 18:05:58 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -10006,7 +10006,7 @@ x100pinit(void)
 		}
 		if (xp_majors[mindex] == 0)
 			xp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

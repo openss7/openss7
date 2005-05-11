@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:39 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:39 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:39 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:57 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:39 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:57 $";
 
 #include "os7/compat.h"
 
@@ -88,7 +88,7 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:39 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:57 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -749,7 +749,7 @@ tuainit(void)
 		}
 		if (tua_majors[mindex] == 0)
 			tua_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(tua_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)

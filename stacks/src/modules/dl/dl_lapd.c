@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:35 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:35 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:35 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:48 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:35 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:48 $";
 
 #include "os7/compat.h"
 
@@ -68,7 +68,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:41:35 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:48 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -6520,7 +6520,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			if ((cmajor = dl_register_strdev(lapd_majors[mindex])) <= 0)
 				break;
 			lapd_majors[mindex] = cmajor;
-#ifdef LIS
+#if 0
 			LIS_DEVFLAGS(cmajor) |= LIS_MODFLG_CLONE;
 #endif
 		}

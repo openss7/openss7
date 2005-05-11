@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:43 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:57 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:43 $ by $Author: brian $
+ Last Modified $Date: 2005/05/10 18:05:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:43 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:57 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:43 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:57 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -85,7 +85,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:43 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:57 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6536,7 +6536,7 @@ sdt_x400pinit(void)
 		}
 		if (xp_majors[mindex] == 0)
 			xp_majors[mindex] = err;
-#ifdef LIS
+#if 0
 		LIS_DEVFLAGS(xp_majors[mindex]) |= LIS_MODFLG_CLONE;
 #endif
 		if (major == 0)
