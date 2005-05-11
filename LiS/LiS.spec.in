@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.19 $) $Date: 2005/04/09 09:34:55 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.20 $) $Date: 2005/05/11 07:58:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/09 09:34:55 $ by $Author: brian $
+# Last Modified $Date: 2005/05/11 07:58:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -324,7 +324,7 @@ Autoreq:        true
 The %{name} package includes kernel modules, libraries, utilities and
 development environment for the development and execution of System V
 Release 4 STREAMS modules and drivers developed for Linux.
-This distribution is only currently applicable to 2.4 kernels and was
+This distribution is currently applicable to 2.4 and 2.6 kernels and was
 targetted at ix86 and ppc architectures, but should build and install
 for other architectures as well.
 
@@ -1468,9 +1468,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.19  2005/04/09 09:34:55  brian
-# - update spec files
+# Revision 1.1.6.20  2005/05/11 07:58:49  brian
+# - add mention of 2.6 kernel support
 #
+
+* Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.19  2005/04/09 09:34:55  brian
+- update spec files
 
 * Tue Apr  5 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.18  2005/04/05 01:57:04  brian
