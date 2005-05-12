@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/11 20:12:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 08:03:31 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/11 20:12:20 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/03/09 08:03:31 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/11 20:12:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>

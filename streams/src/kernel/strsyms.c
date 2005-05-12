@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/11 20:12:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/23 16:48:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/11 20:12:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/23 16:48:51 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/11 20:12:22 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB

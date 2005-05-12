@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/11 20:12:40 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/18 01:36:06 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/11 20:12:40 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/02/18 01:36:06 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/11 20:12:40 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS

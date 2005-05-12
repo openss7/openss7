@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/11 20:12:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/11 20:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/11 20:12:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -73,8 +73,8 @@ static char const ident[] =
 #include "pipe.h"		/* extern verification */
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/04/09 09:37:17 $"
+#define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/11 20:12:11 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

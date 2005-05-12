@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.31 2005/04/28 11:37:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.32 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/28 11:37:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/04/28 11:37:41 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/11 20:10:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

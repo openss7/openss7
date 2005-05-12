@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.3 2004/08/22 06:17:54 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.4 2005/05/11 20:12:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:54 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:54 $"
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/11 20:12:10 $"
 
 typedef struct bufq {
 	spinlock_t q_lock;

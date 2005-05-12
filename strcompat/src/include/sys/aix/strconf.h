@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.2 2005/02/25 13:11:38 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.3 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/02/25 13:11:38 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/02/25 13:11:38 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/11 20:10:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:55 $
+ @(#) $RCSfile: strspecfs.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:12:21 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:55 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:21 $ by $Author: brian $
 
  *****************************************************************************/
 

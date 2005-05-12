@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/11 20:12:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/11 20:12:10 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/11 20:12:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,8 +70,8 @@ static char const ident[] =
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLONE_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/04/09 09:37:17 $"
+#define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/11 20:12:10 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:10 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,8 +71,8 @@ static char const ident[] =
 #include "log.h"
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOG_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/04/09 09:37:17 $"
+#define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define LOG_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:10 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

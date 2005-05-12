@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.3 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.4 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_LOG_H
 #define _SYS_LOG_H
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/11 20:10:21 $"
 
 #endif				/* _SYS_LOG_H */

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.9 2005/04/22 22:50:15 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.10 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/22 22:50:15 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STROPTS_H__
 #define __SYS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/22 22:50:15 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:10:21 $"
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.5 2004/10/12 03:03:11 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.6 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/10/12 03:03:11 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SC_H__
 #define __SYS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2004/10/12 03:03:11 $"
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:21 $"
 
 #define SC_IOC_MAGIC 'C'
 #define SC_IOC_LIST ((SC_IOC_MAGIC << 8) | 0x01)

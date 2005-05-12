@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.1 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.2 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSFDDI_H__
 #define __SYS_OSFDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

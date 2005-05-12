@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/04/25 07:21:39 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/05/11 20:07:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/25 07:21:39 $ by $Author: brian $
+# Last Modified $Date: 2005/05/11 20:07:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1048,6 +1048,7 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])
 	_LINUX_KERNEL_SYMBOL_EXPORT([put_filp])

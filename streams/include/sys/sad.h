@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.7 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.8 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SAD_H__
 #define __SYS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/11 20:10:21 $"
 
 #define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
 

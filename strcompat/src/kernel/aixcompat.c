@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/11 20:10:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:07 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/11 20:10:43 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/11 20:10:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,8 +114,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/21 01:54:07 $"
+#define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/11 20:10:43 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"

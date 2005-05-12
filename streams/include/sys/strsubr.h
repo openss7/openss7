@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.19 2005/03/05 13:07:49 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.20 2005/05/11 20:10:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/05 13:07:49 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/03/05 13:07:49 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/11 20:10:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

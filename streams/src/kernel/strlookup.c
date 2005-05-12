@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/11 20:12:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:34 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/11 20:12:20 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/03/30 02:24:34 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/11 20:12:20 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>

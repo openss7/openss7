@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: umount2.9.man,v 0.9.2.11 2005/04/27 00:32:53 brian Exp $
+.\" @(#) $Id: umount2.9.man,v 0.9.2.12 2005/05/11 20:09:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2003  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/27 00:32:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/11 20:09:34 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros

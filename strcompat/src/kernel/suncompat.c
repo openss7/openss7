@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/11 20:11:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:08 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:11:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/11 20:11:36 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/11 20:11:36 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -119,8 +119,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:37:08 $"
+#define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/11 20:11:36 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

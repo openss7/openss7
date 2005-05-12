@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:05 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:11:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -113,8 +113,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:37:05 $"
+#define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"

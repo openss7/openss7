@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:10 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:10 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -74,8 +74,8 @@ static char const ident[] =
 #include "src/modules/sth.h"
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/04/09 09:37:17 $"
+#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define NSDEV_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:10 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

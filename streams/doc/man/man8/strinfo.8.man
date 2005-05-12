@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strinfo.8.man,v 0.9.2.11 2005/03/30 13:38:32 brian Exp $
+.\" @(#) $Id: strinfo.8.man,v 0.9.2.12 2005/05/11 20:09:03 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:38:32 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/11 20:09:03 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros

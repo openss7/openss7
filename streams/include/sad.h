@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.3 2004/08/22 06:17:50 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.4 2005/05/11 20:10:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:50 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SAD_H
 #define _SAD_H
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2004/08/22 06:17:50 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/11 20:10:04 $"
 
 #include <sys/sad.h>
 

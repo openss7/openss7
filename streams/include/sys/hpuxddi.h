@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: hpuxddi.h,v 0.9.2.7 2004/08/22 06:17:51 brian Exp $
+ @(#) $Id: hpuxddi.h,v 0.9.2.8 2005/05/11 20:10:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUXDDI_H__
 #define __SYS_HPUXDDI_H__
 
-#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/11 20:10:20 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

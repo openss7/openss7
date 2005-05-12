@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/20 18:39:44 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:11:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/20 18:39:44 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:11:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/20 18:39:44 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:11:20 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/20 18:39:44 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:11:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -113,8 +113,8 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 #include "src/kernel/strsad.h"
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/20 18:39:44 $"
+#define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:11:20 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

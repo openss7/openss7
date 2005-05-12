@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/05/11 20:12:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:23 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/05/11 20:12:20 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/09 09:37:23 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/05/11 20:12:20 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -111,9 +111,9 @@ static int (*do_umount) (struct vfsmount * mnt, int flags)
 = (typeof(do_umount)) HAVE_DO_UMOUNT_ADDR;
 #endif
 
-#if HAVE_KFUNC_PATH_LOOKUP
+#if HAVE_PATH_LOOKUP_EXPORT
 #else
-static int path_lookup(const char *path, unsigned flags, struct nameidata *nd)
+int path_lookup(const char *path, unsigned flags, struct nameidata *nd)
 {
 	int error = 0;
 	if (path_init(path, flags, nd))

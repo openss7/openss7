@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/22 06:17:51 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/11 20:10:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/22 06:17:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/22 06:17:51 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/11 20:10:36 $"
 
-static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2004/08/22 06:17:51 $";
+static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/11 20:10:36 $";
 
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/09 09:37:17 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/11 20:12:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:37:17 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/09 09:37:17 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/11 20:12:11 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/09 09:37:17 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/11 20:12:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,8 +71,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"		/* for autopush functions */
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SAD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/04/09 09:37:17 $"
+#define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/11 20:12:11 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"

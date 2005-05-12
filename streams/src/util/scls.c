@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/11 20:12:39 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/14 21:53:25 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/11 20:12:39 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/01/14 21:53:25 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/11 20:12:39 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.

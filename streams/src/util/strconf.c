@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/11 20:12:39 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/14 21:12:00 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:12:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/11 20:12:39 $"
 
 static char const ident[] =
-    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/14 21:12:00 $";
+    "$RCSfile: strconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/11 20:12:39 $";
 
 #define _XOPEN_SOURCE 600
 

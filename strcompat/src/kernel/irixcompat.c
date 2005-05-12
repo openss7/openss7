@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:59 $"
 
 static char const ident[] =
-    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $";
+    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:59 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -113,8 +113,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/04/25 07:21:40 $"
+#define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define IRIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:59 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"

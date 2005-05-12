@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.6 2005/03/30 02:24:28 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.7 2005/05/11 20:10:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/30 02:24:28 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DKI_H__
 #define __SYS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/03/30 02:24:28 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/11 20:10:20 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

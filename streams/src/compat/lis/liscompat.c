@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/13 23:45:50 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/11 20:11:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/13 23:45:50 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:11:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/13 23:45:50 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/11 20:11:11 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/13 23:45:50 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/11 20:11:11 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -116,8 +116,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/04/13 23:45:50 $"
+#define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/11 20:11:11 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.2 2005/04/21 01:54:41 brian Exp $
+ @(#) $Id: aixddi.h,v 0.9.2.3 2005/05/11 20:10:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/21 01:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AXIDDI_H__
 #define __SYS_AXIDDI_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/04/21 01:54:41 $"
+#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/11 20:10:20 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"

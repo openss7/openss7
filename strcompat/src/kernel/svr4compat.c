@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/25 07:21:40 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:11:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:51 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:51 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -120,8 +120,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/25 07:21:40 $"
+#define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:51 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:36:55 $ by $Author: brian $
+ Last Modified $Date: 2005/05/11 20:10:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:52 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:52 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -113,8 +113,8 @@ static char const ident[] =
 #include "src/kernel/strsad.h"
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/04/09 09:36:55 $"
+#define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:52 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
