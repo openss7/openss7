@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.2.man,v 1.1.4.2 2005/03/30 14:46:27 brian Exp $
+.\" @(#) $Id: streamio.2.man,v 1.1.4.3 2005/05/12 02:02:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/12 02:02:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -1313,7 +1313,7 @@ Sets the closing delay time for the stream head.
 .I arg
 is a
 .B long
-value which specifies the delay time in milliseconds.
+value that specifies the delay time in milliseconds.
 .PP
 Upon success,
 .B I_SETTLTIME
@@ -1928,17 +1928,17 @@ does not check for hangup on the pipe.
 .PP
 UN*X documentation shows that
 .I arg
-is a pointer to a
-.BR long .
+is a pointer to an
+.BR integer .
 In
 .B LiS
 .I arg
 is a pointer to an
-.BR int .
-This has an impact on architectures where a
-.B long
-is not the same as an
-.BR int .
+.B unsigned long
+value.
+This is an
+.B LiS
+bug.
 .SS I_LINK
 .PP
 .PP
@@ -1978,7 +1978,7 @@ sized buffers to hold the module name.  There is no excuse for this bug as
 .B Linux
 provides one byte look-ahead verify on the kernel function
 .BR strncpy_to_user ()
-whcih is in fact called by
+which is in fact called by
 .B LiS
 when processing
 .BR I_LOOK .

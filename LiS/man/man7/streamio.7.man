@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 1.1.4.2 2005/03/30 14:46:28 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 1.1.4.3 2005/05/12 02:02:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/12 02:02:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -75,6 +75,8 @@ sort-adjacent-labels
 .SH NAME
 .B streamio
 \- STREAMS ioctl commands 
+.\"
+.\"
 .SH SYNOPSIS   
 .PP
 .B #include <sys/types.h>
@@ -82,8 +84,26 @@ sort-adjacent-labels
 .B #include <stropts.h>
 .HP
 .BI "int " retval " = ioctl (int " fd ", int " command " , ... /* " arg " */);"
-.SH DESCRIPTION
+.\"
+.\"
+.SH ARGUMENTS
 .PP
+.TP
+.I fd
+is an open file descriptor for a STREAMS character special file.
+.TP
+.I command
+is the STREAMS I/O control function that the caller requests be performed.
+.TP
+.I arg
+provides additional information required by the particular I/O
+.IR command .
+Specific
+.IR command " and " arg
+are described below.
+.\"
+.\"
+.SH DESCRIPTION
 .PP
 STREAMS I/O control commands are ioctl commands that are defined to operate on
 all STREAMS character special devices.  All of these commands are interpreted
@@ -92,19 +112,8 @@ by the stream head.  Some commands are passed to the STREAMS module or driver.
 STREAMS I/O control commands are invoked using the normal
 .BR ioctl (2)
 system call, but are defined only for STREAMS character special files.
-.PP
-.I fd
-is an open file descriptor for a STREAMS character special file.
-.PP
-.I command
-is the STREAMS I/O control function that the caller requests be performed.
-.PP
-.I arg
-provides additional information required by the particular I/O
-.IR command .
-Specific
-.IR command " and " arg
-are described below.
+.\"
+.\"
 .SH IOCTLS
 .PP
 .SS I_ATMARK
@@ -1304,7 +1313,7 @@ Sets the closing delay time for the stream head.
 .I arg
 is a
 .B long
-value which specifies the delay time in milliseconds.
+value that specifies the delay time in milliseconds.
 .PP
 Upon success,
 .B I_SETTLTIME
@@ -1585,6 +1594,8 @@ in
 Also, any error returned by the module or driver in a ioctl positive or
 negative acknowledgement message will also be returned in
 .IR errno .
+.\"
+.\"
 .SH "RETURN VALUE"
 .PP
 .PP
@@ -1596,6 +1607,8 @@ Upon failure,
 returns -1 and sets
 .I errno
 to an appropriate error number.
+.\"
+.\"
 .SH ERRORS
 .PP
 .PP
@@ -1636,6 +1649,8 @@ the call to a module or driver open or close procedures, or link or unlink
 procedures, the error number returned by the module or driver can be returned
 in
 .IR errno .
+.\"
+.\"
 .SH CAVEATS
 .PP
 .PP
@@ -1643,6 +1658,8 @@ STREAMS
 .B ioctl()
 calls are complex and there is much conflicting documentation in specific
 areas of behavior.  Not all bugs are bugs and not all features are features.
+.\"
+.\"
 .SH BUGS
 .PP
 .SS I_ATMARK
@@ -1911,17 +1928,17 @@ does not check for hangup on the pipe.
 .PP
 UN*X documentation shows that
 .I arg
-is a pointer to a
-.BR long .
+is a pointer to an
+.BR integer .
 In
 .B LiS
 .I arg
-is a pointer to an
-.BR int .
-This has an impact on architectures where a
-.B long
-is not the same as an
-.BR int .
+is an
+.B unsigned long
+value.
+This is an
+.B LiS
+bug.
 .SS I_LINK
 .PP
 .PP
@@ -1988,6 +2005,8 @@ when it cannot allocate a buffer for the call.
 returns
 .RB [ ENOMEM "] instead of [" ENOSR "] or [" EAGAIN ]
 when it cannot allocate a buffer for the call.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR close (2),
@@ -2006,6 +2025,13 @@ when it cannot allocate a buffer for the call.
 .BR qclose (9),
 .BR qattach (9),
 .BR qdetach (9).
+.\"
+.\"
+.SH "CONFORMING TO"
+.PP
+.BR SVID ", " SUSv2 ", " SUSv3 ", " POSIX .
+.\"
+.\"
 .SH VERSIONS
 .PP
 .PP
