@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/04/11 19:10:48 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/05/11 19:12:36 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/11 19:10:48 $ by $Author: brian $
+## Last Modified $Date: 2005/05/11 19:12:36 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -426,7 +426,7 @@ post-modconf:
 					done ; \
 				fi ; \
 				chmod --reference=$$streams_fil $$streams_new ; \
-				cp -fb --suffix=$$ext.bak $$streams_new $$streams_fil ; \
+				cp -f $$streams_new $$streams_fil ; \
 				rm -f -- $$streams_new ; \
 			fi ; \
 		done ; \
@@ -563,7 +563,7 @@ postun-modconf:
 	@conf_fil=$(DESTDIR)$(sysconfdir)/modules.conf ; \
 	test -f $$conf_fil || exit 0 ; \
 	for f in $(DESTDIR)$(kmoduledir)/../*/modules.$(KMODCONF_EXT) ; do \
-		test -f $$f || exit 0 ; break ; \
+		test -f $$f || break ; exit 0 ; \
 	done ; \
 	conf_tmp="$${TMPDIR-/var/tmp}/`basename $$conf_fil`.tmp.$$$$" ; \
 	conf_new="$${TMPDIR-/var/tmp}/`basename $$conf_fil`.new.$$$$" ; \
@@ -571,7 +571,7 @@ postun-modconf:
 	sed -e '\|^include[[:space:]].*$(modutildir)/$(KMODCONF_EXT)|d' $$conf_new > $$conf_tmp ; \
 	mv -f -- $$conf_tmp $$conf_new ; \
 	chmod --reference=$$conf_fil $$conf_new ; \
-	cp -f -b --suffix=.$(KMODCONF_EXT).bak -- $$conf_new $$conf_fil ; \
+	cp -fb --suffix=.$(KMODCONF_EXT).bak -- $$conf_new $$conf_fil ; \
 	rm -f -- $$conf_new
 
 ##
