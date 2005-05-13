@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: lis.macros,v 1.1.6.1 2005/03/09 23:13:55 brian Exp $
+.\" @(#) $Id: lis.macros,v 1.1.6.2 2005/05/12 20:54:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/09 23:13:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/12 20:54:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -60,10 +60,14 @@
 .PP
 ..
 .de ]>
+.\".PD
+.ad b
 .PP
 Trademarks mentioned are the property of their owners.
 ..
 .de ]-
+.\".PD 0.4v
+.ad l
 .IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
 .\"\\fR[\\fB\\*([F\\fR]\\fP
 .\".IP \\*([F. \\w'(00.)'u
@@ -263,7 +267,8 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-Linux STREAMS: $Name:  $($Revision: 1.1.6.1 $); $Date: 2005/03/09 23:13:55 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"Linux STREAMS: $Name:  $($Revision: 1.1.6.2 $); $Date: 2005/05/12 20:54:37 $.
 .PP
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -276,7 +281,8 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.6.1 $); $Date: 2005/03/09 23:13:55 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.6.2 $); $Date: 2005/05/12 20:54:37 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -291,7 +297,8 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-Linux STREAMS: $Name:  $($Revision: 1.1.6.1 $); $Date: 2005/03/09 23:13:55 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"Linux STREAMS: $Name:  $($Revision: 1.1.6.2 $); $Date: 2005/05/12 20:54:37 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -306,7 +313,8 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.6.1 $); $Date: 2005/03/09 23:13:55 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 X/Open Networking: $Name:  $($Revision: 1.1.6.2 $); $Date: 2005/05/12 20:54:37 $.
 .PP
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -319,7 +327,8 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-Linux STREAMS: $Name:  $($Revision: 1.1.6.1 $); $Date: 2005/03/09 23:13:55 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"Linux STREAMS: $Name:  $($Revision: 1.1.6.2 $); $Date: 2005/05/12 20:54:37 $.
 ..
 .de AU
 .SH "AUTHOR"

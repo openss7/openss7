@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/05/11 20:12:31 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/12 20:58:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:31 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/05/11 20:12:31 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/12 20:58:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/05/11 20:12:31 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/12 20:58:47 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/05/11 20:12:31 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/12 20:58:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1096,13 +1096,13 @@ static int str_i_getcltime(struct file *file, struct stdata *sd, unsigned int cm
 			   unsigned long arg)
 {
 	int err;
-	long closetime, *valp = (long *) arg;
+	int closetime, *valp = (int *) arg;
 	trace();
 	if ((err = verify_area(VERIFY_WRITE, valp, sizeof(*valp))))
 		return (err);
 	if ((err = check_stream_wr(file, sd)))
 		return (err);
-	closetime = sd->sd_closetime;
+	closetime = drv_hztomsec(sd->sd_closetime);
 	err = -EFAULT;
 	if (__copy_to_user(valp, &closetime, sizeof(*valp)))
 		return (err);
@@ -1120,7 +1120,7 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 			   unsigned long arg)
 {
 	int err;
-	long closetime, *valp = (long *) arg;
+	int closetime, *valp = (int *) arg;
 	trace();
 	if ((err = verify_area(VERIFY_READ, valp, sizeof(*valp))))
 		return (err);
@@ -1128,7 +1128,9 @@ static int str_i_setcltime(struct file *file, struct stdata *sd, unsigned int cm
 		return (err);
 	if (__copy_from_user(&closetime, valp, sizeof(*valp)))
 		return (-EFAULT);
-	sd->sd_closetime = closetime;
+	if (0 > closetime || closetime > 300000)
+		return (-EINVAL);
+	sd->sd_closetime = drv_msectohz(closetime);
 	return (0);
 }
 
@@ -1165,10 +1167,20 @@ static int str_i_setsig(struct file *file, struct stdata *sd, unsigned int cmd, 
 {
 	int err;
 	trace();
+	err = -EINVAL;
+	if (arg & ~(S_ALL))
+		goto error;
+	if (arg == 0) {
+		/* if the argument is zero it means to remove the calling process from the list, if 
+		   the calling process is not on the list, return EINVAL */
+	} else {
+	}
 	if ((err = check_stream_io(file, sd)))
-		return (err);
+		goto error;
 	sd->sd_sigflags = arg;
 	return (0);
+      error:
+	return (err);
 }
 
 /**
@@ -1186,7 +1198,7 @@ static int str_i_grdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 		return (err);
 	if ((err = check_stream_io(file, sd)))
 		return (err);
-	rdopt = sd->sd_rdopt & RPROTMASK;
+	rdopt = sd->sd_rdopt & (RMODEMASK | RPROTMASK);
 	err = -EFAULT;
 	if (__copy_to_user(valp, &rdopt, sizeof(*valp)))
 		return (err);
@@ -1204,9 +1216,10 @@ static int str_i_srdopt(struct file *file, struct stdata *sd, unsigned int cmd, 
 {
 	int err, mode, prot;
 	trace();
-	mode = arg & (RNORM | RMSGD | RMSGN);
-	prot = arg & (RPROTNORM | RPROTDAT | RPROTDIS);
-	if ((arg & ~(RPROTMASK)) || (mode != RNORM && mode != RMSGD && mode != RMSGN)
+	mode = arg & (RMODEMASK);
+	prot = arg & (RPROTMASK);
+	if ((arg & ~(RMODEMASK | RPROTMASK))
+	    || (mode != RNORM && mode != RMSGD && mode != RMSGN)
 	    || (prot != RPROTNORM && prot != RPROTDAT && prot != RPROTDIS))
 		return (-EINVAL);
 	if ((err = check_stream_io(file, sd)))
@@ -1522,9 +1535,13 @@ static int str_i_look(struct file *file, struct stdata *sd, unsigned int cmd, un
 		goto exit;
 	srlock(sd);
 	err = -EINVAL;
+	if (sd->sd_pushcnt <= 0)
+		goto unlock_exit;
+	err = -EINVAL;
 	if (!(q = sd->sd_wq->q_next) || !SAMESTR(sd->sd_wq))
 		goto unlock_exit;
 	snprintf(fmname, FMNAMESZ + 1, q->q_qinfo->qi_minfo->mi_idname);
+	srunlock(sd);
 	err = -EFAULT;
 	if (__copy_to_user(valp, fmname, FMNAMESZ + 1))
 		return (err);
@@ -2224,7 +2241,8 @@ int strclose(struct inode *inode, struct file *file)
 			printd(("%s: closing queues\n", __FUNCTION__));
 			wq = sd->sd_wq;
 			while ((qq = wq->q_next) && SAMESTR(wq)) {
-				if ((oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs) {
+				if (!(oflag & (O_NONBLOCK | O_NDELAY)) && qq->q_msgs
+				    && !signal_pending(current)) {
 					struct queinfo *qu = (typeof(qu)) (qq - 1);
 					DECLARE_WAITQUEUE(wait, current);
 					long timeo = sd->sd_closetime;
@@ -3216,7 +3234,7 @@ int strioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned 
  *  -------------------------------------------------------------------------
  */
 struct file_operations strm_f_ops ____cacheline_aligned = {
-	owner:THIS_MODULE,
+	owner:NULL,
 	llseek:strllseek,
 	read:strread,
 	write:strwrite,

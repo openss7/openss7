@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: iperf.macros,v 1.1.2.3 2005/01/25 11:45:15 brian Exp $
+.\" @(#) $Id: iperf.macros,v 1.1.2.4 2005/05/12 20:54:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/01/25 11:45:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/12 20:54:40 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -60,10 +60,14 @@
 .PP
 ..
 .de ]>
+.\".PD
+.ad b
 .PP
 Trademarks mentioned are the property of their owners.
 ..
 .de ]-
+.\".PD 0.4v
+.ad l
 .IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
 .\"\\fR[\\fB\\*([F\\fR]\\fP
 .\".IP \\*([F. \\w'(00.)'u
@@ -71,6 +75,7 @@ Trademarks mentioned are the property of their owners.
 ..
 .de ][
 .if !'\\*([T'' \{\
+.hy 4
 .if !'\\*([R'' \{\
 .\"\fB\\*([R\fR,
 .rm [R
@@ -295,9 +300,10 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -308,11 +314,12 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -323,11 +330,12 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright \(co 2001-2005 OpenSS7 Corporation
+\f(HRCopyright \(co 2001-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -338,9 +346,10 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -351,9 +360,10 @@ All Rights Reserved.
 .de I5
 .SH IDENTIFICATION
 .HP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 .PP
-\f(HRCopyright \(co 1997-2005 OpenSS7 Corporation
+\f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .br
 \f(HRCopyright \(co 1999-2004 The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\
@@ -366,7 +376,8 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/01/25 11:45:15 $.
+@PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
 ..
 .de AU
 .SH "AUTHOR"
@@ -411,6 +422,8 @@ Other trademarks are the property of their respective owners.
 .I3
 ..
 .de T4
+.\".C4
+.\".TH
 .I4
 ..
 .de T5
@@ -425,14 +438,17 @@ Other trademarks are the property of their respective owners.
 ..
 .ie '\\*(.T'ps' \{\
 .nr ps 0.4v
+.hy 6
 .\}
 .el \{\
 .nr ps 1v
+.hy 4
 .\}
 .if !r LL .nr LL \n(.lu
+.if !r LT .nr LT \n(.lu
 .ev 1
-.lt \n(LLu
+.lt \n(LTu
 .xl \n(LLu
 .ll \n(LLu
 .ev
-.\" vim: ft=nroff
+.\" vim: ft=groff

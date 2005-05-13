@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.16 2005/05/11 20:10:20 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.17 2005/05/12 20:58:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/11 20:10:20 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/12 20:58:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -322,6 +322,14 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 
 /* pull in OS specific defines */
 
+#ifdef _SVR3_SOURCE
+#if defined(CONFIG_STREAMS_COMPAT_SVR3) || defined(CONFIG_STREAMS_COMPAT_SVR3_MODULE)
+#include <sys/svr3ddi.h>
+#elif !defined(EXPORT_SYMTAB)
+#warning _SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3
+#endif
+#endif
+
 #ifdef _SVR4_SOURCE
 #if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 #include <sys/svr4ddi.h>
@@ -383,6 +391,14 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #include <sys/macddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC
+#endif
+#endif
+
+#ifdef _IRIX_SOURCE
+#if defined(CONFIG_STREAMS_COMPAT_IRIX) || defined(CONFIG_STREAMS_COMPAT_IRIX_MODULE)
+#include <sys/irixddi.h>
+#elif !defined(EXPORT_SYMTAB)
+#warning _IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX
 #endif
 #endif
 

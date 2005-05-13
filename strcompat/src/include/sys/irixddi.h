@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: irixddi.h,v 0.9.2.2 2005/05/11 20:10:20 brian Exp $
+ @(#) $Id: irixddi.h,v 0.9.2.3 2005/05/12 20:58:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIXDDI_H__
 #define __SYS_IRIXDDI_H__
 
-#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/11 20:10:20 $"
+#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/12 20:58:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -81,7 +81,7 @@ __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
 	return vcmn_err(err_lvl, fmt, args);
 }
 
-__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 2, 3)));
+__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
 __IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
 {
 	va_list args;

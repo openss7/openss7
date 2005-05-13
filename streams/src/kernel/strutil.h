@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/11 20:12:22 $
+ @(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/05/12 20:58:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:22 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:47 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -268,35 +268,35 @@ static __inline__ void slockinit(struct stdata *sd)
 	}
 	swerr();
 }
-static __inline__ void hrlock(queue_t *rq)
+static __inline__ void hrlock(queue_t *q)
 {
 	trace();
-	ensure(rq, return);
-	srlock(((struct queinfo *) rq)->qu_str);
+	ensure(q, return);
+	srlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void hrunlock(queue_t *rq)
+static __inline__ void hrunlock(queue_t *q)
 {
 	trace();
-	ensure(rq, return);
-	srunlock(((struct queinfo *) rq)->qu_str);
+	ensure(q, return);
+	srunlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void hwlock(queue_t *rq, unsigned long *flagsp)
+static __inline__ void hwlock(queue_t *q, unsigned long *flagsp)
 {
 	trace();
-	swlock(((struct queinfo *) rq)->qu_str, flagsp);
+	swlock(((struct queinfo *) RD(q))->qu_str, flagsp);
 }
-static __inline__ void hwunlock(queue_t *rq, unsigned long *flagsp)
+static __inline__ void hwunlock(queue_t *q, unsigned long *flagsp)
 {
 	trace();
-	swunlock(((struct queinfo *) rq)->qu_str, flagsp);
+	swunlock(((struct queinfo *) RD(q))->qu_str, flagsp);
 }
-static __inline__ void __hwlock(queue_t *rq)
+static __inline__ void __hwlock(queue_t *q)
 {
-	__swlock(((struct queinfo *) rq)->qu_str);
+	__swlock(((struct queinfo *) RD(q))->qu_str);
 }
-static __inline__ void __hwunlock(queue_t *rq)
+static __inline__ void __hwunlock(queue_t *q)
 {
-	__swunlock(((struct queinfo *) rq)->qu_str);
+	__swunlock(((struct queinfo *) RD(q))->qu_str);
 }
 
 /* queue band gets and puts */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/16 23:09:07 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,12 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/16 23:09:07 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
  $Log: test-streams.c,v $
- Revision 0.9.2.7  2005/01/16 23:09:07  brian
- - Added --copying options.
+ Revision 0.9.2.8  2005/05/12 20:58:48  brian
+ - corrections during testing
+
+ Revision 0.9.2.3  2005/05/12 20:58:48  brian
+ - corrections during testing
 
  Revision 0.9.2.2  2005/01/16 23:09:07  brian
  - Added --copying options.
@@ -76,9 +79,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/16 23:09:07 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/01/16 23:09:07 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -113,7 +116,7 @@ static const char *spkgname = "LfS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI";
 static const char *shortname = "STREAMS";
-static char devname[256] = "/dev/nuls";
+static char devname[256] = "/dev/echo";
 
 static int exit_on_failure = 0;
 
@@ -1178,9 +1181,9 @@ struct test_stream test_case_1_2 = { NULL, &test_1_2, NULL };
  */
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define desc_case_2_1_1 "\
-Checks that I_NREAD can be performed on a stream.  Because this test is \n\
-peformed on a freshly opened stream, it should return zero (0) as a return \n\
-value and return zero (0) in the integer pointed to by arg."
+Checks that I_NREAD can be performed on a stream.  Because this test is peformed\n\
+on a freshly opened stream, it should return zero (0) as a return value and\n\
+return zero (0) in the integer pointed to by arg."
 int test_2_1_1(int child)
 {
 	int numb = -1;
@@ -1206,12 +1209,8 @@ Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
 int test_2_1_2(int child)
 {
-	if (test_ioctl(child, I_NREAD, (intptr_t) NULL) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_NREAD, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
-	state++;
-	if (last_errno != EFAULT)
-		return (__RESULT_FAILURE);
-	state++;
 	return (__RESULT_SUCCESS);
 }
 struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
@@ -1222,19 +1221,49 @@ struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PUSH
  */
-#define name_case_2_2 "Perform streamio I_PUSH."
-#define desc_case_2_2 "\
+#define name_case_2_2_1 "Perform streamio I_PUSH."
+#define desc_case_2_2_1 "\
 Checks that I_PUSH can be performed on a stream."
-int test_2_2(int child)
+int test_2_2_1(int child)
 {
 	if (test_ioctl(child, I_PUSH, (intptr_t) "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_2 = { &preamble_0, &test_2_2, &postamble_0 };
-#define test_case_2_2_stream_0 (&test_case_2_2)
-#define test_case_2_2_stream_1 (NULL)
-#define test_case_2_2_stream_2 (NULL)
+struct test_stream test_case_2_2_1 = { &preamble_0, &test_2_2_1, &postamble_0 };
+#define test_case_2_2_1_stream_0 (&test_case_2_2_1)
+#define test_case_2_2_1_stream_1 (NULL)
+#define test_case_2_2_1_stream_2 (NULL)
+
+#define name_case_2_2_2 "Perform streamio I_PUSH - EINVAL."
+#define desc_case_2_2_2 "\
+Checks that EINVAL is returned when I_PUSH is performed with an invalid module\n\
+name \"nomodule\"."
+int test_2_2_2(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_2_2 = { &preamble_0, &test_2_2_2, &postamble_0 };
+#define test_case_2_2_2_stream_0 (&test_case_2_2_2)
+#define test_case_2_2_2_stream_1 (NULL)
+#define test_case_2_2_2_stream_2 (NULL)
+
+#define name_case_2_2_3 "Perform streamio I_PUSH - EFAULT."
+#define desc_case_2_2_3 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_2_3(int child)
+{
+	if (test_ioctl(child, I_PUSH, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_2_3 = { &preamble_0, &test_2_2_3, &postamble_0 };
+#define test_case_2_2_3_stream_0 (&test_case_2_2_3)
+#define test_case_2_2_3_stream_1 (NULL)
+#define test_case_2_2_3_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_POP
@@ -1295,37 +1324,428 @@ struct test_stream test_case_2_5 = { &preamble_0, &test_2_5, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SRDOPT
  */
-#define name_case_2_6 "Perform streamio I_SRDOPT."
-#define desc_case_2_6 "\
-Checks that I_SRDOPT can be performed on a stream."
-int test_2_6(int child)
+#define name_case_2_6_1 "Perform streamio I_SRDOPT - EINVAL."
+#define desc_case_2_6_1 "\
+Checks that I_SRDOPT can be performed on a stream.  This case is performed with\n\
+a zero argument and should return EINVAL."
+int test_2_6_1(int child)
 {
-	if (test_ioctl(child, I_SRDOPT, 0) != __RESULT_SUCCESS && last_errno != EINVAL)
+	if (test_ioctl(child, I_SRDOPT, 0) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6 = { &preamble_0, &test_2_6, &postamble_0 };
-#define test_case_2_6_stream_0 (&test_case_2_6)
-#define test_case_2_6_stream_1 (NULL)
-#define test_case_2_6_stream_2 (NULL)
+struct test_stream test_case_2_6_1 = { &preamble_0, &test_2_6_1, &postamble_0 };
+#define test_case_2_6_1_stream_0 (&test_case_2_6_1)
+#define test_case_2_6_1_stream_1 (NULL)
+#define test_case_2_6_1_stream_2 (NULL)
+
+#define name_case_2_6_2 "Perform streamio I_SRDOPT - RNORM | RPROTNORM."
+#define desc_case_2_6_2 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RNORM | RPROTNORM)."
+
+int test_2_6_2(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_2 = { &preamble_0, &test_2_6_2, &postamble_0 };
+#define test_case_2_6_2_stream_0 (&test_case_2_6_2)
+#define test_case_2_6_2_stream_1 (NULL)
+#define test_case_2_6_2_stream_2 (NULL)
+
+#define name_case_2_6_3 "Perform streamio I_SRDOPT - RNORM | RPROTDAT."
+#define desc_case_2_6_3 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RNORM | RPROTDAT)."
+int test_2_6_3(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_3 = { &preamble_0, &test_2_6_3, &postamble_0 };
+#define test_case_2_6_3_stream_0 (&test_case_2_6_3)
+#define test_case_2_6_3_stream_1 (NULL)
+#define test_case_2_6_3_stream_2 (NULL)
+
+#define name_case_2_6_4 "Perform streamio I_SRDOPT - RNORM | RPROTDIS."
+#define desc_case_2_6_4 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RNORM | RPROTDIS)."
+int test_2_6_4(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_4 = { &preamble_0, &test_2_6_4, &postamble_0 };
+#define test_case_2_6_4_stream_0 (&test_case_2_6_4)
+#define test_case_2_6_4_stream_1 (NULL)
+#define test_case_2_6_4_stream_2 (NULL)
+
+#define name_case_2_6_5 "Perform streamio I_SRDOPT - RMSGN | RPROTNORM."
+#define desc_case_2_6_5 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGN | RPROTNORM)."
+int test_2_6_5(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_5 = { &preamble_0, &test_2_6_5, &postamble_0 };
+#define test_case_2_6_5_stream_0 (&test_case_2_6_5)
+#define test_case_2_6_5_stream_1 (NULL)
+#define test_case_2_6_5_stream_2 (NULL)
+
+#define name_case_2_6_6 "Perform streamio I_SRDOPT - RMSGN | RPROTDAT."
+#define desc_case_2_6_6 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGN | RPROTDAT)."
+int test_2_6_6(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_6 = { &preamble_0, &test_2_6_6, &postamble_0 };
+#define test_case_2_6_6_stream_0 (&test_case_2_6_6)
+#define test_case_2_6_6_stream_1 (NULL)
+#define test_case_2_6_6_stream_2 (NULL)
+
+#define name_case_2_6_7 "Perform streamio I_SRDOPT - RMSGN | RPROTDIS."
+#define desc_case_2_6_7 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGN | RPROTDIS)."
+int test_2_6_7(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_7 = { &preamble_0, &test_2_6_7, &postamble_0 };
+#define test_case_2_6_7_stream_0 (&test_case_2_6_7)
+#define test_case_2_6_7_stream_1 (NULL)
+#define test_case_2_6_7_stream_2 (NULL)
+
+#define name_case_2_6_8 "Perform streamio I_SRDOPT - RMSGD | RPROTNORM."
+#define desc_case_2_6_8 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGD | RPROTNORM)."
+int test_2_6_8(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_8 = { &preamble_0, &test_2_6_8, &postamble_0 };
+#define test_case_2_6_8_stream_0 (&test_case_2_6_8)
+#define test_case_2_6_8_stream_1 (NULL)
+#define test_case_2_6_8_stream_2 (NULL)
+
+#define name_case_2_6_9 "Perform streamio I_SRDOPT - RMSGD | RPROTDAT."
+#define desc_case_2_6_9 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGD | RPROTDAT)."
+int test_2_6_9(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_9 = { &preamble_0, &test_2_6_9, &postamble_0 };
+#define test_case_2_6_9_stream_0 (&test_case_2_6_9)
+#define test_case_2_6_9_stream_1 (NULL)
+#define test_case_2_6_9_stream_2 (NULL)
+
+#define name_case_2_6_10 "Perform streamio I_SRDOPT - RMSGD | RPROTDIS."
+#define desc_case_2_6_10 "\
+Checks that I_SRDOPT can be performed on a stream with the values \n\
+(RMSGD | RPROTDIS)."
+int test_2_6_10(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_10 = { &preamble_0, &test_2_6_10, &postamble_0 };
+#define test_case_2_6_10_stream_0 (&test_case_2_6_10)
+#define test_case_2_6_10_stream_1 (NULL)
+#define test_case_2_6_10_stream_2 (NULL)
+
+#define name_case_2_6_11 "Perform streamio I_SRDOPT - EINVAL."
+#define desc_case_2_6_11 "\
+Checks that EINVAL is returned when I_SRDOPT is called with an invalid\n\
+argument (-1UL)."
+int test_2_6_11(int child)
+{
+	if (test_ioctl(child, I_SRDOPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_6_11 = { &preamble_0, &test_2_6_11, &postamble_0 };
+#define test_case_2_6_11_stream_0 (&test_case_2_6_11)
+#define test_case_2_6_11_stream_1 (NULL)
+#define test_case_2_6_11_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_GRDOPT
  */
-#define name_case_2_7 "Perform streamio I_GRDOPT."
-#define desc_case_2_7 "\
-Checks that I_GRDOPT can be performed on a stream."
-int test_2_7(int child)
+#define name_case_2_7_1 "Perform streamio I_GRDOPT - default."
+#define desc_case_2_7_1 "\
+Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
+read options."
+int test_2_7_1(int child)
 {
-	int opts = 0;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & opts) != __RESULT_SUCCESS)
+	int rdopts = -1;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7 = { &preamble_0, &test_2_7, &postamble_0 };
-#define test_case_2_7_stream_0 (&test_case_2_7)
-#define test_case_2_7_stream_1 (NULL)
-#define test_case_2_7_stream_2 (NULL)
+struct test_stream test_case_2_7_1 = { &preamble_0, &test_2_7_1, &postamble_0 };
+#define test_case_2_7_1_stream_0 (&test_case_2_7_1)
+#define test_case_2_7_1_stream_1 (NULL)
+#define test_case_2_7_1_stream_2 (NULL)
+
+#define name_case_2_7_2 "Perform streamio I_GRDOPT - set default."
+#define desc_case_2_7_2 "\
+Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
+options after they have been set with I_SRDOPT."
+int test_2_7_2(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_2 = { &preamble_0, &test_2_7_2, &postamble_0 };
+#define test_case_2_7_2_stream_0 (&test_case_2_7_2)
+#define test_case_2_7_2_stream_1 (NULL)
+#define test_case_2_7_2_stream_2 (NULL)
+
+#define name_case_2_7_3 "Perform streamio I_GRDOPT - RNORM | RPROTDAT."
+#define desc_case_2_7_3 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RNORM | RPROTDAT) after they have been set with I_SRDOPT."
+int test_2_7_3(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTDAT))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_3 = { &preamble_0, &test_2_7_3, &postamble_0 };
+#define test_case_2_7_3_stream_0 (&test_case_2_7_3)
+#define test_case_2_7_3_stream_1 (NULL)
+#define test_case_2_7_3_stream_2 (NULL)
+
+#define name_case_2_7_4 "Perform streamio I_GRDOPT - RNORM | RPROTDIS."
+#define desc_case_2_7_4 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RNORM | RPROTDIS) after they have been set with I_SRDOPT."
+int test_2_7_4(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RNORM | RPROTDIS))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_4 = { &preamble_0, &test_2_7_4, &postamble_0 };
+#define test_case_2_7_4_stream_0 (&test_case_2_7_4)
+#define test_case_2_7_4_stream_1 (NULL)
+#define test_case_2_7_4_stream_2 (NULL)
+
+#define name_case_2_7_5 "Perform streamio I_GRDOPT - RMSGD | RPROTNORM."
+#define desc_case_2_7_5 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGD | RPROTNORM) after they have been set with I_SRDOPT."
+int test_2_7_5(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGD | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_5 = { &preamble_0, &test_2_7_5, &postamble_0 };
+#define test_case_2_7_5_stream_0 (&test_case_2_7_5)
+#define test_case_2_7_5_stream_1 (NULL)
+#define test_case_2_7_5_stream_2 (NULL)
+
+#define name_case_2_7_6 "Perform streamio I_GRDOPT - RMSGD | RPROTDAT."
+#define desc_case_2_7_6 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGD | RPROTDAT) after they have been set with I_SRDOPT."
+int test_2_7_6(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGD | RPROTDAT))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_6 = { &preamble_0, &test_2_7_6, &postamble_0 };
+#define test_case_2_7_6_stream_0 (&test_case_2_7_6)
+#define test_case_2_7_6_stream_1 (NULL)
+#define test_case_2_7_6_stream_2 (NULL)
+
+#define name_case_2_7_7 "Perform streamio I_GRDOPT - RMSGD | RPROTDIS."
+#define desc_case_2_7_7 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGD | RPROTDIS) after they have been set with I_SRDOPT."
+int test_2_7_7(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGD | RPROTDIS))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_7 = { &preamble_0, &test_2_7_7, &postamble_0 };
+#define test_case_2_7_7_stream_0 (&test_case_2_7_7)
+#define test_case_2_7_7_stream_1 (NULL)
+#define test_case_2_7_7_stream_2 (NULL)
+
+#define name_case_2_7_8 "Perform streamio I_GRDOPT - RMSGN | RPROTNORM."
+#define desc_case_2_7_8 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGN | RPROTNORM) after they have been set with I_SRDOPT."
+int test_2_7_8(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGN | RPROTNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_8 = { &preamble_0, &test_2_7_8, &postamble_0 };
+#define test_case_2_7_8_stream_0 (&test_case_2_7_8)
+#define test_case_2_7_8_stream_1 (NULL)
+#define test_case_2_7_8_stream_2 (NULL)
+
+#define name_case_2_7_9 "Perform streamio I_GRDOPT - RMSGN | RPROTDAT."
+#define desc_case_2_7_9 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGN | RPROTDAT) after they have been set with I_SRDOPT."
+int test_2_7_9(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDAT)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGN | RPROTDAT))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_9 = { &preamble_0, &test_2_7_9, &postamble_0 };
+#define test_case_2_7_9_stream_0 (&test_case_2_7_9)
+#define test_case_2_7_9_stream_1 (NULL)
+#define test_case_2_7_9_stream_2 (NULL)
+
+#define name_case_2_7_10 "Perform streamio I_GRDOPT - RMSGN | RPROTDIS."
+#define desc_case_2_7_10 "\
+Checks that I_GRDOPT can be performed on a stream to read the read options\n\
+(RMSGN | RPROTDIS) after they have been set with I_SRDOPT."
+int test_2_7_10(int child)
+{
+	int rdopts = -1;
+	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDIS)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (rdopts != (RMSGN | RPROTDIS))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_10 = { &preamble_0, &test_2_7_10, &postamble_0 };
+#define test_case_2_7_10_stream_0 (&test_case_2_7_10)
+#define test_case_2_7_10_stream_1 (NULL)
+#define test_case_2_7_10_stream_2 (NULL)
+
+#define name_case_2_7_11 "Perform streamio I_GRDOPT - EFAULT."
+#define desc_case_2_7_11 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_7_11(int child)
+{
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_7_11 = { &preamble_0, &test_2_7_11, &postamble_0 };
+#define test_case_2_7_11_stream_0 (&test_case_2_7_11)
+#define test_case_2_7_11_stream_1 (NULL)
+#define test_case_2_7_11_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_STR
@@ -1362,20 +1782,35 @@ struct test_stream test_case_2_9 = { &preamble_0, &test_2_9, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_GETSIG
  */
-#define name_case_2_10 "Perform streamio I_GETSIG."
-#define desc_case_2_10 "\
+#define name_case_2_10_1 "Perform streamio I_GETSIG."
+#define desc_case_2_10_1 "\
 Checks that I_GETSIG can be performed on a stream."
-int test_2_10(int child)
+int test_2_10_1(int child)
 {
 	int sigs = 0;
 	if (test_ioctl(child, I_GETSIG, (intptr_t) & sigs) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_10 = { &preamble_0, &test_2_10, &postamble_0 };
-#define test_case_2_10_stream_0 (&test_case_2_10)
-#define test_case_2_10_stream_1 (NULL)
-#define test_case_2_10_stream_2 (NULL)
+struct test_stream test_case_2_10_1 = { &preamble_0, &test_2_10_1, &postamble_0 };
+#define test_case_2_10_1_stream_0 (&test_case_2_10_1)
+#define test_case_2_10_1_stream_1 (NULL)
+#define test_case_2_10_1_stream_2 (NULL)
+
+#define name_case_2_10_2 "Perform streamio I_GETSIG."
+#define desc_case_2_10_2 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_10_2(int child)
+{
+	if (test_ioctl(child, I_GETSIG, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_10_2 = { &preamble_0, &test_2_10_2, &postamble_0 };
+#define test_case_2_10_2_stream_0 (&test_case_2_10_2)
+#define test_case_2_10_2_stream_1 (NULL)
+#define test_case_2_10_2_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_FIND
@@ -1451,7 +1886,7 @@ struct test_stream test_case_2_14 = { &preamble_0, &test_2_14, &postamble_0 };
 Checks that I_PEEK can be performed on a stream."
 int test_2_15(int child)
 {
-	struct strpeek peek;
+	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
@@ -1509,37 +1944,371 @@ struct test_stream test_case_2_18 = { &preamble_0, &test_2_18, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SWROPT
  */
-#define name_case_2_19 "Perform streamio I_SWROPT."
-#define desc_case_2_19 "\
+#define name_case_2_19_1 "Perform streamio I_SWROPT - default."
+#define desc_case_2_19_1 "\
 Checks that I_SWROPT can be performed on a stream."
-int test_2_19(int child)
+int test_2_19_1(int child)
+{
+	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_1 = { &preamble_0, &test_2_19_1, &postamble_0 };
+#define test_case_2_19_1_stream_0 (&test_case_2_19_1)
+#define test_case_2_19_1_stream_1 (NULL)
+#define test_case_2_19_1_stream_2 (NULL)
+
+#define name_case_2_19_2 "Perform streamio I_SWROPT - SNDZERO."
+#define desc_case_2_19_2 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDZERO)."
+int test_2_19_2(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_2 = { &preamble_0, &test_2_19_2, &postamble_0 };
+#define test_case_2_19_2_stream_0 (&test_case_2_19_2)
+#define test_case_2_19_2_stream_1 (NULL)
+#define test_case_2_19_2_stream_2 (NULL)
+
+#define name_case_2_19_3 "Perform streamio I_SWROPT - SNDPIPE."
+#define desc_case_2_19_3 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDPIPE)."
+int test_2_19_3(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDPIPE)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_3 = { &preamble_0, &test_2_19_3, &postamble_0 };
+#define test_case_2_19_3_stream_0 (&test_case_2_19_3)
+#define test_case_2_19_3_stream_1 (NULL)
+#define test_case_2_19_3_stream_2 (NULL)
+
+#define name_case_2_19_4 "Perform streamio I_SWROPT - SNDHOLD."
+#define desc_case_2_19_4 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDHOLD)."
+int test_2_19_4(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_4 = { &preamble_0, &test_2_19_4, &postamble_0 };
+#define test_case_2_19_4_stream_0 (&test_case_2_19_4)
+#define test_case_2_19_4_stream_1 (NULL)
+#define test_case_2_19_4_stream_2 (NULL)
+
+#define name_case_2_19_5 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE."
+#define desc_case_2_19_5 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDZERO | SNDPIPE)."
+int test_2_19_5(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_5 = { &preamble_0, &test_2_19_5, &postamble_0 };
+#define test_case_2_19_5_stream_0 (&test_case_2_19_5)
+#define test_case_2_19_5_stream_1 (NULL)
+#define test_case_2_19_5_stream_2 (NULL)
+
+#define name_case_2_19_6 "Perform streamio I_SWROPT - SNDZERO | SNDHOLD."
+#define desc_case_2_19_6 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDZERO | SNDHOLD)."
+int test_2_19_6(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_6 = { &preamble_0, &test_2_19_6, &postamble_0 };
+#define test_case_2_19_6_stream_0 (&test_case_2_19_6)
+#define test_case_2_19_6_stream_1 (NULL)
+#define test_case_2_19_6_stream_2 (NULL)
+
+#define name_case_2_19_7 "Perform streamio I_SWROPT - SNDPIPE | SNDHOLD."
+#define desc_case_2_19_7 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDPIPE | SNDHOLD)."
+int test_2_19_7(int child)
+{
+	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_7 = { &preamble_0, &test_2_19_7, &postamble_0 };
+#define test_case_2_19_7_stream_0 (&test_case_2_19_7)
+#define test_case_2_19_7_stream_1 (NULL)
+#define test_case_2_19_7_stream_2 (NULL)
+
+#define name_case_2_19_8 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE | SNDHOLD."
+#define desc_case_2_19_8 "\
+Checks that I_SWROPT can be performed on a stream with write option values\n\
+(SNDZERO | SNDPIPE | SNDHOLD)."
+int test_2_19_8(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19 = { &preamble_0, &test_2_19, &postamble_0 };
-#define test_case_2_19_stream_0 (&test_case_2_19)
-#define test_case_2_19_stream_1 (NULL)
-#define test_case_2_19_stream_2 (NULL)
+struct test_stream test_case_2_19_8 = { &preamble_0, &test_2_19_8, &postamble_0 };
+#define test_case_2_19_8_stream_0 (&test_case_2_19_8)
+#define test_case_2_19_8_stream_1 (NULL)
+#define test_case_2_19_8_stream_2 (NULL)
+
+#define name_case_2_19_9 "Perform streamio I_SWROPT - EINVAL."
+#define desc_case_2_19_9 "\
+Checks that I_SWROPT can be performed on a stream with an invalid argument\n\
+value, resulting in the return of EINVAL."
+int test_2_19_9(int child)
+{
+	if (test_ioctl(child, I_SWROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_19_9 = { &preamble_0, &test_2_19_9, &postamble_0 };
+#define test_case_2_19_9_stream_0 (&test_case_2_19_9)
+#define test_case_2_19_9_stream_1 (NULL)
+#define test_case_2_19_9_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_GWROPT
  */
-#define name_case_2_20 "Perform streamio I_GWROPT."
-#define desc_case_2_20 "\
-Checks that I_GWROPT can be performed on a stream."
-int test_2_20(int child)
+#define name_case_2_20_1 "Perform streamio I_GWROPT."
+#define desc_case_2_20_1 "\
+Checks that I_GWROPT can be performed on a stream to read the stream default\n\
+options after they have been set with I_SWROPT."
+int test_2_20_1(int child)
 {
-	int opts = 0;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & opts) != __RESULT_SUCCESS)
+	int wropts = -1;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != 0)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20 = { &preamble_0, &test_2_20, &postamble_0 };
-#define test_case_2_20_stream_0 (&test_case_2_20)
-#define test_case_2_20_stream_1 (NULL)
-#define test_case_2_20_stream_2 (NULL)
+struct test_stream test_case_2_20_1 = { &preamble_0, &test_2_20_1, &postamble_0 };
+#define test_case_2_20_1_stream_0 (&test_case_2_20_1)
+#define test_case_2_20_1_stream_1 (NULL)
+#define test_case_2_20_1_stream_2 (NULL)
+
+#define name_case_2_20_2 "Perform streamio I_GWROPT - default."
+#define desc_case_2_20_2 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(0) after they have been set with I_SWROPT."
+int test_2_20_2(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != 0)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_2 = { &preamble_0, &test_2_20_2, &postamble_0 };
+#define test_case_2_20_2_stream_0 (&test_case_2_20_2)
+#define test_case_2_20_2_stream_1 (NULL)
+#define test_case_2_20_2_stream_2 (NULL)
+
+#define name_case_2_20_3 "Perform streamio I_GWROPT - SNDZERO."
+#define desc_case_2_20_3 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDZERO) after they have been set with I_SWROPT."
+int test_2_20_3(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_3 = { &preamble_0, &test_2_20_3, &postamble_0 };
+#define test_case_2_20_3_stream_0 (&test_case_2_20_3)
+#define test_case_2_20_3_stream_1 (NULL)
+#define test_case_2_20_3_stream_2 (NULL)
+
+#define name_case_2_20_4 "Perform streamio I_GWROPT - SNDPIPE."
+#define desc_case_2_20_4 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDPIPE) after they have been set with I_SWROPT."
+int test_2_20_4(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDPIPE)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDPIPE))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_4 = { &preamble_0, &test_2_20_4, &postamble_0 };
+#define test_case_2_20_4_stream_0 (&test_case_2_20_4)
+#define test_case_2_20_4_stream_1 (NULL)
+#define test_case_2_20_4_stream_2 (NULL)
+
+#define name_case_2_20_5 "Perform streamio I_GWROPT - SNDHOLD."
+#define desc_case_2_20_5 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDHOLD) after they have been set with I_SWROPT."
+int test_2_20_5(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDHOLD))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_5 = { &preamble_0, &test_2_20_5, &postamble_0 };
+#define test_case_2_20_5_stream_0 (&test_case_2_20_5)
+#define test_case_2_20_5_stream_1 (NULL)
+#define test_case_2_20_5_stream_2 (NULL)
+
+#define name_case_2_20_6 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE."
+#define desc_case_2_20_6 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDZERO | SNDPIPE) after they have been set with I_SWROPT."
+int test_2_20_6(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO | SNDPIPE))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_6 = { &preamble_0, &test_2_20_6, &postamble_0 };
+#define test_case_2_20_6_stream_0 (&test_case_2_20_6)
+#define test_case_2_20_6_stream_1 (NULL)
+#define test_case_2_20_6_stream_2 (NULL)
+
+#define name_case_2_20_7 "Perform streamio I_GWROPT - SNDZERO | SNDHOLD."
+#define desc_case_2_20_7 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDZERO | SNDHOLD) after they have been set with I_SWROPT."
+int test_2_20_7(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO | SNDHOLD))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_7 = { &preamble_0, &test_2_20_7, &postamble_0 };
+#define test_case_2_20_7_stream_0 (&test_case_2_20_7)
+#define test_case_2_20_7_stream_1 (NULL)
+#define test_case_2_20_7_stream_2 (NULL)
+
+#define name_case_2_20_8 "Perform streamio I_GWROPT - SNDPIPE | SNDHOLD."
+#define desc_case_2_20_8 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
+int test_2_20_8(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDPIPE | SNDHOLD))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_8 = { &preamble_0, &test_2_20_8, &postamble_0 };
+#define test_case_2_20_8_stream_0 (&test_case_2_20_8)
+#define test_case_2_20_8_stream_1 (NULL)
+#define test_case_2_20_8_stream_2 (NULL)
+
+#define name_case_2_20_9 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE | SNDHOLD."
+#define desc_case_2_20_9 "\
+Checks that I_GWROPT can be performed on a stream to read the write options\n\
+(SNDZERO | SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
+int test_2_20_9(int child)
+{
+	int wropts = -1;
+	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (wropts != (SNDZERO | SNDPIPE | SNDHOLD))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_9 = { &preamble_0, &test_2_20_9, &postamble_0 };
+#define test_case_2_20_9_stream_0 (&test_case_2_20_9)
+#define test_case_2_20_9_stream_1 (NULL)
+#define test_case_2_20_9_stream_2 (NULL)
+
+#define name_case_2_20_10 "Perform streamio I_GWROPT - EFAULT."
+#define desc_case_2_20_10 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_20_10(int child)
+{
+	if (test_ioctl(child, I_GWROPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_20_10 = { &preamble_0, &test_2_20_10, &postamble_0 };
+#define test_case_2_20_10_stream_0 (&test_case_2_20_10)
+#define test_case_2_20_10_stream_1 (NULL)
+#define test_case_2_20_10_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_LIST
@@ -1650,89 +2419,340 @@ struct test_stream test_case_2_26 = { &preamble_0, &test_2_26, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SETCLTIME
  */
-#define name_case_2_27 "Perform streamio I_SETCLTIME."
-#define desc_case_2_27 "\
-Checks that I_SETCLTIME can be performed on a stream."
-int test_2_27(int child)
+#define name_case_2_27_1 "Perform streamio I_SETCLTIME."
+#define desc_case_2_27_1 "\
+Checks that I_SETCLTIME can be performed on a stream.\n\
+Checks that the close time can be set to zero."
+int test_2_27_1(int child)
 {
-	if (test_ioctl(child, I_SETCLTIME, 0) != __RESULT_SUCCESS)
+	int cltime = 0;
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_27 = { &preamble_0, &test_2_27, &postamble_0 };
-#define test_case_2_27_stream_0 (&test_case_2_27)
-#define test_case_2_27_stream_1 (NULL)
-#define test_case_2_27_stream_2 (NULL)
+struct test_stream test_case_2_27_1 = { &preamble_0, &test_2_27_1, &postamble_0 };
+#define test_case_2_27_1_stream_0 (&test_case_2_27_1)
+#define test_case_2_27_1_stream_1 (NULL)
+#define test_case_2_27_1_stream_2 (NULL)
+
+#define name_case_2_27_2 "Perform streamio I_SETCLTIME."
+#define desc_case_2_27_2 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_27_2(int child)
+{
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_27_2 = { &preamble_0, &test_2_27_2, &postamble_0 };
+#define test_case_2_27_2_stream_0 (&test_case_2_27_2)
+#define test_case_2_27_2_stream_1 (NULL)
+#define test_case_2_27_2_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_GETCLTIME
  */
-#define name_case_2_28 "Perform streamio I_GETCLTIME."
-#define desc_case_2_28 "\
-Checks that I_GETCLTIME can be performed on a stream."
-int test_2_28(int child)
+#define name_case_2_28_1 "Perform streamio I_GETCLTIME - default."
+#define desc_case_2_28_1 "\
+Checks that I_GETCLTIME can be performed on a stream.\n\
+Checks that the default close time is 15000 milliseconds (or 15 seconds)."
+int test_2_28_1(int child)
 {
-	long cltime;
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	int cltime;
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_28 = { &preamble_0, &test_2_28, &postamble_0 };
-#define test_case_2_28_stream_0 (&test_case_2_28)
-#define test_case_2_28_stream_1 (NULL)
-#define test_case_2_28_stream_2 (NULL)
+struct test_stream test_case_2_28_1 = { &preamble_0, &test_2_28_1, &postamble_0 };
+#define test_case_2_28_1_stream_0 (&test_case_2_28_1)
+#define test_case_2_28_1_stream_1 (NULL)
+#define test_case_2_28_1_stream_2 (NULL)
+
+#define name_case_2_28_2 "Perform streamio I_GETCLTIME - EFAULT."
+#define desc_case_2_28_2 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_28_2(int child)
+{
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_28_2 = { &preamble_0, &test_2_28_2, &postamble_0 };
+#define test_case_2_28_2_stream_0 (&test_case_2_28_2)
+#define test_case_2_28_2_stream_1 (NULL)
+#define test_case_2_28_2_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_CANPUT
  */
-#define name_case_2_29 "Perform streamio I_CANPUT."
-#define desc_case_2_29 "\
-Checks that I_CANPUT can be performed on a stream."
-int test_2_29(int child)
+#define name_case_2_29_1 "Perform streamio I_CANPUT."
+#define desc_case_2_29_1 "\
+Checks that I_CANPUT can be performed on a stream for band 0."
+int test_2_29_1(int child)
+{
+	if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS || last_retval != 1)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_29_1 = { &preamble_0, &test_2_29_1, &postamble_0 };
+#define test_case_2_29_1_stream_0 (&test_case_2_29_1)
+#define test_case_2_29_1_stream_1 (NULL)
+#define test_case_2_29_1_stream_2 (NULL)
+
+#define name_case_2_29_2 "Perform streamio I_CANPUT."
+#define desc_case_2_29_2 "\
+Checks that I_CANPUT can be performed on a stream for band 2."
+int test_2_29_2(int child)
 {
 	if (test_ioctl(child, I_CANPUT, 2) != __RESULT_SUCCESS || last_retval != 1)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_29 = { &preamble_0, &test_2_29, &postamble_0 };
-#define test_case_2_29_stream_0 (&test_case_2_29)
-#define test_case_2_29_stream_1 (NULL)
-#define test_case_2_29_stream_2 (NULL)
+struct test_stream test_case_2_29_2 = { &preamble_0, &test_2_29_2, &postamble_0 };
+#define test_case_2_29_2_stream_0 (&test_case_2_29_2)
+#define test_case_2_29_2_stream_1 (NULL)
+#define test_case_2_29_2_stream_2 (NULL)
+
+#define name_case_2_29_3 "Perform streamio I_CANPUT."
+#define desc_case_2_29_3 "\
+Checks that I_CANPUT performed on a stream for an illegal band (256) will result\n\
+in an EINVAL error."
+int test_2_29_3(int child)
+{
+	if (test_ioctl(child, I_CANPUT, 256) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_29_3 = { &preamble_0, &test_2_29_3, &postamble_0 };
+#define test_case_2_29_3_stream_0 (&test_case_2_29_2)
+#define test_case_2_29_3_stream_1 (NULL)
+#define test_case_2_29_3_stream_2 (NULL)
+
+#define name_case_2_29_4 "Perform streamio I_CANPUT."
+#define desc_case_2_29_4 "\
+Checks that I_CANPUT can be performed on a stream for the special band ANYBAND.\n\
+Because there is not any writable non-zero band (no non-zero band exists on a \n\
+newly opened stream), the return value should be zero (0)."
+int test_2_29_4(int child)
+{
+	if (test_ioctl(child, I_CANPUT, (-1UL)) != __RESULT_SUCCESS || last_retval != 0)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_29_4 = { &preamble_0, &test_2_29_4, &postamble_0 };
+#define test_case_2_29_4_stream_0 (&test_case_2_29_4)
+#define test_case_2_29_4_stream_1 (NULL)
+#define test_case_2_29_4_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_SERROPT	(Solaris)
  */
-#define name_case_2_30 "Perform streamio I_SERROPT."
-#define desc_case_2_30 "\
-Checks that I_SERROPT can be performed on a stream."
-int test_2_30(int child)
+#define name_case_2_30_1 "Perform streamio I_SERROPT - default."
+#define desc_case_2_30_1 "\
+Checks that I_SERROPT can be performed on a stream with error option values\n\
+(RERRNORM | WRERRNORM)."
+int test_2_30_1(int child)
 {
 	if (test_ioctl(child, I_SERROPT, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30 = { &preamble_0, &test_2_30, &postamble_0 };
-#define test_case_2_30_stream_0 (&test_case_2_30)
-#define test_case_2_30_stream_1 (NULL)
-#define test_case_2_30_stream_2 (NULL)
+struct test_stream test_case_2_30_1 = { &preamble_0, &test_2_30_1, &postamble_0 };
+#define test_case_2_30_1_stream_0 (&test_case_2_30_1)
+#define test_case_2_30_1_stream_1 (NULL)
+#define test_case_2_30_1_stream_2 (NULL)
+
+#define name_case_2_30_2 "Perform streamio I_SERROPT - RERRNONPERSIST."
+#define desc_case_2_30_2 "\
+Checks that I_SERROPT can be performed on a stream with error options values\n\
+(RERRNONPERSIST | WRERRNORM)."
+int test_2_30_2(int child)
+{
+	if (test_ioctl(child, I_SERROPT, RERRNONPERSIST) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_30_2 = { &preamble_0, &test_2_30_2, &postamble_0 };
+#define test_case_2_30_2_stream_0 (&test_case_2_30_2)
+#define test_case_2_30_2_stream_1 (NULL)
+#define test_case_2_30_2_stream_2 (NULL)
+
+#define name_case_2_30_3 "Perform streamio I_SERROPT - WERRNONPERSIST."
+#define desc_case_2_30_3 "\
+Checks that I_SERROPT can be performed on a stream with error options values\n\
+(RERRNORM | WERRNONPERSIST)."
+int test_2_30_3(int child)
+{
+	if (test_ioctl(child, I_SERROPT, WERRNONPERSIST) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_30_3 = { &preamble_0, &test_2_30_3, &postamble_0 };
+#define test_case_2_30_3_stream_0 (&test_case_2_30_3)
+#define test_case_2_30_3_stream_1 (NULL)
+#define test_case_2_30_3_stream_2 (NULL)
+
+#define name_case_2_30_4 "Perform streamio I_SERROPT - RERRNONPERSIST | WERRNONPERSIST."
+#define desc_case_2_30_4 "\
+Checks that I_SERROPT can be performed on a stream with error options values\n\
+(RERRNONPERSIST | WERRNONPERSIST)."
+int test_2_30_4(int child)
+{
+	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_30_4 = { &preamble_0, &test_2_30_4, &postamble_0 };
+#define test_case_2_30_4_stream_0 (&test_case_2_30_4)
+#define test_case_2_30_4_stream_1 (NULL)
+#define test_case_2_30_4_stream_2 (NULL)
+
+#define name_case_2_30_5 "Perform streamio I_SERROPT - EINVAL."
+#define desc_case_2_30_5 "\
+Checks that I_SERROPT can be performed on a stream with an invalid argument\n\
+value, resulting in the return of EINVAL."
+int test_2_30_5(int child)
+{
+	if (test_ioctl(child, I_SERROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
+		return (__RESULT_FAILURE);
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_30_5 = { &preamble_0, &test_2_30_5, &postamble_0 };
+#define test_case_2_30_5_stream_0 (&test_case_2_30_5)
+#define test_case_2_30_5_stream_1 (NULL)
+#define test_case_2_30_5_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_GERROPT	(Solaris)
  */
-#define name_case_2_31 "Perform streamio I_GERROPT."
-#define desc_case_2_31 "\
-Checks that I_GERROPT can be performed on a stream."
-int test_2_31(int child)
+#define name_case_2_31_1 "Perform streamio I_GERROPT - default."
+#define desc_case_2_31_1 "\
+Checks that I_GERROPT can be performed on a stream to read the stream default\n\
+error options."
+int test_2_31_1(int child)
 {
-	int opts = 0;
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & opts) != __RESULT_SUCCESS)
+	int erropts = -1;
+	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (erropts != (RERRNORM | WERRNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_31_1 = { &preamble_0, &test_2_31_1, &postamble_0 };
+#define test_case_2_31_1_stream_0 (&test_case_2_31_1)
+#define test_case_2_31_1_stream_1 (NULL)
+#define test_case_2_31_1_stream_2 (NULL)
+
+#define name_case_2_31_2 "Perform streamio I_GERROPT - set to default."
+#define desc_case_2_31_2 "\
+Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+(RERRNORM | WERRNORM) after they have been set with I_SERROPT."
+int test_2_31_2(int child)
+{
+	int erropts = -1;
+	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (erropts != (RERRNORM | WERRNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_31_2 = { &preamble_0, &test_2_31_2, &postamble_0 };
+#define test_case_2_31_2_stream_0 (&test_case_2_31_2)
+#define test_case_2_31_2_stream_1 (NULL)
+#define test_case_2_31_2_stream_2 (NULL)
+
+#define name_case_2_31_3 "Perform streamio I_GERROPT - RERRNONPERSIST."
+#define desc_case_2_31_3 "\
+Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+(RERRNONPERSIST | WERRNORM) after they have been set with I_SERROPT."
+int test_2_31_3(int child)
+{
+	int erropts = -1;
+	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (erropts != (RERRNONPERSIST | WERRNORM))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_31_3 = { &preamble_0, &test_2_31_3, &postamble_0 };
+#define test_case_2_31_3_stream_0 (&test_case_2_31_3)
+#define test_case_2_31_3_stream_1 (NULL)
+#define test_case_2_31_3_stream_2 (NULL)
+
+#define name_case_2_31_4 "Perform streamio I_GERROPT - WERRNONPERSIST."
+#define desc_case_2_31_4 "\
+Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+(RERRNORM | WERRNONPERSIST) after they have been set with I_SERROPT."
+int test_2_31_4(int child)
+{
+	int erropts = -1;
+	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (erropts != (RERRNORM | WERRNONPERSIST))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_31_4 = { &preamble_0, &test_2_31_4, &postamble_0 };
+#define test_case_2_31_4_stream_0 (&test_case_2_31_4)
+#define test_case_2_31_4_stream_1 (NULL)
+#define test_case_2_31_4_stream_2 (NULL)
+
+#define name_case_2_31_5 "Perform streamio I_GERROPT - RERRNONPERSIST | WERRNONPERSIST."
+#define desc_case_2_31_5 "\
+Checks that I_GERROPT can be performed on a stream to read the errror options\n\
+(RERRNONPERSIST | WERRNONPERSIST) after they have been set with I_SERROPT."
+int test_2_31_5(int child)
+{
+	int erropts = -1;
+	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
+		return (__RESULT_INCONCLUSIVE);
+	state++;
+	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (erropts != (RERRNONPERSIST | WERRNONPERSIST))
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+struct test_stream test_case_2_31_5 = { &preamble_0, &test_2_31_5, &postamble_0 };
+#define test_case_2_31_5_stream_0 (&test_case_2_31_5)
+#define test_case_2_31_5_stream_1 (NULL)
+#define test_case_2_31_5_stream_2 (NULL)
+
+#define name_case_2_31_6 "Perform streamio I_GERROPT - EFAULT."
+#define desc_case_2_31_6 "\
+Checks that EFAULT is returned when arg points outside the caller's address \n\
+space."
+int test_2_31_6(int child)
+{
+	if (test_ioctl(child, I_GERROPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31 = { &preamble_0, &test_2_31, &postamble_0 };
-#define test_case_2_31_stream_0 (&test_case_2_31)
-#define test_case_2_31_stream_1 (NULL)
-#define test_case_2_31_stream_2 (NULL)
+struct test_stream test_case_2_31_6 = { &preamble_0, &test_2_31_6, &postamble_0 };
+#define test_case_2_31_6_stream_0 (&test_case_2_31_6)
+#define test_case_2_31_6_stream_1 (NULL)
+#define test_case_2_31_6_stream_2 (NULL)
 
 /*
  *  Perform IOCTL on one stream - I_ANCHOR	(Solaris)
@@ -1799,7 +2819,6 @@ struct test_stream test_case_2_35 = { &preamble_0, &test_2_35, &postamble_0 };
 #define test_case_2_35_stream_0 (&test_case_2_35)
 #define test_case_2_35_stream_1 (NULL)
 #define test_case_2_35_stream_2 (NULL)
-#endif
 
 /*
  *  Perform IOCTL on one stream - I_GETTP	(UnixWare)
@@ -1935,6 +2954,7 @@ struct test_stream test_case_2_44 = { &preamble_0, &test_2_44, &postamble_0 };
 #define test_case_2_44_stream_0 (&test_case_2_44)
 #define test_case_2_44_stream_1 (NULL)
 #define test_case_2_44_stream_2 (NULL)
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -2172,8 +3192,14 @@ struct test_case {
 		"2.1.2", name_case_2_1_2, desc_case_2_1_2, {
 	test_case_2_1_2_stream_0, test_case_2_1_2_stream_1, test_case_2_1_2_stream_2}, 0, 0}
 	, {
-		"2.2", name_case_2_2, desc_case_2_2, {
-	test_case_2_2_stream_0, test_case_2_2_stream_1, test_case_2_2_stream_2}, 0, 0}
+		"2.2.1", name_case_2_2_1, desc_case_2_2_1, {
+	test_case_2_2_1_stream_0, test_case_2_2_1_stream_1, test_case_2_2_1_stream_2}, 0, 0}
+	, {
+		"2.2.2", name_case_2_2_2, desc_case_2_2_2, {
+	test_case_2_2_2_stream_0, test_case_2_2_2_stream_1, test_case_2_2_2_stream_2}, 0, 0}
+	, {
+		"2.2.3", name_case_2_2_3, desc_case_2_2_3, {
+	test_case_2_2_3_stream_0, test_case_2_2_3_stream_1, test_case_2_2_3_stream_2}, 0, 0}
 	, {
 		"2.3", name_case_2_3, desc_case_2_3, {
 	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, 0, 0}
@@ -2184,11 +3210,71 @@ struct test_case {
 		"2.5", name_case_2_5, desc_case_2_5, {
 	test_case_2_5_stream_0, test_case_2_5_stream_1, test_case_2_5_stream_2}, 0, 0}
 	, {
-		"2.6", name_case_2_6, desc_case_2_6, {
-	test_case_2_6_stream_0, test_case_2_6_stream_1, test_case_2_6_stream_2}, 0, 0}
+		"2.6.1", name_case_2_6_1, desc_case_2_6_1, {
+	test_case_2_6_1_stream_0, test_case_2_6_1_stream_1, test_case_2_6_1_stream_2}, 0, 0}
 	, {
-		"2.7", name_case_2_7, desc_case_2_7, {
-	test_case_2_7_stream_0, test_case_2_7_stream_1, test_case_2_7_stream_2}, 0, 0}
+		"2.6.2", name_case_2_6_2, desc_case_2_6_2, {
+	test_case_2_6_2_stream_0, test_case_2_6_2_stream_1, test_case_2_6_2_stream_2}, 0, 0}
+	, {
+		"2.6.3", name_case_2_6_3, desc_case_2_6_3, {
+	test_case_2_6_3_stream_0, test_case_2_6_3_stream_1, test_case_2_6_3_stream_2}, 0, 0}
+	, {
+		"2.6.4", name_case_2_6_4, desc_case_2_6_4, {
+	test_case_2_6_4_stream_0, test_case_2_6_4_stream_1, test_case_2_6_4_stream_2}, 0, 0}
+	, {
+		"2.6.5", name_case_2_6_5, desc_case_2_6_5, {
+	test_case_2_6_5_stream_0, test_case_2_6_5_stream_1, test_case_2_6_5_stream_2}, 0, 0}
+	, {
+		"2.6.6", name_case_2_6_6, desc_case_2_6_6, {
+	test_case_2_6_6_stream_0, test_case_2_6_6_stream_1, test_case_2_6_6_stream_2}, 0, 0}
+	, {
+		"2.6.7", name_case_2_6_7, desc_case_2_6_7, {
+	test_case_2_6_7_stream_0, test_case_2_6_7_stream_1, test_case_2_6_7_stream_2}, 0, 0}
+	, {
+		"2.6.8", name_case_2_6_8, desc_case_2_6_8, {
+	test_case_2_6_8_stream_0, test_case_2_6_8_stream_1, test_case_2_6_8_stream_2}, 0, 0}
+	, {
+		"2.6.9", name_case_2_6_9, desc_case_2_6_9, {
+	test_case_2_6_9_stream_0, test_case_2_6_9_stream_1, test_case_2_6_9_stream_2}, 0, 0}
+	, {
+		"2.6.10", name_case_2_6_10, desc_case_2_6_10, {
+	test_case_2_6_10_stream_0, test_case_2_6_10_stream_1, test_case_2_6_10_stream_2}, 0, 0}
+	, {
+		"2.6.11", name_case_2_6_11, desc_case_2_6_11, {
+	test_case_2_6_11_stream_0, test_case_2_6_11_stream_1, test_case_2_6_11_stream_2}, 0, 0}
+	, {
+		"2.7.1", name_case_2_7_1, desc_case_2_7_1, {
+	test_case_2_7_1_stream_0, test_case_2_7_1_stream_1, test_case_2_7_1_stream_2}, 0, 0}
+	, {
+		"2.7.2", name_case_2_7_2, desc_case_2_7_2, {
+	test_case_2_7_2_stream_0, test_case_2_7_2_stream_1, test_case_2_7_2_stream_2}, 0, 0}
+	, {
+		"2.7.3", name_case_2_7_3, desc_case_2_7_3, {
+	test_case_2_7_3_stream_0, test_case_2_7_3_stream_1, test_case_2_7_3_stream_2}, 0, 0}
+	, {
+		"2.7.4", name_case_2_7_4, desc_case_2_7_4, {
+	test_case_2_7_4_stream_0, test_case_2_7_4_stream_1, test_case_2_7_4_stream_2}, 0, 0}
+	, {
+		"2.7.5", name_case_2_7_5, desc_case_2_7_5, {
+	test_case_2_7_5_stream_0, test_case_2_7_5_stream_1, test_case_2_7_5_stream_2}, 0, 0}
+	, {
+		"2.7.6", name_case_2_7_6, desc_case_2_7_6, {
+	test_case_2_7_6_stream_0, test_case_2_7_6_stream_1, test_case_2_7_6_stream_2}, 0, 0}
+	, {
+		"2.7.7", name_case_2_7_7, desc_case_2_7_7, {
+	test_case_2_7_7_stream_0, test_case_2_7_7_stream_1, test_case_2_7_7_stream_2}, 0, 0}
+	, {
+		"2.7.8", name_case_2_7_8, desc_case_2_7_8, {
+	test_case_2_7_8_stream_0, test_case_2_7_8_stream_1, test_case_2_7_8_stream_2}, 0, 0}
+	, {
+		"2.7.9", name_case_2_7_9, desc_case_2_7_9, {
+	test_case_2_7_9_stream_0, test_case_2_7_9_stream_1, test_case_2_7_9_stream_2}, 0, 0}
+	, {
+		"2.7.10", name_case_2_7_10, desc_case_2_7_10, {
+	test_case_2_7_10_stream_0, test_case_2_7_10_stream_1, test_case_2_7_10_stream_2}, 0, 0}
+	, {
+		"2.7.11", name_case_2_7_11, desc_case_2_7_11, {
+	test_case_2_7_11_stream_0, test_case_2_7_11_stream_1, test_case_2_7_11_stream_2}, 0, 0}
 	, {
 		"2.8", name_case_2_8, desc_case_2_8, {
 	test_case_2_8_stream_0, test_case_2_8_stream_1, test_case_2_8_stream_2}, 0, 0}
@@ -2196,8 +3282,11 @@ struct test_case {
 		"2.9", name_case_2_9, desc_case_2_9, {
 	test_case_2_9_stream_0, test_case_2_9_stream_1, test_case_2_9_stream_2}, 0, 0}
 	, {
-		"2.10", name_case_2_10, desc_case_2_10, {
-	test_case_2_10_stream_0, test_case_2_10_stream_1, test_case_2_10_stream_2}, 0, 0}
+		"2.10.1", name_case_2_10_1, desc_case_2_10_1, {
+	test_case_2_10_1_stream_0, test_case_2_10_1_stream_1, test_case_2_10_1_stream_2}, 0, 0}
+	, {
+		"2.10.2", name_case_2_10_2, desc_case_2_10_2, {
+	test_case_2_10_2_stream_0, test_case_2_10_2_stream_1, test_case_2_10_2_stream_2}, 0, 0}
 	, {
 		"2.11", name_case_2_11, desc_case_2_11, {
 	test_case_2_11_stream_0, test_case_2_11_stream_1, test_case_2_11_stream_2}, 0, 0}
@@ -2223,11 +3312,62 @@ struct test_case {
 		"2.18", name_case_2_18, desc_case_2_18, {
 	test_case_2_18_stream_0, test_case_2_18_stream_1, test_case_2_18_stream_2}, 0, 0}
 	, {
-		"2.19", name_case_2_19, desc_case_2_19, {
-	test_case_2_19_stream_0, test_case_2_19_stream_1, test_case_2_19_stream_2}, 0, 0}
+		"2.19.1", name_case_2_19_1, desc_case_2_19_1, {
+	test_case_2_19_1_stream_0, test_case_2_19_1_stream_1, test_case_2_19_1_stream_2}, 0, 0}
 	, {
-		"2.20", name_case_2_20, desc_case_2_20, {
-	test_case_2_20_stream_0, test_case_2_20_stream_1, test_case_2_20_stream_2}, 0, 0}
+		"2.19.2", name_case_2_19_2, desc_case_2_19_2, {
+	test_case_2_19_2_stream_0, test_case_2_19_2_stream_1, test_case_2_19_2_stream_2}, 0, 0}
+	, {
+		"2.19.3", name_case_2_19_3, desc_case_2_19_3, {
+	test_case_2_19_3_stream_0, test_case_2_19_3_stream_1, test_case_2_19_3_stream_2}, 0, 0}
+	, {
+		"2.19.4", name_case_2_19_4, desc_case_2_19_4, {
+	test_case_2_19_4_stream_0, test_case_2_19_4_stream_1, test_case_2_19_4_stream_2}, 0, 0}
+	, {
+		"2.19.5", name_case_2_19_5, desc_case_2_19_5, {
+	test_case_2_19_5_stream_0, test_case_2_19_5_stream_1, test_case_2_19_5_stream_2}, 0, 0}
+	, {
+		"2.19.6", name_case_2_19_6, desc_case_2_19_6, {
+	test_case_2_19_6_stream_0, test_case_2_19_6_stream_1, test_case_2_19_6_stream_2}, 0, 0}
+	, {
+		"2.19.7", name_case_2_19_7, desc_case_2_19_7, {
+	test_case_2_19_7_stream_0, test_case_2_19_7_stream_1, test_case_2_19_7_stream_2}, 0, 0}
+	, {
+		"2.19.8", name_case_2_19_8, desc_case_2_19_8, {
+	test_case_2_19_8_stream_0, test_case_2_19_8_stream_1, test_case_2_19_8_stream_2}, 0, 0}
+	, {
+		"2.19.9", name_case_2_19_9, desc_case_2_19_9, {
+	test_case_2_19_9_stream_0, test_case_2_19_9_stream_1, test_case_2_19_9_stream_2}, 0, 0}
+	, {
+		"2.20.1", name_case_2_20_1, desc_case_2_20_1, {
+	test_case_2_20_1_stream_0, test_case_2_20_1_stream_1, test_case_2_20_1_stream_2}, 0, 0}
+	, {
+		"2.20.2", name_case_2_20_2, desc_case_2_20_2, {
+	test_case_2_20_2_stream_0, test_case_2_20_2_stream_1, test_case_2_20_2_stream_2}, 0, 0}
+	, {
+		"2.20.3", name_case_2_20_3, desc_case_2_20_3, {
+	test_case_2_20_3_stream_0, test_case_2_20_3_stream_1, test_case_2_20_3_stream_2}, 0, 0}
+	, {
+		"2.20.4", name_case_2_20_4, desc_case_2_20_4, {
+	test_case_2_20_4_stream_0, test_case_2_20_4_stream_1, test_case_2_20_4_stream_2}, 0, 0}
+	, {
+		"2.20.5", name_case_2_20_5, desc_case_2_20_5, {
+	test_case_2_20_5_stream_0, test_case_2_20_5_stream_1, test_case_2_20_5_stream_2}, 0, 0}
+	, {
+		"2.20.6", name_case_2_20_6, desc_case_2_20_6, {
+	test_case_2_20_6_stream_0, test_case_2_20_6_stream_1, test_case_2_20_6_stream_2}, 0, 0}
+	, {
+		"2.20.7", name_case_2_20_7, desc_case_2_20_7, {
+	test_case_2_20_7_stream_0, test_case_2_20_7_stream_1, test_case_2_20_7_stream_2}, 0, 0}
+	, {
+		"2.20.8", name_case_2_20_8, desc_case_2_20_8, {
+	test_case_2_20_8_stream_0, test_case_2_20_8_stream_1, test_case_2_20_8_stream_2}, 0, 0}
+	, {
+		"2.20.9", name_case_2_20_9, desc_case_2_20_9, {
+	test_case_2_20_9_stream_0, test_case_2_20_9_stream_1, test_case_2_20_9_stream_2}, 0, 0}
+	, {
+		"2.20.10", name_case_2_20_10, desc_case_2_20_10, {
+	test_case_2_20_10_stream_0, test_case_2_20_10_stream_1, test_case_2_20_10_stream_2}, 0, 0}
 	, {
 		"2.21", name_case_2_21, desc_case_2_21, {
 	test_case_2_21_stream_0, test_case_2_21_stream_1, test_case_2_21_stream_2}, 0, 0}
@@ -2247,20 +3387,62 @@ struct test_case {
 		"2.26", name_case_2_26, desc_case_2_26, {
 	test_case_2_26_stream_0, test_case_2_26_stream_1, test_case_2_26_stream_2}, 0, 0}
 	, {
-		"2.27", name_case_2_27, desc_case_2_27, {
-	test_case_2_27_stream_0, test_case_2_27_stream_1, test_case_2_27_stream_2}, 0, 0}
+		"2.27.1", name_case_2_27_1, desc_case_2_27_1, {
+	test_case_2_27_1_stream_0, test_case_2_27_1_stream_1, test_case_2_27_1_stream_2}, 0, 0}
 	, {
-		"2.28", name_case_2_28, desc_case_2_28, {
-	test_case_2_28_stream_0, test_case_2_28_stream_1, test_case_2_28_stream_2}, 0, 0}
+		"2.27.2", name_case_2_27_2, desc_case_2_27_2, {
+	test_case_2_27_2_stream_0, test_case_2_27_2_stream_1, test_case_2_27_2_stream_2}, 0, 0}
 	, {
-		"2.29", name_case_2_29, desc_case_2_29, {
-	test_case_2_29_stream_0, test_case_2_29_stream_1, test_case_2_29_stream_2}, 0, 0}
+		"2.28.1", name_case_2_28_1, desc_case_2_28_1, {
+	test_case_2_28_1_stream_0, test_case_2_28_1_stream_1, test_case_2_28_1_stream_2}, 0, 0}
 	, {
-		"2.30", name_case_2_30, desc_case_2_30, {
-	test_case_2_30_stream_0, test_case_2_30_stream_1, test_case_2_30_stream_2}, 0, 0}
+		"2.28.2", name_case_2_28_2, desc_case_2_28_2, {
+	test_case_2_28_2_stream_0, test_case_2_28_2_stream_1, test_case_2_28_2_stream_2}, 0, 0}
 	, {
-		"2.31", name_case_2_31, desc_case_2_31, {
-	test_case_2_31_stream_0, test_case_2_31_stream_1, test_case_2_31_stream_2}, 0, 0}
+		"2.29.1", name_case_2_29_1, desc_case_2_29_1, {
+	test_case_2_29_1_stream_0, test_case_2_29_1_stream_1, test_case_2_29_1_stream_2}, 0, 0}
+	, {
+		"2.29.2", name_case_2_29_2, desc_case_2_29_2, {
+	test_case_2_29_2_stream_0, test_case_2_29_2_stream_1, test_case_2_29_2_stream_2}, 0, 0}
+	, {
+		"2.29.3", name_case_2_29_3, desc_case_2_29_3, {
+	test_case_2_29_3_stream_0, test_case_2_29_3_stream_1, test_case_2_29_3_stream_2}, 0, 0}
+	, {
+		"2.29.4", name_case_2_29_4, desc_case_2_29_4, {
+	test_case_2_29_4_stream_0, test_case_2_29_4_stream_1, test_case_2_29_4_stream_2}, 0, 0}
+	, {
+		"2.30.1", name_case_2_30_1, desc_case_2_30_1, {
+	test_case_2_30_1_stream_0, test_case_2_30_1_stream_1, test_case_2_30_1_stream_2}, 0, 0}
+	, {
+		"2.30.2", name_case_2_30_2, desc_case_2_30_2, {
+	test_case_2_30_2_stream_0, test_case_2_30_2_stream_1, test_case_2_30_2_stream_2}, 0, 0}
+	, {
+		"2.30.3", name_case_2_30_3, desc_case_2_30_3, {
+	test_case_2_30_3_stream_0, test_case_2_30_3_stream_1, test_case_2_30_3_stream_2}, 0, 0}
+	, {
+		"2.30.4", name_case_2_30_4, desc_case_2_30_4, {
+	test_case_2_30_4_stream_0, test_case_2_30_4_stream_1, test_case_2_30_4_stream_2}, 0, 0}
+	, {
+		"2.30.5", name_case_2_30_5, desc_case_2_30_5, {
+	test_case_2_30_5_stream_0, test_case_2_30_5_stream_1, test_case_2_30_5_stream_2}, 0, 0}
+	, {
+		"2.31.1", name_case_2_31_1, desc_case_2_31_1, {
+	test_case_2_31_1_stream_0, test_case_2_31_1_stream_1, test_case_2_31_1_stream_2}, 0, 0}
+	, {
+		"2.31.2", name_case_2_31_2, desc_case_2_31_2, {
+	test_case_2_31_2_stream_0, test_case_2_31_2_stream_1, test_case_2_31_2_stream_2}, 0, 0}
+	, {
+		"2.31.3", name_case_2_31_3, desc_case_2_31_3, {
+	test_case_2_31_3_stream_0, test_case_2_31_3_stream_1, test_case_2_31_3_stream_2}, 0, 0}
+	, {
+		"2.31.4", name_case_2_31_4, desc_case_2_31_4, {
+	test_case_2_31_4_stream_0, test_case_2_31_4_stream_1, test_case_2_31_4_stream_2}, 0, 0}
+	, {
+		"2.31.5", name_case_2_31_5, desc_case_2_31_5, {
+	test_case_2_31_5_stream_0, test_case_2_31_5_stream_1, test_case_2_31_5_stream_2}, 0, 0}
+	, {
+		"2.31.6", name_case_2_31_6, desc_case_2_31_6, {
+	test_case_2_31_6_stream_0, test_case_2_31_6_stream_1, test_case_2_31_6_stream_2}, 0, 0}
 	, {
 		"2.32", name_case_2_32, desc_case_2_32, {
 	test_case_2_32_stream_0, test_case_2_32_stream_1, test_case_2_32_stream_2}, 0, 0}
@@ -2275,7 +3457,6 @@ struct test_case {
 		"2.35", name_case_2_35, desc_case_2_35, {
 	test_case_2_35_stream_0, test_case_2_35_stream_1, test_case_2_35_stream_2}, 0, 0}
 	, {
-#endif
 		"2.36", name_case_2_36, desc_case_2_36, {
 	test_case_2_36_stream_0, test_case_2_36_stream_1, test_case_2_36_stream_2}, 0, 0}
 	, {
@@ -2303,6 +3484,7 @@ struct test_case {
 		"2.44", name_case_2_44, desc_case_2_44, {
 	test_case_2_44_stream_0, test_case_2_44_stream_1, test_case_2_44_stream_2}, 0, 0}
 	, {
+#endif
 	NULL,}
 };
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.20 2005/05/11 20:10:21 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.21 2005/05/12 20:58:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/11 20:10:21 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/12 20:58:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -126,6 +126,13 @@ struct strevent {
 	int se_id;			/* identifier for this event structure */
 	int se_seq;			/* use sequence number */
 };
+
+#define se_procp    x.e.procp
+#define se_events   x.e.events
+
+#define se_func	    x.b.func
+#define se_arg	    x.b.arg
+#define se_size	    x.b.size
 
 /* synchronization queue structure */
 typedef struct syncq {

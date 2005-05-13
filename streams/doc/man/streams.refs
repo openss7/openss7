@@ -115,6 +115,16 @@
 %N journal issue number
 %X annotation (separate paragraph after citation)
 
+%L RFC 1321
+%A Ronald L. Rivest
+%E Ronald L. Rivest
+%Q Internet Engineering Task Force
+%T The MD5 Message-Digest Algorithm
+%R RFC 1321
+%D April 1992
+%I Internet Engineering Task Force
+%U http://www.ietf.org/rfc/rfc1321.txt
+
 %L RFC 1349
 %A Philip Almquist
 %E Philip Almquist
@@ -324,7 +334,7 @@
 %L RFC 3436
 %A Adreas Jungmaier
 %A Eric Rescorla
-%A Michael Tuxen
+%A Michael Tuexen
 %E Adreas Jungmaier
 %T Transport Layer Security over Stream Control Transmission Protocol
 %Q The Internet Society
@@ -3431,7 +3441,7 @@ Part 1: Protocol Specification
 %Q Apple Computer, Inc.
 %I Apple
 %C Cupertino, California
-%U http://developer.apple.com/macos/opentransport/
+%U http://developer.apple.com/macros/opentransport/
 
 %L MACOTDN
 %R Revision 1.5d2
@@ -3595,7 +3605,7 @@ Part 1: Protocol Specification
 %A Randall R. Stewart
 %A Michael A. Ramalho
 %A Qiaobing Xie
-%A Michael Tuxen
+%A Michael Tuexen
 %A Phillip T. Conrad
 %E Randall R. Stewart
 %Q Internet Engineering Task Force \(em Transport Area Working Group
@@ -3610,7 +3620,7 @@ Part 1: Protocol Specification
 %A Randall R. Stewart
 %A Michael A. Ramalho
 %A Qiaobing Xie
-%A Michael Tuxen
+%A Michael Tuexen
 %A Phillip T. Conrad
 %E Randall R. Stewart
 %Q Internet Engineering Task Force
@@ -3662,7 +3672,7 @@ Part 1: Protocol Specification
 %A Kacheong Poon
 %A Phillip T. Conrad
 %A Armando L. Caro Jr.
-%A Michael Tuxen
+%A Michael Tuexen
 %E Randall R. Stewart
 %Q Internet Engineering Task Force \(em Transport Area Working Group
 %T Stream Control Transmission Protocol (SCTP) Implementor's Guide
@@ -3678,7 +3688,7 @@ Part 1: Protocol Specification
 %A Ivan Arias-Rodriguez
 %A Kacheong Poon
 %A Armando L. Caro Jr.
-%A Michael Tuxen
+%A Michael Tuexen
 %E Randall R. Stewart
 %Q Internet Engineering Task Force - Transport Area Working Group
 %T Stream Control Transmission Protocol (SCTP) Implementor's Guide
@@ -3687,6 +3697,24 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force - Signalling Transport Working Group
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt
+
+%K sctpsock-07
+%L SCTPSOCK07
+%A Randall R. Stewart
+%A Qiaobing Xie
+%A La Monte H.P. Yarroll
+%A Johnathan Wood
+%A Kacheong Poon
+%A Ken Fujita
+%A Michael Tuexen
+%E Randall R. Stewart
+%Q Internet Engineering Task Force - Transport Area Working Group
+%T Sockets API Extensions for Stream Control Transmission Protocol (SCTP)
+%R draft-ietf-tsvwg-sctpsocket-07.txt
+%D August 22, 2003
+%I Internet Engineering Task Force - Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpsocket-07.txt
 
 %K capi20
 %L CAPI 2.0

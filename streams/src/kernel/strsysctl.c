@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/11 20:12:22 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/12 20:58:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:22 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/11 20:12:22 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/12 20:58:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/11 20:12:22 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/12 20:58:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,7 +76,7 @@ int sysctl_str_maxpsz = STRMAXPSZ;	/* stream head default max packet size */
 int sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
 int sysctl_str_hiwat = STRHIGH;		/* stream head default hi water mark */
 int sysctl_str_lowat = STRLOW;		/* stream head default lo water mark */
-int sysctl_str_cltime = 1500;		/* close wait time in msec */
+int sysctl_str_cltime = 1500;		/* close wait time in msec (in HZ) */
 int sysctl_str_rtime = 1;		/* HZ to wait to forward held msg */
 int sysctl_str_nstrpush = 64;		/* maximum number of pushed modules */
 int sysctl_str_strthresh = (1 << 20);	/* memory limit */

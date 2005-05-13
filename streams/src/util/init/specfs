@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/12 20:58:48 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -79,7 +79,7 @@ build_options() {
 
 start() {
     if [ -n "$SPECFS_MOUNTPOINT" ] ; then
-	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
+	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems >/dev/null 2>&1 ; then
 	    action $"Loading kernel module specfs: " \
 		modprobe -k -q -- specfs
 	    RETVAL=$? ; [ $RETVAL -eq 0 ] || return $RETVAL
@@ -231,7 +231,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/12 20:58:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -277,7 +277,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:04 $ by $Author: brian $
+# Last Modified $Date: 2005/05/12 20:58:48 $ by $Author: brian $
 #
 # =============================================================================
 

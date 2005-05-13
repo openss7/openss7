@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streamio.7.man,v 0.9.2.14 2005/05/11 20:08:53 brian Exp $
+.\" @(#) $Id: streamio.7.man,v 0.9.2.15 2005/05/12 20:58:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/11 20:08:53 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/12 20:58:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -539,14 +539,14 @@ below.)
 .PP
 Gets the close delay time (in milliseconds) associated with the stream head.
 .I arg
-points to a
-.B long
+points to an
+.B int
 to receive the delay.
 .PP
 Upon success,
 .B I_GETCLTIME
 returns zero (0) and the close delay time in the
-.B long
+.B int
 pointed to by
 .IR arg .
 Upon failure,
@@ -1660,16 +1660,16 @@ the read queue at the other end of the pipe is full.
 .PP
 Sets the closing delay time for the stream head.
 .I arg
-is a
-.B long
-value which specifies the delay time in milliseconds.
+points to an
+.B int
+that specifies the delay time in milliseconds.
 .PP
 Upon success,
-.B I_SETTLTIME
+.B I_SETCLTIME
 returns zero (0) and sets the close delay time for
 .BR fd .
 Upon failure,
-.B I_SETTLTIME
+.B I_SETCLTIME
 returns -1 and sets
 .IR errno (3)
 to an appropriate error number as follows:
@@ -2117,6 +2117,39 @@ recognizes some
 and
 .IR LiS -specific
 IO control numbers for compatibility.
+.IP \(em
+.IR AIX \(rg
+.IR HP-UX \(rg,
+and
+.IR UnixWare \(rg
+document that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+documents that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a long timeout value.
+.I LiS
+follows
+.IR Solaris \(rg.
+.B SUSv2
+.[
+susv2
+.]
+documents that, when command is
+.BR I_SETCLTIME ,
+.I arg
+is a pointer to an integer timeout value.
+.IR Solaris \(rg
+can be seen in
+.BR strace (8)
+output to pass a pointer instead of a value.  This means that
+.IR Solaris \(rg
+documentation is erroneous, and
+.I LiS
+implementation is wrong.
 .\"
 .\"
 .SH CONFORMANCE

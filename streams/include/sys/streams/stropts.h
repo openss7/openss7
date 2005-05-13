@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.10 2005/05/11 20:10:21 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.11 2005/05/12 20:58:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STROPTS_H__
 #define __SYS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:10:21 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/12 20:58:46 $"
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -108,15 +108,18 @@
 #define I_BIGPIPE	(__SID |37)	/* UnixWare */
 #define I_GETTP		(__SID |38)	/* UnixWare */
 
+#define I_GETMSG	(__SID |40)	/* HP-UX */
+#define I_PUTMSG	(__SID |41)	/* HP-UX */
+
 #define I_AUTOPUSH	(__SID |48)	/* Mac OT */
 #define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
-#define I_FIFO		(__SID |51)	/* Mac OT */
+#define I_FIFO		(__SID |51)	/* Mac OT, 45 on HP-UX */
 
-#define I_PUTPMSG	(__SID |250)	/* LiS, 41 on Mac OT */
-#define I_GETPMSG	(__SID |251)	/* LiS, 40 on Mac OT */
+#define I_PUTPMSG	(__SID |250)	/* LiS, 41 on Mac OT, 43 on HP-UX */
+#define I_GETPMSG	(__SID |251)	/* LiS, 40 on Mac OT, 42 on HP-UX */
 #define I_FATTACH	(__SID |252)	/* LiS */
 #define I_FDETACH	(__SID |253)	/* LiS */
-#define I_PIPE		(__SID |254)	/* LiS, 49 on Mac OT */
+#define I_PIPE		(__SID |254)	/* LiS, 49 on Mac OT, 44 on HP-UX */
 
 #define INFTIM		(-1UL)
 
@@ -153,6 +156,7 @@
 #define S_RDBAND	(1<<7)
 #define S_WRBAND	(1<<8)
 #define S_BANDURG	(1<<9)
+#define S_ALL		(S_INPUT|S_HIPRI|S_OUTPUT|S_MSG|S_ERROR|S_HANGUP|S_RDNORM|S_WRNORM|S_RDBAND|S_WRBAND|S_BANDURG)
 
 #define RS_HIPRI	(1<<0)	/* only read hi priority messages */
 #define RS_EXDATA	(1<<5)	/* Mac OT */
@@ -168,6 +172,7 @@
 #define RPROTDIS	(1<<3)	/* proto part discarded */
 #define RPROTNORM	(1<<4)	/* proto part fail read EBADMSG */
 #define RPROTMASK	(RPROTDAT|RPROTDIS|RPROTNORM)	/* proto bit mask */
+/* OSF also adds RFILL and RPROTCOMPRESS but these are incompatible with i386 ABI */
 
 #define SNDZERO		(1<<0)
 #define SNDPIPE		(1<<1)

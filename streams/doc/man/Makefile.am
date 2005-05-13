@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/11 20:08:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/05/12 20:58:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/11 20:08:00 $ by $Author: brian $
+# Last Modified $Date: 2005/05/12 20:58:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -308,6 +308,7 @@ man_MANS = \
 	man9/__cmin_search.9 \
 	man9/cminsw_list.9 \
 	man9/cmn_err.9 \
+	man9/cmn_err_tag.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
 	man9/copymsg.9 \
@@ -392,6 +393,7 @@ man_MANS = \
 	man9/getminor.9 \
 	man9/getq.9 \
 	man9/get_sleep_lock.9 \
+	man9/icmn_err.9 \
 	man9/identify.9 \
 	man9/_info.9 \
 	man9/_init.9 \
@@ -713,6 +715,7 @@ man_MANS = \
 	man9/pipe.9 \
 	man9/power.9 \
 	man9/printf.9 \
+	man9/printf_UW7.9 \
 	man9/probe.9 \
 	man9/pullupmsg.9 \
 	man9/put.9 \
@@ -740,6 +743,7 @@ man_MANS = \
 	man9/qprocsoff.9 \
 	man9/qprocson.9 \
 	man9/qpush.9 \
+	man9/qready.9 \
 	man9/qreply.9 \
 	man9/qsize.9 \
 	man9/qtimeout.9 \
@@ -783,6 +787,8 @@ man_MANS = \
 	man9/SAMESTR.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
+	man9/sealloc.9 \
+	man9/sefree.9 \
 	man9/setq.9 \
 	man9/setqsched.9 \
 	man9/sleep.9 \
@@ -1135,6 +1141,7 @@ dist_noinst_MANS = \
 	man9/__cmin_search.9.man \
 	man9/cminsw_list.9.man \
 	man9/cmn_err.9.man \
+	man9/cmn_err_tag.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
 	man9/copymsg.9.man \
@@ -1219,6 +1226,7 @@ dist_noinst_MANS = \
 	man9/getminor.9.man \
 	man9/getq.9.man \
 	man9/get_sleep_lock.9.man \
+	man9/icmn_err.9.man \
 	man9/identify.9.man \
 	man9/_info.9.man \
 	man9/_init.9.man \
@@ -1540,6 +1548,7 @@ dist_noinst_MANS = \
 	man9/pipe.9.man \
 	man9/power.9.man \
 	man9/printf.9.man \
+	man9/printf_UW7.9.man \
 	man9/probe.9.man \
 	man9/pullupmsg.9.man \
 	man9/put.9.man \
@@ -1567,6 +1576,7 @@ dist_noinst_MANS = \
 	man9/qprocsoff.9.man \
 	man9/qprocson.9.man \
 	man9/qpush.9.man \
+	man9/qready.9.man \
 	man9/qreply.9.man \
 	man9/qsize.9.man \
 	man9/qtimeout.9.man \
@@ -1610,6 +1620,8 @@ dist_noinst_MANS = \
 	man9/SAMESTR.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
+	man9/sealloc.9.man \
+	man9/sefree.9.man \
 	man9/setq.9.man \
 	man9/setqsched.9.man \
 	man9/sleep.9.man \

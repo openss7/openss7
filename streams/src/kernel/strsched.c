@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/11 20:12:21 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/05/12 20:58:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:21 $ by $Author: brian $
+ Last Modified $Date: 2005/05/12 20:58:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/11 20:12:21 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/05/12 20:58:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/11 20:12:21 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/05/12 20:58:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1063,6 +1063,26 @@ static struct strevent *find_event(int event_id)
 	read_unlock_irqrestore(&event_hash_lock, flags);
 	return (*sep);
 }
+
+/**
+ *  sealloc:	- allocate a stream event structure
+ */
+struct strevent *sealloc(void)
+{
+	return event_alloc(SE_STREAM, NULL);
+}
+EXPORT_SYMBOL(sealloc);
+
+/**
+ *  sefree:	- deallocate a stream event structure
+ *  @se:	the stream event structure to deallocate
+ */
+int sefree(struct strevent *se)
+{
+	event_free(se);
+	return (0);
+}
+EXPORT_SYMBOL(sefree);
 
 #if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
     !defined CONFIG_STREAMS_COMPAT_AIX_MODULE && \
@@ -2127,6 +2147,8 @@ static void clear_shinfo(struct shinfo *sh)
 	sd->sd_rdopt = RNORM | RPROTNORM;
 	sd->sd_wropt = 0;
 	sd->sd_eropt = RERRNORM | WERRNORM;
+	sd->sd_closetime = sysctl_str_cltime;
+//	sd->sd_rtime = sysctl_str_rtime;
 	init_waitqueue_head(&sd->sd_waitq);
 	slockinit(sd);
 //	init_MUTEX(&sd->sd_mutex);
