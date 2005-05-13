@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/04/01 03:30:15 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/05/13 03:54:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 03:30:15 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:54:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,6 +103,7 @@ dnl PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/include -
 dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
 dnl fi
+dnl PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
@@ -114,6 +115,7 @@ dnl fi
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
 dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl

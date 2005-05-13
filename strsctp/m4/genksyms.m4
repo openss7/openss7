@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/29 17:19:14 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/05/13 03:47:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/29 17:19:14 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:47:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -272,6 +272,21 @@ MODPOST_INPUTS="$MODPOST_INPUTS"
 # =============================================================================
 
 # =============================================================================
+# _KSYMS_OUTPUT_MODVER_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_KSYMS_OUTPUT_MODVER_CONFIG], [dnl
+    AC_CONFIG_COMMANDS([modvers], [dnl
+	AC_MSG_NOTICE([creating $MODVERSIONS_H])
+	mkdir -p -- $PKGINCL
+	touch $MODVERSIONS_H
+    ], [dnl
+PKGINCL="$PKGINCL"
+MODVERSIONS_H="$MODVERSIONS_H"
+    ])
+])# _KSYMS_OUTPUT_MODVER_CONFIG
+# =============================================================================
+
+# =============================================================================
 # _KSYMS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_OUTPUT], [dnl
@@ -279,7 +294,11 @@ AC_DEFUN([_KSYMS_OUTPUT], [dnl
 dnl _KSYMS_OUTPUT_MODSYMS_CONFIG
     if test :${linux_cv_k_ko_modules:-no} = :yes ; then
 	_KSYMS_OUTPUT_MODPOST_CONFIG
+    else
+	MODVERSIONS_H="${PKGINCL}/modversions.h"
+	_KSYMS_OUTPUT_MODVER_CONFIG
     fi
+    AC_SUBST([MODVERSIONS_H])dnl
 ])# _KSYMS_OUTPUT
 # =============================================================================
 

@@ -4278,6 +4278,7 @@ int	lis_thread_runqueues(void *p)
     current->rt_priority = 50 ;		/* middle value real-time priority */
     sigfillset(&MY_BLKS) ;		/* block all signals */
     sigdelset(&MY_BLKS, SIGKILL) ;	/* enable KILL */
+#if CONFIG_SMP
 #if defined(SET_CPUS_ALLOWED)
 # if defined(KERNEL_2_5)
     set_cpus_allowed(current, cpumask_of_cpu(cpu_id)) ;
@@ -4286,6 +4287,7 @@ int	lis_thread_runqueues(void *p)
 # endif
 #else
     current->cpus_allowed = (1 << cpu_id) ;	/* older 2.4 kernels */
+#endif
 #endif
 
 #if defined(KERNEL_2_5)

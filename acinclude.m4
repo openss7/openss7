@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/03/16 11:54:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/13 03:54:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/16 11:54:36 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:54:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -204,11 +204,11 @@ AC_DEFUN([_OS7_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
-    _LINUX_STREAMS
-    _XNS
-    _XTI
-    _INET
-    _SCTP
+dnl _LINUX_STREAMS
+dnl _XNS
+dnl _XTI
+dnl _INET
+dnl _SCTP
 ])# _OS7_SETUP
 # =============================================================================
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2005/05/11 20:10:21 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/05/13 03:57:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
+ Last Modified $Date: 2005/05/13 03:57:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:10:21 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/13 03:57:39 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -222,11 +222,11 @@ __SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 __SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
-#if HAVE_READ_TRYLOCK
+#if CONFIG_SMP && HAVE_READ_TRYLOCK
 	if (read_trylock(lockp))
 		return (old_pl);
 #else
-#if HAVE_WRITE_TRYLOCK
+#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
@@ -243,7 +243,7 @@ __SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 __SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
-#if HAVE_WRITE_TRYLOCK
+#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
 	if (write_trylock(lockp))
 		return (old_pl);
 #else

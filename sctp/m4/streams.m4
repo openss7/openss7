@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/04/01 03:22:33 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/05/13 03:47:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/01 03:22:33 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:47:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,6 +81,7 @@ dnl
     m4_ifdef([_LINUX_KERNEL], [_LINUX_STREAMS_KERNEL])
     _LINUX_STREAMS_OUTPUT
     AC_SUBST([STREAMS_CPPFLAGS])
+    AC_SUBST([STREAMS_MODFLAGS])
     AC_SUBST([STREAMS_LDADD])
     AC_SUBST([STREAMS_MODMAP])
     AC_SUBST([STREAMS_SYMVER])
@@ -145,6 +146,22 @@ AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
 	    if test :"${streams_cv_lfs_includes:-no}" != :no 
 	    then
 		streams_cv_config="$streams_cv_lfs_config"
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for streams include modversions file], [streams_cv_modversions], [dnl
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no 
+	then
+	    if test :"${streams_cv_lis_includes:-no}" != :no 
+	    then
+		streams_cv_modversions="$streams_cv_lis_modversions"
+	    fi
+	fi
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
+	then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no 
+	    then
+		streams_cv_modversions="$streams_cv_lfs_modversions"
 	    fi
 	fi
     ])
@@ -229,6 +246,10 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
     if test :"${streams_cv_config:-no}" != :no
     then
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-include ${streams_cv_config}"
+    fi
+    if test :"${streams_cv_modversions:-no}" != :no
+    then
+	STREAMS_MODFLAGS="${STREAMS_MODFLAGS}${STREAMS_MODFLAGS:+ }-include ${streams_cv_modversions}"
     fi
     AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_lis_includes:-no}" != :no])
     AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_lfs_includes:-no}" != :no])
@@ -350,7 +371,7 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume no
 		    # old place for modversions
 		    if test -f "$streams_dir/$streams_what" 
 		    then
-			streams_cv_lis_modversions='yes'
+			streams_cv_lis_modversions="$streams_dir/$streams_what"
 			break
 		    fi
 		    # new place for modversions
@@ -360,7 +381,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			then
 			    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
-			    streams_cv_lis_modversions='yes'
+			    streams_cv_lis_modversions="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			    break
 			fi
 		    fi
@@ -496,7 +517,7 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume no
 		    # old place for modversions
 		    if test -f "$streams_dir/$streams_what" 
 		    then
-			streams_cv_lfs_modversions='yes'
+			streams_cv_lfs_modversions="$streams_dir/$streams_what"
 			break
 		    fi
 		    # new place for modversions
@@ -506,7 +527,7 @@ dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will jus
 			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			then
 			    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
-			    streams_cv_lfs_modversions='yes'
+			    streams_cv_lfs_modversions="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what"
 			    break
 			fi
 		    fi

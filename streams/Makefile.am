@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/04/25 07:21:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/05/13 03:54:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/25 07:21:39 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:54:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -604,8 +604,6 @@ test_streams_CFLAGS		= $(LFS_CFLAGS)
 endif
 ## RPM_BUILD_USER
 endif
-
-PKGINCL				= include/sys/$(PACKAGE_NAME)
 
 AUTOCONFIG_H			= include/sys/config.h
 

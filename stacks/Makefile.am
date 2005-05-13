@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/04/12 00:04:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/05/13 03:54:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/12 00:04:52 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 03:54:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -973,8 +973,6 @@ INSTALL_EXEC_HOOK += install-inet-devices
 UNINSTALL_HOOK += uninstall-inet-devices
 
 .PHONY: install-inet-devices uninstall-inet-devices
-
-PKGINCL				= include/sys/$(PACKAGE_NAME)
 
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
 ##
