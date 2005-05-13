@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tri.7.man,v 0.9.2.5 2005/03/30 13:39:44 brian Exp $
+.\" @(#) $Id: tri.7.man,v 0.9.2.6 2005/05/13 09:33:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/03/30 13:39:44 $ by $Author: brian $
+.\" Modified $Date: 2005/05/13 09:33:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -54,6 +54,15 @@ sort-adjacent-labels
 .PP
 .B TRI
 \- Transaction Interface
+.SH SYNOPSIS
+.PP
+.B #include <sys/tri.h>
+.HP
+.BI "int " tri_stream " = open(" tri_device ", " flags );
+.HP
+.BI "int " tri_xtistr " = t_open(" tri_device ", " flags);
+.HP
+.BI "int " tri_socket " = socket(" pfamily ", " socktype ", " protocol );
 .SH DESCRIPTION
 .
 .

@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: iperf.macros,v 1.1.2.4 2005/05/12 20:54:40 brian Exp $
+.\" @(#) $Id: iperf.macros,v 1.1.2.5 2005/05/13 09:49:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/12 20:54:40 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:49:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -77,7 +77,7 @@ Trademarks mentioned are the property of their owners.
 .if !'\\*([T'' \{\
 .hy 4
 .if !'\\*([R'' \{\
-.\"\fB\\*([R\fR,
+\fB\\*([R\fR,
 .rm [R
 .\}
 \fI\\*([T\fR\c
@@ -301,7 +301,7 @@ The OpenSS7 Project http://www.openss7.org/
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 .PP
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -315,7 +315,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -331,7 +331,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -347,7 +347,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 .PP
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -361,7 +361,7 @@ All Rights Reserved.
 .SH IDENTIFICATION
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 .PP
 \f(HRCopyright \(co 1997-2005 OpenSS7 Corp.
 .br
@@ -377,7 +377,7 @@ All Rights Reserved.
 .SH "VERSIONS"
 .PP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.4 $); $Date: 2005/05/12 20:54:40 $.
+.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.2.5 $); $Date: 2005/05/13 09:49:43 $.
 ..
 .de AU
 .SH "AUTHOR"

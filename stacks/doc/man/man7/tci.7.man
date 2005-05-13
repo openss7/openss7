@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tci.7.man,v 0.9.2.6 2005/03/30 13:39:43 brian Exp $
+.\" @(#) $Id: tci.7.man,v 0.9.2.7 2005/05/13 09:33:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/03/30 13:39:43 $ by $Author: brian $
+.\" Modified $Date: 2005/05/13 09:33:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -53,13 +53,22 @@ sort-adjacent-labels
 .SH NAME
 .B TCI
 \- Transaction Component Interface
+.SH SYNOPSIS
+.PP
+.B #include <sys/tci.h>
+.HP
+.BI "int " tci_stream " = open(" tci_device ", " flags );
+.HP
+.BI "int " tci_xtistr " = t_open(" tci_device ", " flags);
+.HP
+.BI "int " tci_socket " = socket(" pfamily ", " socktype ", " protocol );
 .SH DESCRIPTION
 .PP
 This document specifies a
 .IR STREAMS (4)-based
 kernel-level instantiation of the ITU-T Q.771 TCAP  TC service definition.
 .[
-q.771
+q771
 .]
 The Transaction Component Interace (TCI) enable the user of a TCAP/ROSE service to access and use
 any of a variety of conforming TCAP/ROSE service providers without specific knowledge of the
@@ -78,7 +87,7 @@ x.210
 .]
 the Transaction Capabilities Application Part (Q.771),
 .[
-q.771
+q771
 .]
 ISO/CCITT Remote Operations Service Element (ROSE) service (X.219),
 .[
@@ -96,7 +105,7 @@ Application Part
 .BR "" ( tcap (4))
 for ITU-T applications as described in ITU-T Recommendation Q.771.
 .[
-q.771
+q771
 .]
 .B TCI also supportes the Remote Operations Service Element (ROSE) described in ITU-T Recommendation
 X.219.
@@ -109,7 +118,7 @@ transaction component service.
 .PP
 The Transaction Component Sub-Layer
 .[
-q.771
+q771
 .]
 provides a subset of the ROSE services interface.
 .[
@@ -126,7 +135,7 @@ user at the boundary between the trasnaction component sub-layer and the applica
 component user entity.
 For TCAP, this is the interface between the TC sub-layer and the TC-user.
 .[
-q.771
+q771
 .]
 For ISO/OSI, this is the interface between the ROSE
 .[

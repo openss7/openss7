@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: x400p.4.man,v 0.9.2.4 2005/03/30 13:39:21 brian Exp $
+.\" @(#) $Id: x400p.4.man,v 0.9.2.5 2005/05/13 09:33:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:21 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -350,9 +350,10 @@ Two drivers is confusing and the deprecated driver must be removed.
 .BR <ss7/mxi_ioctl.h> .
 .SH VERSIONS
 .PP
-This manpage was updated $Date: 2005/03/30 13:39:21 $ for
-.B strss7
-release $Name:  $($Revision: 0.9.2.4 $).
+This manpage was updated @PACKAGE_DATE@ for
+.B @PACKAGE@
+release
+.BR "@VERSION@" .
 .PP
 The
 .B X400P

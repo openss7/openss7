@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_mtp.3.man,v 0.9.2.5 2005/03/30 13:39:14 brian Exp $
+.\" @(#) $Id: xti_mtp.3.man,v 0.9.2.6 2005/05/13 09:33:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,12 +53,12 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
 .R1
-bracket-label "\fR [\fB" "\fR]" "\fR, \fB"
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
 database strss7.refs
 accumulate
@@ -98,10 +98,9 @@ sort-adjacent-labels
 .BI "int " mtp_xtistr " = t_open(" \fR/dev/mtp-tpi-co\fI ", " flags );
 .\"
 .\"
-.SH DESCRIPTION
+.SH OVERVIEW
 .PP
-This manual section describes the protocol-specific information that is
-relevant for MTP
+This manual section describes the protocol-specific information that is relevant for MTP
 .[
 q704
 .]
@@ -114,8 +113,8 @@ t1.111
 .[
 jtq704
 .]
-transport providers.  This section also describes the
-protocol-specific information that is relevant when MTP services
+transport providers; it describes the protocol-specific information that is relevant when MTP
+services
 .[
 q701
 .]
@@ -128,12 +127,9 @@ or TALI
 .[
 TALI
 .]
-.RB ( tali (4)).
-.\"
-.\"
-.PP
-This section also defines the data structures and constants required for MTP
-transport providers that are exposed through the XTI/TLI
+.RB ( tali (4));
+and it defines the data structures and constants required for MTP transport providers that are
+exposed through the XTI/TLI
 .[
 xti
 .]
@@ -142,6 +138,34 @@ xns
 .]
 .B <xti_mtp.h>
 header file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XTI-MTP
+is an
+.I X/Open Transport Interface
+.[
+xti
+.]
+.[
+xns
+.]
+based interface with specific support of the Signalling System Number 7, Message Transfer Part
+protocol.
+.[
+q704
+.]
+.[
+mtpv1
+.]
+.[
+t1.111
+.]
+.[
+jtq704
+.]
 .\"
 .\"
 .SH "ADDRESS FORMAT"
@@ -846,7 +870,7 @@ For pseudo-connection oriented services providers, these XTI/TLI calls will fail
 return -1 and set
 .IR t_errno (3)
 to
-.BR [ TNOTSUPPORT ].
+.RB [ TNOTSUPPORT ].
 .SS \fB\)t_unbind\fR(3)
 .PP
 This function operates as described in
@@ -858,23 +882,6 @@ This function operates as described in
 MTP does not support a true connection-oriented mode, but supports the concept
 of the establishment of a signalling relation between two endpoints in the SS7
 network.
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
-.BR m3ua (4),
-.BR mtp (4),
-.BR tali (4),
-.BR sockets (3),
-.BR t_errno (3),
-.BR t_optmgmt (3),
-.BR t_rcvudata (3),
-.BR t_rcvvudata (3),
-.BR t_sndudata (3),
-.BR t_sndvudata (3),
-.BR xnet (3),
-.BR xti (3),
-.BR xti_ss7 (3).
 .\"
 .\"
 .SH DEVICES
@@ -910,17 +917,50 @@ For more information on the SIGTRAN M3UA device, see
 .BR m3ua (4).
 .\"
 .\"
-.SH VERSIONS
+.SH "SEE ALSO"
+.PP
+.BR m3ua (4),
+.BR mtp (4),
+.BR tali (4),
+.BR sockets (3),
+.BR t_errno (3),
+.BR t_optmgmt (3),
+.BR t_rcvudata (3),
+.BR t_rcvvudata (3),
+.BR t_sndudata (3),
+.BR t_sndvudata (3),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ss7 (3).
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 The
-.B MTP-TPI
+.B XTI-MTP
 driver is specific to the
-.B OpenSS7
-stack.
-This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
 .[
 xns
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-MTP interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

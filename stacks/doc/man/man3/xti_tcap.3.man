@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.6 2005/03/30 13:39:15 brian Exp $
+.\" @(#) $Id: xti_tcap.3.man,v 0.9.2.7 2005/05/13 09:33:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -100,19 +100,69 @@ sort-adjacent-labels
 .BI "int " tcap_xistr " = t_open(" device ", " flags );
 .\"
 .\"
-.SH DESCRIPTION
+.SH OVERVIEW
 .PP
-This section describes the protocol-sepcific information that is relevant of
-TCAP transport providers.  This section also described the protoocl-specific
-information that is relevant when TCAP services are provider over an IP
-network using SUA or TALI.
-.\"
-.\"
-.PP
-This section also defines the data structure and constants required for TCAP
-transport provider that are exposed through the
+This section describes the protocol-sepcific information that is relevant for TCAP
+.[
+q771
+.]
+.[
+tcapv2
+.]
+.[
+t1.114
+.]
+transport providers; it describes the protoocl-specific information that is relevant when TCAP
+services
+.[
+q771
+.]
+are provided over an IP network using TUA
+.[
+tua-02
+.]
+.RB ( tua (4))
+or TALI
+.[
+TALI
+.]
+.RB ( tali (4));
+and it defines the data structure and constants required for TCAP transport provider that are
+exposed through the XTI/TLI
+.[
+xti
+.]
+.[
+xns
+.]
 .B <xti_tcap.h>
 header file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XTI-TCAP
+is an
+.I X/Open Transport Interface
+.[
+xti
+.]
+.[
+xns
+.]
+based interface with specific support of the Signalling System Number 7,
+Transaction Capabilities Application Part
+protocol.
+.[
+q771
+.]
+.[
+tcapv2
+.]
+.[
+t1.114
+.]
 .\"
 .\"
 .SH "ADDRESS FORMATS"
@@ -286,15 +336,7 @@ Application Part, yeat are used by SS7 protocol levels representing MTP Users.
 .\"
 .SH CAVEATS
 .PP
-.\"
-.\"
-.SH "SEE ALSO"
-.PP
-.BR xnet (3),
-.BR xti (3),
-.BR xti_ss7 (3),
-.BR xti_mtp (3),
-.BR xti_sccp (3).
+This manual page is incomplete.
 .\"
 .\"
 .SH DEVICES
@@ -315,16 +357,42 @@ For more information on the SIGTRAN TUA device, see
 .BR tua (4).
 .\"
 .\"
-.SH VERSIONS
+.SH "SEE ALSO"
+.PP
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ss7 (3),
+.BR xti_mtp (3),
+.BR xti_sccp (3).
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 The
-.B TCAP-TPI
+.B XTI-TCAP
 driver is specific to the
-.BR OpenSS7
-stack.  This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
 .[
 xns
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-TCAP interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

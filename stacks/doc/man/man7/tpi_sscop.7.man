@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: tpi_sscop.7.man,v 0.9.2.4 2005/03/30 13:39:44 brian Exp $
+.\" @(#) $Id: tpi_sscop.7.man,v 0.9.2.5 2005/05/13 09:33:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:44 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -75,6 +75,99 @@ sort-adjacent-labels
 .SH NAME
 .B tpi_sscop
 \- Transport Provider Interface (TPI) \- Service Specific Connection Oriented Protocol (SSCOP) Corrigendum
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/tpi.h>
+.br
+.B #include <sys/tpi_sscop.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B TPI-SSCOP
+provides a stream supporting the Transport Provider Interface
+.RB ( tpi (7))
+to the Service Specific Connection Oriented Protocol
+.RB ( sscop (4)).
+This
+.IR STREAMS (4)
+interface provides the
+.BR sscop (4)
+protocol service interface using the T-primitives of the
+.BR tpi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR tpi (7)
+interface such as the
+.BR xti (3)
+.BR timod (4)
+and the
+.BR sockets (3)
+.BR sockmod (4)
+or
+.BR socksys (4).
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+.\"
+.\"
+.SH "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+.\"
+.\"
+.SH "PROTOCOL SERVICE PRIMITIVES"
+.PP
+.\"
+.\"
+.SH "IOCTLS"
+.PP
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+.\"
+.\"
+.SH "ERRORS"
+.PP
+.\"
+.\"
+.SH "CAVEATS"
+.PP
+This manual page is incomplete.
+.\"
+.\"
+.SH AUTHOR
+.PP
+Brian F. G. Bidulock <bidulock@openss7.org>
+.br
+The OpenSS7 Project http://www.openss7.org
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage describes Version 2 of the
+.BR TPI-SSCOP
+interface.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sscop (4),
+.BR tpi (7),
+.BR streamio (2),
+.BR putmsg (2),
+.BR getmsg (2),
+.BR putpmsg (2),
+.BR getpmsg (2),
+.BR read (2),
+.BR write (2).
+.\"
+.\"
 .XX
 .[
 tpi Revision 2.0.0

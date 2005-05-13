@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: cci_sipt.7.man,v 0.9.2.4 2005/03/30 13:39:41 brian Exp $
+.\" @(#) $Id: cci_sipt.7.man,v 0.9.2.5 2005/05/13 09:33:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/03/30 13:39:41 $ by $Author: brian $
+.\" Modified $Date: 2005/05/13 09:33:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -50,6 +50,245 @@ sort-adjacent-labels
 .\"
 .\"
 .TH CCI-SIPT 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Call Control Interface (CCI)"
+.\"
+.\"
 .SH NAME
+.B CCI-SIPT
+\- Call Control Interface \- Corrgendum for SIP-T Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/cci.h>
+.br
+.B #include <ss7/sipt.h>
+.br
+.B #include <ss7/sipt_ioctl.h>
+.HP
+.BI "int " sipt_stream " = open(" \fR/dev/sipt\fI ", " flags );
+.\"
+.\"
 .SH DESCRIPTION
+.PP
+This Corrigendum describes the formats and rules that are specific to SIP-T.
+.[
+sipt-rfc
+.]
+The Corrigendum must be used along with the generic CCI as defined in the main
+document when implementing a CCS provider that will be configured with the SIP-T
+call processing layer.
+.\"
+.\"
+.SS "Primitives and Rules for SIP-T Conformance"
+.PP
+The following are the rules that apply to the CCI primitives for SIP-T
+compatibility.
+.\"
+.\"
+.SS "CALL CONTROL ADDRESSES"
+.PP
+.\"
+.\"
+.PP
+.B "Format"
+.\"
+.\"
+.PP
+The format of call control addresses is as follows:
+.\"
+.\"
+.PP
+.B "Parameters"
+.\"
+.\"
+.TP
+.I "cc_addr_length:"
+Specifies or indicates the length of the call control address.  If a call
+control address is not included in the primitive, this parameter must be coded
+zero (0).
+.\"
+.\"
+.TP
+.I "cc_addr_offset:"
+Specifies or indicates the offset of the address from the begining of the
+primitive.  If a call control address is not included with the primitive, this
+parameter must be coded zero (0).
+.\"
+.\"
+.PP
+.B "Address Format"
+.\"
+.\"
+.PP
+The format of the call control addresses for Q.764 conforming CCS providers is
+as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct sipt_addr {
+} sipt_addr_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.PP
+.B "Address Fields"
+.\"
+.\"
+.SS "OPTIONAL PARAMETERS"
+.PP
+.\"
+.\"
+.PP
+.B "Format"
+.\"
+.\"
+.PP
+The format of the optional parameters for SIP-T conforming CCS providers is as
+follows:
+.\"
+.\"
+.PP
+.B "Parameters"
+.\"
+.\"
+.TP
+.I "cc_opt_length:"
+Specifies or indicates the length of the optional parameters associated with
+the primitive.  For SIP-T conforming CCS providers, the format of the optional
+parameters is the format of the Optional Headers as specified in SIP-T.
+.\"
+.\"
+.TP
+.I "cc_opt_offset:"
+Specifies the offset of the optional parameters from the beginning of the
+block.
+.\"
+.\"
+.PP
+.B "Rules"
+.\"
+.\"
+.PP
+Rules for optional parameters:
+.\"
+.\"
+.IP \(em 4
+The optional parameters provided by the CCS user may be checked for syntax by
+the CCS provider.  If the CCS provider discovers a syntax error in the format
+of the optional parameters, the CCS provider should respond with a
+.BR CC_ERROR_ACK (7)
+primitive with error
+.RB [ CCBADOPT ].
+.\"
+.\"
+.IP \(em 4
+For some primitives, specific optional parameters might be interpreted by the
+CCS provider and alter the function of some primitives.  See the specific
+primitive descriptions later in this Corrigendum.
+.\"
+.\"
+.IP \(em 4
+Except for optional parameters interpreted by the CCS provider as specified
+later in this Corrigendum, the optional parameters are treated as opaque and
+the optional parameter list is only checked for syntax.  Opaque parameters
+will be passed to the SIP message without examination by the CCS provider.
+.\"
+.\"
+.IP \(em 4
+To perform specific functions, additional optional parameters may be added to
+SIP-T messages by the CCS provider.
+.\"
+.\"
+.IP \(em 4
+To perform specific functions, optional parameters may be modified by the CCS
+provider before being added to SIP-T messages.
+.\"
+.\"
+.SH "Local Management Primitives"
+.PP
+.SS CC_INFO_ACK
+.SS CC_BIND_REQ
+.SS CC_BIND_ACK
+.SS CC_OPTMGMT_REQ
+.SH "Call Setup Primitives"
+.PP
+.SS CC_SETUP_REQ
+.SS CC_SETUP_IND
+.SS CC_SETUP_RES
+.SS CC_SETUP_CON
+.SS CC_CALL_REATTEMPT_IND
+.SS CC_SETUP_COMPLETE_REQ
+.SS CC_SETUP_COMPLETE_IND
+.SH "Continuity Check Phase"
+.PP
+.SS CC_CONT_CHECK_REQ
+.SS CC_CONT_CHECK_IND
+.SS CC_CONT_TEST_REQ
+.SS CC_CONT_TEST_IND
+.SS CC_CONT_REPORT_REQ
+.SS CC_CONT_REPORT_IND
+.SH "Call Establishment Primitives"
+.PP
+.SS CC_MORE_INFO_REQ
+.SS CC_MORE_INFO_IND
+.SS CC_INFORMATION_REQ
+.SS CC_INFORMATION_IND
+.SS CC_INFO_TIMEOUT_IND
+.SS CC_PROCEEDING_REQ
+.SS CC_PROCEEDING_IND
+.SS CC_ALERTING_REQ
+.SS CC_ALERTING_IND
+.SS CC_PROGRESS_REQ
+.SS CC_PROGRESS_IND
+.SS CC_IBI_REQ
+.SS CC_IBI_IND
+.SH "Call Established Primitives"
+.PP
+.SS CC_SUSPEND_REQ
+.SS CC_SUSPEND_IND
+.SS CC_SUSPEND_RES
+.SS CC_SUSPEND_REJECT_REQ
+.SS CC_RESUME_REQ
+.SS CC_RESUME_IND
+.SS CC_RESUME_RES
+.SS CC_RESUME_REJECT_REQ
+.SH "Call Termination Primitives"
+.PP
+.SS CC_REJECT_REQ
+.SS CC_CALL_FAILURE_IND
+.SS CC_DISCONNECT_REQ
+.SS CC_RELEASE_REQ
+.SS CC_RELEASE_IND
+.SH "Management Primitives"
+.PP
+.SS CC_RESTART_REQ
+.SS CC_RESET_REQ
+.SS CC_RESET_IND 
+.SS CC_RESET_RES
+.SS CC_RESET_CON
+.SS CC_BLOCKING_REQ
+.SS CC_BLOCKING_IND
+.SS CC_BLOCKING_RES
+.SS CC_BLOCKING_CON
+.SS CC_UNBLOCKING_REQ
+.SS CC_UNBLOCKING_IND
+.SS CC_UNBLOCKING_RES
+.SS CC_UNBLOCKING_CON
+.SS CC_QUERY_REQ
+.SS CC_QUERY_IND
+.SS CC_QUERY_RES
+.SS CC_QUERY_CON
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/cci.h> ,
+.BR <ss7/cci_ioctl.h> .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
 

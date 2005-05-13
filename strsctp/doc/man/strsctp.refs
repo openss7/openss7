@@ -115,946 +115,6 @@
 %N journal issue number
 %X annotation (separate paragraph after citation)
 
-%L RFC 1321
-%A Ronald L. Rivest
-%E Ronald L. Rivest
-%Q Internet Engineering Task Force
-%T The MD5 Message-Digest Algorithm
-%R RFC 1321
-%D April 1992
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc1321.txt
-
-%L RFC 1349
-%A Philip Almquist
-%E Philip Almquist
-%Q Internet Engineering Task Force
-%T Type of Service in the Internet Protocol Suite
-%R RFC 1349
-%D July 1992
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc1349.txt
-
-%L RFC 2119
-%A Scott Bradner
-%E Scott Bradner
-%Q Internet Engineering Task Force
-%T Key words for use in RFCs to Indicate Requirement Levels
-%R RFC 2119 \(em BCP 14
-%D March 1997
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2119.txt
-
-%L RFC 2126
-%A Y. Pouffray
-%A A. Young
-%E Y. Pouffray
-%T ISO Transport Service on top of TCP (ITOT)
-%R RFC 2126
-%D March 1997
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2126.txt
-
-%L RFC 2196
-%A Barbara Y. Frazer
-%E Barbara Y. Frazer
-%Q Internet Engineering Task Force
-%T Site Security Handbook
-%R RFC 2196
-%D September 1997
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2196.txt
-
-%L RFC 2246
-%A Time Dierke
-%A Christopher Allen
-%E Time Dierke
-%Q The Internet Society
-%T The TLS Protocol \(em Version 1.0
-%R RFC 2246
-%D January 1999
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2246.txt
-
-%L RFC 2279
-%A Francois Yergenau
-%Q Internet Engineering Task Force
-%T UTF-8, a transformation format of ISO 10646
-%Q The Internet Society
-%R RFC 2279
-%D January 1998
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2279.txt
-
-%L RFC 2401
-%K ipsec
-%A Stephen Kent
-%A Randall Atkinson
-%E Stephen Kent
-%Q Internet Engineering Task Force
-%T Security Architecture for the Internet Protocol
-%Q The Internet Society
-%R RFC 2401
-%D November 1998
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2401.txt
-
-%L RFC 2406
-%K ipsecesp
-%A Stephen Kent
-%A Randall Atkinson
-%E Stephen Kent
-%Q Internet Engineering Task Force
-%T IP Encapsulating Security Payload (ESP)
-%Q The Internet Society
-%R RFC 2406
-%D November 1998
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2406.txt
-
-%L RFC 2407
-%K ipsecdoi
-%A Derrell Piper
-%Q Internet Engineering Task Force
-%T The Internet IP Security Domain of Interpretation for ISAKMP
-%Q The Internet Society
-%R RFC 2407
-%D November 1998
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2407.txt
-
-%L RFC 2409
-%K ike
-%A Dan Harkins
-%A Dave Carrel
-%E Dan Harkins
-%Q Internet Engineering Task Force
-%T The Internet Key Exchange (IKE)
-%Q The Internet Society
-%R RFC 2409
-%D November 1998
-%I Internet Engineering Task Force
-%U http://www.ietf.org/rfc/rfc2409.txt
-
-%L RFC 2916
-%A Patrik Falstrom
-%Q Internet Engineering Task Force
-%T E.164 number and DNS (ENUM)
-%Q The Internet Society
-%R RFC 2916
-%D September 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2916.txt
-
-%K rfc0768
-%L RFC 768
-%A J. Postel
-%E J. Postel
-%Q Information Sciences Institute, University of Southern California
-%T User Datagram Protocol
-%R RFC 768
-%D August 28, 1980
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc0768.txt
-
-%K rfc0793
-%L RFC 793
-%Q Information Sciences Institute, University of Southern California
-%T Transmission Control Protocol, DARPA Internet Program, Protocol Specification
-%R RFC 793
-%D September 1981
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc0793.txt
-
-%K rfc1122
-%L RFC 1122
-%E Robert Braden
-%T Requirements for Internet Hosts -- Communication Layers
-%Q The Internet Society
-%R RFC 1122
-%D October 1989
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc1122.txt
-
-%K rfc2001
-%L RFC 2001
-%A W. Richard Stevens
-%E W. Richard Stevens
-%T TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery Algorithms
-%Q The Internet Society
-%R RFC 2001
-%D January 1997
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2001.txt
-
-%L RFC 2960
-%A Randall R. Stewart
-%A Qiaobing Xie
-%A Ken Morneault
-%A Chip Sharp
-%A Hanns Juergen Schwarzbauer
-%A Tom Taylor
-%A Ian Rytina
-%A Hallewar Kalla
-%A Lixia Zhang
-%A Vern Paxson
-%E Randall R. Stewart
-%T Stream Control Transmission Protocol (SCTP)
-%Q The Internet Society
-%R RFC 2960
-%D February 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2960.txt
-
-%L RFC 3309
-%A Jonathan Stone
-%A Randall R. Stewart
-%A Douglas Otis
-%E Jonathan Stone
-%T Stream Control Transmission Protocol (SCTP) Checksum Change
-%Q The Internet Society
-%R RFC 3309
-%D September 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3309.txt
-
-%K rfc3168
-%L RFC 3168
-%A K. K. Ramakrishnan
-%A Sally Floyd
-%A David L. Black
-%E K. K. Ramakrishnan
-%T The Addition of Explicit Congestion Notification (ECN) to IP
-%Q The Internet Society
-%R RFC 3168
-%D September 2001
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3168.txt
-
-%L RFC 3436
-%A Adreas Jungmaier
-%A Eric Rescorla
-%A Michael Tuexen
-%E Adreas Jungmaier
-%T Transport Layer Security over Stream Control Transmission Protocol
-%Q The Internet Society
-%R RFC 3436
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3436.txt
-
-%K rfc2976
-%L RFC 2976
-%R RFC 2976
-%A Steve Donovan
-%E Steve Donovan
-%Q The Internet Society
-%T The SIP INFO Method
-%D October 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2976.txt
-
-%K rfc3204
-%L RFC 3204
-%R RFC 3204
-%A Eric Zimmerer
-%A Aparna Vemuri
-%A Jon Peterson
-%A Lyndon Ong
-%A Francois Audet
-%A Ho Zonoun
-%A M. Watson
-%E Eric Zimmerer
-%Q The Internet Society
-%T MIME Media Types for ISUP and QSIG Objects
-%D December 2001
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3204.txt
-
-%K rfc3261
-%K siprfc
-%L RFC 3261
-%R RFC 3261
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Gonzalo Camarillo
-%A Alan Johnston
-%A Jon Peterson
-%A Robert Sparks
-%A Mark Handley
-%A Eve Schooler
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T SIP: Session Initiation Protocol
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3261.txt
-
-%K rfc3262
-%L RFC 3262
-%R RFC 3262
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3262.txt
-
-%K rfc3263
-%L RFC 3263
-%R RFC 3263
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Session Initiation Protocol (SIP): Locating SIP Servers
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3263.txt
-
-%K rfc3265
-%L RFC 3265
-%R RFC 3265
-%A Adam Roach
-%E Adam Roach
-%Q The Internet Society
-%T Session Initiation Protocol (SIP)-Specific Event Notification
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3265.txt
-
-%K rfc3361
-%L RFC 3361
-%R RFC 3361
-%A Henning Schulzrinne
-%E Henning Schulzrinne
-%Q The Internet Society
-%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
-%D August 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3361.txt
-
-%K rfc3310
-%L RFC 3310
-%R RFC 3310
-%A Aki Niemi
-%A Jari Arkko
-%A Vesa Torvinen
-%E Aki Niemi
-%Q The Internet Society
-%T Hypertext Transfer Protocol (HTTP) Digest Authentication Using Authentication and Key Agreement (AKA)
-%D September 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3310.txt
-
-%K rfc3311
-%L RFC 3311
-%R RFC 3311
-%A Jonathan Rosenberg
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T The Session Initiation Protocol UPDATE Method
-%D September 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3311.txt
-
-%K rfc3312
-%L RFC 3312
-%R RFC 3312
-%A Gonzalo Camarillo
-%A Bill Marshall
-%A Jonathan Rosenberg
-%E Gonzalo Camarillo
-%Q The Internet Society
-%T Integration of Resource Management and Session Initiation Protocol (SIP)
-%D October 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3312.txt
-
-%K rfc3420
-%L RFC 3420
-%R RFC 3420
-%A Robert J. Sparks
-%E Robert J. Sparks
-%Q The Internet Society
-%T Internet Media Type message/sipfrag
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3420.txt
-
-%K rfc3323
-%L RFC 3323
-%R RFC 3323
-%A Jon Peterson
-%E Jon Peterson
-%Q The Internet Society
-%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3323.txt
-
-%K rfc3325
-%L RFC 3325
-%R RFC 3325
-%A Cullen Jennings
-%A Jon Peterson
-%A Mark Watson
-%E Cullen Jennings
-%Q The Internet Society
-%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3325.txt
-
-%K rfc3428
-%L RFC 3428
-%R RFC 3428
-%A Ben Campbell
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Christian Huitema
-%A David Gurle
-%E Ben Campbell
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension for Instant Messaging
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3428.txt
-
-%K rfc3326
-%L RFC 3326
-%R RFC 3326
-%A Henning Schulzrinne
-%A David R. Oran
-%A Gonzalo Camarillo
-%E Henning Schulzrinne
-%Q The Internet Society
-%T The Reason Header Field for the Session Initiation Protocol (SIP)
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3326.txt
-
-%K rfc3327
-%L RFC 3327
-%R RFC 3327
-%A Dean Willis
-%A Bernie Hoeneisen
-%E Dean Willis
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3327.txt
-
-%K rfc3329
-%L RFC 3329
-%R RFC 3329
-%A Jari Arkko
-%A Vesa Torvinen
-%A Gonzalo Camarillo
-%A Aki Niemi
-%A Tao Haukka
-%E Jari Arkko
-%Q The Internet Society
-%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
-%D January 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3329.txt
-
-%K rfc3313
-%L RFC 3313
-%R RFC 3313
-%A Bill Marshall
-%E Bill Marshall
-%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
-%D January 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3313.txt
-
-%K rfc3515
-%L RFC 3515
-%R RFC 3515
-%A Robert J. Sparks
-%E Robert J. Sparks
-%Q The Internet Society
-%T The Session Initiation Protocol (SIP) Refer Method
-%D April 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3515.txt
-
-%K rfc3525
-%L RFC 3525
-%R RFC 3525
-%A Terry L. Anderson
-%A Christian Groves
-%A Marcello Pantaleo
-%A Tom Taylor
-%E Tom Taylor
-%T Gateway Control Protocol Version 1
-%D June 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3525.txt
-
-%K rfc3015
-%L RFC 3015
-%R RFC 3015
-%A F. Cuervo, et al
-%E F. Cuervo
-%T Megaco Protocol Version 1.0
-%D November 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3015.txt
-
-%K rfc2886
-%L RFC 2886
-%R RFC 2886
-%A Tom Taylor
-%E Tom Taylor
-%T Megaco Errata
-%D August 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2886.txt
-
-%K rfc2885
-%L RFC 2885
-%R RFC 2885
-%A F. Cuervo, et al
-%E F. Cuervo
-%T Megaco Protocol Version 0.8
-%D August 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2885.txt
-
-%K rfc2805
-%L RFC 2805
-%R RFC 2805
-%A Nancy Greene, et al
-%E Nancy Greene
-%T Media Gateway Control Protocol Architecture and Requirements
-%D April 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2805.txt
-
-%K rfc2897
-%L RFC 2897
-%R RFC 2897
-%A Nancy Greene, et al
-%E Nancy Greene
-%T Proposal for an MGCP Advanced Audio Package
-%D August 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2897.txt
-
-%K rfc3054
-%L RFC 3054
-%R RFC 3054
-%A Peter Blatherwick, et al
-%E Peter Blatherwick
-%T Megaco IP Phone Media Gateway Application Profile
-%D January 2001
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3054.txt
-
-%K rfc3064
-%L RFC 3064
-%R RFC 3064
-%A B. Foster, et al
-%E B. Foster
-%T MCGP CAS Package
-%D February 2001
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3064.txt
-
-%K rfc3149
-%L RFC 3149
-%R RFC 3149
-%A A. Srinath, et al
-%E A. Srinath
-%T MGCP Business Phone Package
-%D September 2001
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3149.txt
-
-%K rfc3435
-%L RFC 3435
-%R RFC 3435
-%A F. Andreasen
-%A B. Foster
-%E F. Andreasen
-%T Media Gateway Control Protocol (MGCP) Version 1.0
-%D January 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3435.txt
-
-%K rfc2705
-%L RFC 2705
-%R RFC 2705
-%A Mauricio Arango
-%A Andrew Dugan
-%A Isaac Elliott
-%A Christian Huitema
-%A Scott Pickett
-%E Mauricio Arango
-%T Media Gateway Control Protocol (MGCP) Version 1.0
-%D October 1999
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2705.txt
-
-%K rfc3441
-%L RFC 3441
-%R RFC 3441
-%A R. Kumar
-%E R. Kumar
-%T Asynchronous Transfer Mode (ATM) Package for the Media Gateway Control Protocol (MGCP)
-%D January 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3441.txt
-
-%K rfc1889
-%L RFC 1889
-%R RFC 1889
-%A Henry Shulzrinne
-%A Stephen L. Casner
-%A Ron Frederick
-%A Van Jacobson
-%E Henry Shulzrinne
-%T RTP: A Transport Protocol for Real-Time Application
-%D January 1996
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc1889.txt
-
-%K rfc2959
-%L RFC 2959
-%R RFC 2959
-%A Mark Baugher
-%A Bill Strahm
-%A Irina Suconick
-%E Mark Baugher
-%T Real-Time Transport Protocol Management Information Base
-%D October 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2959.txt
-
-%K rfc3158
-%L RFC 3158
-%R RFC 3158
-%A Colin Perkins
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Colin Perkins
-%T RTP Testing Strategies
-%D August 2001
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3158.txt
-
-%K rfc3267
-%L RFC 3267
-%R RFC 3267
-%A Johan Sjoberg
-%A Magnus Westerlund
-%A Ari Lakaniemi
-%A Qiaobing Xie
-%E Johan Sjoberg
-%T Real-Time Transport Protocol (RTP) Payload Format and File Storage Format for the Adaptive Multi-Rate (AMR) and Adaptive Multi-Rate Wideband (AMR-WB) Audio Codecs
-%D June 2002
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3267.txt
-
-%K tali
-%K rfc3094
-%L RFC 3094
-%R RFC 3094
-%A David Sprague
-%A Dan Brendes
-%A Robby Benedyk
-%A Joe Keller
-%E David Sprague
-%T Tekelec's Transport Adapter Layer Interface
-%D April 2001
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3094.txt
-
-%K rfc2976
-%L RFC 2976
-%R RFC 2976
-%A Steve Donovan
-%E Steve Donovan
-%Q The Internet Society
-%T The SIP INFO Method
-%D October 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2976.txt
-
-%K rfc3204
-%L RFC 3204
-%R RFC 3204
-%A Eric Zimmerer
-%A Aparna Vemuri
-%A Jon Peterson
-%A Lyndon Ong
-%A Francois Audet
-%A Ho Zonoun
-%A M. Watson
-%E Eric Zimmerer
-%Q The Internet Society
-%T MIME Media Types for ISUP and QSIG Objects
-%D December 2001
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3204.txt
-
-%K rfc3261
-%K siprfc
-%L RFC 3261
-%R RFC 3261
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Gonzalo Camarillo
-%A Alan Johnston
-%A Jon Peterson
-%A Robert Sparks
-%A Mark Handley
-%A Eve Schooler
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T SIP: Session Initiation Protocol
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3261.txt
-
-%K rfc3262
-%L RFC 3262
-%R RFC 3262
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3262.txt
-
-%K rfc3263
-%L RFC 3263
-%R RFC 3263
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T Session Initiation Protocol (SIP): Locating SIP Servers
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3263.txt
-
-%K rfc3265
-%L RFC 3265
-%R RFC 3265
-%A Adam Roach
-%E Adam Roach
-%Q The Internet Society
-%T Session Initiation Protocol (SIP)-Specific Event Notification
-%D June 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3265.txt
-
-%K rfc3311
-%L RFC 3311
-%R RFC 3311
-%A Jonathan Rosenberg
-%E Jonathan Rosenberg
-%Q The Internet Society
-%T The Session Initiation Protocol UPDATE Method
-%D September 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3311.txt
-
-%K rfc3312
-%L RFC 3312
-%R RFC 3312
-%A Gonzalo Camarillo
-%A Bill Marshall
-%A Jonathan Rosenberg
-%E Gonzalo Camarillo
-%Q The Internet Society
-%T Integration of Resource Management and Session Initiation Protocol (SIP)
-%D October 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3312.txt
-
-%K rfc3313
-%L RFC 3313
-%R RFC 3313
-%A Bill Marshall
-%E Bill Marshall
-%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
-%D January 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3313.txt
-
-%K rfc3323
-%L RFC 3323
-%R RFC 3323
-%A Jon Peterson
-%E Jon Peterson
-%Q The Internet Society
-%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3323.txt
-
-%K rfc3325
-%L RFC 3325
-%R RFC 3325
-%A Cullen Jennings
-%A Jon Peterson
-%A Mark Watson
-%E Cullen Jennings
-%Q The Internet Society
-%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
-%D November 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3325.txt
-
-%K rfc3326
-%L RFC 3326
-%R RFC 3326
-%A Henning Schulzrinne
-%A David R. Oran
-%A Gonzalo Camarillo
-%E Henning Schulzrinne
-%Q The Internet Society
-%T The Reason Header Field for the Session Initiation Protocol (SIP)
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3326.txt
-
-%K rfc3327
-%L RFC 3327
-%R RFC 3327
-%A Dean Willis
-%A Bernie Hoeneisen
-%E Dean Willis
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3327.txt
-
-%K rfc3329
-%L RFC 3329
-%R RFC 3329
-%A Jari Arkko
-%A Vesa Torvinen
-%A Gonzalo Camarillo
-%A Aki Niemi
-%A Tao Haukka
-%E Jari Arkko
-%Q The Internet Society
-%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
-%D January 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3329.txt
-
-%K rfc3361
-%L RFC 3361
-%R RFC 3361
-%A Henning Schulzrinne
-%E Henning Schulzrinne
-%Q The Internet Society
-%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
-%D August 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3361.txt
-
-%K rfc3372
-%K bcp63
-%L BCP 63
-%R BCP 63 (RFC 3372)
-%A Aparna Vemuri
-%A Jon Peterson
-%E Aparna Vemuri
-%T Session Initiation Protocol for Telephones (SIP-T): Context and Architectures
-%D September 2002
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/bcp/bcp63.txt
-
-%K rfc3398
-%L RFC 3398
-%R RFC 3398
-%A Gonzalo Camarillo
-%A Adam Roach
-%A Jon Peterson
-%A Lyndon Ong
-%E Gonzalo Camarillo
-%T Integrated Services Digital Network (ISDN) User Part (ISUP) to Session Initiation Protocol (SIP) Mapping
-%D December 2002
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3398.txt
-
-%K rfc3428
-%L RFC 3428
-%R RFC 3428
-%A Ben Campbell
-%A Jonathan Rosenberg
-%A Henning Schulzrinne
-%A Christian Huitema
-%A David Gurle
-%E Ben Campbell
-%Q The Internet Society
-%T Session Initiation Protocol (SIP) Extension for Instant Messaging
-%D December 2002
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3428.txt
-
-%K rfc3515
-%L RFC 3515
-%R RFC 3515
-%A Robert J. Sparks
-%E Robert J. Sparks
-%Q The Internet Society
-%T The Session Initiation Protocol (SIP) Refer Method
-%D April 2003
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3515.txt
-
-%K rfc3666
-%K bcp76
-%L BCP 76
-%R BCP 76 (RFC 3666)
-%A Alan Johnston
-%A Steve Donovan
-%A Robert Sparks
-%A Chris Cunningham
-%A Kevin Summers
-%E Alan Johnston
-%T Session Initiation Protocol (SIP) Public Switched Telephone Network (PSTN) Call Flows
-%D December 2003
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/bcp/bcp76.txt
-
 %L SIPT
 %R draft-ietf-sipping-sipt-04.txt
 %A Aparna Vemuri
@@ -1080,74 +140,6 @@
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sipping-isup-06.txt
-
-%K preSPIRITS
-%K rfc2995
-%L RFC 2995
-%R RFC 2995
-%A Hui-Lan Lu
-%A Igor Faynberg
-%A John Voelker
-%A Mark Weissman
-%A Weizhong Zhang
-%A Sung-Yurn Rhim
-%A Jinkyung Hwang
-%A Shinji Ago
-%A S. Moeenuddin
-%A S. Hadvani
-%A Soren Nyckelgard
-%A John Yoakum
-%A Lewis Robart
-%E Hui-Lan Lu
-%T Pre-SPIRITS Implementations of PSTN-initiated Services
-%D November 2000
-%Q The Internet Society
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2995.txt
-
-%K rfc3136
-%L RFC 3136
-%R RFC 3136
-%A Lev Slutsman
-%A Igor Faynberg
-%A Mark Weissman
-%E Lev Slutsman
-%Q The Internet Society
-%I The Internet Society
-%T The SPIRITS Architecture
-%D June 2001
-%U http://www.ietf.org/rfc/rfc3136.txt
-
-%K rfc3199
-%L RFC 3199
-%R RFC 3199
-%E Igor Faynberg
-%A Igor Faynberg
-%A Jorge Gato
-%A Hui-Lan Lu
-%A Lev Slutsman
-%Q The Internet Society
-%I The Internet Society
-%T Service in the Public Switched Telephone Newtork/Intelligent Network (PSTN/IN) Requesting %InTernet Service (SPIRITS) Protocol Requirements
-%D August 2002
-%U http://www.ietf.org/rfc/rfc3199.txt
-
-%K rfc3910
-%L RFC 3910
-%R RFC 3910
-%E Vijay K. Gurbani
-%A Vijay K. Gurbani
-%A Alec Brusilovsky
-%A Igor Faynberg
-%A Jorge Gato
-%A Hui-Lan Lu
-%A Musa Unmehopa
-%Q The Internet Society
-%I The Internet Society
-%T The SPIRITS (Services in PSTN requesting Internet Services) Protocol
-%D October 2004
-%U http://www.ietf.org/rfc/rfc3910.txt
-
 
 %K bob
 %L SMull
@@ -1502,21 +494,6 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U %http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-00.txt
 
-%K M2UA-RFC
-%L M2UA
-%A Ken Morneault
-%A Ram Dantu
-%A Greg Sidebottom
-%A Brian Bidulock
-%A Jacob Heitz
-%E Ken Morneault
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) \(em User Adaptation Layer
-%R RFC 3331
-%D September, 2002
-%I Internet Engineering Task Force \(em Signalling Transport Working Group
-%U http://www.ietf.org/rfc/rfc3331.txt
-
 %L M3UA
 %A Greg Sidebottom
 %A Guy Mousseau
@@ -1601,18 +578,6 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m3ua-12.txt
-
-%K M3UA-RFC
-%L M3UA
-%A Greg Sidebottom
-%A Ken Morneault
-%A Javier Pastor-Balbas, (eds)
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) \(em User Adaptation Layer (M3UA)
-%R RFC 3332
-%D September, 2002
-%I Internet Engineering Task Force \(em Signalling Transport Working Group
-%U http://www.ietf.org/rfc/rfc3332.txt
 
 %K SUA15
 %L SUA15
@@ -1736,10 +701,11 @@ Part 1: Protocol Specification
 %E Brian Bidulock, (ed)
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 ISUP-User Adaptation Layer (ISUA)
-%R <draft-bidulock-sigtran-isua-01.txt>
+%R draft-bidulock-sigtran-isua-01.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-isua-01.txt
 
 %K isua-00
 %L ISUA
@@ -1759,10 +725,11 @@ Part 1: Protocol Specification
 %E Brian Bidulock, (ed)
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T SS7 TCAP-User Adaptation Layer (TUA)
-%R <draft-bidulock-sigtran-tua-02.txt>
+%R draft-bidulock-sigtran-tua-02.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-tua-02.txt
 
 %K tua-01
 %L TUA01
@@ -1824,20 +791,6 @@ Part 1: Protocol Specification
 %D May 2003
 %I The Internet Society
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3057bis-00.txt
-
-%K IUA-RFC
-%L IUA
-%A Ken Morneault
-%A Selvam Rengasami
-%A Melleswar Kalla
-%A Greg Sidebottom
-%E Ken Morneault
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T ISDN Q.921-User Adaptation Layer
-%R RFC 3057
-%D November, 2000
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3057.txt
 
 %K dua-05
 %L DUA
@@ -2000,12 +953,24 @@ Part 1: Protocol Specification
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
-%R <draft-bidulock-sigtran-corid-02.txt>
+%R draft-bidulock-sigtran-corid-02.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-02.txt
 
 %K corid-01
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-01.txt
+%D January 2002
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-01.txt
+
+%K corid-00
 %L CORID
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
@@ -2016,25 +981,16 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-00.txt
 
-%K corid-00
-%L CORID
-%A Brian Bidulock
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
-%R <draft-bidulock-sigtran-corid-00.txt>
-%D January 2002
-%O Work In Progress.
-%I Internet Engineering Task Force \(em Signalling Transport Working Group
-
 %K sessid-02
 %L SESSID
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Session Identification for SS7 Signalling User Adaptation Layers
-%R <draft-bidulock-sigtran-sessid-02.txt>
+%R draft-bidulock-sigtran-sessid-02.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-02.txt
 
 %K sessid-01
 %L SESSID
@@ -2063,70 +1019,77 @@ Part 1: Protocol Specification
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
-%R <draft-bidulock-sigtran-regext-02.txt>
+%R draft-bidulock-sigtran-regext-02.txt
 %D July 26 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-02.txt
 
 %K regext-01
 %L REGEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
-%R <draft-bidulock-sigtran-regext-01.txt>
+%R draft-bidulock-sigtran-regext-01.txt
 %D January 2, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-01.txt
 
 %K regext-00
 %L REGEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
-%R <draft-bidulock-sigtran-regext-00.txt>
+%R draft-bidulock-sigtran-regext-00.txt
 %D January 2002
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-00.txt
 
 %K loadsel-02
 %L LOADSEL
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
-%R <draft-bidulock-sigtran-loadsel-02.txt>
+%R draft-bidulock-sigtran-loadsel-02.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-02.txt
 
 %K loadsel-01
 %L LOADSEL
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
-%R <draft-bidulock-sigtran-loadsel-01.txt>
+%R draft-bidulock-sigtran-loadsel-01.txt
 %D January 2, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-01.txt
 
 %K loadsel-00
 %L LOADSEL
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
-%R <draft-bidulock-sigtran-loadsel-00.txt>
+%R draft-bidulock-sigtran-loadsel-00.txt
 %D January 2002
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-00.txt
 
 %K loadgrp-02
 %L LOADGRP
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
-%R <draft-bidulock-sigtran-loadgrp-02.txt>
+%R draft-bidulock-sigtran-loadgrp-02.txt
 %D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-02.txt
 
 %K loadgrp-01
 %L LOADGRP
@@ -2160,36 +1123,6 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %O (Previously "CCITT Recommendation")
-
-%K rfc2719
-%L RFC 2719
-%A Lyndon Ong
-%A Ian Rytina
-%A Matt Holdrege
-%A Lode Coene
-%A Miguel-Angel Garcia
-%A Chip Sharp
-%A Imre Juhasz
-%A Huai-an Paul Lin
-%A HannsJuergen Schwarzbauer
-%E Lyndon Ong
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T Framework Architecture for Signaling Transport
-%R RFC 2719
-%D October, 1999
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2719.txt
-
-%L RFC 2434
-%A Thomas Narten
-%A Herald Tveit Alvestrand
-%E Thomas Narten
-%Q Internet Engineering Task Force
-%T Guidelines for Writing an IANA Considerations Section in RFCs
-%R RFC 2434
-%D October, 1998
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc2434.txt
 
 %K m2pa-09
 %L M2PA09
@@ -3220,32 +2153,6 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Transport Area Working Group
 %U http://www.ietf.org/internet-drafts/draft-minshall-nagle-01.txt
 
-%L RFC 791
-%Q Internet Engineering Task Force \(em Network Working Group
-%T Internet Protocol \(em DARPA Internet Program \(em Protocol Specification
-%R RFC 791
-%D September 1981
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc0791.txt
-
-%L RFC 896
-%A John Nagle
-%Q Internet Engineering Task Force \(em Network Working Group
-%T Congestion control in IP/TCP Internetworks
-%R RFC 896
-%D January 6, 1984
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc0896.txt
-
-%L RFC 813
-%A D. Clark
-%Q Internet Engineering Task Force \(em Network Working Group
-%T Window and Acknowledgment Strategy in TCP
-%R RFC 813
-%D July, 1982
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc0813.txt
-
 %L SVID
 %R SVID
 %K svid
@@ -3616,20 +2523,6 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-prsctp-00.txt
 
-%L RFC 3758
-%A Randall R. Stewart
-%A Michael A. Ramalho
-%A Qiaobing Xie
-%A Michael Tuexen
-%A Phillip T. Conrad
-%E Randall R. Stewart
-%Q Internet Engineering Task Force
-%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
-%R RFC 3758
-%D May 2004
-%I The Internet Society
-%U http://www.ietf.org/rfc/rfc3758.txt
-
 %K addip-07
 %L ADDIP07
 %A Randall R. Stewart
@@ -3871,17 +2764,942 @@ Part 1: Protocol Specification
 %I OpenSS7 Corporation
 %U http://www.openss7.org/docs/mxi.pdf
 
-%K strxns
-%L STRXNS
-%A Brian F. G. Bidulock
-%E Brian F. G. Bidulock
-%Q OpenSS7 Corporation
-%T OpenSS7 XNS Networking - Installation and Reference Manual
-%R strxns Revision 0.9.2
-%N Edition 0.9.2, Release 1
-%C Edmonton
-%D August 2004
-%I The OpenSS7 Project
-%U http://www.openss7.org/docs/strxns.pdf
+%K rfc768
+%L RFC 768
+%A J. Postel
+%E J. Postel
+%Q Information Sciences Institute, University of Southern California
+%T User Datagram Protocol
+%R RFC 768
+%D August 28, 1980
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0768.txt
 
+%K rfc791
+%L RFC 791
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Internet Protocol \(em DARPA Internet Program \(em Protocol Specification
+%R RFC 791
+%D September 1981
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0791.txt
+
+%K rfc793
+%L RFC 793
+%Q Information Sciences Institute, University of Southern California
+%T Transmission Control Protocol, DARPA Internet Program, Protocol Specification
+%R RFC 793
+%D September 1981
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0793.txt
+
+%K rfc813
+%L RFC 813
+%A D. Clark
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Window and Acknowledgment Strategy in TCP
+%R RFC 813
+%D July, 1982
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0813.txt
+
+%K rfc896
+%L RFC 896
+%A John Nagle
+%Q Internet Engineering Task Force \(em Network Working Group
+%T Congestion control in IP/TCP Internetworks
+%R RFC 896
+%D January 6, 1984
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0896.txt
+
+%K rfc1122
+%L RFC 1122
+%E Robert Braden
+%T Requirements for Internet Hosts -- Communication Layers
+%Q The Internet Society
+%R RFC 1122
+%D October 1989
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1122.txt
+
+%K rfc1321
+%L RFC 1321
+%A Ronald L. Rivest
+%E Ronald L. Rivest
+%Q Internet Engineering Task Force
+%T The MD5 Message-Digest Algorithm
+%R RFC 1321
+%D April 1992
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1321.txt
+
+%K rfc1349
+%L RFC 1349
+%A Philip Almquist
+%E Philip Almquist
+%Q Internet Engineering Task Force
+%T Type of Service in the Internet Protocol Suite
+%R RFC 1349
+%D July 1992
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1349.txt
+
+%K rfc1889
+%L RFC 1889
+%R RFC 1889
+%A Henry Shulzrinne
+%A Stephen L. Casner
+%A Ron Frederick
+%A Van Jacobson
+%E Henry Shulzrinne
+%Q Internet Engineering Task Force
+%T RTP: A Transport Protocol for Real-Time Application
+%D January 1996
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1889.txt
+
+%K rfc2001
+%L RFC 2001
+%A W. Richard Stevens
+%E W. Richard Stevens
+%T TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery Algorithms
+%Q Internet Engineering Task Force
+%R RFC 2001
+%D January 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2001.txt
+
+%K rfc2119
+%L RFC 2119
+%A Scott Bradner
+%E Scott Bradner
+%Q Internet Engineering Task Force
+%T Key words for use in RFCs to Indicate Requirement Levels
+%R RFC 2119 \(em BCP 14
+%D March 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2119.txt
+
+%K rfc2126
+%L RFC 2126
+%A Y. Pouffray
+%A A. Young
+%E Y. Pouffray
+%Q Internet Engineering Task Force
+%T ISO Transport Service on top of TCP (ITOT)
+%R RFC 2126
+%D March 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2126.txt
+
+%K rfc2196
+%L RFC 2196
+%A Barbara Y. Frazer
+%E Barbara Y. Frazer
+%Q Internet Engineering Task Force
+%T Site Security Handbook
+%R RFC 2196
+%D September 1997
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2196.txt
+
+%K rfc2246
+%L RFC 2246
+%A Time Dierke
+%A Christopher Allen
+%E Time Dierke
+%Q Internet Engineering Task Force
+%T The TLS Protocol \(em Version 1.0
+%R RFC 2246
+%D January 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2246.txt
+
+%K rfc2279
+%L RFC 2279
+%A Francois Yergenau
+%Q Internet Engineering Task Force
+%T UTF-8, a transformation format of ISO 10646
+%R RFC 2279
+%D January 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2279.txt
+
+%L RFC 2401
+%K ipsec
+%A Stephen Kent
+%A Randall Atkinson
+%E Stephen Kent
+%Q Internet Engineering Task Force
+%T Security Architecture for the Internet Protocol
+%R RFC 2401
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2401.txt
+
+%L RFC 2406
+%K ipsecesp
+%A Stephen Kent
+%A Randall Atkinson
+%E Stephen Kent
+%Q Internet Engineering Task Force
+%T IP Encapsulating Security Payload (ESP)
+%R RFC 2406
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2406.txt
+
+%L RFC 2407
+%K ipsecdoi
+%A Derrell Piper
+%Q Internet Engineering Task Force
+%T The Internet IP Security Domain of Interpretation for ISAKMP
+%R RFC 2407
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2407.txt
+
+%L RFC 2409
+%K ike
+%A Dan Harkins
+%A Dave Carrel
+%E Dan Harkins
+%Q Internet Engineering Task Force
+%T The Internet Key Exchange (IKE)
+%R RFC 2409
+%D November 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2409.txt
+
+%L RFC 2434
+%A Thomas Narten
+%A Herald Tveit Alvestrand
+%E Thomas Narten
+%Q Internet Engineering Task Force
+%T Guidelines for Writing an IANA Considerations Section in RFCs
+%R RFC 2434
+%D October, 1998
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2434.txt
+
+%K rfc2705
+%L RFC 2705
+%R RFC 2705
+%A Mauricio Arango
+%A Andrew Dugan
+%A Isaac Elliott
+%A Christian Huitema
+%A Scott Pickett
+%E Mauricio Arango
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol (MGCP) Version 1.0
+%D October 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2705.txt
+
+%K rfc2719
+%L RFC 2719
+%A Lyndon Ong
+%A Ian Rytina
+%A Matt Holdrege
+%A Lode Coene
+%A Miguel-Angel Garcia
+%A Chip Sharp
+%A Imre Juhasz
+%A Huai-an Paul Lin
+%A HannsJuergen Schwarzbauer
+%E Lyndon Ong
+%Q Internet Engineering Task Force
+%T Framework Architecture for Signaling Transport
+%R RFC 2719
+%D October, 1999
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2719.txt
+
+%K rfc2805
+%L RFC 2805
+%R RFC 2805
+%A Nancy Greene, et al
+%E Nancy Greene
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol Architecture and Requirements
+%D April 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2805.txt
+
+%K rfc2885
+%L RFC 2885
+%R RFC 2885
+%A F. Cuervo, et al
+%E F. Cuervo
+%Q Internet Engineering Task Force
+%T Megaco Protocol Version 0.8
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2885.txt
+
+%K rfc2886
+%L RFC 2886
+%R RFC 2886
+%A Tom Taylor
+%E Tom Taylor
+%Q Internet Engineering Task Force
+%T Megaco Errata
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2886.txt
+
+%K rfc2897
+%L RFC 2897
+%R RFC 2897
+%A Nancy Greene, et al
+%E Nancy Greene
+%Q Internet Engineering Task Force
+%T Proposal for an MGCP Advanced Audio Package
+%D August 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2897.txt
+
+%L RFC 2916
+%A Patrik Falstrom
+%Q Internet Engineering Task Force
+%T E.164 number and DNS (ENUM)
+%R RFC 2916
+%D September 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2916.txt
+
+%K rfc2959
+%L RFC 2959
+%R RFC 2959
+%A Mark Baugher
+%A Bill Strahm
+%A Irina Suconick
+%E Mark Baugher
+%Q Internet Engineering Task Force
+%T Real-Time Transport Protocol Management Information Base
+%D October 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2959.txt
+
+%L RFC 2960
+%A Randall R. Stewart
+%A Qiaobing Xie
+%A Ken Morneault
+%A Chip Sharp
+%A Hanns Juergen Schwarzbauer
+%A Tom Taylor
+%A Ian Rytina
+%A Hallewar Kalla
+%A Lixia Zhang
+%A Vern Paxson
+%E Randall R. Stewart
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP)
+%R RFC 2960
+%D February 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2960.txt
+
+%K rfc2976
+%L RFC 2976
+%R RFC 2976
+%A Steve Donovan
+%E Steve Donovan
+%Q Internet Engineering Task Force
+%T The SIP INFO Method
+%D October 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2976.txt
+
+%K preSPIRITS
+%K rfc2995
+%L RFC 2995
+%R RFC 2995
+%A Hui-Lan Lu
+%A Igor Faynberg
+%A John Voelker
+%A Mark Weissman
+%A Weizhong Zhang
+%A Sung-Yurn Rhim
+%A Jinkyung Hwang
+%A Shinji Ago
+%A S. Moeenuddin
+%A S. Hadvani
+%A Soren Nyckelgard
+%A John Yoakum
+%A Lewis Robart
+%E Hui-Lan Lu
+%Q Internet Engineering Task Force
+%T Pre-SPIRITS Implementations of PSTN-initiated Services
+%D November 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2995.txt
+
+%K rfc3015
+%L RFC 3015
+%R RFC 3015
+%A F. Cuervo, et al
+%E F. Cuervo
+%Q Internet Engineering Task Force
+%T Megaco Protocol Version 1.0
+%D November 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3015.txt
+
+%K rfc3054
+%L RFC 3054
+%R RFC 3054
+%A Peter Blatherwick, et al
+%E Peter Blatherwick
+%Q Internet Engineering Task Force
+%T Megaco IP Phone Media Gateway Application Profile
+%D January 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3054.txt
+
+%K IUA-RFC
+%L IUA
+%A Ken Morneault
+%A Selvam Rengasami
+%A Melleswar Kalla
+%A Greg Sidebottom
+%E Ken Morneault
+%Q Internet Engineering Task Force
+%T ISDN Q.921-User Adaptation Layer
+%R RFC 3057
+%D November, 2000
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3057.txt
+
+%K rfc3064
+%L RFC 3064
+%R RFC 3064
+%A B. Foster, et al
+%E B. Foster
+%Q Internet Engineering Task Force
+%T MCGP CAS Package
+%D February 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3064.txt
+
+%K tali
+%K rfc3094
+%L RFC 3094
+%R RFC 3094
+%A David Sprague
+%A Dan Brendes
+%A Robby Benedyk
+%A Joe Keller
+%E David Sprague
+%Q Internet Engineering Task Force
+%T Tekelec's Transport Adapter Layer Interface
+%D April 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3094.txt
+
+%K rfc3136
+%L RFC 3136
+%R RFC 3136
+%A Lev Slutsman
+%A Igor Faynberg
+%A Mark Weissman
+%E Lev Slutsman
+%Q Internet Engineering Task Force
+%T The SPIRITS Architecture
+%D June 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3136.txt
+
+%K rfc3149
+%L RFC 3149
+%R RFC 3149
+%A A. Srinath, et al
+%E A. Srinath
+%Q Internet Engineering Task Force
+%T MGCP Business Phone Package
+%D September 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3149.txt
+
+%K rfc3158
+%L RFC 3158
+%R RFC 3158
+%A Colin Perkins
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Colin Perkins
+%Q Internet Engineering Task Force
+%T RTP Testing Strategies
+%D August 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3158.txt
+
+%K rfc3168
+%L RFC 3168
+%A K. K. Ramakrishnan
+%A Sally Floyd
+%A David L. Black
+%E K. K. Ramakrishnan
+%Q Internet Engineering Task Force
+%T The Addition of Explicit Congestion Notification (ECN) to IP
+%R RFC 3168
+%D September 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3168.txt
+
+%K rfc3199
+%L RFC 3199
+%R RFC 3199
+%E Igor Faynberg
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Lev Slutsman
+%Q Internet Engineering Task Force
+%T Service in the Public Switched Telephone Newtork/Intelligent Network (PSTN/IN) Requesting %InTernet Service (SPIRITS) Protocol Requirements
+%D August 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3199.txt
+
+%K rfc3204
+%L RFC 3204
+%R RFC 3204
+%A Eric Zimmerer
+%A Aparna Vemuri
+%A Jon Peterson
+%A Lyndon Ong
+%A Francois Audet
+%A Ho Zonoun
+%A M. Watson
+%E Eric Zimmerer
+%Q Internet Engineering Task Force
+%T MIME Media Types for ISUP and QSIG Objects
+%D December 2001
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3204.txt
+
+%K rfc3261
+%K siprfc
+%L RFC 3261
+%R RFC 3261
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Gonzalo Camarillo
+%A Alan Johnston
+%A Jon Peterson
+%A Robert Sparks
+%A Mark Handley
+%A Eve Schooler
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T SIP: Session Initiation Protocol
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3261.txt
+
+%K rfc3262
+%L RFC 3262
+%R RFC 3262
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T Reliability of Provisional Responses in the Session Initiation Protocol (SIP)
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3262.txt
+
+%K rfc3263
+%L RFC 3263
+%R RFC 3263
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP): Locating SIP Servers
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3263.txt
+
+%K rfc3265
+%L RFC 3265
+%R RFC 3265
+%A Adam Roach
+%E Adam Roach
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP)-Specific Event Notification
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3265.txt
+
+%K rfc3267
+%L RFC 3267
+%R RFC 3267
+%A Johan Sjoberg
+%A Magnus Westerlund
+%A Ari Lakaniemi
+%A Qiaobing Xie
+%E Johan Sjoberg
+%Q Internet Engineering Task Force
+%T Real-Time Transport Protocol (RTP) Payload Format and File Storage Format for the Adaptive Multi-Rate (AMR) and Adaptive Multi-Rate Wideband (AMR-WB) Audio Codecs
+%D June 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3267.txt
+
+%L RFC 3309
+%A Jonathan Stone
+%A Randall R. Stewart
+%A Douglas Otis
+%E Jonathan Stone
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP) Checksum Change
+%R RFC 3309
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3309.txt
+
+%K rfc3310
+%L RFC 3310
+%R RFC 3310
+%A Aki Niemi
+%A Jari Arkko
+%A Vesa Torvinen
+%E Aki Niemi
+%Q Internet Engineering Task Force
+%T Hypertext Transfer Protocol (HTTP) Digest Authentication Using Authentication and Key Agreement (AKA)
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3310.txt
+
+%K rfc3311
+%L RFC 3311
+%R RFC 3311
+%A Jonathan Rosenberg
+%E Jonathan Rosenberg
+%Q Internet Engineering Task Force
+%T The Session Initiation Protocol UPDATE Method
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3311.txt
+
+%K rfc3312
+%L RFC 3312
+%R RFC 3312
+%A Gonzalo Camarillo
+%A Bill Marshall
+%A Jonathan Rosenberg
+%E Gonzalo Camarillo
+%Q Internet Engineering Task Force
+%T Integration of Resource Management and Session Initiation Protocol (SIP)
+%D October 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3312.txt
+
+%K rfc3313
+%L RFC 3313
+%R RFC 3313
+%A Bill Marshall
+%E Bill Marshall
+%Q Internet Engineering Task Force
+%T Privacy Session Initiation Protocol (SIP) Extensions for Media Authorization
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3313.txt
+
+%K rfc3323
+%L RFC 3323
+%R RFC 3323
+%A Jon Peterson
+%E Jon Peterson
+%Q Internet Engineering Task Force
+%T A Privacy Mechanism for the Session Initiation Protocol (SIP)
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3323.txt
+
+%K rfc3325
+%L RFC 3325
+%R RFC 3325
+%A Cullen Jennings
+%A Jon Peterson
+%A Mark Watson
+%E Cullen Jennings
+%Q Internet Engineering Task Force
+%T Privacy Extensions to the Session Initiation Protocol (SIP) for Asserted Identity with Trusted Networks
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3325.txt
+
+%K rfc3326
+%L RFC 3326
+%R RFC 3326
+%A Henning Schulzrinne
+%A David R. Oran
+%A Gonzalo Camarillo
+%E Henning Schulzrinne
+%Q Internet Engineering Task Force
+%T The Reason Header Field for the Session Initiation Protocol (SIP)
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3326.txt
+
+%K rfc3327
+%L RFC 3327
+%R RFC 3327
+%A Dean Willis
+%A Bernie Hoeneisen
+%E Dean Willis
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Extension Header Field for Registering Non-Adjacent Contacts
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3327.txt
+
+%K rfc3329
+%L RFC 3329
+%R RFC 3329
+%A Jari Arkko
+%A Vesa Torvinen
+%A Gonzalo Camarillo
+%A Aki Niemi
+%A Tao Haukka
+%E Jari Arkko
+%Q Internet Engineering Task Force
+%T Security Mechansim Agreement for the Session Initiation Protocol (SIP)
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3329.txt
+
+%K M2UA-RFC
+%L M2UA
+%A Ken Morneault
+%A Ram Dantu
+%A Greg Sidebottom
+%A Brian Bidulock
+%A Jacob Heitz
+%E Ken Morneault
+%Q Internet Engineering Task Force
+%T Signaling System 7 (SS7) Message Transfer Part 2 (MTP2) \(em User Adaptation Layer
+%R RFC 3331
+%D September, 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3331.txt
+
+%K M3UA-RFC
+%L M3UA
+%A Greg Sidebottom
+%A Ken Morneault
+%A Javier Pastor-Balbas, (eds)
+%Q Internet Engineering Task Force
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) \(em User Adaptation Layer (M3UA)
+%R RFC 3332
+%D September, 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3332.txt
+
+%K rfc3361
+%L RFC 3361
+%R RFC 3361
+%A Henning Schulzrinne
+%E Henning Schulzrinne
+%Q Internet Engineering Task Force
+%T Dynamic Host Configuration Protocol (DHCP-for-IPv4) Option for Session Initiation Protocol (SIP) Servers
+%D August 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3361.txt
+
+%K SIPT-RFC
+%K rfc3372
+%K bcp63
+%L BCP 63
+%R BCP 63 (RFC 3372)
+%A Aparna Vemuri
+%A Jon Peterson
+%E Aparna Vemuri
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol for Telephones (SIP-T): Context and Architectures
+%D September 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp63.txt
+
+%K rfc3398
+%L RFC 3398
+%R RFC 3398
+%A Gonzalo Camarillo
+%A Adam Roach
+%A Jon Peterson
+%A Lyndon Ong
+%E Gonzalo Camarillo
+%Q Internet Engineering Task Force
+%T Integrated Services Digital Network (ISDN) User Part (ISUP) to Session Initiation Protocol (SIP) Mapping
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3398.txt
+
+%K rfc3420
+%L RFC 3420
+%R RFC 3420
+%A Robert J. Sparks
+%E Robert J. Sparks
+%Q Internet Engineering Task Force
+%T Internet Media Type message/sipfrag
+%D November 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3420.txt
+
+%K rfc3428
+%L RFC 3428
+%R RFC 3428
+%A Ben Campbell
+%A Jonathan Rosenberg
+%A Henning Schulzrinne
+%A Christian Huitema
+%A David Gurle
+%E Ben Campbell
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Extension for Instant Messaging
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3428.txt
+
+%K rfc3435
+%L RFC 3435
+%R RFC 3435
+%A F. Andreasen
+%A B. Foster
+%E F. Andreasen
+%Q Internet Engineering Task Force
+%T Media Gateway Control Protocol (MGCP) Version 1.0
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3435.txt
+
+%K rfc3436
+%L RFC 3436
+%A Adreas Jungmaier
+%A Eric Rescorla
+%A Michael Tuexen
+%E Adreas Jungmaier
+%Q Internet Engineering Task Force
+%T Transport Layer Security over Stream Control Transmission Protocol
+%R RFC 3436
+%D December 2002
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3436.txt
+
+%K rfc3441
+%L RFC 3441
+%R RFC 3441
+%A R. Kumar
+%E R. Kumar
+%Q Internet Engineering Task Force
+%T Asynchronous Transfer Mode (ATM) Package for the Media Gateway Control Protocol (MGCP)
+%D January 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3441.txt
+
+%K rfc3515
+%L RFC 3515
+%R RFC 3515
+%A Robert J. Sparks
+%E Robert J. Sparks
+%Q Internet Engineering Task Force
+%T The Session Initiation Protocol (SIP) Refer Method
+%D April 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3515.txt
+
+%K rfc3525
+%L RFC 3525
+%R RFC 3525
+%A Terry L. Anderson
+%A Christian Groves
+%A Marcello Pantaleo
+%A Tom Taylor
+%E Tom Taylor
+%Q Internet Engineering Task Force
+%T Gateway Control Protocol Version 1
+%D June 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3525.txt
+
+%K rfc3666
+%K bcp76
+%L BCP 76
+%R BCP 76 (RFC 3666)
+%A Alan Johnston
+%A Steve Donovan
+%A Robert Sparks
+%A Chris Cunningham
+%A Kevin Summers
+%E Alan Johnston
+%Q Internet Engineering Task Force
+%T Session Initiation Protocol (SIP) Public Switched Telephone Network (PSTN) Call Flows
+%D December 2003
+%I The Internet Society
+%U http://www.ietf.org/rfc/bcp/bcp76.txt
+
+%K rfc3758
+%L RFC 3758
+%A Randall R. Stewart
+%A Michael A. Ramalho
+%A Qiaobing Xie
+%A Michael Tuexen
+%A Phillip T. Conrad
+%E Randall R. Stewart
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP) Partial Reliability Extension
+%R RFC 3758
+%D May 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3758.txt
+
+%K V5UA-RFC
+%K rfc3807
+%L V5UA
+%A Eva Weilandt
+%A Neeraj Khanchandani
+%A Sanjay Rao
+%Q Internet Engineering Task Force
+%T V5.2-User Adaption Layer (V5UA)
+%R RFC 3807
+%D June 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3807.txt
+%O Updates RFC 3057.
+
+%K SUA-RFC
+%K rfc3868
+%L SUA
+%A John Loughney
+%A Greg Sidebottom
+%A Lode Coene
+%A Gery Verwimp
+%A Joe Keller
+%A Brian Bidulock
+%E John Loughney
+%Q Internet Engineering Task Force
+%T Signalling Connection Control Part User Adaptation Layer (SUA)
+%R RFC 3868
+%D  October, 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3868.txt
+
+%K rfc3910
+%L RFC 3910
+%R RFC 3910
+%E Vijay K. Gurbani
+%A Vijay K. Gurbani
+%A Alec Brusilovsky
+%A Igor Faynberg
+%A Jorge Gato
+%A Hui-Lan Lu
+%A Musa Unmehopa
+%Q Internet Engineering Task Force
+%T The SPIRITS (Services in PSTN requesting Internet Services) Protocol
+%D October 2004
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3910.txt
 

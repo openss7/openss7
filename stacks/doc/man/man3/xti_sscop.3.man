@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.5 2005/03/30 13:39:15 brian Exp $
+.\" @(#) $Id: xti_sscop.3.man,v 0.9.2.6 2005/05/13 09:33:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -100,6 +100,9 @@ sort-adjacent-labels
 .BI "int " tcap_xistr " = t_open(" device ", " flags );
 .\"
 .\"
+.SH OVERVIEW
+.\"
+.\"
 .SH DESCRIPTION
 .\"
 .\"
@@ -115,21 +118,41 @@ sort-adjacent-labels
 .SH CAVEATS
 .\"
 .\"
+.SH DEVICES
+.\"
+.\"
 .SH "SEE ALSO"
 .BR xti (3),
 .BR xnet (3).
 .\"
 .\"
-.SH DEVICES
+.SH COMPATIBILITY
+.PP
+The
+.B XTI-SSCOP
+driver is specific to the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
-.SH VERSIONS
-.\"
-.\"
-.XX
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
 .[
 xns
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-SSCOP interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

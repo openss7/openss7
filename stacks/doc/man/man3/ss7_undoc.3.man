@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ss7_undoc.3.man,v 0.9.2.1 2005/04/01 09:54:31 brian Exp $
+.\" @(#) $Id: ss7_undoc.3.man,v 0.9.2.2 2005/05/13 09:33:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/01 09:54:31 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -71,38 +71,67 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH SS7_UNDOC 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH UNDOCUMNETED 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
 .SH NAME
 .B ss7_undoc
-\- undocumented SS7 symbols
+\- undocumented SS7 symbols and libraries
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .HP 12
 \fBundocumented_symbol\fR()
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Various.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 .hy 6
-These are undocumented SS7 symbols:
+These are undocumented SS7 symbols and libraries that still need a manual page written for them.
 .TP
 .BR cframe .
-.PD 0
-.PD
 .\"
 .\"
-.XX
-.[
-magic
-.]
-.[
-svr42
-.]
-.[
-svr4
-.]
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+These symbols and libraries need a manual page.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
 .\"
 .\"
 .[
 $LIST$
 .]
 .TI
-

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: ss7_undoc.7.man,v 0.9.2.1 2005/04/01 09:54:43 brian Exp $
+.\" @(#) $Id: ss7_undoc.7.man,v 0.9.2.2 2005/05/13 09:33:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/01 09:54:43 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:09 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -166,6 +166,8 @@ These are undocumented SS7 symbols:
 .BR rudp ,
 .TP
 .BR saal_sscop ,
+.TP
+.BR sccp_socket ,
 .TP
 .BR sccpi ,
 .TP

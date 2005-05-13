@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_ss7.3.man,v 0.9.2.5 2005/03/30 13:39:15 brian Exp $
+.\" @(#) $Id: xti_ss7.3.man,v 0.9.2.6 2005/05/13 09:33:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:08 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -104,6 +104,9 @@ sort-adjacent-labels
 .PP
 .\"
 .\"
+.SH OVERVIEW
+.\"
+.\"
 .SH DESCRIPTION
 .\"
 .\"
@@ -124,12 +127,13 @@ This option can be used with
 It is normally not possible to set or negotiate this value using the XTI/TLI
 stream.  This value is normally read-only to the XTI/TLI user stream and is set
 using management configuration IO controls on the specific driver.
-.sp 0.4v
+.RS
+.PP
 Protocol variant can be one of the following values:
-.sp 0.4v
+.PP
 .TS
 tab(:);
-lb 1 l.
+li 1 l.
 T_SS7_PVAR_ITUT88:\(em ITU-T 1988 Recommendations
 T_SS7_PVAR_ITUT93:\(em ITU-T 1993 Recommendations
 T_SS7_PVAR_ITUT96:\(em ITU-T 1996 Recommendations
@@ -144,6 +148,7 @@ T_SS7_PVAR_ANSI96:\(em ANSI 1996 Standards
 T_SS7_PVAR_ANSI00:\(em ANSI 2000 Standards
 T_SS7_PVAR_JTTC94:\(em JTTC 1994 Specifications
 .TE
+.RE
 .TP
 .B T_SS7_MPLEV
 This option is a
@@ -206,6 +211,11 @@ that it does not.
 .\"
 .\"
 .SH CAVEATS
+.PP
+This manual page is incomplete.
+.\"
+.\"
+.SH DEVICES
 .\"
 .\"
 .SH "SEE ALSO"
@@ -213,18 +223,33 @@ that it does not.
 .BR xnet (3).
 .\"
 .\"
-.SH DEVICES
-.\"
-.\"
-.SH VERSIONS
-.\"
-.\"
-.SH "CONFORMING TO"
+.SH COMPATIBILITY
 .PP
-The Open Group XNS Issue 5.2.
+The
+.B XTI-SS7
+driver is specific to the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
 .[
 xns
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-SS7 interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

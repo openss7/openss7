@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: xti_sccp.3.man,v 0.9.2.5 2005/03/30 13:39:14 brian Exp $
+.\" @(#) $Id: xti_sccp.3.man,v 0.9.2.6 2005/05/13 09:33:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,12 +53,12 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 09:33:07 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
 .R1
-bracket-label "\fR [\fB" "\fR]" "\fR, \fB"
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
 database strss7.refs
 accumulate
@@ -96,7 +96,7 @@ sort-adjacent-labels
 .BI "int " sccp_xtistr " = t_open(" \fR/dev/sccp-tpi-co\fR ", " flags );
 .\"
 .\"
-.SH DESCRIPTION
+.SH OVERVIEW
 .PP
 This manual section describes the protocol-specific information that is
 relevant for SCCP
@@ -112,7 +112,7 @@ t1.112
 .[
 jtq714
 .]
-transport providers.  This section also describes the
+transport providers; it describes the
 protocol-specific information that is relevant when SCCP services
 .[
 q711
@@ -120,17 +120,16 @@ q711
 are provided
 over an IP network using SUA
 .[
-sua15
+SUA-RFC
 .]
 .RB ( sua (4))
 or TALI
 .[
 TALI
 .]
-.RB ( tali (4)).
-.PP
-This section also defines the data structures and constants required for SCCP
-transport providers that are exposed through the XTI/TLI
+.RB ( tali (4));
+and it defines the data structures and constants required for SCCP transport providers that are
+exposed through the XTI/TLI
 .[
 xti
 .]
@@ -139,6 +138,35 @@ xns
 .]
 .B <xti_sccp.h>
 header file.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XTI-SCCP
+is an
+.I X/Open Transport Interface
+.[
+xti
+.]
+.[
+xns
+.]
+based interface with specific support of the Signalling System Number 7,
+Signalling Connection Control Part
+protocol.
+.[
+q714
+.]
+.[
+sccpv4
+.]
+.[
+t1.112
+.]
+.[
+jtq714
+.]
 .\"
 .\"
 .SH "ADDRESS FORMAT"
@@ -205,9 +233,11 @@ following values:
 .TP 24
 \fISCCP_RI_DPC_SSN\fR
 route on DPC/SSN.
+.PD 0
 .TP
 \fISCCP_RI_GT\fR
 route on Global Title.
+.PD
 .RE
 .\"
 .\"
@@ -228,6 +258,7 @@ octet.  Subsystem Numbers fill a complete 8-bit byte.
 .TP 24
 \fISCCP_SSN_UNKNOWN\fR
 unknown or unspecified.
+.PD 0
 .TP
 \fISCCP_SSN_SCMG\fR
 SCCP Management.
@@ -270,6 +301,7 @@ Broadband ISDN.
 .TP
 \fISCCP_SSN_TC_TEST\fR
 TC test.
+.PD
 .RE
 .\"
 .\"
@@ -282,6 +314,7 @@ conveys the Global Title type.
 .TP 24
 \fISCCP_GTTTYPE_NONE\fR
 no GT.
+.PD 0
 .TP
 \fISCCP_GTTTYPE_NAI\fR
 NAI only.
@@ -294,6 +327,7 @@ TT, ES and NPLAN.
 .TP
 \fISCCP_GTTTYPE_NP_NAI\fR
 TT, ES, NPLAN and NAI.
+.PD
 .RE
 .\"
 .\"
@@ -311,6 +345,7 @@ conveys the Encoding Scheme.
 .TP 24
 \fISCCP_ES_UNKNOWN\fR
 unknown.
+.PD 0
 .TP
 \fISCCP_ES_BCD_ODD\fR
 BCD, odd number of digits.
@@ -320,6 +355,7 @@ BCD, even number of digits.
 .TP
 \fISCCP_ES_NATIONAL\fR
 National specific.
+.PD
 .RE
 .\"
 .\"
@@ -332,6 +368,7 @@ conveys the Numbering Plan.
 .TP 24
 \fISCCP_NPLAN_UNKNOWN\fR
 unknown or unspecified.
+.PD 0
 .TP
 \fISCCP_NPLAN_ISDN\fR
 E.164 ISDN.
@@ -356,6 +393,7 @@ ISDN PLMN.
 .TP
 \fISCCP_NPLAN_PRIVATE\fR
 private.
+.PD
 .RE
 .\"
 .\"
@@ -453,6 +491,7 @@ option value.  The option value can be one of the following values:
 .TP 24
 \fIT_INVALID\fR
 not known because not bound to a specific network indicator.
+.PD 0
 .TP
 \fIT_SS7_PVAR_ITUT88\fR
 ITU-T Recommendation Q.714, 1988
@@ -501,6 +540,7 @@ JTTC JQ.714 2000.
 .TP
 \fIT_SS7_PVAR_NICC00\fR
 NICC ND1005:2000/08.
+.PD
 .RE
 .\"
 .\"
@@ -551,6 +591,7 @@ that can take on the following values:
 .RB ( T_CLTS )
 protocol class 0
 (no assurance of sequence).
+.PD 0
 .TP
 \fIT_SCCP_PCLASS_1\fR
 .RB ( T_CLTS )
@@ -569,7 +610,7 @@ protocol class 3
 .TP
 \fIT_SCCP_PCLASS_ALL\fR
 a bit mask representing all of the above values.
-.TE
+.PD
 .RE
 .TP
 .B T_SCCP_IMPORTANCE
@@ -868,6 +909,7 @@ values apply:
 .TP
 .I T_SCCP_RELC_END_USER_ORIGINATED
 the remote SCCP peer user released the transport connection.
+.PD 0
 .TP
 .I T_SCCP_RELC_END_USER_BUSY
 the remote SCCP peer user released the transport connection due to user congestion.
@@ -928,6 +970,7 @@ an unqualified (unspecified or unknown) reason.
 .I T_SCCP_RELC_SCCP_FAILURE
 the SCCP provider released the transport connection due to
 failure of the remote SCCP.
+.PD
 .PP
 When a transport connection request is being refused, one of the following
 .I dis->reason
@@ -935,6 +978,7 @@ values apply:
 .TP
 .I T_SCCP_REFC_END_USER_ORIGINATED
 the remote SCCP peer user refused the transport connection.
+.PD 0
 .TP
 .I T_SCCP_REFC_END_USER_CONGESTION
 the remote SCCP peer user refused the transport connection due to congestion.
@@ -1004,6 +1048,7 @@ the remote SCCP endpoint address.
 .I T_SCCP_REFC_UNEQUIPPED_USER
 the SCCP provider refused the transport connection due to an unequipped remote
 SCCP user.
+.PD
 .\"
 .\"
 .SS t_rcv\fR(3), \fBt_rcvv\fR(3)
@@ -1070,6 +1115,7 @@ defines the following protocol dependent error codes:
 .I T_SCCP_RETC_NO_ADDRESS_TYPE_TRANSLATION
 the network returned the unit data because there was no translation for the
 called party address in the message.
+.PD 0
 .TP
 .I T_SCCP_RETC_NO_ADDRESS_TRANSLATION
 the network returned the unit data because the called part address required
@@ -1117,6 +1163,7 @@ required and segmentation was not supported.
 .I T_SCCP_RETC_SEGMENTATION_FAILURE
 the network returned the unit data because segmentation of the message was
 required and segmentation failed.
+.PD
 .PP
 The following error codes will be returned by some protocol variants with some
 protocol additional options:
@@ -1124,6 +1171,7 @@ protocol additional options:
 .I T_SCCP_RETC_MESSAGE_CHANGE_FAILURE
 the network returned the unit data because a change between [XL]UDT was
 necessary but failed.
+.PD 0
 .TP
 .I T_SCCP_RETC_INVALID_INS_ROUTING_REQUEST
 the network returned the unit data because it contained an invalid
@@ -1152,6 +1200,7 @@ routing but contained redundant (invalid) routing information.
 .I T_SCCP_RETC_UNABLE_TO_PERFORM_ISNI_IDENTIFICATION
 the network returned the unit data because it required ISNI identification and
 no identification was available.
+.PD
 .\"
 .\"
 .SS t_snddis\fR(3)
@@ -1241,14 +1290,6 @@ connection-oriented transport service providers only support protocol classes
 2 nd 3.
 .\"
 .\"
-.SH "SEE ALSO"
-.PP
-.\"
-.\"
-.BR xti (3),
-.BR xnet (3).
-.\"
-.\"
 .SH DEVICES
 .PP
 There are a number of SCCP devices providing the Transport Provider Interface
@@ -1273,17 +1314,72 @@ For more information on the SIGTRAN SUA device, see
 .BR sua (4).
 .\"
 .\"
-.SH VERSIONS
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.BR sccp (4),
+.BR sua (4),
+.BR tali (4),
+.BR sockets (3),
+.BR xti (3),
+.BR xti_ss7 (3),
+.BR errno (3),
+.BR t_accept (3),
+.BR t_bind (3),
+.BR t_close (3),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR t_listen (3),
+.BR t_open (3),
+.BR t_optmgmt (3),
+.BR t_rcv (3),
+.BR t_rcvconnect (3),
+.BR t_rcvdis (3),
+.BR t_rcvrel (3),
+.BR t_rcvreldata (3),
+.BR t_rcvudata (3),
+.BR t_rcvuderr (3),
+.BR t_rcvv (3),
+.BR t_rcvvudata (3),
+.BR t_snd (3),
+.BR t_snddis (3),
+.BR t_sndrel (3),
+.BR t_sndreldata (3),
+.BR t_sndudata (3),
+.BR t_sndv (3),
+.BR t_sndvudata (3),
+.BR t_unbind (3),
+.BR xnet (3).
+.\"
+.\"
+.SH COMPATIBILITY
 .PP
 The
-.B SCCP-TPI
+.B XTI-SCCP
 driver is specific to the
-.B OpenSS7
-stack.
-This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This is an unofficial Corrigendum to
+.IR "XNS 5.2 Revision 2" .
 .[
 xns
 .]
+.\"
+.\"
+.SH HISTORY
+.PP
+The XTI-SCCP interface first appears in the
+.IR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

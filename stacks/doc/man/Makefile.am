@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/04/02 16:25:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/13 11:40:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:25:48 $ by $Author: brian $
+# Last Modified $Date: 2005/05/13 11:40:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,6 @@ if PKG_BUILD_INDEP
 
 ss7_man_MANS = \
 	man3/cframe.3 \
-	man3/soon.3 \
 	man3/xti_mtp.3 \
 	man3/xti_sccp.3 \
 	man3/xti_ss7.3 \
@@ -132,7 +131,6 @@ ss7_man_MANS = \
 	man4/mx.4 \
 	man4/mx_ioctl.4 \
 	man4/OpenSS7.4 \
-	man4/openss7_soon.4 \
 	man4/pca200e.4 \
 	man4/q921.4 \
 	man4/q922.4 \
@@ -159,16 +157,12 @@ ss7_man_MANS = \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
 	man4/sscop_mce.4 \
-	man4/STREAMS.4 \
 	man4/sua.4 \
 	man4/sua_ioctl.4 \
 	man4/tali.4 \
 	man4/tali_ioctl.4 \
 	man4/tcap.4 \
 	man4/tcap_ioctl.4 \
-	man4/tlclts.4 \
-	man4/tlcots.4 \
-	man4/tlcotsod.4 \
 	man4/tua.4 \
 	man4/tua_ioctl.4 \
 	man4/ua_ioctl.4 \
@@ -185,7 +179,6 @@ ss7_man_MANS = \
 	man4/x400p-ch.4 \
 	man4/x400p-ss7.4 \
 	man4/ss7_undoc.4 \
-	man5/openss7_soon.5 \
 	man7/bicci.7 \
 	man7/capi.7 \
 	man7/CC_addr_ack.7 \
@@ -680,7 +673,6 @@ ss7_man_MANS = \
 	man7/MTP_TRANSFER_IND.7 \
 	man7/MTP_TRANSFER_REQ.7 \
 	man7/MTP_UNBIND_REQ.7 \
-	man7/mtp_xti.7 \
 	man7/MX_attach_req.7 \
 	man7/MX_ATTACH_REQ.7 \
 	man7/MX_attach_req_t.7 \
@@ -946,7 +938,6 @@ ss7_man_MANS = \
 	man7/TR_uni_ind_t.7 \
 	man7/TR_uni_req.7 \
 	man7/TR_uni_req_t.7 \
-	man8/acb56.8 \
 	man8/bicc.8 \
 	man8/bua.8 \
 	man8/cpc388.8 \
@@ -966,8 +957,6 @@ ss7_man_MANS = \
 	man8/mtp.8 \
 	man8/sccp.8 \
 	man8/sdl.8 \
-	man8/sdl_udp.8 \
-	man8/sdl_xxx.8 \
 	man8/sdt.8 \
 	man8/sigtran.8 \
 	man8/sl.8 \
@@ -976,8 +965,7 @@ ss7_man_MANS = \
 	man8/ss7.8 \
 	man8/ss7confd.8 \
 	man8/ss7d.8 \
-	man8/ss7dev.8 \
-	man8/strconf.8 \
+	man8/strss7_mknod.8 \
 	man8/sua.8 \
 	man8/tcap.8 \
 	man8/tua.8 \
@@ -1048,6 +1036,9 @@ inet_man_MANS = \
 	man4/ticlts.4 \
 	man4/ticots.4 \
 	man4/ticotsord.4 \
+	man4/tlclts.4 \
+	man4/tlcots.4 \
+	man4/tlcotsod.4 \
 	man4/udp.4 \
 	man4/udp_ioctl.4 \
 	man4/xtios.4
@@ -1377,7 +1368,6 @@ endif
 
 ss7_dist_noinst_MANS = \
 	man3/cframe.3.man \
-	man3/soon.3.man \
 	man3/xti_mtp.3.man \
 	man3/xti_sccp.3.man \
 	man3/xti_ss7.3.man \
@@ -1450,7 +1440,6 @@ ss7_dist_noinst_MANS = \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
 	man4/OpenSS7.4.man \
-	man4/openss7_soon.4.man \
 	man4/pca200e.4.man \
 	man4/q921.4.man \
 	man4/q922.4.man \
@@ -1477,16 +1466,12 @@ ss7_dist_noinst_MANS = \
 	man4/sscop.4.man \
 	man4/sscop_ioctl.4.man \
 	man4/sscop_mce.4.man \
-	man4/STREAMS.4.man \
 	man4/sua.4.man \
 	man4/sua_ioctl.4.man \
 	man4/tali.4.man \
 	man4/tali_ioctl.4.man \
 	man4/tcap.4.man \
 	man4/tcap_ioctl.4.man \
-	man4/tlclts.4.man \
-	man4/tlcots.4.man \
-	man4/tlcotsod.4.man \
 	man4/tua.4.man \
 	man4/tua_ioctl.4.man \
 	man4/ua_ioctl.4.man \
@@ -1503,7 +1488,6 @@ ss7_dist_noinst_MANS = \
 	man4/x400p-ch.4.man \
 	man4/x400p-ss7.4.man \
 	man4/ss7_undoc.4.man \
-	man5/openss7_soon.5.man \
 	man7/bicci.7.man \
 	man7/capi.7.man \
 	man7/CC_addr_ack.7.man \
@@ -1998,7 +1982,6 @@ ss7_dist_noinst_MANS = \
 	man7/MTP_TRANSFER_IND.7.man \
 	man7/MTP_TRANSFER_REQ.7.man \
 	man7/MTP_UNBIND_REQ.7.man \
-	man7/mtp_xti.7.man \
 	man7/MX_attach_req.7.man \
 	man7/MX_ATTACH_REQ.7.man \
 	man7/MX_attach_req_t.7.man \
@@ -2264,7 +2247,6 @@ ss7_dist_noinst_MANS = \
 	man7/TR_uni_ind_t.7.man \
 	man7/TR_uni_req.7.man \
 	man7/TR_uni_req_t.7.man \
-	man8/acb56.8.man \
 	man8/bicc.8.man \
 	man8/bua.8.man \
 	man8/cpc388.8.man \
@@ -2284,8 +2266,6 @@ ss7_dist_noinst_MANS = \
 	man8/mtp.8.man \
 	man8/sccp.8.man \
 	man8/sdl.8.man \
-	man8/sdl_udp.8.man \
-	man8/sdl_xxx.8.man \
 	man8/sdt.8.man \
 	man8/sigtran.8.man \
 	man8/sl.8.man \
@@ -2294,8 +2274,7 @@ ss7_dist_noinst_MANS = \
 	man8/ss7.8.man \
 	man8/ss7confd.8.man \
 	man8/ss7d.8.man \
-	man8/ss7dev.8.man \
-	man8/strconf.8.man \
+	man8/strss7_mknod.8.man \
 	man8/sua.8.man \
 	man8/tcap.8.man \
 	man8/tua.8.man \
@@ -2366,6 +2345,9 @@ inet_dist_noinst_MANS = \
 	man4/ticlts.4.man \
 	man4/ticots.4.man \
 	man4/ticotsord.4.man \
+	man4/tlclts.4.man \
+	man4/tlcots.4.man \
+	man4/tlcotsod.4.man \
 	man4/udp.4.man \
 	man4/udp_ioctl.4.man \
 	man4/xtios.4.man
