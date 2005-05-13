@@ -1,40 +1,59 @@
 /*****************************************************************************
 
- @(#) $Id: test-sctp.c,v 0.9.2.2 2004/02/22 09:11:24 brian Exp $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/13 11:15:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  Unauthorized distribution or duplication is prohibited.
 
  This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution
- and decompilation.  No part of this software or related documentation
- may be reproduced in any form by any means without the prior written
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written
  authorization of the copyright holder, and licensors, if any.
 
  The recipient of this document, by its retention and use, warrants that
- the recipient will protect this information and keep it confidential,
- and will not disclose the information contained in this document
- without the written permission of its owner.
+ the recipient will protect this information and keep it confidential, and
+ will not disclose the information contained in this document without the
+ written permission of its owner.
 
  The author reserves the right to revise this software and documentation
  for any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state
- of the technical arts, or the reflection of changes in the design of any
+ promulgated by various agencies, utilization of advances in the state of
+ the technical arts, or the reflection of changes in the design of any
  techniques, or procedures embodied, described, or referred to herein.
  The author is under no obligation to provide any feature listed herein.
 
  -----------------------------------------------------------------------------
 
- Modified $Date: 2004/02/22 09:11:24 $ by $Author: brian $
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"),
+ it is classified as "Commercial Computer Software" under paragraph
+ 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+ ("DFARS") (or any successor regulations) and the Government is acquiring
+ only the license rights granted herein (the license rights customarily
+ provided to non-Government users).  If the Software is supplied to any unit
+ or agency of the Government other than DoD, it is classified as "Restricted
+ Computer Software" and the Government's rights in the Software are defined
+ in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+ any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ of the NASA Supplement to the FAR (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2005/05/13 11:15:52 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-static char const ident[] = "$Id: test-sctp.c,v 0.9.2.2 2004/02/22 09:11:24 brian Exp $";
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/13 11:15:52 $"
+
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/13 11:15:52 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -780,14 +799,14 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -841,7 +860,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -858,6 +877,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -871,18 +891,21 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-	This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        print the version and exit\n\
+    -C, --copying\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
@@ -899,13 +922,14 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{NULL, }
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "qvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "qvhV?");
+		c = getopt(argc, argv, "qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -925,6 +949,9 @@ main(int argc, char *argv[])
 			exit(0);
 		case 'V':
 			version(argc, argv);
+			exit(0);
+		case 'C':
+			copying(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -948,7 +975,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

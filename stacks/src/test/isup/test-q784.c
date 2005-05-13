@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -47,14 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/29 11:24:30 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/05/13 11:15:51 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/29 11:24:30 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -15944,14 +15944,14 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argvp[])
+copying(int argc, char *argvp[])
 {
 	if (verbose < 0)
 		return;
 	fprintf(stdout, "\
 Q.784 ISUP Basic Call Test Specification - Conformance Test Program\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -16001,7 +16001,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -16019,6 +16019,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -16032,6 +16033,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -16046,14 +16048,16 @@ Options:\n\
     -o, --onetest STRING\n\
         specifies the test number STRING to run\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        print the version and exit\n\
+    -C, --copying\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
@@ -16085,13 +16089,14 @@ main(int argc, char **argv)
 			{"verbose",	no_argument,		NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{NULL, }
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhV?");
+		c = getopt(argc, argv, "f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -16171,6 +16176,9 @@ main(int argc, char **argv)
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -16196,6 +16204,6 @@ main(int argc, char **argv)
 		FFLUSH(stderr);
 		exit(1);
 	}
-	splash(argc, argv);
+	copying(argc, argv);
 	return do_tests();
 }

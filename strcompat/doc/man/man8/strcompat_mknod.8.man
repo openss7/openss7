@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strcompat_mknod.8.man,v 0.9.2.3 2005/05/11 20:09:03 brian Exp $
+.\" @(#) $Id: strcompat_mknod.8.man,v 0.9.2.4 2005/05/13 11:38:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/11 20:09:03 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 11:38:55 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B streams_mknod
-\- create or remove \fISTREAMS\fR ddevice nodes
+\- create or remove \fISTREAMS\fR device nodes
 .\"
 .\"
 .SH SYNOPSIS
@@ -173,7 +173,7 @@ primary device nodes:
 .RS
 .nf
 \fC\s-1\
-#> stream_mknod
+#> streams_mknod
 \s+1\fP
 .fi
 .RE
@@ -185,7 +185,7 @@ primary device nodes:
 .RS
 .nf
 \fC\s-1\
-#> stream_mknod -r
+#> streams_mknod -r
 \s+1\fP
 .fi
 .RE

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:13:13 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/13 11:15:57 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -52,13 +52,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/25 16:13:13 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/05/13 11:15:57 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:13:13 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/13 11:15:57 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/01/25 16:13:13 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/13 11:15:57 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -12393,7 +12393,7 @@ copying(int argc, char *argv[])
 \n\
 XNS 5.2 - OpenSS7 XTI/TLI Library - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -12449,7 +12449,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -12502,7 +12502,7 @@ Options:\n\
         suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
         increase verbosity or set to LEVEL [default: 1]\n\
-	this option may be repeated.\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
         print this usage message and exit\n\
     -V, --version\n\

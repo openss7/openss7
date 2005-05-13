@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/13 11:15:49 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002 OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000 Brian F. G. Bidulock <bidulock@dallas.net>
 
  All Rights Reserved.
@@ -52,14 +52,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/02/22 08:51:36 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/05/13 11:15:49 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/13 11:15:49 $"
 
 static char const ident[] =
-    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/02/22 08:51:36 $";
+    "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/13 11:15:49 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -4080,14 +4080,14 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -4141,7 +4141,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -4158,6 +4158,7 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -4171,28 +4172,31 @@ Usage:\n\
     %1$s [options]\n\
     %1$s {-h, --help}\n\
     %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
     -f, --fast [SCALE]\n\
-        Increase speed of tests by scaling timers [default: 50]\n\
+        increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
-        Print a test case summary at end of testing [default: off]\n\
+        print a test case summary at end of testing [default: off]\n\
     -o, --onetest [TESTCASE]\n\
-        Run a single test case.\n\
+        run a single test case.\n\
     -t, --tests [RANGE]\n\
-        Run a range of test cases.\n\
+        run a range of test cases.\n\
     -m, --messages\n\
-        Display messages. [default: off]\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-	This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+	this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exists\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exists\n\
+        print the version and exit\n\
+    -C, --copying\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
@@ -4224,13 +4228,14 @@ main(int argc, char *argv[])
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{NULL, }
+			{ 0, }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "f::so:t:mqvhV?", long_options, &option_index);
+		c = getopt_long(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "f::so:t:mqvhV?");
+		c = getopt(argc, argv, "f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -4310,6 +4315,9 @@ main(int argc, char *argv[])
 		case 'V':
 			version(argc, argv);
 			exit(0);
+		case 'C':
+			copying(argc, argv);
+			exit(0);
 		case '?':
 		default:
 		      bad_option:
@@ -4339,7 +4347,7 @@ main(int argc, char *argv[])
 		}
 		exit(2);
 	}
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

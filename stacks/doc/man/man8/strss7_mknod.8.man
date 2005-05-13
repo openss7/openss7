@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strinet_mknod.8.man,v 0.9.2.3 2005/05/13 11:38:55 brian Exp $
+.\" @(#) $Id: strss7_mknod.8.man,v 0.9.2.1 2005/05/13 11:38:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/13 11:38:55 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/13 11:38:56 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so strinet.macros
+.so strss7.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database strinet.refs
+database strss7.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,35 +71,35 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STRINET_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH STRSS7_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B strinet_mknod
-\- create or remove \fISTREAMS INET\fR device nodes
+.B strss7_mknod
+\- create or remove \fISTRSS7\fR device nodes
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstrinet_mknod\fR [\fIoptions\fR]
+\fBstrss7_mknod\fR [\fIoptions\fR]
 .PD 0
 .HP 12
-\fBstrinet_mknod\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR}
+\fBstrss7_mknod\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR}
 .HP 12
-\fBstrinet_mknod\fR {\fB-h\fR|\fB--help\fR}
+\fBstrss7_mknod\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBstrinet_mknod\fR {\fB-V\fR|\fB--version\fR}
+\fBstrss7_mknod\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBstrinet_mknod\fR {\fB-C\fR|\fB--copying\fR}
+\fBstrss7_mknod\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B strinet_mknod
+.B strss7_mknod
 is a small utility program that can be used to create or remove primary
-.I STREAMS INET
+.I STREAMS SS7
 device nodes.
 
 .\"
@@ -109,7 +109,7 @@ device nodes.
 .TP
 .BR -r ", " --remove
 Remove
-.I STREAMS INET
+.I STREAMS SS7
 device nodes instead of creating them.
 .TP
 .BR -h ", " --help
@@ -154,38 +154,38 @@ option suppresses the printing of diagnostic messages to
 .\"
 .SH NOTICES
 .PP
-.B strinet_mknod
+.B strss7_mknod
 is created when the
-.I STREAMS INET
+.I STREAMS SS7
 package is configured.  A version of
-.B strinet_mknod
+.B strss7_mknod
 from one version of the
-.I STREAMS INET
+.I STREAMS SS7
 package release might be incompatible with that of another version.
 .\"
 .\"
 .SH EXAMPLES
 .PP
 The following example will create all necessary
-.I STREAMS INET
+.I STREAMS SS7
 primary device nodes:
 .PP
 .RS
 .nf
 \fC\s-1\
-#> strinet_mknod
+#> strss7_mknod
 \s+1\fP
 .fi
 .RE
 .PP
 The following example will remove all
-.I STREAMS INET
+.I STREAMS SS7
 primary device nodes:
 .PP
 .RS
 .nf
 \fC\s-1\
-#> strinet_mknod -r
+#> strss7_mknod -r
 \s+1\fP
 .fi
 .RE
@@ -193,16 +193,16 @@ primary device nodes:
 .\"
 .SH DEVICES
 .PP
-.B strinet_mknod
+.B strss7_mknod
 creates or removes the following devices:
 .\"
 .\"
 .SH FILES
 .PP
 .TP
-.B /usr/sbin/strinet_mknod
+.B /usr/sbin/strss7_mknod
 contains the
-.B strinet_mknod
+.B strss7_mknod
 command.
 .\"
 .\"
@@ -215,17 +215,17 @@ command.
 .\"
 .SH BUGS
 .PP
-.B strinet_mknod
+.B strss7_mknod
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B strinet_mknod
+.B strss7_mknod
 is an
 .IR LiS -specific
 command.
-.B strinet_mknod
+.B strss7_mknod
 is provided for compatibility with
 .I LiS
 with the following portability considerations:
@@ -252,7 +252,7 @@ LiS
 .\"
 .SH HISTORY
 .PP
-.B strinet_mknod
+.B strss7_mknod
 first appeared in
 .IR LiS .
 .[
