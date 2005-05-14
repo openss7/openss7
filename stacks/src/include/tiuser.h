@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:13 $
+ @(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:30:43 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:13 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:43 $ by $Author: brian $
 
  $Log: tiuser.h,v $
+ Revision 0.9.2.3  2005/05/14 08:30:43  brian
+ - copyright header correction
+
  Revision 0.9.2.2  2004/09/02 09:31:13  brian
  - Synchronization with other packages.
 
@@ -63,7 +66,7 @@
 #ifndef _TIUSER_H
 #define _TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

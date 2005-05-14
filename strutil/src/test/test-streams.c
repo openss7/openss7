@@ -1,27 +1,40 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2 or later, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +48,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,12 +59,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/12 20:58:48 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:39:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
+
  $Log: test-streams.c,v $
- Revision 0.9.2.8  2005/05/12 20:58:48  brian
- - corrections during testing
+ Revision 0.9.2.10  2005/05/14 08:39:37  brian
+ - updated copyright headers
+
+ Revision 0.9.2.5  2005/05/14 08:39:37  brian
+ - updated copyright headers
+
+ Revision 0.9.2.4  2005/05/14 08:34:46  brian
+ - copyright header correction
 
  Revision 0.9.2.3  2005/05/12 20:58:48  brian
  - corrections during testing
@@ -79,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/12 20:58:48 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -3712,7 +3732,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -3759,32 +3779,32 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -d, --device DEVICE\n\
-        Device name to open [default: %2$s].\n\
+        device name to open [default: %2$s].\n\
     -e, --exit\n\
-        Exit on the first failed or inconclusive test case.\n\
+        exit on the first failed or inconclusive test case.\n\
     -l, --list [RANGE]\n\
-        List test case names within a range [default: all] and exit.\n\
+        list test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
-        Increase speed of tests by scaling timers [default: 50]\n\
+        increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
-        Print a test case summary at end of testing [default: off]\n\
+        print a test case summary at end of testing [default: off]\n\
     -o, --onetest [TESTCASE]\n\
-        Run a single test case.\n\
+        run a single test case.\n\
     -t, --tests [RANGE]\n\
-        Run a range of test cases.\n\
+        run a range of test cases.\n\
     -m, --messages\n\
-        Display messages. [default: off]\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Print this usage message and exit\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Print version and exit\n\
+        print version and exit\n\
     -C, --copying\n\
-        Print copying permissions and exit\n\
+        print copying permissions and exit\n\
 ", argv[0], devname);
 }
 

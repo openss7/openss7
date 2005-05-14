@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 18:05:49 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -73,7 +73,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:49 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

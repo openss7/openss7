@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:39 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:11:28 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:39 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/11 20:11:28 $"
+#define OSFCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:39 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"

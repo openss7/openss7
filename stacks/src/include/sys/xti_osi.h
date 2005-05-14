@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/09/02 09:31:14 $
+ @(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:30:49 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/09/02 09:31:14 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:49 $ by $Author: brian $
 
  $Log: xti_osi.h,v $
+ Revision 0.9.2.3  2005/05/14 08:30:49  brian
+ - copyright header correction
+
  Revision 0.9.2.2  2004/09/02 09:31:14  brian
  - Synchronization with other packages.
 
@@ -63,7 +66,7 @@
 #ifndef _SYS_XTI_OSI_H
 #define _SYS_XTI_OSI_H
 
-#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_osi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 /*
    SPECIFIC ISO OPTION AND MANAGEMENT PARAMETERS 

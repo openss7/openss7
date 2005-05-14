@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_sndvudata.3.man,v 0.9.2.4 2005/03/30 13:39:08 brian Exp $
+.\" @(#) $Id: t_sndvudata.3.man,v 0.9.2.5 2005/05/14 08:28:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -42,7 +42,7 @@
 .\" Software is supplied to any unit or agency of the Government other than
 .\" DoD, it is classified as "Restricted Computer Software" and the
 .\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
 .\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 13:39:08 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/14 08:28:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros

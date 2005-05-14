@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:01 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:09 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:01 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:01 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:09 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:01 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:09 $";
 
 #include "os7/compat.h"
 
@@ -61,7 +61,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:43:01 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:09 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

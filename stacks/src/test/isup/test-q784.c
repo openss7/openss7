@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -42,19 +42,19 @@
  or agency of the Government other than DoD, it is classified as "Restricted
  Computer Software" and the Government's rights in the Software are defined
  in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
- any success regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+ any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
  of the NASA Supplement to the FAR (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/13 11:15:51 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/05/14 08:31:29 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/13 11:15:51 $";
+    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:29 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -15986,7 +15986,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 rights in the Software are defined in paragraph 52.227-19 of the Federal Acquis-\n\
-ition Regulations (\"FAR\") (or any success regulations) or, in the cases of NASA,\n\
+ition Regulations (\"FAR\") (or any successor regulations) or, in the cases of NASA,\n\
 in paragraph  18.52.227-86 of the NASA  Supplement  to the FAR (or any successor\n\
 regulations).\n\
 ");

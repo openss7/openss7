@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:50 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:50 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:50 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:20 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:50 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

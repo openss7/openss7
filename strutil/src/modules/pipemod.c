@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/11 20:12:31 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:43 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:31 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/11 20:12:31 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:43 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/11 20:12:31 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:43 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/11 20:12:31 $"
+#define PIPEMOD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:43 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"

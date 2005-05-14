@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 13:25:44 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/01/22 13:25:44 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform

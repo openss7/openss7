@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.8 2005/04/12 09:28:52 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.9 2005/05/14 08:35:10 brian Exp $
 %
 % =========================================================================
 %
@@ -43,7 +43,7 @@
 % Software is supplied to any unit or agency of the Government other than
 % DoD, it is classified as "Restricted Computer Software" and the
 % Government's rights in the Software are defined in paragraph 52.227-19
-% of the Federal Acquisition Regulations ("FAR") (or any success
+% of the Federal Acquisition Regulations ("FAR") (or any successor
 % regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
 % NASA Supplement to the FAR (or any successor regulations).
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/04/12 09:28:52 $ by $Author: brian $
+% Last Modified $Date: 2005/05/14 08:35:10 $ by $Author: brian $
 %
 % =========================================================================
 

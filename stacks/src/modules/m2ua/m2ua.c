@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:51 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 18:05:51 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:51 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:51 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $";
 
 #include "os7/compat.h"
 
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/10 18:05:51 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

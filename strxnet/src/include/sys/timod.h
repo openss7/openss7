@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.2 2004/05/16 04:12:33 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.3 2005/05/14 08:28:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/16 04:12:33 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
 
  $Log: timod.h,v $
+ Revision 0.9.2.3  2005/05/14 08:28:29  brian
+ - copyright header correction
+
  Revision 0.9.2.2  2004/05/16 04:12:33  brian
  - Updating strxnet release.
 
@@ -59,7 +62,7 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define TIMOD			('T'<<8)
 #define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */

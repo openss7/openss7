@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:57 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:08 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:57 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:57 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:08 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:57 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:08 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:57 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:08 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hmac_sha1.h,v 0.9.2.2 2005/01/11 04:23:26 brian Exp $
+ @(#) $Id: sctp_hmac_sha1.h,v 0.9.2.3 2005/05/14 08:29:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/11 04:23:26 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:29:18 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_HMAC_SHA1_H__
 #define __SCTP_HMAC_SHA1_H__
 
-#ident "@(#) $RCSfile: sctp_hmac_sha1.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hmac_sha1.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 extern void hmac_sha1(uint8_t *text, int tlen, uint8_t *key, int klen, uint8_t *digest);
 

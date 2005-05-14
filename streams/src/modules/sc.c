@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:31 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/14 08:34:44 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:31 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:31 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/14 08:34:44 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:31 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/14 08:34:44 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/11 20:12:31 $"
+#define SC_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/14 08:34:44 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

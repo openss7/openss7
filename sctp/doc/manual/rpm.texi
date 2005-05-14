@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.1 2004/12/20 10:18:19 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.2 2005/05/14 08:29:32 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -42,7 +42,7 @@
 @c Software is supplied to any unit or agency of the Government other than
 @c DoD, it is classified as "Restricted Computer Software" and the
 @c Government's rights in the Software are defined in paragraph 52.227-19
-@c of the Federal Acquisition Regulations ("FAR") (or any success
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
 @c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
 @c NASA Supplement to the FAR (or any successor regulations).
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2004/12/20 10:18:19 $ by $Author: brian $
+@c Last Modified $Date: 2005/05/14 08:29:32 $ by $Author: brian $
 @c
 @c =========================================================================
 

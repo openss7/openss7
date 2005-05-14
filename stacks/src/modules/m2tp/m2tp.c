@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:58 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:12 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:58 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:58 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:12 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:58 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

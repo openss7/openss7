@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.1 2004/08/21 10:53:59 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.2 2005/05/14 08:29:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,9 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:53:59 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:29:20 $ by $Author: brian $
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.2  2005/05/14 08:29:20  brian
+ - copyright header correction
+
  Revision 0.9.2.1  2004/08/21 10:53:59  brian
  - Force checkin on branch.
 
@@ -68,7 +71,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 

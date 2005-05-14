@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/01/24 07:46:40 $
+ @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:48 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/24 07:46:40 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:48 $ by $Author: brian $
 
  $Log: tpi.h,v $
+ Revision 0.9.2.4  2005/05/14 08:30:48  brian
+ - copyright header correction
+
  Revision 0.9.2.3  2005/01/24 07:46:40  brian
  - Removed compiler warnings.
 
@@ -66,7 +69,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #if 0
 #if !defined _XTI_H && !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__

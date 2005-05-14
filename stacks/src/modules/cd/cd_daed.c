@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:51 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:32 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:51 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:51 $";
 
 #include "os7/compat.h"
 
@@ -69,7 +69,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:41:32 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:30:51 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"

@@ -1,27 +1,40 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2 or later, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +48,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +59,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/27 06:24:29 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:24 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: perftest.c,v $
+ Revision 0.9.2.3  2005/05/14 08:31:24  brian
+ - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:24 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/27 06:24:29 $";
+static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:24 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -458,7 +477,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");

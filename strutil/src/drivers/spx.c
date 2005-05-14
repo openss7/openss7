@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:11 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:34:41 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:12:11 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:11 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:34:41 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:11 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:34:41 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/11 20:12:11 $"
+#define SPX_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:34:41 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

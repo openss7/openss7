@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff
 .\"
-.\" @(#) $Id: netperf.macros,v 1.1.2.2 2004/08/12 01:05:54 brian Exp $
+.\" @(#) $Id: netperf.macros,v 1.1.2.3 2005/05/14 08:30:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -41,7 +41,7 @@
 .\" Software is supplied to any unit or agency of the Government other than
 .\" DoD, it is classified as "Restricted Computer Software" and the
 .\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any success
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
 .\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
@@ -52,7 +52,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2004/08/12 01:05:54 $ by $Author: brian $
+.\" Last Modified $Date: 2005/05/14 08:30:02 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .de ]<
@@ -262,7 +262,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .HP
-OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/05/14 08:30:02 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -275,7 +275,7 @@ All Rights Reserved.
 .de I2
 .SH IDENTIFICATION
 .HP
-OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/05/14 08:30:02 $.
 .PP
 \f(HRCopyright \(co 1992 UNIX International, Inc.
 .br
@@ -290,7 +290,7 @@ All Rights Reserved.
 .de I3
 .SH IDENTIFICATION
 .HP
-OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/05/14 08:30:02 $.
 .PP
 \f(HRCopyright \(co 2000 John A. Boyd Jr.  protologos, LLC
 .br
@@ -305,7 +305,7 @@ All Rights Reserved.
 .de I4
 .SH IDENTIFICATION
 .HP
-OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/05/14 08:30:02 $.
 .PP
 \f(HRCopyright \(co 1997-2004 OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
@@ -318,7 +318,7 @@ All Rights Reserved.
 .de VR
 .SH "VERSIONS"
 .PP
-OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.2 $); $Date: 2004/08/12 01:05:54 $.
+OpenSS7 Netperf: $Name:  $($Revision: 1.1.2.3 $); $Date: 2005/05/14 08:30:02 $.
 ..
 .de AU
 .SH "AUTHOR"

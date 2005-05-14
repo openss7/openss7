@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.1 2004/05/12 08:01:39 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.2 2005/05/14 08:30:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/05/12 08:01:39 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIRDWR_H
 #define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/05/12 08:01:39 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:48 $"
 
 #if !defined _TIRDWR_H && !defined __KERNEL__
 #error ****

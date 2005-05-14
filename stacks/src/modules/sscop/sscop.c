@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:10 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:16 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:10 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:10 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -75,7 +75,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:43:16 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:10 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 18:05:53 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $";
+    "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:01 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -76,7 +76,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/10 18:05:53 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:01 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:16 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:34 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:16 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:16 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:34 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:16 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

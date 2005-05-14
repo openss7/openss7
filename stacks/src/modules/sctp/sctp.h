@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.2 2004/08/31 07:19:54 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.3 2005/05/14 08:31:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/31 07:19:54 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/31 07:19:54 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:04 $"
 
 #ifndef tid_t
 typedef int tid_t;

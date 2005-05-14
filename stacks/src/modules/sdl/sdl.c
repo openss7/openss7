@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:07 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:54 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:07 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/09 09:42:54 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:07 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

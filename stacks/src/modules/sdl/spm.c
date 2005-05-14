@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:07 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:54 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:07 $"
 
-static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $";
+static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:07 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -71,7 +71,7 @@ static char const ident[] = "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $)
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:54 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:07 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

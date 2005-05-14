@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:44 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:44 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:44 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:44 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:41:44 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

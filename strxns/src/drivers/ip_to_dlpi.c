@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/09 09:44:29 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:26:11 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:44:29 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:26:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/09 09:44:29 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:26:11 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/04/09 09:44:29 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:26:11 $";
 
 #include "os7/compat.h"
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2005/04/09 09:44:29 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:26:11 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"

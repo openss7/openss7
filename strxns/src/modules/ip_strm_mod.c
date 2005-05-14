@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:26:13 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:58 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:26:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:26:13 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:26:13 $";
 
 #include "os7/compat.h"
 
@@ -76,7 +76,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/04/09 09:43:58 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:26:13 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"

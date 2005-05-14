@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.24 $) $Date: 2005/04/22 22:50:42 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.25 $) $Date: 2005/05/14 08:30:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -36,7 +36,7 @@
 # users).  If the Software is supplied to any unit or agency of the Government
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 # the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 # (or any successor regulations).
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/22 22:50:42 $ by $Author: brian $
+# Last Modified $Date: 2005/05/14 08:30:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -376,6 +376,9 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.25  2005/05/14 08:30:02  brian
+# - copyright header correction
+#
 # Revision 1.1.2.24  2005/04/22 22:50:42  brian
 # - remove noarch
 #

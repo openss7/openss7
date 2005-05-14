@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9.2.1 2004/08/21 10:14:57 brian Exp $
+ @(#) $Id: sctp_output.h,v 0.9.2.2 2005/05/14 08:31:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_OUTPUT_H__
 #define __SCTP_OUTPUT_H__
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:57 $"
+#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:06 $"
 
 extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
 extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);

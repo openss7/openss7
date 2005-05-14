@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:02 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:36 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:02 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:02 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -77,7 +77,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/04/09 09:42:36 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:31:02 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

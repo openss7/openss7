@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:59 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:11:59 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:59 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:59 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/11 20:11:59 $"
+#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"

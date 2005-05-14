@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 15:37:28 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:03 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: netserver.c,v $
+ Revision 1.1.1.10  2005/05/14 08:30:03  brian
+ - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/01/22 15:37:28 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1176,7 +1182,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any success  regulations) or, in the  cases of NASA, in\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 \n\

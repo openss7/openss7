@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $
+ @(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -35,20 +35,20 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 18:05:59 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $"
+#ident "@(#) $RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $";
+    "$RCSfile: x400p-ss7.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:31:22 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -89,7 +89,7 @@ static char const ident[] =
 
 #define X400P_DESCRIP		"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/05/10 18:05:59 $"
+#define X400P_REVISION		"OpenSS7 $RCSfile: x400p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:31:22 $"
 #define X400P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define X400P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

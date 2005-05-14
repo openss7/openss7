@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.1.12.1 $) $Date: 2005/03/09 23:13:50 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,16 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/03/09 23:13:50 $ by $Author: brian $
 
- $Log$
+ $Log: stropts.h,v $
+ Revision 1.1.1.1.12.1  2005/03/09 23:13:50  brian
+ - First stab at autoconf'ed 2.18.0.  Results of merge.
+
  *****************************************************************************/
 
 #ifndef _STROPTS_H
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name$($Revision$) Copyright (c) 1997-2004  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 1.1.1.1.12.1 $) Copyright (c) 1997-2004  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

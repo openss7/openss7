@@ -1,5 +1,5 @@
 # OpenSS7 Master Package -- CVS procedures.  2005-03-15
-# $Id: README-cvs,v 0.9.2.1 2005/03/15 21:54:24 brian Exp $
+# $Id: README-cvs,v 0.9.2.2 2005/05/14 08:36:11 brian Exp $
 # Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 # See the end for copying conditions.
@@ -47,7 +47,7 @@ All Rights Reserved.
  Software is supplied to any unit or agency of the Government other than
  DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19
- of the Federal Acquisition Regulations ("FAR") (or any success
+ of the Federal Acquisition Regulations ("FAR") (or any successor
  regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
  NASA Supplement to the FAR (or any successor regulations).
 

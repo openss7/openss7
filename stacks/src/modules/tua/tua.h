@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/30 21:52:36 $
+ @(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:17 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/30 21:52:36 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:17 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __TUA_H__
 #define __TUA_H__
 
-#ident "@(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2004/08/30 21:52:36 $"
+#ident "@(#) $RCSfile: tua.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:31:17 $"
 
 #include "../ua/ua.h"
 #include <ss7/tcap.h>

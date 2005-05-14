@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7-dev.preinst.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/03/26 22:35:29 $
+# @(#) $RCSfile: strss7-dev.preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:32:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -37,7 +37,7 @@
 # users).  If the Software is supplied to any unit or agency of the Government
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 # the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 # (or any successor regulations).
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/26 22:35:29 $ by $Author: brian $
+# Last Modified $Date: 2005/05/14 08:32:21 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -76,10 +76,13 @@ subpkg=dev
 # =============================================================================
 #
 # $Log: strss7-dev.preinst.in,v $
-# Revision 0.9.2.1  2005/03/26 22:35:29  brian
+# Revision 0.9.2.2  2005/05/14 08:32:21  brian
+# - copyright header correction
+#
+# Revision 1.1.2.1  2005/03/26 22:35:29  brian
 # - working up debian maint scripts
 #
-# Revision 0.9.2.1  2005/03/26 22:21:15  brian
+# Revision 1.1.2.1  2005/03/26 22:21:15  brian
 # - working up debian maint scripts
 #
 # Revision 0.9.2.1  2005/03/26 03:11:24  brian

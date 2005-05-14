@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:17 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:43:42 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:17 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:17 $";
 
 #include "os7/compat.h"
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2005/04/09 09:43:42 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:31:17 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:42:30 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:01 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/04/09 09:42:30 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:01 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

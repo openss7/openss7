@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: spec_fs_i.h,v 0.9.2.5 2005/05/11 20:10:21 brian Exp $
+ @(#) $Id: spec_fs_i.h,v 0.9.2.6 2005/05/14 08:34:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:21 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SPEC_FS_I_H__
 #define __SYS_SPEC_FS_I_H__
 
-#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/11 20:10:21 $"
+#ident "@(#) $RCSfile: spec_fs_i.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:36 $"
 
  /* Note: this is identical layout to a socket (rearranged for validation).  The minor exception is 
     that the the sock pointer points to an stdata and the proto_ops pointer points to a stream_ops

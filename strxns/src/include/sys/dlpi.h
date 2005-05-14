@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.2 2005/01/22 14:31:29 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.3 2005/05/14 08:26:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/01/22 14:31:29 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/01/22 14:31:29 $"
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:26:12 $"
 
 #ifdef __LP64__
 typedef int32_t dl_long;

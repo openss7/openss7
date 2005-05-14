@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.6 2005/05/11 20:10:04 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.7 2005/05/14 08:34:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/11 20:10:04 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2005  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

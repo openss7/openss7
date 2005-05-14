@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $
+ @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/09 09:41:20 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:30:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $"
 
-static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/09 09:41:20 $";
+static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel

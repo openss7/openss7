@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:55 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:07 $
 
  -----------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@
  users).  If the Software is supplied to any unit or agency of the Government
  other than DoD, it is classified as "Restricted Computer Software" and the
  Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
  (or any successor regulations).
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 18:05:55 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:31:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:55 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:55 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:07 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/10 18:05:55 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:31:07 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

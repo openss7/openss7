@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/04/02 16:28:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:26:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -36,7 +36,7 @@
 # users).  If the Software is supplied to any unit or agency of the Government
 # other than DoD, it is classified as "Restricted Computer Software" and the
 # Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any success regulations) or, in
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 # the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 # (or any successor regulations).
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/02 16:28:15 $ by $Author: brian $
+# Last Modified $Date: 2005/05/14 08:26:21 $ by $Author: brian $
 #
 # =============================================================================
 
