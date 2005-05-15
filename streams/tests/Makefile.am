@@ -1,44 +1,57 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/05/14 08:34:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 23:59:23 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Unauthorized distribution or duplication is prohibited.
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
+# This software and related documentation is protected by copyright and
+# distributed under licenses restricting its use, copying, distribution and
+# decompilation.  No part of this software or related documentation may be
+# reproduced in any form by any means without the prior written
+# authorization of the copyright holder, and licensors, if any.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# The recipient of this document, by its retention and use, warrants that
+# the recipient will protect this information and keep it confidential, and
+# will not disclose the information contained in this document without the
+# written permission of its owner.
+#
+# The author reserves the right to revise this software and documentation
+# for any reason, including but not limited to, conformity with standards
+# promulgated by various agencies, utilization of advances in the state of
+# the technical arts, or the reflection of changes in the design of any
+# techniques, or procedures embodied, described, or referred to herein.
+# The author is under no obligation to provide any feature listed herein.
+#
+# -----------------------------------------------------------------------------
+#
+# As an exception to the above, this software may be distributed under the
+# GNU General Public License (GPL) Version 2 or later, so long as the
+# software is distributed with, and only used for the testing of, OpenSS7
+# modules, drivers, and libraries.
 #
 # -----------------------------------------------------------------------------
 #
 # U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 # behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
+# to you.  If the Software is supplied by the Department of Defense ("DoD"),
+# it is classified as "Commercial Computer Software" under paragraph
+# 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+# ("DFARS") (or any successor regulations) and the Government is acquiring
+# only the license rights granted herein (the license rights customarily
+# provided to non-Government users).  If the Software is supplied to any unit
+# or agency of the Government other than DoD, it is classified as "Restricted
+# Computer Software" and the Government's rights in the Software are defined
+# in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+# any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86
+# of the NASA Supplement to the FAR (or any successor regulations).
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:34:48 $ by $Author: brian $
+# Last Modified $Date: 2005/05/14 23:59:23 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.17  2005/05/14 23:59:23  brian
+# - getting autotest up and running
+#
+# Revision 0.9.2.13  2005/05/14 23:59:23  brian
+# - getting autotest up and running
 #
 # =============================================================================
 
@@ -76,8 +98,8 @@ TESTSUITE		= testsuite
 package.m4: $(top_srcdir)/configure
 	@( \
 		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE_TARNAME@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@PACKAGE_VERSION@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
@@ -90,8 +112,19 @@ package.m4: $(top_srcdir)/configure
 
 # my rule
 TESTSUITE_DEPS		= \
-			testsuite.at \
+			clone.at \
+			connld.at \
+			echo.at \
+			fifo.at \
 			kernel.at \
+			log.at \
+			nsdev.at \
+			nuls.at \
+			pipemod.at \
+			sad.at \
+			sc.at \
+			streams.at \
+			testsuite.at \
 			package.m4
 
 # my rule
@@ -135,7 +168,7 @@ installcheck-inet:
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	$(SHELL) $<
+	DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' $(SHELL) $<
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal \

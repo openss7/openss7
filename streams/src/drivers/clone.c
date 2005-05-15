@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/14 08:34:40 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/14 08:34:40 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/14 08:34:40 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/14 08:34:40 $"
+#define CLONE_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/15 04:08:15 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -185,7 +185,7 @@ static int cloneopen(struct inode *inode, struct file *file)
 	printd(("%s: opening cloned device internal major %hu, minor %hu\n", __FUNCTION__, cdev->d_modid, 0));
 	err = spec_open(inode, file, makedevice(cdev->d_modid, 0), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
+	sdev_put(cdev);
 exit:
 	return (err);
 }
@@ -208,7 +208,7 @@ static struct cdevsw clone_cdev = {
 	d_str:&clone_info,
 	d_flag:D_CLONE,
 	d_fop:&clone_ops,
-	d_mode:S_IFCHR,
+	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
 	d_kmod:THIS_MODULE,
 };
 
@@ -258,7 +258,7 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	printd(("%s: internal major %hu\n", __FUNCTION__, modid));
 	err = -ENXIO;
 	printd(("%s: device maps to internal major %hu, minor %hu\n", __FUNCTION__, modid, 0));
-	if (!(cdev = cdev_get(minor))) {
+	if (!(cdev = sdev_get(minor))) {
 		printd(("%s: could not find driver for minor %hu\n", __FUNCTION__, minor));
 		goto up_exit;
 	}
@@ -267,7 +267,7 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
 	err = spec_open(inode, file, makedevice(modid, instance), CLONEOPEN);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
+	sdev_put(cdev);
       up_exit:
 	up(&inode->i_sem);
       exit:

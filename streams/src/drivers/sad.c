@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/05/14 08:34:41 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/14 23:59:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 23:59:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/05/14 08:34:41 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/14 23:59:09 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/05/14 08:34:41 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/14 23:59:09 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -72,7 +72,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/05/14 08:34:41 $"
+#define SAD_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/05/14 23:59:09 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -412,20 +412,20 @@ static struct cdevsw sad_cdev = {
 	d_str:&sad_info,
 	d_flag:0,
 	d_fop:NULL,
-	d_mode:S_IFCHR,
+	d_mode:S_IFCHR | S_IRUGO | S_IWUGO,
 	d_kmod:THIS_MODULE,
 };
 
 static struct devnode sad_node_admin = {
 	n_name:"admin",
 	n_flag:0,
-	n_mode:S_IFCHR,
+	n_mode:S_IFCHR | S_IRUSR | S_IWUSR,
 };
 
 static struct devnode sad_node_user = {
 	n_name:"user",
 	n_flag:0,
-	n_mode:S_IFCHR,
+	n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 #ifdef CONFIG_STREAMS_SAD_MODULE

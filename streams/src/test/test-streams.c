@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:39:37 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 23:59:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
- Revision 0.9.2.10  2005/05/14 08:39:37  brian
- - updated copyright headers
+ Revision 0.9.2.11  2005/05/14 23:59:16  brian
+ - getting autotest up and running
+
+ Revision 0.9.2.6  2005/05/14 23:59:16  brian
+ - getting autotest up and running
 
  Revision 0.9.2.5  2005/05/14 08:39:37  brian
  - updated copyright headers
@@ -99,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:39:37 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -3649,7 +3652,7 @@ int do_tests(void)
 			fprintf(stdout, "========= %2d failures    \n", failures);
 			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
 			fprintf(stdout, "========= %2d skipped     \n", skipped);
-			if (!(aborted + failures + inconclusive))
+			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
@@ -3663,7 +3666,7 @@ int do_tests(void)
 				fprintf(stderr, "\n");
 			fflush(stderr);
 			lockf(fileno(stderr), F_ULOCK, 0);
-		} else if (failures + inconclusive) {
+		} else if (failures) {
 			lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");

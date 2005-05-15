@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/05/14 08:34:42 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/05/14 08:34:42 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/05/14 08:34:42 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -657,7 +657,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		printd(("%s: name is a device or module\n", __FUNCTION__));
 		if ((inode = cdev->d_inode)) {
 			igrab(inode);
-			cdev_put(cdev);
+			sdev_put(cdev);
 			printd(("%s: adding inode %p to dentry %p\n", __FUNCTION__, inode, new));
 			d_add(new, inode);
 			return (NULL);	/* success */
@@ -665,7 +665,7 @@ STATIC struct dentry *spec_root_i_lookup(struct inode *dir, struct dentry *new)
 		/* It must be a module.  This has the rather unwanted side-effect that searching
 		   directory %s could demand load streams-%s, where streams-%s is not a driver but
 		   a module. */
-		cdev_put(cdev);
+		sdev_put(cdev);
 	}
 	return ERR_PTR(-ENOENT);
 }
@@ -976,7 +976,7 @@ STATIC INLINE int spec_parse_options(char *options, struct spec_sb_info *sbi)
 	int setmod = 0;
 	uid_t uid = 0;
 	uid_t gid = 0;
-	umode_t mode = 0666;
+	umode_t mode = 0777;
 	char *this_char, *value, *token = options;
 	ptrace(("%s: paring options %p\n", __FUNCTION__, sbi));
 	if (!sbi || sbi->sbi_magic != SPEC_SBI_MAGIC)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:34:41 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:34:41 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/15 04:08:15 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 08:34:41 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -742,22 +742,22 @@ EXPORT_SYMBOL_GPL(cdev_str);
  */
 
 /**
- *  cdev_get: - get a reference to a STREAMS device
+ *  sdev_get: - get a reference to a STREAMS device
  *  @major: (internal) major device number of the STREAMS device
  *
  *  Context: When the calling context can block, an attempt will be made to load the driver by major
  *  device number.
  */
-struct cdevsw *cdev_get(major_t major)
+struct cdevsw *sdev_get(major_t major)
 {
 	return cdev_lookup(major, !in_interrupt());
 }
 
 /**
- *  cdev_put:	- put a reference to a STREAMS device
+ *  sdev_put:	- put a reference to a STREAMS device
  *  @cdev:	STREAMS device structure pointer to put
  */
-void cdev_put(struct cdevsw *cdev)
+void sdev_put(struct cdevsw *cdev)
 {
 	if (cdev && cdev->d_kmod) {
 		ptrace(("%s: %s: decrementing use count\n", __FUNCTION__, cdev->d_name));
@@ -770,8 +770,8 @@ void cdev_put(struct cdevsw *cdev)
     defined CONFIG_STREAMS_COMPAT_LIS_MODULE || \
     defined CONFIG_STREAMS_COMPAT_UW7_MODULE || \
     defined CONFIG_STREAMS_CLONE_MODULE
-EXPORT_SYMBOL_GPL(cdev_get);
-EXPORT_SYMBOL_GPL(cdev_put);
+EXPORT_SYMBOL_GPL(sdev_get);
+EXPORT_SYMBOL_GPL(sdev_put);
 #endif
 
 /**
@@ -794,7 +794,7 @@ EXPORT_SYMBOL_GPL(cdrv_get);
  */
 void cdrv_put(struct cdevsw *cdev)
 {
-	cdev_put(cdev);
+	sdev_put(cdev);
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE
@@ -1093,10 +1093,10 @@ int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor)
 	cmin->n_minor = minor;
 	if (!cmin->n_str)
 		cmin->n_str = cdev->d_str;
-	if (!cmin->n_mode & S_IFMT)
+	if (!(cmin->n_mode & S_IFMT))
 		cmin->n_mode = cdev->d_mode;
-	if (!cmin->n_mode & S_IFMT)
-		cmin->n_mode = S_IFCHR;
+	if (!(cmin->n_mode & S_IFMT))
+		cmin->n_mode = S_IFCHR | S_IRUGO | S_IWUGO;
 	/* add to list and hash */
 	ensure(cdev->d_minors.next, INIT_LIST_HEAD(&cdev->d_minors));
 	list_add(&cmin->n_list, &cdev->d_minors);
