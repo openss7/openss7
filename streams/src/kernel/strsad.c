@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:42 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:42 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -176,14 +176,14 @@ int autopush_add(struct strapush *sap)
 			goto error;
 	}
 	err = -ENOSTR;
-	if ((cdev = cdev_get(sap->sap_major)) == NULL)
+	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_add(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
+	sdev_put(cdev);
       error:
 	return (err);
 }
@@ -204,14 +204,14 @@ int autopush_del(struct strapush *sap)
 #endif
 		goto error;
 	err = -ENODEV;
-	if ((cdev = cdev_get(sap->sap_major)) == NULL)
+	if ((cdev = sdev_get(sap->sap_major)) == NULL)
 		goto error;
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	spin_lock_irqsave(&apush_lock, flags);
 	err = __autopush_del(cdev, sap);
 	spin_unlock_irqrestore(&apush_lock, flags);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
+	sdev_put(cdev);
       error:
 	return (err);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:38 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:38 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:38 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:38 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,7 +115,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:38 $"
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -399,11 +399,11 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		int err;
 		if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
 			return (EINVAL);
-		if ((cdev = cdev_get(sc->sc_major)) == NULL)
+		if ((cdev = sdev_get(sc->sc_major)) == NULL)
 			return (ENOENT);
 		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		cdev_put(cdev);
+		sdev_put(cdev);
 		if ((err = unregister_strdev(cdev, sc->sc_major)) == 0)
 			kmem_free(cdev, sizeof(*cdev));
 		return (-err);

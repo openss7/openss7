@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/14 08:34:43 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:43 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/14 08:34:43 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/05/14 08:34:43 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1208,7 +1208,7 @@ modID_t getmid(const char *name)
 		modID_t modid = cdev->d_modid;
 		printd(("%s: %s: found device\n", __FUNCTION__, cdev->d_name));
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		cdev_put(cdev);
+		sdev_put(cdev);
 		return (modid);
 	}
 	return (0);

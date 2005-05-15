@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -305,11 +305,11 @@ int etoimajor(major_t emajor)
 #else
 	major_t major = 0;
 #endif
-	if ((cdev = cdev_get(emajor))) {
+	if ((cdev = sdev_get(emajor))) {
 		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 		major = cdev->d_modid;
 		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		cdev_put(cdev);
+		sdev_put(cdev);
 	}
 	return (major);
 }

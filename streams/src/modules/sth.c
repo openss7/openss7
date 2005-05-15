@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:44 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:44 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:44 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:44 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:44 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3689,7 +3689,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	printd(("%s: character device external major %hu, minor %hu\n", __FUNCTION__, major,
 		minor));
 	err = -ENXIO;
-	if (!(cdev = cdev_get(major)))
+	if (!(cdev = sdev_get(major)))
 		goto up_exit;
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	printd(("%s: major maps to streams driver %s\n", __FUNCTION__, cdev->d_name));
@@ -3705,7 +3705,7 @@ STATIC int cdev_open(struct inode *inode, struct file *file)
 	    ((cdev->d_flag & D_CLONE) ? CLONEOPEN : DRVOPEN);
 	err = spec_open(inode, file, dev, sflag);
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
+	sdev_put(cdev);
       up_exit:
 	up(&inode->i_sem);
       exit:

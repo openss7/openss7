@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:39 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:39 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 04:08:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:39 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:39 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -117,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/14 08:34:39 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -637,11 +637,11 @@ streamtab_t *lis_find_strdev(major_t major)
 #endif
 	{
 		struct cdevsw *cdev;
-		if ((cdev = cdev_get(major)) != NULL) {
+		if ((cdev = sdev_get(major)) != NULL) {
 			printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 			st = cdev->d_str;
 			printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-			cdev_put(cdev);
+			sdev_put(cdev);
 		}
 	}
 	return st;
@@ -2333,13 +2333,13 @@ int lis_unregister_strdev(major_t major)
 	if (major != MAJOR(MKDEV(major, 0)))
 #endif
 		return (-EINVAL);
-	if ((cdev = cdev_get(major)) == NULL)
+	if ((cdev = sdev_get(major)) == NULL)
 		return (-ENOENT);
 	printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	cdev_put(cdev);
-	/* we should be able to accept a cdev of NULL so that we don't need to export cdev_get and
-	   cdev_put when liscomp is loaded as a module */
+	sdev_put(cdev);
+	/* we should be able to accept a cdev of NULL so that we don't need to export sdev_get and
+	   sdev_put when liscomp is loaded as a module */
 	if ((err = unregister_strdev(cdev, major)) == 0)
 		kmem_free(cdev, sizeof(*cdev));
 	return (err);
