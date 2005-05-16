@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/13 03:54:29 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/05/16 10:21:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:29 $ by $Author: brian $
+# Last Modified $Date: 2005/05/16 10:21:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,6 +150,7 @@ AC_DEFUN([_XNET_SETUP], [dnl
     _LINUX_DEVFS
     _GENKSYMS
     _LINUX_STREAMS
+    with_tli='yes'
     with_xnet='yes'
     _XOPEN
 ])# _XNET_SETUP

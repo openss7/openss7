@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/05/15 23:57:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/16 11:25:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/15 23:57:20 $ by $Author: brian $
+# Last Modified $Date: 2005/05/16 11:25:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.18  2005/05/15 23:57:20  brian
-# - update tests
+# Revision 0.9.2.19  2005/05/16 11:25:08  brian
+# - minor rearrangement
+#
+# Revision 0.9.2.15  2005/05/16 11:25:08  brian
+# - minor rearrangement
 #
 # Revision 0.9.2.14  2005/05/15 23:57:20  brian
 # - update tests
@@ -115,11 +118,11 @@ package.m4: $(top_srcdir)/configure
 
 # my rule
 TESTSUITE_DEPS		= \
+			kernel.at \
 			clone.at \
 			connld.at \
 			echo.at \
 			fifo.at \
-			kernel.at \
 			log.at \
 			nsdev.at \
 			nuls.at \

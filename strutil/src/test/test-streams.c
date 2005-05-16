@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 23:59:16 $ by $Author: brian $
+ Last Modified $Date: 2005/05/16 10:55:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
- Revision 0.9.2.11  2005/05/14 23:59:16  brian
- - getting autotest up and running
+ Revision 0.9.2.13  2005/05/16 10:55:14  brian
+ - updated test program
+
+ Revision 0.9.2.8  2005/05/16 10:55:14  brian
+ - updated test program
+
+ Revision 0.9.2.7  2005/05/16 10:31:54  brian
+ - updates and corrections
 
  Revision 0.9.2.6  2005/05/14 23:59:16  brian
  - getting autotest up and running
@@ -102,9 +108,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 23:59:16 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -126,7 +132,7 @@ static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0
 
 #include <sys/types.h>
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Configuration
@@ -181,7 +187,7 @@ int flags = 0;
 
 struct timeval when;
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Events and Actions
@@ -194,12 +200,13 @@ enum {
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 };
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  */
+
 int show = 1;
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Timer Functions
@@ -207,7 +214,7 @@ int show = 1;
  *  -------------------------------------------------------------------------
  */
 
-/* 
+/*
  *  Timer values for tests: each timer has a low range (minus error margin)
  *  and a high range (plus error margin).
  */
@@ -231,7 +238,8 @@ long test_start = 0;
 
 static int state;
 
-/* 
+#if 0
+/*
  *  Return the current time in milliseconds.
  */
 static long now(void)
@@ -278,7 +286,7 @@ static long milliseconds_2nd(char *t)
 	return now();
 }
 
-/* 
+/*
  *  Check the current time against the beginning time provided as an argnument
  *  and see if the time inverval falls between the low and high values for the
  *  timer as specified by arguments.  Return SUCCESS if the interval is within
@@ -306,6 +314,7 @@ static int check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
+#endif
 
 static int time_event(int event)
 {
@@ -351,7 +360,7 @@ static int timer_sethandler(void)
 	return __RESULT_SUCCESS;
 }
 
-/* 
+/*
  *  Start an interval timer as the overall test timer.
  */
 static int start_tt(long duration)
@@ -367,11 +376,14 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+
+#if 0
 static int start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int stop_tt(void)
 {
@@ -682,103 +694,103 @@ const char *event_string(int event)
 	}
 }
 
-const char *ioctl_string(int cmd)
+const char *ioctl_string(int cmd, intptr_t arg)
 {
 	switch (cmd) {
 	case I_NREAD:
-		return ("I_NREAD-------");
+		return ("I_NREAD");
 	case I_PUSH:
-		return ("I_PUSH--------");
+		return ("I_PUSH");
 	case I_POP:
-		return ("I_POP---------");
+		return ("I_POP");
 	case I_LOOK:
-		return ("I_LOOK--------");
+		return ("I_LOOK");
 	case I_FLUSH:
-		return ("I_FLUSH-------");
+		return ("I_FLUSH");
 	case I_SRDOPT:
-		return ("I_SRDOPT------");
+		return ("I_SRDOPT");
 	case I_GRDOPT:
-		return ("I_GRDOPT------");
+		return ("I_GRDOPT");
 	case I_STR:
-		return ("I_STR---------");
+		return ("I_STR");
 	case I_SETSIG:
-		return ("I_SETSIG------");
+		return ("I_SETSIG");
 	case I_GETSIG:
-		return ("I_GETSIG------");
+		return ("I_GETSIG");
 	case I_FIND:
-		return ("I_FIND--------");
+		return ("I_FIND");
 	case I_LINK:
-		return ("I_LINK--------");
+		return ("I_LINK");
 	case I_UNLINK:
-		return ("I_UNLINK------");
+		return ("I_UNLINK");
 	case I_RECVFD:
-		return ("I_RECVFD------");
+		return ("I_RECVFD");
 	case I_PEEK:
-		return ("I_PEEK--------");
+		return ("I_PEEK");
 	case I_FDINSERT:
-		return ("I_FDINSERT----");
+		return ("I_FDINSERT");
 	case I_SENDFD:
-		return ("I_SENDFD------");
+		return ("I_SENDFD");
 	case I_E_RECVFD:
-		return ("I_E_RECVFD----");
+		return ("I_E_RECVFD");
 	case I_SWROPT:
-		return ("I_SWROPT------");
+		return ("I_SWROPT");
 	case I_GWROPT:
-		return ("I_GWROPT------");
+		return ("I_GWROPT");
 	case I_LIST:
-		return ("I_LIST--------");
+		return ("I_LIST");
 	case I_PLINK:
-		return ("I_PLINK-------");
+		return ("I_PLINK");
 	case I_PUNLINK:
-		return ("I_PUNLINK-----");
+		return ("I_PUNLINK");
 	case I_FLUSHBAND:
-		return ("I_FLUSHBAND---");
+		return ("I_FLUSHBAND");
 	case I_CKBAND:
-		return ("I_CKBAND------");
+		return ("I_CKBAND");
 	case I_GETBAND:
-		return ("I_GETBAND-----");
+		return ("I_GETBAND");
 	case I_ATMARK:
-		return ("I_ATMARK------");
+		return ("I_ATMARK");
 	case I_SETCLTIME:
-		return ("I_SETCLTIME---");
+		return ("I_SETCLTIME");
 	case I_GETCLTIME:
-		return ("I_GETCLTIME---");
+		return ("I_GETCLTIME");
 	case I_CANPUT:
-		return ("I_CANPUT------");
+		return ("I_CANPUT");
 	case I_SERROPT:
-		return ("I_SERROPT-----");
+		return ("I_SERROPT");
 	case I_GERROPT:
-		return ("I_GERROPT-----");
+		return ("I_GERROPT");
 	case I_ANCHOR:
-		return ("I_ANCHOR------");
+		return ("I_ANCHOR");
 #if 0
 	case I_S_RECVFD:
-		return ("I_S_RECVFD----");
+		return ("I_S_RECVFD");
 	case I_STATS:
-		return ("I_STATS-------");
+		return ("I_STATS");
 	case I_BIGPIPE:
-		return ("I_BIGPIPE-----");
+		return ("I_BIGPIPE");
 #endif
 	case I_GETTP:
-		return ("I_GETTP-------");
+		return ("I_GETTP");
 	case I_AUTOPUSH:
-		return ("I_AUTOPUSH----");
+		return ("I_AUTOPUSH");
 	case I_HEAP_REPORT:
-		return ("I_HEAP_REPORT-");
+		return ("I_HEAP_REPORT");
 	case I_FIFO:
-		return ("I_FIFO--------");
+		return ("I_FIFO");
 	case I_PUTPMSG:
-		return ("I_PUTPMSG-----");
+		return ("I_PUTPMSG");
 	case I_GETPMSG:
-		return ("I_GETPMSG-----");
+		return ("I_GETPMSG");
 	case I_FATTACH:
-		return ("I_FATTACH-----");
+		return ("I_FATTACH");
 	case I_FDETACH:
-		return ("I_FDETACH-----");
+		return ("I_FDETACH");
 	case I_PIPE:
-		return ("I_PIPE--------");
+		return ("I_PIPE");
 	default:
-		return ("(unexpected)--");
+		return ("(unexpected)");
 	}
 }
 
@@ -837,6 +849,17 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 	fprintf(stdout, msgs[child], val, val2);
 	fflush(stdout);
 	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_pipe(int child)
+{
+	static const char *msgs[] = {
+		"  pipe()      ----->v  v<------------------------------>v                   \n",
+		"                    v  v<------------------------------>v<-----     pipe()  \n",
+		"                    .  .                                .                   \n",
+	};
+	if (verbose > 3)
+		print_simple(child, msgs);
 }
 
 void print_open(int child)
@@ -977,11 +1000,24 @@ void print_timeout(int child)
 		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
 		"  ++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
 		"    ++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
+		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++[%d]\n",
 	};
 	if (show_timeout || verbose > 0) {
 		print_simple_int(child, msgs, state);
 		show_timeout--;
 	}
+};
+
+void print_nothing(int child)
+{
+	static const char *msgs[] = {
+		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                   [%d]\n",
+		"                    |  |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
+		"                    |- |- - - - - nothing! - - - - - - -|                   [%d]\n",
+		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
+	};
+	if (verbose > 1)
+		print_simple_int(child, msgs, state);
 };
 
 void print_string_state(int child, const char *msgs[], const char *string)
@@ -992,14 +1028,36 @@ void print_string_state(int child, const char *msgs[], const char *string)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-void print_command(int child, const char *command)
+void print_syscall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"  %-14s--->|  |                                |                   [%d]\n",
+		"                    |  |                                |<---%14s [%d]\n",
+		"                    |  |                                |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void print_tx_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"--%16s->|  |                                |                   [%d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
+		"                    |  |                                |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"%-14s<----/|                               |  |                    [%d]\n",
 		"  %-14s<--/|                               |  |                    [%d]\n",
 		"    %-14s</|                               |  |                    [%d]\n",
 	};
-	if (verbose > 3)
+	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -1009,6 +1067,7 @@ void print_errno(int child, long error)
 		"%-14s<----/|                               |  |                    [%d]\n",
 		"  %-14s<--/|                               |  |                    [%d]\n",
 		"    %-14s</|                               |  |                    [%d]\n",
+		"                    |  |       [%14s]        |                    [%d]\n",
 	};
 	if (verbose > 3)
 		print_string_state(child, msgs, errno_string(error));
@@ -1036,28 +1095,192 @@ void print_success_value(int child, int value)
 		print_double_int(child, msgs, value, state);
 }
 
-void print_ioctl(int child, int cmd)
+void print_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
 		"%-14s----->|                               |  |                    [%d]\n",
 		"  %-14s--->|                               |  |                    [%d]\n",
 		"    %-14s->|                               |  |                    [%d]\n",
 	};
-	if (verbose)
-		print_string_state(child, msgs, ioctl_string(cmd));
+	if (verbose > 0)
+		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
-/* 
+void print_ioctl(int child, int cmd, intptr_t arg)
+{
+	if (verbose > 3)
+		print_ti_ioctl(child, cmd, arg);
+}
+
+/*
  *  -------------------------------------------------------------------------
  *
  *  Driver actions.
  *
  *  -------------------------------------------------------------------------
  */
+int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
+{
+	if (band) {
+		if (verbose > 3) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			lockf(fileno(stdout), F_ULOCK, 0);
+			fflush(stdout);
+		}
+		print_syscall(child, "putpmsg(2)----");
+		for (;;) {
+			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
+				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				return (__RESULT_FAILURE);
+			}
+			print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
+	} else {
+		if (verbose > 3) {
+			lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			lockf(fileno(stdout), F_ULOCK, 0);
+			fflush(stdout);
+		}
+		print_syscall(child, "putmsg(2)-----");
+		for (;;) {
+			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
+				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+					continue;
+				return (__RESULT_FAILURE);
+			}
+			print_success_value(child, last_retval);
+			return (__RESULT_SUCCESS);
+		}
+	}
+}
+
+int test_write(int child, const void *buf, size_t len)
+{
+	print_syscall(child, "write(2)------");
+	for (;;) {
+		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_writev(int child, const struct iovec *iov, int num)
+{
+	print_syscall(child, "writev(2)-----");
+	for (;;) {
+		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
+{
+	print_syscall(child, "getmsg(2)-----");
+	for (;;) {
+		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, int *flagp)
+{
+	print_syscall(child, "getpmsg(2)----");
+	for (;;) {
+		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_read(int child, void *buf, size_t count)
+{
+	print_syscall(child, "read(2)-------");
+	for (;;) {
+		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_readv(int child, const struct iovec *iov, int count)
+{
+	print_syscall(child, "readv(2)------");
+	for (;;) {
+		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_ti_ioctl(int child, int cmd, intptr_t arg)
+{
+	if (cmd == I_STR && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	print_ti_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	if (cmd == I_STR && verbose > 3) {
+		struct strioctl *icp = (struct strioctl *) arg;
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	return __RESULT_SUCCESS;
+}
 
 int test_ioctl(int child, int cmd, intptr_t arg)
 {
-	print_ioctl(child, cmd);
+	print_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
 			print_errno(child, (last_errno = errno));
@@ -1067,6 +1290,24 @@ int test_ioctl(int child, int cmd, intptr_t arg)
 		}
 		print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
+	}
+}
+
+int test_pipe(int child)
+{
+	int fds[2];
+	for (;;) {
+		print_pipe(child);
+		if (pipe(fds) >= 0) {
+			test_fd[child + 0] = fds[0];
+			test_fd[child + 1] = fds[1];
+			print_success(child);
+			return (__RESULT_SUCCESS);
+		}
+		print_errno(child, (last_errno = errno));
+		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			continue;
+		return (__RESULT_FAILURE);
 	}
 }
 
@@ -1104,10 +1345,10 @@ int test_close(int child)
 	}
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
- *  Test initialization and termination.
+ *  Test harness initialization and termination.
  *
  *  -------------------------------------------------------------------------
  */
@@ -1124,7 +1365,7 @@ static int end_tests(void)
 	return (__RESULT_SUCCESS);
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Preambles and postambles
@@ -1147,7 +1388,7 @@ int postamble_0(int child)
 	return __RESULT_SUCCESS;
 }
 
-/* 
+/*
  *  =========================================================================
  *
  *  The Test Cases...
@@ -1161,9 +1402,11 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
+#define test_group_1 "Open and close streams"
 /*
  *  Open and Close 1 stream.
  */
+#define tgrp_case_1_1 test_group_1
 #define name_case_1_1 "Open and close 1 stream."
 #define desc_case_1_1 "\
 Checks that one stream can be opened and closed."
@@ -1183,6 +1426,7 @@ struct test_stream test_case_1_1 = { NULL, &test_1_1, NULL };
 /*
  *  Open and Close 3 streams.
  */
+#define tgrp_case_1_2 test_group_1
 #define name_case_1_2 "Open and close 3 streams."
 #define desc_case_1_2 "\
 Checks that three streams can be opened and closed."
@@ -1199,9 +1443,12 @@ struct test_stream test_case_1_2 = { NULL, &test_1_2, NULL };
 #define test_case_1_2_stream_1 (&test_case_1_2)
 #define test_case_1_2_stream_2 (&test_case_1_2)
 
+#define test_group_2 "Perform IOCTL on one stream"
+
 /*
  *  Perform IOCTL on one stream - I_NREAD
  */
+#define tgrp_case_2_1_1 test_group_2
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define desc_case_2_1_1 "\
 Checks that I_NREAD can be performed on a stream.  Because this test is peformed\n\
@@ -1226,6 +1473,7 @@ struct test_stream test_case_2_1_1 = { &preamble_0, &test_2_1_1, &postamble_0 };
 #define test_case_2_1_1_stream_1 (NULL)
 #define test_case_2_1_1_stream_2 (NULL)
 
+#define tgrp_case_2_1_2 test_group_2
 #define name_case_2_1_2 "Perform streamio I_NREAD - EFAULT."
 #define desc_case_2_1_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -1244,6 +1492,7 @@ struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PUSH
  */
+#define tgrp_case_2_2_1 test_group_2
 #define name_case_2_2_1 "Perform streamio I_PUSH."
 #define desc_case_2_2_1 "\
 Checks that I_PUSH can be performed on a stream."
@@ -1258,6 +1507,7 @@ struct test_stream test_case_2_2_1 = { &preamble_0, &test_2_2_1, &postamble_0 };
 #define test_case_2_2_1_stream_1 (NULL)
 #define test_case_2_2_1_stream_2 (NULL)
 
+#define tgrp_case_2_2_2 test_group_2
 #define name_case_2_2_2 "Perform streamio I_PUSH - EINVAL."
 #define desc_case_2_2_2 "\
 Checks that EINVAL is returned when I_PUSH is performed with an invalid module\n\
@@ -1273,6 +1523,7 @@ struct test_stream test_case_2_2_2 = { &preamble_0, &test_2_2_2, &postamble_0 };
 #define test_case_2_2_2_stream_1 (NULL)
 #define test_case_2_2_2_stream_2 (NULL)
 
+#define tgrp_case_2_2_3 test_group_2
 #define name_case_2_2_3 "Perform streamio I_PUSH - EFAULT."
 #define desc_case_2_2_3 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -1291,6 +1542,7 @@ struct test_stream test_case_2_2_3 = { &preamble_0, &test_2_2_3, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_POP
  */
+#define tgrp_case_2_3 test_group_2
 #define name_case_2_3 "Perform streamio I_POP."
 #define desc_case_2_3 "\
 Checks that I_POP can be performed on a stream."
@@ -1308,6 +1560,7 @@ struct test_stream test_case_2_3 = { &preamble_0, &test_2_3, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_LOOK
  */
+#define tgrp_case_2_4 test_group_2
 #define name_case_2_4 "Perform streamio I_LOOK."
 #define desc_case_2_4 "\
 Checks that I_LOOK can be performed on a stream."
@@ -1326,6 +1579,7 @@ struct test_stream test_case_2_4 = { &preamble_0, &test_2_4, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FLUSH
  */
+#define tgrp_case_2_5 test_group_2
 #define name_case_2_5 "Perform streamio I_FLUSH."
 #define desc_case_2_5 "\
 Checks that I_FLUSH can be performed on a stream."
@@ -1347,6 +1601,7 @@ struct test_stream test_case_2_5 = { &preamble_0, &test_2_5, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SRDOPT
  */
+#define tgrp_case_2_6_1 test_group_2
 #define name_case_2_6_1 "Perform streamio I_SRDOPT - EINVAL."
 #define desc_case_2_6_1 "\
 Checks that I_SRDOPT can be performed on a stream.  This case is performed with\n\
@@ -1363,6 +1618,7 @@ struct test_stream test_case_2_6_1 = { &preamble_0, &test_2_6_1, &postamble_0 };
 #define test_case_2_6_1_stream_1 (NULL)
 #define test_case_2_6_1_stream_2 (NULL)
 
+#define tgrp_case_2_6_2 test_group_2
 #define name_case_2_6_2 "Perform streamio I_SRDOPT - RNORM | RPROTNORM."
 #define desc_case_2_6_2 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1380,6 +1636,7 @@ struct test_stream test_case_2_6_2 = { &preamble_0, &test_2_6_2, &postamble_0 };
 #define test_case_2_6_2_stream_1 (NULL)
 #define test_case_2_6_2_stream_2 (NULL)
 
+#define tgrp_case_2_6_3 test_group_2
 #define name_case_2_6_3 "Perform streamio I_SRDOPT - RNORM | RPROTDAT."
 #define desc_case_2_6_3 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1396,6 +1653,7 @@ struct test_stream test_case_2_6_3 = { &preamble_0, &test_2_6_3, &postamble_0 };
 #define test_case_2_6_3_stream_1 (NULL)
 #define test_case_2_6_3_stream_2 (NULL)
 
+#define tgrp_case_2_6_4 test_group_2
 #define name_case_2_6_4 "Perform streamio I_SRDOPT - RNORM | RPROTDIS."
 #define desc_case_2_6_4 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1412,6 +1670,7 @@ struct test_stream test_case_2_6_4 = { &preamble_0, &test_2_6_4, &postamble_0 };
 #define test_case_2_6_4_stream_1 (NULL)
 #define test_case_2_6_4_stream_2 (NULL)
 
+#define tgrp_case_2_6_5 test_group_2
 #define name_case_2_6_5 "Perform streamio I_SRDOPT - RMSGN | RPROTNORM."
 #define desc_case_2_6_5 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1428,6 +1687,7 @@ struct test_stream test_case_2_6_5 = { &preamble_0, &test_2_6_5, &postamble_0 };
 #define test_case_2_6_5_stream_1 (NULL)
 #define test_case_2_6_5_stream_2 (NULL)
 
+#define tgrp_case_2_6_6 test_group_2
 #define name_case_2_6_6 "Perform streamio I_SRDOPT - RMSGN | RPROTDAT."
 #define desc_case_2_6_6 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1444,6 +1704,7 @@ struct test_stream test_case_2_6_6 = { &preamble_0, &test_2_6_6, &postamble_0 };
 #define test_case_2_6_6_stream_1 (NULL)
 #define test_case_2_6_6_stream_2 (NULL)
 
+#define tgrp_case_2_6_7 test_group_2
 #define name_case_2_6_7 "Perform streamio I_SRDOPT - RMSGN | RPROTDIS."
 #define desc_case_2_6_7 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1460,6 +1721,7 @@ struct test_stream test_case_2_6_7 = { &preamble_0, &test_2_6_7, &postamble_0 };
 #define test_case_2_6_7_stream_1 (NULL)
 #define test_case_2_6_7_stream_2 (NULL)
 
+#define tgrp_case_2_6_8 test_group_2
 #define name_case_2_6_8 "Perform streamio I_SRDOPT - RMSGD | RPROTNORM."
 #define desc_case_2_6_8 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1476,6 +1738,7 @@ struct test_stream test_case_2_6_8 = { &preamble_0, &test_2_6_8, &postamble_0 };
 #define test_case_2_6_8_stream_1 (NULL)
 #define test_case_2_6_8_stream_2 (NULL)
 
+#define tgrp_case_2_6_9 test_group_2
 #define name_case_2_6_9 "Perform streamio I_SRDOPT - RMSGD | RPROTDAT."
 #define desc_case_2_6_9 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1492,6 +1755,7 @@ struct test_stream test_case_2_6_9 = { &preamble_0, &test_2_6_9, &postamble_0 };
 #define test_case_2_6_9_stream_1 (NULL)
 #define test_case_2_6_9_stream_2 (NULL)
 
+#define tgrp_case_2_6_10 test_group_2
 #define name_case_2_6_10 "Perform streamio I_SRDOPT - RMSGD | RPROTDIS."
 #define desc_case_2_6_10 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
@@ -1508,6 +1772,7 @@ struct test_stream test_case_2_6_10 = { &preamble_0, &test_2_6_10, &postamble_0 
 #define test_case_2_6_10_stream_1 (NULL)
 #define test_case_2_6_10_stream_2 (NULL)
 
+#define tgrp_case_2_6_11 test_group_2
 #define name_case_2_6_11 "Perform streamio I_SRDOPT - EINVAL."
 #define desc_case_2_6_11 "\
 Checks that EINVAL is returned when I_SRDOPT is called with an invalid\n\
@@ -1527,6 +1792,7 @@ struct test_stream test_case_2_6_11 = { &preamble_0, &test_2_6_11, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_GRDOPT
  */
+#define tgrp_case_2_7_1 test_group_2
 #define name_case_2_7_1 "Perform streamio I_GRDOPT - default."
 #define desc_case_2_7_1 "\
 Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
@@ -1547,6 +1813,7 @@ struct test_stream test_case_2_7_1 = { &preamble_0, &test_2_7_1, &postamble_0 };
 #define test_case_2_7_1_stream_1 (NULL)
 #define test_case_2_7_1_stream_2 (NULL)
 
+#define tgrp_case_2_7_2 test_group_2
 #define name_case_2_7_2 "Perform streamio I_GRDOPT - set default."
 #define desc_case_2_7_2 "\
 Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
@@ -1570,6 +1837,7 @@ struct test_stream test_case_2_7_2 = { &preamble_0, &test_2_7_2, &postamble_0 };
 #define test_case_2_7_2_stream_1 (NULL)
 #define test_case_2_7_2_stream_2 (NULL)
 
+#define tgrp_case_2_7_3 test_group_2
 #define name_case_2_7_3 "Perform streamio I_GRDOPT - RNORM | RPROTDAT."
 #define desc_case_2_7_3 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1593,6 +1861,7 @@ struct test_stream test_case_2_7_3 = { &preamble_0, &test_2_7_3, &postamble_0 };
 #define test_case_2_7_3_stream_1 (NULL)
 #define test_case_2_7_3_stream_2 (NULL)
 
+#define tgrp_case_2_7_4 test_group_2
 #define name_case_2_7_4 "Perform streamio I_GRDOPT - RNORM | RPROTDIS."
 #define desc_case_2_7_4 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1616,6 +1885,7 @@ struct test_stream test_case_2_7_4 = { &preamble_0, &test_2_7_4, &postamble_0 };
 #define test_case_2_7_4_stream_1 (NULL)
 #define test_case_2_7_4_stream_2 (NULL)
 
+#define tgrp_case_2_7_5 test_group_2
 #define name_case_2_7_5 "Perform streamio I_GRDOPT - RMSGD | RPROTNORM."
 #define desc_case_2_7_5 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1639,6 +1909,7 @@ struct test_stream test_case_2_7_5 = { &preamble_0, &test_2_7_5, &postamble_0 };
 #define test_case_2_7_5_stream_1 (NULL)
 #define test_case_2_7_5_stream_2 (NULL)
 
+#define tgrp_case_2_7_6 test_group_2
 #define name_case_2_7_6 "Perform streamio I_GRDOPT - RMSGD | RPROTDAT."
 #define desc_case_2_7_6 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1662,6 +1933,7 @@ struct test_stream test_case_2_7_6 = { &preamble_0, &test_2_7_6, &postamble_0 };
 #define test_case_2_7_6_stream_1 (NULL)
 #define test_case_2_7_6_stream_2 (NULL)
 
+#define tgrp_case_2_7_7 test_group_2
 #define name_case_2_7_7 "Perform streamio I_GRDOPT - RMSGD | RPROTDIS."
 #define desc_case_2_7_7 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1685,6 +1957,7 @@ struct test_stream test_case_2_7_7 = { &preamble_0, &test_2_7_7, &postamble_0 };
 #define test_case_2_7_7_stream_1 (NULL)
 #define test_case_2_7_7_stream_2 (NULL)
 
+#define tgrp_case_2_7_8 test_group_2
 #define name_case_2_7_8 "Perform streamio I_GRDOPT - RMSGN | RPROTNORM."
 #define desc_case_2_7_8 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1708,6 +1981,7 @@ struct test_stream test_case_2_7_8 = { &preamble_0, &test_2_7_8, &postamble_0 };
 #define test_case_2_7_8_stream_1 (NULL)
 #define test_case_2_7_8_stream_2 (NULL)
 
+#define tgrp_case_2_7_9 test_group_2
 #define name_case_2_7_9 "Perform streamio I_GRDOPT - RMSGN | RPROTDAT."
 #define desc_case_2_7_9 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1731,6 +2005,7 @@ struct test_stream test_case_2_7_9 = { &preamble_0, &test_2_7_9, &postamble_0 };
 #define test_case_2_7_9_stream_1 (NULL)
 #define test_case_2_7_9_stream_2 (NULL)
 
+#define tgrp_case_2_7_10 test_group_2
 #define name_case_2_7_10 "Perform streamio I_GRDOPT - RMSGN | RPROTDIS."
 #define desc_case_2_7_10 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
@@ -1754,6 +2029,7 @@ struct test_stream test_case_2_7_10 = { &preamble_0, &test_2_7_10, &postamble_0 
 #define test_case_2_7_10_stream_1 (NULL)
 #define test_case_2_7_10_stream_2 (NULL)
 
+#define tgrp_case_2_7_11 test_group_2
 #define name_case_2_7_11 "Perform streamio I_GRDOPT - EFAULT."
 #define desc_case_2_7_11 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -1773,6 +2049,7 @@ struct test_stream test_case_2_7_11 = { &preamble_0, &test_2_7_11, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_STR
  */
+#define tgrp_case_2_8 test_group_2
 #define name_case_2_8 "Perform streamio I_STR."
 #define desc_case_2_8 "\
 Checks that I_STR can be performed on a stream."
@@ -1788,6 +2065,7 @@ struct test_stream test_case_2_8 = { &preamble_0, &test_2_8, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SETSIG
  */
+#define tgrp_case_2_9 test_group_2
 #define name_case_2_9 "Perform streamio I_SETSIG."
 #define desc_case_2_9 "\
 Checks that I_SETSIG can be performed on a stream."
@@ -1805,6 +2083,7 @@ struct test_stream test_case_2_9 = { &preamble_0, &test_2_9, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_GETSIG
  */
+#define tgrp_case_2_10_1 test_group_2
 #define name_case_2_10_1 "Perform streamio I_GETSIG."
 #define desc_case_2_10_1 "\
 Checks that I_GETSIG can be performed on a stream."
@@ -1820,6 +2099,7 @@ struct test_stream test_case_2_10_1 = { &preamble_0, &test_2_10_1, &postamble_0 
 #define test_case_2_10_1_stream_1 (NULL)
 #define test_case_2_10_1_stream_2 (NULL)
 
+#define tgrp_case_2_10_2 test_group_2
 #define name_case_2_10_2 "Perform streamio I_GETSIG."
 #define desc_case_2_10_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -1838,6 +2118,7 @@ struct test_stream test_case_2_10_2 = { &preamble_0, &test_2_10_2, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_FIND
  */
+#define tgrp_case_2_11 test_group_2
 #define name_case_2_11 "Perform streamio I_FIND."
 #define desc_case_2_11 "\
 Checks that I_FIND can be performed on a stream."
@@ -1856,6 +2137,7 @@ struct test_stream test_case_2_11 = { &preamble_0, &test_2_11, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_LINK
  */
+#define tgrp_case_2_12 test_group_2
 #define name_case_2_12 "Perform streamio I_LINK."
 #define desc_case_2_12 "\
 Checks that I_LINK can be performed on a stream."
@@ -1871,6 +2153,7 @@ struct test_stream test_case_2_12 = { &preamble_0, &test_2_12, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_UNLINK
  */
+#define tgrp_case_2_13 test_group_2
 #define name_case_2_13 "Perform streamio I_UNLINK."
 #define desc_case_2_13 "\
 Checks that I_UNLINK can be performed on a stream."
@@ -1886,6 +2169,7 @@ struct test_stream test_case_2_13 = { &preamble_0, &test_2_13, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_RECVFD
  */
+#define tgrp_case_2_14 test_group_2
 #define name_case_2_14 "Perform streamio I_RECVFD."
 #define desc_case_2_14 "\
 Checks that I_RECVFD can be performed on a stream."
@@ -1904,6 +2188,7 @@ struct test_stream test_case_2_14 = { &preamble_0, &test_2_14, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PEEK
  */
+#define tgrp_case_2_15 test_group_2
 #define name_case_2_15 "Perform streamio I_PEEK."
 #define desc_case_2_15 "\
 Checks that I_PEEK can be performed on a stream."
@@ -1922,6 +2207,7 @@ struct test_stream test_case_2_15 = { &preamble_0, &test_2_15, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FDINSERT
  */
+#define tgrp_case_2_16 test_group_2
 #define name_case_2_16 "Perform streamio I_FDINSERT."
 #define desc_case_2_16 "\
 Checks that I_FDINSERT can be performed on a stream."
@@ -1937,6 +2223,7 @@ struct test_stream test_case_2_16 = { &preamble_0, &test_2_16, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SENDFD
  */
+#define tgrp_case_2_17 test_group_2
 #define name_case_2_17 "Perform streamio I_SENDFD."
 #define desc_case_2_17 "\
 Checks that I_SENDFD can be performed on a stream."
@@ -1952,6 +2239,7 @@ struct test_stream test_case_2_17 = { &preamble_0, &test_2_17, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_E_RECVFD
  */
+#define tgrp_case_2_18 test_group_2
 #define name_case_2_18 "Perform streamio I_E_RECVFD."
 #define desc_case_2_18 "\
 Checks that I_E_RECVFD can be performed on a stream."
@@ -1967,6 +2255,7 @@ struct test_stream test_case_2_18 = { &preamble_0, &test_2_18, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SWROPT
  */
+#define tgrp_case_2_19_1 test_group_2
 #define name_case_2_19_1 "Perform streamio I_SWROPT - default."
 #define desc_case_2_19_1 "\
 Checks that I_SWROPT can be performed on a stream."
@@ -1982,6 +2271,7 @@ struct test_stream test_case_2_19_1 = { &preamble_0, &test_2_19_1, &postamble_0 
 #define test_case_2_19_1_stream_1 (NULL)
 #define test_case_2_19_1_stream_2 (NULL)
 
+#define tgrp_case_2_19_2 test_group_2
 #define name_case_2_19_2 "Perform streamio I_SWROPT - SNDZERO."
 #define desc_case_2_19_2 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -1998,6 +2288,7 @@ struct test_stream test_case_2_19_2 = { &preamble_0, &test_2_19_2, &postamble_0 
 #define test_case_2_19_2_stream_1 (NULL)
 #define test_case_2_19_2_stream_2 (NULL)
 
+#define tgrp_case_2_19_3 test_group_2
 #define name_case_2_19_3 "Perform streamio I_SWROPT - SNDPIPE."
 #define desc_case_2_19_3 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2014,6 +2305,7 @@ struct test_stream test_case_2_19_3 = { &preamble_0, &test_2_19_3, &postamble_0 
 #define test_case_2_19_3_stream_1 (NULL)
 #define test_case_2_19_3_stream_2 (NULL)
 
+#define tgrp_case_2_19_4 test_group_2
 #define name_case_2_19_4 "Perform streamio I_SWROPT - SNDHOLD."
 #define desc_case_2_19_4 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2030,6 +2322,7 @@ struct test_stream test_case_2_19_4 = { &preamble_0, &test_2_19_4, &postamble_0 
 #define test_case_2_19_4_stream_1 (NULL)
 #define test_case_2_19_4_stream_2 (NULL)
 
+#define tgrp_case_2_19_5 test_group_2
 #define name_case_2_19_5 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE."
 #define desc_case_2_19_5 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2046,6 +2339,7 @@ struct test_stream test_case_2_19_5 = { &preamble_0, &test_2_19_5, &postamble_0 
 #define test_case_2_19_5_stream_1 (NULL)
 #define test_case_2_19_5_stream_2 (NULL)
 
+#define tgrp_case_2_19_6 test_group_2
 #define name_case_2_19_6 "Perform streamio I_SWROPT - SNDZERO | SNDHOLD."
 #define desc_case_2_19_6 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2062,6 +2356,7 @@ struct test_stream test_case_2_19_6 = { &preamble_0, &test_2_19_6, &postamble_0 
 #define test_case_2_19_6_stream_1 (NULL)
 #define test_case_2_19_6_stream_2 (NULL)
 
+#define tgrp_case_2_19_7 test_group_2
 #define name_case_2_19_7 "Perform streamio I_SWROPT - SNDPIPE | SNDHOLD."
 #define desc_case_2_19_7 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2078,6 +2373,7 @@ struct test_stream test_case_2_19_7 = { &preamble_0, &test_2_19_7, &postamble_0 
 #define test_case_2_19_7_stream_1 (NULL)
 #define test_case_2_19_7_stream_2 (NULL)
 
+#define tgrp_case_2_19_8 test_group_2
 #define name_case_2_19_8 "Perform streamio I_SWROPT - SNDZERO | SNDPIPE | SNDHOLD."
 #define desc_case_2_19_8 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
@@ -2094,6 +2390,7 @@ struct test_stream test_case_2_19_8 = { &preamble_0, &test_2_19_8, &postamble_0 
 #define test_case_2_19_8_stream_1 (NULL)
 #define test_case_2_19_8_stream_2 (NULL)
 
+#define tgrp_case_2_19_9 test_group_2
 #define name_case_2_19_9 "Perform streamio I_SWROPT - EINVAL."
 #define desc_case_2_19_9 "\
 Checks that I_SWROPT can be performed on a stream with an invalid argument\n\
@@ -2113,6 +2410,7 @@ struct test_stream test_case_2_19_9 = { &preamble_0, &test_2_19_9, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_GWROPT
  */
+#define tgrp_case_2_20_1 test_group_2
 #define name_case_2_20_1 "Perform streamio I_GWROPT."
 #define desc_case_2_20_1 "\
 Checks that I_GWROPT can be performed on a stream to read the stream default\n\
@@ -2133,6 +2431,7 @@ struct test_stream test_case_2_20_1 = { &preamble_0, &test_2_20_1, &postamble_0 
 #define test_case_2_20_1_stream_1 (NULL)
 #define test_case_2_20_1_stream_2 (NULL)
 
+#define tgrp_case_2_20_2 test_group_2
 #define name_case_2_20_2 "Perform streamio I_GWROPT - default."
 #define desc_case_2_20_2 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2156,6 +2455,7 @@ struct test_stream test_case_2_20_2 = { &preamble_0, &test_2_20_2, &postamble_0 
 #define test_case_2_20_2_stream_1 (NULL)
 #define test_case_2_20_2_stream_2 (NULL)
 
+#define tgrp_case_2_20_3 test_group_2
 #define name_case_2_20_3 "Perform streamio I_GWROPT - SNDZERO."
 #define desc_case_2_20_3 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2179,6 +2479,7 @@ struct test_stream test_case_2_20_3 = { &preamble_0, &test_2_20_3, &postamble_0 
 #define test_case_2_20_3_stream_1 (NULL)
 #define test_case_2_20_3_stream_2 (NULL)
 
+#define tgrp_case_2_20_4 test_group_2
 #define name_case_2_20_4 "Perform streamio I_GWROPT - SNDPIPE."
 #define desc_case_2_20_4 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2202,6 +2503,7 @@ struct test_stream test_case_2_20_4 = { &preamble_0, &test_2_20_4, &postamble_0 
 #define test_case_2_20_4_stream_1 (NULL)
 #define test_case_2_20_4_stream_2 (NULL)
 
+#define tgrp_case_2_20_5 test_group_2
 #define name_case_2_20_5 "Perform streamio I_GWROPT - SNDHOLD."
 #define desc_case_2_20_5 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2225,6 +2527,7 @@ struct test_stream test_case_2_20_5 = { &preamble_0, &test_2_20_5, &postamble_0 
 #define test_case_2_20_5_stream_1 (NULL)
 #define test_case_2_20_5_stream_2 (NULL)
 
+#define tgrp_case_2_20_6 test_group_2
 #define name_case_2_20_6 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE."
 #define desc_case_2_20_6 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2248,6 +2551,7 @@ struct test_stream test_case_2_20_6 = { &preamble_0, &test_2_20_6, &postamble_0 
 #define test_case_2_20_6_stream_1 (NULL)
 #define test_case_2_20_6_stream_2 (NULL)
 
+#define tgrp_case_2_20_7 test_group_2
 #define name_case_2_20_7 "Perform streamio I_GWROPT - SNDZERO | SNDHOLD."
 #define desc_case_2_20_7 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2271,6 +2575,7 @@ struct test_stream test_case_2_20_7 = { &preamble_0, &test_2_20_7, &postamble_0 
 #define test_case_2_20_7_stream_1 (NULL)
 #define test_case_2_20_7_stream_2 (NULL)
 
+#define tgrp_case_2_20_8 test_group_2
 #define name_case_2_20_8 "Perform streamio I_GWROPT - SNDPIPE | SNDHOLD."
 #define desc_case_2_20_8 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2294,6 +2599,7 @@ struct test_stream test_case_2_20_8 = { &preamble_0, &test_2_20_8, &postamble_0 
 #define test_case_2_20_8_stream_1 (NULL)
 #define test_case_2_20_8_stream_2 (NULL)
 
+#define tgrp_case_2_20_9 test_group_2
 #define name_case_2_20_9 "Perform streamio I_GWROPT - SNDZERO | SNDPIPE | SNDHOLD."
 #define desc_case_2_20_9 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
@@ -2317,6 +2623,7 @@ struct test_stream test_case_2_20_9 = { &preamble_0, &test_2_20_9, &postamble_0 
 #define test_case_2_20_9_stream_1 (NULL)
 #define test_case_2_20_9_stream_2 (NULL)
 
+#define tgrp_case_2_20_10 test_group_2
 #define name_case_2_20_10 "Perform streamio I_GWROPT - EFAULT."
 #define desc_case_2_20_10 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -2336,6 +2643,7 @@ struct test_stream test_case_2_20_10 = { &preamble_0, &test_2_20_10, &postamble_
 /*
  *  Perform IOCTL on one stream - I_LIST
  */
+#define tgrp_case_2_21 test_group_2
 #define name_case_2_21 "Perform streamio I_LIST."
 #define desc_case_2_21 "\
 Checks that I_LIST can be performed on a stream."
@@ -2353,6 +2661,7 @@ struct test_stream test_case_2_21 = { &preamble_0, &test_2_21, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PUNLINK
  */
+#define tgrp_case_2_22 test_group_2
 #define name_case_2_22 "Perform streamio I_PUNLINK."
 #define desc_case_2_22 "\
 Checks that I_PUNLINK can be performed on a stream."
@@ -2368,6 +2677,7 @@ struct test_stream test_case_2_22 = { &preamble_0, &test_2_22, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FLUSHBAND
  */
+#define tgrp_case_2_23 test_group_2
 #define name_case_2_23 "Perform streamio I_FLUSHBAND."
 #define desc_case_2_23 "\
 Checks that I_FLUSHBAND can be performed on a stream."
@@ -2390,6 +2700,7 @@ struct test_stream test_case_2_23 = { &preamble_0, &test_2_23, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_CKBAND
  */
+#define tgrp_case_2_24 test_group_2
 #define name_case_2_24 "Perform streamio I_CKBAND."
 #define desc_case_2_24 "\
 Checks that I_CKBAND can be performed on a stream."
@@ -2407,6 +2718,7 @@ struct test_stream test_case_2_24 = { &preamble_0, &test_2_24, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_GETBAND
  */
+#define tgrp_case_2_25 test_group_2
 #define name_case_2_25 "Perform streamio I_GETBAND."
 #define desc_case_2_25 "\
 Checks that I_GETBAND can be performed on a stream."
@@ -2425,6 +2737,7 @@ struct test_stream test_case_2_25 = { &preamble_0, &test_2_25, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_ATMARK
  */
+#define tgrp_case_2_26 test_group_2
 #define name_case_2_26 "Perform streamio I_ATMARK."
 #define desc_case_2_26 "\
 Checks that I_ATMARK can be performed on a stream."
@@ -2442,6 +2755,7 @@ struct test_stream test_case_2_26 = { &preamble_0, &test_2_26, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_SETCLTIME
  */
+#define tgrp_case_2_27_1 test_group_2
 #define name_case_2_27_1 "Perform streamio I_SETCLTIME."
 #define desc_case_2_27_1 "\
 Checks that I_SETCLTIME can be performed on a stream.\n\
@@ -2458,6 +2772,7 @@ struct test_stream test_case_2_27_1 = { &preamble_0, &test_2_27_1, &postamble_0 
 #define test_case_2_27_1_stream_1 (NULL)
 #define test_case_2_27_1_stream_2 (NULL)
 
+#define tgrp_case_2_27_2 test_group_2
 #define name_case_2_27_2 "Perform streamio I_SETCLTIME."
 #define desc_case_2_27_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -2476,6 +2791,7 @@ struct test_stream test_case_2_27_2 = { &preamble_0, &test_2_27_2, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_GETCLTIME
  */
+#define tgrp_case_2_28_1 test_group_2
 #define name_case_2_28_1 "Perform streamio I_GETCLTIME - default."
 #define desc_case_2_28_1 "\
 Checks that I_GETCLTIME can be performed on a stream.\n\
@@ -2492,6 +2808,7 @@ struct test_stream test_case_2_28_1 = { &preamble_0, &test_2_28_1, &postamble_0 
 #define test_case_2_28_1_stream_1 (NULL)
 #define test_case_2_28_1_stream_2 (NULL)
 
+#define tgrp_case_2_28_2 test_group_2
 #define name_case_2_28_2 "Perform streamio I_GETCLTIME - EFAULT."
 #define desc_case_2_28_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -2510,6 +2827,7 @@ struct test_stream test_case_2_28_2 = { &preamble_0, &test_2_28_2, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_CANPUT
  */
+#define tgrp_case_2_29_1 test_group_2
 #define name_case_2_29_1 "Perform streamio I_CANPUT."
 #define desc_case_2_29_1 "\
 Checks that I_CANPUT can be performed on a stream for band 0."
@@ -2524,6 +2842,7 @@ struct test_stream test_case_2_29_1 = { &preamble_0, &test_2_29_1, &postamble_0 
 #define test_case_2_29_1_stream_1 (NULL)
 #define test_case_2_29_1_stream_2 (NULL)
 
+#define tgrp_case_2_29_2 test_group_2
 #define name_case_2_29_2 "Perform streamio I_CANPUT."
 #define desc_case_2_29_2 "\
 Checks that I_CANPUT can be performed on a stream for band 2."
@@ -2538,6 +2857,7 @@ struct test_stream test_case_2_29_2 = { &preamble_0, &test_2_29_2, &postamble_0 
 #define test_case_2_29_2_stream_1 (NULL)
 #define test_case_2_29_2_stream_2 (NULL)
 
+#define tgrp_case_2_29_3 test_group_2
 #define name_case_2_29_3 "Perform streamio I_CANPUT."
 #define desc_case_2_29_3 "\
 Checks that I_CANPUT performed on a stream for an illegal band (256) will result\n\
@@ -2553,6 +2873,7 @@ struct test_stream test_case_2_29_3 = { &preamble_0, &test_2_29_3, &postamble_0 
 #define test_case_2_29_3_stream_1 (NULL)
 #define test_case_2_29_3_stream_2 (NULL)
 
+#define tgrp_case_2_29_4 test_group_2
 #define name_case_2_29_4 "Perform streamio I_CANPUT."
 #define desc_case_2_29_4 "\
 Checks that I_CANPUT can be performed on a stream for the special band ANYBAND.\n\
@@ -2572,6 +2893,7 @@ struct test_stream test_case_2_29_4 = { &preamble_0, &test_2_29_4, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_SERROPT	(Solaris)
  */
+#define tgrp_case_2_30_1 test_group_2
 #define name_case_2_30_1 "Perform streamio I_SERROPT - default."
 #define desc_case_2_30_1 "\
 Checks that I_SERROPT can be performed on a stream with error option values\n\
@@ -2587,6 +2909,7 @@ struct test_stream test_case_2_30_1 = { &preamble_0, &test_2_30_1, &postamble_0 
 #define test_case_2_30_1_stream_1 (NULL)
 #define test_case_2_30_1_stream_2 (NULL)
 
+#define tgrp_case_2_30_2 test_group_2
 #define name_case_2_30_2 "Perform streamio I_SERROPT - RERRNONPERSIST."
 #define desc_case_2_30_2 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
@@ -2602,6 +2925,7 @@ struct test_stream test_case_2_30_2 = { &preamble_0, &test_2_30_2, &postamble_0 
 #define test_case_2_30_2_stream_1 (NULL)
 #define test_case_2_30_2_stream_2 (NULL)
 
+#define tgrp_case_2_30_3 test_group_2
 #define name_case_2_30_3 "Perform streamio I_SERROPT - WERRNONPERSIST."
 #define desc_case_2_30_3 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
@@ -2617,6 +2941,7 @@ struct test_stream test_case_2_30_3 = { &preamble_0, &test_2_30_3, &postamble_0 
 #define test_case_2_30_3_stream_1 (NULL)
 #define test_case_2_30_3_stream_2 (NULL)
 
+#define tgrp_case_2_30_4 test_group_2
 #define name_case_2_30_4 "Perform streamio I_SERROPT - RERRNONPERSIST | WERRNONPERSIST."
 #define desc_case_2_30_4 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
@@ -2632,6 +2957,7 @@ struct test_stream test_case_2_30_4 = { &preamble_0, &test_2_30_4, &postamble_0 
 #define test_case_2_30_4_stream_1 (NULL)
 #define test_case_2_30_4_stream_2 (NULL)
 
+#define tgrp_case_2_30_5 test_group_2
 #define name_case_2_30_5 "Perform streamio I_SERROPT - EINVAL."
 #define desc_case_2_30_5 "\
 Checks that I_SERROPT can be performed on a stream with an invalid argument\n\
@@ -2650,6 +2976,7 @@ struct test_stream test_case_2_30_5 = { &preamble_0, &test_2_30_5, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_GERROPT	(Solaris)
  */
+#define tgrp_case_2_31_1 test_group_2
 #define name_case_2_31_1 "Perform streamio I_GERROPT - default."
 #define desc_case_2_31_1 "\
 Checks that I_GERROPT can be performed on a stream to read the stream default\n\
@@ -2670,6 +2997,7 @@ struct test_stream test_case_2_31_1 = { &preamble_0, &test_2_31_1, &postamble_0 
 #define test_case_2_31_1_stream_1 (NULL)
 #define test_case_2_31_1_stream_2 (NULL)
 
+#define tgrp_case_2_31_2 test_group_2
 #define name_case_2_31_2 "Perform streamio I_GERROPT - set to default."
 #define desc_case_2_31_2 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
@@ -2693,6 +3021,7 @@ struct test_stream test_case_2_31_2 = { &preamble_0, &test_2_31_2, &postamble_0 
 #define test_case_2_31_2_stream_1 (NULL)
 #define test_case_2_31_2_stream_2 (NULL)
 
+#define tgrp_case_2_31_3 test_group_2
 #define name_case_2_31_3 "Perform streamio I_GERROPT - RERRNONPERSIST."
 #define desc_case_2_31_3 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
@@ -2716,6 +3045,7 @@ struct test_stream test_case_2_31_3 = { &preamble_0, &test_2_31_3, &postamble_0 
 #define test_case_2_31_3_stream_1 (NULL)
 #define test_case_2_31_3_stream_2 (NULL)
 
+#define tgrp_case_2_31_4 test_group_2
 #define name_case_2_31_4 "Perform streamio I_GERROPT - WERRNONPERSIST."
 #define desc_case_2_31_4 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
@@ -2739,6 +3069,7 @@ struct test_stream test_case_2_31_4 = { &preamble_0, &test_2_31_4, &postamble_0 
 #define test_case_2_31_4_stream_1 (NULL)
 #define test_case_2_31_4_stream_2 (NULL)
 
+#define tgrp_case_2_31_5 test_group_2
 #define name_case_2_31_5 "Perform streamio I_GERROPT - RERRNONPERSIST | WERRNONPERSIST."
 #define desc_case_2_31_5 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
@@ -2762,6 +3093,7 @@ struct test_stream test_case_2_31_5 = { &preamble_0, &test_2_31_5, &postamble_0 
 #define test_case_2_31_5_stream_1 (NULL)
 #define test_case_2_31_5_stream_2 (NULL)
 
+#define tgrp_case_2_31_6 test_group_2
 #define name_case_2_31_6 "Perform streamio I_GERROPT - EFAULT."
 #define desc_case_2_31_6 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
@@ -2780,6 +3112,7 @@ struct test_stream test_case_2_31_6 = { &preamble_0, &test_2_31_6, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_ANCHOR	(Solaris)
  */
+#define tgrp_case_2_32 test_group_2
 #define name_case_2_32 "Perform streamio I_ANCHOR."
 #define desc_case_2_32 "\
 Checks that I_ANCHOR can be performed on a stream."
@@ -2798,6 +3131,7 @@ struct test_stream test_case_2_32 = { &preamble_0, &test_2_32, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_S_RECVFD	(UnixWare)
  */
+#define tgrp_case_2_33 test_group_2
 #define name_case_2_33 "Perform streamio I_S_RECVFD."
 #define desc_case_2_33 "\
 Checks that I_S_RECVFD can be performed on a stream."
@@ -2816,6 +3150,7 @@ struct test_stream test_case_2_33 = { &preamble_0, &test_2_33, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_STATS	(UnixWare)
  */
+#define tgrp_case_2_34 test_group_2
 #define name_case_2_34 "Perform streamio I_STATS."
 #define desc_case_2_34 "\
 Checks that I_STATS can be performed on a stream."
@@ -2831,6 +3166,7 @@ struct test_stream test_case_2_34 = { &preamble_0, &test_2_34, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_BIGPIPE	(UnixWare)
  */
+#define tgrp_case_2_35 test_group_2
 #define name_case_2_35 "Perform streamio I_BIGPIPE."
 #define desc_case_2_35 "\
 Checks that I_BIGPIPE can be performed on a stream."
@@ -2846,6 +3182,7 @@ struct test_stream test_case_2_35 = { &preamble_0, &test_2_35, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_GETTP	(UnixWare)
  */
+#define tgrp_case_2_36 test_group_2
 #define name_case_2_36 "Perform streamio I_GETTP."
 #define desc_case_2_36 "\
 Checks that I_GETTP can be performed on a stream."
@@ -2861,6 +3198,7 @@ struct test_stream test_case_2_36 = { &preamble_0, &test_2_36, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_AUTOPUSH	(MacOT)
  */
+#define tgrp_case_2_37 test_group_2
 #define name_case_2_37 "Perform streamio I_AUTOPUSH."
 #define desc_case_2_37 "\
 Checks that I_AUTOPUSH can be performed on a stream."
@@ -2876,6 +3214,7 @@ struct test_stream test_case_2_37 = { &preamble_0, &test_2_37, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_HEAP_REPORT	(MacOT)
  */
+#define tgrp_case_2_38 test_group_2
 #define name_case_2_38 "Perform streamio I_HEAP_REPORT."
 #define desc_case_2_38 "\
 Checks that I_HEAP_REPORT can be performed on a stream."
@@ -2891,6 +3230,7 @@ struct test_stream test_case_2_38 = { &preamble_0, &test_2_38, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FIFO	(MacOT)
  */
+#define tgrp_case_2_39 test_group_2
 #define name_case_2_39 "Perform streamio I_FIFO."
 #define desc_case_2_39 "\
 Checks that I_FIFO can be performed on a stream."
@@ -2906,6 +3246,7 @@ struct test_stream test_case_2_39 = { &preamble_0, &test_2_39, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PUTPMSG	(LiS)
  */
+#define tgrp_case_2_40 test_group_2
 #define name_case_2_40 "Perform streamio I_PUTPMSG."
 #define desc_case_2_40 "\
 Checks that I_PUTPMSG can be performed on a stream."
@@ -2921,6 +3262,7 @@ struct test_stream test_case_2_40 = { &preamble_0, &test_2_40, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_GETPMSG	(LiS)
  */
+#define tgrp_case_2_41 test_group_2
 #define name_case_2_41 "Perform streamio I_GETPMSG."
 #define desc_case_2_41 "\
 Checks that I_GETPMSG can be performed on a stream."
@@ -2936,6 +3278,7 @@ struct test_stream test_case_2_41 = { &preamble_0, &test_2_41, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FATTACH	(LiS)
  */
+#define tgrp_case_2_42 test_group_2
 #define name_case_2_42 "Perform streamio I_FATTACH."
 #define desc_case_2_42 "\
 Checks that I_FATTACH can be performed on a stream."
@@ -2951,6 +3294,7 @@ struct test_stream test_case_2_42 = { &preamble_0, &test_2_42, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_FDETACH	(LiS)
  */
+#define tgrp_case_2_43 test_group_2
 #define name_case_2_43 "Perform streamio I_FDETACH."
 #define desc_case_2_43 "\
 Checks that I_FDETACH can be performed on a stream."
@@ -2966,6 +3310,7 @@ struct test_stream test_case_2_43 = { &preamble_0, &test_2_43, &postamble_0 };
 /*
  *  Perform IOCTL on one stream - I_PIPE	(LiS)
  */
+#define tgrp_case_2_44 test_group_2
 #define name_case_2_44 "Perform streamio I_PIPE."
 #define desc_case_2_44 "\
 Checks that I_PIPE can be performed on a stream."
@@ -2979,7 +3324,7 @@ struct test_stream test_case_2_44 = { &preamble_0, &test_2_44, &postamble_0 };
 #define test_case_2_44_stream_2 (NULL)
 #endif
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Test case child scheduler
@@ -3028,7 +3373,7 @@ int run_stream(int child, struct test_stream *stream)
 	exit(result);
 }
 
-/* 
+/*
  *  Fork multiple children to do the actual testing.
  */
 
@@ -3157,7 +3502,7 @@ int test_run(struct test_stream *stream[])
 		} else {
 			if (timer_timeout) {
 				timer_timeout = 0;
-				print_timeout(0);
+				print_timeout(3);
 				last_event = __EVENT_TIMEOUT;
 			}
 			if (child[0]) {
@@ -3186,7 +3531,7 @@ int test_run(struct test_stream *stream[])
 	return (__RESULT_INCONCLUSIVE);
 }
 
-/* 
+/*
  *  -------------------------------------------------------------------------
  *
  *  Test case lists
@@ -3196,6 +3541,7 @@ int test_run(struct test_stream *stream[])
 
 struct test_case {
 	const char *numb;		/* test case number */
+	const char *tgrp;		/* test case group */
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
 	struct test_stream *stream[3];	/* test streams */
@@ -3203,310 +3549,209 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
-		"1.1", name_case_1_1, desc_case_1_1, {
-	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, 0, 0}
-	, {
-		"1.2", name_case_1_2, desc_case_1_2, {
-	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, 0, 0}
-	, {
-		"2.1.1", name_case_2_1_1, desc_case_2_1_1, {
-	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, 0, 0}
-	, {
-		"2.1.2", name_case_2_1_2, desc_case_2_1_2, {
-	test_case_2_1_2_stream_0, test_case_2_1_2_stream_1, test_case_2_1_2_stream_2}, 0, 0}
-	, {
-		"2.2.1", name_case_2_2_1, desc_case_2_2_1, {
-	test_case_2_2_1_stream_0, test_case_2_2_1_stream_1, test_case_2_2_1_stream_2}, 0, 0}
-	, {
-		"2.2.2", name_case_2_2_2, desc_case_2_2_2, {
-	test_case_2_2_2_stream_0, test_case_2_2_2_stream_1, test_case_2_2_2_stream_2}, 0, 0}
-	, {
-		"2.2.3", name_case_2_2_3, desc_case_2_2_3, {
-	test_case_2_2_3_stream_0, test_case_2_2_3_stream_1, test_case_2_2_3_stream_2}, 0, 0}
-	, {
-		"2.3", name_case_2_3, desc_case_2_3, {
-	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, 0, 0}
-	, {
-		"2.4", name_case_2_4, desc_case_2_4, {
-	test_case_2_4_stream_0, test_case_2_4_stream_1, test_case_2_4_stream_2}, 0, 0}
-	, {
-		"2.5", name_case_2_5, desc_case_2_5, {
-	test_case_2_5_stream_0, test_case_2_5_stream_1, test_case_2_5_stream_2}, 0, 0}
-	, {
-		"2.6.1", name_case_2_6_1, desc_case_2_6_1, {
-	test_case_2_6_1_stream_0, test_case_2_6_1_stream_1, test_case_2_6_1_stream_2}, 0, 0}
-	, {
-		"2.6.2", name_case_2_6_2, desc_case_2_6_2, {
-	test_case_2_6_2_stream_0, test_case_2_6_2_stream_1, test_case_2_6_2_stream_2}, 0, 0}
-	, {
-		"2.6.3", name_case_2_6_3, desc_case_2_6_3, {
-	test_case_2_6_3_stream_0, test_case_2_6_3_stream_1, test_case_2_6_3_stream_2}, 0, 0}
-	, {
-		"2.6.4", name_case_2_6_4, desc_case_2_6_4, {
-	test_case_2_6_4_stream_0, test_case_2_6_4_stream_1, test_case_2_6_4_stream_2}, 0, 0}
-	, {
-		"2.6.5", name_case_2_6_5, desc_case_2_6_5, {
-	test_case_2_6_5_stream_0, test_case_2_6_5_stream_1, test_case_2_6_5_stream_2}, 0, 0}
-	, {
-		"2.6.6", name_case_2_6_6, desc_case_2_6_6, {
-	test_case_2_6_6_stream_0, test_case_2_6_6_stream_1, test_case_2_6_6_stream_2}, 0, 0}
-	, {
-		"2.6.7", name_case_2_6_7, desc_case_2_6_7, {
-	test_case_2_6_7_stream_0, test_case_2_6_7_stream_1, test_case_2_6_7_stream_2}, 0, 0}
-	, {
-		"2.6.8", name_case_2_6_8, desc_case_2_6_8, {
-	test_case_2_6_8_stream_0, test_case_2_6_8_stream_1, test_case_2_6_8_stream_2}, 0, 0}
-	, {
-		"2.6.9", name_case_2_6_9, desc_case_2_6_9, {
-	test_case_2_6_9_stream_0, test_case_2_6_9_stream_1, test_case_2_6_9_stream_2}, 0, 0}
-	, {
-		"2.6.10", name_case_2_6_10, desc_case_2_6_10, {
-	test_case_2_6_10_stream_0, test_case_2_6_10_stream_1, test_case_2_6_10_stream_2}, 0, 0}
-	, {
-		"2.6.11", name_case_2_6_11, desc_case_2_6_11, {
-	test_case_2_6_11_stream_0, test_case_2_6_11_stream_1, test_case_2_6_11_stream_2}, 0, 0}
-	, {
-		"2.7.1", name_case_2_7_1, desc_case_2_7_1, {
-	test_case_2_7_1_stream_0, test_case_2_7_1_stream_1, test_case_2_7_1_stream_2}, 0, 0}
-	, {
-		"2.7.2", name_case_2_7_2, desc_case_2_7_2, {
-	test_case_2_7_2_stream_0, test_case_2_7_2_stream_1, test_case_2_7_2_stream_2}, 0, 0}
-	, {
-		"2.7.3", name_case_2_7_3, desc_case_2_7_3, {
-	test_case_2_7_3_stream_0, test_case_2_7_3_stream_1, test_case_2_7_3_stream_2}, 0, 0}
-	, {
-		"2.7.4", name_case_2_7_4, desc_case_2_7_4, {
-	test_case_2_7_4_stream_0, test_case_2_7_4_stream_1, test_case_2_7_4_stream_2}, 0, 0}
-	, {
-		"2.7.5", name_case_2_7_5, desc_case_2_7_5, {
-	test_case_2_7_5_stream_0, test_case_2_7_5_stream_1, test_case_2_7_5_stream_2}, 0, 0}
-	, {
-		"2.7.6", name_case_2_7_6, desc_case_2_7_6, {
-	test_case_2_7_6_stream_0, test_case_2_7_6_stream_1, test_case_2_7_6_stream_2}, 0, 0}
-	, {
-		"2.7.7", name_case_2_7_7, desc_case_2_7_7, {
-	test_case_2_7_7_stream_0, test_case_2_7_7_stream_1, test_case_2_7_7_stream_2}, 0, 0}
-	, {
-		"2.7.8", name_case_2_7_8, desc_case_2_7_8, {
-	test_case_2_7_8_stream_0, test_case_2_7_8_stream_1, test_case_2_7_8_stream_2}, 0, 0}
-	, {
-		"2.7.9", name_case_2_7_9, desc_case_2_7_9, {
-	test_case_2_7_9_stream_0, test_case_2_7_9_stream_1, test_case_2_7_9_stream_2}, 0, 0}
-	, {
-		"2.7.10", name_case_2_7_10, desc_case_2_7_10, {
-	test_case_2_7_10_stream_0, test_case_2_7_10_stream_1, test_case_2_7_10_stream_2}, 0, 0}
-	, {
-		"2.7.11", name_case_2_7_11, desc_case_2_7_11, {
-	test_case_2_7_11_stream_0, test_case_2_7_11_stream_1, test_case_2_7_11_stream_2}, 0, 0}
-	, {
-		"2.8", name_case_2_8, desc_case_2_8, {
-	test_case_2_8_stream_0, test_case_2_8_stream_1, test_case_2_8_stream_2}, 0, 0}
-	, {
-		"2.9", name_case_2_9, desc_case_2_9, {
-	test_case_2_9_stream_0, test_case_2_9_stream_1, test_case_2_9_stream_2}, 0, 0}
-	, {
-		"2.10.1", name_case_2_10_1, desc_case_2_10_1, {
-	test_case_2_10_1_stream_0, test_case_2_10_1_stream_1, test_case_2_10_1_stream_2}, 0, 0}
-	, {
-		"2.10.2", name_case_2_10_2, desc_case_2_10_2, {
-	test_case_2_10_2_stream_0, test_case_2_10_2_stream_1, test_case_2_10_2_stream_2}, 0, 0}
-	, {
-		"2.11", name_case_2_11, desc_case_2_11, {
-	test_case_2_11_stream_0, test_case_2_11_stream_1, test_case_2_11_stream_2}, 0, 0}
-	, {
-		"2.12", name_case_2_12, desc_case_2_12, {
-	test_case_2_12_stream_0, test_case_2_12_stream_1, test_case_2_12_stream_2}, 0, 0}
-	, {
-		"2.13", name_case_2_13, desc_case_2_13, {
-	test_case_2_13_stream_0, test_case_2_13_stream_1, test_case_2_13_stream_2}, 0, 0}
-	, {
-		"2.14", name_case_2_14, desc_case_2_14, {
-	test_case_2_14_stream_0, test_case_2_14_stream_1, test_case_2_14_stream_2}, 0, 0}
-	, {
-		"2.15", name_case_2_15, desc_case_2_15, {
-	test_case_2_15_stream_0, test_case_2_15_stream_1, test_case_2_15_stream_2}, 0, 0}
-	, {
-		"2.16", name_case_2_16, desc_case_2_16, {
-	test_case_2_16_stream_0, test_case_2_16_stream_1, test_case_2_16_stream_2}, 0, 0}
-	, {
-		"2.17", name_case_2_17, desc_case_2_17, {
-	test_case_2_17_stream_0, test_case_2_17_stream_1, test_case_2_17_stream_2}, 0, 0}
-	, {
-		"2.18", name_case_2_18, desc_case_2_18, {
-	test_case_2_18_stream_0, test_case_2_18_stream_1, test_case_2_18_stream_2}, 0, 0}
-	, {
-		"2.19.1", name_case_2_19_1, desc_case_2_19_1, {
-	test_case_2_19_1_stream_0, test_case_2_19_1_stream_1, test_case_2_19_1_stream_2}, 0, 0}
-	, {
-		"2.19.2", name_case_2_19_2, desc_case_2_19_2, {
-	test_case_2_19_2_stream_0, test_case_2_19_2_stream_1, test_case_2_19_2_stream_2}, 0, 0}
-	, {
-		"2.19.3", name_case_2_19_3, desc_case_2_19_3, {
-	test_case_2_19_3_stream_0, test_case_2_19_3_stream_1, test_case_2_19_3_stream_2}, 0, 0}
-	, {
-		"2.19.4", name_case_2_19_4, desc_case_2_19_4, {
-	test_case_2_19_4_stream_0, test_case_2_19_4_stream_1, test_case_2_19_4_stream_2}, 0, 0}
-	, {
-		"2.19.5", name_case_2_19_5, desc_case_2_19_5, {
-	test_case_2_19_5_stream_0, test_case_2_19_5_stream_1, test_case_2_19_5_stream_2}, 0, 0}
-	, {
-		"2.19.6", name_case_2_19_6, desc_case_2_19_6, {
-	test_case_2_19_6_stream_0, test_case_2_19_6_stream_1, test_case_2_19_6_stream_2}, 0, 0}
-	, {
-		"2.19.7", name_case_2_19_7, desc_case_2_19_7, {
-	test_case_2_19_7_stream_0, test_case_2_19_7_stream_1, test_case_2_19_7_stream_2}, 0, 0}
-	, {
-		"2.19.8", name_case_2_19_8, desc_case_2_19_8, {
-	test_case_2_19_8_stream_0, test_case_2_19_8_stream_1, test_case_2_19_8_stream_2}, 0, 0}
-	, {
-		"2.19.9", name_case_2_19_9, desc_case_2_19_9, {
-	test_case_2_19_9_stream_0, test_case_2_19_9_stream_1, test_case_2_19_9_stream_2}, 0, 0}
-	, {
-		"2.20.1", name_case_2_20_1, desc_case_2_20_1, {
-	test_case_2_20_1_stream_0, test_case_2_20_1_stream_1, test_case_2_20_1_stream_2}, 0, 0}
-	, {
-		"2.20.2", name_case_2_20_2, desc_case_2_20_2, {
-	test_case_2_20_2_stream_0, test_case_2_20_2_stream_1, test_case_2_20_2_stream_2}, 0, 0}
-	, {
-		"2.20.3", name_case_2_20_3, desc_case_2_20_3, {
-	test_case_2_20_3_stream_0, test_case_2_20_3_stream_1, test_case_2_20_3_stream_2}, 0, 0}
-	, {
-		"2.20.4", name_case_2_20_4, desc_case_2_20_4, {
-	test_case_2_20_4_stream_0, test_case_2_20_4_stream_1, test_case_2_20_4_stream_2}, 0, 0}
-	, {
-		"2.20.5", name_case_2_20_5, desc_case_2_20_5, {
-	test_case_2_20_5_stream_0, test_case_2_20_5_stream_1, test_case_2_20_5_stream_2}, 0, 0}
-	, {
-		"2.20.6", name_case_2_20_6, desc_case_2_20_6, {
-	test_case_2_20_6_stream_0, test_case_2_20_6_stream_1, test_case_2_20_6_stream_2}, 0, 0}
-	, {
-		"2.20.7", name_case_2_20_7, desc_case_2_20_7, {
-	test_case_2_20_7_stream_0, test_case_2_20_7_stream_1, test_case_2_20_7_stream_2}, 0, 0}
-	, {
-		"2.20.8", name_case_2_20_8, desc_case_2_20_8, {
-	test_case_2_20_8_stream_0, test_case_2_20_8_stream_1, test_case_2_20_8_stream_2}, 0, 0}
-	, {
-		"2.20.9", name_case_2_20_9, desc_case_2_20_9, {
-	test_case_2_20_9_stream_0, test_case_2_20_9_stream_1, test_case_2_20_9_stream_2}, 0, 0}
-	, {
-		"2.20.10", name_case_2_20_10, desc_case_2_20_10, {
-	test_case_2_20_10_stream_0, test_case_2_20_10_stream_1, test_case_2_20_10_stream_2}, 0, 0}
-	, {
-		"2.21", name_case_2_21, desc_case_2_21, {
-	test_case_2_21_stream_0, test_case_2_21_stream_1, test_case_2_21_stream_2}, 0, 0}
-	, {
-		"2.22", name_case_2_22, desc_case_2_22, {
-	test_case_2_22_stream_0, test_case_2_22_stream_1, test_case_2_22_stream_2}, 0, 0}
-	, {
-		"2.23", name_case_2_23, desc_case_2_23, {
-	test_case_2_23_stream_0, test_case_2_23_stream_1, test_case_2_23_stream_2}, 0, 0}
-	, {
-		"2.24", name_case_2_24, desc_case_2_24, {
-	test_case_2_24_stream_0, test_case_2_24_stream_1, test_case_2_24_stream_2}, 0, 0}
-	, {
-		"2.25", name_case_2_25, desc_case_2_25, {
-	test_case_2_25_stream_0, test_case_2_25_stream_1, test_case_2_25_stream_2}, 0, 0}
-	, {
-		"2.26", name_case_2_26, desc_case_2_26, {
-	test_case_2_26_stream_0, test_case_2_26_stream_1, test_case_2_26_stream_2}, 0, 0}
-	, {
-		"2.27.1", name_case_2_27_1, desc_case_2_27_1, {
-	test_case_2_27_1_stream_0, test_case_2_27_1_stream_1, test_case_2_27_1_stream_2}, 0, 0}
-	, {
-		"2.27.2", name_case_2_27_2, desc_case_2_27_2, {
-	test_case_2_27_2_stream_0, test_case_2_27_2_stream_1, test_case_2_27_2_stream_2}, 0, 0}
-	, {
-		"2.28.1", name_case_2_28_1, desc_case_2_28_1, {
-	test_case_2_28_1_stream_0, test_case_2_28_1_stream_1, test_case_2_28_1_stream_2}, 0, 0}
-	, {
-		"2.28.2", name_case_2_28_2, desc_case_2_28_2, {
-	test_case_2_28_2_stream_0, test_case_2_28_2_stream_1, test_case_2_28_2_stream_2}, 0, 0}
-	, {
-		"2.29.1", name_case_2_29_1, desc_case_2_29_1, {
-	test_case_2_29_1_stream_0, test_case_2_29_1_stream_1, test_case_2_29_1_stream_2}, 0, 0}
-	, {
-		"2.29.2", name_case_2_29_2, desc_case_2_29_2, {
-	test_case_2_29_2_stream_0, test_case_2_29_2_stream_1, test_case_2_29_2_stream_2}, 0, 0}
-	, {
-		"2.29.3", name_case_2_29_3, desc_case_2_29_3, {
-	test_case_2_29_3_stream_0, test_case_2_29_3_stream_1, test_case_2_29_3_stream_2}, 0, 0}
-	, {
-		"2.29.4", name_case_2_29_4, desc_case_2_29_4, {
-	test_case_2_29_4_stream_0, test_case_2_29_4_stream_1, test_case_2_29_4_stream_2}, 0, 0}
-	, {
-		"2.30.1", name_case_2_30_1, desc_case_2_30_1, {
-	test_case_2_30_1_stream_0, test_case_2_30_1_stream_1, test_case_2_30_1_stream_2}, 0, 0}
-	, {
-		"2.30.2", name_case_2_30_2, desc_case_2_30_2, {
-	test_case_2_30_2_stream_0, test_case_2_30_2_stream_1, test_case_2_30_2_stream_2}, 0, 0}
-	, {
-		"2.30.3", name_case_2_30_3, desc_case_2_30_3, {
-	test_case_2_30_3_stream_0, test_case_2_30_3_stream_1, test_case_2_30_3_stream_2}, 0, 0}
-	, {
-		"2.30.4", name_case_2_30_4, desc_case_2_30_4, {
-	test_case_2_30_4_stream_0, test_case_2_30_4_stream_1, test_case_2_30_4_stream_2}, 0, 0}
-	, {
-		"2.30.5", name_case_2_30_5, desc_case_2_30_5, {
-	test_case_2_30_5_stream_0, test_case_2_30_5_stream_1, test_case_2_30_5_stream_2}, 0, 0}
-	, {
-		"2.31.1", name_case_2_31_1, desc_case_2_31_1, {
-	test_case_2_31_1_stream_0, test_case_2_31_1_stream_1, test_case_2_31_1_stream_2}, 0, 0}
-	, {
-		"2.31.2", name_case_2_31_2, desc_case_2_31_2, {
-	test_case_2_31_2_stream_0, test_case_2_31_2_stream_1, test_case_2_31_2_stream_2}, 0, 0}
-	, {
-		"2.31.3", name_case_2_31_3, desc_case_2_31_3, {
-	test_case_2_31_3_stream_0, test_case_2_31_3_stream_1, test_case_2_31_3_stream_2}, 0, 0}
-	, {
-		"2.31.4", name_case_2_31_4, desc_case_2_31_4, {
-	test_case_2_31_4_stream_0, test_case_2_31_4_stream_1, test_case_2_31_4_stream_2}, 0, 0}
-	, {
-		"2.31.5", name_case_2_31_5, desc_case_2_31_5, {
-	test_case_2_31_5_stream_0, test_case_2_31_5_stream_1, test_case_2_31_5_stream_2}, 0, 0}
-	, {
-		"2.31.6", name_case_2_31_6, desc_case_2_31_6, {
-	test_case_2_31_6_stream_0, test_case_2_31_6_stream_1, test_case_2_31_6_stream_2}, 0, 0}
-	, {
-		"2.32", name_case_2_32, desc_case_2_32, {
-	test_case_2_32_stream_0, test_case_2_32_stream_1, test_case_2_32_stream_2}, 0, 0}
-	, {
+		"1.1", tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
+	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, 0, 0}, {
+		"1.2", tgrp_case_1_2, name_case_1_2, desc_case_1_2, {
+	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, 0, 0}, {
+		"2.1.1", tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, {
+	test_case_2_1_1_stream_0, test_case_2_1_1_stream_1, test_case_2_1_1_stream_2}, 0, 0}, {
+		"2.1.2", tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, {
+	test_case_2_1_2_stream_0, test_case_2_1_2_stream_1, test_case_2_1_2_stream_2}, 0, 0}, {
+		"2.2.1", tgrp_case_2_2_1, name_case_2_2_1, desc_case_2_2_1, {
+	test_case_2_2_1_stream_0, test_case_2_2_1_stream_1, test_case_2_2_1_stream_2}, 0, 0}, {
+		"2.2.2", tgrp_case_2_2_2, name_case_2_2_2, desc_case_2_2_2, {
+	test_case_2_2_2_stream_0, test_case_2_2_2_stream_1, test_case_2_2_2_stream_2}, 0, 0}, {
+		"2.2.3", tgrp_case_2_2_3, name_case_2_2_3, desc_case_2_2_3, {
+	test_case_2_2_3_stream_0, test_case_2_2_3_stream_1, test_case_2_2_3_stream_2}, 0, 0}, {
+		"2.3", tgrp_case_2_3, name_case_2_3, desc_case_2_3, {
+	test_case_2_3_stream_0, test_case_2_3_stream_1, test_case_2_3_stream_2}, 0, 0}, {
+		"2.4", tgrp_case_2_4, name_case_2_4, desc_case_2_4, {
+	test_case_2_4_stream_0, test_case_2_4_stream_1, test_case_2_4_stream_2}, 0, 0}, {
+		"2.5", tgrp_case_2_5, name_case_2_5, desc_case_2_5, {
+	test_case_2_5_stream_0, test_case_2_5_stream_1, test_case_2_5_stream_2}, 0, 0}, {
+		"2.6.1", tgrp_case_2_6_1, name_case_2_6_1, desc_case_2_6_1, {
+	test_case_2_6_1_stream_0, test_case_2_6_1_stream_1, test_case_2_6_1_stream_2}, 0, 0}, {
+		"2.6.2", tgrp_case_2_6_2, name_case_2_6_2, desc_case_2_6_2, {
+	test_case_2_6_2_stream_0, test_case_2_6_2_stream_1, test_case_2_6_2_stream_2}, 0, 0}, {
+		"2.6.3", tgrp_case_2_6_3, name_case_2_6_3, desc_case_2_6_3, {
+	test_case_2_6_3_stream_0, test_case_2_6_3_stream_1, test_case_2_6_3_stream_2}, 0, 0}, {
+		"2.6.4", tgrp_case_2_6_4, name_case_2_6_4, desc_case_2_6_4, {
+	test_case_2_6_4_stream_0, test_case_2_6_4_stream_1, test_case_2_6_4_stream_2}, 0, 0}, {
+		"2.6.5", tgrp_case_2_6_5, name_case_2_6_5, desc_case_2_6_5, {
+	test_case_2_6_5_stream_0, test_case_2_6_5_stream_1, test_case_2_6_5_stream_2}, 0, 0}, {
+		"2.6.6", tgrp_case_2_6_6, name_case_2_6_6, desc_case_2_6_6, {
+	test_case_2_6_6_stream_0, test_case_2_6_6_stream_1, test_case_2_6_6_stream_2}, 0, 0}, {
+		"2.6.7", tgrp_case_2_6_7, name_case_2_6_7, desc_case_2_6_7, {
+	test_case_2_6_7_stream_0, test_case_2_6_7_stream_1, test_case_2_6_7_stream_2}, 0, 0}, {
+		"2.6.8", tgrp_case_2_6_8, name_case_2_6_8, desc_case_2_6_8, {
+	test_case_2_6_8_stream_0, test_case_2_6_8_stream_1, test_case_2_6_8_stream_2}, 0, 0}, {
+		"2.6.9", tgrp_case_2_6_9, name_case_2_6_9, desc_case_2_6_9, {
+	test_case_2_6_9_stream_0, test_case_2_6_9_stream_1, test_case_2_6_9_stream_2}, 0, 0}, {
+		"2.6.10", tgrp_case_2_6_10, name_case_2_6_10, desc_case_2_6_10, {
+	test_case_2_6_10_stream_0, test_case_2_6_10_stream_1, test_case_2_6_10_stream_2}, 0, 0}, {
+		"2.6.11", tgrp_case_2_6_11, name_case_2_6_11, desc_case_2_6_11, {
+	test_case_2_6_11_stream_0, test_case_2_6_11_stream_1, test_case_2_6_11_stream_2}, 0, 0}, {
+		"2.7.1", tgrp_case_2_7_1, name_case_2_7_1, desc_case_2_7_1, {
+	test_case_2_7_1_stream_0, test_case_2_7_1_stream_1, test_case_2_7_1_stream_2}, 0, 0}, {
+		"2.7.2", tgrp_case_2_7_2, name_case_2_7_2, desc_case_2_7_2, {
+	test_case_2_7_2_stream_0, test_case_2_7_2_stream_1, test_case_2_7_2_stream_2}, 0, 0}, {
+		"2.7.3", tgrp_case_2_7_3, name_case_2_7_3, desc_case_2_7_3, {
+	test_case_2_7_3_stream_0, test_case_2_7_3_stream_1, test_case_2_7_3_stream_2}, 0, 0}, {
+		"2.7.4", tgrp_case_2_7_4, name_case_2_7_4, desc_case_2_7_4, {
+	test_case_2_7_4_stream_0, test_case_2_7_4_stream_1, test_case_2_7_4_stream_2}, 0, 0}, {
+		"2.7.5", tgrp_case_2_7_5, name_case_2_7_5, desc_case_2_7_5, {
+	test_case_2_7_5_stream_0, test_case_2_7_5_stream_1, test_case_2_7_5_stream_2}, 0, 0}, {
+		"2.7.6", tgrp_case_2_7_6, name_case_2_7_6, desc_case_2_7_6, {
+	test_case_2_7_6_stream_0, test_case_2_7_6_stream_1, test_case_2_7_6_stream_2}, 0, 0}, {
+		"2.7.7", tgrp_case_2_7_7, name_case_2_7_7, desc_case_2_7_7, {
+	test_case_2_7_7_stream_0, test_case_2_7_7_stream_1, test_case_2_7_7_stream_2}, 0, 0}, {
+		"2.7.8", tgrp_case_2_7_8, name_case_2_7_8, desc_case_2_7_8, {
+	test_case_2_7_8_stream_0, test_case_2_7_8_stream_1, test_case_2_7_8_stream_2}, 0, 0}, {
+		"2.7.9", tgrp_case_2_7_9, name_case_2_7_9, desc_case_2_7_9, {
+	test_case_2_7_9_stream_0, test_case_2_7_9_stream_1, test_case_2_7_9_stream_2}, 0, 0}, {
+		"2.7.10", tgrp_case_2_7_10, name_case_2_7_10, desc_case_2_7_10, {
+	test_case_2_7_10_stream_0, test_case_2_7_10_stream_1, test_case_2_7_10_stream_2}, 0, 0}, {
+		"2.7.11", tgrp_case_2_7_11, name_case_2_7_11, desc_case_2_7_11, {
+	test_case_2_7_11_stream_0, test_case_2_7_11_stream_1, test_case_2_7_11_stream_2}, 0, 0}, {
+		"2.8", tgrp_case_2_8, name_case_2_8, desc_case_2_8, {
+	test_case_2_8_stream_0, test_case_2_8_stream_1, test_case_2_8_stream_2}, 0, 0}, {
+		"2.9", tgrp_case_2_9, name_case_2_9, desc_case_2_9, {
+	test_case_2_9_stream_0, test_case_2_9_stream_1, test_case_2_9_stream_2}, 0, 0}, {
+		"2.10.1", tgrp_case_2_10_1, name_case_2_10_1, desc_case_2_10_1, {
+	test_case_2_10_1_stream_0, test_case_2_10_1_stream_1, test_case_2_10_1_stream_2}, 0, 0}, {
+		"2.10.2", tgrp_case_2_10_2, name_case_2_10_2, desc_case_2_10_2, {
+	test_case_2_10_2_stream_0, test_case_2_10_2_stream_1, test_case_2_10_2_stream_2}, 0, 0}, {
+		"2.11", tgrp_case_2_11, name_case_2_11, desc_case_2_11, {
+	test_case_2_11_stream_0, test_case_2_11_stream_1, test_case_2_11_stream_2}, 0, 0}, {
+		"2.12", tgrp_case_2_12, name_case_2_12, desc_case_2_12, {
+	test_case_2_12_stream_0, test_case_2_12_stream_1, test_case_2_12_stream_2}, 0, 0}, {
+		"2.13", tgrp_case_2_13, name_case_2_13, desc_case_2_13, {
+	test_case_2_13_stream_0, test_case_2_13_stream_1, test_case_2_13_stream_2}, 0, 0}, {
+		"2.14", tgrp_case_2_14, name_case_2_14, desc_case_2_14, {
+	test_case_2_14_stream_0, test_case_2_14_stream_1, test_case_2_14_stream_2}, 0, 0}, {
+		"2.15", tgrp_case_2_15, name_case_2_15, desc_case_2_15, {
+	test_case_2_15_stream_0, test_case_2_15_stream_1, test_case_2_15_stream_2}, 0, 0}, {
+		"2.16", tgrp_case_2_16, name_case_2_16, desc_case_2_16, {
+	test_case_2_16_stream_0, test_case_2_16_stream_1, test_case_2_16_stream_2}, 0, 0}, {
+		"2.17", tgrp_case_2_17, name_case_2_17, desc_case_2_17, {
+	test_case_2_17_stream_0, test_case_2_17_stream_1, test_case_2_17_stream_2}, 0, 0}, {
+		"2.18", tgrp_case_2_18, name_case_2_18, desc_case_2_18, {
+	test_case_2_18_stream_0, test_case_2_18_stream_1, test_case_2_18_stream_2}, 0, 0}, {
+		"2.19.1", tgrp_case_2_19_1, name_case_2_19_1, desc_case_2_19_1, {
+	test_case_2_19_1_stream_0, test_case_2_19_1_stream_1, test_case_2_19_1_stream_2}, 0, 0}, {
+		"2.19.2", tgrp_case_2_19_2, name_case_2_19_2, desc_case_2_19_2, {
+	test_case_2_19_2_stream_0, test_case_2_19_2_stream_1, test_case_2_19_2_stream_2}, 0, 0}, {
+		"2.19.3", tgrp_case_2_19_3, name_case_2_19_3, desc_case_2_19_3, {
+	test_case_2_19_3_stream_0, test_case_2_19_3_stream_1, test_case_2_19_3_stream_2}, 0, 0}, {
+		"2.19.4", tgrp_case_2_19_4, name_case_2_19_4, desc_case_2_19_4, {
+	test_case_2_19_4_stream_0, test_case_2_19_4_stream_1, test_case_2_19_4_stream_2}, 0, 0}, {
+		"2.19.5", tgrp_case_2_19_5, name_case_2_19_5, desc_case_2_19_5, {
+	test_case_2_19_5_stream_0, test_case_2_19_5_stream_1, test_case_2_19_5_stream_2}, 0, 0}, {
+		"2.19.6", tgrp_case_2_19_6, name_case_2_19_6, desc_case_2_19_6, {
+	test_case_2_19_6_stream_0, test_case_2_19_6_stream_1, test_case_2_19_6_stream_2}, 0, 0}, {
+		"2.19.7", tgrp_case_2_19_7, name_case_2_19_7, desc_case_2_19_7, {
+	test_case_2_19_7_stream_0, test_case_2_19_7_stream_1, test_case_2_19_7_stream_2}, 0, 0}, {
+		"2.19.8", tgrp_case_2_19_8, name_case_2_19_8, desc_case_2_19_8, {
+	test_case_2_19_8_stream_0, test_case_2_19_8_stream_1, test_case_2_19_8_stream_2}, 0, 0}, {
+		"2.19.9", tgrp_case_2_19_9, name_case_2_19_9, desc_case_2_19_9, {
+	test_case_2_19_9_stream_0, test_case_2_19_9_stream_1, test_case_2_19_9_stream_2}, 0, 0}, {
+		"2.20.1", tgrp_case_2_20_1, name_case_2_20_1, desc_case_2_20_1, {
+	test_case_2_20_1_stream_0, test_case_2_20_1_stream_1, test_case_2_20_1_stream_2}, 0, 0}, {
+		"2.20.2", tgrp_case_2_20_2, name_case_2_20_2, desc_case_2_20_2, {
+	test_case_2_20_2_stream_0, test_case_2_20_2_stream_1, test_case_2_20_2_stream_2}, 0, 0}, {
+		"2.20.3", tgrp_case_2_20_3, name_case_2_20_3, desc_case_2_20_3, {
+	test_case_2_20_3_stream_0, test_case_2_20_3_stream_1, test_case_2_20_3_stream_2}, 0, 0}, {
+		"2.20.4", tgrp_case_2_20_4, name_case_2_20_4, desc_case_2_20_4, {
+	test_case_2_20_4_stream_0, test_case_2_20_4_stream_1, test_case_2_20_4_stream_2}, 0, 0}, {
+		"2.20.5", tgrp_case_2_20_5, name_case_2_20_5, desc_case_2_20_5, {
+	test_case_2_20_5_stream_0, test_case_2_20_5_stream_1, test_case_2_20_5_stream_2}, 0, 0}, {
+		"2.20.6", tgrp_case_2_20_6, name_case_2_20_6, desc_case_2_20_6, {
+	test_case_2_20_6_stream_0, test_case_2_20_6_stream_1, test_case_2_20_6_stream_2}, 0, 0}, {
+		"2.20.7", tgrp_case_2_20_7, name_case_2_20_7, desc_case_2_20_7, {
+	test_case_2_20_7_stream_0, test_case_2_20_7_stream_1, test_case_2_20_7_stream_2}, 0, 0}, {
+		"2.20.8", tgrp_case_2_20_8, name_case_2_20_8, desc_case_2_20_8, {
+	test_case_2_20_8_stream_0, test_case_2_20_8_stream_1, test_case_2_20_8_stream_2}, 0, 0}, {
+		"2.20.9", tgrp_case_2_20_9, name_case_2_20_9, desc_case_2_20_9, {
+	test_case_2_20_9_stream_0, test_case_2_20_9_stream_1, test_case_2_20_9_stream_2}, 0, 0}, {
+		"2.20.10", tgrp_case_2_20_10, name_case_2_20_10, desc_case_2_20_10, {
+	test_case_2_20_10_stream_0, test_case_2_20_10_stream_1, test_case_2_20_10_stream_2}, 0, 0}, {
+		"2.21", tgrp_case_2_21, name_case_2_21, desc_case_2_21, {
+	test_case_2_21_stream_0, test_case_2_21_stream_1, test_case_2_21_stream_2}, 0, 0}, {
+		"2.22", tgrp_case_2_22, name_case_2_22, desc_case_2_22, {
+	test_case_2_22_stream_0, test_case_2_22_stream_1, test_case_2_22_stream_2}, 0, 0}, {
+		"2.23", tgrp_case_2_23, name_case_2_23, desc_case_2_23, {
+	test_case_2_23_stream_0, test_case_2_23_stream_1, test_case_2_23_stream_2}, 0, 0}, {
+		"2.24", tgrp_case_2_24, name_case_2_24, desc_case_2_24, {
+	test_case_2_24_stream_0, test_case_2_24_stream_1, test_case_2_24_stream_2}, 0, 0}, {
+		"2.25", tgrp_case_2_25, name_case_2_25, desc_case_2_25, {
+	test_case_2_25_stream_0, test_case_2_25_stream_1, test_case_2_25_stream_2}, 0, 0}, {
+		"2.26", tgrp_case_2_26, name_case_2_26, desc_case_2_26, {
+	test_case_2_26_stream_0, test_case_2_26_stream_1, test_case_2_26_stream_2}, 0, 0}, {
+		"2.27.1", tgrp_case_2_27_1, name_case_2_27_1, desc_case_2_27_1, {
+	test_case_2_27_1_stream_0, test_case_2_27_1_stream_1, test_case_2_27_1_stream_2}, 0, 0}, {
+		"2.27.2", tgrp_case_2_27_2, name_case_2_27_2, desc_case_2_27_2, {
+	test_case_2_27_2_stream_0, test_case_2_27_2_stream_1, test_case_2_27_2_stream_2}, 0, 0}, {
+		"2.28.1", tgrp_case_2_28_1, name_case_2_28_1, desc_case_2_28_1, {
+	test_case_2_28_1_stream_0, test_case_2_28_1_stream_1, test_case_2_28_1_stream_2}, 0, 0}, {
+		"2.28.2", tgrp_case_2_28_2, name_case_2_28_2, desc_case_2_28_2, {
+	test_case_2_28_2_stream_0, test_case_2_28_2_stream_1, test_case_2_28_2_stream_2}, 0, 0}, {
+		"2.29.1", tgrp_case_2_29_1, name_case_2_29_1, desc_case_2_29_1, {
+	test_case_2_29_1_stream_0, test_case_2_29_1_stream_1, test_case_2_29_1_stream_2}, 0, 0}, {
+		"2.29.2", tgrp_case_2_29_2, name_case_2_29_2, desc_case_2_29_2, {
+	test_case_2_29_2_stream_0, test_case_2_29_2_stream_1, test_case_2_29_2_stream_2}, 0, 0}, {
+		"2.29.3", tgrp_case_2_29_3, name_case_2_29_3, desc_case_2_29_3, {
+	test_case_2_29_3_stream_0, test_case_2_29_3_stream_1, test_case_2_29_3_stream_2}, 0, 0}, {
+		"2.29.4", tgrp_case_2_29_4, name_case_2_29_4, desc_case_2_29_4, {
+	test_case_2_29_4_stream_0, test_case_2_29_4_stream_1, test_case_2_29_4_stream_2}, 0, 0}, {
+		"2.30.1", tgrp_case_2_30_1, name_case_2_30_1, desc_case_2_30_1, {
+	test_case_2_30_1_stream_0, test_case_2_30_1_stream_1, test_case_2_30_1_stream_2}, 0, 0}, {
+		"2.30.2", tgrp_case_2_30_2, name_case_2_30_2, desc_case_2_30_2, {
+	test_case_2_30_2_stream_0, test_case_2_30_2_stream_1, test_case_2_30_2_stream_2}, 0, 0}, {
+		"2.30.3", tgrp_case_2_30_3, name_case_2_30_3, desc_case_2_30_3, {
+	test_case_2_30_3_stream_0, test_case_2_30_3_stream_1, test_case_2_30_3_stream_2}, 0, 0}, {
+		"2.30.4", tgrp_case_2_30_4, name_case_2_30_4, desc_case_2_30_4, {
+	test_case_2_30_4_stream_0, test_case_2_30_4_stream_1, test_case_2_30_4_stream_2}, 0, 0}, {
+		"2.30.5", tgrp_case_2_30_5, name_case_2_30_5, desc_case_2_30_5, {
+	test_case_2_30_5_stream_0, test_case_2_30_5_stream_1, test_case_2_30_5_stream_2}, 0, 0}, {
+		"2.31.1", tgrp_case_2_31_1, name_case_2_31_1, desc_case_2_31_1, {
+	test_case_2_31_1_stream_0, test_case_2_31_1_stream_1, test_case_2_31_1_stream_2}, 0, 0}, {
+		"2.31.2", tgrp_case_2_31_2, name_case_2_31_2, desc_case_2_31_2, {
+	test_case_2_31_2_stream_0, test_case_2_31_2_stream_1, test_case_2_31_2_stream_2}, 0, 0}, {
+		"2.31.3", tgrp_case_2_31_3, name_case_2_31_3, desc_case_2_31_3, {
+	test_case_2_31_3_stream_0, test_case_2_31_3_stream_1, test_case_2_31_3_stream_2}, 0, 0}, {
+		"2.31.4", tgrp_case_2_31_4, name_case_2_31_4, desc_case_2_31_4, {
+	test_case_2_31_4_stream_0, test_case_2_31_4_stream_1, test_case_2_31_4_stream_2}, 0, 0}, {
+		"2.31.5", tgrp_case_2_31_5, name_case_2_31_5, desc_case_2_31_5, {
+	test_case_2_31_5_stream_0, test_case_2_31_5_stream_1, test_case_2_31_5_stream_2}, 0, 0}, {
+		"2.31.6", tgrp_case_2_31_6, name_case_2_31_6, desc_case_2_31_6, {
+	test_case_2_31_6_stream_0, test_case_2_31_6_stream_1, test_case_2_31_6_stream_2}, 0, 0}, {
+		"2.32", tgrp_case_2_32, name_case_2_32, desc_case_2_32, {
+	test_case_2_32_stream_0, test_case_2_32_stream_1, test_case_2_32_stream_2}, 0, 0}, {
 #if 0
-		"2.33", name_case_2_33, desc_case_2_33, {
-	test_case_2_33_stream_0, test_case_2_33_stream_1, test_case_2_33_stream_2}, 0, 0}
-	, {
-		"2.34", name_case_2_34, desc_case_2_34, {
-	test_case_2_34_stream_0, test_case_2_34_stream_1, test_case_2_34_stream_2}, 0, 0}
-	, {
-		"2.35", name_case_2_35, desc_case_2_35, {
-	test_case_2_35_stream_0, test_case_2_35_stream_1, test_case_2_35_stream_2}, 0, 0}
-	, {
-		"2.36", name_case_2_36, desc_case_2_36, {
-	test_case_2_36_stream_0, test_case_2_36_stream_1, test_case_2_36_stream_2}, 0, 0}
-	, {
-		"2.37", name_case_2_37, desc_case_2_37, {
-	test_case_2_37_stream_0, test_case_2_37_stream_1, test_case_2_37_stream_2}, 0, 0}
-	, {
-		"2.38", name_case_2_38, desc_case_2_38, {
-	test_case_2_38_stream_0, test_case_2_38_stream_1, test_case_2_38_stream_2}, 0, 0}
-	, {
-		"2.39", name_case_2_39, desc_case_2_39, {
-	test_case_2_39_stream_0, test_case_2_39_stream_1, test_case_2_39_stream_2}, 0, 0}
-	, {
-		"2.40", name_case_2_40, desc_case_2_40, {
-	test_case_2_40_stream_0, test_case_2_40_stream_1, test_case_2_40_stream_2}, 0, 0}
-	, {
-		"2.41", name_case_2_41, desc_case_2_41, {
-	test_case_2_41_stream_0, test_case_2_41_stream_1, test_case_2_41_stream_2}, 0, 0}
-	, {
-		"2.42", name_case_2_42, desc_case_2_42, {
-	test_case_2_42_stream_0, test_case_2_42_stream_1, test_case_2_42_stream_2}, 0, 0}
-	, {
-		"2.43", name_case_2_43, desc_case_2_43, {
-	test_case_2_43_stream_0, test_case_2_43_stream_1, test_case_2_43_stream_2}, 0, 0}
-	, {
-		"2.44", name_case_2_44, desc_case_2_44, {
-	test_case_2_44_stream_0, test_case_2_44_stream_1, test_case_2_44_stream_2}, 0, 0}
-	, {
+		"2.33", tgrp_case_2_33, name_case_2_33, desc_case_2_33, {
+	test_case_2_33_stream_0, test_case_2_33_stream_1, test_case_2_33_stream_2}, 0, 0}, {
+		"2.34", tgrp_case_2_34, name_case_2_34, desc_case_2_34, {
+	test_case_2_34_stream_0, test_case_2_34_stream_1, test_case_2_34_stream_2}, 0, 0}, {
+		"2.35", tgrp_case_2_35, name_case_2_35, desc_case_2_35, {
+	test_case_2_35_stream_0, test_case_2_35_stream_1, test_case_2_35_stream_2}, 0, 0}, {
+		"2.36", tgrp_case_2_36, name_case_2_36, desc_case_2_36, {
+	test_case_2_36_stream_0, test_case_2_36_stream_1, test_case_2_36_stream_2}, 0, 0}, {
+		"2.37", tgrp_case_2_37, name_case_2_37, desc_case_2_37, {
+	test_case_2_37_stream_0, test_case_2_37_stream_1, test_case_2_37_stream_2}, 0, 0}, {
+		"2.38", tgrp_case_2_38, name_case_2_38, desc_case_2_38, {
+	test_case_2_38_stream_0, test_case_2_38_stream_1, test_case_2_38_stream_2}, 0, 0}, {
+		"2.39", tgrp_case_2_39, name_case_2_39, desc_case_2_39, {
+	test_case_2_39_stream_0, test_case_2_39_stream_1, test_case_2_39_stream_2}, 0, 0}, {
+		"2.40", tgrp_case_2_40, name_case_2_40, desc_case_2_40, {
+	test_case_2_40_stream_0, test_case_2_40_stream_1, test_case_2_40_stream_2}, 0, 0}, {
+		"2.41", tgrp_case_2_41, name_case_2_41, desc_case_2_41, {
+	test_case_2_41_stream_0, test_case_2_41_stream_1, test_case_2_41_stream_2}, 0, 0}, {
+		"2.42", tgrp_case_2_42, name_case_2_42, desc_case_2_42, {
+	test_case_2_42_stream_0, test_case_2_42_stream_1, test_case_2_42_stream_2}, 0, 0}, {
+		"2.43", tgrp_case_2_43, name_case_2_43, desc_case_2_43, {
+	test_case_2_43_stream_0, test_case_2_43_stream_1, test_case_2_43_stream_2}, 0, 0}, {
+		"2.44", tgrp_case_2_44, name_case_2_44, desc_case_2_44, {
+	test_case_2_44_stream_0, test_case_2_44_stream_1, test_case_2_44_stream_2}, 0, 0}, {
 #endif
 	NULL,}
 };
@@ -3532,7 +3777,6 @@ int do_tests(void)
 	int failures = 0;
 	int skipped = 0;
 	int aborted = 0;
-	int num_exit;
 	print_header();
 	show = 0;
 	if (verbose > 0) {
@@ -3559,6 +3803,8 @@ int do_tests(void)
 			}
 			if (verbose > 0) {
 				lockf(fileno(stdout), F_LOCK, 0);
+				if (verbose > 1)
+					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1)
 					fprintf(stdout, "%s\n", tests[i].desc);
@@ -3688,15 +3934,15 @@ int do_tests(void)
 	}
 }
 
-void splash(int argc, char *argv[])
+void copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -3738,6 +3984,7 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
+\n\
 ");
 }
 
@@ -3746,12 +3993,16 @@ void version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 %1$s:\n\
     %2$s\n\
     Copyright (c) 1997-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permissions.\n\
+\n\
 ", argv[0], ident);
 }
 
@@ -3762,9 +4013,9 @@ void usage(int argc, char *argv[])
 	fprintf(stderr, "\
 Usage:\n\
     %1$s [options]\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 ", argv[0]);
 }
 
@@ -3773,11 +4024,12 @@ void help(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+\n\
 Usage:\n\
     %1$s [options]\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
@@ -3808,6 +4060,7 @@ Options:\n\
         print version and exit\n\
     -C, --copying\n\
         print copying permissions and exit\n\
+\n\
 ", argv[0], devname);
 }
 
@@ -3868,6 +4121,8 @@ int main(int argc, char *argv[])
 				fprintf(stdout, "\n");
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
+						if (verbose > 2)
+							fprintf(stdout, "Test Group: %s\n", t->tgrp);
 						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
@@ -3886,6 +4141,8 @@ int main(int argc, char *argv[])
 			} else {
 				fprintf(stdout, "\n");
 				for (t = tests; t->numb; t++) {
+					if (verbose > 2)
+						fprintf(stdout, "Test Group: %s\n", t->tgrp);
 					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 					if (verbose > 1)
 						fprintf(stdout, "%s\n\n", t->desc);
@@ -3976,7 +4233,7 @@ int main(int argc, char *argv[])
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			splash(argc, argv);
+			copying(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -3990,7 +4247,6 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
@@ -4007,7 +4263,7 @@ int main(int argc, char *argv[])
 		}
 		exit(2);
 	}
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }
