@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:39:37 $
+ @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/15 23:57:08 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:39:37 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 23:57:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipemod.c,v $
- Revision 0.9.2.6  2005/05/14 08:39:37  brian
- - updated copyright headers
+ Revision 0.9.2.7  2005/05/15 23:57:08  brian
+ - update tests
+
+ Revision 0.9.2.5  2005/05/15 23:57:08  brian
+ - update tests
 
  Revision 0.9.2.4  2005/05/14 08:39:37  brian
  - updated copyright headers
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:39:37 $"
+#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/15 23:57:08 $"
 
-static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:39:37 $";
+static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/15 23:57:08 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -137,9 +140,10 @@ static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 
+static int last_prim = 0;
 static int last_event = 0;
 static int last_errno = 0;
-static int last_prim = 0;
+static int last_retval = 0;
 
 int test_fd[3] = { 0, 0, 0 };
 
@@ -740,7 +744,8 @@ void print_close(int child)
 		print_simple(child, msgs);
 }
 
-void print_preamble(int child) {
+void print_preamble(int child)
+{
 	static const char *msgs[] = {
 		"--------------------+------------Preamble-----------+--+                    \n",
 		"  ------------------+------------Preamble-----------+--+                    \n",
@@ -750,101 +755,111 @@ void print_preamble(int child) {
 		print_simple(child, msgs);
 };
 
-void print_inconclusive(int child) {
+void print_inconclusive(int child)
+{
 	static const char *msgs[] = {
-		 "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
-		 "  ?????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
-		 "    ???????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+		"???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+		"  ?????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+		"    ???????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 };
 
-void print_test(int child) {
+void print_test(int child)
+{
 	static const char *msgs[] = {
-		 "--------------------+--------------Test-------------+--+                    \n",
-		 "  ------------------+--------------Test-------------+--+                    \n",
-		 "    ----------------+--------------Test-------------+--+                    \n",
+		"--------------------+--------------Test-------------+--+                    \n",
+		"  ------------------+--------------Test-------------+--+                    \n",
+		"    ----------------+--------------Test-------------+--+                    \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
 };
 
-void print_failed(int child) {
+void print_failed(int child)
+{
 	static const char *msgs[] = {
-		 "XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
-		 "  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
-		 "    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
+		"  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
+		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 };
 
-void print_script_error(int child) {
+void print_script_error(int child)
+{
 	static const char *msgs[] = {
-		 "####################|########## SCRIPT ERROR #######|##|                    [%d]\n",
-		 "  ##################|########## SCRIPT ERROR #######|##|                    [%d]\n",
-		 "    ################|########## SCRIPT ERROR #######|##|                    [%d]\n",
+		"####################|########## SCRIPT ERROR #######|##|                    [%d]\n",
+		"  ##################|########## SCRIPT ERROR #######|##|                    [%d]\n",
+		"    ################|########## SCRIPT ERROR #######|##|                    [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
 };
 
-void print_passed(int child) {
+void print_passed(int child)
+{
 	static const char *msgs[] = {
-		 "********************|************ PASSED ***********|**|                    [%d]\n",
-		 "  ******************|************ PASSED ***********|**|                    [%d]\n",
-		 "    ****************|************ PASSED ***********|**|                    [%d]\n",
+		"********************|************ PASSED ***********|**|                    [%d]\n",
+		"  ******************|************ PASSED ***********|**|                    [%d]\n",
+		"    ****************|************ PASSED ***********|**|                    [%d]\n",
 	};
 	if (verbose > 2)
 		print_simple_int(child, msgs, state);
 };
 
-void print_postamble(int child) {
+void print_postamble(int child)
+{
 	static const char *msgs[] = {
-		 "--------------------+------------Postamble----------+--+                    \n",
-		 "  ------------------+------------Postamble----------+--+                    \n",
-		 "    ----------------+------------Postamble----------+--+                    \n",
+		"--------------------+------------Postamble----------+--+                    \n",
+		"  ------------------+------------Postamble----------+--+                    \n",
+		"    ----------------+------------Postamble----------+--+                    \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
 };
 
-void print_test_end(int child) {
+void print_test_end(int child)
+{
 	static const char *msgs[] = {
-		 "--------------------+-------------------------------+--+                    \n",
-		 "  ------------------+-------------------------------+--+                    \n",
-		 "    ----------------+-------------------------------+--+                    \n",
+		"--------------------+-------------------------------+--+                    \n",
+		"  ------------------+-------------------------------+--+                    \n",
+		"    ----------------+-------------------------------+--+                    \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
 };
 
-void print_terminated(int child, int signal) {
+void print_terminated(int child, int signal)
+{
 	static const char *msgs[] = {
-		 "@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
-		 "  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
-		 "    @@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
+		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
+		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
 };
 
-void print_stopped(int child, int signal) {
+void print_stopped(int child, int signal)
+{
 	static const char *msgs[] = {
-		 "&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
-		 "  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
-		 "    &&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
+		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
+		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
 };
 
-void print_timeout(int child) {
+void print_timeout(int child)
+{
 	static const char *msgs[] = {
-		 "++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
-		 "  ++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
-		 "    ++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
+		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
+		"  ++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
+		"    ++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
 	};
 	if (show_timeout || verbose > 0) {
 		print_simple_int(child, msgs, state);
@@ -1287,6 +1302,12 @@ int do_tests(void)
 	int num_exit;
 	print_header();
 	show = 0;
+	if (verbose > 0) {
+		lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "\nUsing device %s\n\n", devname);
+		fflush(stdout);
+		lockf(fileno(stdout), F_ULOCK, 0);
+	}
 	if (begin_tests() == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
@@ -1398,7 +1419,7 @@ int do_tests(void)
 			fprintf(stdout, "========= %2d failures    \n", failures);
 			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
 			fprintf(stdout, "========= %2d skipped     \n", skipped);
-			if (!(aborted + failures + inconclusive))
+			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
@@ -1412,7 +1433,7 @@ int do_tests(void)
 				fprintf(stderr, "\n");
 			fflush(stderr);
 			lockf(fileno(stderr), F_ULOCK, 0);
-		} else if (failures + inconclusive) {
+		} else if (failures) {
 			lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");
@@ -1528,32 +1549,32 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -d, --device DEVICE\n\
-        Device name to open [default: %2$s].\n\
+        device name to open [default: %2$s].\n\
     -e, --exit\n\
-        Exit on the first failed or inconclusive test case.\n\
+        exit on the first failed or inconclusive test case.\n\
     -l, --list [RANGE]\n\
-        List test case names within a range [default: all] and exit.\n\
+        list test case names within a range [default: all] and exit.\n\
     -f, --fast [SCALE]\n\
-        Increase speed of tests by scaling timers [default: 50]\n\
+        increase speed of tests by scaling timers [default: 50]\n\
     -s, --summary\n\
-        Print a test case summary at end of testing [default: off]\n\
+        print a test case summary at end of testing [default: off]\n\
     -o, --onetest [TESTCASE]\n\
-        Run a single test case.\n\
+        run a single test case.\n\
     -t, --tests [RANGE]\n\
-        Run a range of test cases.\n\
+        run a range of test cases.\n\
     -m, --messages\n\
-        Display messages. [default: off]\n\
+        display messages. [default: off]\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Print this usage message and exit\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Print version and exit\n\
+        print version and exit\n\
     -C, --copying\n\
-        Print copying permissions and exit\n\
+        print copying permissions and exit\n\
 ", argv[0], devname);
 }
 
@@ -1600,8 +1621,11 @@ int main(int argc, char *argv[])
 			break;
 		switch (c) {
 		case 'd':
-			snprintf(devname, sizeof(*devname), "%s", optarg);
-			break;
+			if (optarg) {
+				snprintf(devname, sizeof(devname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
 		case 'e':
 			exit_on_failure = 1;
 			break;
@@ -1651,26 +1675,29 @@ int main(int argc, char *argv[])
 			summary = 1;
 			break;
 		case 'o':
-			if (!range) {
-				for (t = tests; t->numb; t++)
-					t->run = 0;
-				tests_to_run = 0;
-			}
-			range = 1;
-			for (n = 0, t = tests; t->numb; t++)
-				if (!strncmp(t->numb, optarg, 16)) {
-					if (!t->result) {
-						t->run = 1;
-						n++;
-						tests_to_run++;
-					}
+			if (optarg) {
+				if (!range) {
+					for (t = tests; t->numb; t++)
+						t->run = 0;
+					tests_to_run = 0;
 				}
-			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
-				fflush(stderr);
-				goto bad_option;
+				range = 1;
+				for (n = 0, t = tests; t->numb; t++)
+					if (!strncmp(t->numb, optarg, 16)) {
+						if (!t->result) {
+							t->run = 1;
+							n++;
+							tests_to_run++;
+						}
+					}
+				if (!n) {
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fflush(stderr);
+					goto bad_option;
+				}
+				break;
 			}
-			break;
+			goto bad_option;
 		case 'q':
 			verbose = 0;
 			break;
@@ -1751,4 +1778,3 @@ int main(int argc, char *argv[])
 	do_tests();
 	exit(0);
 }
-

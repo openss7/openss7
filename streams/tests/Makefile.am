@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/05/14 23:59:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/05/15 23:57:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 23:59:23 $ by $Author: brian $
+# Last Modified $Date: 2005/05/15 23:57:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.17  2005/05/14 23:59:23  brian
-# - getting autotest up and running
+# Revision 0.9.2.18  2005/05/15 23:57:20  brian
+# - update tests
+#
+# Revision 0.9.2.14  2005/05/15 23:57:20  brian
+# - update tests
 #
 # Revision 0.9.2.13  2005/05/14 23:59:23  brian
 # - getting autotest up and running
@@ -168,7 +171,7 @@ installcheck-inet:
 
 # my rule
 installcheck-test: $(TESTSUITE)
-	DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' $(SHELL) $<
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
