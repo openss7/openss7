@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:41 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/15 19:41:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 19:41:02 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:41 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/15 19:41:02 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:41 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/15 19:41:02 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -64,10 +64,11 @@ static char const ident[] =
 #include <linux/kernel.h>
 
 #include "sys/config.h"
+#include "src/kernel/strspecfs.h"	/* for specfs_get and specfs_put */
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/14 08:34:41 $"
+#define STREAMS_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/05/15 19:41:02 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -319,12 +320,14 @@ static
 #endif
 int __init streams_init(void)
 {
-	int result;
+	int result = -EINVAL;
 #ifdef CONFIG_STREAMS_MODULE
 	printk(KERN_INFO STREAMS_BANNER);	/* log message */
 #else
 	printk(KERN_INFO STREAMS_SPLASH);	/* console splash */
 #endif
+	if (!specfs_get())
+		goto no_specfs;
 	if ((result = strprocfs_init()))
 		goto no_procfs;
 	if ((result = strsysctl_init()))
@@ -338,6 +341,8 @@ int __init streams_init(void)
       no_strsysctl:
 	strprocfs_exit();
       no_procfs:
+	specfs_put();
+      no_specfs:
 	return (result);
 }
 
@@ -350,6 +355,7 @@ void __exit streams_exit(void)
 	strsched_exit();
 	strsysctl_exit();
 	strprocfs_exit();
+	specfs_put();
 }
 
 #ifdef CONFIG_STREAMS_MODULE

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/05/15 19:40:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 19:40:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/05/15 19:40:26 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/05/15 19:40:26 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/15 04:08:15 $"
+#define SPECFS_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/05/15 19:40:26 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1054,18 +1054,24 @@ STATIC void spec_read_inode(struct inode *inode)
 #else
 #error HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO or HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP must be defined.
 #endif
+#if 0
 		inode->i_mode = (sbi->sbi_mode & ~S_IFMT);
 		if (!sbi->sbi_setmod)
 			inode->i_mode &= ~current->fs->umask;
 		inode->i_uid = sbi->sbi_setuid ? sbi->sbi_uid : current->fsuid;
 		inode->i_gid = sbi->sbi_setgid ? sbi->sbi_gid : current->fsgid;
+#else
+		inode->i_mode = (sbi->sbi_mode & ~S_IFMT);
+		inode->i_uid = sbi->sbi_uid;
+		inode->i_gid = sbi->sbi_gid;
+#endif
 	}
 	if (getmajor(inode->i_ino)) {
 		dev_t dev = MKDEV(cdev->d_major, getminor(inode->i_ino) & MINORMASK);
 		/* for device nodes, the major component of the i_ino is the module id */
-		printd(("%s: reading device node %p (%ld)\n", __FUNCTION__, inode, inode->i_ino));
 		inode->i_mode |= (cdev->d_mode & S_IFMT) ? (cdev->d_mode & S_IFMT) : S_IFCHR;
 		inode->i_mode &= ~S_IXUGO;
+		printd(("%s: reading device node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino, (inode->i_mode & ~S_IFMT)));
 		inode->i_op = NULL;
 		inode->i_fop = cdev->d_fop;
 #if HAVE_KFUNC_TO_KDEV_T
@@ -1077,9 +1083,9 @@ STATIC void spec_read_inode(struct inode *inode)
 		// inode->i_fop = &spec_dev_f_ops;
 	} else {
 		/* for module nodes, the minor component of the i_ino is the module id */
-		printd(("%s: reading driver node %p (%ld)\n", __FUNCTION__, inode, inode->i_ino));
 		inode->i_mode |= S_IFDIR;
 		inode->i_mode |= ((inode->i_mode & S_IRUGO) >> 2);
+		printd(("%s: reading driver node %p (%ld) %o\n", __FUNCTION__, inode, inode->i_ino, (inode->i_mode & ~S_IFMT)));
 		inode->i_op = &spec_dir_i_ops;
 		inode->i_fop = &spec_dir_f_ops;
 	}
@@ -1275,8 +1281,8 @@ STATIC int spec_remount_fs(struct super_block *sb, int *flags, char *data)
 	struct spec_sb_info *sbi = sb->u.generic_sbp;
 #endif
 	(void) flags;
-	ptrace(("%s: remouting superblock %p\n", __FUNCTION__, sb));
-	return spec_parse_options(data, sbi);
+	ptrace(("%s: remounting superblock %p\n", __FUNCTION__, sb));
+	return (data ? spec_parse_options(data, sbi) : 0);
 }
 
 /**
@@ -1328,7 +1334,7 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 
 /* TODO: handle extended attributes */
 /**
- *  specfs_read_super: - create a shadow special filesystem super block
+ *  specfs_fill_super: - create a shadow special filesystem super block
  *  @sb:	superblock for which to read a superblock inode
  *  @data:	options data
  *  @silent:	whether to ignore options errors
@@ -1360,6 +1366,7 @@ STATIC int specfs_fill_super(struct super_block *sb, void *data, int silent)
 	inode->i_blksize = 1024;
 	inode->i_uid = inode->i_gid = 0;
 	inode->i_mode = S_IFDIR | S_IRUGO | S_IXUGO | S_IWUSR;
+	ptrace(("%s: super block mode %o\n", __FUNCTION__, (inode->i_mode & ~S_IFMT)));
 	inode->i_op = &spec_root_i_ops;
 	inode->i_fop = &spec_root_f_ops;
 	inode->i_nlink = 2;
@@ -1426,12 +1433,17 @@ struct vfsmount *specfs_get(void)
 {
 	spin_lock(&specfs_lock);
 	if (!specfs_mnt) {
-		if (IS_ERR(specfs_mnt = kern_mount(&spec_fs_type)))
+		ptrace(("%s: performing kern mount\n", __FUNCTION__));
+		specfs_mnt = kern_mount(&spec_fs_type);
+		if (IS_ERR(specfs_mnt))
 			specfs_mnt = NULL;
 	}
 	spin_unlock(&specfs_lock);
+	if (specfs_mnt)
+		ptrace(("%s: mount count is now %d\n", __FUNCTION__, atomic_read(&specfs_mnt->mnt_count)));
 	return (mntget(specfs_mnt));
 }
+EXPORT_SYMBOL_GPL(specfs_get);
 
 #if ! HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
@@ -1441,13 +1453,17 @@ struct vfsmount *specfs_get(void)
 void specfs_put(void)
 {
 	if (specfs_mnt) {
+		ptrace(("%s: mount count is now %d\n", __FUNCTION__, atomic_read(&specfs_mnt->mnt_count)));
 		mntput(specfs_mnt);
 		spin_lock(&specfs_lock);
-		if (atomic_read(&specfs_mnt->mnt_count) == 1)
+		if (atomic_read(&specfs_mnt->mnt_count) == 1) {
+			ptrace(("%s: performing kern umount\n", __FUNCTION__));
 			kern_umount(xchg(&specfs_mnt, NULL));
+		}
 		spin_unlock(&specfs_lock);
 	}
 }
+EXPORT_SYMBOL_GPL(specfs_put);
 
 /**
  *  strspecfs_init: - initialize the shadow special filesystem

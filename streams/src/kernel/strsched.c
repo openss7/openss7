@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/05/15 19:40:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/05/14 08:34:42 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/05/14 08:34:42 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -2339,7 +2339,7 @@ open_softirq(int nr, void (*action)(struct softirq_action*), void *data)
 /**
  *  strsched_init:  - initialize the STREAMS scheduler
  */
-	int strsched_init(void)
+int strsched_init(void)
 {
 	int result, i;
 	if ((result = str_init_caches()) < 0)
