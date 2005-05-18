@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/05/14 07:46:09 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/05/18 08:29:07 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 07:46:09 $ by $Author: brian $
+## Last Modified $Date: 2005/05/18 08:29:07 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -303,6 +303,7 @@ pre-modules:
 		modl_list="$${modl_list:+$$modl_list }$$b" ; \
 	done ; \
 	if test -f $(DESTDIR)$(kmoduledir)/modules.dep ; then \
+		xtrace=`shopt -p -o | grep xtrace` ; set +x ; \
 		dep= ; while read line ; do \
 			case $$line in \
 				(*\\)	line="`echo $$line | sed -e 's|\\$$||'`" ; \
@@ -323,6 +324,7 @@ pre-modules:
 			fi ; \
 			dep= ; \
 		done < $(DESTDIR)$(kmoduledir)/modules.dep ; \
+		eval "$$xtrace" ; \
 	fi ; \
 	if test -n "$$modl_mods" ; then \
 		$(ECHO) "rm -f -- $$modl_mods" ; \
