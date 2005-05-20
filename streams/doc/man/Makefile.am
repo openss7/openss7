@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/05/14 08:34:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/20 04:27:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:34:11 $ by $Author: brian $
+# Last Modified $Date: 2005/05/20 04:27:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,10 +283,12 @@ man_MANS = \
 	man9/cdev_del.9 \
 	man9/cdev_find.9 \
 	man9/cdev_get.9 \
+	man9/sdev_get.9 \
 	man9/__cdev_lookup.9 \
 	man9/cdev_match.9 \
 	man9/cdev_minor.9 \
 	man9/cdev_put.9 \
+	man9/sdev_put.9 \
 	man9/__cdev_search.9 \
 	man9/cdev_str.9 \
 	man9/cdevsw.9 \
@@ -803,6 +805,8 @@ man_MANS = \
 	man9/__smod_search.9 \
 	man9/spec_dentry.9 \
 	man9/spec_open.9 \
+	man9/specfs_get.9 \
+	man9/specfs_put.9 \
 	man9/SPG.9 \
 	man9/spl0.9 \
 	man9/spl1.9 \
@@ -1116,10 +1120,12 @@ dist_noinst_MANS = \
 	man9/cdev_del.9.man \
 	man9/cdev_find.9.man \
 	man9/cdev_get.9.man \
+	man9/sdev_get.9.man \
 	man9/__cdev_lookup.9.man \
 	man9/cdev_match.9.man \
 	man9/cdev_minor.9.man \
 	man9/cdev_put.9.man \
+	man9/sdev_put.9.man \
 	man9/__cdev_search.9.man \
 	man9/cdev_str.9.man \
 	man9/cdevsw.9.man \
@@ -1636,6 +1642,8 @@ dist_noinst_MANS = \
 	man9/__smod_search.9.man \
 	man9/spec_dentry.9.man \
 	man9/spec_open.9.man \
+	man9/specfs_get.9.man \
+	man9/specfs_put.9.man \
 	man9/SPG.9.man \
 	man9/spl0.9.man \
 	man9/spl1.9.man \

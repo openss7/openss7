@@ -1,7 +1,7 @@
 dnl vim: ft=config
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: nuls.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/15 23:57:20 $
+dnl @(#) $RCSfile: nuls.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/20 04:45:40 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/15 23:57:20 $ by $Author: brian $
+dnl Last Modified $Date: 2005/05/20 04:45:40 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: nuls.at,v $
+dnl Revision 0.9.2.3  2005/05/20 04:45:40  brian
+dnl - updated test suites
+dnl
 dnl Revision 0.9.2.2  2005/05/15 23:57:20  brian
 dnl - update tests
 dnl
@@ -73,6 +76,12 @@ dnl Revision 0.9.2.1  2005/05/14 23:59:23  brian
 dnl - getting autotest up and running
 dnl
 dnl ==========================================================================
+
+m4_include([package.m4])
+
+AT_INIT([testsuite-nuls])
+
+AT_TESTED([test-nuls])
 
 AT_SETUP([nuls test 1.1])
 AT_KEYWORDS([nuls])

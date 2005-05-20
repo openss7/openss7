@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/03/08 00:22:36 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/20 04:23:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/08 00:22:36 $ by $Author: brian $
+# Last Modified $Date: 2005/05/20 04:23:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,7 +122,7 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
 # _AUTOTEST_OUTPUT
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_OUTPUT], [dnl
-    AC_CONFIG_TESTDIR([tests])
+    AC_CONFIG_TESTDIR([tests], [.])
     AC_CONFIG_FILES([tests/Makefile])
     AC_CONFIG_FILES([tests/atlocal])
 dnl _AUTOTEST_OUTPUT_CONFIG

@@ -1,0 +1,252 @@
+dnl vim: ft=config sw=4
+dnl ==========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/05/20 04:46:05 $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2005/05/20 04:46:05 $ by $Author: brian $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.1  2005/05/20 04:46:05  brian
+dnl - added test suite for strtst
+dnl
+dnl ==========================================================================
+
+m4_include([package.m4])
+
+AT_INIT([testsuite-strtst])
+
+AT_TESTED([strtst])
+
+AT_BANNER([open/close test [[MT]]])
+AT_SETUP([streams test open])
+AT_KEYWORDS([streams open])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst open
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([ioctl test])
+AT_SETUP([streams test ioctl])
+AT_KEYWORDS([streams ioctl])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst ioctl
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([module test])
+AT_SETUP([streams test module])
+AT_KEYWORDS([streams module])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst module
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([read options test])
+AT_SETUP([streams test rdopt])
+AT_KEYWORDS([streams rdopt])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst rdopt
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([write test])
+AT_SETUP([streams test write])
+AT_KEYWORDS([streams write])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst write
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([close time test])
+AT_SETUP([streams test timer])
+AT_KEYWORDS([streams timer])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst timer
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([putmsg test [[MT]]])
+AT_SETUP([streams test putmsg])
+AT_KEYWORDS([streams putmsg])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst putmsg
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([poll test [[MT]]])
+AT_SETUP([streams test poll])
+AT_KEYWORDS([streams poll])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst poll
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([multiplexor test])
+AT_SETUP([streams test mux])
+AT_KEYWORDS([streams mux])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst mux
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([clone driver test])
+AT_SETUP([streams test clone])
+AT_KEYWORDS([streams clone])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst clone
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([bufcall test [[MT]]])
+AT_SETUP([streams test bufcall])
+AT_KEYWORDS([streams bufcall])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst bufcall
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([sad driver test])
+AT_SETUP([streams test sad])
+AT_KEYWORDS([streams sad])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst sad
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([FIFO/pipe test [[MT]]])
+AT_SETUP([streams test fifo])
+AT_KEYWORDS([streams fifo])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst fifo
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([FD passing test [[MT]]])
+AT_SETUP([streams test passfd])
+AT_KEYWORDS([streams passfd])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst passfd
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([Q-band test [[MT]]])
+AT_SETUP([streams test band])
+AT_KEYWORDS([streams band])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst band
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([flushing test [[MT]]])
+AT_SETUP([streams test flush])
+AT_KEYWORDS([streams flush])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst flush
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([autopush test])
+AT_SETUP([streams test autopush])
+AT_KEYWORDS([streams autopush])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst autopush
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_BANNER([MT open test])
+AT_SETUP([streams test mt_open])
+AT_KEYWORDS([streams mt_open])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options="-vvv" ; fi
+    strtst mt_open
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+

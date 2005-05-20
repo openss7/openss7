@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/19 20:49:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/20 04:44:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/19 20:49:34 $ by $Author: brian $
+# Last Modified $Date: 2005/05/20 04:44:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2005/05/20 04:44:59  brian
+# - updated autotest makefiles
+#
 # Revision 0.9.2.6  2005/05/19 20:49:34  brian
 # - upgrading test suites
 #
@@ -93,6 +96,12 @@ if PKG_BUILD_ARCH
 
 # my rule
 TESTSUITE		= testsuite
+TESTSUITES		= \
+			  $(TESTSUITE)-timod \
+			  $(TESTSUITE)-tirdwr \
+			  $(TESTSUITE)-xnet \
+			  $(TESTSUITE)-xnet_thr \
+			  $(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -103,12 +112,6 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
-	@if test ':$(srcdir)' != ':.' ; then \
-		$(ECHO) "cp -pf package.m4 $(srcdir)/package.m4" ; \
-		cp -pf package.m4 $(srcdir)/package.m4 ; \
-		$(ECHO) "rm -f package.m4" ; \
-		rm -f package.m4 ; \
-	fi
 
 # my rule
 TESTSUITE_DEPS		= \
@@ -121,11 +124,8 @@ TESTSUITE_DEPS		= \
 			package.m4
 
 # my rule
-$(TESTSUITE) $(TESTSUITE)-timod $(TESTSUITE)-tirdwr $(TESTSUITE)-xnet $(TESTSUITE)-xnet_thr: $(TESTSUITE_DEPS)
-	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
-	@file=`$(ECHO) '$@' | sed -e 's|.*/||'` ; \
-	cp -pf $@.tmp $(srcdir)/$$file
-	rm -f $@.tmp
+$(TESTSUITES): $(TESTSUITE_DEPS)
+	$(AUTOTEST) -I $(srcdir) $@.at -o $@
 
 # my rule
 atconfig: $(top_builddir)/config.status
@@ -137,76 +137,77 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITE) $(TESTSUITE)-timod $(TESTSUITE)-tirdwr $(TESTSUITE)-xnet $(TESTSUITE)-xnet_thr
+all-testsuite: $(TESTSUITES)
 
 if PERFORM_TESTING
+## PERFORM_TESTING
 
-# my rule
-installcheck-specfs:
-
-# my rule
-installcheck-streams:
+INSTALLCHECK_TESTS =
 
 # my rule
 installcheck-xnet: $(TESTSUITE)-xnet
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
+INSTALLCHECK_TESTS += installcheck-xnet
+
 # my rule
-installcheck-xnet: $(TESTSUITE)-xnet_thr
+installcheck-xnet_thr: $(TESTSUITE)-xnet_thr
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-xnet_thr
 
 # my rule
 installcheck-timod: $(TESTSUITE)-timod
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
+INSTALLCHECK_TESTS += installcheck-timod
+
 # my rule
 installcheck-tirdwr: $(TESTSUITE)-tirdwr
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-tirdwr
 
 # my rule
 installcheck-inet: inet
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
+INSTALLCHECK_TESTS += installcheck-inet
+
 # my rule
 installcheck-test: $(TESTSUITE)
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
-# my rule
-installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
-	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod \
-	installcheck-xnet_thr installcheck-tirdwr installcheck-test
+INSTALLCHECK_TESTS += installcheck-test
 
+# my rule
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal $(INSTALLCHECK_TESTS)
+
+## PERFORM_TESTING
 else
+## ! PERFORM_TESTING
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal
 
+## ! PERFORM_TESTING
 endif
 
 # my rule
-clean-testsuite: $(TESTSUITE) $(TESTSUITE)-timod $(TESTSUITE)-tirdwr $(TESTSUITE)-xnet $(TESTSUITE)-xnet_thr
-	@for f in "$^" ; do \
+clean-testsuite:
+	@for f in $(TESTSUITES) ; do \
 		if test -r "$$f" ; then \
 			$(ECHO) "$(SHELL) $$f --clean" ; \
 			$(SHELL) $$f --clean ; \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
 		fi ; \
 	done
 
 CLEANFILES		+= \
-			$(TESTSUITE) \
-			$(TESTSUITE)-timod \
-			$(TESTSUITE)-tirdwr \
-			$(TESTSUITE)-xnet \
-			$(TESTSUITE)-xnet_thr \
 			atconfig \
 			atlocal \
 			package.m4
-
-MAINTAINERCLEANFILES	+= \
-			$(srcdir)/$(TESTSUITE) \
-			$(srcdir)/atconfig \
-			$(srcdir)/atlocal \
-			$(srcdir)/package.m4
 
 ALL_LOCAL += all-testsuite
 
@@ -217,8 +218,6 @@ CLEAN_LOCAL += clean-testsuite
 ## PKG_BUILD_ARCH
 endif
 
-.PHONY: all-testsuite installcheck-testsuite clean-testsuite \
-	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod
-	installcheck-tirdwr installcheck-inet installcheck-test
+.PHONY: all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
 
 # vim: ft=automake

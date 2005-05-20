@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/16 11:25:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/20 04:44:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/16 11:25:08 $ by $Author: brian $
+# Last Modified $Date: 2005/05/20 04:44:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.19  2005/05/16 11:25:08  brian
-# - minor rearrangement
+# Revision 0.9.2.20  2005/05/20 04:44:58  brian
+# - updated autotest makefiles
+#
+# Revision 0.9.2.16  2005/05/20 04:44:58  brian
+# - updated autotest makefiles
 #
 # Revision 0.9.2.15  2005/05/16 11:25:08  brian
 # - minor rearrangement
@@ -99,6 +102,19 @@ if PKG_BUILD_ARCH
 
 # my rule
 TESTSUITE		= testsuite
+TESTSUITES		= \
+			  streams \
+			  clone \
+			  connld \
+			  echo \
+			  fifo \
+			  log \
+			  nsdev \
+			  nuls \
+			  pipemod \
+			  sad \
+			  sc \
+			  $(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -109,16 +125,11 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
-	@if test ':$(srcdir)' != ':.' ; then \
-		$(ECHO) "cp -pf package.m4 $(srcdir)/package.m4" ; \
-		cp -pf package.m4 $(srcdir)/package.m4 ; \
-		$(ECHO) "rm -f package.m4" ; \
-		rm -f package.m4 ; \
-	fi
 
 # my rule
 TESTSUITE_DEPS		= \
 			kernel.at \
+			streams.at \
 			clone.at \
 			connld.at \
 			echo.at \
@@ -129,16 +140,12 @@ TESTSUITE_DEPS		= \
 			pipemod.at \
 			sad.at \
 			sc.at \
-			streams.at \
-			testsuite.at \
+			$(TESTSUITE).at \
 			package.m4
 
 # my rule
-$(TESTSUITE): $(TESTSUITE_DEPS)
-	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
-	@file=`$(ECHO) '$@' | sed -e 's|.*/||'` ; \
-	cp -pf $@.tmp $(srcdir)/$$file
-	rm -f $@.tmp
+$(TESTSUITES): $(TESTSUITE_DEPS)
+	$(AUTOTEST) -I $(srcdir) $@.at -o $@
 
 # my rule
 atconfig: $(top_builddir)/config.status
@@ -150,62 +157,113 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITE)
+all-testsuite: $(TESTSUITES)
 
 if PERFORM_TESTING
+## PERFORM_TESTING
+
+INSTALLCHECK_TESTS =
 
 # my rule
-installcheck-specfs:
+installcheck-clone: clone
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-clone
 
 # my rule
-installcheck-streams:
+installcheck-connld: connld
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-connld
 
 # my rule
-installcheck-xnet:
+installcheck-echo: echo
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-echo
 
 # my rule
-installcheck-timod:
+installcheck-fifo: fifo
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-fifo
 
 # my rule
-installcheck-tirdwr:
+installcheck-log: log
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-log
 
 # my rule
-installcheck-inet:
+installcheck-nsdev: nsdev
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-nsdev
+
+# my rule
+installcheck-nuls: nuls
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-nuls
+
+# my rule
+installcheck-pipemod: pipemod
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-pipemod
+
+# my rule
+installcheck-sad: sad
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-sad
+
+# my rule
+installcheck-sc: sc
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-sc
+
+# my rule
+installcheck-streams: streams
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-streams
 
 # my rule
 installcheck-test: $(TESTSUITE)
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
-# my rule
-installcheck-testsuite: $(TESTSUITE) atconfig atlocal \
-	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod \
-	installcheck-tirdwr installcheck-inet installcheck-test
+INSTALLCHECK_TESTS += installcheck-test
 
+# my rule
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal $(INSTALLCHECK_TESTS)
+
+## PERFORM_TESTING
 else
+## ! PERFORM_TESTING
 
 # my rule
 installcheck-testsuite: $(TESTSUITE) atconfig atlocal
 
+## ! PERFORM_TESTING
 endif
 
 # my rule
-clean-testsuite: $(TESTSUITE)
-	@if test -r "$<" ; then \
-		$(ECHO) "$(SHELL) $< --clean" ; \
-		$(SHELL) $< --clean ; \
-	fi
+clean-testsuite:
+	@for f in $(TESTSUITES) ; do \
+		if test -r "$$f" ; then \
+			$(ECHO) "$(SHELL) $$f --clean" ; \
+			$(SHELL) $$f --clean ; \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
 
 CLEANFILES		+= \
-			$(TESTSUITE) \
 			atconfig \
 			atlocal \
 			package.m4
-
-MAINTAINERCLEANFILES	+= \
-			$(srcdir)/$(TESTSUITE) \
-			$(srcdir)/atconfig \
-			$(srcdir)/atlocal \
-			$(srcdir)/package.m4
 
 ALL_LOCAL += all-testsuite
 
@@ -216,8 +274,6 @@ CLEAN_LOCAL += clean-testsuite
 ## PKG_BUILD_ARCH
 endif
 
-.PHONY: all-testsuite installcheck-testsuite clean-testsuite \
-	installcheck-specfs installcheck-streams installcheck-xnet installcheck-timod
-	installcheck-tirdwr installcheck-inet installcheck-test
+.PHONY: all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
 
 # vim: ft=automake
