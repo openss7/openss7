@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.34 $) $Date: 2005/05/14 08:29:49 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.35 $) $Date: 2005/05/19 20:48:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:29:49 $ by $Author: brian $
+# Last Modified $Date: 2005/05/19 20:48:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -568,12 +568,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.34  2005/05/14 08:29:49  brian
-# - copyright header correction
+# Revision 1.1.2.35  2005/05/19 20:48:12  brian
+# - suppress shell trace in loops
 #
-# Revision 1.1.2.33  2005/04/09 09:34:52  brian
-# - update spec files
-#
+
+* Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.34  2005/05/14 08:29:49  brian
+- copyright header correction
+
+* Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.33  2005/04/09 09:34:52  brian
+- update spec files
 
 * Tue Apr  5 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.32  2005/04/05 01:57:04  brian

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/05/14 08:29:12 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/05/19 20:48:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:29:12 $ by $Author: brian $
+# Last Modified $Date: 2005/05/19 20:48:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -613,6 +613,7 @@ if [ $1 = 1 ] ; then : # fresh install
         if [ -f %{_kmoduledir}/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
+            xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
@@ -633,6 +634,7 @@ if [ $1 = 1 ] ; then : # fresh install
                 fi
                 dep=
             done < %{_kmoduledir}/modules.dep
+            eval "$xtrace"
         fi
     fi
     # remove conflicting and dependent modules
@@ -1161,6 +1163,7 @@ if [ $1 = 1 ] ; then : # fresh install
         if [ -f $dir/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
+            xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
@@ -1181,6 +1184,7 @@ if [ $1 = 1 ] ; then : # fresh install
                 fi
                 dep=
             done < $dir/modules.dep
+            eval "$xtrace"
         fi
         conf_old=%_sysconfdir/modules.conf
         if [ -f $conf_old ] ; then
@@ -1491,12 +1495,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.60  2005/05/14 08:29:12  brian
-# - copyright header correction
+# Revision 0.9.2.61  2005/05/19 20:48:14  brian
+# - suppress shell trace in loops
 #
-# Revision 0.9.2.59  2005/05/11 07:58:51  brian
-# - add mention of 2.6 kernel support
-#
+
+* Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.60  2005/05/14 08:29:12  brian
+- copyright header correction
+
+* Wed May 11 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.59  2005/05/11 07:58:51  brian
+- add mention of 2.6 kernel support
 
 * Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.58  2005/04/09 09:35:26  brian

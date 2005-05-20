@@ -1,3 +1,7 @@
 Makefile.in
 package.m4
 testsuite
+testsuite-timod
+testsuite-tirdwr
+testsuite-xnet
+testsuite-xnet_thr

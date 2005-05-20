@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.16 $) $Date: 2005/05/14 08:35:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2005/05/19 20:48:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:35:00 $ by $Author: brian $
+# Last Modified $Date: 2005/05/19 20:48:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -173,6 +173,8 @@ $(libLiSdrvr_a_OBJECTS): $(libLiSdrvr_a_DEPENDENCIES)
 drivers/str/linux/relay3.c: drivers/str/relay.c
 	mkdir -p `echo '$@' | sed -e 's|/[^/]*$$||'`
 	cp -f $< $@
+
+CLEANFILES			+= drivers/str/linux/relay3.c
 
 libLiSload_a_SOURCES		= drivers/str/pipemod.c \
 				  drivers/str/linux/liskmod.c \

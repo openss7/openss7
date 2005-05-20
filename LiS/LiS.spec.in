@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.21 $) $Date: 2005/05/14 08:35:00 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.22 $) $Date: 2005/05/19 20:48:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:35:00 $ by $Author: brian $
+# Last Modified $Date: 2005/05/19 20:48:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -550,6 +550,7 @@ if [ $1 = 1 ] ; then : # fresh install
         if [ -f %{_kmoduledir}/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
+            xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
@@ -570,6 +571,7 @@ if [ $1 = 1 ] ; then : # fresh install
                 fi
                 dep=
             done < %{_kmoduledir}/modules.dep
+            eval "$xtrace"
         fi
     fi
     # remove conflicting and dependent modules
@@ -1138,6 +1140,7 @@ if [ $1 = 1 ] ; then : # fresh install
         if [ -f $dir/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
+            xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
@@ -1158,6 +1161,7 @@ if [ $1 = 1 ] ; then : # fresh install
                 fi
                 dep=
             done < $dir/modules.dep
+            eval "$xtrace"
         fi
         conf_old=%_sysconfdir/modules.conf
         if [ -f $conf_old ] ; then
@@ -1468,12 +1472,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.21  2005/05/14 08:35:00  brian
-# - copyright header correction
+# Revision 1.1.6.22  2005/05/19 20:48:12  brian
+# - suppress shell trace in loops
 #
-# Revision 1.1.6.20  2005/05/11 07:58:49  brian
-# - add mention of 2.6 kernel support
-#
+
+* Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.21  2005/05/14 08:35:00  brian
+- copyright header correction
+
+* Wed May 11 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.20  2005/05/11 07:58:49  brian
+- add mention of 2.6 kernel support
 
 * Sat Apr  9 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.19  2005/04/09 09:34:55  brian
