@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/20 04:44:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/21 07:39:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/20 04:44:59 $ by $Author: brian $
+# Last Modified $Date: 2005/05/21 07:39:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2005/05/21 07:39:53  brian
+# - new testsuite organization
+#
 # Revision 0.9.2.7  2005/05/20 04:44:59  brian
 # - updated autotest makefiles
 #
@@ -97,11 +100,11 @@ if PKG_BUILD_ARCH
 # my rule
 TESTSUITE		= testsuite
 TESTSUITES		= \
-			  $(TESTSUITE)-timod \
-			  $(TESTSUITE)-tirdwr \
-			  $(TESTSUITE)-xnet \
-			  $(TESTSUITE)-xnet_thr \
-			  $(TESTSUITE)
+			$(TESTSUITE)-timod \
+			$(TESTSUITE)-tirdwr \
+			$(TESTSUITE)-xnet \
+			$(TESTSUITE)-xnet_thr \
+			$(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -109,7 +112,8 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
 

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2005/05/20 04:46:05 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/05/21 07:39:51 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -54,11 +54,17 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/20 04:46:05 $ by $Author: brian $
+dnl Last Modified $Date: 2005/05/21 07:39:51 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.3  2005/05/21 07:39:51  brian
+dnl - new testsuite organization
+dnl
+dnl Revision 1.1.2.2  2005/05/21 07:14:25  brian
+dnl - added full set of LiS tests
+dnl
 dnl Revision 1.1.2.1  2005/05/20 04:46:05  brian
 dnl - added test suite for strtst
 dnl
@@ -66,12 +72,11 @@ dnl ==========================================================================
 
 m4_include([package.m4])
 
-AT_INIT([testsuite-strtst])
-
+AT_INIT([strtst])
 AT_TESTED([strtst])
 
-AT_BANNER([open/close test [[MT]]])
-AT_SETUP([streams test open])
+AT_BANNER([Open/close test [[MT]]:])
+AT_SETUP([strtst open])
 AT_KEYWORDS([streams open])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -80,8 +85,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([ioctl test])
-AT_SETUP([streams test ioctl])
+AT_BANNER([Ioctl test:])
+AT_SETUP([strtst ioctl])
 AT_KEYWORDS([streams ioctl])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -90,8 +95,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([module test])
-AT_SETUP([streams test module])
+AT_BANNER([Module test:])
+AT_SETUP([strtst module])
 AT_KEYWORDS([streams module])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -100,8 +105,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([read options test])
-AT_SETUP([streams test rdopt])
+AT_BANNER([Read options test:])
+AT_SETUP([strtst rdopt])
 AT_KEYWORDS([streams rdopt])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -110,8 +115,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([write test])
-AT_SETUP([streams test write])
+AT_BANNER([Write test:])
+AT_SETUP([strtst write])
 AT_KEYWORDS([streams write])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -120,8 +125,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([close time test])
-AT_SETUP([streams test timer])
+AT_BANNER([Close time test:])
+AT_SETUP([strtst timer])
 AT_KEYWORDS([streams timer])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -130,8 +135,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([putmsg test [[MT]]])
-AT_SETUP([streams test putmsg])
+AT_BANNER([Putmsg test [[MT]]:])
+AT_SETUP([strtst putmsg])
 AT_KEYWORDS([streams putmsg])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -140,8 +145,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([poll test [[MT]]])
-AT_SETUP([streams test poll])
+AT_BANNER([Poll test [[MT]]:])
+AT_SETUP([strtst poll])
 AT_KEYWORDS([streams poll])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -150,8 +155,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([multiplexor test])
-AT_SETUP([streams test mux])
+AT_BANNER([Multiplexor test:])
+AT_SETUP([strtst mux])
 AT_KEYWORDS([streams mux])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -160,8 +165,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([clone driver test])
-AT_SETUP([streams test clone])
+AT_BANNER([Clone driver test:])
+AT_SETUP([strtst clone])
 AT_KEYWORDS([streams clone])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -170,8 +175,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([bufcall test [[MT]]])
-AT_SETUP([streams test bufcall])
+AT_BANNER([Bufcall test [[MT]]:])
+AT_SETUP([strtst bufcall])
 AT_KEYWORDS([streams bufcall])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -180,8 +185,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([sad driver test])
-AT_SETUP([streams test sad])
+AT_BANNER([SAD driver test:])
+AT_SETUP([strtst sad])
 AT_KEYWORDS([streams sad])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -190,8 +195,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([FIFO/pipe test [[MT]]])
-AT_SETUP([streams test fifo])
+AT_BANNER([FIFO/pipe test [[MT]]:])
+AT_SETUP([strtst fifo])
 AT_KEYWORDS([streams fifo])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -200,8 +205,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([FD passing test [[MT]]])
-AT_SETUP([streams test passfd])
+AT_BANNER([FD passing test [[MT]]:])
+AT_SETUP([strtst passfd])
 AT_KEYWORDS([streams passfd])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -210,8 +215,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Q-band test [[MT]]])
-AT_SETUP([streams test band])
+AT_BANNER([Q-band test [[MT]]:])
+AT_SETUP([strtst band])
 AT_KEYWORDS([streams band])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -220,8 +225,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([flushing test [[MT]]])
-AT_SETUP([streams test flush])
+AT_BANNER([Flushing test [[MT]]:])
+AT_SETUP([strtst flush])
 AT_KEYWORDS([streams flush])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -230,8 +235,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([autopush test])
-AT_SETUP([streams test autopush])
+AT_BANNER([Autopush test:])
+AT_SETUP([strtst autopush])
 AT_KEYWORDS([streams autopush])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
@@ -240,8 +245,8 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([MT open test])
-AT_SETUP([streams test mt_open])
+AT_BANNER([MT open test:])
+AT_SETUP([strtst mt_open])
 AT_KEYWORDS([streams mt_open])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi

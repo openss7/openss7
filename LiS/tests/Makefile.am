@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.5 $) $Date: 2005/05/20 04:44:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.7 $) $Date: 2005/05/21 07:39:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/20 04:44:57 $ by $Author: brian $
+# Last Modified $Date: 2005/05/21 07:39:51 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.7  2005/05/21 07:39:51  brian
+# - new testsuite organization
+#
+# Revision 1.1.4.6  2005/05/21 07:14:25  brian
+# - added full set of LiS tests
+#
 # Revision 1.1.4.5  2005/05/20 04:44:57  brian
 # - updated autotest makefiles
 #
@@ -91,8 +97,12 @@ if PKG_BUILD_ARCH
 # my rule
 TESTSUITE		= testsuite
 TESTSUITES		= \
-			  $(TESTSUITE)-strtst \
-			  $(TESTSUITE)
+			$(TESTSUITE)-strtst \
+			$(TESTSUITE)-timetst \
+			$(TESTSUITE)-test \
+			$(TESTSUITE)-test2 \
+			$(TESTSUITE)-thrtst \
+			$(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -100,7 +110,8 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
 
@@ -108,6 +119,10 @@ package.m4: $(top_srcdir)/configure
 TESTSUITE_DEPS		= \
 			kernel.at \
 			$(TESTSUITE)-strtst.at \
+			$(TESTSUITE)-timetst.at \
+			$(TESTSUITE)-test.at \
+			$(TESTSUITE)-test2.at \
+			$(TESTSUITE)-thrtst.at \
 			$(TESTSUITE).at \
 			package.m4
 
@@ -137,6 +152,30 @@ installcheck-strtst: $(TESTSUITE)-strtst
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-strtst
+
+# my rule
+installcheck-timetst: $(TESTSUITE)-timetst
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-timetst
+
+# my rule
+installcheck-lis_test: $(TESTSUITE)-test
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-lis_test
+
+# my rule
+installcheck-lis_test2: $(TESTSUITE)-test2
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-lis_test2
+
+# my rule
+installcheck-thrtst: $(TESTSUITE)-thrtst
+	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
+
+INSTALLCHECK_TESTS += installcheck-thrtst
 
 # my rule
 installcheck-test: $(TESTSUITE)

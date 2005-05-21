@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/05/20 04:44:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/21 07:39:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/20 04:44:58 $ by $Author: brian $
+# Last Modified $Date: 2005/05/21 07:39:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.20  2005/05/20 04:44:58  brian
-# - updated autotest makefiles
+# Revision 0.9.2.21  2005/05/21 07:39:52  brian
+# - new testsuite organization
+#
+# Revision 0.9.2.17  2005/05/21 07:39:52  brian
+# - new testsuite organization
 #
 # Revision 0.9.2.16  2005/05/20 04:44:58  brian
 # - updated autotest makefiles
@@ -103,18 +106,18 @@ if PKG_BUILD_ARCH
 # my rule
 TESTSUITE		= testsuite
 TESTSUITES		= \
-			  streams \
-			  clone \
-			  connld \
-			  echo \
-			  fifo \
-			  log \
-			  nsdev \
-			  nuls \
-			  pipemod \
-			  sad \
-			  sc \
-			  $(TESTSUITE)
+			$(TESTSUITE)-streams \
+			$(TESTSUITE)-clone \
+			$(TESTSUITE)-connld \
+			$(TESTSUITE)-echo \
+			$(TESTSUITE)-fifo \
+			$(TESTSUITE)-log \
+			$(TESTSUITE)-nsdev \
+			$(TESTSUITE)-nuls \
+			$(TESTSUITE)-pipemod \
+			$(TESTSUITE)-sad \
+			$(TESTSUITE)-sc \
+			$(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -122,24 +125,25 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
 
 # my rule
 TESTSUITE_DEPS		= \
 			kernel.at \
-			streams.at \
-			clone.at \
-			connld.at \
-			echo.at \
-			fifo.at \
-			log.at \
-			nsdev.at \
-			nuls.at \
-			pipemod.at \
-			sad.at \
-			sc.at \
+			$(TESTSUITE)-streams.at \
+			$(TESTSUITE)-clone.at \
+			$(TESTSUITE)-connld.at \
+			$(TESTSUITE)-echo.at \
+			$(TESTSUITE)-fifo.at \
+			$(TESTSUITE)-log.at \
+			$(TESTSUITE)-nsdev.at \
+			$(TESTSUITE)-nuls.at \
+			$(TESTSUITE)-pipemod.at \
+			$(TESTSUITE)-sad.at \
+			$(TESTSUITE)-sc.at \
 			$(TESTSUITE).at \
 			package.m4
 
@@ -165,67 +169,67 @@ if PERFORM_TESTING
 INSTALLCHECK_TESTS =
 
 # my rule
-installcheck-clone: clone
+installcheck-clone: $(TESTSUITE)-clone
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-clone
 
 # my rule
-installcheck-connld: connld
+installcheck-connld: $(TESTSUITE)-connld
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-connld
 
 # my rule
-installcheck-echo: echo
+installcheck-echo: $(TESTSUITE)-echo
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-echo
 
 # my rule
-installcheck-fifo: fifo
+installcheck-fifo: $(TESTSUITE)-fifo
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-fifo
 
 # my rule
-installcheck-log: log
+installcheck-log: $(TESTSUITE)-log
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-log
 
 # my rule
-installcheck-nsdev: nsdev
+installcheck-nsdev: $(TESTSUITE)-nsdev
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-nsdev
 
 # my rule
-installcheck-nuls: nuls
+installcheck-nuls: $(TESTSUITE)-nuls
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-nuls
 
 # my rule
-installcheck-pipemod: pipemod
+installcheck-pipemod: $(TESTSUITE)-pipemod
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-pipemod
 
 # my rule
-installcheck-sad: sad
+installcheck-sad: $(TESTSUITE)-sad
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-sad
 
 # my rule
-installcheck-sc: sc
+installcheck-sc: $(TESTSUITE)-sc
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-sc
 
 # my rule
-installcheck-streams: streams
+installcheck-streams: $(TESTSUITE)-streams
 	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
 
 INSTALLCHECK_TESTS += installcheck-streams
