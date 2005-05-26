@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.22 $) $Date: 2005/05/19 20:48:12 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.23 $) $Date: 2005/05/26 09:59:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/19 20:48:12 $ by $Author: brian $
+# Last Modified $Date: 2005/05/26 09:59:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1442,6 +1442,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{_sysconfdir}/streams.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %{_modutildir}/*
@@ -1451,6 +1452,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{_sysconfdir}/streams.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1472,9 +1474,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.22  2005/05/19 20:48:12  brian
-# - suppress shell trace in loops
+# Revision 1.1.6.23  2005/05/26 09:59:32  brian
+# - a few changes for WBEL3 release build
 #
+
+* Thu May 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.22  2005/05/19 20:48:12  brian
+- suppress shell trace in loops
 
 * Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.21  2005/05/14 08:35:00  brian

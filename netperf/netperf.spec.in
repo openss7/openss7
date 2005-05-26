@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.26 $) $Date: 2005/05/19 20:48:13 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.27 $) $Date: 2005/05/26 09:59:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/19 20:48:13 $ by $Author: brian $
+# Last Modified $Date: 2005/05/26 09:59:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -376,9 +376,13 @@ other architectures as well.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.26  2005/05/19 20:48:13  brian
-# - suppress shell trace in loops
+# Revision 1.1.2.27  2005/05/26 09:59:33  brian
+# - a few changes for WBEL3 release build
 #
+
+* Thu May 19 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.26  2005/05/19 20:48:13  brian
+- suppress shell trace in loops
 
 * Sat May 14 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.25  2005/05/14 08:30:02  brian
