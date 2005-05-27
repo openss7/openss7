@@ -1,7 +1,7 @@
 # vim: ft=sh sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.2 $) $Date: 2005/05/14 08:35:12 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.3 $) $Date: 2005/05/27 07:48:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:35:12 $ by $Author: brian $
+# Last Modified $Date: 2005/05/27 07:48:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -119,10 +119,10 @@ prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 at_bindir="@bindir@"
 at_datadir="@datadir@"
-at_DESTDIR="@DESTDIR@"
+at_DESTDIR="${DESTDIR}"
 at_exec_prefix="@exec_prefix@"
 at_kmoduledir="@kmoduledir@"
-at_krootdir="@krootdir@"
+at_krootdir="${krootdir}"
 at_ksysmap="@ksysmap@"
 at_kversion="@kversion@"
 at_libdir="@libdir@"

@@ -1,35 +1,44 @@
 dnl vim: ft=config
-dnl =========================================================================
+dnl ==========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/27 07:48:47 $
 dnl
-dnl @(#) $Id: testsuite.at,v 0.9.2.2 2005/05/14 08:29:20 brian Exp $
+dnl --------------------------------------------------------------------------
 dnl
-dnl =========================================================================
-dnl
-dnl Copyright (C) 2001-2004  OpenSS7 Corp. <http://www.openss7.com>
+dnl Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
 dnl
-dnl Permission is granted to make and distribute verbatim copies of this
-dnl README file provided the copyright notice and this permission notice are
-dnl preserved on all copies.
-dnl 
-dnl Permission is granted to copy and distribute modified versions of this
-dnl manual under the conditions for verbatim copying, provided that the
-dnl entire resulting derived work is distributed under the terms of a
-dnl permission notice identical to this one
-dnl 
-dnl Since the Linux kernel and libraries are constantly changing, this README
-dnl file may be incorrect or out-of-date.  The author(s) assume no
-dnl responsibility for errors or omissions, or for damages resulting from the
-dnl use of the information contained herein.  The author(s) may not have
-dnl taken the same level of care in the production of this manual, which is
-dnl licensed free of charge, as they might when working professionally.
-dnl 
-dnl Formatted or processed versions of this manual, if unaccompanied by the
-dnl source, must acknowledge the copyright and authors of this work.
-dnl 
-dnl =========================================================================
-dnl 
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU General Public License (GPL) Version 2 or later, so long as the
+dnl software is distributed with, and only used for the testing of, OpenSS7
+dnl modules, drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
 dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 dnl behalf of the U.S. Government ("Government"), the following provisions
 dnl apply to you.  If the Software is supplied by the Department of Defense
@@ -44,17 +53,23 @@ dnl in the Software are defined in paragraph 52.227-19 of the Federal
 dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
 dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 dnl (or any successor regulations).
-dnl 
-dnl =========================================================================
-dnl 
-dnl Commercial licensing and support of this software is available from
-dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-dnl 
-dnl =========================================================================
 dnl
-dnl Last Modified $Date: 2005/05/14 08:29:20 $ by $Author: brian $
-dnl 
-dnl =========================================================================
+dnl --------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2005/05/27 07:48:47 $ by $Author: brian $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl $Log: testsuite.at,v $
+dnl Revision 0.9.2.3  2005/05/27 07:48:47  brian
+dnl - updated test suites to match LFS package
+dnl
+dnl ==========================================================================
 
 m4_include([package.m4])
 
@@ -75,3 +90,4 @@ m4_include([kernel.at])
 #m4_include([dummy2.m4])
 #m4_include([dummy3.m4])
 #m4_include([dummy4.m4])
+
