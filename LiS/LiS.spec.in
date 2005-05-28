@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.24 $) $Date: 2005/05/27 20:03:42 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.25 $) $Date: 2005/05/28 05:07:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/27 20:03:42 $ by $Author: brian $
+# Last Modified $Date: 2005/05/28 05:07:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -379,7 +379,7 @@ fi
     CONFIG_SITE="%{csite_file}" \
     MODPOST_CACHE="%{mpost_file}" \
     --cache-file="%{cache_file}" \
-%if %{BUILD_arch}
+%ifnarch noarch
     --host=%{_target_platform} \
 %endif
     --prefix=%{_prefix} \
@@ -1474,6 +1474,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.25  2005/05/28 05:07:01  brian
+# - do not provide host if no architecture
+#
 # Revision 1.1.6.24  2005/05/27 20:03:42  brian
 # - suppress excessive shell debugging statements
 #

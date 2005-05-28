@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2005/05/19 20:48:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.18 $) $Date: 2005/05/28 04:42:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/19 20:48:57 $ by $Author: brian $
+# Last Modified $Date: 2005/05/28 04:42:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -265,8 +265,10 @@ include am/kernel.am
 if WITH_KO_MODULES
 else
 if PKG_BUILD_INDEP
+if RPM_BUILD_USER
 dist_modutil_DATA		= \
 				util/modutils/lis
+endif
 endif
 endif
 
