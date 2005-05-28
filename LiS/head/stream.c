@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.2 $) $Date: 2005/04/12 22:45:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.2 $) $Date: 2005/04/12 22:45:01 $"
 
 /*                               -*- Mode: C -*- 
  * stream.c --- STREAMS entry points and main routines 
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: stream.c,v 1.4 1996/01/17 18:57:07 dave Exp $
+ * RCS Id          : $Id: stream.c,v 1.1.1.4.4.2 2005/04/12 22:45:01 brian Exp $
  * ----------------______________________________________________
  *
  *   Copyright (C) 1995  Francisco J. Ballesteros, Graham Wheeler,
@@ -176,10 +176,14 @@ queuerun(int cpu_id)
 	lis_currq[cpu_id] = q ;			/* for debugging */
 	if (!LIS_CHECK_Q_MAGIC(q))
 	{
+#if 0
 	    printk("queuerun: scan queue is broken\n") ;
 	    lis_scanqhead = NULL ;
 	    lis_scanqtail = NULL ;
 	    K_ATOMIC_SET(&lis_runq_req_cnt, 0) ;
+#else
+	    printk("queuerun: queue flags are 0x%lx\n", q->q_flag);
+#endif
 	    goto scan_loop_bottom ;
 	}
 
@@ -279,10 +283,14 @@ scan_loop_bottom:
 	lis_currq[cpu_id] = q ;			/* for debugging */
 	if (!LIS_CHECK_Q_MAGIC(q))
 	{
+#if 0
 	    printk("queuerun: service queue is broken\n") ;
 	    lis_qhead = NULL ;
 	    lis_qtail = NULL ;
 	    K_ATOMIC_SET(&lis_runq_req_cnt, 0) ;
+#else
+	    printk("queuerun(2): queue flags are 0x%lx\n", q->q_flag);
+#endif
 	    goto qsched_loop_bottom ;
 	}
 
