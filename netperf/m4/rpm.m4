@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/03/31 00:06:43 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/05/28 07:17:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 00:06:43 $ by $Author: brian $
+# Last Modified $Date: 2005/05/28 07:17:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -154,14 +154,14 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
-			    (3.0)	rpm_cv_dist_extra=".centos3" ;;
-			    (4.0)	rpm_cv_dist_extra=".centos4" ;;
+			    (3|3.?)	rpm_cv_dist_extra=".centos3" ;;
+			    (4|4.0)	rpm_cv_dist_extra=".centos4" ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3.0)	rpm_cv_dist_extra=".WB3" ;;
-			    (4.0)	rpm_cv_dist_extra=".WB4" ;;
+			    (3|3.0)	rpm_cv_dist_extra=".WB3" ;;
+			    (4|4.0)	rpm_cv_dist_extra=".WB4" ;;
 			esac
 			;;
 		    (fedora)
