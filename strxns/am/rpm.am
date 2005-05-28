@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/05/14 07:46:09 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2005/05/28 05:38:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 07:46:09 $ by $Author: brian $
+## Last Modified $Date: 2005/05/28 05:38:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -250,7 +250,7 @@ lfs-rpm:
 noa-rpm:
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm || :
 
-rpms: noa-rpm lis-rpm lfs-rpm one-rpm
+rpms: lis-rpm lfs-rpm one-rpm noa-rpm
 
 # Another sneaky trick
 all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
@@ -274,20 +274,19 @@ rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
-	rpmtarg=`$(ECHO) $@ | sed -e 's|rebuild|rpms|'` ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
 			fi ; \
 		done ; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" $$rpmtarg" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" $$rpmtarg || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm|| :; \
 	done ; \
-	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"noarch\" $$rpmtarg" ; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="noarch" $$rpmtarg || :
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' kversion=\"$$k\" RPMTARGET=\"noarch\" noa-rpm" ; \
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' kversion="$$k" RPMTARGET="noarch" noa-rpm || :
 
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
@@ -308,7 +307,7 @@ resign: sign
 			$(ECHO) "D: existing gpg sig in $$rpm" ; \
 		fi ; \
 	done ; \
-	if test :$$unsigned_rpms != : ; then \
+	if test ":$$unsigned_rpms" != : ; then \
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
