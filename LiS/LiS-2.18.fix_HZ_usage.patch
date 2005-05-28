@@ -1,0 +1,99 @@
+diff -ur LiS-2.18.orig/head/linux-mdep.c LiS-2.18/head/linux-mdep.c
+--- LiS-2.18.orig/head/linux-mdep.c	2004-10-13 18:07:36.000000000 +0200
++++ LiS-2.18/head/linux-mdep.c	2005-03-31 15:08:55.679753385 +0200
+@@ -808,7 +808,7 @@
+ ************************************************************************/
+ long	_RP lis_time_till(long target_time)
+ {
+-    return( target_time - jiffies*(1000/HZ) ) ;
++    return( target_time - jiffies_to_msecs(jiffies) ) ;
+ 
+ } /* lis_time_till */
+ 
+@@ -823,7 +823,7 @@
+ ************************************************************************/
+ long	_RP lis_target_time(long milli_sec)
+ {
+-    return( jiffies*(1000/HZ) + milli_sec ) ;
++    return( jiffies_to_msecs(jiffies) + milli_sec ) ;
+ 
+ } /* lis_target_time */
+ 
+@@ -837,7 +837,7 @@
+ ************************************************************************/
+ long	_RP lis_milli_to_ticks(long milli_sec)
+ {
+-    return(milli_sec/(1000/HZ)) ;
++    return msecs_to_jiffies(milli_sec) ;
+ }
+ 
+ 
+diff -ur LiS-2.18.orig/head/poll.c LiS-2.18/head/poll.c
+--- LiS-2.18.orig/head/poll.c	2004-09-07 19:11:22.000000000 +0300
++++ LiS-2.18/head/poll.c	2005-03-31 14:52:55.838753847 +0200
+@@ -180,7 +180,6 @@
+     long		 target_time ;			/* in ms */
+     int			 timer_id = 0 ;
+     long		 time_interval = time_out ;	/* in ms */
+-    long		 ms_per_tick = 1000/HZ ;
+     long		 ticks ;			/* in system ticks */
+     struct pollfd	*pfds;
+     struct pollfd	*pfd_ptr ;
+@@ -204,8 +203,7 @@
+     /*
+      * Round time interval up to a multiple of system ticks.
+      */
+-    ticks = (time_interval + ms_per_tick - 1) / ms_per_tick ;
+-    target_time = lis_target_time(ticks*ms_per_tick) ;
++    target_time = lis_target_time(time_interval) ;
+ 
+     if (   (err=lis_check_umem(NULL,VERIFY_WRITE,fds,size))<0
+ 	|| (err=lis_check_umem(NULL,VERIFY_READ,fds,size))<0
+diff -ur LiS-2.18.orig/head/port-mdep.c LiS-2.18/head/port-mdep.c
+--- LiS-2.18.orig/head/port-mdep.c	2004-09-02 22:11:17.000000000 +0300
++++ LiS-2.18/head/port-mdep.c	2005-03-31 14:43:19.148915820 +0200
+@@ -312,7 +312,7 @@
+     tl->prev	= NULL ;
+     tl->function= fn;
+     tl->data	= arg;
+-    tl->tdelta	= ticks * (1000/HZ) ;		/* convert to milli-secs */
++    tl->tdelta	= jiffies_to_msecs(ticks) ;		/* convert to milli-secs */
+     port_add_timer(tl);
+ }
+ 
+diff -ur LiS-2.18.orig/head/user/usrio.c LiS-2.18/head/user/usrio.c
+--- LiS-2.18.orig/head/user/usrio.c	2002-10-30 00:38:07.000000000 +0200
++++ LiS-2.18/head/user/usrio.c	2005-03-31 14:52:18.635249739 +0200
+@@ -1091,7 +1091,6 @@
+     long		 target_time ;			/* in ms */
+     int			 timer_id = 0 ;
+     long		 time_interval = time_out ;	/* in ms */
+-    long		 ms_per_tick = 1000/HZ ;
+     long		 ticks ;			/* in system ticks */
+     pollfd_t		*pfds;
+     pollfd_t		*pfd_ptr ;
+@@ -1103,11 +1102,7 @@
+     int			 ready_fd_cnt = 0 ;
+     lis_semaphore_t	 poll_sem ;
+ 
+-    /*
+-     * Round time interval up to a multiple of system ticks.
+-     */
+-    ticks = (time_interval + ms_per_tick - 1) / ms_per_tick ;
+-    target_time = lis_target_time(ticks*ms_per_tick) ;
++    target_time = lis_target_time(time_interval);
+ 
+     if (   (err=lis_check_umem(NULL,VERIFY_WRITE,fds,size))<0
+ 	|| (err=lis_check_umem(NULL,VERIFY_READ,fds,size))<0
+diff -ur LiS-2.18.orig/include/sys/LiS/wait.h LiS-2.18/include/sys/LiS/wait.h
+--- LiS-2.18.orig/include/sys/LiS/wait.h	2004-09-03 23:41:28.000000000 +0300
++++ LiS-2.18/include/sys/LiS/wait.h	2005-03-31 14:54:55.529305278 +0200
+@@ -49,8 +49,6 @@
+ /*  -------------------------------------------------------------------  */
+ /*                         Shared global variables                       */
+ 
+-#define ONESEC (1000000/HZ)	/* ? */
+-
+ /*  -------------------------------------------------------------------  */
+ /*			Exported functions & macros                      */
+ 

@@ -1,0 +1,217 @@
+diff -ur LiS-2.18.orig/drivers/str/linux/ldl.c LiS-2.18/drivers/str/linux/ldl.c
+--- LiS-2.18.orig/drivers/str/linux/ldl.c	2004-09-13 18:12:45.000000000 +0300
++++ LiS-2.18/drivers/str/linux/ldl.c	2005-03-31 14:35:50.440813077 +0200
+@@ -122,8 +122,8 @@
+ 
+ #define ldldev		net_device
+ #define driver_started(dev)	 1
+-#define	START_BH_ATOMIC(dev)	spin_lock_bh(&(dev)->queue_lock)
+-#define	END_BH_ATOMIC(dev)	spin_unlock_bh(&(dev)->queue_lock)
++#define	START_BH_ATOMIC(dev, flags)	spin_lock_irqsave(&(dev)->queue_lock, flags)
++#define	END_BH_ATOMIC(dev,flags)	spin_unlock_irqrestore(&(dev)->queue_lock, flags)
+ 
+ #if defined(ARPHRD_IEEE802_TR)
+ #define	IS_ARPHRD_IEEE802_TR(dev) (dev)->type == ARPHRD_IEEE802_TR
+@@ -340,7 +340,7 @@
+ 
+ ldl_gstats_ioctl_t	ldl_gstats ;
+ #define	ginc(field)	lis_atomic_inc(&ldl_gstats.field)
+-STATIC unsigned long	ldl_debug_mask ;
++STATIC unsigned long	ldl_debug_mask;
+ 
+ STATIC struct pt *first_pt;
+ STATIC lis_spin_lock_t first_pt_lock;
+@@ -569,11 +569,12 @@
+ /*
+  *  sap_create  - create and add another packet type (sap) to a device.
+  *
+- *  Returns 0 on success, -1 on failure.
++ *  Returns 0 on success, -1 on failure. If the returned pt is not NULL,
++ *  than dev_add_pack(pt) must be called later, when interrupts are enabled
+  *
+  *  Notice that sap_create is always called under SPLSTR()
+  */
+-STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
++STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype, struct packet_type **return_pt)
+ {
+ 	struct pt *pt, *npt;
+ 	struct sap *sap;
+@@ -582,6 +583,7 @@
+ 	LISASSERT(dl->magic == DL_MAGIC);
+ 	LISASSERT(dl->ndev != NULL);
+ 
++	*return_pt = NULL;
+ 	saptype = htons(saptype);
+ 
+ 	if ((sap = ALLOC(sizeof *sap)) == NULL)
+@@ -649,7 +651,8 @@
+ 		pt->pt.next = NULL;
+ #endif
+ 		lis_spin_unlock(&first_pt_lock);
+-		dev_add_pack(&pt->pt);
++		/* dev_add_pack(&pt->pt); will be called later, when no locks are held */
++		*return_pt = &pt->pt;
+ 	} else {
+ 		/* Re-use of packet_type */
+ 		LISASSERT(pt->magic == PT_MAGIC);
+@@ -676,6 +679,7 @@
+ 	int psw;
+ 	struct pt *pt, *opt;
+ 	struct sap **sapp_dl, **sapp_pt;
++	struct packet_type * to_remove = NULL;
+ 
+ 	LISASSERT(dl != NULL);
+ 	LISASSERT(dl->magic == DL_MAGIC);
+@@ -703,7 +707,8 @@
+ 				}
+ 		}
+ 		lis_spin_unlock(&first_pt_lock);
+-		dev_remove_pack(&pt->pt);
++		/* dev_remove_pack(&pt->pt); will be called later, when no locks are held */
++		to_remove = &pt->pt;
+ 		pt->magic = 0;
+ 		FREE(pt);
+ 		--pt_n_alloc;
+@@ -742,6 +747,9 @@
+ 				 * Emergency brake
+ 				 */
+ 				SPLX(psw);
++				if ( to_remove ) {
++					dev_remove_pack(to_remove);
++				}				
+ 				return -1;
+ 			}
+ 			LISASSERT((*sapp_dl)->magic == SAP_MAGIC);
+@@ -760,6 +768,9 @@
+ 	--sap_n_alloc;
+ 
+ 	SPLX(psw);
++	if ( to_remove ) {
++		dev_remove_pack(to_remove);
++	}
+ 	return 0;
+ }
+ 
+@@ -859,7 +870,10 @@
+ 	 *  should come from this endpoint.
+ 	 */
+ 	if (dl->dlstate == DL_IDLE) {
++		dl->dlstate = DL_UNBIND_PENDING;
++		SPLX(psw);
+ 		sap_destroy_all(dl);
++		SPLSTR(psw);
+ 		dl->dlstate = DL_UNBOUND;
+ 	}
+ 	if (dl->dlstate == DL_UNBOUND) {
+@@ -1020,9 +1034,10 @@
+ 			 * clients of the driver, but that's just the
+ 			 * way has to be.  DMG 8/25/00
+ 			 */
+-			START_BH_ATOMIC(ndev->dev) ;
++			unsigned long flags;
++			START_BH_ATOMIC(ndev->dev, flags) ;
+ 			qdisc_reset(ndev->dev->qdisc) ;
+-			END_BH_ATOMIC(ndev->dev) ;
++			END_BH_ATOMIC(ndev->dev, flags) ;
+ 			ndev->dev = NULL;
+ 		}
+ 		ndev_free(ndev);
+@@ -1209,7 +1224,8 @@
+ 	if (atomic_read(&ndev->wr_cur) <= ndev->wr_max) {
+ 		struct Qdisc *q;
+ 
+-		START_BH_ATOMIC(dev);
++		unsigned long flags;
++		START_BH_ATOMIC(dev, flags);
+ 		q = dev->qdisc;
+ 		LISASSERT(q != NULL);
+ 		if (q->enqueue) {
+@@ -1217,11 +1233,11 @@
+ 
+ 			ret = q->enqueue(skb, q);
+ 			qdisc_wakeup(dev);
+-			END_BH_ATOMIC(dev);
++			END_BH_ATOMIC(dev. flags);
+ 			if (ret == 1)
+ 				return DONE;
+ 		} else {
+-			END_BH_ATOMIC(dev);
++			END_BH_ATOMIC(dev, flags);
+ 			if (dev_queue_xmit(skb) >= 0)
+ 				return DONE;
+ 		}
+@@ -3352,6 +3368,7 @@
+ 	unsigned short saptype;
+ 	int psw;
+ 	int len;
++	struct packet_type *pt;
+ 
+ 	ginc(bind_req_cnt) ;
+ 	SPLSTR(psw);
+@@ -3416,7 +3433,7 @@
+ 			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
+ 	}
+ 
+-	if (sap_create(dl, dlsap, saptype) < 0) {
++	if (sap_create(dl, dlsap, saptype, &pt) < 0) {
+ 		SPLX(psw);
+ 		return reply_error_ack(dl, mp, DL_BIND_REQ, DL_SYSERR, ENOMEM);
+ 	}
+@@ -3453,6 +3470,11 @@
+ 	dl->dlstate = DL_IDLE;
+ 	SPLX(psw);
+ 
++	if ( pt ) {
++		/*  Can be called only when no locks are held */
++		dev_add_pack(pt);
++	}
++
+ 	if (ldl_debug_mask & LDL_DEBUG_BIND)
+ 	    printk("ldl: ws_bind: "
+ 	    	   "dl_sap=%x framing=%s pkt-type=%s\n",
+@@ -3488,6 +3510,7 @@
+ 	dl->dlstate = DL_UNBIND_PENDING;
+ 	SPLX(psw);
+ 
++	/* Call only when no locks are held */
+ 	sap_destroy_all(dl);
+ 
+ 	if (putctl1(dl->rq->q_next, M_FLUSH, FLUSHRW) == 0)
+@@ -3517,6 +3540,7 @@
+ 	dl_subs_bind_ack_t *ackp;
+ 	int len;
+ 	int psw;
++	struct packet_type *pt;
+ 	
+ 	ginc(subs_bind_req_cnt) ;
+ 	SPLSTR(psw);
+@@ -3625,12 +3649,17 @@
+ 			mp = bp;
+ 		}
+ 
+-		if (sap_create(dl, dlsap, saptype) < 0) {
++		if (sap_create(dl, dlsap, saptype, &pt) < 0) {
+ 			SPLX(psw);
+ 			return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_TOOMANY, 0);
+ 		}
+ 		SPLX(psw);
+ 
++		/*  Can be called only when no locks are held */
++		if ( pt ) {
++			dev_add_pack(pt);
++		}
++
+ 		mp->b_datap->db_type = M_PCPROTO;
+ 		ackp = (dl_subs_bind_ack_t *)mp->b_wptr;
+ 		ackp->dl_primitive = DL_SUBS_BIND_ACK;
+@@ -4157,7 +4186,10 @@
+ 	}
+ 
+ 	if (dl->dlstate == DL_IDLE) {
++		dl->dlstate = DL_UNBIND_PENDING;
++		SPLX(psw);
+ 		sap_destroy_all(dl);
++		SPLSTR(psw);
+ 		dl->dlstate = DL_UNBOUND;
+ 	}
+ 	if (dl->dlstate != DL_UNATTACHED) {
