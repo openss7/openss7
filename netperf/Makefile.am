@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.29 $) $Date: 2005/05/14 08:30:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2005/05/29 07:49:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,14 +46,21 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:30:02 $ by $Author: brian $
+# Last Modified $Date: 2005/05/29 07:49:30 $ by $Author: brian $
 #
 # =============================================================================
 
-#
-#   General rules
-#
+##
+## General rules
+##
 include am/openss7.am
+
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 dist_bin_SCRIPTS		= \
 				  netperf_arr \
@@ -122,9 +129,20 @@ netserver_SOURCES		= netserver.c
 netserver_LDADD			= libnetperf.la $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
+## RPM_BUILD_USER
+endif
+
+## PKG_BUILD_ARCH
+endif
+
 dist_noinst_SCRIPTS		+= configure.nexusware
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(dist_sbin_SCRIPTS)
+
+MANMACRO_PFX			= netperf
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 
 man1_MANS			= \
 				  man1/netperf.1 \
@@ -182,7 +200,10 @@ dist_noinst_MANS		= \
 				  man8/packet_byte_script.man \
 				  man8/netserver.man
 
-MANMACRO_PFX			= netperf
+## PKG_BUILD_INDEP
+endif
+
+include am/man.am
 
 info_TEXINFOS			= netperf.texi
 EXTRA_info_TEXINFOS		= \
@@ -200,29 +221,27 @@ EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes netperf_hp.ps
 
 include am/info.am
 
-include am/man.am
-
-#
-# Rules for lsms
-#
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-#   Rules for making rpms
-#
+##
+## Rules for making rpms
+##
 AM_RPMFLAGS			=
 AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
 
 EXTRA_DIST		+= \

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/05/28 05:07:09 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/05/29 11:28:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 05:07:09 $ by $Author: brian $
+# Last Modified $Date: 2005/05/29 11:28:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +56,7 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %global BUILD_modules 1
 %global BUILD_tools   1
+%global BUILD_libs    0
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
@@ -69,7 +70,7 @@
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|')
+%global kernel_source %(echo %{_kversion} | sed -e 's|BOOT$||;s|smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
 %global core_name   core-%{_kversion}
@@ -86,12 +87,13 @@
 %global infofiles   %{name}
 #global initfiles
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')
+%{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
 %{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
+#{!?_modutildir:     %{expand: %%global _modutildir   %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:     %{expand: %%global _kmoduledir   %%{_lib}/modules/%%{kernel_version}}}
 
 # because we only need to build the tools binaries once for each architecture,
@@ -113,7 +115,6 @@
 %endif
 
 %if %{BUILD_tools}
-%global BUILD_libs    0
 %else
 %global BUILD_libs    0
 %global BUILD_source  0
@@ -133,7 +134,7 @@
 %global FILES_tools         1
 %global FILES_doc           1
 %global FILES_doclibs       1
-%global FILES_source        1
+%global FILES_source        %{BUILD_source}
 %global FILES_init          1
 %global FILES_ko_init       1
 %global FILES_noinit        1
@@ -368,11 +369,11 @@ fi
     %{?_without_checks:          '%disable %_without_checks'} \
     %{?_with_autotest:           '%enable %_with_autotest'} \
     %{?_without_autotest:        '%disable %_without_autotest'} \
-    %{?_with_k_optimize:         '%_with_k_optimize'} \
     %{?_with_cooked_manpages:    '%_with_cooked_manpages'} \
     %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
     %{?_with_public:             '%enable %_with_public'} \
     %{?_without_public:          '%disable %_without_public'} \
+    %{?_with_k_optimize:         '%_with_k_optimize'} \
     %{?_with_k_debug:            '%enable %_with_k_debug'} \
     %{?_without_k_debug:         '%disable %_without_k_debug'} \
     %{?_with_k_test:             '%enable %_with_k_test'} \
@@ -446,8 +447,7 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
 
 function package_source() {
-# clean out binaries and auxilliary files
-    make mostlyclean
+# remove include2 symbolic link
     rm -fr include2
 # punch rpm release to Custom
     echo '.Custom.1'  > .rpmextra
@@ -455,6 +455,8 @@ function package_source() {
     mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
 # tar and move the sources for source release
     tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+# clean out binaries and auxilliary files
+    ( cd %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease} ; make mostlyclean )
 # create symbolic link
     ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
 }
@@ -465,6 +467,9 @@ package_source
 
 # stupid mandrake spec-helper will compress our macros files otherwise
 @COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+
+# stupid suse check compresses everything (including our macro files)
+%{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
 
 %clean
 # ---------------------------------------------------------------------------
@@ -832,7 +837,9 @@ Group:          Development/System
 #Prefix:         %{_bindir}
 #Prefix:         %{_sbindir}
 Prefix:         %{_libexecdir}
+#Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-utils
+#Conflicts:      %{_conflict}-util
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1012,6 +1019,7 @@ if [ $1 = 1 ] ; then : # fresh install
     list="%{modules}"
     for dir in %{_kmoduledir}/../* ; do
         [ -d $dir ] || continue
+        xtrace=`shopt -p -o | grep xtrace` ; set +x
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
 		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
 		case " $list " in (*" $b "*) ;; (*) continue ;; esac
@@ -1021,7 +1029,6 @@ if [ $1 = 1 ] ; then : # fresh install
         if [ -f $dir/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
-            xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
@@ -1042,8 +1049,8 @@ if [ $1 = 1 ] ; then : # fresh install
                 fi
                 dep=
             done < $dir/modules.dep
-            eval "$xtrace"
         fi
+        eval "$xtrace"
         if [ -n "$strm_mods" -o -n "$strm_deps" ] ; then
             rm -f -- $strm_mods $strm_deps
         fi
@@ -1216,14 +1223,17 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+#{_sysconfdir}/sctp.conf
 %{_initrddir}/../*
 %{_configdir}/*
+#{_modutildir}/*
 %endif
 
 %if %{FILES_ko_init}
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+#{_sysconfdir}/sctp.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1232,6 +1242,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+#{_modutildir}/*
 %endif
 
 %if %{FILES_ko_noinit}
@@ -1244,15 +1255,24 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.56  2005/05/28 05:07:09  brian
-# - do not provide host if no architecture
+# Revision 0.9.2.58  2005/05/29 11:28:40  brian
+# - better approach to mostlyclean
 #
-# Revision 1.56  2005/05/28 05:07:09  brian
-# - do not provide host if no architecture
+# Revision 1.58  2005/05/29 11:28:40  brian
+# - better approach to mostlyclean
 #
-# Revision 1.55  2005/05/27 20:03:46  brian
-# - suppress excessive shell debugging statements
-#
+
+* Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.57  2005/05/29 07:49:33  brian
+- updates and corrections for SuSE 9.2 build
+
+* Sat May 28 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.56  2005/05/28 05:07:09  brian
+- do not provide host if no architecture
+
+* Fri May 27 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.55  2005/05/27 20:03:46  brian
+- suppress excessive shell debugging statements
 
 * Thu May 26 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.54  2005/05/26 09:59:34  brian

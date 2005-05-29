@@ -52,6 +52,9 @@
 
 SUBDIRS = compat doc include src
 
+##
+## General rules
+##
 include am/openss7.am
 
 AM_CPPFLAGS = @STRIP_BEGIN@ \
@@ -60,27 +63,27 @@ AM_CPPFLAGS = @STRIP_BEGIN@ \
 
 EXTRA_DIST += autogen.sh LICENSE
 
-#
-# Rules for lsms
-#
+##
+## Rules for lsms
+##
 include am/lsm.am
 
-#
-# Rules for archives
-#
+##
+## Rules for archives
+##
 include am/archive.am
 
-#
-#   Rules for making rpms
-#
+##
+## Rules for making rpms
+##
 AM_RPMFLAGS			=
 AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 
-#
-# Rules for making deb packages
-#
+##
+## Rules for making deb packages
+##
 include am/deb.am
 
 EXTRA_DIST		+= \

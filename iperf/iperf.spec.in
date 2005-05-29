@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.36 $) $Date: 2005/05/26 09:59:33 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.38 $) $Date: 2005/05/29 11:28:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/26 09:59:33 $ by $Author: brian $
+# Last Modified $Date: 2005/05/29 11:28:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,31 +56,89 @@
 # rpmbuild will not build a binary rpm when it has no %files section
 %global BUILD_modules 0
 %global BUILD_tools   1
+%global BUILD_libs    0
+%global BUILD_noarch  1
+%global BUILD_arch    1
+%global BUILD_source  1
 
-%global epoch @PACKAGE_RPMEPOCH@
-%global base @PACKAGE_TARNAME@
-%global title @PACKAGE_TITLE@
-%global stitle @PACKAGE_SHORTTITLE@
+%global epoch       @PACKAGE_RPMEPOCH@
+%global base        @PACKAGE_LCNAME@
+%global title       @PACKAGE_TITLE@
+%global stitle      @PACKAGE_SHORTTITLE@
 
-%global modules     iperf
 %global libraries   iperf
 %global tools       iperf
 %global infofiles   %{name}
 
+%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
+
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
-%{?_without_modules: %{expand: %%global BUILD_modules 0}}
-%{?_without_tools:   %{expand: %%global BUILD_tools   0}}
-%{?_with_modules:    %{expand: %%global BUILD_modules 1}}
-%{?_with_tools:      %{expand: %%global BUILD_tools   1}}
+#{?_without_modules: %{expand: %%global BUILD_modules 0}}
+#{?_without_tools:   %{expand: %%global BUILD_tools   0}}
+%{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
+%{?_without_arch:    %{expand: %%global BUILD_arch    0}}
+%{?_without_public:  %{expand: %%global BUILD_source  0}}
 
-%if %{BUILD_tools}
-%global BUILD_libs    0
-%else
-%global BUILD_libs    0
+#{?_with_modules:    %{expand: %%global BUILD_modules 1}}
+#{?_with_tools:      %{expand: %%global BUILD_tools   1}}
+%{?_with_indep:      %{expand: %%global BUILD_noarch  1}}
+%{?_with_arch:       %{expand: %%global BUILD_arch    1}}
+%{?_with_public:     %{expand: %%global BUILD_source  1}}
+
+%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+
+%if %{BUILD_arch}
+%global BUILD_source  0
 %endif
 
+%if %{BUILD_tools}
+%else
+%global BUILD_libs    0
+%global BUILD_source  0
+%endif
+
+%if %{BUILD_tools}
+%global FILES_libs          1
+%global FILES_nolibs        1
+%global FILES_tools         1
+%global FILES_doc           1
+%global FILES_doclibs       1
+%global FILES_source        %{BUILD_source}
+%else
+%global FILES_libs          0
+%global FILES_nolibs        0
+%global FILES_tools         0
+%global FILES_doc           0
+%global FILES_doclibs       0
+%global FILES_source        0
+%endif
+
+%if %{BUILD_arch}
+%else
+%global FILES_modules       0
+%global FILES_ko_modules    0
+%global FILES_libs          0
+%global FILES_nolibs        0
+%global FILES_tools         0
+%endif
+
+%if %{BUILD_noarch}
+%else
+%global FILES_doc           0
+%global FILES_doclibs       0
+%global FILES_source        0
+%endif
+
+%if %{BUILD_libs}
+%global FILES_nolibs        0
+%global FILES_doc           0
+%else
+%global FILES_libs          0
+%global FILES_doclibs       0
+%endif
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -91,66 +149,64 @@
 %define buildreq_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|BuildRequires: %1 =|')
 %define requires_prov() %(LANG_ALL="C" rpm -q --provides `rpm -q --whatprovides %2` | grep '%2' | grep -v "is not" | head -1 | sed -e 's|%2.*=|Requires: %1 =|')
 
-Summary:	%{title} for OpenSS7 SCTP
+Summary:        %{title} for OpenSS7 SCTP
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
 License:        BSD/GPL
 Group:          System Environment/Base
-%if %{?url: 1}%{!?url: 0}
-URL:            %{url}
-%endif
-%if %{?_xpm_icon: 1}%{!?_xpm_icon: 0}
-Icon:           %{_xpm_icon}
-%endif
-%if %{?_gif_icon: 1}%{!?_gif_icon: 0}
-Icon:           %{_gif_icon}
-%endif
-ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel
+%{?url:URL:            %{url}}
+%{?_xpm_icon:Icon:           %{_xpm_icon}}
+%{?_gif_icon:Icon:           %{_gif_icon}}
+ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/%{name}-%{version}.tar.bz2
 Obsoletes:      %{base}
 Obsoletes:      %{name}
 Obsoletes:      iperf
-%if %{?buildroot: 0}%{!?buildroot: 1}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root
-%endif
+%{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 Provides:       iperf
 #BuildRequires:  sctp-devel >= 0.2.20
-%if %{BUILD_modules}
-BuildRequires:  kernel-source = %{kernel_source}
-BuildRequires:  modutils >= 2.4.12
-%endif
+
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+
 %ifarch s390 s390x
 BuildRequires:  gcc >= 2.95.3
 %else
-%ifarch %{all_ppc}
+%ifarch %all_ppc
 BuildRequires:  gcc >= 2.96-75
 %else
-%if %{newgcc}
+%if %newgcc
 BuildRequires:  gcc >= 2.96-98
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
 %endif
 %endif
-%if %{newgcc}
+%if %newgcc
 BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
+
 # these are some needs of the configure script
 # to manipulate manual pages:
+BuildRequires:  /usr/bin/groff
 BuildRequires:  /usr/bin/soelim
 BuildRequires:  /usr/bin/refer
 BuildRequires:  /usr/bin/tbl
 BuildRequires:  /usr/bin/pic
 BuildRequires:  /usr/bin/gzip
-# to generate kernel symbols:
-#BuildRequires:  /sbin/genksyms
+
+# to build documentation
+#BuildRequires: transfig >= 3.2
+#BuildRequires: ImageMagick
+#BuildRequires: tetex >= 1.0
+#BuildRequires: ghostscript >= 6.51
+# to install documentation
+#BuildRequires: texinfo >= 4.0
 # find the rest automagically
 Autoreq:        true
 
@@ -173,7 +229,7 @@ other architectures as well.
 
 preferred_cflags="%{optflags}"
 
-%ifarch %{ix86}
+%ifarch %ix86
 preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
 %endif
 
@@ -212,7 +268,9 @@ fi
     CXXCPP="${CXXCPP:-$CPP}" \
     CONFIG_SITE="%{csite_file}" \
     --cache-file="%{cache_file}" \
+%ifnarch noarch
     --host=%{_target_platform} \
+%endif
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
@@ -229,6 +287,10 @@ fi
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
+    %{?_with_arch:               '%enable %_with_arch'} \
+    %{?_without_arch:            '%disable %_without_arch'} \
+    %{?_with_indep:              '%enable %_with_indep'} \
+    %{?_without_indep:           '%disable %_without_indep'} \
     %{?_with_checks:             '%enable %_with_checks'} \
     %{?_without_checks:          '%disable %_without_checks'} \
     %{?_with_autotest:           '%enable %_with_autotest'} \
@@ -248,13 +310,12 @@ make check
 # in case it was not cleaned
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
-%if %{?_enable_debug_packages: %{_enable_debug_packages}}%{!?_enable_debug_packages: 0}
-# we are going to create debug packages, so we need to install unstripped binaries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install
-%else
-# use libtoolized install-strip to strip binaries, modules, shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
-%endif
+# if we are going to create debug packages, we need to install unstripped
+# binaries; otherwise use libtoolized install-strip to strip binaries, modules,
+# shared and static libraries.
+make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+    %{!?_enable_debug_packages: install-strip} \
+    %{?_enable_debug_packages: install}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -262,22 +323,30 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" install-strip
 # get the installed info directory out of the build root
 [ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
 
-%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
-# clean out binaries and auxilliary files
-make mostlyclean
-rm -fr include2
+function package_source() {
+# remove include2 symbolic link
+    rm -fr include2
 # punch rpm release to Custom
-echo '.Custom.1'  > .rpmextra
+    echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
-mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+    mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
 # tar and move the sources for source release
-tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+    tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
+# clean out binaries and auxilliary files
+    ( cd %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease} ; make mostlyclean )
 # create symbolic link
-ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+    ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
+}
+
+%if %{BUILD_source}
+package_source
 %endif
 
 # stupid mandrake spec-helper will compress our macros files otherwise
 @COOKED_MANPAGES_FALSE@export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+
+# stupid suse check compresses everything (including our macro files)
+%{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
 
 %clean
 # ---------------------------------------------------------------------------
@@ -288,9 +357,7 @@ ln -sf %{name}-%{version}-%{fullrelease} %{buildroot}%{_usrsrc}/%{name}
 %package openss7
 Summary:        %{title} for OpenSS7 SCTP
 Group:          System Environment/Base
-Prefix:         %{_docdir}
 Prefix:         %{_bindir}
-Prefix:         %{_mandir}
 Autoreq:        true
 Release:        %{fullrelease}
 
@@ -318,61 +385,140 @@ Prefix:         %{_datadir}/locale
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
-The %{name}-lib package contains the run-time shared libraries
-necessary to run applications programs and utilities developed for
-%{title}.
+The %{name}-lib package contains the run-time shared libraries necessary to
+run applications programs developed for %{title}.
 
+%if %{have_libraries}
 %pre lib
 # ---------------------------------------------------------------------------
-if [ $1 = 0 ] ; then
-#   this is supposed to be a fresh install
-#   see if there are any libraries hanging around from a non-rpm install
+if [ $1 = 1 ] ; then : # fresh install
+    # See if there are any libraries hanging around from a non-rpm install.  If there are, just
+    # delete them.
     libs="%{libraries}" ; for lib in $libs ; do
         old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
         if [ -n "$old_libs" ] ; then
-#       old libraries hanging around, delete them
+            # Old libraries hanging around, delete them.
             echo "warning: Deleting old non-rpm libraries $old_libs" >&2
             rm -f $old_libs
         fi
     done
-else
-    :
-#   upgrade, let RPM do its job
 fi
+%endif
 
 %post lib
 # ---------------------------------------------------------------------------
-# do a load config
-if [ $1 = 0 ] ; then
-#   end of fresh install, do /sbin/ldconfig
-    /sbin/ldconfig >/dev/null
-else
-    :
-#   upgrade, wait for old postun
+if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
+    # After a fresh install or upgrade, do a load config.
+    /sbin/ldconfig
 fi
 
 %postun lib
 # ---------------------------------------------------------------------------
-# whether complete removal or upgrade, do a load config
-/sbin/ldconfig
+if [ $1 = 0 -or $1 = 1 ] ; then
+    # Whether complete removal or upgrade, do a load config.
+    /sbin/ldconfig
+fi
 
-%if %{BUILD_libs}
+%if %{FILES_libs}
 %files lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
 %{_datadir}/locale/*
+%endif
+
+# ===========================================================================
+%package devel
+
+Summary:        %{title} headers, libs and docs.
+Group:          Development/System
+Prefix:         %{_libdir}
+#Prefix:         %{_includedir}/%{name}
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description devel
+The %{name}-devel package contains library archives for static compilation,
+and headers files to develop %{title} applications.  This
+also includes the header files and static libraries required to compile
+%{title} applications programs.  In addition it contains all of the
+manual pages necessary for developing %{title} application programs.
+
+%if %{FILES_libs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
+#dir %{_includedir}/%{name}
+#{includedir}/%{name}/*.h
+#{includedir}/%{name}/sys/*
+%endif
+
+%if %{FILES_nolibs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#dir %{_includedir}/%{name}
+#{includedir}/%{name}/*.h
+#{includedir}/%{name}/sys/*
+%endif
+
+# ===========================================================================
+%package util
+
+Summary:        %{title} admin utilities.
+Group:          Development/System
+#Prefix:         %{_bindir}
+#Prefix:         %{_sbindir}
+Prefix:         %{_libexecdir}
+#Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Obsoletes:      %{name}-utils
+#Conflicts:      %{_conflict}-util
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description util
+The %{name}-util package provides administrative and configuration test
+utilities and commands associated with the %{title} package.
+
+%pre util
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ]; then : # fresh install
+    # This is a fresh install, look for old non-rpm tools.
+    tools="%{tools}" ; for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $tool 2>/dev/null`"
+            done
+        done
+    done
+fi
+
+%if %{FILES_tools}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+#{_bindir}/*
+#{_sbindir}/*
+#{_libexecdir}/*test*
+#{_libexecdir}/*tst
 %endif
 
 # ===========================================================================
@@ -384,15 +530,13 @@ Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
+#Conflicts:      %{_conflict}-doc
+#Conflicts:      %{_conflict}-docs
 Obsoletes:      %{name}-docs
 Prereq:         /sbin/install-info
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -403,7 +547,7 @@ The %{name}-doc package contains html documentation for the development of
 %post doc
 # ---------------------------------------------------------------------------
 if [ -x /sbin/install-info ] ; then
-    # older rpm versions do not compress info files
+    # Older rpm versions do not compress info files.
     for n in %{infofiles} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
@@ -418,7 +562,7 @@ fi
 %preun doc
 # ---------------------------------------------------------------------------
 if [ "$1" = 0 -a -x /sbin/install-info ] ; then
-    # older rpm versions do not compress info files
+    # Older rpm versions do not compress info files.
     for n in %{infofiles} ; do
         if [ -f %{_infodir}/$n.info ] ; then
             /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
@@ -430,14 +574,13 @@ if [ "$1" = 0 -a -x /sbin/install-info ] ; then
     done
 fi
 
-%if %{BUILD_tools}
+%if %{FILES_doclibs}
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
 %doc ABOUT-NLS
-%endif
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS LICENSE
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc LICENSE
 %doc LSM %{name}-%{version}.lsm
 #%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -445,39 +588,17 @@ fi
 %{_mandir}/man*/*
 %endif
 
-# ===========================================================================
-%package devel
-
-Summary:        %{title} headers, libs and docs.
-Group:          Development/System
-Prefix:         %{_libdir}
-Prefix:         %{_includedir}
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description devel
-The %{name}-devel package contains library archives for static compilation,
-and headers files to develop %{title} applications.
-This also includes the header files and static libraries required to compile
-%{title} applications programs.  In addition it
-contains all of the manual pages necessary for developing
-%{title} application programs.
-
-%if %{BUILD_tools}
-%files devel
+%if %{FILES_doc}
+%files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%if %{BUILD_libs}
-%{_libdir}/*.a
-%endif
-#%{_includedir}/*
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
+%doc LICENSE
+%doc LSM %{name}-%{version}.lsm
+#%{_infodir}/*
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
+@COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
+%{_mandir}/man*/*
 %endif
 
 # ===========================================================================
@@ -487,12 +608,8 @@ Summary:        %{title} source package.
 Group:          Development/System
 Prefix:         %{_usrsrc}
 Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -501,7 +618,7 @@ The %{name}-source package contains the source code necessary for building the
 %{name} release.  It includes the autoconf configuration utilities necessary
 to create and distribute this rpm.
 
-%if %{?_without_public: 0}%{!?_without_public: %{BUILD_tools}}
+%if %{FILES_source}
 %files source
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
@@ -512,65 +629,20 @@ to create and distribute this rpm.
 %endif
 
 # ===========================================================================
-%package util
-
-Summary:        %{title} admin utilities and test programs.
-Group:          Development/System
-#Prefix:         %{_bindir}
-#Prefix:         %{_sbindir}
-Prefix:         %{_libexecdir}
-Obsoletes:      %{name}-utils
-Autoreq:        true
-%if %{?_xpm: 1}%{!?_xpm: 0}
-Icon:           %{_xpm}
-%endif
-%if %{?_gif: 1}%{!?_gif: 0}
-Icon:           %{_gif}
-%endif
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description util
-The %{name}-util package provides administrative and configuration
-test utilities and commands associated with the
-%{title} package.
-
-%pre util
-# ---------------------------------------------------------------------------
-if [ $1 = 0 ]; then
-# this is a fresh install, look for old non-rpm tools
-    tools="%{tools}" ; for tool in $tools ; do
-        location="`which $tool 2>/dev/null`"
-        while [ -n "$location" -a -x "$location" ] ; do
-            eval "rm -f $location"
-            location="`which $tool 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-                eval "rm -f $location"
-                location="`which $tool 2>/dev/null`"
-            done
-        done
-    done
-else
-    :
-#   upgrade, let rpm do its job
-fi
-
-%if %{BUILD_tools}
-%files util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-#%{_bindir}/*
-#%{_sbindir}/*
-#%{_libexecdir}/*test*
-%endif
-
-# ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.36  2005/05/26 09:59:33  brian
-# - a few changes for WBEL3 release build
+# Revision 1.1.2.38  2005/05/29 11:28:29  brian
+# - better approach to mostlyclean
 #
+
+* Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.37  2005/05/29 07:49:24  brian
+- updates and corrections for SuSE 9.2 build
+
+* Thu May 26 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.36  2005/05/26 09:59:33  brian
+- a few changes for WBEL3 release build
 
 * Thu May 19 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.35  2005/05/19 20:48:12  brian
