@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 07:48:25 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/29 09:39:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 07:48:25 $ by $Author: brian $
+# Last Modified $Date: 2005/05/29 09:39:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 07:48:25 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/29 09:39:37 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -504,12 +504,14 @@ else
     exec 3>/dev/null
 fi
 
+retval=0
 errors=0
 warnings=0
 
 command_error() {
     $ECHO "$program: E: ${1+$@}" >&3
     ((errors++))
+    retval=1
 }
 
 command_warn() {
@@ -1103,11 +1105,6 @@ case "$command" in
 	;;
 esac
 
-if test $errors -eq 0
-then
-    exit 0
-fi
-
-exit 1
+exit $retval
 
 # vim: ft=sh sw=4
