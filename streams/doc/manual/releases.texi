@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.11 2005/05/14 08:34:35 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.12 2005/05/30 06:49:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 08:34:35 $ by $Author: brian $
+@c Last Modified $Date: 2005/05/30 06:49:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -132,8 +132,9 @@ This section discusses compatibility with major prerequisites.
 @item Fedora Core 1 (FC1)
 @item Debian 3.0r2 Woody
 @item Mandrakelinux 9.2 (MDK92)
-@item RedHat Enterprise Linux 3 (EL3)
-@item WhiteBox Enterprise Linux 3 (WBEL3)
+@item RedHat Enterprise Linux 3.0 (EL3)
+@item WhiteBox Enterprise Linux 3.0 (WBEL3)
+@item CentOS Enterprise Linux 3.4 (centos34)
 @item Fedora Core 2 (FC2)
 @item SuSE 9.1 Personal
 @item Mandrakelinux 10.0 (MDK100)
@@ -141,7 +142,8 @@ This section discusses compatibility with major prerequisites.
 @item Mandrakelinux 10.1 (MDK101)
 @item Fedora Core 3 (FC3)
 @item RedHat Enterprise Linux 4 (EL4)
-@item CentOS Enterprise Linux 4.0
+@item CentOS Enterprise Linux 4.0 (centos4)
+@item WhiteBox Enterprise Linux 4 (WBEL4)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably

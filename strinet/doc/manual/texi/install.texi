@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.19 2005/05/14 07:49:18 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.22 2005/05/30 07:46:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/14 07:49:18 $ by $Author: brian $
+@c Last Modified $Date: 2005/05/30 07:46:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -107,10 +107,10 @@ to download, configure, build and install from the source tarball.
 @cindex binary rpms
 
 To install from binary RPM, you will need several of the RPM for a complete
-installation.  Binary RPM fall into three categories.  To download and install a
-complete package requires the appropriate RPM from each of the three categories
+installation.  Binary RPM fall into several categories.  To download and install a
+complete package requires the appropriate RPM from each of the several categories
 below, as applicable.  Some release packages do not provide RPMs in each of the
-three categories.
+several categories.
 
 To install from Binary RPM, you will need all of the following kernel
 indepdendent packages for your architecture, and one of the kernel-depdendent
@@ -121,7 +121,7 @@ Independent RPM are
 dependent on neither the Linux kernel version, nor the STREAMS package.
 For example, the
 source package
-@samp{@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm},
+@samp{@value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm},
 is not dependent on
 kernel nor STREAMS package.
 
@@ -134,8 +134,8 @@ RPM}).
 
 @subsubheading Architecture Independent
 @table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm}
-The @file{@value{PACKAGE}-dev} package contains the device definitions necessary
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-noarch/@-@value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm, @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
 all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
 8.0 distribution which uses an older version of @command{rpm}.  Distributions
@@ -144,20 +144,20 @@ operation.  Note also that not all release packages contain devices.  Only
 packages that provide STREAMS character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm}
-The @file{@value{PACKAGE}-doc} package contains this manual in plaintext,
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-noarch/@-@value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext,
 postscript, PDF and HTML forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} STREAMS modules or drivers.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm}
-The @file{@value{PACKAGE}-init} package contains the init scripts and provides
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-noarch/@-@value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--init} package contains the init scripts and provides
 the postinst scripts necessary to create kernel module preloads and modules
 definitions for all kernel module @samp{core} subpackages.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm, @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm}
-The @file{@value{PACKAGE}-source} package contains the source code necessary for
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-noarch/@-@value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}@--source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
@@ -167,22 +167,22 @@ that do not contain kernel modules do not generate a source RPM package.}
 
 @subsubheading Architecture Dependent
 @table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-devel} package contains library archives for static
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
 This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-lib} package contains the run-time shared libraries
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
 @footnote{Note that not all release packages contain shared libraries, and,
 therefore, not all release packages contain this package.}
 
 @ignore
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
 @end ignore
@@ -202,19 +202,19 @@ architecture.  If your architecture is not on the list, you can build binary RPM
 from the source RPM (see @pxref{Building from the Source RPM}).
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-LiS-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--LiS@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--LiS@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE}-LiS-util} package if you have LiS installed.
+@file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-streams-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE}-streams-util} package if you have streams installed.
+@file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 
 @subsubheading Kernel-Dependent RPM
@@ -233,16 +233,16 @@ architecture of the kernel package.  @command{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-core} package contains the loadable kernel modules
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
 that depend only on the kernel.  This package is heavily tied to the kernel for
 which it was compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.  Note also that only release
 packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
 kernels and is not necessary and not built for 2.6 series kernels.} contains the
@@ -254,44 +254,44 @@ compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-LiS-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
 heavily tied to the STREAMS package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-streams-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
 heavily tied to the STREAMS package and kernel for which it was compiled.  This
-particular package applies to @file{streams} (@cite{Linux Fast-STREAMS}) on
+particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-LiS-info} package@footnote{Note that only release
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--LiS@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
-contain a @file{LiS-info} subpackage.} contains the module symbol version
-information for the @file{LiS-core} subpackage, above.  It is possible to load
+contain a @file{LiS@--info} subpackage.} contains the module symbol version
+information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
-the actual kernel modules (from the @file{LiS-core} subpackage above).  This
+the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
 package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm, @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm}
-The @file{@value{PACKAGE}-streams-info} package@footnote{Note that only release
+@item @uref{http://www.openss7.org/@-rpms/@-RPMS/@-i686/@-@value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm, @value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
+The @file{@value{PACKAGE}@--streams@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
-contain a @file{streams-info} subpackage.} contains the module symbol version
-information for the @file{streams-core} subpackage, above.  It is possible to
+contain a @file{streams@--info} subpackage.} contains the module symbol version
+information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
-loaded the actual kernel modules (from the @file{streams-core} subpackage
+loaded the actual kernel modules (from the @file{streams@--core} subpackage
 above).  This package is heavily tied to the STREAMS package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
-(@cite{Linux Fast-STREAMS}) on kernel version
+(@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 @end table
@@ -308,10 +308,10 @@ RPM}.
 @cindex binary debs
 
 To install from binary DEB, you will need several of the DEB for a complete
-installation.  Binary DEB fall into three categories.  To download and install a
-complete package requires the appropriate DEB from each of the three categories
+installation.  Binary DEB fall into several categories.  To download and install a
+complete package requires the appropriate DEB from each of the several categories
 below, as applicable.  Some release packages do not provide DEBs in each of the
-three categories.
+several categories.
 
 To install from Binary DEB, you will need all of the following kernel
 indepdendent packages for your architecture, and one of the kernel-depdendent
@@ -320,7 +320,7 @@ packages from the next section.
 @subsubheading Independent DEB
 Independent DEB are dependent on neither the Linux kernel version, nor the
 STREAMS package.  For example, the source package
-@samp{@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb},
+@samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb},
 is not dependent on kernel nor STREAMS package.
 
 @noindent
@@ -332,27 +332,27 @@ from the Debian DSC}).
 
 @subsubheading Architecture Independent
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb}
-The @file{@value{PACKAGE}-dev} package contains the device definitions necessary
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.
 @footnote{Note that not all release packages contain devices.  Only packages
 that provide STREAMS character device drivers need devices, and then only when
 the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb}
-The @file{@value{PACKAGE}-doc} package contains this manual in plaintext,
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--doc} package contains this manual in plaintext,
 postscript, PDF and HTML forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} STREAMS modules or drivers.
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb}
-The @file{@value{PACKAGE}-init} package contains the init scripts and provides
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--init} package contains the init scripts and provides
 the postinst scripts necessary to create kernel module preloads and modules
 definitions for all kernel module @samp{core} subpackages.
 
-@item @uref{http://www.openss7.org/debain/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb, @value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb}
-The @file{@value{PACKAGE}-source} package contains the source code necessary for
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}@--source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @command{autoconf}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
@@ -362,22 +362,22 @@ that do not contain kernel modules do not generate a source DEB package.}
 
 @subsubheading Architecture Dependent
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-devel} package contains library archives for static
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
 This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/debain/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-lib} package contains the run-time shared libraries
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
 @footnote{Note that not all release packages contain shared libraries, and,
 therefore, not all release packages contain this package.}
 
 @ignore
-@item @uref{http://www.openss7.org/debain/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
 @end ignore
@@ -397,19 +397,19 @@ architecture.  If your architecture is not on the list, you can build binary DEB
 from the Debian DSC (see @pxref{Building from the Debian DSC}).
 
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-LiS-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-LiS-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--LiS@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--LiS@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--LiS@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE}-LiS-util} package if you have LiS installed.
+@file{@value{PACKAGE}@--LiS@--util} package if you have LiS installed.
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-streams-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-streams-util} package provides administrative and
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--streams@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--streams@--util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.  Because this package must link a
 STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
-@file{@value{PACKAGE}-streams-util} package if you have streams installed.
+@file{@value{PACKAGE}@--streams@--util} package if you have streams installed.
 @end table
 
 @subsubheading Kernel-Dependent DEB
@@ -428,16 +428,16 @@ architecture of the kernel package.  @command{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-core} package contains the loadable kernel modules
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
 that depend only on the kernel.  This package is heavily tied to the kernel for
 which it was compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.  Note also that only release
 packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
 kernels and is not necessary and not built for 2.6 series kernels.} contains the
@@ -449,44 +449,44 @@ compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-LiS-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-LiS-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--LiS@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--LiS@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
 heavily tied to the STREAMS package and kernel for which it was compiled.  This
 particular package applies to @file{LiS} (@cite{Linux STREAMS}) on kernel
 version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-streams-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-streams-core} package contains the kernel modules that
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--streams@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--streams@--core} package contains the kernel modules that
 provide the @value{PACKAGE_TITLE} STREAMS modules and drivers.  This package is
 heavily tied to the STREAMS package and kernel for which it was compiled.  This
-particular package applies to @file{streams} (@cite{Linux Fast-STREAMS}) on
+particular package applies to @file{streams} (@cite{Linux Fast@--STREAMS}) on
 kernel version @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-LiS-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-LiS-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-LiS-info} package@footnote{Note that only release
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--LiS@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--LiS@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--LiS@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
-contain a @file{LiS-info} subpackage.} contains the module symbol version
-information for the @file{LiS-core} subpackage, above.  It is possible to load
+contain a @file{LiS@--info} subpackage.} contains the module symbol version
+information for the @file{LiS@--core} subpackage, above.  It is possible to load
 this subpackage and compile modules that use the exported symbols without loaded
-the actual kernel modules (from the @file{LiS-core} subpackage above).  This
+the actual kernel modules (from the @file{LiS@--core} subpackage above).  This
 package is heavily tied to the STREAMS package and kernel for which it was
 compiled.  This particular package applies to @file{LiS} (@cite{Linux STREAMS})
 on kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-streams-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb, @value{PACKAGE}-streams-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb}
-The @file{@value{PACKAGE}-streams-info} package@footnote{Note that only release
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}@--streams@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb, @value{PACKAGE}@--streams@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}@--streams@--info} package@footnote{Note that only release
 packages that contain kernel modules and that export versioned symbols will
-contain a @file{streams-info} subpackage.} contains the module symbol version
-information for the @file{streams-core} subpackage, above.  It is possible to
+contain a @file{streams@--info} subpackage.} contains the module symbol version
+information for the @file{streams@--core} subpackage, above.  It is possible to
 load this subpackage and compile modules that use the exported symbols without
-loaded the actual kernel modules (from the @file{streams-core} subpackage
+loaded the actual kernel modules (from the @file{streams@--core} subpackage
 above).  This package is heavily tied to the STREAMS package and kernel for
 which it was compiled.  This particular package applies to @file{streams}
-(@cite{Linux Fast-STREAMS}) on kernel version
+(@cite{Linux Fast@--STREAMS}) on kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 @end table
@@ -506,10 +506,10 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll
 you own binary RPM, download the following source RPM.
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm, @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm}
+@item @uref{http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to
 build binary RPM for any supported architecture and for any 2.4 or 2.6 kernel,
-for either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.
+for either @cite{Linux STREAMS} or @cite{Linux Fast@--STREAMS}.
 @end table
 
 @subsubheading Configuration
@@ -526,11 +526,11 @@ If you cannot obtain a binary DEB for your architecture, or would like to roll
 your own DEB, download the following Debian DSC.
 
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc, @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc}
-@itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz, @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz}
+@item @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
+@itemx @uref{http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
 This is the Debian DSC for the package.  From this Debian DSC it is possible to
 build binary DEB for any supported architecture and for any 2.4 or 2.6 kernel,
-for either @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS}.
+for either @cite{Linux STREAMS} or @cite{Linux Fast@--STREAMS}.
 @end table
 
 @subsubheading Configuration
@@ -543,12 +543,12 @@ To configure the source RPM, @xref{Configuring the Debian DSC}.
 @cindex downloading, tar ball
 @cindex tar ball
 
-For non-RPM architectures, such as @cite{NexusWare} embedded target, download
+For non-RPM architectures, such as @cite{Nex@-us@-Ware} embedded target, download
 the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz, @value{PACKAGE}-@value{VERSION}.tar.gz}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2, @value{PACKAGE}-@value{VERSION}.tar.bz2}
+@item @uref{http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.gz, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
+@itemx @uref{http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
 These are the @command{tar} balls for the release.  These @command{tar} balls
 contain the @command{autoconf} distribution which includes all the source
 necessary for building and installing the package.  These tarballs will even
@@ -560,7 +560,7 @@ The tar ball may be downloaded easily with @command{wget} as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end cartouche
 @end example
 
@@ -569,7 +569,7 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
 @end cartouche
 @end example
 
@@ -580,7 +580,7 @@ following commands:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.gz
 % tar -xzvf @value{PACKAGE}-@value{VERSION}.tar.gz
 @end cartouche
 @end example
@@ -590,7 +590,7 @@ or
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end cartouche
 @end example
@@ -735,23 +735,23 @@ This allows some degree of customization.  Relocations that are available on the
 binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--LiS@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@itemx @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--streams@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
-@item @file{@value{_rootdir}/lib/modules/@value{_kversion}}
+@item @file{@value{_rootdir}/lib/@-modules/@-@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
 @value{PACKAGE_NAME} STREAMS core, drivers and modules.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 @end table
 
-@item @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--LiS@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@itemx @value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--streams@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
-@item @file{@value{_rootdir}/usr/include/@value{PACKAGE}/@value{_kversion}}
+@item @file{@value{_rootdir}/usr/@-include/@-@value{PACKAGE}/@-@value{_kversion}}
 This relocatable directory contains the kernel module exported symbol
 information that allows other kernel modules to be compiled against the correct
 version of the @value{PACKAGE} package.@footnote{Note that the @samp{_kversion}
@@ -759,26 +759,26 @@ of @samp{@value{_kversion}} is only an example.  Also, note that the @samp{info}
 subpackage is only applicable to the 2.4 kernel series.}
 @end table
 
-@item @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 (not relocatable)
 
-@item @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains @value{PACKAGE} libraries.
-@item @file{@value{_rootdir}@value{_includedir}/@value{PACKAGE}}
+@item @file{@value{_rootdir}@value{_includedir}/@-@value{PACKAGE}}
 This relocatable directory contains @value{PACKAGE} header files.
 @end table
 
-@item @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
-@item @file{@value{_rootdir}@value{_datadir}/doc}
+@item @file{@value{_rootdir}@value{_datadir}/@-doc}
 This relocatable directory contains all package specific documentation
 (including this manual).  The subdirectory in this directory is the
-@file{@value{PACKAGE}-@value{VERSION}} directory.
+@file{@value{PACKAGE}@--@value{VERSION}} directory.
 @item @file{@value{_rootdir}@value{_infodir}}
 This relocatable directory contains info files (including the info version of
 this manual).
@@ -786,30 +786,30 @@ this manual).
 This relocatable directory contains manual pages.
 @end table
 
-@item @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--LiS@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--LiS@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@itemx @value{PACKAGE}@--streams@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--streams@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains the run-time shared libraries necessary to
 run applications programs and utilities developed for @value{PACKAGE_TITLE}.
-@item @file{@value{_rootdir}@value{_datadir}/locale}
+@item @file{@value{_rootdir}@value{_datadir}/@-locale}
 This relocatable directory contains the locale information for shared library
 files.
 @end table
 
-@item @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
-@item @file{@value{_rootdir}@value{_prefix}/src}
+@item @file{@value{_rootdir}@value{_prefix}/@-src}
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-LiS-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@itemx @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
-@cindex @value{PACKAGE}-streams-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
+@item @value{PACKAGE}@--LiS@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--LiS@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@itemx @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}@--streams@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
@@ -1379,8 +1379,8 @@ The default is to build loadable kernel modules.
 Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be
 installed.  The default is based on the option @command{--with-k-release},
 @command{--with-k-prefix} and @command{--with-k-rootdir}.  The default is
-@file{DESTDIR}/@file{K-MODULES-DIR} which is typically
-@file{@var{DESTDIR}/lib/modules/@var{PACKAGE_KRELEASE}/}.  This directory is
+@file{DESTDIR}/@-@file{K@--MODULES@--DIR} which is typically
+@file{@var{DESTDIR}/@-lib/@-modules/@-@var{PACKAGE_KRELEASE}/@-}.  This directory is
 normally located by the @command{configure} script and need only be provided for
 special cross-build environments or when requested by a @command{configure}
 script error message.
@@ -1389,7 +1389,7 @@ script error message.
 @opindex k-build
 Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured
 kernel source resides.  The default is
-@file{@var{DESTDIR}/@var{K-MODULES-DIR}/build}.  This directory is normally
+@file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-build}.  This directory is normally
 located by the @command{configure} script and need only be provided for special
 cross-build environments or when requested by a @command{configure} script error
 message.
@@ -1398,7 +1398,7 @@ message.
 @opindex k-build
 Specify the @samp{K-SOURCE-DIR} base kernel build directory in which configured
 kernel source resides.  The default is
-@file{@var{DESTDIR}/@var{K-MODULES-DIR}/source}.  This directory is normally
+@file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-source}.  This directory is normally
 located by the @command{configure} script and need only be provided for special
 cross-build environments or when requested by a @command{configure} script error
 message.
@@ -1406,14 +1406,14 @@ message.
 @item --with-k-modver=K-MODVER-FILE
 @opindex k-sysmap
 Specify the @samp{K-MODVER-FILE} kernel module versions file.  The default is
-@file{@var{K-BUILD-DIR}/Module.symvers}.  This file is normally located by the
+@file{@var{K@--BUILD@--DIR}/@-Module.symvers}.  This file is normally located by the
 @command{configure} script and need only be provided for special cross-build
 environments or when requested by a @command{configure} script error message.
 
 @item --with-k-sysmap=K-SYSMAP-FILE
 @opindex k-sysmap
 Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
-@file{@var{K-BUILD-DIR}/System.map}.  This file is normally located by the
+@file{@var{K@--BUILD@--DIR}/@-System.map}.  This file is normally located by the
 @command{configure} script and need only be provided for special cross-build
 environments or when requested by a @command{configure} script error message.
 
@@ -1422,7 +1422,7 @@ environments or when requested by a @command{configure} script error message.
 @opindex k-includes
 Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the
 build is targeted.  The default is
-@file{@var{DESTDIR}/@var{K-BUILD-DIR}/include}.  This directory is normally
+@file{@var{DESTDIR}/@-@var{K@--BUILD@--DIR}/@-include}.  This directory is normally
 located by the @command{configure} script and need only be provided for special
 cross-build environments or when requested by a @command{configure} script error
 message.
@@ -1431,7 +1431,7 @@ message.
 @item --with-k-archdir=K-ARCHDIR
 @opindex k-archdir
 Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The
-default is @file{@var{DESTDIR}/@var{K-SOURCE-DIR}/arch}.  This directory is
+default is @file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-arch}.  This directory is
 normally located by the @command{configure} script and need only be provided for
 special cross-build environments or when requested by a @command{configure}
 script error message.
@@ -1439,7 +1439,7 @@ script error message.
 @item --with-k-machdir=K-MACHDIR
 @opindex k-machdir
 Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The
-default is @file{@var{DESTDIR}/@var{K-SOURCE-DIR}/@var{target_cpu}}.  This
+default is @file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-@var{target_cpu}}.  This
 directory is normally located by the @command{configure} script and need only be
 provided for special cross-build environments or when requested by a
 @command{configure} script error message.
@@ -1447,7 +1447,7 @@ provided for special cross-build environments or when requested by a
 @item --with-k-config=K-CONFIG
 @opindex k-config
 Specify the @samp{K-CONFIG} kernel configuration file.  The default is
-@file{@var{BOOT}/config-@var{K-RELEASE}}.  This configuration file is normally
+@file{@var{BOOT}/@-config@--@var{K@--RELEASE}}.  This configuration file is normally
 located by the @command{configure} script and need only be provided forspecial
 cross-build environments or when requested by a @command{configure} script error
 message.
@@ -1465,7 +1465,7 @@ compiles kernel modules @code{-O3}, and @var{quick} compiles kernel modules
 @opindex lis
 Specify the @samp{LIS-DIR} directory in which to find LiS headers.  Also
 specifies that the build is to be made against Linux STREAMS.  The default is
-@file{/usr/include/LiS} if it exists, @samp{no} otherwise.  This directory is
+@file{/usr/@-include/@-LiS} if it exists, @samp{no} otherwise.  This directory is
 normally located by the @command{configure} script and need only be provided for
 special cross-build environments or when requested by a @command{configure}
 script error message.
@@ -1476,7 +1476,7 @@ This option has no effect on packages that do not use the STREAMS subsystem.
 @opindex lfs
 Specify the @samp{LFS-DIR} directory in which to find LfS headers.  Also
 specifies that the build is to be made against Linux Fast-STREAMS.  The default
-is @file{/usr/include/streams} if it exists, @samp{no} otherwise.  This
+is @file{/usr/@-include/@-streams} if it exists, @samp{no} otherwise.  This
 directory is normally located by the @command{configure} script and need only be
 provided for special cross-build environments or when requested by a
 @command{configure} script error message.
@@ -1647,8 +1647,8 @@ are installed.  By default, @command{configure} will search for this tool.
 
 @item DESTDIR
 Cross build root directory.  Specifies the root directory for build and
-installation.  For example, for @cite{NexusWare} cross-builds, this is set to
-environment variable @var{NEXUSWARE_PREFIX} on configuration to point to the
+installation.  For example, for @cite{Nex@-us@-Ware} cross-builds, this is set to
+environment variable @var{NEX@-US@-WARE@-_@-PRE@-FIX} on configuration to point to the
 root of the cross-build tree for both configuration and installation.
 
 @item DEPMOD
@@ -1741,7 +1741,7 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
+% wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 % rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end cartouche
 @end example
@@ -1755,7 +1755,7 @@ are provided on the @command{rpm} command line.  For example:
 @cartouche
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
-  --with lis -- @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
+  --with lis -- @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 @end cartouche
 @end example
 
@@ -1785,8 +1785,8 @@ The Debian DSC is rebuilt to binary DEBs as follows:
 
 @example
 @cartouche
-% wget http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
-% wget http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz
 % dpkg-buildpackage -v @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
 @end cartouche
 @end example
@@ -1835,7 +1835,7 @@ Folowing is an example of a native build against the running kernel:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
@@ -1854,16 +1854,16 @@ cross-building, specify the root for the build with environment variable
 @var{DESTDIR}.  The cross-compile host must also be specified if different from
 the build host.  Either the compiler and other tools must be in the usual places
 where GNU @command{autoconf} can find them, or they must be specified with
-declarations such as @samp{CC=/u5/NexusWare24/ppc-linux/gcc} on the
+declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--linux/@-gcc} on the
 @command{configure} command line.  Look in the file @file{configure.nexusware}
 in the release package for an example.
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
-% tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
-% pushd @value{PACKAGE}-@value{VERSION}
-% ./configure DESTDIR="/some/other/root" \ 
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% tar -xjvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% pushd @value{PACKAGE}@--@value{VERSION}
+% ./configure DESTDIR="/some/@-other/@-root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
 % make
 % popd
@@ -1873,19 +1873,19 @@ in the release package for an example.
 @subsubsection NexusWare Build
 
 Additional support is provided for cross-building for the @cite{Performance
-Technologies Inc.} @cite{NexusWare} embedded target for the CPC-384, CPC-388 and
+Technologies Inc.} @cite{Nex@-us@-Ware} embedded target for the CPC-384, CPC-388 and
 CPC-396 cards.  A configuration script wrapper (@file{configure.nexusware}) is
 provided to simplify the cross-build operation for these targets.  The following
 steps describe the process:
 
 @enumerate
-@item Follow the normal @cite{NexusWare} instructions for rebuilding a
+@item Follow the normal @cite{Nex@-us@-Ware} instructions for rebuilding a
 @file{generic} kernel and flash image as follows:  (Note that I keep my
-@cite{NexusWare} build in @file{/u5/NexusWare24}.)
+@cite{Nex@-us@-Ware} build in @file{/u5/@-Nex@-us@-Ware@-24}.)
 
 @example
 @cartouche
-% pushd /u5/NexusWare24
+% pushd /u5/@-Nex@-us@-Ware@-24
 % source SETUP.sh
 % make
 % popd
@@ -1896,11 +1896,11 @@ steps describe the process:
 (@pxref{Downloading the Tar Ball}) and configure (@pxref{Configuring the Tar
 Ball}) using the provided @file{configure.nexusware} wrapper for
 @command{configure}.  This wrapper simply tells the @command{configure} script
-where to find the @cite{NexusWare} sources and which @cite{NexusWare}
+where to find the @cite{Nex@-us@-Ware} sources and which @cite{Nex@-us@-Ware}
 cross-building tools to use for a cross-compile.@footnote{Although I have not
 tried it, because we use GNU @command{autoconf} for configuration, these
-instructions should work equally well for the Solaris @cite{NexusWare}
-cross-building environment as it does for the Linux @cite{NexusWare}
+instructions should work equally well for the Solaris @cite{Nex@-us@-Ware}
+cross-building environment as it does for the Linux @cite{Nex@-us@-Ware}
 cross-building environment.}
 
 Any of the normal @command{configure} script options (@pxref{Configuring the Tar
@@ -1916,16 +1916,16 @@ file system flash image.
 
 @end enumerate
 
-Following is what I use for configuration and installation: (My @cite{NexusWare}
-tree is rooted at @file{/u5/NexusWare}.)
+Following is what I use for configuration and installation: (My @cite{Nex@-us@-Ware}
+tree is rooted at @file{/u5/@-Nex@-us@-Ware}.)
 
 @example
 @cartouche
-% pushd /u5/NexusWare24
+% pushd /u5/@-Nex@-us@-Ware@-24
 % source SETUP.sh
 % make
 % popd
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure.nexusware --with-k-optimize=size
@@ -1935,25 +1935,25 @@ tree is rooted at @file{/u5/NexusWare}.)
 @end cartouche
 @end example
 
-Once built and installed in the @cite{NexusWare} directory, you will have to
+Once built and installed in the @cite{Nex@-us@-Ware} directory, you will have to
 (currently) hand edit a @file{.spec} file to include the components you want in
-the @cite{NexusWare} root file system.  If you are cross-building for
-@cite{NexusWare} you should already know what that means.  Objects that you
+the @cite{Nex@-us@-Ware} root file system.  If you are cross-building for
+@cite{Nex@-us@-Ware} you should already know what that means.  Objects that you
 might be interested in copying to the root file system are kernel modules that
 were installed in
-@file{@var{$NEXUSWARE_PREFIX}/@-lib/@-modules/@-2.4.18/@-@value{PACKAGE_LCNAME}},
-libraries installed in @file{@var{$NEXUSWARE_PREFIX}/@-usr/@-lib} and utility
-functions installed in @file{@var{$NEXUSWARE_PREFIX}/@-usr/@-bin} and
-@file{@var{$NEXUSWARE_PREFIX}/@-usr/@-sbin} and test programs in
-@file{@var{$NEXUSWARE_PREFIX}/@-usr/@-libexec}.  If you would prefer that these
-programs be installed in @file{@var{$NEXUSWARE_PREFIX}/@-lib},
-@file{@var{$NEXUSWARE_PREFIX}/@-bin}, @file{@var{$NEXUSWARE_PREFIX}/@-sbin} and
-@file{@var{$NEXUSWARE_PREFIX}/@-libexec}, (say because you want to remote mount
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib/@-modules/@-2.4.18/@-@value{PACKAGE_LCNAME}},
+libraries installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-lib} and utility
+functions installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-bin} and
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-sbin} and test programs in
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-libexec}.  If you would prefer that these
+programs be installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib},
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-bin}, @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-sbin} and
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-libexec}, (say because you want to remote mount
 the @file{/usr} directory after boot), then specify the @samp{--exec-prefix=/}
 option to @samp{./configure.nexusware}.
 
-In addition, because @cite{NexusWare} does not include an
-@file{/etc/modules.conf} file by default, it will be necessary to add one or
+In addition, because @cite{Nex@-us@-Ware} does not include an
+@file{/etc/@-modules.conf} file by default, it will be necessary to add one or
 edit your @file{rc.4} file to @command{insmod} the necessary
 @file{@value{PACKAGE_NAME}} modules at boot time.
 
@@ -1962,12 +1962,12 @@ you need to rebuild the @samp{generic} kernel flash image once more for these
 objects to be included in the flash file system.  It is important that this
 second build of the kernel image be the same as the first.
 
-When modifying and rebuilding a @cite{NexusWare} kernel, it will be necessary to
+When modifying and rebuilding a @cite{Nex@-us@-Ware} kernel, it will be necessary to
 rebuild and install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make
 install-strip} stage or start again with @samp{./configure.nexusware}.  You can
 place the unpacked tarball in
-@file{@var{$NEXUSWARE_PREFIX}/usr/src/@value{PACKAGE}}, and add the following to
-the top-level @cite{NexusWare} @file{Makefile} to make the build process a
+@file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/usr/src/@value{PACKAGE}}, and add the following to
+the top-level @cite{Nex@-us@-Ware} @file{Makefile} to make the build process a
 single step process instead of dual pass:
 
 @smallexample
@@ -1993,17 +1993,17 @@ all:
 @end smallexample
 
 Another, perhaps simpler approach, is to make the necessary edits to the
-@cite{NexusWare} top-level @file{Makefile} and @file{.spec} and @file{rc.4}
-files, download and unpack the tar ball into the @cite{NexusWare} directory, and
-build the @cite{NexusWare} flash image as normal:
+@cite{Nex@-us@-Ware} top-level @file{Makefile} and @file{.spec} and @file{rc.4}
+files, download and unpack the tar ball into the @cite{Nex@-us@-Ware} directory, and
+build the @cite{Nex@-us@-Ware} flash image as normal:
 
 @example
 @cartouche
-% wget http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2
-% pushd /u5/NexusWare24
+% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
+% pushd /u5/@-Nex@-us@-Ware@-24
 % source SETUP.sh
 % pushd usr/src
-% tar -xjvf $@{DIRSTACK[2]@}/@value{PACKAGE}-@value{VERSION}.tar.bz2
+% tar -xjvf $@{DIRSTACK[2]@}/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
 % ln -sf @value{PACKAGE}-@value{VERSION} @value{PACKAGE}
 % popd
 % make
@@ -2255,12 +2255,12 @@ configured for demand loading.  The @samp{install} and @samp{install-strip}
 @fnindex make
 @fnindex make install
 @fnindex make install-strip
-targets will make the necessary changes to the @file{/etc/modules.conf} file and
+targets will make the necessary changes to the @file{/etc/@-modules@-.conf} file and
 place the modules in an appropriate place in
-@file{@value{_rootdir}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
+@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE_LCNAME}}.
 The @samp{make install} process should have copied the kernel module files
 @file{streams-*.o} to the directory
-@file{@value{_rootdir}/lib/modules/@value{_kversion}/@value{PACKAGE_LCNAME}}.
+@file{@value{_rootdir}/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE_LCNAME}}.
 This means that to load any of these modules, you can simply execute, for
 example, @samp{modprobe stream-@var{somedriver}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
@@ -2273,16 +2273,16 @@ the new kmod mechanisms for demand loading kernel modules.
 The convention for @file{@value{PACKAGE}} kernel loadable object files is:
 @itemize @bullet
 @item Their name start with "streams-".
-@item They are placed in @file{/lib/modules/@value{_kversion}/streams/}, where @samp{@value{_kversion}} is an example kernel version.
-@pgindex /lib/modules/@value{_kversion}/streams/
+@item They are placed in @file{/@-lib@-/@-modules@-/@-@value{_kversion}@-/@-streams@-/@-}, where @samp{@value{_kversion}} is an example kernel version.
+@pgindex /lib/@-modules/@-@value{_kversion}/@-streams/@-
 @end itemize
 
 If your kernel has been built using the @file{kerneld} daemon, then
 @file{@value{PACKAGE_NAME}} kernel modules will automatically load as soon as
 the STREAMS module is pushed or the driver is opened.  The @samp{make install}
 process makes the necessary changes to the
-@file{@value{_rootdir}/etc/modules.conf} file.  After the install, you will see
-lines like the following added to your @file{@value{_rootdir}/etc/modules.conf}
+@file{@value{_rootdir}/@-etc/@-modules.conf} file.  After the install, you will see
+lines like the following added to your @file{@value{_rootdir}/@-etc/@-modules.conf}
 file:
 
 @example
@@ -2296,8 +2296,8 @@ endif
 
 @noindent
 which will provide for demand loading of the modules if they have been built and
-installed for the running kernel.  The @file{/lib/modules/@command{`uname
--r`}/modules.@value{PACKAGE_LCNAME}} file looks like this:
+installed for the running kernel.  The @file{/lib/@-modules/@-@command{`uname
+-r`}/@-modules.@value{PACKAGE_LCNAME}} file looks like this:
 
 @smallexample
 @cartouche
@@ -2321,7 +2321,7 @@ Fast-STREAMS Reference Manual}.
 @cindex NexusWare
 @cindex loading kernel modules
 
-Under exceptional circumstances, such as a @cite{NexusWare} build, it is
+Under exceptional circumstances, such as a @cite{Nex@-us@-Ware} build, it is
 necessary to hand-edit a @file{.spec} and @file{rc.4} file to load the modules
 at boot time.@footnote{At some time I expect to create an
 @samp{install-nexusware} target that will make the necessary modifications to
