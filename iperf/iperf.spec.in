@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.38 $) $Date: 2005/05/29 11:28:29 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.39 $) $Date: 2005/05/30 14:25:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/29 11:28:29 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 14:25:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,7 @@
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
+%global BUILD_test    0
 
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
@@ -104,6 +105,7 @@
 %global FILES_libs          1
 %global FILES_nolibs        1
 %global FILES_tools         1
+%global FILES_test          %{BUILD_test}
 %global FILES_doc           1
 %global FILES_doclibs       1
 %global FILES_source        %{BUILD_source}
@@ -111,6 +113,7 @@
 %global FILES_libs          0
 %global FILES_nolibs        0
 %global FILES_tools         0
+%global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
@@ -127,6 +130,7 @@
 
 %if %{BUILD_noarch}
 %else
+%global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
@@ -522,6 +526,33 @@ fi
 %endif
 
 # ===========================================================================
+%package test
+
+Summary:        %{title} test utilities.
+Group:          System Environment/Base
+Prefix:         %{_libexecdir}/%{name}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Obsoletes:      %{name}-tests
+#Conflicts:      %{_conflict}-test
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description test
+The %{name}-test package provides testsuites used for troubleshooting
+the %{title} package.
+
+%if %{FILES_test}
+%files test
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libexecdir}/%{name}/atlocal
+%{_libexecdir}/%{name}/testsuite*
+%endif
+
+# ===========================================================================
 %package doc
 
 Summary:        %{title} manpages, manuals and docs.
@@ -632,9 +663,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.38  2005/05/29 11:28:29  brian
-# - better approach to mostlyclean
+# Revision 1.1.2.39  2005/05/30 14:25:49  brian
+# - packaged standalong test suites
 #
+
+* Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.38  2005/05/29 11:28:29  brian
+- better approach to mostlyclean
 
 * Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.37  2005/05/29 07:49:24  brian

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.18 $) $Date: 2005/05/28 04:42:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.19 $) $Date: 2005/05/30 14:25:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:42:43 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 14:25:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -424,8 +424,10 @@ if PKG_BUILD_INDEP
 SUBDIRS += man manual
 endif
 
+SUBDIRS += tests
+
 if PKG_BUILD_ARCH
-SUBDIRS += tests . testsuite
+SUBDIRS += . testsuite
 endif
 
 if PKG_BUILD_INDEP

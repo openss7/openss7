@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-thrtst.at,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2005/05/21 07:39:51 $
+dnl @(#) $RCSfile: testsuite-thrtst.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/05/30 14:25:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/21 07:39:51 $ by $Author: brian $
+dnl Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-thrtst.at,v $
+dnl Revision 1.1.2.3  2005/05/30 14:25:54  brian
+dnl - packaged standalong test suites
+dnl
 dnl Revision 1.1.2.2  2005/05/21 07:39:51  brian
 dnl - new testsuite organization
 dnl
@@ -74,11 +77,7 @@ dnl - added full set of LiS tests
 dnl
 dnl ==========================================================================
 
-m4_include([package.m4])
-
-AT_INIT([thrtst])
 AT_TESTED([thrtst])
-
 AT_BANNER([Thread Test])
 
 AT_SETUP([thrtst])

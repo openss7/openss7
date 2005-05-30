@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-tirdwr.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/05/19 20:49:35 $
+dnl @(#) $RCSfile: testsuite-tirdwr.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/30 14:25:57 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/19 20:49:35 $ by $Author: brian $
+dnl Last Modified $Date: 2005/05/30 14:25:57 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-tirdwr.at,v $
+dnl Revision 0.9.2.2  2005/05/30 14:25:57  brian
+dnl - packaged standalong test suites
+dnl
 dnl Revision 0.9.2.1  2005/05/19 20:49:35  brian
 dnl - upgrading test suites
 dnl
@@ -74,10 +77,8 @@ dnl - updating tests
 dnl
 dnl ==========================================================================
 
-m4_include([package.m4])
-
-AT_INIT([tirdwr])
 AT_TESTED([test-tirdwr])
+AT_BANNER([TIRDWR module tests])
 
 AT_SETUP([tirdwr test 1.1])
 AT_KEYWORDS([tirdwr])

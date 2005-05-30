@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/05/21 07:39:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/30 14:25:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,13 +60,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/21 07:39:52 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 14:25:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
-# Revision 0.9.2.21  2005/05/21 07:39:52  brian
-# - new testsuite organization
+# Revision 0.9.2.22  2005/05/30 14:25:55  brian
+# - packaged standalong test suites
+#
+# Revision 0.9.2.18  2005/05/30 14:25:55  brian
+# - packaged standalong test suites
 #
 # Revision 0.9.2.17  2005/05/21 07:39:52  brian
 # - new testsuite organization
@@ -87,6 +90,8 @@
 
 include ../am/openss7.am
 
+pkglibexecdir = $(libexecdir)/@PACKAGE@
+
 #
 # This automake file is used to specify the autotest definitions and targets
 # necessary for performing pre-install and post-install checks.  Pre-install
@@ -96,28 +101,7 @@ include ../am/openss7.am
 #
 
 # my rule
-EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
-# my rule
-dist_noinst_SCRIPTS	+= $(TESTSUITE)
-
-if PKG_BUILD_ARCH
-## PKG_BUILD_ARCH
-
-# my rule
 TESTSUITE		= testsuite
-TESTSUITES		= \
-			$(TESTSUITE)-streams \
-			$(TESTSUITE)-clone \
-			$(TESTSUITE)-connld \
-			$(TESTSUITE)-echo \
-			$(TESTSUITE)-fifo \
-			$(TESTSUITE)-log \
-			$(TESTSUITE)-nsdev \
-			$(TESTSUITE)-nuls \
-			$(TESTSUITE)-pipemod \
-			$(TESTSUITE)-sad \
-			$(TESTSUITE)-sc \
-			$(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -145,10 +129,11 @@ TESTSUITE_DEPS		= \
 			$(TESTSUITE)-sad.at \
 			$(TESTSUITE)-sc.at \
 			$(TESTSUITE).at \
+			local.at \
 			package.m4
 
 # my rule
-$(TESTSUITES): $(TESTSUITE_DEPS)
+$(TESTSUITE): $(TESTSUITE_DEPS)
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@
 
 # my rule
@@ -161,78 +146,12 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITES)
+all-testsuite: $(TESTSUITE)
 
 if PERFORM_TESTING
 ## PERFORM_TESTING
 
 INSTALLCHECK_TESTS =
-
-# my rule
-installcheck-clone: $(TESTSUITE)-clone
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-clone
-
-# my rule
-installcheck-connld: $(TESTSUITE)-connld
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-connld
-
-# my rule
-installcheck-echo: $(TESTSUITE)-echo
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-echo
-
-# my rule
-installcheck-fifo: $(TESTSUITE)-fifo
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-fifo
-
-# my rule
-installcheck-log: $(TESTSUITE)-log
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-log
-
-# my rule
-installcheck-nsdev: $(TESTSUITE)-nsdev
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-nsdev
-
-# my rule
-installcheck-nuls: $(TESTSUITE)-nuls
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-nuls
-
-# my rule
-installcheck-pipemod: $(TESTSUITE)-pipemod
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-pipemod
-
-# my rule
-installcheck-sad: $(TESTSUITE)-sad
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-sad
-
-# my rule
-installcheck-sc: $(TESTSUITE)-sc
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-sc
-
-# my rule
-installcheck-streams: $(TESTSUITE)-streams
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-streams
 
 # my rule
 installcheck-test: $(TESTSUITE)
@@ -255,7 +174,7 @@ endif
 
 # my rule
 clean-testsuite:
-	@for f in $(TESTSUITES) ; do \
+	@for f in $(TESTSUITE) ; do \
 		if test -r "$$f" ; then \
 			$(ECHO) "$(SHELL) $$f --clean" ; \
 			$(SHELL) $$f --clean ; \
@@ -275,8 +194,14 @@ INSTALLCHECK_LOCAL += installcheck-testsuite
 
 CLEAN_LOCAL += clean-testsuite
 
-## PKG_BUILD_ARCH
+if PKG_BUILD_INDEP
+## Test suites are actually architecture independent!
+pkglibexec_DATA		= atlocal
+pkglibexec_SCRIPTS	= $(TESTSUITE)
 endif
+
+# my rule
+EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
 
 .PHONY: all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
 

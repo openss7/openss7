@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.7 $) $Date: 2005/05/21 07:39:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.8 $) $Date: 2005/05/30 14:25:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/21 07:39:51 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.8  2005/05/30 14:25:54  brian
+# - packaged standalong test suites
+#
 # Revision 1.1.4.7  2005/05/21 07:39:51  brian
 # - new testsuite organization
 #
@@ -78,6 +81,8 @@
 
 include ../am/openss7.am
 
+pkglibexecdir = $(libexecdir)/@PACKAGE@
+
 #
 # This automake file is used to specify the autotest definitions and targets
 # necessary for performing pre-install and post-install checks.  Pre-install
@@ -87,22 +92,7 @@ include ../am/openss7.am
 #
 
 # my rule
-EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
-# my rule
-dist_noinst_SCRIPTS	+= $(TESTSUITE)
-
-if PKG_BUILD_ARCH
-## PKG_BUILD_ARCH
-
-# my rule
 TESTSUITE		= testsuite
-TESTSUITES		= \
-			$(TESTSUITE)-strtst \
-			$(TESTSUITE)-timetst \
-			$(TESTSUITE)-test \
-			$(TESTSUITE)-test2 \
-			$(TESTSUITE)-thrtst \
-			$(TESTSUITE)
 
 # my rule
 package.m4: $(top_srcdir)/configure
@@ -124,10 +114,11 @@ TESTSUITE_DEPS		= \
 			$(TESTSUITE)-test2.at \
 			$(TESTSUITE)-thrtst.at \
 			$(TESTSUITE).at \
+			local.at \
 			package.m4
 
 # my rule
-$(TESTSUITES): $(TESTSUITE_DEPS)
+$(TESTSUITE): $(TESTSUITE_DEPS)
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@
 
 # my rule
@@ -140,42 +131,12 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITES)
+all-testsuite: $(TESTSUITE)
 
 if PERFORM_TESTING
 ## PERFORM_TESTING
 
 INSTALLCHECK_TESTS =
-
-# my rule
-installcheck-strtst: $(TESTSUITE)-strtst
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-strtst
-
-# my rule
-installcheck-timetst: $(TESTSUITE)-timetst
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-timetst
-
-# my rule
-installcheck-lis_test: $(TESTSUITE)-test
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-lis_test
-
-# my rule
-installcheck-lis_test2: $(TESTSUITE)-test2
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-lis_test2
-
-# my rule
-installcheck-thrtst: $(TESTSUITE)-thrtst
-	$(SHELL) $< DESTDIR='$(DESTDIR)' krootdir='$(krootdir)' AUTOTEST_PATH='.'
-
-INSTALLCHECK_TESTS += installcheck-thrtst
 
 # my rule
 installcheck-test: $(TESTSUITE)
@@ -198,7 +159,7 @@ endif
 
 # my rule
 clean-testsuite:
-	@for f in $(TESTSUITES) ; do \
+	@for f in $(TESTSUITE) ; do \
 		if test -r "$$f" ; then \
 			$(ECHO) "$(SHELL) $$f --clean" ; \
 			$(SHELL) $$f --clean ; \
@@ -218,8 +179,14 @@ INSTALLCHECK_LOCAL += installcheck-testsuite
 
 CLEAN_LOCAL += clean-testsuite
 
-## PKG_BUILD_ARCH
+if PKG_BUILD_INDEP
+## Test suites are actually architecture independent!
+pkglibexec_DATA		= atlocal
+pkglibexec_SCRIPTS	= $(TESTSUITE)
 endif
+
+# my rule
+EXTRA_DIST		+= $(TESTSUITE) $(TESTSUITE_DEPS)
 
 .PHONY: all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
 

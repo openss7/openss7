@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/05/21 07:39:51 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/05/30 14:25:54 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -54,11 +54,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/21 07:39:51 $ by $Author: brian $
+dnl Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.4  2005/05/30 14:25:54  brian
+dnl - packaged standalong test suites
+dnl
 dnl Revision 1.1.2.3  2005/05/21 07:39:51  brian
 dnl - new testsuite organization
 dnl
@@ -70,12 +73,10 @@ dnl - added test suite for strtst
 dnl
 dnl ==========================================================================
 
-m4_include([package.m4])
-
-AT_INIT([strtst])
 AT_TESTED([strtst])
+AT_BANNER([LiS STREAMS test])
 
-AT_BANNER([Open/close test [[MT]]:])
+dnl AT_BANNER([Open/close test [[MT]]:])
 AT_SETUP([strtst open])
 AT_KEYWORDS([streams open])
 AT_CHECK([
@@ -85,7 +86,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Ioctl test:])
+dnl AT_BANNER([Ioctl test:])
 AT_SETUP([strtst ioctl])
 AT_KEYWORDS([streams ioctl])
 AT_CHECK([
@@ -95,7 +96,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Module test:])
+dnl AT_BANNER([Module test:])
 AT_SETUP([strtst module])
 AT_KEYWORDS([streams module])
 AT_CHECK([
@@ -105,7 +106,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Read options test:])
+dnl AT_BANNER([Read options test:])
 AT_SETUP([strtst rdopt])
 AT_KEYWORDS([streams rdopt])
 AT_CHECK([
@@ -115,7 +116,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Write test:])
+dnl AT_BANNER([Write test:])
 AT_SETUP([strtst write])
 AT_KEYWORDS([streams write])
 AT_CHECK([
@@ -125,7 +126,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Close time test:])
+dnl AT_BANNER([Close time test:])
 AT_SETUP([strtst timer])
 AT_KEYWORDS([streams timer])
 AT_CHECK([
@@ -135,7 +136,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Putmsg test [[MT]]:])
+dnl AT_BANNER([Putmsg test [[MT]]:])
 AT_SETUP([strtst putmsg])
 AT_KEYWORDS([streams putmsg])
 AT_CHECK([
@@ -145,7 +146,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Poll test [[MT]]:])
+dnl AT_BANNER([Poll test [[MT]]:])
 AT_SETUP([strtst poll])
 AT_KEYWORDS([streams poll])
 AT_CHECK([
@@ -155,7 +156,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Multiplexor test:])
+dnl AT_BANNER([Multiplexor test:])
 AT_SETUP([strtst mux])
 AT_KEYWORDS([streams mux])
 AT_CHECK([
@@ -165,7 +166,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Clone driver test:])
+dnl AT_BANNER([Clone driver test:])
 AT_SETUP([strtst clone])
 AT_KEYWORDS([streams clone])
 AT_CHECK([
@@ -175,7 +176,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Bufcall test [[MT]]:])
+dnl AT_BANNER([Bufcall test [[MT]]:])
 AT_SETUP([strtst bufcall])
 AT_KEYWORDS([streams bufcall])
 AT_CHECK([
@@ -185,7 +186,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([SAD driver test:])
+dnl AT_BANNER([SAD driver test:])
 AT_SETUP([strtst sad])
 AT_KEYWORDS([streams sad])
 AT_CHECK([
@@ -195,7 +196,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([FIFO/pipe test [[MT]]:])
+dnl AT_BANNER([FIFO/pipe test [[MT]]:])
 AT_SETUP([strtst fifo])
 AT_KEYWORDS([streams fifo])
 AT_CHECK([
@@ -205,7 +206,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([FD passing test [[MT]]:])
+dnl AT_BANNER([FD passing test [[MT]]:])
 AT_SETUP([strtst passfd])
 AT_KEYWORDS([streams passfd])
 AT_CHECK([
@@ -215,7 +216,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Q-band test [[MT]]:])
+dnl AT_BANNER([Q-band test [[MT]]:])
 AT_SETUP([strtst band])
 AT_KEYWORDS([streams band])
 AT_CHECK([
@@ -225,7 +226,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Flushing test [[MT]]:])
+dnl AT_BANNER([Flushing test [[MT]]:])
 AT_SETUP([strtst flush])
 AT_KEYWORDS([streams flush])
 AT_CHECK([
@@ -235,7 +236,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([Autopush test:])
+dnl AT_BANNER([Autopush test:])
 AT_SETUP([strtst autopush])
 AT_KEYWORDS([streams autopush])
 AT_CHECK([
@@ -245,7 +246,7 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_BANNER([MT open test:])
+dnl AT_BANNER([MT open test:])
 AT_SETUP([strtst mt_open])
 AT_KEYWORDS([streams mt_open])
 AT_CHECK([
