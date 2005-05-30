@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.29 $) $Date: 2005/05/29 11:28:36 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2005/05/30 00:14:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/29 11:28:36 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 00:14:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -385,6 +385,11 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
     %{!?_enable_debug_packages: install-strip} \
     %{?_enable_debug_packages: install}
 
+# because we don't have the info files in a conditional subdirectory,
+# we have problems with netperf.info being installed on indep builds
+@PKG_BUILD_INDEP_FALSE@make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+@PKG_BUILD_INDEP_FALSE@    uninstall-info
+
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
 
@@ -589,6 +594,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.30  2005/05/30 00:14:06  brian
+# - address included info file issues
+#
 # Revision 1.1.2.29  2005/05/29 11:28:36  brian
 # - better approach to mostlyclean
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2005/05/29 07:49:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.31 $) $Date: 2005/05/30 00:14:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/29 07:49:30 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 00:14:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -205,7 +205,12 @@ endif
 
 include am/man.am
 
-info_TEXINFOS			= netperf.texi
+info_TEXINFOS			=
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+info_TEXINFOS			+= netperf.texi
 EXTRA_info_TEXINFOS		= \
 				  scripts/texi/gpl.texi \
 				  scripts/texi/fdl.texi \
@@ -218,6 +223,9 @@ netperf_hp.ps:
 CLEANFILES += netperf_hp.ps
 
 EXTRA_DIST			+= ACKNWLDGMNTS COPYRIGHT README.ovms Release_Notes netperf_hp.ps
+
+## PKG_BUILD_INDEP
+endif
 
 include am/info.am
 

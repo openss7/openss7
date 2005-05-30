@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/05/30 00:17:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/05/30 00:17:16 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/30 00:17:16 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -230,11 +230,15 @@ __SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
+#if CONFIG_SMP
 	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
+#endif
 		read_lock(lockp);
 		return (old_pl);
+#if CONFIG_SMP
 	}
+#endif
 #endif
 #endif
 	splx(old_pl);
@@ -247,11 +251,15 @@ __SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 	if (write_trylock(lockp))
 		return (old_pl);
 #else
+#if CONFIG_SMP
 	/* this will jam up sometimes */
 	if (!spin_is_locked(lockp)) {
+#endif
 		write_lock(lockp);
 		return (old_pl);
+#if CONFIG_SMP
 	}
+#endif
 #endif
 	splx(old_pl);
 	return (invpl);

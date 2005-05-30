@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: map.h,v 0.9.2.2 2005/05/10 09:48:35 brian Exp $
+ @(#) $Id: map.h,v 0.9.2.3 2005/05/30 00:17:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/10 09:48:35 $ by $Author: brian $
+ Last Modified $Date: 2005/05/30 00:17:16 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_MAP_H
 #define _SYS_MAP_H
 
-#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/10 09:48:35 $"
+#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/30 00:17:16 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -97,7 +97,7 @@ struct map *rmallocmap(size_t mapsize);
 struct map *rmallocmap_wait(size_t mapsize);
 void rmfreemap(struct map *map);
 
-ulong malloc(struct map *map, size_t size);
+/* ulong malloc(struct map *map, size_t size); */ /* GCC 3.4 hates this */
 ulong rmalloc(struct map *map, size_t size);
 ulong rmalloc_wait(struct map *map, size_t size);
 ulong rmalloc_locked(struct map *map, size_t size);

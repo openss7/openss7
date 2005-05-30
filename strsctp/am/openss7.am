@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2005/05/14 07:46:09 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/05/30 00:10:16 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 07:46:09 $ by $Author: brian $
+## Last Modified $Date: 2005/05/30 00:10:16 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -125,7 +125,6 @@ $(FORCED_TARGETS): forced-% : %
 MY_PHONY		+= $(FORCED_TARGETS)
 
 $(RELEASE_DIRECTORIES)::
-	@$(ECHO) "Making $@ in `pwd`"
 	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
 	
 release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
