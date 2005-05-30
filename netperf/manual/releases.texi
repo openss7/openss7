@@ -1,0 +1,310 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: releases.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@c ----------------------------------------------------------------------------
+
+This is the OpenSS7 Release of the @value{PACKAGE_TITLE} package, modified for use with OpenSS7
+Stream Control Transmission Protocol (SCTP) Linux Native Kernel and @cite{Linux Fast-STREAMS} or
+@cite{Linux STREAMS} SVR 4.2 STREAMS releases.
+
+The purpose of providing a separate release of this package was to provide support for SCTP as well
+as providing the ability to use GNU autoconf tools for maintenance and binary RPM release of the
+package; also, to separate the @value{PACKAGE_TITLE} tools, headers, drivers and modules from the
+@cite{Linux STREAMS} package for use with both @cite{Linux STREAMS} and @cite{Linux Fast-STREAMS} in
+preparation for replacement of the former by the later.
+
+The following sections provide information on @value{PACKAGE_TITLE} releases as well as
+compatibility information of OpenSS7 release to the original HP releases of the
+@value{PACKAGE_TITLE} package, as well as Linux kernel compatibility.
+
+@menu
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Bugs::			Known Bugs
+* Schedule::			Development and Bug Fix Schedule
+* History::			Project History
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Prerequisites
+@section Prerequisites
+@cindex prerequisites
+
+Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
+
+@itemize @bullet
+@item A fairly LSB compliant GNU/Linux distribution.
+@footnote{@xref{GNU/Linux Distributions}, for more information.}
+@item Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.10)
+@item glibc2 or better.
+@item GNU info (for info files).
+@item GNU groff (for man pages).
+@footnote{If you are using a Debian release, please make sure to install the groff extension package
+(@samp{groff_ext}), as it contains the @command{refer} or @command{grefer} commands necessary for
+including references in the manual pages.}
+@end itemize
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Compatibility
+@section Compatibility
+@cindex compatibility
+
+This section discusses compatibility with major prerequisites.
+
+@menu
+* GNU/Linux Distributions::	Compatibility to GNU/Linux Distributions
+* Linux Kernel::		Compatibility to Linux Kernels
+* Linux STREAMS::		Compatibility to LiS
+* Linux Fast-STREAMS::		Compatibility to LfS
+* HP Netperf::			Compatibility to HP Netperf
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node GNU/Linux Distributions
+@subsection GNU/Linux Distributions
+@cindex GNU/Linux Distributions
+
+@dfn{@value{PACKAGE_TITLE}} is compatible with the following @dfn{Linux} distributions:
+
+@itemize @bullet
+@item RedHat Linux 7.2 (RH7)
+@item RedHat Linux 7.3 (RH7)
+@item Performance Technlogies @dfn{NexusWare24}
+@item RedHat Linux 8.0 (RH8)
+@item RedHat Linux 9 (RH9)
+@item SuSE 8.0 Professional
+@item Fedora Core 1 (FC1)
+@item Debian 3.0r2 Woody
+@item Mandrakelinux 9.2 (MDK92)
+@item RedHat Enterprise Linux 3.0 (EL3)
+@item WhiteBox Enterprise Linux 3.0 (WBEL3)
+@item CentOS Enterprise Linux 3.4 (centos34)
+@item Fedora Core 2 (FC2)
+@item SuSE 9.1 Personal
+@item Mandrakelinux 10.0 (MDK100)
+@item SuSE 9.2 Professional (SuSE9.2)
+@item Mandrakelinux 10.1 (MDK101)
+@item Fedora Core 3 (FC3)
+@item RedHat Enterprise Linux 4 (EL4)
+@item CentOS Enterprise Linux 4.0 (centos4)
+@item WhiteBox Enterprise Linux 4 (WBEL4)
+@end itemize
+
+When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
+compatible with a  much broader array of distributions than those listed above.  These are the
+distributions against which the current maintainer creates builds.
+
+@node Linux Kernel
+@subsection Kernel
+@cindex Kernel
+
+@dfn{@value{PACKAGE_TITLE}} compiles as a @dfn{Linux} kernel module.  It is not ncessary to patch the
+@dfn{Linux} kernel to use the package.  At a later date, it is possible to move this package into the
+kernel.
+
+@dfn{@value{PACKAGE_TITLE}} is compatible with 2.4 kernel series after 2.4.10.  It has been tested
+up to and including 2.6.10.
+
+@node Linux STREAMS
+@subsection Linux STREAMS
+@cindex Linux STREAMS
+
+@node Linux Fast-STREAMS
+@subsection Linux Fast-STREAMS
+@cindex Linux Fast-STREAMS
+
+@node HP Netperf
+@subsection HP Netperf
+@cindex HP Netperf
+
+This section addresses compatibility issues between @cite{OpenSS7} and @cite{Hewlett-Packard}
+releases of @cite{netperf}.
+
+@subsubheading @value{PACKAGE}-@value{VERSION} and Netserver Compatibility
+
+OpenSS7 modifications to support SCTP does not alter the datastructures or exchange between the
+@command{netperf} client and the @command{netserver} server.  New structures and test definitions
+have been added for SCTP that are largely consistent with those of TCP.  Specifically, a
+@cite{netperf-2.3} client should be able to connect and perform tests with a
+@cite{@value{PACKAGE}-@value{VERSION}} server.  Also, a @cite{@value{PACKAGE}-@value{VERSION}}
+client should be able to connect and perform tests (other than SCTP) with a @cite{netperf-2.3}
+server.
+
+@subsubheading @value{PACKAGE}-@value{VERSION} and Option Compatibility
+
+OpenSS7 releases provide all options compiled-in to the client and server.  This obviates the need
+for editing makefiles and recompiling the client or server from source as is described in the
+@cite{Hewlett-Packard Company} documentation.
+
+@subsubheading @value{PACKAGE}-@value{VERSION} and SCTP Compatibility
+
+SCTP Socket API tests are (likely) only compatible with the OpenSS7 Sockets implementations of SCTP.
+The reason for this is that the OpenSS7 Sockets implementations use the POSIX standard socket API
+rather than the non-standard socket API described in documents such as
+@cite{draft-stewart-tsvwg-sctpsocket-xx.txt}.
+
+SCTP XTI API tests are (likely) only compatible with the OpenSS7 STREAMS implementation  of SCTP,
+and the OpenSS7 XTI over Sockets implementation (@pxref{Top, Introduction, Introduction, strinet,
+OpenSS7 STREAMS INET Driver}) with the OpenSS7 Linux Native SCTP Sockets implementation.  The reason
+for this is that the OpenSS7 STREAMS implementation uses the X/Open XNS 5.2 SUSv2 UNIX'98 standard
+XTI interface rather than the non-standard socket API described in documents such as
+@cite{draft-stewart-tsvwg-sctpsocket-xx.txt}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Release Notes
+@section Release Notes
+@cindex release notes
+
+The sections that follow provide information on OpenSS7 releases of the @*
+@value{PACKAGE_TITLE} package
+as well as compatibility information of OpenSS7 releases to the original
+Hewlett-Packard Company releases.
+
+@ifnotplaintext
+@ifnothtml
+@menu
+* Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+@end menu
+@end ifnothtml
+@end ifnotplaintext
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-@value{VERSION}
+@subsection Release @value{PACKAGE}-@value{VERSION}
+@cindex release @value{PACKAGE}-@value{VERSION}
+
+Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.  It is
+based on the Hewlett-Packard Company @cite{netperf-2.3} release.
+
+This release provides modifications to support the Stream Control Transmission
+Protocol (SCTP) and provides tests for the Sockets API for the OpenSS7 Linux
+Native Kernel version of SCTP as well as tests for the XTI API for the OpenSS7
+STREAMS version of SCTP.  In addition, use of the XTI API for TCP and UDP tests
+is supported using the OpenSS7 STREAMS INET package.
+
+SCTP Sockets API tests depend upon the availability of an the OpenSS7 Sockets
+implementation of SCTP in an OpenSS7 patched kernel.  Some binary kernels and
+prepatched kernel source for popular architectures are provided as RPMs from
+@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
+
+SCTP XTI API tests depend upon the availability of the OpenSS7 STREAMS
+implementation of SCTP.  Some binary and source packages for @cite{LiS STREAMS},
+@cite{Linux Fast-STREAMS}, the @cite{strxnet} XTI/TLI library and the
+@cite{strsctp} package are available from
+@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
+@ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library
+Reference Manual}.
+
+Under Linux, the TCP and UDP XTI API tests depend upon the availability of the
+OpenSS7 INET driver.  Some binary and source packages for @cite{LiS STREAMS},
+@cite{Linux Fast-STREAMS}, the @cite{strxnet} XTI/TLI library and the
+@cite{strinet} package (@pxref{Top, Introduction, Introduction, strinet, OpenSS7
+STREAMS INET Driver}) are available from
+@uref{http://www.openss7.org/download.html, the OpenSS7 Project download page}.
+@ref{Top, Introduction, Introduction, libxnet, The OpenSS7 XNS/XTI Library
+Reference Manual}.
+
+This release also provides updates to the antiquated @cite{netperf-2.1} release
+documentation distributed with @cite{netperf-2.3}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Bugs
+@section Bugs
+@cindex bugs
+
+@dfn{@value{PACKAGE_TITLE}} has many known bugs.  These are alpha releases.  Use at your own risk.
+Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANY} under @ref{GNU General
+Public License}.}
+
+@b{This software is @i{alpha} software.  As such, it will likely crash your kernel.  Installation
+of the software may irreparably mangle your header files or Linux distribution in such a way as to
+make it unusable.  Crashes will likely lock your system and rebooting the system might not repair the
+problem.  You can loose all the data on your system.  Because this software can crash your kernel,
+the resulting unstable system could destroy computer hardware or peripherals making them unusable.
+You will likely void the warranty on any system on which you run this software. YOU HAVE BEEN
+WARNED.}
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Schedule
+@section Schedule
+@cindex schedule
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node History
+@section History
+@cindex history
+
+@c ----------------------------------------------------------------------------
+

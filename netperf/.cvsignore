@@ -12,11 +12,6 @@ INSTALL
 *.log
 netperf-2.1.pdf
 netperf-2.1.ps
-netperf.info
-netperf.info-1
-netperf.info-2
-netperf.info-3
-netperf.info-4
 _build
 _install
 scripts

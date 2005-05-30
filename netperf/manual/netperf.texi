@@ -1,0 +1,1840 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: netperf.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+% Copyright (C) 1993-1995  Hewlett-Packard Company
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename netperf.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory Network testing
+@direntry
+* Netperf: (netperf).           OpenSS7 implementation of HP Netperf.
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 1993-1995  @uref{http://www.hp.com/, Hewlett-Packard Company}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+documentation, and is consistent with @value{PACKAGE_TARNAME} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+
+@page
+@vskip 0pt plus 1filll
+Portions of this manual are @*
+Copyright @copyright{} 1993, 1994, 1995  Hewlett-Package Company @*
+All Rights Reserved. @*
+
+@noindent
+The enclosed software and documentation includes copyrighted works of
+Hewlett-Packard Co.  For as long as you comply with the following limitations,
+you are hereby authorized to (i) use, reproduce, and modify the software and
+documentation, and to (ii) distribute the software and documentation,
+including modifications, for non-commercial purposes only.
+
+@enumerate
+@item
+The enclosed software and documentation is made available at no charge in
+order to advance the general development of high-performance networking
+products.
+@item
+You may not delete any copyright notices contains in the software or
+documentation.  All hard copies, and copies in source code or object code
+form, of the software or documentation (including modifications) must contain
+at least one of the copyright notices.
+@item
+The enclosed software and documentation has not be subjected to testing and
+quality control and is not a Hewlett-Packard Co. product.  At a future time,
+Hewlett-Packard Co. may or may not offer a version of the software and
+documentation as a product.
+@item
+@strong{THE SOFTWARE AND DOCUMENTATION IS PROVIDED ``AS IS''.  @*
+HEWLETT-PACKARD COMPANY DOES NOT WARRANT THAT THE USE, REPRODUCTION,
+MODIFICATION OR DISTRIBUTION OF THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE
+A THIRD PARY'S INTELLECTUAL PROPERTY RIGHTS.  HP DOES NOT WARRANT THAT THE
+SOFTWARE OR DOCUMENTATION IS ERROR FREE.  HP DISCLAIMS ALL WARRANTIES, EXPRESS
+AND IMPLIED, WITH REGARD TO THE SOFTWARE AND THE DOCUMENTATION.  HP SPECIFICALLY
+DISCLAIMS ALL WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.}
+@item
+@strong{HEWLETT-PACKARD COMPANY WILL NOT IN ANY EVENT BE LIABLE FOR ANY DIRECT,
+INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING LOST PROFITS)
+RELATED TO ANY USE, REPRODUCTION, MODIFICATION, OR DISTRIBUTION OF THE SOFTWARE
+OR DOCUMENTATION.}
+@end enumerate
+
+@vskip 0pt
+@end titlepage
+@page
+
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@c Define an index of tests
+@defcodeindex te
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Acknowledgments::		Sponsors and Contributors
+
+* Introduction::		Introduction to the package
+* Reference::			Contents of the package
+* Tests::			Tests included in the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+
+* GPL::				GNU General Public License
+* LGPL::			GNU Lesser General Public License
+* FDL::				GNU Free Documentation License
+
+* Indices::			Index of Indices
+
+ ----- detailed node listing -----
+
+Acknowledgments
+
+* Sponsors::			Sponsors of the package
+* Contributors::		People who contributed to the development of
+				the package.
+Introduction
+
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+
+Reference
+
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+
+Tests
+
+* Design::			Design of the package
+* Stream Tests::		Stream tests
+* Request/Response Tests::	Request/response tests
+* Global Options::		Global test options
+* Test Options::		Specific test options
+
+Conformance
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Bugs::			Known Bugs
+* Schedule::			Development and Bug Fix Schedule
+* History::			Project History
+
+Installation
+
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removal::			Removal of the package
+* Loading::			Loading the package
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* Test Index::			Index of Tests
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@node Acknowledgments
+@unnumbered Acknowledgments
+@cindex credits
+
+As with most open source projects, this project would not have been possible without the valiant
+efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
+Community}.
+
+@menu
+* Sponsors::			Sponsors
+* Contributors::		Contributors
+@end menu
+
+@node Sponsors
+@unnumberedsec Sponsors
+@cindex sponsors
+
+Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
+
+@itemize
+@item OpenSS7 Corporation
+@item Hewlett-Packard Company
+@end itemize
+
+@noindent
+Additional funding for The OpenSS7 Project was provided by:
+
+@itemize
+@item OpenSS7 Corporation
+@item Lockheed Martin
+@item Performance Technologies
+@item Motorola
+@item HOB International
+@item Comverse
+@item Sonus Networks
+@item France Telecom
+@end itemize
+
+@node Contributors
+@unnumberedsec Contributors
+@cindex contributors
+
+The primary contributor to the OpenSS7 @value{PACKAGE_TITLE} package is
+@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
+of significant contributors to the project:
+
+@itemize
+@item Per Berquist
+@item John Boyd
+@item Chuck Winters
+@item Peter Courtney
+@item Tom Chandler
+@item Gurol Akman
+@item Others
+@end itemize
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and
+future development schedule of the @value{PACKAGE_TITLE} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Notice::			Notice
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@node Notice
+@section Notice
+@cindex notice
+
+This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
+@uref{http://www.openss7.org/, The OpenSS7 Project} to support network performance testing and
+benchmarking of the OpenSS7 Linux Kernel Native and STREAMS implementations of Stream Control
+Transmission Protocol (SCTP) as described in RFC 2960.  To support testing of the emerging SCTP
+protocol, specific stream, request/response and connect/close tests were added to test the SCTP
+protocol in a fashion similar to Transmission Control Protocol (TCP).  The objective of retaining as
+much compatibility as possible to the TCP tests was to provide a basis for comparison between TCP
+and SCTP implementations on the Linux and HP-UX operating systems.
+
+In addition, XTI tests have been enhanced and are used to test the OpenSS7 STREAMS XTI INET
+implementation, @xref{Top, OpenSS7 STREAMS INET Driver, , strinet, OpenSS7 STREAMS INET Driver}.
+The OpenSS7 STREAMS INET implementation is an implementation XTI STREAMS over Sockets for the Linux
+operating system.  Tests in the XTI API test group compared against equivalent tests in the Sockets
+API test group provide an indication of the overheads introduced by running XTI over Sockets.  The
+OpenSS7 STREAMS INET driver also provides XTI over Sockets for the Linux Native SCTP implementation
+and comparisons between the XTI over Sockets and pure STREAMS approaches to SCTP can be made.
+
+@node Overview
+@section Overview
+@cindex overview
+
+This manual documents the design, implementation, installation, operation and future development of
+the @value{PACKAGE_TITLE} package.
+
+Netperf is a benchmark that can be used to measure various aspects of networking performance.  Its
+primary focus is on bulk data transfer and request/response performance using SCTP, TCP or UDP, the
+X/Open XTI/TLI XNS 5.2 interface and the Berkeley Sockets interface.  There are optional tests
+available to measure the performance of DLPI, Unix Domain sockets and STREAMS, the Fore ATM API and
+the HP HiPPI LLA interface.
+
+This tool is maintained and informally supported by the IND Networking Performance Team.  It is
+@strong{NOT} supported via any of the normal Hewlett-Packard support channels.  You are free to make
+enhancements and modifications to this tool.
+
+@node Organization
+@section Organization of this Document
+@cindex organization
+
+This document is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Reference::			Contents of the package
+* Tests::			Tests included in the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+@end menu
+@end ifnottex
+@iftex
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Tests}.
+@tab Tests included in the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@end multitable
+@end iftex
+
+We thank you in advance for your comments, and hope that you find this tool
+useful.
+
+The maintainers of netperf.
+
+"How fast is it?  It's so fast, that ..." ;-)
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+You may not be familiar with some of the conventions and definitions used by this document.
+Generally, items of particular importance, command line options, and commands will be in
+@b{boldface} type.  Filenames and command line items requiring user substitution will appear in
+@i{italicized} type.
+
+A @i{sizespec} is a one or two item list passed with a command line option that can set the value of
+one or two netperf parameters.  If you wish to set both parameters to separate values, items should
+be separated by a comma, for example: "@code{parm1, parm2}".  If you wish to set the first parameter
+without altering the value of the second, you should follow the first item with a comma, for
+example: "@code{parm1,}".  Likewise, precede the item with a comma if you wish to set only the
+second parameter, for example "@code{,parm2}".  An item without a commal will set both parameters.
+This last mode is the one most frequently used.
+
+Netperf has two types of command line options.  The first are global command line opoptions.  They
+are essentially any option that is not tied to a particular test, or group of tests.  An example of
+a global command line option is the test type.  The second options are test specific options.  These
+are options that are only applicable to a particular test.  An example of a test specific option
+would be the send socket buffer size for a @var{TCP_STREAM} test.  Global command line options are
+specified first, test specific options second.  They must be separated from each other by a
+"@code{--}" (two dashes).  If you wish to give test specific options only, they must be preceded by
+"@code{--}".
+
+For example:
+@example
+$ netperf -- -m 1024
+@end example
+
+@c ----------------------------------------------------------------------------
+
+@node Reference
+@chapter Reference
+@cindex reference
+
+@menu
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Utilities::			Utilities
+* Development::			Development against the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Files
+@section Files
+@cindex headers
+
+@include tree.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Development
+@section Development
+@cindex developing
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Tests
+@chapter Tests
+@cindex tests
+
+@menu
+* Design::                      Design of the tool.
+* Stream Tests::                Describes bulk data transfer tests.
+* Request/Response Tests::      Describes request and response tests.
+* Global Options::              Global command line options.
+* Test Options::                Test types and command line options.
+@end menu
+
+@node Design
+@section Design
+@cindex design
+
+@menu
+Design Basics::
+CPU Utilization::
+Supported Interfaces::
+Supported Protocols::
+Supported Tests::
+@end menu
+
+@node Design Basics
+@subsection Design Basics
+@cindex design basics
+
+Netperf is designed around the basic client-server model.  There are two
+executables -- @command{netperf} and @command{netserver}.  Generally you will
+only execute the @command{netperf} program -- the @command{netserver} program
+will be invoked by the other system's @command{inetd}.
+
+When you execute @command{netperf}, the first thing that happens is the
+establishment of a control connection to the remote system.  This connection
+will be used to pass test configuration information and results to and from
+the remote system.  Regardless of the type of test being run, the control
+connection will be a TCP connection using BSD sockets.
+
+Once the control connection is up and the configuration information has been
+passed, a separate connection will be opened for the measurement itself using
+the APIs and protocols appropriate for the test.  The test will be performed,
+and the results will be displayed.
+
+Netperf places no traffic on the control connection while a test is in
+progress.  Certain TCP options, such as @var{SO_KEEPALIVE}, if set as your
+system's default, may put packets out on the control connection.
+
+@node CPU Utilization
+@subsection CPU Utilization
+@cindex cpu utilization
+
+CPU utilization is a frequently requested metric of networking performance.
+Unfortunately, it can also be one of the most difficult metrics to measure
+accurately.  Netperf is designed to use one of several (perhaps platform
+dependent) CPU utilization measurement schemes.  Depending on the CPU
+utilization measurement technique used, a unique single-letter code will be
+included in the CPU portion of the test banner for both the local and remote
+systems.
+
+The default CPU measurement technique is based on the use of "loopers" which
+will sit in tight little loops consuming any CPU left over by the networking.
+This method is not without its added overhead, but wherever possible, card has
+been taken to keep that overhead to a minimum.  If you would like to get an
+estimate of the overhead, run one test with CPU utilization, and one test
+without, and compare the throughputs.  Use of loopers in measuring CPU
+utilization is indicated by the letter code "L".
+
+@b{NOTE:} For accurate CPU utilization on MP systems, it is @strong{crucial}
+that @command{netperf} and @command{netserver} know the number of processors
+on the system.  For some systems (@cite{HP-UX}) this can be determined
+programmatically.  Other systems require the use of the "@code{-n}" gloabl
+command line argument.
+
+@cite{HP-UX 10.X} offers a zero additional overhead, very accurate CPU
+utilization mechanism based on the @command{pstat()} system call.  If you are
+compiling on @cite{HP-UX 10}, you should replace the "@code{-DUSE_LOOPER}" in
+the @file{makefile} with "@code{-DUSE_PSTAT}" and recompile.  When this method
+is being used, the letter code "T" will be displayed.
+
+Other codes may be included in later versions of @command{netperf}.  When the
+CPU utilization mechanism is unknown, either a "U" or a "?" will be displayed.
+
+Great care should be exercised when looking at CPU utilization.  Be certain
+you are familiar with the technique being used, and its implications.  For
+example, a mechanism that is based solely on CPU charged to the
+@command{netperf} (@command{netserver}) process alone will likely under-report
+the real CPU utilization @strong{significantly}.  Much network processing
+takes place away from the user process context.  Caveat Benchmarker!
+
+@node Supported Interfaces
+@subsection Supported Interfaces
+@cindex interfaces supported
+@cindex supported interfaces
+
+@table @b
+@item Sockets
+BSD/POSIX Sockets Interface
+@item XTI
+X/Open Transport Interface (XTI/TLI) XNS 5.2 Interface
+@item IPv6
+BSD/POSIX IPv6 Sockets Interface
+@item Unix
+BSD/POSIX Unix Domain Sockets Interface
+@item DLPI
+X/Open XNS 5.2 Data Link Provider Interface (DLPI)
+@item DNS
+Directory Name Service
+@end table
+
+@node Supported Protocols
+@subsection Supported Protocols
+@cindex protocols supported
+@cindex supported protocols
+
+@table @b
+@item SCTP
+@item TCP
+@item UDP
+@item UNIX
+@item DL
+@item DNS
+@end table
+
+@node Supported Tests
+@subsection Supported Tests
+@cindex tests supported
+@cindex supported tests
+
+@table @b
+@item STREAM
+@item MAERTS
+@item SENDFILE
+@item RR
+@item NBRR
+@item CRR
+@item TRR
+@item CC
+@item DNS
+@end table
+
+@node Stream Tests
+@section Stream Tests
+@cindex Tests Stream
+
+@menu
+Available bulk data transfer performance tests::
+Using Netperf to measure bulk data transfer performance::
+@end menu
+
+@node Available bulk data transfer performance tests
+@subsection Available bulk data transfer performance tests
+@cindex tests performance bulk data transfer
+
+@subsubsection Forward Unidirectional Stream Performance Test (STREAM)
+
+The intent of the @var{STREAMS} performance tests is to test forward
+unidirectional bulk data transfer in the direction from client to server.
+This is similar to the @var{MAERTS} tests, with the exception that the data
+transfer is in the forward direction.  The basic test sequence is as follows:
+
+@example
+server: bind()
+server: listen()
+client: bind()
+client: connect()
+server: accept()
+client: send() [repeated]
+server: recv() [repeated]
+client: shutdown()
+client: close()
+server: close()
+test complete
+@end example
+
+There are three interface types that are of interest:
+
+@table @b
+
+@item Stream
+This is a connection-oriented reliable unidirectional bulk data transfer
+without regard for message boundaries.
+Protocols supporting this type of data transfer are SCTP, TCP, UNIX CO, and
+DLPI CO.
+Interfaces supporting this type of data transfer are Sockets, XTI, IPv6, UNIX
+and DLPI.
+
+This interface type has been traditionally tested by @command{netperf},
+however, connection-oriented tests have been lumped together with
+connectionless tests.
+Supported tests are:
+@table @code
+@item SCTP_STREAM
+@teindex SCTP_STREAM
+SCTP BSD/POSIX IPv4 Sockets Interface (@code{SOCK_STREAM})
+@item TCP_STREAM
+@teindex TCP_STREAM
+TCP BSD/POSIX IPv4 Sockets Interface (@code{SOCK_STREAM})
+@item SCTPIPV6_STREAM
+@teindex SCTPIPV6_STREAM
+SCTP BSD/POSIX IPv6 Sockets Interface (@code{SOCK_STREAM})
+@item TCPIPV6_STREAM
+@teindex TCPIPV6_STREAM
+TCP BSD/POSIX IPv6 Sockets Interface (@code{SOCK_STREAM})
+@item STR@-EAM@-_@-STR@-EAM
+@teindex STREAM_STREAM
+Unix Domain BSD/POSIX Sockets Interface (@code{SOCK_STREAM})
+@item DLCO_STREAM
+@teindex DLCO_STREAM
+DLPI Connection-Oriented (@code{DLCO})
+@end table
+
+@item Datagram
+This is a connectionless unreliable unidirectional bulk data transfer
+regarding message boundaries.
+Protocols supporting this type of data trasnfer are UDP, UNIX CL and DLPI CL.
+Interfaces supporting this type of data transfer are Sockets, XTI, IPv6, UNIX
+and DLPI.
+
+This interface type has been traditionally tested by @command{netperf},
+however, connection-oriented tests have been lumped together with
+connectionless tests.
+Supported tests are:
+@table @code
+@item UDP_STREAM
+@teindex UDP_STREAM
+@item UDPIPV6_STREAM
+@teindex UDPIPV6_STREAM
+@item DLCL_STREAM
+@teindex DLCL_STREAM
+@item FORE_STREAM
+@teindex FORE_STREAM
+@end table
+
+@item Packet
+This is a connection-oriented reliable unidirectional bulk data transfer
+regarding message boudnaries.
+Protocols supporting this type of data transfer are SCTP, and DLPI CO.
+Interfaces supporting this type of data transfer are Sockets, XTI, IPv6 and
+DLPI.
+
+This interface type has @strong{not} been traditionally tested by
+@command{netperf}; however, with the introduction of SCTP as a test protocol,
+these tests have been added to the @command{netperf} framework.
+Supported tests are:
+@table @code
+@item SCTP_PACKET
+@teindex SCTP_PACKET
+SCTP BSD/POSIX IPv4 Sockets Interface (@code{SOCK_SEQPACKET})
+@item SCTPIPV6_PACKET
+@teindex SCTPIPV6_PACKET
+SCTP BSD/POSIX IPv6 Sockets Interface (@code{SOCK_SEQPACKET})
+@end table
+
+@end table
+
+@subsubsection Reverse Unidirectional Stream Performance Test (MAERTS)
+
+The intent of the @var{MAERTS} performance tests is to test reverse
+unidirectional bulk data transfer in the direction from server to client.
+This is simlar to the @var{STREAM} tests, with the exception that the data
+transfer is in the opposite direction.  The basic test sequence is as follows:
+
+@example
+server: bind()
+server: listen()
+client: bind()
+client: connect()
+server: accept()
+server: send() [repeated]
+client: recv() [repeated]
+server: shutdown()
+server: close()
+client: close()
+test complete
+@end example
+
+Supported tests are:
+@table @code
+@item SCTP_MAERTS
+IPv4 SCTP BSD/POSIX Sockets Interface
+@item TCP_MAERTS
+IPv4 TCP BSD/POSIX Sockets Interface
+@end table
+
+@subsubsection Paged Unidirectional Stream Performance Test (SENDFILE)
+
+The intent of the @var{SENDFILE} performance tests is to test paged
+unidirectional stream bulk data transfer in the direction from client to
+server.  This is simlar to the @var{STREAM} tests with the variation that the
+BSD-style @command{sendfile()} system call is used to transfer data directly
+from a @command{mmap}'ed file to the connection.  The basic test sequence is
+as follows:
+
+@example
+server: bind()
+server: listen()
+client: bind()
+client: connect()
+server: accept()
+client: sendfile()
+server: recv() [repeated]
+client: shutdown()
+client: close()
+server: close()
+test complete
+@end example
+
+This test has tranditionally only been available for @emph{TCP} under
+@command{netperf}; however, OpenSS7 has added @emph{SCTP} as another protocol
+for @var{SENDFILE} testing.  These tests only used the BSD/POSIX IPv4 Sockets
+interface.  Supported tests are:
+@table @code
+@item SCTP_SENDFILE
+IPv4 SCTP BSD/POSIX Sockets Interface
+@item TCP_SENDFILE
+IPv4 TCP BSD/POSIX Sockets Interface
+@end table
+
+@node Using Netperf to measure bulk data transfer performance
+@subsection Using Netperf to measure bulk data transfer performance
+@cindex tests performance bulk data transfer
+
+The most common use of @command{netperf} is measuring bulk data transfer
+performance.  This is also referred to as "stream" or "unidirectional stream"
+performance.  Essentially, these tests will measure how fast one ssystem can
+send data to another and/or how fast the other system can receive it.
+
+@menu
+* SCTP_STREAM::		SCTP Stream Forward Performance
+* SCTP_MAERTS::		SCTP Stream Reverse Performance
+* SCTP_SENDFILE::	SCTP Stream Sendfile Performance
+* TCP_STREAM::		TCP Stream Forward Performance
+* TCP_MAERTS::		TCP Stream Reverse Performance
+* TCP_SENDFILE::	TCP Stream Sendfile Performance
+* UDP_STREAM::		UDP Stream Performance
+* XTI_SCTP_STREAM::	XTI SCTP Stream Forward Performance
+* XTI_TCP_STREAM::	XTI TCP Stream Forward Performance
+* XTI_UDP_STREAM::	XTI UDP Stream Performance
+* SCTPIPV6_STREAM::	SCTP IPv6 Stream Forward Performance
+* TCPIPV6_STREAM::	TCP IPv6 Stream Forward Performance
+* UDPIPV6_STREAM::	UDP IPv6 Stream Forward Performance
+* DLCO_STREAM::		DLPI CO Performance
+* DLCL_STREAM::		DLPI CL Performance
+* STREAM_STREAM::	Unix Domain Stream Socket Stream Performance
+* DG_STREAM::		Unix Domain Datagram Socket Stream Performance
+* FORE_STREAM::		Fore ATM API Performance
+@end menu
+
+@node SCTP_STREAM
+@subsubsection SCTP Stream Forward Performance
+@teindex SCTP_STREAM
+@cindex Tests Stream SCTP Sockets Forward
+
+@node SCTP_MAERTS
+@subsubsection SCTP Stream Reverse Performance
+@teindex SCTP_MAERTS
+@cindex Tests Stream SCTP Sockets Reverse
+
+@node SCTP_SENDFILE
+@subsubsection SCTP Stream Sendfile Performance
+@teindex SCTP_SENDFILE
+@cindex Tests Stream SCTP Sockets Sendfile
+
+@node TCP_STREAM
+@subsubsection TCP Stream Forward Performance
+@teindex TCP_STREAM
+@cindex Tests Stream TCP Sockets Forward
+
+The TCP stream performance test is the default test for the @command{netperf}
+program.  The simplest test is peformed by entering the command:
+@example
+$ netperf -H @var{remotehost}
+@end example
+@noindent
+which will perform a 10 second test between the local system and the system
+identified by @var{remotehost}.  The socket buffers on either end will be
+sized according to the systems' default and all TCP options (e.g.
+@var{TCP_NODELAY}) will be at their default settings.
+
+To assist in measuring TCP stream performance, two script files are provided
+with the @command{netperf} distribution.  They are @file{tcp_stream_script}
+and @file{tcp_range_script}.  @file{tcp_stream_script} will invoke
+@command{netperf} based on the setting of script variables controlling socket
+and send sizes.  @file{tcp_range_script} will perform a similar set of tests,
+with the difference being that where @file{tcp_stream_script} tests specific
+datapoints, @file{tcp_range_script} will perform tests at points within a
+specified range.
+
+If you would like to perform tests other than those done by the scripts, you
+can invoke @command{netperf} manually.  Some of the options you will likely
+want to experiment with are:
+
+@table @code
+@item -s @var{sizespec}
+which will set the local send and receive socket buffer sizes to the value(s)
+specified.  [Default: system default socket buffer sizes]
+
+@item -S @var{sizespec}
+which behaves just like @code{-s} but for the remote system
+
+@item -m @var{value}
+set the local send size to @var{value} bytes.  [Default: local socket buffer
+size]
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+[Default: remote receive socket buffer size]
+
+@item -I @var{value}
+set the test length to @var{value} seconds when @var{value} is > 0 and to
+|@var{value}| bytes when @var{value} < 0
+
+@item -D
+set the @var{TCP_NODELAY} option to true on both systems
+
+@end table
+
+This is not a complete list of options that can affect TCP stream performance,
+but it does cover those options that are used most often.  A complete list of
+@command{netperf} options can be found in "Test Options".
+@c **** need a reference here
+
+@node TCP_MAERTS
+@subsubsection TCP Stream Reverse Performance
+@teindex TCP_MAERTS
+@cindex Tests Stream TCP Sockets Reverse
+
+@node TCP_SENDFILE
+@subsubsection TCP Stream Sendfile Performance
+@teindex TCP_SENDFILE
+@cindex Tests Stream TCP Sockets Sendfile
+
+@node UDP_STREAM
+@subsubsection UDP Stream Performance
+@teindex UDP_STREAM
+@cindex Tests Stream UDP Sockets
+
+A UDP stream performance test is very similar to a TCP stream test.  One
+difference is that the send size cannot be larger than the smaller of the
+local and remote socket buffer sizes.  What this means is that you must make
+certain that when you specify the @code{-m} option, you use a value that is
+less than or equal to the socket buffer sizes (@code{-s} and @code{-S}).
+Also, since the UDP stream test is not the default test, the
+@code{-t @var{testname}} option must be specified, with the @var{testname} set
+to @var{UDP_STREAM}.  So, a simple UDP stream test command might look
+something like this:
+@example
+$ netperf -H @var{remotehost} -t @var{UDP_STREAM} -- -m 1024
+@end example
+
+There is a script provided that performs various UDP stream performance tests.
+It is called @file{udp_stream_script}.   As with TCP stream performance, you
+can use the script provided, or perform tests yourself to get datapoints not
+covered by the script.
+
+@b{NOTE:} UDP is an unreliable protocol.  It is important that you examine the
+results carefully as the reported send rate can be much higher than the actual
+receive rate.  Great care should be taken when reporting @var{UDP_STREAM} test
+results to make sure they are not misleading.  For example, one should
+@strong{always} report both send and receive rates @strong{together} for a
+@var{UDP_STREAM} test.  If you are going to report a single number, you should
+report the receive rate.
+
+@b{NOTE:} If you would like to "pace" the send rate of the @var{UDP_STREAM}
+test, add a "@code{-DINTERVALS}" to the @file{makefile}, do a @samp{make
+clean} and recompile.  You can then use the @code{-b} and @code{-w} global
+options to set the burst size (sends) and wait time (milliseconds)
+respectively.
+
+@node XTI_SCTP_STREAM
+@subsubsection XTI SCTP Stream Performance
+@teindex XTI_SCTP_STREAM
+@cindex Tests Stream SCTP XTI
+
+@node XTI_TCP_STREAM
+@subsubsection XTI TCP Stream Performance
+@teindex XTI_TCP_STREAM
+@cindex Tests Stream TCP XTI
+
+The XTI TCP stream performance test is quite similar to the @var{TCP_STREAM}
+test.  XTI requires a device file to be opened -- as the device file is placed
+in different locations on different systems, it generally must be specified.
+The simplest XTI TCP stream test on @cite{HP-UX} is performed by entering the
+command:
+@example
+$ netperf -H @var{remotehost} -t XTI_TCP_STREAM -- -X /dev/inet_cots
+@end example
+@noindent
+which will perform a 10 second test between the local system and the system
+identified by @var{remotehost}.  The STREAMS buffers on either end will be
+sized according to the systems' default and all TCP options (e.g.
+@var{T_TCP_NODELAY}) will be at their default settings.
+
+The test parameters for an @var{XTI_TCP_STREAM} test are the same as for a
+@var{TCP_STREAM} test with the addition of:
+
+@table @code
+@item -X @var{devspec}
+set the local/remote XTI device file name from @var{devspec}.
+@end table
+
+@node XTI_UDP_STREAM
+@subsubsection XTI UDP Performance
+@teindex XTI_UDP_STREAM
+@cindex Tests Stream UDP XTI
+
+The XTI UDP stream performance test is quite similar to the @var{UDP_STREAM}
+test.  XTI requires a device file be opened.  As the device file is placed in
+different locations on different systems, it generally must be specified.  The
+simplest XTI UDP stream test on @cite{HP-UX} is performed by entering the
+command:
+@example
+$ netperf -H @var{remotehost} -t XTI_UDP_STREAM -- -X /dev/inet_clts
+@end example
+
+The test parameters for an @var{XTI_UDP_STREAM} test are the same as for a
+@var{UDP_STREAM} test with the addition of:
+
+@table @code
+@item -X @var{devspec}
+set the local/remote XTI device file name from @var{devspec}.
+@end table
+
+@b{NOTE:} UDP is an unreliable protocol.  It is important that you examine the
+results carefully as the reported send rate can be much higher than the actual
+receive rate.  Great care should be taken when reporting @var{UDP_STREAM} test
+results to make sure they are not misleading.  For example, one should
+@strong{always} report both send and receive rates @strong{together} for a
+@var{UDP_STREAM} test.  If you are going to report a single number, you should
+report the receive rate.
+
+@b{NOTE:} If you would like to "pace" the send rate of the @var{UDP_STREAM}
+test, add a "@code{-DINTERVALS}" to the @file{makefile}, do a @samp{make
+clean} and recompile.  You can then use the @code{-b} and @code{-w} global
+options to set the burst size (sends) and wait time (milliseconds)
+respectively.
+
+@node SCTPIPV6_STREAM
+@subsubsection SCTP IPv6 Stream Forward Performance
+@teindex SCTPIPV6_STREAM
+@cindex Tests Stream SCTP Sockets IPv6 Forward
+
+@node TCPIPV6_STREAM
+@subsubsection TCP IPv6 Stream Forward Performance
+@teindex TCPIPV6_STREAM
+@cindex Tests Stream TCP Sockets IPv6 Forward
+
+@node UDPIPV6_STREAM
+@subsubsection UDP IPv6 Stream Forward Performance
+@teindex UDPIPV6_STREAM
+@cindex Tests Stream UDP Sockets IPv6 Forward
+
+@node DLCO_STREAM
+@subsubsection DLPI Connection Oriented Stream Performance
+@teindex DLCO_STREAM
+@cindex Tests Stream CO DLPI
+
+@b{NOTE:} DLPI tests are not compiled-in by default with @command{netperf}.
+If you wish to measure performance over DLPI, you will need to add a
+@code{-DDO_DLPI} to the @file{makefile} and perhaps add to the "@code{LIBS=}"
+and recompile @command{netperf} and @command{netserver}.
+
+A DLPI Connection Oriented Stream test (@var{DLCO_STREAM}) looks very similar
+to a TCP Stream test -- they both use reliable, connection oriented protocols.
+The DLPI tests differs from the TCP test in that the message size must always
+be less than or equal to the local interface's MTU -- DLPI does not provide
+TCP-style segmentation and reassembly.
+
+The simplest DLPI Connection Oriented Stream test would look something like
+this:
+@example
+$ netperf -H @var{remotehost} -t DLCO_STREAM -- -m 1024
+@end example
+
+Here are some of the DLPI-specific command line options:
+
+@table @code
+@item -D @var{devspec}
+specify the local and/or remote DLPI device file name(s) (fully qualified).
+Syntax is the same as that of @var{sizespec}.
+
+@item -m @var{value}
+sepcify the send size, in bytes, for the local system.  This must be less than
+or equal to the link MTU.
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+
+@item -p @var{ppaspec}
+set the local and/or remote DLPI PPA(s).  Syntax is the same as that of a
+@var{sizespec}.
+
+@item -r @var{value}
+specify the request size, in bytes, for the test.
+
+@item -R @var{value}
+specify the response size, in bytes, for the test.
+
+@item -s @var{value}
+sepcify the 802.2 SAP for the test.  This shouold not conflict with any
+assigned SAPs.
+
+@item -w @var{sizespec}
+specify the local send/recv window sizes in frames (where available).
+
+@item -W @var{sizespec}
+specify the remote sned/recv window sizes in frames (where available).
+
+@end table
+
+@node DLCL_STREAM
+@subsubsection DLPI Connectionless Stream Performance
+@teindex DLCL_STREAM
+@cindex Tests Stream CL DLPI
+
+@b{NOTE:} DLPI tests are not compiled-in by default with @command{netperf}.
+If you wish to measure performance over DLPI, you will need to add a
+@code{-DDO_DLPI} to the @file{makefile} and perhaps add to the "@code{LIBS=}"
+and recompile @command{netperf} and @command{netserver}.
+
+A DLPI Connectionless Stream test (@var{DLCL_STREAM}) is analogous to a
+@var{UDP_STREAM} test.  They both make use of unreliable, connectionless
+transports.  The DLPI test differs from the UDP test in that the message size
+must always be less than or equal to the link MTU -- DLPI does not provide
+IP-like segmentation and reassembly functionality, and the @command{netperf}
+benchmark does not presume to provide one.
+
+The simplest DLPI Connectionless Stream test command line would look something
+like this:
+@example
+$ netperf -H @var{remotehost} -t DLCL_STREAM -- -m 1024
+@end example
+
+Here are some of the DLPI-specific command line options for the
+@var{DLCL_STREAM} test:
+
+@table @code
+@item -D @var{devspec}
+specify the local and/or remote DLPI device file name(s) (fully qualified).
+Syntax is the same as that of @var{sizespec}.
+
+@item -m @var{value}
+sepcify the send size, in bytes, for the local system.  This must be less than
+or equal to the link MTU.
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+
+@item -p @var{ppaspec}
+set the local and/or remote DLPI PPA(s).  Syntax is the same as that of a
+@var{sizespec}.
+
+@item -r @var{value}
+specify the request size, in bytes, for the test.
+
+@item -R @var{value}
+specify the response size, in bytes, for the test.
+
+@item -s @var{value}
+sepcify the 802.2 SAP for the test.  This shouold not conflict with any
+assigned SAPs.
+
+@item -w @var{sizespec}
+specify the local send/recv window sizes in frames (where available).
+
+@item -W @var{sizespec}
+specify the remote sned/recv window sizes in frames (where available).
+
+@end table
+
+@node STREAM_STREAM
+@subsubsection Unix Domain Stream Sockets Performance
+@teindex STREAM_STREAM
+@cindex Tests Stream CO UNIX Sockets
+
+@b{NOTE:} Unix Domain Socket tests are not compiled into @command{netperf} by
+default.  If you wish to measusre the performance of Unix Domain Sockets, you
+must recompile @command{netperf} and @command{netserver} with @code{-DDO_UNIX}
+added to the @file{makefile}.
+
+A Unix Domain Stream Socket Stream test (@var{STR@-EAM@-_@-STR@-EAM}) is very much
+like a @var{TCP_STREAM} test.
+
+The simplest Unix Domain Socket Stream test command line would look something
+like this:
+@example
+$ netperf -t STREAM_STREAM
+@end example
+
+The @code{-H} global command line option is not valid for Unix Domain Socket
+test and should not be specified.
+
+Here are some of the Unix Domain-specific command line options for the
+@var{STR@-EAM@-_@-STR@-EAM} test:
+
+@table @code
+@item -m @var{value}
+set the local send size to @var{value} bytes. [Default: local socket buffer
+size]
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+[Default: remote receive socket buffer size]
+
+@item -p @var{dirspec}
+set the directory where pipes will be created.  [Default:system default for
+the @command{tempnam()} call]
+
+@item -s @var{sizespec}
+which will set the local send an receive socket buffer sizes to the value(s)
+specified.  [Default: system default socket buffer sizes]
+
+@item -S @var{sizespec}
+which behaves just like @code{-s} but for the remote system.
+
+@end table
+
+@node DG_STREAM
+@subsubsection Unix Domain Datagram Sockets Performance
+@teindex DG_STREAM
+@cindex Tests Stream CL UNIX Sockets
+
+@b{NOTE:} Unix Domain Socket tests are not compiled into @command{netperf} by
+default.  If you wish to measure the performance of Unix Domain Sockets, you
+must recompile @command{netperf} and @command{netserver} with
+@code{-DDO_UNIX} added to the @file{makefile}.
+
+A Unix Domain Datagram Socket stream test (@var{DG_STREAM}) is very much like
+a @var{TCP_STREAM} test except that message boundaries are preserved.
+The simplest Unix Domain Datagram Socket stream test command line would look
+something like this:
+@example
+$ netperf -t DG_STREAM
+@end example
+
+The @code{-H} global command line option is not valid for a Unix Domain Socket
+test and should not be specified.  Here are some of the test specific command
+line options available in a @var{DG_STREAM} test.
+
+@table @code
+@item -m @var{value}
+set the local send size to @var{value} bytes. [Default: local socket buffer
+size]
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+[Default: remote receive socket buffer size]
+
+@item -p @var{dirspec}
+set the directory where pipes will be created.  [Default:system default for
+the @command{tempnam()} call]
+
+@item -s @var{sizespec}
+which will set the local send an receive socket buffer sizes to the value(s)
+specified.  [Default: system default socket buffer sizes]
+
+@item -S @var{sizespec}
+which behaves just like @code{-s} but for the remote system.
+
+@end table
+
+@node FORE_STREAM
+@subsubsection Fore ATM API Stream Performance
+@teindex FORE_STREAM
+@cindex Tests Stream ATM FORE
+
+@b{NOTE:} Fore ATM API tests are not compiled into @command{netperf} by
+default.  If you wish to measure the performance of connections over the Fore
+ATM API, you must recompile @command{netperf} and @command{netserver} with
+@code{-DDO_FORE} added to the @file{makefile}.
+
+A Fore ATM API stream test (@var{FORE_STREAM}) is very much like a
+@var{UDP_STREAM} test.
+
+@b{NOTE:} The Fore ATM API expores an unreliable protocol.  It is important
+that you examine the results carefully as the reported send rate can be much
+higher than the actual receive rate.  Great care should be taken when
+reporting @var{FORE_STREAM} test results to make sure they are not misleading.
+For example, one should @strong{always} report both send and receive rates
+@strong{together} for a @var{FORE_STREAM} test.  If you are going to report a
+single number, you should report the receive rate.
+
+The simplest Fore ATM API stream test command line would look something like
+this:
+@example
+$ netperf -t FORE_STREAM -H @var{remotehost}
+@end example
+
+Here are some of the test specific command line options applicable to a
+@var{FORE_STREAM} test.
+
+@table @code
+@item -a @var{AAL}
+use the ATM Adaptation Layer number @var{AAL} to encapsulate packets.
+Specifying 3 or 4 will yeild AAL3/4, and 5 will yeild AAL5.  [Default: 5 ->
+AAL5]
+
+@item -b @var{sizespec}
+set the mean burst target and/or minimum in units of kilobit packets.  The
+first value is target and the second is minimum.  [Default: 0,0]
+
+@item -d @var{devspec}
+set the name of the ATM device file to be opened. [Default: /dev/atm]
+
+@item -m @var{value}
+set the local send size to @var{value} bytes.  This must not be larger than
+the ATM MTU. [Default: ATM MTU]
+
+@item -M @var{value}
+which behaves like @code{-m}, setting the receive size for the remote system.
+[Default: ATM MTU]
+
+@item -p @var{sizespec}
+set the peak bandwidth target and/or minimum in units of kilobits/s.  The
+first value is target and the second is minimum.  [Default: 0,0 -> network
+assigned]
+
+@item -P @var{sizespec}
+set the mean bandwidth target and/or minimum in units of kilobits/s.  The
+first value is target and the second is minimum.  [Default: 0,0 -> network
+assigned]
+
+@end table
+
+@node Request/Response Tests
+@section Request/Response Tests
+@cindex Tests Request/Response
+
+@menu
+* Request/Response Description::	Request/Response Description
+* Request/Response Performance::	Request/Response Performance
+@end menu
+
+@node Request/Response Description
+@subsection Available request/response performance tests
+@cindex Tests Request/Response Description
+
+@menu
+* RR::		Request/Response Blocking Tests
+* NBRR::	Request/Response Non-Blocking Tests
+* CRR::		Request/Response Connection Tests
+* TRR::		Request/Response Transaction Tests
+* CC::		Connect/Close Tests
+@end menu
+
+@node RR
+@subsubsection Request/Response Performance Test (RR)
+@cindex Tests Request/Response Blocking
+
+@node NBRR
+@subsubsection Non-Blocking Request/Response Performance Test (NBRR)
+@cindex Tests Request/Response Non-Blocking
+
+@node CRR
+@subsubsection Connect/Request/Response Performance Test (CRR)
+@cindex Tests Request/Response Connect
+
+@node TRR
+@subsubsection Transaction Request/Response Performance Test (TRR)
+@cindex Tests Request/Response Transaction
+
+@node CC
+@subsubsection Connect/Close Performance Test (CC)
+@cindex Tests Connect/Close
+
+@node Request/Response Performance
+@subsection Using Netperf to measure request/response performance
+@cindex Tests Request/Response Performance
+
+Request/response performance is the second test that can be investigated with
+@command{netperf}.  Generally speaking, @command{netperf} request/response
+performance is quoted as "transactions/s" for a given request and response
+size.  A transaction is defined as the exchange of a single request and a
+single response.  From a transaction rate, one can infer one way and
+route-tripi average latency.
+
+
+@menu
+* SCTP_RR::	SCTP Request/Response Performance
+* SCTP_NBRR::	SCTP Request/Response Non-Blocking Performance
+* SCTP_CRR::	SCTP Request/Response Connect Performance
+* SCTP_TRR::	SCTP Request/Response Transaction Performance
+* SCTP_CC::	SCTP Connect/Close Performance
+* TCP_RR::	TCP Request/Response Performance
+* TCP_NBRR::	TCP Request/Response Non-Blocking Performance
+* TCP_CRR::	TCP Request/Response Connect Performance
+* TCP_TRR::	TCP Request/Response Transaction Performance
+* TCP_CC::	TCP Connect/Close Performance
+* UDP_RR::	UDP Request/Response Performance
+* XTI_SCTP_RR::	XTI SCTP Request/Response Performance
+* XTI_TCP_RR::	XTI TCP Request/Response Performance
+* XTI_UDP_RR::	XTI UDP Request/Response Performance
+* SCTPIPV6_RR::	SCTP IPv6 Request/Reqponse Performance
+* TCPIPV6_RR::	TCP IPv6 Request/Reqponse Performance
+* UDPIPV6_RR::	UDP IPv6 Request/Reqponse Performance
+* DLCO_RR::	DLPI CO Request/Response Performance
+* DLCL_RR::	DLPI CL Request/Response Performance
+* STREAM_RR::	Unix Domain Stream Socket Request/Response Performance
+* DG_RR::	Unix Domain Datagram Socket Request/Response Performance
+* LWPSTR_RR::	Unix Domain Stream Socket Light-Weight Process Request/Response Performance
+* LWPDG_RR::	Unix Domain Datagram Socket Light-Weight Process Request/Response Performance
+* FORE_RR::	Fore ATM API Request/Response Performance
+@end menu
+
+@node SCTP_RR
+@subsubsection SCTP Request/Response Performance
+@teindex SCTP_RR
+@cindex Tests Request/Response SCTP Sockets
+
+@node SCTP_NBRR
+@subsubsection SCTP Non-Blocking Request/Response Performance
+@teindex SCTP_NBRR
+@cindex Tests Request/Response Non-Blocking SCTP Sockets
+
+@node SCTP_CRR
+@subsubsection SCTP Request/Response Connect Performance
+@teindex SCTP_CRR
+@cindex Tests Request/Response Connect SCTP Sockets
+
+@node SCTP_TRR
+@subsubsection SCTP Request/Response Transaction Performance
+@teindex SCTP_TRR
+@cindex Tests Request/Response Transaction SCTP Sockets
+
+@node SCTP_CC
+@subsubsection SCTP Connect/Close Performance
+@teindex SCTP_CC
+@cindex Tests Connect/Close SCTP Sockets
+
+@node TCP_RR
+@subsubsection TCP Request/Response Performance
+@teindex TCP_RR
+@cindex Tests Request/Response TCP Sockets
+
+The TCP request/response test can be invoked with @command{netperf} through
+the use of the @code{-t} option with an argument of @var{TCP_RR}.  So, a
+"default" request/response command would look something like this:
+@example
+$ netperf -H @var{remotehost} -t TCP_RR
+@end example
+@noindent
+and will use the system default socket buffer sizes, a default request size of
+1 byte, and a default response size of 1 byte.
+
+As with the stream performance tests, a script is available to assist you in
+generating TCP request/response performance numbers.  It is called
+@file{tcp_rr_script}.  However, if you should need to generate numbers at
+point of your own choosing, these command line options will be of use:
+
+@table @code
+@item -r @var{sizespec}
+set the request and/or response sizes based on @var{sizespec}.
+@item -I @var{value}
+set the test duration based on @var{value}.  For @var{value} > 0, test
+duration will be @var{value} seconds.  Otherwise, test duration will be
+|@var{value}| transactions.
+@item -s @var{sizespec}
+which will set the local send and receive socket buffer sizes to the value(s)
+specified.  [Default: system default socket buffer sizes]
+@item -S @var{sizespec}
+which behaves like @code{-s} but for the remote system
+@item -D
+set the @var{TCP_NODELAY} option to true on both systems
+@end table
+
+The request and response sizes will be buffer sizes posted to send and receive.
+The @code{-m} and @code{-M} options are not meaningful for a @var{TCP_RR}
+test.  As TCP is a stream protocol and not a message protocol, it is necessary
+to loop on receives until the entire message is delivered.  The buffer
+pointer passed to the first receive for an individual transaction will be
+aligned and offset as requested by the user.  It will be incremented by the
+number of bytes received each time until the entire request/response is
+received.  The buffer pointer will be realigned and offset for the next
+transaction.
+
+@node TCP_NBRR
+@subsubsection TCP Non-Blocking Request/Response Performance
+@teindex TCP_NBRR
+@cindex Tests Request/Response Non-Blocking TCP Sockets
+
+@var{TCP_NBRR} is the same as @var{TCP_RR} except that it uses POSIX
+non-blocking sockets.
+
+@node TCP_CRR
+@subsubsection TCP Request/Response Connect Performance
+@teindex TCP_CRR
+@cindex Tests Request/Response Connect TCP Sockets
+
+The @var{TCP_CRR} test is a test which mimics the http protocol used by most
+web servers.  Instead of simply measuring the performance of request/response
+in the same connection, it establishes a new connection for each
+request/response pair.  The test-specific parameters are the same as the
+@var{TCP_RR} test with one addition:
+@table @code
+@item -p @var{max}[,@var{min}]
+set the minimum or maximum port numbers used by the client side.
+@end table
+It is important that this test run for a reasonable length of time -- at least
+two minutes.  This is related to the behavior of various TCP implementations.
+If you run the test for shorter periods of time, the results could be higher
+than seen in a steady-state condition.  So, a good @var{TCP_CRR} command line
+to simulate a web-server might look like:
+@example
+$ netperf -t TCP_CRR -I 120 -H @var{remotehost} -- -r 32,1024
+@end example
+
+@node TCP_TRR
+@subsubsection TCP Request/Response Transaction Performance
+@teindex TCP_TRR
+@cindex Tests Request/Response Transaction TCP Sockets
+
+@node TCP_CC
+@subsubsection TCP Connect/Close Performance
+@teindex TCP_CC
+@cindex Tests Connect/Close TCP Sockets
+
+@node UDP_RR
+@subsubsection UDP Request/Response Performance
+@teindex UDP_RR
+@cindex Tests Request/Response UDP Sockets
+
+UDP request/response performance works just like TCP request/response
+performance.  All the options available for TCP are available for UDP with the
+exception of the @code{-D} option: @var{TCP_NODELAY} has no meaning for a UDP
+test.  To invoke a UDP request/response test, use an argument of @var{UDP_RR}
+with the @code{-t} option to produce the a command something like this:
+@example
+$ netperf -H @var{remotehost} -t UDP_RR
+@end example
+@noindent
+Again, a script is provided which will generate results for some of the more
+common datapoints.  It is named @file{udp_rr_scrip}.
+
+@node XTI_SCTP_RR
+@subsubsection XTI SCTP Request/Response Performance
+@teindex XTI_SCTP_RR
+@cindex Tests Request/Response SCTP XTI
+
+@node XTI_TCP_RR
+@subsubsection XTI TCP Request/Response Performance
+@teindex XTI_TCP_RR
+@cindex Tests Request/Response TCP XTI
+
+The XTI TCP request/response test can be invoked with @command{netperf}
+through the use of the @code{-t} option with an argument of @var{XTI_TCP_RR}.
+Not all systems put the requisite device files in the same location, so, a
+"default" request/response command on @cite{HP-UX} would look something like
+this:
+@example
+$ netperf -H @var{remotehost} -t XTI_TCP_RR -- -X /dev/inet_cots
+@end example
+@noindent
+and will use the system default socket buffer sizes, a default request size of
+1 byte, and a default response size of 1 byte.
+
+The command line options for the @var{XTI_TCP_RR} test are the same as the
+@var{TCP_RR} test, with the following additions:
+@table @code
+@item -X @var{devspec}
+set the local/remote XTI device file name from @var{devspec}.
+@end table
+
+The request and response sizes will be the buffer sizes posted to send and
+receive.  As TCP is a stream protocol and not a message protocol, it is
+necessary to loop on receives until the entire message is delivered.  The
+buffer pointer passed to the first receive for an individual transaction will
+be aligned and offset as requested by the user.  It will be incremented by the
+number of bytes received each time until the entire request/response is
+received.  The buffer pointer will be realigned and offset for the next
+transaction.
+
+@node XTI_UDP_RR
+@subsubsection XTI UDP Request/Response Performance
+@teindex XTI_UDP_RR
+@cindex Tests Request/Response UDP XTI
+
+The XTI UDP requset/response test can be invoked with netperf through the use
+of the @code{-t} option with an argument of @var{XTI_UDP_RR}.  Not all systems
+put the requisite device files in the same location, so, a "default"
+request/response command on @cite{HP-UX} would look something like this:
+@example
+$ netperf -H @var{remotehost} -t XTI_UDP_RR -- -X /dev/inet_clts
+@end example
+@noindent
+and will use the system default socket buffer sizes, a default request size of
+1 byte, and a default response size of 1 byte.
+
+The command line options for the @var{XTI_UDP_RR} test are the same as the
+@var{UDP_RR} test, with the following additions:
+@table @code
+@item -X @var{devspec}
+set the local/remote XTI device file name from @var{devspec}.
+@end table
+
+The request and response sizes will be the buffer sizes posted to send and
+receive.
+
+@node SCTPIPV6_RR
+@subsubsection SCTP IPv6 Request/Response Performance
+@teindex SCTPIPV6_RR
+@cindex Tests Request/Response SCTP IPv6 Sockets
+
+@node TCPIPV6_RR
+@subsubsection TCP IPv6 Request/Response Performance
+@teindex TCPIPV6_RR
+@cindex Tests Request/Response TCP IPv6 Sockets
+
+@node UDPIPV6_RR
+@subsubsection UDP IPv6 Request/Response Performance
+@teindex UDPIPV6_RR
+@cindex Tests Request/Response UDP IPv6 Sockets
+
+@node DLCO_RR
+@subsubsection DLPI Connection Oriented Request/Response Performance
+@teindex DLCO_RR
+@cindex Tests Request/Response CO DLPI
+
+@node DLCL_RR
+@subsubsection DLPI Connectionless Request/Response Performance
+@teindex DLCL_RR
+@cindex Tests Request/Response CL DLPI
+
+@node STREAM_RR
+@subsubsection Unix Domain Stream Socket Request/Response Performance
+@teindex STREAM_RR
+@cindex Tests Request/Response CO UNIX Sockets
+
+@node DG_RR
+@subsubsection Unix Domain Datagram  Socket Request/Response Performance
+@teindex DG_RR
+@cindex Tests Request/Response CL UNIX Sockets
+
+@node LWPSTR_RR
+@subsubsection Unix Domain Stream Socket Request/Response Light-Weight Process Performance
+@teindex LWPSTR_RR
+@cindex Tests Request/Response CO UNIX LWP Sockets
+
+@node LWPDG_RR
+@subsubsection Unix Domain Datagram Socket Request/Response Light-Weight Process Performance
+@teindex LWPDG_RR
+@cindex Tests Request/Response CL UNIX LWP Sockets
+
+@node FORE_RR
+@subsubsection Fore ATM API Request/Response Performance
+@teindex FORE_RR
+@cindex Tests Request/Response ATM FORE
+
+@node Global Options
+@section Global Options
+@cindex Options Test Global
+
+@node Test Options
+@section Test Options
+@cindex Options Test Specific
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include texi/install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node GPL
+@appendix GPL
+@cindex license GPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/gpl.texi
+
+@node LGPL
+@appendix LGPL
+@cindex license LGPL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/lesser.texi
+
+@node FDL
+@appendix FDL
+@cindex license FDL
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+@include texi/fdl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@appendix Indices
+@cindex indices
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Author Index::		Index of Authors
+@end menu
+
+@node Concept Index
+@appendixsec Index of Concepts
+@printindex cp
+
+@node Type Index
+@appendixsec Index of Data Types
+@printindex tp
+
+@node Function Index
+@appendixsec Index of Functions and Macros
+@printindex fn
+
+@node Variable Index
+@appendixsec Index of Variables and Constants
+@printindex vr
+
+@node Test Index
+@appendixsec Index of Tests
+@printindex te
+
+@node File Index
+@appendixsec Index of Files and Programs
+@printindex pg
+
+@node Option Index
+@appendixsec Index of Configuration Options
+@printindex op
+
+@node Author Index
+@appendixsec Index of Authors
+@printindex au
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+@c ============================================================================

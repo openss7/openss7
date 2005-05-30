@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2005/05/30 00:14:06 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.32 $) $Date: 2005/05/30 14:25:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/30 00:14:06 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 14:25:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,7 @@
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  1
+%global BUILD_test    0
 %global BUILD_lis     1
 %global BUILD_lfs     0
 
@@ -149,6 +150,7 @@
 %global FILES_libs          1
 %global FILES_nolibs        1
 %global FILES_tools         1
+%global FILES_test          %{BUILD_test}
 %global FILES_doc           1
 %global FILES_doclibs       1
 %global FILES_source        %{BUILD_source}
@@ -156,6 +158,7 @@
 %global FILES_libs          0
 %global FILES_nolibs        0
 %global FILES_tools         0
+%global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
@@ -172,6 +175,7 @@
 
 %if %{BUILD_noarch}
 %else
+%global FILES_test          0
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
@@ -385,11 +389,6 @@ make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
     %{!?_enable_debug_packages: install-strip} \
     %{?_enable_debug_packages: install}
 
-# because we don't have the info files in a conditional subdirectory,
-# we have problems with netperf.info being installed on indep builds
-@PKG_BUILD_INDEP_FALSE@make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
-@PKG_BUILD_INDEP_FALSE@    uninstall-info
-
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
 
@@ -484,6 +483,33 @@ fi
 %endif
 
 # ===========================================================================
+%package test
+
+Summary:        %{title} test utilities.
+Group:          System Environment/Base
+Prefix:         %{_libexecdir}/%{name}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Obsoletes:      %{name}-tests
+#Conflicts:      %{_conflict}-test
+Autoreq:        true
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description test
+The %{name}-test package provides testsuites used for troubleshooting
+the %{title} package.
+
+%if %{FILES_test}
+%files test
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libexecdir}/%{name}/atlocal
+%{_libexecdir}/%{name}/testsuite*
+%endif
+
+# ===========================================================================
 %package doc
 
 Summary:        %{title} manpages, manuals and docs.
@@ -541,8 +567,8 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #doc ABOUT-NLS
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
-%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes %{name}.pdf %{name}.html
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS manual
+%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -554,8 +580,8 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
-%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes %{name}.pdf %{name}.html
+%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS manual
+%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
 %doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
@@ -594,12 +620,21 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.30  2005/05/30 00:14:06  brian
-# - address included info file issues
+# Revision 1.1.2.32  2005/05/30 14:25:50  brian
+# - packaged standalong test suites
 #
-# Revision 1.1.2.29  2005/05/29 11:28:36  brian
-# - better approach to mostlyclean
-#
+
+* Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.31  2005/05/30 08:44:00  brian
+- moved documentation for RHEL4 build
+
+* Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.30  2005/05/30 00:14:06  brian
+- address included info file issues
+
+* Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.29  2005/05/29 11:28:36  brian
+- better approach to mostlyclean
 
 * Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.28  2005/05/29 07:49:30  brian

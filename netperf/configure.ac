@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.12 $) $Date: 2005/03/09 08:00:23 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.2.13 $) $Date: 2005/05/30 08:44:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/09 08:00:23 $ by $Author: brian $
+# Last Modified $Date: 2005/05/30 08:44:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -158,7 +158,10 @@ AC_CHECK_FUNCS([pstat kstat perfstat sysctl])
 
 AC_NETPERF
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+		 manual/Makefile
+		 manual/texi/args.texi
+		 scripts/texi/args.texi])
 
 AC_OUTPUT
 
