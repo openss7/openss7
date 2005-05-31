@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.39 $) $Date: 2005/05/30 14:25:49 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.40 $) $Date: 2005/05/31 05:10:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/30 14:25:49 $ by $Author: brian $
+# Last Modified $Date: 2005/05/31 05:10:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -663,9 +663,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.39  2005/05/30 14:25:49  brian
-# - packaged standalong test suites
+# Revision 1.1.2.40  2005/05/31 05:10:39  brian
+# - correct case on modutildir filename
 #
+
+* Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.39  2005/05/30 14:25:49  brian
+- packaged standalong test suites
 
 * Sun May 29 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.38  2005/05/29 11:28:29  brian
