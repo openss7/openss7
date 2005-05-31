@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/05/30 19:44:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strtst.c,v $
+ Revision 1.1.1.5.4.6  2005/05/30 19:44:15  brian
+ - tried a little harder to test the band test to run consistently
+
+ Revision 1.1.1.5.4.5  2005/05/30 19:07:27  brian
+ - The band test did not take into account that there were double queues so I
+   placed delay at the half-way read point to allow one queue to backenable the
+   other internally and run its service procedure before reading further.  The
+   test was failing because all band 2 messages were read while some were
+   stacked a queue before and two band 1 messages are on the queue.  Thus a
+   band 1 message was read between band 2 messages and the script thought that
+   the test was failing.  This is rather synthetic because it uses knowledge of
+   the underlying implementation (2 queues instead of 1).
+
+ Revision 1.1.1.5.4.4  2005/05/14 08:35:12  brian
+ - copyright header correction
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $";
 
 
 /*
