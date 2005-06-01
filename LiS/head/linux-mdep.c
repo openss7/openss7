@@ -1130,7 +1130,7 @@ static void lis_cdev_put(struct dentry *d)
 	if (inode && inode->i_cdev)
 	    printk(">> i->i_cdev: c@0x%p/%d/%x \"%s\"\n",
 		inode->i_cdev,
-#if HAVE_KINC_LINUX_KREF_H
+#if HAVE_KMEMB_STRUCT_KOBJECT_KREF
 		K_ATOMIC_READ(&inode->i_cdev->kobj.kref.refcount),
 #else
 		K_ATOMIC_READ(&inode->i_cdev->kobj.refcount),

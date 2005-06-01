@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/29 09:39:37 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/01 02:42:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/29 09:39:37 $ by $Author: brian $
+# Last Modified $Date: 2005/06/01 02:42:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/29 09:39:37 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/01 02:42:27 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -618,7 +618,7 @@ _ACEOF
     eval "syms=\"\$mod_${token}_undefs\""
     for sym in $syms ; do
 	eval "crc=\"\$sym_${sym}_crc\""
-	test :"$crc" != : || { command_error "symbol $sym remains unresolved" ; continue ; }
+	test :"$crc" != : || { command_warn "symbol $sym has no version" ; continue ; }
 	printf "\t{ 0x%08x, \"%s\" },\n" $crc $sym
 	case " $(eval '$ECHO "$mod_'${token}'_deps"') " in
 	    (*" `eval '$ECHO "$sym_'${sym}'_name"'` "*) ;;

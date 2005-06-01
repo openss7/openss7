@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.21 $) $Date: 2005/05/13 03:54:28 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.22 $) $Date: 2005/06/01 02:42:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:28 $ by $Author: brian $
+# Last Modified $Date: 2005/06/01 02:42:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -542,7 +542,8 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			  struct file_system_type.read_super,
 			  struct file_system_type.get_sb,
 			  struct super_operations.read_inode2,
-			  struct kstatfs.f_type], [:], [:], [
+			  struct kstatfs.f_type,
+			  struct kobject.kref], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
