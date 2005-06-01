@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.94 $) $Date: 2005/05/15 23:56:12 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/06/01 10:46:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/15 23:56:12 $ by $Author: brian $
+# Last Modified $Date: 2005/06/01 10:46:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -691,6 +691,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 	    eval "k_build_search_path=\"
 		${kmoduledir:+${DESTDIR}${kmoduledir}/build}
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/build
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}${rootdir}/usr/src/linux-obj
@@ -702,6 +703,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/build
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}
 		${DESTDIR}/usr/src/linux-obj
@@ -806,6 +808,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}${rootdir}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}${rootdir}/usr/src/linux
 		${DESTDIR}${rootdir}/lib/modules/${kversion}/source
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}
 		${DESTDIR}/usr/src/kernel-source-${knumber}
 		${DESTDIR}/usr/src/linux-${kversion}
@@ -814,6 +817,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}/usr/src/linux
 		${DESTDIR}/lib/modules/${kversion}/source
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}
 		${DESTDIR}/usr/src/kernels/${kversion}\""
 	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
 	    linux_cv_k_source=
@@ -858,10 +862,14 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 	    linux_cv_k_modver="$with_k_modver"
 	else
 	    eval "k_modver_search_path=\"
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.symvers
 		${kbuilddir}/Module.symvers-${kversion}
 		${kbuilddir}/Module.symvers
 		${DESTDIR}${rootdir}/boot/Module.symvers-${kversion}
 		${DESTDIR}${rootdir}/boot/Module.symvers
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
+		${DESTDIR}/usr/src/kernels/${kversion}/Module.symvers
 		${DESTDIR}/boot/Module.symvers-${kversion}
 		${DESTDIR}/boot/Module.symvers\""
 	    k_modver_search_path=`echo "$k_modver_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
@@ -897,6 +905,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 	    if test ":$linux_cv_k_running" != :yes
 	    then
 		case "$linux_cv_k_modver" in
+		    (*/usr/src/kernels/*)
+			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
 			    (mandrake)
@@ -992,6 +1002,8 @@ dnl
 	    if test :$linux_cv_k_running != :yes
 	    then
 		case "$linux_cv_k_sysmap" in
+		    (*/usr/src/kernels/*)
+			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
 			    (mandrake)
@@ -1354,13 +1366,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
 		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
-		    ${kbuilddir}/.config
+		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
+		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
 		    ${DESTDIR}${rootdir}/boot/config-${kversion}
 		    ${DESTDIR}${rootdir}/boot/config
+		    ${kbuilddir}/.config
 		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
+		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
@@ -1371,11 +1387,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
 		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
-		    ${kbuilddir}/.config
+		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
+		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
+		    ${kbuilddir}/.config
 		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
+		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
 		    ${DESTDIR}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}/usr/src/linux-obj/.config
@@ -1418,7 +1438,7 @@ dnl
 *** ])
 	else
 	    case "$linux_cv_k_config" in
-		(*/configs/*|*/arch/*/defconf*|*/kernel-headers-*)
+		(*/configs/*|*/arch/*/defconf*|*/kernel-headers-*|*/usr/src/kernels/*)
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    AC_MSG_WARN([
