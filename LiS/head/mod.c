@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/04/12 22:45:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/04/12 22:45:00 $"
 
 /*                               -*- Mode: C -*- 
  * mod.c --- module mgmt
@@ -546,7 +546,7 @@ static int apush_validate(autopush_list_t *list)
 	for (i = 0; i < list->npush; ++i) {
 		modID_t mod = list->mod[i];
 
-		if (lis_fmod_sw[mod].f_str != NULL)
+		if (lis_fmod_sw[mod].f_state & LIS_MODSTATE_INITED)
 			continue; /* registered */
 		return -1; /* not registered or configured */
 	}
@@ -797,10 +797,10 @@ lis_register_module_qlock_option(modID_t id, int qlock_option)
 static int _RP unregister_module(fmodsw_t *slot)
 {
     modID_t id;
-    int err;
+    int	    err;
     char    name[LIS_NAMESZ + 1];
 
-    if (slot->f_str == NULL)
+    if (!(slot->f_state & LIS_MODSTATE_INITED))
 	return(0) ;			/* already done */
 
     if (slot->f_count)
@@ -915,9 +915,9 @@ lis_findmod(const char *name)
     /* Look for the module */
     for (id = lis_fmodcnt; id > 0; id--)
 	if (!strcmp(lis_fmod_sw[id].f_name, name))
-	    return id; /* found it */
+	    break ;
 
-    return LIS_NULL_MID;
+    return (id > 0 ? id : LIS_NULL_MID);
 } /* lis_findmod */
 
 /*  -------------------------------------------------------------------  */
@@ -1498,6 +1498,11 @@ void lis_init_mod(void)
 		 */
 		strncpy(lis_fmod_sw[modid].f_objname,
 			lis_module_config[i].cnf_objname, LIS_NAMESZ) ;
+		lis_fmod_sw[i].f_state &= ~LIS_MODSTATE_MASK ;
+		if (lis_fmod_sw[modid].f_objname[0])
+		    lis_fmod_sw[modid].f_state |= LIS_MODSTATE_UNLOADED ;
+		else
+		    lis_fmod_sw[modid].f_state |= LIS_MODSTATE_LINKED ;
 	}
 
 	for (i = 0; i < DRV_CONFIG_SIZE; ++i)
