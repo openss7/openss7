@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/01 02:42:27 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/02 03:05:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/01 02:42:27 $ by $Author: brian $
+# Last Modified $Date: 2005/06/02 03:05:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/01 02:42:27 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/02 03:05:12 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -606,6 +606,7 @@ _ACEOF
 # if modversions is not set.
 #
 add_versions() {
+    test :$modversions = :y || return
     name="$1"
     token=`echo "$name" | $modpost_tokenize`
     cat<<_ACEOF

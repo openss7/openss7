@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.98 $) $Date: 2005/06/01 10:46:59 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/06/02 03:05:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/01 10:46:59 $ by $Author: brian $
+# Last Modified $Date: 2005/06/02 03:05:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,6 +148,8 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_BOOT
     _LINUX_CHECK_KERNEL_BUILDDIR
     _LINUX_CHECK_KERNEL_SRCDIR
+    _LINUX_CHECK_KERNEL_VERSIONS
+    _LINUX_CHECK_KERNEL_MODVERSIONS
     _LINUX_CHECK_KERNEL_MODVER
     _LINUX_CHECK_KERNEL_SYSMAP
     _LINUX_CHECK_KERNEL_KSYMS
@@ -889,7 +891,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 	then
 	    if test ":${linux_cv_k_ko_modules:-no}" != :no
 	    then
-		AC_MSG_WARN([
+		if test ":${linux_cv_k_versions}" != :no -a ":${linux_cv_k_modversions}" != :no
+		then
+		    AC_MSG_WARN([
 *** 
 *** Configure could not find the module versions file for kernel version
 *** "$kversion".  The locations searched were:
@@ -900,6 +904,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 *** your kernel's module versions file with option --with-k-modver before
 *** repeating.
 *** ])
+		fi
 	    fi
 	else
 	    if test ":$linux_cv_k_running" != :yes
