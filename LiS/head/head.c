@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.3 $) $Date: 2005/04/12 22:44:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:44:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.3 $) $Date: 2005/04/12 22:44:59 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.10 2003/11/23 19:58:44 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.3 2005/04/12 22:44:59 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -2008,6 +2008,9 @@ int lis_await_qsched(stdata_t *hd, queue_t *q)
     queue_t	*rq ;
     queue_t	*wq ;
     lis_semaphore_t	wakeup_sem ;
+
+    if (q == NULL)
+	return(0);   /* stupid pipe bugs dave added */
 
     wq = WR(q);
     rq = RD(q) ;

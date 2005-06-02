@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/19 20:49:28 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/19 20:49:28 $ by $Author: brian $
+ Last Modified $Date: 2005/06/02 09:57:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.9  2005/06/02 09:57:45  brian
+ - a few corrections to upgraded test suites
+
  Revision 0.9.2.8  2005/05/19 20:49:28  brian
  - upgrading test suites
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/19 20:49:28 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/19 20:49:28 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -1101,9 +1104,9 @@ void print_close(int child)
 void print_preamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+  +---------Preamble--------------+                    \n",
-		"                    +  +---------Preamble--------------+--------------------\n",
-		"                    +--+---------Preamble--------------+                    \n",
+		"--------------------+  +----------Preamble--------------+                   \n",
+		"                    +  +----------Preamble--------------+-------------------\n",
+		"                    +--+----------Preamble--------------+                   \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
@@ -1112,9 +1115,9 @@ void print_preamble(int child)
 void print_inconclusive(int child)
 {
 	static const char *msgs[] = {
-		"???????????????????\?|  |?????\? INCONCLUSIVE ???????\???\?|                    [%d]\n",
-		"                    |  |?????\? INCONCLUSIVE ???????\???\?|???????????????????\?[%d]\n",
-		"                    |??|?????\? INCONCLUSIVE ???????\?|?\?|                    [%d]\n",
+		"????????????????????|  |??????? INCONCLUSIVE ???????????|                   [%d]\n",
+		"                    |  |??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
+		"                    |??|??????? INCONCLUSIVE ???????????|                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
@@ -1123,9 +1126,9 @@ void print_inconclusive(int child)
 void print_test(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+  +-----------Test----------------+                    \n",
-		"                    +  +-----------Test----------------+--------------------\n",
-		"                    +--+-----------Test----------------+                    \n",
+		"--------------------+  +------------Test----------------+                   \n",
+		"                    +  +------------Test----------------+-------------------\n",
+		"                    +--+------------Test----------------+                   \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
@@ -1134,9 +1137,9 @@ void print_test(int child)
 void print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d]\n",
-		"                    |  |XXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXXX[%d]\n",
-		"                    |XX|XXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
+		"                    |  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX[%d]\n",
+		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
@@ -1145,9 +1148,9 @@ void print_failed(int child)
 void print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|  |####### SCRIPT ERROR ##########|                    [%d]\n",
-		"                    |  |####### SCRIPT ERROR ###########|###################[%d]\n",
-		"                    |##|####### SCRIPT ERROR ##########|                    [%d]\n",
+		"####################|  |######## SCRIPT ERROR ##########|                   [%d]\n",
+		"                    |  |######## SCRIPT ERROR ##########|###################[%d]\n",
+		"                    |##|######## SCRIPT ERROR ##########|                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
@@ -1156,9 +1159,9 @@ void print_script_error(int child)
 void print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|  |********* PASSED **************|                    [%d]\n",
-		"                    |  |********* PASSED **************|********************[%d]\n",
-		"                    |**|********* PASSED **************|                    [%d]\n",
+		"********************|  |********** PASSED **************|                   [%d]\n",
+		"                    |  |********** PASSED **************|*******************[%d]\n",
+		"                    |**|********** PASSED **************|                   [%d]\n",
 	};
 	if (verbose > 2)
 		print_simple_int(child, msgs, state);
@@ -1167,9 +1170,9 @@ void print_passed(int child)
 void print_postamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+  +----------Postamble------------+                    \n",
-		"                    +  +----------Postamble------------+--------------------\n",
-		"                    +--+---------Postamble-------------+                    \n",
+		"--------------------+  +----------Postamble-------------+                   \n",
+		"                    +  +----------Postamble-------------+-------------------\n",
+		"                    +--+----------Postamble-------------+                   \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
@@ -1178,9 +1181,9 @@ void print_postamble(int child)
 void print_test_end(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+  +-------------------------------+                    \n",
-		"                    +  +-------------------------------+--------------------\n",
-		"                    +--+-------------------------------+                    \n",
+		"--------------------+  +--------------------------------+                   \n",
+		"                    +  +--------------------------------+-------------------\n",
+		"                    +--+--------------------------------+                   \n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
@@ -1189,9 +1192,9 @@ void print_test_end(int child)
 void print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@ TERMINATED @@@@@@@@@@@@@|                   {%d}\n",
-		"                    |  |@@@@@@@ TERMINATED @@@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
-		"                    |@@@@@@@@@@ TERMINATED @@@@@@@@@@@@@|                   {%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                   {%d}\n",
+		"                    |  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
+		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|                   {%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
@@ -1200,9 +1203,9 @@ void print_terminated(int child, int signal)
 void print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&& STOPPED &&&&&&&&&&&&&&&&|                   {%d}\n",
-		"                    |  |&&&&&&& STOPPED &&&&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
-		"                    |&&&&&&&&&& STOPPED &&&&&&&&&&&&&&&&|                   {%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
+		"                    |  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
+		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
@@ -1212,7 +1215,7 @@ void print_timeout(int child)
 {
 	static const char *msgs[] = {
 		"++++++++++++++++++++|  |+++++++++ TIMEOUT! +++++++++++++|                   [%d]\n",
-		"                    |  |+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++[%d]\n",
+		"                    |  |+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++[%d]\n",
 		"                    |++|+++++++++ TIMEOUT! +++++++++++++|                   [%d]\n",
 		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++[%d]\n",
 	};
@@ -1369,7 +1372,7 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 		union T_primitives *p = (typeof(p)) ctrl->buf;
 		print_tx_prim(child, prim_string(p->type));
 	}
-	if (band) {
+	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
@@ -2594,7 +2597,7 @@ int wait_event(int child, int wait)
 			last_event = __EVENT_TIMEOUT;
 			return time_event(__EVENT_TIMEOUT);
 		}
-		if (verbose > 3) {
+		if (verbose > 4) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "polling %d:\n", child);
 			fflush(stdout);
@@ -2620,7 +2623,7 @@ int wait_event(int child, int wait)
 				char dbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, dbuf };
-				if (verbose > 3) {
+				if (verbose > 4) {
 					lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "getmsg from %d:\n", child);
 					fflush(stdout);
@@ -3131,6 +3134,8 @@ static int test_2_2_bot(int child, int signal, int expect)
 	if (get_event(child) != signal)
 		return (__RESULT_FAILURE);
 	state++;
+	last_t_errno = TSYSERR;
+	last_errno = EPROTO;
 	if (do_signal(child, expect) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/04/12 22:45:00 $
+ @(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/06/01 20:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:00 $ by $Author: brian $
+ Last Modified $Date: 2005/06/01 20:21:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/04/12 22:45:00 $"
+#ident "@(#) $RCSfile: mod.c,v $ $Name:  $($Revision: 1.1.1.5.4.5 $) $Date: 2005/06/01 20:21:19 $"
 
 /*                               -*- Mode: C -*- 
  * mod.c --- module mgmt
@@ -433,6 +433,7 @@ int find_empty_mod_index(const char *name)
 	    printk("No available module number for \"%s\"\n", name) ;
 	    return LIS_NULL_MID;
 	}
+	initialize_module(id, name, LIS_MODSTATE_UNKNOWN);
 	lis_fmodcnt++;
     }
 

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: streams.8.man,v 1.1.4.2 2005/03/30 14:46:28 brian Exp $
+.\" @(#) $Id: streams.8.man,v 1.1.4.3 2005/06/02 09:58:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/03/30 14:46:28 $ by $Author: brian $
+.\" Last Modified $Date: 2005/06/02 09:58:51 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -80,22 +80,195 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
+\fBstreams\fR [\fIcommand\fR]
+.HP 12
 \fBstreams\fR [\fIoptions\fR]
 .HP 12
-\fBstreams\fR {\fB-h\fR|\fB--help\fR}
+\fBstreams\fR {\fB-h\fR,\fB--help\fR}
 .HP 12
-\fBstreams\fR {\fB-V\fR|\fB--version\fR}
+\fBstreams\fR {\fB-V\fR,\fB--version\fR}
 .HP 12
-\fBstreams\fR {\fB-C\fR|\fB--copying\fR}
+\fBstreams\fR {\fB--copying\fR}
 .PD
-.\"
-.\"
-.SH OPTIONS
-none
 .\"
 .\"
 .SH DESCRIPTION
 This manpage is under construction.
+.\"
+.\"
+.SH COMANDS
+.PP
+.TP
+.B start
+starts the
+.I STREAMS
+subsystem
+.TP
+.B stop
+stops the
+.I STREAMS
+subsystem
+.TP
+.B status
+reports the status of the
+.I STREAMS
+subsystem
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-c\fR, \fB--maxmsg\fR [\fIKBYTES\fR]
+print or set the maximum message memory usage for LiS.  The default value is zero.
+.TP
+\fB-C\fR, \fB--maxmem\fR \fIKBYTES\fR
+print or set the maximum memory usage for LiS.  The default value is zero.
+.TP
+\fB-s\fR, \fB--memstats\fR
+prints the
+.I STREAMS
+memory statistics.
+.TP
+\fB-S\fR, \fB--qrunstats\fR
+prints the
+.I STREAMS
+queue run statistics.
+.TP
+\fB-t\fR, \fB--timestats\fR
+prints the
+.I STREAMS
+timing statistics.
+.TP
+\fB-m\fR, \fB--dumpmem\fR
+dumps
+.I STREAMS
+memory allocation to the syslog file.
+.TP
+\fB-p\fR, \fB--dumpspl\fR
+dumps SPL trace buffer to the syslog file.
+.TP
+\fB-q\fR, \fB--dumpqueues\fR
+dumps all queues to the syslog file.
+.TP
+\fB-d\fR, \fB--debug1\fR \fIMASK\fR
+sets the first debug mask.  The default
+.I MASK
+is zero.
+.I MASK
+is a value representing a bitwise OR of any of the following values:
+.RS
+.PP
+.TS
+tab(:);
+rllsss.
+0x00000001:OPEN:T{
+T}
+0x00000002:CLOSE:T{
+T}
+0x00000004:READ:T{
+T}
+0x00000008:WRITE:T{
+T}
+0x00000010:IOCTL:T{
+T}
+0x00000020:PUTNEXT:T{
+T}
+0x00000040:STRRPUT:T{
+T}
+0x00000080:SIG:T{
+T}
+0x00000100:PUTMSG:T{
+T}
+0x00000200:GETMSG:T{
+T}
+0x00000400:POLL:T{
+T}
+0x00000800:LINK:T{
+T}
+0x00001000:MEAS_TIME:T{
+T}
+0x00002000:MEM_LEAK:T{
+T}
+0x00004000:FLUSH:T{
+T}
+0x00008000:FATTACH:T{
+T}
+0x00010000:SAFE:T{
+T}
+0x00020000:TRCE_MSG:T{
+T}
+0x00040000:CLEAN_MSG:T{
+T}
+0x00080000:SPL_TRACE:T{
+T}
+0x00100000:MP_ALLOC:T{
+T}
+0x00200000:MP_FREEMSG:T{
+T}
+0x00400000:MALLOC:T{
+T}
+0x00800000:MONITOR_MEM:T{
+T}
+0x01000000:DMP_QUEUE:T{
+T}
+0x02000000:DMP_MBLK:T{
+T}
+0x04000000:DMP_DBLK:T{
+T}
+0x08000000:DMP_STRHD:T{
+T}
+0x10000000:VOPEN:T{
+T}
+0x20000000:VCLOSE:T{
+T}
+0x40000000:-:T{
+T}
+0x80000000:ADDRS:T{
+T}
+.TE
+.RE
+.TP
+\fB-D\fR, \fB--debug2\fR \fIMASK2\fR
+sets the second debug mask.  The default
+.I MASK2
+is zero.
+.I MASK2
+is a value representing a bitwise OR of any of the following values:
+.RS
+.PP
+.TS
+tab(:);
+rllsss.
+0x00000001:SNDFD:T{
+T}
+0x00000002:CP:T{
+T}
+0x00000004:CACHE:T{
+T}
+.TE
+.RE
+.TP
+\fB-\fI<FLAG>\fR, \fB--\fI<FLAG>\fR
+sets a debug flag, where
+.I <FLAG>
+is one of the symbolic
+.B --debug1
+or
+.B --debug2
+flag names listed above.  These options can occur multiples times.  Multiple flags are effectively OR'ed
+together.
+.TP
+\fB-Q\fR, \fB--quiet\fR
+suppresses normal output.
+.TP
+\fB-h\fR, \fB--help\fR, \fB-H\fR (obsolete)
+print usage information and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+print version and exit.
+.TP
+\fB--copying\fR
+print copying permissions and exit.
 .\"
 .\"
 .SH DIAGNOSTICS
