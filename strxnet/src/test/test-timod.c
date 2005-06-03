@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/02 09:57:45 $ by $Author: brian $
+ Last Modified $Date: 2005/06/03 12:19:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.10  2005/06/03 12:19:16  brian
+ - more upgrading of test suites
+
  Revision 0.9.2.9  2005/06/02 09:57:45  brian
  - a few corrections to upgraded test suites
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/02 09:57:45 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -165,6 +168,10 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
 #include <getopt.h>
 #endif
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #define NEED_T_USCALAR_T
 
 #include <xti.h>
@@ -208,6 +215,7 @@ static int last_provflag = T_SENDZERO | T_ORDRELDATA | T_XPG4_1;
 static int last_tstate = TS_UNBND;
 
 static int MORE_flag = 0;
+static int DATA_flag = T_ODF_EX | T_ODF_MORE;
 
 int test_fd[3] = { 0, 0, 0 };
 
@@ -231,6 +239,10 @@ static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
 static int test_bufsize = 256;
 static int test_tidu = 256;
+static int test_mgmtflags = T_NEGOTIATE;
+static struct sockaddr_in *test_addr = NULL;
+static char *test_data = NULL;
+static int test_resfd = -1;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -489,6 +501,58 @@ static int stop_tt(void)
 	sigprocmask(SIG_BLOCK, &mask, NULL);
 	return __RESULT_SUCCESS;
 }
+
+/* 
+ *  Addresses
+ */
+
+/* 
+ *  Options
+ */
+
+/*
+ * data options 
+ */
+struct {
+	struct t_opthdr xti_hdr __attribute__ ((packed));
+	t_scalar_t xti_val __attribute__ ((packed));
+} opt_data = {
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+};
+
+/*
+ * connect options 
+ */
+struct {
+	struct t_opthdr xti_hdr __attribute__ ((packed));
+	t_scalar_t xti_val __attribute__ ((packed));
+} opt_conn = {
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+};
+
+/*
+ * management options 
+ */
+struct {
+	struct t_opthdr xti_hdr __attribute__ ((packed));
+	t_scalar_t xti_val __attribute__ ((packed));
+} opt_optm = {
+	{
+	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+};
+
+#if 1
+typeof(opt_data) *test_opt_data = NULL;
+typeof(opt_conn) *test_opt_conn = NULL;
+typeof(opt_optm) *test_opt_optm = NULL;
+#endif
+#if 0
+typeof(opt_data) *test_opt_data = &opt_data;
+typeof(opt_conn) *test_opt_conn = &opt_conn;
+typeof(opt_optm) *test_opt_optm = &opt_optm;
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -756,6 +820,76 @@ char *errno_string(long err)
 	}
 }
 
+char *terrno_string(ulong terr, long uerr)
+{
+	switch (terr) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(uerr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		return buf;
+	}
+	}
+}
+
 const char *event_string(int event)
 {
 	switch (event) {
@@ -775,6 +909,68 @@ const char *event_string(int event)
 		return ("SUCCESS");
 	case __RESULT_FAILURE:
 		return ("FAILURE");
+	case __TEST_CONN_REQ:
+		return ("T_CONN_REQ");
+	case __TEST_CONN_RES:
+		return ("T_CONN_RES");
+	case __TEST_DISCON_REQ:
+		return ("T_DISCON_REQ");
+	case __TEST_DATA_REQ:
+		return ("T_DATA_REQ");
+	case __TEST_EXDATA_REQ:
+		return ("T_EXDATA_REQ");
+	case __TEST_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ");
+	case __TEST_INFO_REQ:
+		return ("T_INFO_REQ");
+	case __TEST_BIND_REQ:
+		return ("T_BIND_REQ");
+	case __TEST_UNBIND_REQ:
+		return ("T_UNBIND_REQ");
+	case __TEST_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ");
+	case __TEST_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ");
+	case __TEST_ORDREL_REQ:
+		return ("T_ORDREL_REQ");
+	case __TEST_CONN_IND:
+		return ("T_CONN_IND");
+	case __TEST_CONN_CON:
+		return ("T_CONN_CON");
+	case __TEST_DISCON_IND:
+		return ("T_DISCON_IND");
+	case __TEST_DATA_IND:
+		return ("T_DATA_IND");
+	case __TEST_EXDATA_IND:
+		return ("T_EXDATA_IND");
+	case __TEST_NRM_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_EXP_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_INFO_ACK:
+		return ("T_INFO_ACK");
+	case __TEST_BIND_ACK:
+		return ("T_BIND_ACK");
+	case __TEST_ERROR_ACK:
+		return ("T_ERROR_ACK");
+	case __TEST_OK_ACK:
+		return ("T_OK_ACK");
+	case __TEST_UNITDATA_IND:
+		return ("T_UNITDATA_IND");
+	case __TEST_UDERROR_IND:
+		return ("T_UDERROR_IND");
+	case __TEST_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK");
+	case __TEST_ORDREL_IND:
+		return ("T_ORDREL_IND");
+	case __TEST_ADDR_REQ:
+		return ("T_ADDR_REQ");
+	case __TEST_ADDR_ACK:
+		return ("T_ADDR_ACK");
+	case __TEST_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case __TEST_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
 	default:
 		return ("(unexpected");
 	}
@@ -943,6 +1139,502 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	}
 }
 
+const char *state_string(ulong state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WRES_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
+
+void print_addr(char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	if (add_len) {
+		if (add_len != sizeof(*a))
+			printf("Aaarrg! add_len = %d, ", add_len);
+		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	} else
+		printf("(no address)");
+	printf("\n");
+}
+
+char *addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	if (add_len) {
+		if (add_len != sizeof(*a))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
+		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+
+char *status_string(struct t_opthdr *oh)
+{
+	switch (oh->status) {
+	case 0:
+		return (NULL);
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	default:
+		return ("(unknown status)");
+	}
+}
+
+char *level_string(struct t_opthdr *oh)
+{
+	switch (oh->level) {
+	case XTI_GENERIC:
+		return ("XTI_GENERIC");
+#if 0
+	case T_INET_IP:
+		return ("T_INET_IP");
+	case T_INET_UDP:
+		return ("T_INET_UDP");
+	case T_INET_TCP:
+		return ("T_INET_TCP");
+	case T_INET_SCTP:
+		return ("T_INET_SCTP");
+#endif
+	default:
+		return ("(unknown level)");
+	}
+}
+
+char *name_string(struct t_opthdr *oh)
+{
+	if (oh->name == T_ALLOPT)
+		return ("T_ALLOPT");
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			return ("XTI_DEBUG");
+		case XTI_LINGER:
+			return ("XTI_LINGER");
+		case XTI_RCVBUF:
+			return ("XTI_RCVBUF");
+		case XTI_RCVLOWAT:
+			return ("XTI_RCVLOWAT");
+		case XTI_SNDBUF:
+			return ("XTI_SNDBUF");
+		case XTI_SNDLOWAT:
+			return ("XTI_SNDLOWAT");
+		}
+		break;
+#if 0
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			return ("T_IP_OPTIONS");
+		case T_IP_TOS:
+			return ("T_IP_TOS");
+		case T_IP_TTL:
+			return ("T_IP_TTL");
+		case T_IP_REUSEADDR:
+			return ("T_IP_REUSEADDR");
+		case T_IP_DONTROUTE:
+			return ("T_IP_DONTROUTE");
+		case T_IP_BROADCAST:
+			return ("T_IP_BROADCAST");
+		case T_IP_ADDR:
+			return ("T_IP_ADDR");
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return ("T_UDP_CHECKSUM");
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return ("T_TCP_NODELAY");
+		case T_TCP_MAXSEG:
+			return ("T_TCP_MAXSEG");
+		case T_TCP_KEEPALIVE:
+			return ("T_TCP_KEEPALIVE");
+		case T_TCP_CORK:
+			return ("T_TCP_CORK");
+		case T_TCP_KEEPIDLE:
+			return ("T_TCP_KEEPIDLE");
+		case T_TCP_KEEPINTVL:
+			return ("T_TCP_KEEPINTVL");
+		case T_TCP_KEEPCNT:
+			return ("T_TCP_KEEPCNT");
+		case T_TCP_SYNCNT:
+			return ("T_TCP_SYNCNT");
+		case T_TCP_LINGER2:
+			return ("T_TCP_LINGER2");
+		case T_TCP_DEFER_ACCEPT:
+			return ("T_TCP_DEFER_ACCEPT");
+		case T_TCP_WINDOW_CLAMP:
+			return ("T_TCP_WINDOW_CLAMP");
+		case T_TCP_INFO:
+			return ("T_TCP_INFO");
+		case T_TCP_QUICKACK:
+			return ("T_TCP_QUICKACK");
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return ("T_SCTP_NODELAY");
+		case T_SCTP_CORK:
+			return ("T_SCTP_CORK");
+		case T_SCTP_PPI:
+			return ("T_SCTP_PPI");
+		case T_SCTP_SID:
+			return ("T_SCTP_SID");
+		case T_SCTP_SSN:
+			return ("T_SCTP_SSN");
+		case T_SCTP_TSN:
+			return ("T_SCTP_TSN");
+		case T_SCTP_RECVOPT:
+			return ("T_SCTP_RECVOPT");
+		case T_SCTP_COOKIE_LIFE:
+			return ("T_SCTP_COOKIE_LIFE");
+		case T_SCTP_SACK_DELAY:
+			return ("T_SCTP_SACK_DELAY");
+		case T_SCTP_PATH_MAX_RETRANS:
+			return ("T_SCTP_PATH_MAX_RETRANS");
+		case T_SCTP_ASSOC_MAX_RETRANS:
+			return ("T_SCTP_ASSOC_MAX_RETRANS");
+		case T_SCTP_MAX_INIT_RETRIES:
+			return ("T_SCTP_MAX_INIT_RETRIES");
+		case T_SCTP_HEARTBEAT_ITVL:
+			return ("T_SCTP_HEARTBEAT_ITVL");
+		case T_SCTP_RTO_INITIAL:
+			return ("T_SCTP_RTO_INITIAL");
+		case T_SCTP_RTO_MIN:
+			return ("T_SCTP_RTO_MIN");
+		case T_SCTP_RTO_MAX:
+			return ("T_SCTP_RTO_MAX");
+		case T_SCTP_OSTREAMS:
+			return ("T_SCTP_OSTREAMS");
+		case T_SCTP_ISTREAMS:
+			return ("T_SCTP_ISTREAMS");
+		case T_SCTP_COOKIE_INC:
+			return ("T_SCTP_COOKIE_INC");
+		case T_SCTP_THROTTLE_ITVL:
+			return ("T_SCTP_THROTTLE_ITVL");
+		case T_SCTP_MAC_TYPE:
+			return ("T_SCTP_MAC_TYPE");
+		case T_SCTP_CKSUM_TYPE:
+			return ("T_SCTP_CKSUM_TYPE");
+		case T_SCTP_ECN:
+			return ("T_SCTP_ECN");
+		case T_SCTP_ALI:
+			return ("T_SCTP_ALI");
+		case T_SCTP_ADD:
+			return ("T_SCTP_ADD");
+		case T_SCTP_SET:
+			return ("T_SCTP_SET");
+		case T_SCTP_ADD_IP:
+			return ("T_SCTP_ADD_IP");
+		case T_SCTP_DEL_IP:
+			return ("T_SCTP_DEL_IP");
+		case T_SCTP_SET_IP:
+			return ("T_SCTP_SET_IP");
+		case T_SCTP_PR:
+			return ("T_SCTP_PR");
+		case T_SCTP_LIFETIME:
+			return ("T_SCTP_LIFETIME");
+		case T_SCTP_DISPOSITION:
+			return ("T_SCTP_DISPOSITION");
+		case T_SCTP_MAX_BURST:
+			return ("T_SCTP_MAX_BURST");
+		case T_SCTP_HB:
+			return ("T_SCTP_HB");
+		case T_SCTP_RTO:
+			return ("T_SCTP_RTO");
+		case T_SCTP_MAXSEG:
+			return ("T_SCTP_MAXSEG");
+		case T_SCTP_STATUS:
+			return ("T_SCTP_STATUS");
+		case T_SCTP_DEBUG:
+			return ("T_SCTP_DEBUG");
+		}
+		break;
+#endif
+	}
+	return ("(unknown name)");
+}
+
+char *yesno_string(struct t_opthdr *oh)
+{
+	switch (*((t_uscalar_t *) T_OPT_DATA(oh))) {
+	case T_YES:
+		return ("T_YES");
+	case T_NO:
+		return ("T_NO");
+	default:
+		return ("(invalid)");
+	}
+}
+
+char *value_string(struct t_opthdr *oh)
+{
+#if 0
+	static char buf[64] = "(invalid)";
+#endif
+	if (oh->len == sizeof(*oh))
+		return (NULL);
+	switch (oh->level) {
+	case XTI_GENERIC:
+		switch (oh->name) {
+		case XTI_DEBUG:
+			break;
+		case XTI_LINGER:
+			break;
+		case XTI_RCVBUF:
+			break;
+		case XTI_RCVLOWAT:
+			break;
+		case XTI_SNDBUF:
+			break;
+		case XTI_SNDLOWAT:
+			break;
+		}
+		break;
+#if 0
+	case T_INET_IP:
+		switch (oh->name) {
+		case T_IP_OPTIONS:
+			break;
+		case T_IP_TOS:
+			if (oh->len == sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_TTL:
+			if (oh->len == sizeof(*oh) + sizeof(unsigned char))
+				snprintf(buf, sizeof(buf), "0x%02x", *((unsigned char *) T_OPT_DATA(oh)));
+			return buf;
+		case T_IP_REUSEADDR:
+			return yesno_string(oh);
+		case T_IP_DONTROUTE:
+			return yesno_string(oh);
+		case T_IP_BROADCAST:
+			return yesno_string(oh);
+		case T_IP_ADDR:
+			if (oh->len == sizeof(*oh) + sizeof(uint32_t)) {
+				uint32_t addr = *((uint32_t *) T_OPT_DATA(oh));
+				snprintf(buf, sizeof(buf), "%d.%d.%d.%d", (addr >> 0) & 0x00ff, (addr >> 8) & 0x00ff, (addr >> 16) & 0x00ff, (addr >> 24) & 0x00ff);
+			}
+			return buf;
+		}
+		break;
+	case T_INET_UDP:
+		switch (oh->name) {
+		case T_UDP_CHECKSUM:
+			return yesno_string(oh);
+		}
+		break;
+	case T_INET_TCP:
+		switch (oh->name) {
+		case T_TCP_NODELAY:
+			return yesno_string(oh);
+		case T_TCP_MAXSEG:
+			if (oh->len == sizeof(*oh) + sizeof(t_uscalar_t))
+				snprintf(buf, sizeof(buf), "%lu", (ulong) *((t_uscalar_t *) T_OPT_DATA(oh)));
+			return buf;
+		case T_TCP_KEEPALIVE:
+			return yesno_string(oh);
+		case T_TCP_CORK:
+			return yesno_string(oh);
+		case T_TCP_KEEPIDLE:
+			break;
+		case T_TCP_KEEPINTVL:
+			break;
+		case T_TCP_KEEPCNT:
+			break;
+		case T_TCP_SYNCNT:
+			break;
+		case T_TCP_LINGER2:
+			break;
+		case T_TCP_DEFER_ACCEPT:
+			break;
+		case T_TCP_WINDOW_CLAMP:
+			break;
+		case T_TCP_INFO:
+			break;
+		case T_TCP_QUICKACK:
+			break;
+		}
+		break;
+	case T_INET_SCTP:
+		switch (oh->name) {
+		case T_SCTP_NODELAY:
+			return yesno_string(oh);
+		case T_SCTP_CORK:
+			return yesno_string(oh);
+		case T_SCTP_PPI:
+			break;
+		case T_SCTP_SID:
+			break;
+		case T_SCTP_SSN:
+			break;
+		case T_SCTP_TSN:
+			break;
+		case T_SCTP_RECVOPT:
+			return yesno_string(oh);
+		case T_SCTP_COOKIE_LIFE:
+			break;
+		case T_SCTP_SACK_DELAY:
+			break;
+		case T_SCTP_PATH_MAX_RETRANS:
+			break;
+		case T_SCTP_ASSOC_MAX_RETRANS:
+			break;
+		case T_SCTP_MAX_INIT_RETRIES:
+			break;
+		case T_SCTP_HEARTBEAT_ITVL:
+			break;
+		case T_SCTP_RTO_INITIAL:
+			break;
+		case T_SCTP_RTO_MIN:
+			break;
+		case T_SCTP_RTO_MAX:
+			break;
+		case T_SCTP_OSTREAMS:
+			break;
+		case T_SCTP_ISTREAMS:
+			break;
+		case T_SCTP_COOKIE_INC:
+			break;
+		case T_SCTP_THROTTLE_ITVL:
+			break;
+		case T_SCTP_MAC_TYPE:
+			break;
+		case T_SCTP_CKSUM_TYPE:
+			break;
+		case T_SCTP_ECN:
+			break;
+		case T_SCTP_ALI:
+			break;
+		case T_SCTP_ADD:
+			break;
+		case T_SCTP_SET:
+			break;
+		case T_SCTP_ADD_IP:
+			break;
+		case T_SCTP_DEL_IP:
+			break;
+		case T_SCTP_SET_IP:
+			break;
+		case T_SCTP_PR:
+			break;
+		case T_SCTP_LIFETIME:
+			break;
+		case T_SCTP_DISPOSITION:
+			break;
+		case T_SCTP_MAX_BURST:
+			break;
+		case T_SCTP_HB:
+			break;
+		case T_SCTP_RTO:
+			break;
+		case T_SCTP_MAXSEG:
+			break;
+		case T_SCTP_STATUS:
+			break;
+		case T_SCTP_DEBUG:
+			break;
+		}
+		break;
+#endif
+	}
+	return ("(unknown value)");
+}
+
+char *mgmtflag_string(t_uscalar_t flag)
+{
+	switch (flag) {
+	case T_NEGOTIATE:
+		return ("T_NEGOTIATE");
+	case T_CHECK:
+		return ("T_CHECK");
+	case T_DEFAULT:
+		return ("T_DEFAULT");
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_CURRENT:
+		return ("T_CURRENT");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	}
+	return "(unknown flag)";
+}
+
+char *size_string(ulong size)
+{
+	static char buf[128];
+	switch (size) {
+	case T_INFINITE:
+		return ("T_INFINITE");
+	case T_INVALID:
+		return ("T_INVALID");
+	case T_UNSPEC:
+		return ("T_UNSPEC");
+	}
+	snprintf(buf, sizeof(buf), "%lu", size);
+	return buf;
+}
+
 const char *prim_string(ulong prim)
 {
 	switch (prim) {
@@ -1011,6 +1703,78 @@ const char *prim_string(ulong prim)
 	}
 }
 
+char *t_errno_string(long err, long syserr)
+{
+	switch (err) {
+	case 0:
+		return ("ok");
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(syserr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "[%ld]", err);
+		return buf;
+	}
+	}
+}
+
 void print_less(int child)
 {
 	if (verbose < 1 || !show)
@@ -1068,6 +1832,14 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
+void print_simple_string(int child, const char *msgs[], const char *string)
+{
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
 void print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -1084,6 +1856,7 @@ void print_open(int child)
 	static const char *msgs[] = {
 		"  open()      ----->v  .                                .                   \n",
 		"                    |  v                                v<-----     open()  \n",
+		"                    |  v<-------------------------------.------     open()  \n",
 		"                    .  .                                .                   \n",
 	};
 	if (verbose > 3)
@@ -1095,6 +1868,7 @@ void print_close(int child)
 	static const char *msgs[] = {
 		"  close()     ----->X  |                                |                   \n",
 		"                    .  X                                X<-----    close()  \n",
+		"                    .  X<-------------------------------.------    close()  \n",
 		"                    .  .                                .                   \n",
 	};
 	if (verbose > 3)
@@ -1106,33 +1880,36 @@ void print_preamble(int child)
 	static const char *msgs[] = {
 		"--------------------+  +----------Preamble--------------+                   \n",
 		"                    +  +----------Preamble--------------+-------------------\n",
-		"                    +--+----------Preamble--------------+                   \n",
+		"                    +  +----------Preamble--------------+-------------------\n",
+		"--------------------+--+----------Preamble--------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_inconclusive(int child)
 {
 	static const char *msgs[] = {
 		"????????????????????|  |??????? INCONCLUSIVE ???????????|                   [%d]\n",
 		"                    |  |??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
-		"                    |??|??????? INCONCLUSIVE ???????????|                   [%d]\n",
+		"                    |  |??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
+		"????????????????????|??|??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_test(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +------------Test----------------+                   \n",
 		"                    +  +------------Test----------------+-------------------\n",
-		"                    +--+------------Test----------------+                   \n",
+		"                    +  +------------Test----------------+-------------------\n",
+		"--------------------+--+------------Test----------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_failed(int child)
 {
@@ -1140,10 +1917,11 @@ void print_failed(int child)
 		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
 		"                    |  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX[%d]\n",
 		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_script_error(int child)
 {
@@ -1151,10 +1929,11 @@ void print_script_error(int child)
 		"####################|  |######## SCRIPT ERROR ##########|                   [%d]\n",
 		"                    |  |######## SCRIPT ERROR ##########|###################[%d]\n",
 		"                    |##|######## SCRIPT ERROR ##########|                   [%d]\n",
+		"####################|##|######## SCRIPT ERROR ##########|###################[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_passed(int child)
 {
@@ -1162,10 +1941,11 @@ void print_passed(int child)
 		"********************|  |********** PASSED **************|                   [%d]\n",
 		"                    |  |********** PASSED **************|*******************[%d]\n",
 		"                    |**|********** PASSED **************|                   [%d]\n",
+		"********************|**|********** PASSED **************|*******************[%d]\n",
 	};
 	if (verbose > 2)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_postamble(int child)
 {
@@ -1173,43 +1953,47 @@ void print_postamble(int child)
 		"--------------------+  +----------Postamble-------------+                   \n",
 		"                    +  +----------Postamble-------------+-------------------\n",
 		"                    +--+----------Postamble-------------+                   \n",
+		"--------------------+--+----------Postamble-------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_test_end(int child)
 {
 	static const char *msgs[] = {
 		"--------------------+  +--------------------------------+                   \n",
 		"                    +  +--------------------------------+-------------------\n",
-		"                    +--+--------------------------------+                   \n",
+		"                    +--+--------------------------------+-------------------\n",
+		"--------------------+--+--------------------------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
 		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                   {%d}\n",
 		"                    |  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
-		"                    |@@@@@@@@@@@ TERMINATED @@@@@@@@@@@@|                   {%d}\n",
+		"                    |@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
-};
+}
 
 void print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
 		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
 		"                    |  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
-		"                    |&&&&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
+		"                    |&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
-};
+}
 
 void print_timeout(int child)
 {
@@ -1223,7 +2007,7 @@ void print_timeout(int child)
 		print_simple_int(child, msgs, state);
 		show_timeout--;
 	}
-};
+}
 
 void print_nothing(int child)
 {
@@ -1235,7 +2019,7 @@ void print_nothing(int child)
 	};
 	if (verbose > 1)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_string_state(int child, const char *msgs[], const char *string)
 {
@@ -1250,6 +2034,7 @@ void print_syscall(int child, const char *command)
 	static const char *msgs[] = {
 		"  %-14s--->|  |                                |                   [%d]\n",
 		"                    |  |                                |<---%14s [%d]\n",
+		"                    |  |                                |<---%14s [%d]\n",
 		"                    |  |                                |                   [%d]\n",
 	};
 	if (verbose > 0)
@@ -1260,6 +2045,7 @@ void print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"--%16s->|  |                                |                   [%d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
 		"                    |  |                                |                   [%d]\n",
 	};
@@ -1272,10 +2058,43 @@ void print_rx_prim(int child, const char *command)
 	static const char *msgs[] = {
 		"<-%16s--|  |                                |                   [%d]\n",
 		"                    |  |- - - - - - - - - - - - - - - ->|-%16s->[%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|-%16s->[%d]\n",
+		"                    |  |      <%16s>        |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
+}
+
+void print_ack_prim(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"<-%16s-/|  |                                |                   [%d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s->[%d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s->[%d]\n",
+		"                    |  |      <%16s>        |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void print_long_state(int child, const char *msgs[], long value)
+{
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, state);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_no_prim(int child, long prim)
+{
+	static const char *msgs[] = {
+		"????%4ld????  ?----?|  | ?- - - - - - - - - - - - - -? |                    [%d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????   [%d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????   [%d]\n",
+		"                    |  | ?- - - - - %4ld  - - - - - -? |                    [%d]\n",
+	};
+	if (verbose > 0)
+		print_long_state(child, msgs, prim);
 }
 
 void print_string_int_state(int child, const char *msgs[], const char *string, int val)
@@ -1289,7 +2108,8 @@ void print_string_int_state(int child, const char *msgs[], const char *string, i
 void print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"<-%1$-16s--|  |  %2$4d bytes                    |                   [%3$d]\n",
+		"<-%1$16s--|  |  %2$4d bytes                    |                   [%3$d]\n",
+		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s>[%3$d]\n",
 		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s>[%3$d]\n",
 		"                    |  |  %2$4d bytes  %1$16s  |                   [%3$d]\n",
 	};
@@ -1302,7 +2122,7 @@ void print_errno(int child, long error)
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                   [%d]\n",
 		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
 		"                    |  |       [%14s]         |                   [%d]\n",
 	};
 	if (verbose > 3)
@@ -1314,7 +2134,8 @@ void print_success(int child)
 	static const char *msgs[] = {
 		"  ok          <----/|  |                                |                   [%d]\n",
 		"                    |  |                                |\\---->         ok  [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |\\---->         ok  [%d]\n",
+		"                    |  |              ok                |                   [%d]\n",
 	};
 	if (verbose > 4)
 		print_simple_int(child, msgs, state);
@@ -1325,7 +2146,8 @@ void print_success_value(int child, int value)
 	static const char *msgs[] = {
 		"  %10d  <----/|  |                                |                   [%d]\n",
 		"                    |  |                                |\\---->  %10d [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |\\---->  %10d [%d]\n",
+		"                    |  |         [%10d]           |                   [%d]\n",
 	};
 	if (verbose)
 		print_double_int(child, msgs, value, state);
@@ -1337,6 +2159,7 @@ void print_ti_ioctl(int child, int cmd, intptr_t arg)
 		"--ioctl(2)--------->|  |    %16s            |                   [%d]\n",
 		"                    |  |    %16s            |<---ioctl(2)------ [%d]\n",
 		"                    |  |    %16s            |<---ioctl(2)------ [%d]\n",
+		"                    |  |    %16s ioctl(2)   |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
@@ -1351,12 +2174,125 @@ void print_ioctl(int child, int cmd, intptr_t arg)
 void print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"  %1$-16s->|  |  %2$4d bytes                    |                   [%3$d]\n",
-		"                    |  |  %2$4d bytes                    |<-%1$16s [%3$d]\n",
-		"                    |  |  %2$4d bytes  %1$16s  |                   [%3$d]\n",
+		"  %1$16s->|- | %2$4d bytes- - - - - - - - - - >|                   [%3$d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s [%3$d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s [%3$d]\n",
+		"                    |< + %2$4d bytes %1$16s |  |                   [%3$d]\n",
 	};
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
+}
+
+void print_libcall(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"  %-16s->|  |                                |                   [%d]\n",
+		"                    |  |                                |<-%16s [%d]\n",
+		"                    |  |                                |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, command);
+}
+
+void print_terror(int child, long error, long terror)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
+		"                    |  |                                |                   [%d]\n",
+		"                    |  |       [%14s]         |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+
+void print_expect(int child, int want)
+{
+	static const char *msgs[] = {
+		" (%-16s) |  | - - - -[Expected]- - - - - - - |                    [%d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d]\n",
+		"                    |- |- [Expected %-16s ] -|                    [%d]\n",
+	};
+	if (verbose > 1 && show)
+		print_string_state(child, msgs, event_string(want));
+}
+
+void print_string(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%-20s|  |                               |                    \n",
+		"                    |  |                               |%-20s\n",
+		"                    |  |                               |%-20s\n",
+		"                    |  |    %-20s       |                    \n",
+	};
+	if (verbose > 1 && show)
+		print_simple_string(child, msgs, string);
+}
+
+void print_time_state(int child, const char *msgs[], ulong time)
+{
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, state);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_waiting(int child, ulong time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /|                    [%d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
+		"                    | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
+	};
+	if (verbose > 0 && show)
+		print_time_state(child, msgs, time);
+}
+
+void print_mgmtflag(int child, t_uscalar_t flag)
+{
+	print_string(child, mgmtflag_string(flag));
+}
+
+void print_opt_level(int child, struct t_opthdr *oh)
+{
+	char *level = level_string(oh);
+	if (level)
+		print_string(child, level);
+}
+void print_opt_name(int child, struct t_opthdr *oh)
+{
+	char *name = name_string(oh);
+	if (name)
+		print_string(child, name);
+}
+void print_opt_status(int child, struct t_opthdr *oh)
+{
+	char *status = status_string(oh);
+	if (status)
+		print_string(child, status);
+}
+void print_opt_value(int child, struct t_opthdr *oh)
+{
+	char *value = value_string(oh);
+	if (value)
+		print_string(child, value);
+}
+void print_options(int child, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	if (verbose < 4)
+		return;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		int len = oh->len - sizeof(*oh);
+		if (len < 0)
+			break;
+		print_opt_level(child, oh);
+		print_opt_name(child, oh);
+		print_opt_status(child, oh);
+		print_opt_value(child, oh);
+	}
 }
 
 /*
@@ -1366,12 +2302,53 @@ void print_datcall(int child, const char *command, size_t bytes)
  *
  *  -------------------------------------------------------------------------
  */
+int test_ioctl(int child, int cmd, intptr_t arg)
+{
+	print_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
+	}
+}
+
+int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	struct strfdinsert fdi;
+	if (ctrl) {
+		fdi.ctlbuf.maxlen = ctrl->maxlen;
+		fdi.ctlbuf.len = ctrl->len;
+		fdi.ctlbuf.buf = ctrl->buf;
+	} else {
+		fdi.ctlbuf.maxlen = -1;
+		fdi.ctlbuf.len = 0;
+		fdi.ctlbuf.buf = NULL;
+	}
+	if (data) {
+		fdi.databuf.maxlen = data->maxlen;
+		fdi.databuf.len = data->len;
+		fdi.databuf.buf = data->buf;
+	} else {
+		fdi.databuf.maxlen = -1;
+		fdi.databuf.len = 0;
+		fdi.databuf.buf = NULL;
+	}
+	fdi.flags = flags;
+	fdi.fildes = resfd;
+	fdi.offset = offset;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
 int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
-	if (ctrl != NULL) {
-		union T_primitives *p = (typeof(p)) ctrl->buf;
-		print_tx_prim(child, prim_string(p->type));
-	}
 	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
 			lockf(fileno(stdout), F_LOCK, 0);
@@ -1388,7 +2365,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if (verbose > 3)
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	} else {
@@ -1407,7 +2385,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if (verbose > 3)
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	}
@@ -1519,7 +2498,8 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		print_success_value(child, last_retval);
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		break;
 	}
 	if (cmd == I_STR && verbose > 3) {
@@ -1550,19 +2530,52 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	return (__RESULT_FAILURE);
 }
 
-int test_ioctl(int child, int cmd, intptr_t arg)
+int test_nonblock(int child)
 {
-	print_ioctl(child, cmd, arg);
+	long flags;
+	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			print_errno(child, (last_errno = errno));
-			if (last_errno == EINTR || last_errno == ERESTART)
-				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
-		return (__RESULT_SUCCESS);
+		break;
 	}
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_block(int child)
+{
+	long flags;
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
 }
 
 int test_pipe(int child)
@@ -1620,87 +2633,59 @@ int test_close(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  IUT (Implementation Under Test) Initialization
+ *  STREAM Initialization
  *
  *  -------------------------------------------------------------------------
  */
 
-static int top_push(void)
+static int stream_start(int child)
 {
+	switch (child) {
+	case 1:
+		if (test_pipe(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	case 2:
+		return __RESULT_SUCCESS;
+	case 0:
 #if 0
-	if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
 #endif
-	return __RESULT_SUCCESS;
+		return __RESULT_SUCCESS;
+	default:
+		return __RESULT_FAILURE;
+	}
 }
 
-static int top_pop(void)
+static int stream_stop(int child)
 {
+	switch (child) {
+	case 1:
+		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(1) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	case 2:
+		return __RESULT_SUCCESS;
+	case 0:
 #if 0
-	if (test_ioctl(0, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		if (test_ioctl(0, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
 #endif
-	return __RESULT_SUCCESS;
-}
-
-static int top_start(void)
-{
-	if (top_push() != __RESULT_SUCCESS)
+		return __RESULT_SUCCESS;
+	default:
 		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-static int top_stop(void)
-{
-	if (top_pop() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-/*
- *  -------------------------------------------------------------------------
- *
- *  PT (Protocol Tester) Initialization
- *
- *  -------------------------------------------------------------------------
- */
-
-static int bot_open(void)
-{
-	if (test_pipe(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-static int bot_close(void)
-{
-	if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (test_close(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	if (test_close(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-static int bot_start(void)
-{
-	if (bot_open() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
-}
-
-static int bot_stop(void)
-{
-	if (bot_close() != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
-	return __RESULT_SUCCESS;
+	}
 }
 
 /*
@@ -1714,10 +2699,13 @@ static int bot_stop(void)
 static int begin_tests(void)
 {
 	state = 0;
-	if (bot_start() != __RESULT_SUCCESS)
+	if (stream_start(0) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	if (top_start() != __RESULT_SUCCESS)
+	if (stream_start(1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (stream_start(2) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	show_acks = 1;
@@ -1727,10 +2715,13 @@ static int begin_tests(void)
 static int end_tests(void)
 {
 	show_acks = 0;
-	if (top_stop() != __RESULT_SUCCESS)
+	if (stream_stop(2) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
-	if (bot_stop() != __RESULT_SUCCESS)
+	if (stream_stop(1) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (stream_stop(0) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -1778,563 +2769,653 @@ static int do_signal(int child, int action)
 		return test_writev(child, vector, 4);
 	}
 	}
-	switch (child) {
-	case 0:
-		switch (action) {
-		case __TEST_PUSH:
-			return test_ti_ioctl(child, I_PUSH, (intptr_t) "timod");
-		case __TEST_POP:
-			return test_ti_ioctl(child, I_POP, (intptr_t) NULL);
-		case __TEST_PUTMSG_DATA:
-			ctrl = NULL;
-			data->len = sprintf(dbuf, "Putmsg test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_PUTPMSG_DATA:
-			ctrl = NULL;
-			data->len = sprintf(dbuf, "Putpmsg band test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 1;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CONN_REQ:
-			ctrl->len = sizeof(p->conn_req);
+	switch (action) {
+	case __TEST_PUSH:
+		return test_ti_ioctl(child, I_PUSH, (intptr_t) "timod");
+	case __TEST_POP:
+		return test_ti_ioctl(child, I_POP, (intptr_t) NULL);
+	case __TEST_PUTMSG_DATA:
+		ctrl = NULL;
+		data->len = sprintf(dbuf, "Putmsg test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PUTPMSG_DATA:
+		ctrl = NULL;
+		data->len = sprintf(dbuf, "Putpmsg band test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 1;
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_REQ:
+		ctrl->len = sizeof(p->conn_req)
+		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
+		p->conn_req.PRIM_type = T_CONN_REQ;
+		p->conn_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
+		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
+		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
+		if (test_addr)
+			bcopy(test_addr, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
+		if (test_opt_conn)
+			bcopy(test_opt_conn, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			p->conn_req.PRIM_type = T_CONN_REQ;
-			p->conn_req.DEST_length = 0;
-			p->conn_req.DEST_offset = 0;
-			p->conn_req.OPT_length = 0;
-			p->conn_req.OPT_offset = 0;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CONN_RES:
-			ctrl->len = sizeof(p->conn_res);
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_IND:
+		ctrl->len = sizeof(p->conn_ind);
+		p->conn_ind.PRIM_type = T_CONN_IND;
+		p->conn_ind.SRC_length = 0;
+		p->conn_ind.SRC_offset = 0;
+		p->conn_ind.OPT_length = 0;
+		p->conn_ind.OPT_offset = 0;
+		p->conn_ind.SEQ_number = last_sequence;
+		data->len = sprintf(dbuf, "Connection indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_RES:
+		ctrl->len = sizeof(p->conn_res);
+		p->conn_res.PRIM_type = T_CONN_RES;
+		p->conn_res.ACCEPTOR_id = 0;
+		p->conn_res.OPT_length = 0;
+		p->conn_res.OPT_offset = 0;
+		p->conn_res.SEQ_number = last_sequence;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			p->conn_res.PRIM_type = T_CONN_RES;
-			p->conn_res.ACCEPTOR_id = 0;
-			p->conn_res.OPT_length = 0;
-			p->conn_res.OPT_offset = 0;
-			p->conn_res.SEQ_number = last_sequence;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_options(child, cbuf + p->conn_res.OPT_offset, p->conn_res.OPT_length);
+		if (test_resfd == -1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_DISCON_REQ:
-			ctrl->len = sizeof(p->discon_req);
+		else
+			return test_insertfd(child, test_resfd, 4, ctrl, data, test_pflags);
+	case __TEST_CONN_CON:
+		ctrl->len = sizeof(p->conn_con);
+		p->conn_con.PRIM_type = T_CONN_CON;
+		p->conn_con.RES_length = 0;
+		p->conn_con.RES_offset = 0;
+		p->conn_con.OPT_length = 0;
+		p->conn_con.OPT_offset = 0;
+		data->len = sprintf(dbuf, "Connection confirmation test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_options(child, cbuf + p->conn_con.OPT_offset, p->conn_con.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DISCON_REQ:
+		ctrl->len = sizeof(p->discon_req);
+		p->discon_req.PRIM_type = T_DISCON_REQ;
+		p->discon_req.SEQ_number = last_sequence;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			p->discon_req.PRIM_type = T_DISCON_REQ;
-			p->discon_req.SEQ_number = last_sequence;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_DATA_REQ:
-			ctrl->len = sizeof(p->data_req);
-			p->data_req.PRIM_type = T_DATA_REQ;
-			p->data_req.MORE_flag = MORE_flag;
-			data->len = sprintf(dbuf, "Normal test message.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_EXDATA_REQ:
-			ctrl->len = sizeof(p->exdata_req);
-			p->exdata_req.PRIM_type = T_EXDATA_REQ;
-			p->exdata_req.MORE_flag = MORE_flag;
-			data->len = sprintf(dbuf, "Expedited test message.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_INFO_REQ:
-			ctrl->len = sizeof(p->info_req);
-			p->info_req.PRIM_type = T_INFO_REQ;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DISCON_IND:
+		ctrl->len = sizeof(p->discon_ind);
+		p->discon_ind.PRIM_type = T_DISCON_IND;
+		p->discon_ind.DISCON_reason = 0;
+		p->discon_ind.SEQ_number = last_sequence;
+		data->len = sprintf(dbuf, "Disconnection indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DATA_REQ:
+		ctrl->len = sizeof(p->data_req);
+		p->data_req.PRIM_type = T_DATA_REQ;
+		p->data_req.MORE_flag = MORE_flag;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_BIND_REQ:
-			ctrl->len = sizeof(p->bind_req);
-			p->bind_req.PRIM_type = T_BIND_REQ;
-			p->bind_req.ADDR_length = 0;
-			p->bind_req.ADDR_offset = 0;
-			p->bind_req.CONIND_number = last_qlen;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_DATA_IND:
+		ctrl->len = sizeof(p->data_ind);
+		p->data_ind.PRIM_type = T_DATA_IND;
+		p->data_ind.MORE_flag = MORE_flag;
+		data->len = sprintf(dbuf, "Normal test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_EXDATA_REQ:
+		ctrl->len = sizeof(p->exdata_req);
+		p->exdata_req.PRIM_type = T_EXDATA_REQ;
+		p->exdata_req.MORE_flag = MORE_flag;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_UNBIND_REQ:
-			ctrl->len = sizeof(p->unbind_req);
-			p->unbind_req.PRIM_type = T_UNBIND_REQ;
+		test_pflags = MSG_BAND;
+		test_pband = 1;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_EXDATA_IND:
+		ctrl->len = sizeof(p->exdata_ind);
+		p->data_ind.PRIM_type = T_EXDATA_IND;
+		p->data_ind.MORE_flag = MORE_flag;
+		data->len = sprintf(dbuf, "Expedited test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 1;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_INFO_REQ:
+		ctrl->len = sizeof(p->info_req);
+		p->info_req.PRIM_type = T_INFO_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_INFO_ACK:
+		ctrl->len = sizeof(p->info_ack);
+		p->info_ack.PRIM_type = T_INFO_ACK;
+		p->info_ack.TSDU_size = test_bufsize;
+		p->info_ack.ETSDU_size = test_bufsize;
+		p->info_ack.CDATA_size = test_bufsize;
+		p->info_ack.DDATA_size = test_bufsize;
+		p->info_ack.ADDR_size = test_bufsize;
+		p->info_ack.OPT_size = test_bufsize;
+		p->info_ack.TIDU_size = test_tidu;
+		p->info_ack.SERV_type = last_servtype;
+		p->info_ack.CURRENT_state = last_tstate;
+		p->info_ack.PROVIDER_flag = last_provflag;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_BIND_REQ:
+		ctrl->len = sizeof(p->bind_req) + (test_addr ? sizeof(*test_addr) : 0);
+		p->bind_req.PRIM_type = T_BIND_REQ;
+		p->bind_req.ADDR_length = test_addr ? sizeof(*test_addr) : 0;
+		p->bind_req.ADDR_offset = test_addr ? sizeof(p->bind_req) : 0;
+		p->bind_req.CONIND_number = last_qlen;
+		if (test_addr)
+			bcopy(test_addr, (&p->bind_req) + 1, sizeof(*test_addr));
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_BIND_ACK:
+		ctrl->len = sizeof(p->bind_ack);
+		p->bind_ack.PRIM_type = T_BIND_ACK;
+		p->bind_ack.ADDR_length = 0;
+		p->bind_ack.ADDR_offset = 0;
+		p->bind_ack.CONIND_number = last_qlen;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_UNBIND_REQ:
+		ctrl->len = sizeof(p->unbind_req);
+		p->unbind_req.PRIM_type = T_UNBIND_REQ;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ERROR_ACK:
+		ctrl->len = sizeof(p->error_ack);
+		p->error_ack.PRIM_type = T_ERROR_ACK;
+		p->error_ack.ERROR_prim = last_prim;
+		p->error_ack.TLI_error = last_t_errno;
+		p->error_ack.UNIX_error = last_errno;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_string(child, terrno_string(p->error_ack.TLI_error, p->error_ack.UNIX_error));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_OK_ACK:
+		ctrl->len = sizeof(p->ok_ack);
+		p->ok_ack.PRIM_type = T_OK_ACK;
+		p->ok_ack.CORRECT_prim = 0;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_UNITDATA_REQ:
+		ctrl->len = sizeof(p->unitdata_req)
+		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
+		p->unitdata_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
+		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
+		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
+		if (test_addr)
+			bcopy(test_addr, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
+		if (test_opt_data)
+			bcopy(test_opt_data, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_UNITDATA_REQ:
-			ctrl->len = sizeof(p->unitdata_req);
-			p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
-			p->unitdata_req.DEST_length = 0;
-			p->unitdata_req.DEST_offset = 0;
-			p->unitdata_req.OPT_length = 0;
-			p->unitdata_req.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Unit test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_OPTMGMT_REQ:
-			ctrl->len = sizeof(p->optmgmt_req);
-			p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-			p->optmgmt_req.OPT_length = 0;
-			p->optmgmt_req.OPT_offset = 0;
-			p->optmgmt_req.MGMT_flags = T_NEGOTIATE;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
+		print_options(child, cbuf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_UNITDATA_IND:
+		ctrl->len = sizeof(p->unitdata_ind);
+		p->unitdata_ind.PRIM_type = T_UNITDATA_IND;
+		p->unitdata_ind.SRC_length = 0;
+		p->unitdata_ind.SRC_offset = 0;
+		p->unitdata_ind.OPT_length = 0;
+		p->unitdata_ind.OPT_offset = 0;
+		data->len = sprintf(dbuf, "Unit test data indication.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
+		print_options(child, cbuf + p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_UDERROR_IND:
+		ctrl->len = sizeof(p->uderror_ind);
+		p->uderror_ind.PRIM_type = T_UDERROR_IND;
+		p->uderror_ind.DEST_length = 0;
+		p->uderror_ind.DEST_offset = 0;
+		p->uderror_ind.OPT_length = 0;
+		p->uderror_ind.OPT_offset = 0;
+		p->uderror_ind.ERROR_type = 0;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_OPTMGMT_REQ:
+		ctrl->len = sizeof(p->optmgmt_req)
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.MGMT_flags = test_mgmtflags;
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_mgmtflag(child, p->optmgmt_req.MGMT_flags);
+		print_options(child, cbuf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_OPTMGMT_ACK:
+		ctrl->len = sizeof(p->optmgmt_ack);
+		p->optmgmt_ack.PRIM_type = T_OPTMGMT_ACK;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_mgmtflag(child, p->optmgmt_ack.MGMT_flags);
+		print_options(child, cbuf + p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ORDREL_REQ:
+		ctrl->len = sizeof(p->ordrel_req);
+		p->ordrel_req.PRIM_type = T_ORDREL_REQ;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_ORDREL_REQ:
-			ctrl->len = sizeof(p->ordrel_req);
-			p->ordrel_req.PRIM_type = T_ORDREL_REQ;
-			data->len = sprintf(dbuf, "Orderly release data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_OPTDATA_REQ:
-			ctrl->len = sizeof(p->optdata_req);
-			p->optdata_req.PRIM_type = T_OPTDATA_REQ;
-			p->optdata_req.DATA_flag = T_ODF_EX | T_ODF_MORE;
-			p->optdata_req.OPT_length = 0;
-			p->optdata_req.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Option data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_ADDR_REQ:
-			ctrl->len = sizeof(p->addr_req);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ORDREL_IND:
+		ctrl->len = sizeof(p->ordrel_ind);
+		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
+		data->len = sprintf(dbuf, "Orderly release indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_OPTDATA_REQ:
+		ctrl->len = sizeof(p->optdata_req)
+		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		p->optdata_req.PRIM_type = T_OPTDATA_REQ;
+		p->optdata_req.DATA_flag = DATA_flag;
+		p->optdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
+		p->optdata_req.OPT_offset = test_opt_data ? sizeof(p->optdata_req) : 0;
+		if (test_data)
+			data->len = sprintf(dbuf, test_data);
+		else
 			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CAPABILITY_REQ:
-			ctrl->len = sizeof(p->capability_req);
-			p->capability_req.PRIM_type = T_CAPABILITY_REQ;
-			p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_O_TI_GETINFO:
-			ic.ic_cmd = O_TI_GETINFO;
-			ic.ic_len = sizeof(p->info_ack);
-			p->info_req.PRIM_type = T_INFO_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_O_TI_OPTMGMT:
-			ic.ic_cmd = O_TI_OPTMGMT;
-			ic.ic_len = sizeof(p->optmgmt_ack);
-			p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-			p->optmgmt_req.OPT_length = 0;
-			p->optmgmt_req.OPT_offset = 0;
-			p->optmgmt_req.MGMT_flags = T_NEGOTIATE;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_O_TI_BIND:
-			ic.ic_cmd = O_TI_BIND;
-			ic.ic_len = sizeof(p->bind_ack);
-			p->bind_req.PRIM_type = T_BIND_REQ;
-			p->bind_req.ADDR_length = 0;
-			p->bind_req.ADDR_offset = 0;
-			p->bind_req.CONIND_number = last_qlen;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_O_TI_UNBIND:
-			ic.ic_cmd = O_TI_UNBIND;
-			ic.ic_len = sizeof(p->ok_ack);
-			p->unbind_req.PRIM_type = T_UNBIND_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_GETINFO:
-			ic.ic_cmd = _O_TI_GETINFO;
-			ic.ic_len = sizeof(p->info_ack);
-			p->info_req.PRIM_type = T_INFO_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_OPTMGMT:
-			ic.ic_cmd = _O_TI_OPTMGMT;
-			ic.ic_len = sizeof(p->optmgmt_ack);
-			p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-			p->optmgmt_req.OPT_length = 0;
-			p->optmgmt_req.OPT_offset = 0;
-			p->optmgmt_req.MGMT_flags = T_NEGOTIATE;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_BIND:
-			ic.ic_cmd = _O_TI_BIND;
-			ic.ic_len = sizeof(p->bind_ack);
-			p->bind_req.PRIM_type = T_BIND_REQ;
-			p->bind_req.ADDR_length = 0;
-			p->bind_req.ADDR_offset = 0;
-			p->bind_req.CONIND_number = last_qlen;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_UNBIND:
-			ic.ic_cmd = _O_TI_UNBIND;
-			ic.ic_len = sizeof(p->ok_ack);
-			p->unbind_req.PRIM_type = T_UNBIND_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_GETMYNAME:
-			ic.ic_cmd = _O_TI_GETMYNAME;
-			ic.ic_len = sizeof(p->addr_ack);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_GETPEERNAME:
-			ic.ic_cmd = _O_TI_GETPEERNAME;
-			ic.ic_len = sizeof(p->addr_ack);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_XTI_HELLO:
-			ic.ic_cmd = _O_TI_XTI_HELLO;
-			ic.ic_len = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_XTI_GET_STATE:
-			ic.ic_cmd = _O_TI_XTI_GET_STATE;
-			ic.ic_len = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_XTI_CLEAR_EVENT:
-			ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
-			ic.ic_len = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_XTI_MODE:
-			ic.ic_cmd = _O_TI_XTI_MODE;
-			ic.ic_len = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST__O_TI_TLI_MODE:
-			ic.ic_cmd = _O_TI_TLI_MODE;
-			ic.ic_len = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_GETINFO:
-			ic.ic_cmd = TI_GETINFO;
-			ic.ic_len = sizeof(p->info_ack);
-			p->info_req.PRIM_type = T_INFO_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_OPTMGMT:
-			ic.ic_cmd = TI_OPTMGMT;
-			ic.ic_len = sizeof(p->optmgmt_ack);
-			p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-			p->optmgmt_req.OPT_length = 0;
-			p->optmgmt_req.OPT_offset = 0;
-			p->optmgmt_req.MGMT_flags = T_NEGOTIATE;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_BIND:
-			ic.ic_cmd = TI_BIND;
-			ic.ic_len = sizeof(p->bind_ack);
-			p->bind_req.PRIM_type = T_BIND_REQ;
-			p->bind_req.ADDR_length = 0;
-			p->bind_req.ADDR_offset = 0;
-			p->bind_req.CONIND_number = last_qlen;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_UNBIND:
-			ic.ic_cmd = TI_UNBIND;
-			ic.ic_len = sizeof(p->ok_ack);
-			p->unbind_req.PRIM_type = T_UNBIND_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_GETMYNAME:
-			ic.ic_cmd = TI_GETMYNAME;
-			ic.ic_len = sizeof(p->addr_ack);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_GETPEERNAME:
-			ic.ic_cmd = TI_GETPEERNAME;
-			ic.ic_len = sizeof(p->addr_ack);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETMYNAME:
-			ic.ic_cmd = TI_SETMYNAME;
-			ic.ic_len = sizeof(p->conn_res);
-			p->conn_res.PRIM_type = T_CONN_RES;
-			p->conn_res.ACCEPTOR_id = 0;
-			p->conn_res.OPT_length = 0;
-			p->conn_res.OPT_offset = 0;
-			p->conn_res.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETPEERNAME:
-			ic.ic_cmd = TI_SETPEERNAME;
-			ic.ic_len = sizeof(p->conn_req);
-			p->conn_req.PRIM_type = T_CONN_REQ;
-			p->conn_req.DEST_length = 0;
-			p->conn_req.DEST_offset = 0;
-			p->conn_req.OPT_length = 0;
-			p->conn_req.OPT_offset = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETMYNAME_DISC:
-			ic.ic_cmd = TI_SETMYNAME;
-			ic.ic_len = sizeof(p->discon_req);
-			p->discon_req.PRIM_type = T_DISCON_REQ;
-			p->discon_req.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETPEERNAME_DISC:
-			ic.ic_cmd = TI_SETPEERNAME;
-			ic.ic_len = sizeof(p->discon_req);
-			p->discon_req.PRIM_type = T_DISCON_REQ;
-			p->discon_req.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETMYNAME_DATA:
-			ic.ic_cmd = TI_SETMYNAME;
-			ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
-			p->conn_res.PRIM_type = T_CONN_RES;
-			p->conn_res.ACCEPTOR_id = 0;
-			p->conn_res.OPT_length = 0;
-			p->conn_res.OPT_offset = 0;
-			p->conn_res.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETPEERNAME_DATA:
-			ic.ic_cmd = TI_SETPEERNAME;
-			ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
-			p->conn_req.PRIM_type = T_CONN_REQ;
-			p->conn_req.DEST_length = 0;
-			p->conn_req.DEST_offset = 0;
-			p->conn_req.OPT_length = 0;
-			p->conn_req.OPT_offset = 0;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETMYNAME_DISC_DATA:
-			ic.ic_cmd = TI_SETMYNAME;
-			ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
-			p->discon_req.PRIM_type = T_DISCON_REQ;
-			p->discon_req.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SETPEERNAME_DISC_DATA:
-			ic.ic_cmd = TI_SETPEERNAME;
-			ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
-			p->discon_req.PRIM_type = T_DISCON_REQ;
-			p->discon_req.SEQ_number = last_sequence;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_SYNC:
-		{
-			union {
-				struct ti_sync_req req;
-				struct ti_sync_ack ack;
-			} *s = (typeof(s)) p;
-			ic.ic_cmd = TI_SYNC;
-			ic.ic_len = sizeof(*s);
-			s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		if (test_opt_data)
+			bcopy(test_opt_data, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		test_pflags = MSG_BAND;
+		test_pband = (DATA_flag & T_ODF_EX) ? 1 : 0;
+		if (p->optdata_req.DATA_flag & T_ODF_EX) {
+			if (p->optdata_req.DATA_flag & T_ODF_MORE)
+				print_tx_prim(child, "T_OPTDATA_REQ!+ ");
+			else
+				print_tx_prim(child, "T_OPTDATA_REQ!  ");
+		} else {
+			if (p->optdata_req.DATA_flag & T_ODF_MORE)
+				print_tx_prim(child, "T_OPTDATA_REQ+  ");
+			else
+				print_tx_prim(child, "T_OPTDATA_REQ   ");
 		}
-		case __TEST_TI_GETADDRS:
-			ic.ic_cmd = TI_GETADDRS;
-			ic.ic_len = sizeof(p->addr_ack);
-			p->addr_req.PRIM_type = T_ADDR_REQ;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		case __TEST_TI_CAPABILITY:
-			ic.ic_cmd = TI_CAPABILITY;
-			ic.ic_len = sizeof(p->capability_ack);
-			p->capability_req.PRIM_type = T_CAPABILITY_REQ;
-			p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-			return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
-		default:
-			return __RESULT_SCRIPT_ERROR;
-		}
-	case 1:
-		switch (action) {
-		case __TEST_PUTMSG_DATA:
-			ctrl = NULL;
-			data->len = sprintf(dbuf, "Putmsg test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_PUTPMSG_DATA:
-			ctrl = NULL;
-			data->len = sprintf(dbuf, "Putpmsg band test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 1;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CONN_IND:
-			ctrl->len = sizeof(p->conn_ind);
-			p->conn_ind.PRIM_type = T_CONN_IND;
-			p->conn_ind.SRC_length = 0;
-			p->conn_ind.SRC_offset = 0;
-			p->conn_ind.OPT_length = 0;
-			p->conn_ind.OPT_offset = 0;
-			p->conn_ind.SEQ_number = last_sequence;
-			data->len = sprintf(dbuf, "Connection indication test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CONN_CON:
-			ctrl->len = sizeof(p->conn_con);
-			p->conn_con.PRIM_type = T_CONN_CON;
-			p->conn_con.RES_length = 0;
-			p->conn_con.RES_offset = 0;
-			p->conn_con.OPT_length = 0;
-			p->conn_con.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Connection confirmation test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_DISCON_IND:
-			ctrl->len = sizeof(p->discon_ind);
-			p->discon_ind.PRIM_type = T_DISCON_IND;
-			p->discon_ind.DISCON_reason = 0;
-			p->discon_ind.SEQ_number = last_sequence;
-			data->len = sprintf(dbuf, "Disconnection indication test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_DATA_IND:
-			ctrl->len = sizeof(p->data_ind);
-			p->data_ind.PRIM_type = T_DATA_IND;
-			p->data_ind.MORE_flag = MORE_flag;
-			data->len = sprintf(dbuf, "Normal test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_EXDATA_IND:
-			ctrl->len = sizeof(p->exdata_ind);
-			p->data_ind.PRIM_type = T_EXDATA_IND;
-			p->data_ind.MORE_flag = MORE_flag;
-			data->len = sprintf(dbuf, "Expedited test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 1;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_INFO_ACK:
-			ctrl->len = sizeof(p->info_ack);
-			p->info_ack.PRIM_type = T_INFO_ACK;
-			p->info_ack.TSDU_size = test_bufsize;
-			p->info_ack.ETSDU_size = test_bufsize;
-			p->info_ack.CDATA_size = test_bufsize;
-			p->info_ack.DDATA_size = test_bufsize;
-			p->info_ack.ADDR_size = test_bufsize;
-			p->info_ack.OPT_size = test_bufsize;
-			p->info_ack.TIDU_size = test_tidu;
-			p->info_ack.SERV_type = last_servtype;
-			p->info_ack.CURRENT_state = last_tstate;
-			p->info_ack.PROVIDER_flag = last_provflag;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_BIND_ACK:
-			ctrl->len = sizeof(p->bind_ack);
-			p->bind_ack.PRIM_type = T_BIND_ACK;
-			p->bind_ack.ADDR_length = 0;
-			p->bind_ack.ADDR_offset = 0;
-			p->bind_ack.CONIND_number = last_qlen;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_ERROR_ACK:
-			ctrl->len = sizeof(p->error_ack);
-			p->error_ack.PRIM_type = T_ERROR_ACK;
-			p->error_ack.ERROR_prim = last_prim;
-			p->error_ack.TLI_error = last_t_errno;
-			p->error_ack.UNIX_error = last_errno;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_OK_ACK:
-			ctrl->len = sizeof(p->ok_ack);
-			p->ok_ack.PRIM_type = T_OK_ACK;
-			p->ok_ack.CORRECT_prim = 0;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_UNITDATA_IND:
-			ctrl->len = sizeof(p->unitdata_ind);
-			p->unitdata_ind.PRIM_type = T_UNITDATA_IND;
-			p->unitdata_ind.SRC_length = 0;
-			p->unitdata_ind.SRC_offset = 0;
-			p->unitdata_ind.OPT_length = 0;
-			p->unitdata_ind.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Unit test data indication.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_UDERROR_IND:
-			ctrl->len = sizeof(p->uderror_ind);
-			p->uderror_ind.PRIM_type = T_UDERROR_IND;
-			p->uderror_ind.DEST_length = 0;
-			p->uderror_ind.DEST_offset = 0;
-			p->uderror_ind.OPT_length = 0;
-			p->uderror_ind.OPT_offset = 0;
-			p->uderror_ind.ERROR_type = 0;
-			data = NULL;
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_OPTMGMT_ACK:
-			ctrl->len = sizeof(p->optmgmt_ack);
-			p->optmgmt_ack.PRIM_type = T_OPTMGMT_ACK;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_ORDREL_IND:
-			ctrl->len = sizeof(p->ordrel_ind);
-			p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-			data->len = sprintf(dbuf, "Orderly release indication test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_EXP_OPTDATA_IND:
-			ctrl->len = sizeof(p->optdata_ind);
-			p->optdata_ind.PRIM_type = T_OPTDATA_IND;
-			p->optdata_ind.DATA_flag = T_ODF_EX;
-			p->optdata_ind.OPT_length = 0;
-			p->optdata_ind.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Option data indication test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 1;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_NRM_OPTDATA_IND:
-			ctrl->len = sizeof(p->optdata_ind);
-			p->optdata_ind.PRIM_type = T_OPTDATA_IND;
-			p->optdata_ind.DATA_flag = 0;
-			p->optdata_ind.OPT_length = 0;
-			p->optdata_ind.OPT_offset = 0;
-			data->len = sprintf(dbuf, "Option data indication test data.");
-			test_pflags = MSG_BAND;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_ADDR_ACK:
-			ctrl->len = sizeof(p->addr_ack);
-			p->addr_ack.PRIM_type = T_ADDR_ACK;
-			p->addr_ack.LOCADDR_length = 0;
-			p->addr_ack.LOCADDR_offset = 0;
-			p->addr_ack.REMADDR_length = 0;
-			p->addr_ack.REMADDR_offset = 0;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		case __TEST_CAPABILITY_ACK:
-			ctrl->len = sizeof(p->capability_ack);
-			p->capability_ack.PRIM_type = T_CAPABILITY_ACK;
-			p->capability_ack.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-			p->capability_ack.INFO_ack.TSDU_size = test_bufsize;
-			p->capability_ack.INFO_ack.ETSDU_size = test_bufsize;
-			p->capability_ack.INFO_ack.CDATA_size = test_bufsize;
-			p->capability_ack.INFO_ack.DDATA_size = test_bufsize;
-			p->capability_ack.INFO_ack.ADDR_size = test_bufsize;
-			p->capability_ack.INFO_ack.OPT_size = test_bufsize;
-			p->capability_ack.INFO_ack.TIDU_size = test_tidu;
-			p->capability_ack.INFO_ack.SERV_type = last_servtype;
-			p->capability_ack.INFO_ack.CURRENT_state = last_tstate;
-			p->capability_ack.INFO_ack.PROVIDER_flag = last_provflag;
-			p->capability_ack.ACCEPTOR_id = 0;
-			data = NULL;
-			test_pflags = MSG_HIPRI;
-			test_pband = 0;
-			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-		default:
-			return __RESULT_SCRIPT_ERROR;
-		}
+		print_options(child, cbuf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_NRM_OPTDATA_IND:
+		ctrl->len = sizeof(p->optdata_ind);
+		p->optdata_ind.PRIM_type = T_OPTDATA_IND;
+		p->optdata_ind.DATA_flag = 0;
+		p->optdata_ind.OPT_length = 0;
+		p->optdata_ind.OPT_offset = 0;
+		data->len = sprintf(dbuf, "Option data indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
+			print_tx_prim(child, "T_OPTDATA_IND+  ");
+		else
+			print_tx_prim(child, "T_OPTDATA_IND   ");
+		print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_EXP_OPTDATA_IND:
+		ctrl->len = sizeof(p->optdata_ind);
+		p->optdata_ind.PRIM_type = T_OPTDATA_IND;
+		p->optdata_ind.DATA_flag = T_ODF_EX;
+		p->optdata_ind.OPT_length = 0;
+		p->optdata_ind.OPT_offset = 0;
+		data->len = sprintf(dbuf, "Option data indication test data.");
+		test_pflags = MSG_BAND;
+		test_pband = 1;
+		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
+			print_tx_prim(child, "T_OPTDATA_IND!+ ");
+		else
+			print_tx_prim(child, "T_OPTDATA_IND!  ");
+		print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ADDR_REQ:
+		ctrl->len = sizeof(p->addr_req);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_ADDR_ACK:
+		ctrl->len = sizeof(p->addr_ack);
+		p->addr_ack.PRIM_type = T_ADDR_ACK;
+		p->addr_ack.LOCADDR_length = 0;
+		p->addr_ack.LOCADDR_offset = 0;
+		p->addr_ack.REMADDR_length = 0;
+		p->addr_ack.REMADDR_offset = 0;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->addr_ack.LOCADDR_offset, p->addr_ack.LOCADDR_length));
+		print_string(child, addr_string(cbuf + p->addr_ack.REMADDR_offset, p->addr_ack.REMADDR_length));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CAPABILITY_REQ:
+		ctrl->len = sizeof(p->capability_req);
+		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
+		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CAPABILITY_ACK:
+		ctrl->len = sizeof(p->capability_ack);
+		p->capability_ack.PRIM_type = T_CAPABILITY_ACK;
+		p->capability_ack.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
+		p->capability_ack.INFO_ack.TSDU_size = test_bufsize;
+		p->capability_ack.INFO_ack.ETSDU_size = test_bufsize;
+		p->capability_ack.INFO_ack.CDATA_size = test_bufsize;
+		p->capability_ack.INFO_ack.DDATA_size = test_bufsize;
+		p->capability_ack.INFO_ack.ADDR_size = test_bufsize;
+		p->capability_ack.INFO_ack.OPT_size = test_bufsize;
+		p->capability_ack.INFO_ack.TIDU_size = test_tidu;
+		p->capability_ack.INFO_ack.SERV_type = last_servtype;
+		p->capability_ack.INFO_ack.CURRENT_state = last_tstate;
+		p->capability_ack.INFO_ack.PROVIDER_flag = last_provflag;
+		p->capability_ack.ACCEPTOR_id = 0;
+		data = NULL;
+		test_pflags = MSG_HIPRI;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_O_TI_GETINFO:
+		ic.ic_cmd = O_TI_GETINFO;
+		ic.ic_len = sizeof(p->info_ack);
+		p->info_req.PRIM_type = T_INFO_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_O_TI_OPTMGMT:
+		ic.ic_cmd = O_TI_OPTMGMT;
+		ic.ic_len = sizeof(p->optmgmt_ack)
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.MGMT_flags = test_mgmtflags;
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_O_TI_BIND:
+		ic.ic_cmd = O_TI_BIND;
+		ic.ic_len = sizeof(p->bind_ack);
+		p->bind_req.PRIM_type = T_BIND_REQ;
+		p->bind_req.ADDR_length = 0;
+		p->bind_req.ADDR_offset = 0;
+		p->bind_req.CONIND_number = last_qlen;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_O_TI_UNBIND:
+		ic.ic_cmd = O_TI_UNBIND;
+		ic.ic_len = sizeof(p->ok_ack);
+		p->unbind_req.PRIM_type = T_UNBIND_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_GETINFO:
+		ic.ic_cmd = _O_TI_GETINFO;
+		ic.ic_len = sizeof(p->info_ack);
+		p->info_req.PRIM_type = T_INFO_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_OPTMGMT:
+		ic.ic_cmd = _O_TI_OPTMGMT;
+		ic.ic_len = sizeof(p->optmgmt_ack)
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.MGMT_flags = test_mgmtflags;
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_BIND:
+		ic.ic_cmd = _O_TI_BIND;
+		ic.ic_len = sizeof(p->bind_ack);
+		p->bind_req.PRIM_type = T_BIND_REQ;
+		p->bind_req.ADDR_length = 0;
+		p->bind_req.ADDR_offset = 0;
+		p->bind_req.CONIND_number = last_qlen;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_UNBIND:
+		ic.ic_cmd = _O_TI_UNBIND;
+		ic.ic_len = sizeof(p->ok_ack);
+		p->unbind_req.PRIM_type = T_UNBIND_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_GETMYNAME:
+		ic.ic_cmd = _O_TI_GETMYNAME;
+		ic.ic_len = sizeof(p->addr_ack);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_GETPEERNAME:
+		ic.ic_cmd = _O_TI_GETPEERNAME;
+		ic.ic_len = sizeof(p->addr_ack);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_XTI_HELLO:
+		ic.ic_cmd = _O_TI_XTI_HELLO;
+		ic.ic_len = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_XTI_GET_STATE:
+		ic.ic_cmd = _O_TI_XTI_GET_STATE;
+		ic.ic_len = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_XTI_CLEAR_EVENT:
+		ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
+		ic.ic_len = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_XTI_MODE:
+		ic.ic_cmd = _O_TI_XTI_MODE;
+		ic.ic_len = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST__O_TI_TLI_MODE:
+		ic.ic_cmd = _O_TI_TLI_MODE;
+		ic.ic_len = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_GETINFO:
+		ic.ic_cmd = TI_GETINFO;
+		ic.ic_len = sizeof(p->info_ack);
+		p->info_req.PRIM_type = T_INFO_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_OPTMGMT:
+		ic.ic_cmd = TI_OPTMGMT;
+		ic.ic_len = sizeof(p->optmgmt_ack)
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.MGMT_flags = test_mgmtflags;
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_BIND:
+		ic.ic_cmd = TI_BIND;
+		ic.ic_len = sizeof(p->bind_ack);
+		p->bind_req.PRIM_type = T_BIND_REQ;
+		p->bind_req.ADDR_length = 0;
+		p->bind_req.ADDR_offset = 0;
+		p->bind_req.CONIND_number = last_qlen;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_UNBIND:
+		ic.ic_cmd = TI_UNBIND;
+		ic.ic_len = sizeof(p->ok_ack);
+		p->unbind_req.PRIM_type = T_UNBIND_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_GETMYNAME:
+		ic.ic_cmd = TI_GETMYNAME;
+		ic.ic_len = sizeof(p->addr_ack);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_GETPEERNAME:
+		ic.ic_cmd = TI_GETPEERNAME;
+		ic.ic_len = sizeof(p->addr_ack);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETMYNAME:
+		ic.ic_cmd = TI_SETMYNAME;
+		ic.ic_len = sizeof(p->conn_res);
+		p->conn_res.PRIM_type = T_CONN_RES;
+		p->conn_res.ACCEPTOR_id = 0;
+		p->conn_res.OPT_length = 0;
+		p->conn_res.OPT_offset = 0;
+		p->conn_res.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETPEERNAME:
+		ic.ic_cmd = TI_SETPEERNAME;
+		ic.ic_len = sizeof(p->conn_req);
+		p->conn_req.PRIM_type = T_CONN_REQ;
+		p->conn_req.DEST_length = 0;
+		p->conn_req.DEST_offset = 0;
+		p->conn_req.OPT_length = 0;
+		p->conn_req.OPT_offset = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETMYNAME_DISC:
+		ic.ic_cmd = TI_SETMYNAME;
+		ic.ic_len = sizeof(p->discon_req);
+		p->discon_req.PRIM_type = T_DISCON_REQ;
+		p->discon_req.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETPEERNAME_DISC:
+		ic.ic_cmd = TI_SETPEERNAME;
+		ic.ic_len = sizeof(p->discon_req);
+		p->discon_req.PRIM_type = T_DISCON_REQ;
+		p->discon_req.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETMYNAME_DATA:
+		ic.ic_cmd = TI_SETMYNAME;
+		ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
+		p->conn_res.PRIM_type = T_CONN_RES;
+		p->conn_res.ACCEPTOR_id = 0;
+		p->conn_res.OPT_length = 0;
+		p->conn_res.OPT_offset = 0;
+		p->conn_res.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETPEERNAME_DATA:
+		ic.ic_cmd = TI_SETPEERNAME;
+		ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
+		p->conn_req.PRIM_type = T_CONN_REQ;
+		p->conn_req.DEST_length = 0;
+		p->conn_req.DEST_offset = 0;
+		p->conn_req.OPT_length = 0;
+		p->conn_req.OPT_offset = 0;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETMYNAME_DISC_DATA:
+		ic.ic_cmd = TI_SETMYNAME;
+		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
+		p->discon_req.PRIM_type = T_DISCON_REQ;
+		p->discon_req.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SETPEERNAME_DISC_DATA:
+		ic.ic_cmd = TI_SETPEERNAME;
+		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
+		p->discon_req.PRIM_type = T_DISCON_REQ;
+		p->discon_req.SEQ_number = last_sequence;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_SYNC:
+	{
+		union {
+			struct ti_sync_req req;
+			struct ti_sync_ack ack;
+		} *s = (typeof(s)) p;
+		ic.ic_cmd = TI_SYNC;
+		ic.ic_len = sizeof(*s);
+		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	}
+	case __TEST_TI_GETADDRS:
+		ic.ic_cmd = TI_GETADDRS;
+		ic.ic_len = sizeof(p->addr_ack);
+		p->addr_req.PRIM_type = T_ADDR_REQ;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	case __TEST_TI_CAPABILITY:
+		ic.ic_cmd = TI_CAPABILITY;
+		ic.ic_len = sizeof(p->capability_ack);
+		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
+		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
+		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+	default:
+		return __RESULT_SCRIPT_ERROR;
 	}
 	return __RESULT_SCRIPT_ERROR;
 }
-
-#if 0
-static int top_signal(int action)
-{
-	return do_signal(0, action);
-}
-
-static int bot_signal(int action)
-{
-	return do_signal(1, action);
-}
-#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -2346,140 +3427,207 @@ static int bot_signal(int action)
 
 static int do_decode_data(int child, struct strbuf *data)
 {
-	print_rx_data(child, "DATA------------", data ? data->len : 0);
-	return (__TEST_DATA);
+	int event = __RESULT_DECODE_ERROR;
+	if (data->len >= 0) {
+		event = __TEST_DATA;
+		print_rx_prim(child, "DATA------------");
+	}
+	return ((last_event = event));
 }
+
 static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 {
-	int ret;
+	int event = __RESULT_DECODE_ERROR;
 	union T_primitives *p = (union T_primitives *) ctrl->buf;
-	switch (child) {
-	case 0:
-		print_rx_prim(child, prim_string(p->type));
-		switch ((last_prim = p->type)) {
-		case T_CONN_IND:
-			last_sequence = p->conn_ind.SEQ_number;
-			ret = __TEST_CONN_IND;
-			break;
-		case T_CONN_CON:
-			ret = __TEST_CONN_CON;
-			break;
-		case T_DISCON_IND:
-			ret = __TEST_DISCON_IND;
-			break;
-		case T_DATA_IND:
-			ret = __TEST_DATA_IND;
-			break;
-		case T_EXDATA_IND:
-			ret = __TEST_EXDATA_IND;
-			break;
-		case T_INFO_ACK:
-			ret = __TEST_INFO_ACK;
-			break;
-		case T_BIND_ACK:
-			last_qlen = p->bind_ack.CONIND_number;
-			ret = __TEST_BIND_ACK;
-			break;
-		case T_ERROR_ACK:
-			ret = __TEST_ERROR_ACK;
-			break;
-		case T_OK_ACK:
-			ret = __TEST_OK_ACK;
-			break;
-		case T_UNITDATA_IND:
-			ret = __TEST_UNITDATA_IND;
-			break;
-		case T_UDERROR_IND:
-			ret = __TEST_UDERROR_IND;
-			break;
-		case T_OPTMGMT_ACK:
-			ret = __TEST_OPTMGMT_ACK;
-			break;
-		case T_ORDREL_IND:
-			ret = __TEST_ORDREL_IND;
-			break;
-		case T_OPTDATA_IND:
-			if (p->optdata_ind.DATA_flag & T_ODF_EX)
-				ret = __TEST_EXP_OPTDATA_IND;
-			else
-				ret = __TEST_NRM_OPTDATA_IND;
-			break;
-		case T_ADDR_ACK:
-			ret = __TEST_ADDR_ACK;
-			break;
-		case T_CAPABILITY_ACK:
-			ret = __TEST_CAPABILITY_ACK;
-			break;
-		default:
-			ret = __RESULT_DECODE_ERROR;
-			break;
-		}
-		if (data && data->len >= 0)
-			if (do_decode_data(child, data) != __TEST_DATA)
-				ret = __RESULT_FAILURE;
-		break;
-	case 1:
-		print_rx_prim(child, prim_string(p->type));
+	if (ctrl->len >= sizeof(p->type)) {
 		switch ((last_prim = p->type)) {
 		case T_CONN_REQ:
-			ret = __TEST_CONN_REQ;
+			event = __TEST_CONN_REQ;
+			print_rx_prim(child, prim_string(p->type));
+			print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 			break;
 		case T_CONN_RES:
-			ret = __TEST_CONN_RES;
+			event = __TEST_CONN_RES;
+			print_rx_prim(child, prim_string(p->type));
+			print_options(child, cbuf + p->conn_res.OPT_offset, p->conn_res.OPT_length);
 			break;
 		case T_DISCON_REQ:
+			event = __TEST_DISCON_REQ;
 			last_sequence = p->discon_req.SEQ_number;
-			ret = __TEST_DISCON_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_DATA_REQ:
+			event = __TEST_DATA_REQ;
 			MORE_flag = p->data_req.MORE_flag;
-			ret = __TEST_DATA_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_EXDATA_REQ:
+			event = __TEST_EXDATA_REQ;
 			MORE_flag = p->data_req.MORE_flag;
-			ret = __TEST_EXDATA_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_INFO_REQ:
-			ret = __TEST_INFO_REQ;
+			event = __TEST_INFO_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_BIND_REQ:
+			event = __TEST_BIND_REQ;
 			last_qlen = p->bind_req.CONIND_number;
-			ret = __TEST_BIND_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_UNBIND_REQ:
-			ret = __TEST_UNBIND_REQ;
+			event = __TEST_UNBIND_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_UNITDATA_REQ:
-			ret = __TEST_UNITDATA_REQ;
+			event = __TEST_UNITDATA_REQ;
+			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
+			print_options(child, cbuf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 			break;
 		case T_OPTMGMT_REQ:
-			ret = __TEST_OPTMGMT_REQ;
+			event = __TEST_OPTMGMT_REQ;
+			print_rx_prim(child, prim_string(p->type));
+			print_mgmtflag(child, p->optmgmt_req.MGMT_flags);
+			print_options(child, cbuf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 			break;
 		case T_ORDREL_REQ:
-			ret = __TEST_ORDREL_REQ;
+			event = __TEST_ORDREL_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_OPTDATA_REQ:
-			ret = __TEST_OPTDATA_REQ;
+			event = __TEST_OPTDATA_REQ;
+			if (p->optdata_req.DATA_flag & T_ODF_EX) {
+				if (p->optdata_req.DATA_flag & T_ODF_MORE)
+					print_rx_prim(child, "T_OPTDATA_REQ!+ ");
+				else
+					print_rx_prim(child, "T_OPTDATA_REQ!  ");
+			} else {
+				if (p->optdata_req.DATA_flag & T_ODF_MORE)
+					print_rx_prim(child, "T_OPTDATA_REQ+  ");
+				else
+					print_rx_prim(child, "T_OPTDATA_REQ   ");
+			}
+			print_options(child, cbuf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 			break;
 		case T_ADDR_REQ:
-			ret = __TEST_ADDR_REQ;
+			event = __TEST_ADDR_REQ;
+			print_rx_prim(child, prim_string(p->type));
 			break;
 		case T_CAPABILITY_REQ:
-			ret = __TEST_CAPABILITY_REQ;
+			event = __TEST_CAPABILITY_REQ;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_CONN_IND:
+			event = __TEST_CONN_IND;
+			last_sequence = p->conn_ind.SEQ_number;
+			print_rx_prim(child, prim_string(p->type));
+			print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
+			break;
+		case T_CONN_CON:
+			event = __TEST_CONN_CON;
+			print_rx_prim(child, prim_string(p->type));
+			print_options(child, cbuf + p->conn_con.OPT_offset, p->conn_con.OPT_length);
+			break;
+		case T_DISCON_IND:
+			event = __TEST_DISCON_IND;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_DATA_IND:
+			event = __TEST_DATA_IND;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_EXDATA_IND:
+			event = __TEST_EXDATA_IND;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_INFO_ACK:
+			event = __TEST_INFO_ACK;
+			print_ack_prim(child, prim_string(p->type));
+			break;
+		case T_BIND_ACK:
+			event = __TEST_BIND_ACK;
+			last_qlen = p->bind_ack.CONIND_number;
+			print_ack_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
+			break;
+		case T_ERROR_ACK:
+			event = __TEST_ERROR_ACK;
+			print_ack_prim(child, prim_string(p->type));
+			print_string(child, terrno_string(p->error_ack.TLI_error, p->error_ack.UNIX_error));
+			break;
+		case T_OK_ACK:
+			event = __TEST_OK_ACK;
+			print_ack_prim(child, prim_string(p->type));
+			break;
+		case T_UNITDATA_IND:
+			event = __TEST_UNITDATA_IND;
+			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
+			print_options(child, cbuf + p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
+			break;
+		case T_UDERROR_IND:
+			event = __TEST_UDERROR_IND;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_OPTMGMT_ACK:
+			event = __TEST_OPTMGMT_ACK;
+			print_ack_prim(child, prim_string(p->type));
+			print_mgmtflag(child, p->optmgmt_ack.MGMT_flags);
+			print_options(child, cbuf + p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
+			break;
+		case T_ORDREL_IND:
+			event = __TEST_ORDREL_IND;
+			print_rx_prim(child, prim_string(p->type));
+			break;
+		case T_OPTDATA_IND:
+			if (p->optdata_ind.DATA_flag & T_ODF_EX) {
+				event = __TEST_EXP_OPTDATA_IND;
+				if (p->optdata_ind.DATA_flag & T_ODF_MORE)
+					print_rx_prim(child, "T_OPTDATA_IND!+ ");
+				else
+					print_rx_prim(child, "T_OPTDATA_IND!  ");
+			} else {
+				event = __TEST_NRM_OPTDATA_IND;
+				if (p->optdata_ind.DATA_flag & T_ODF_MORE)
+					print_rx_prim(child, "T_OPTDATA_IND+  ");
+				else
+					print_rx_prim(child, "T_OPTDATA_IND   ");
+			}
+			print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+			break;
+		case T_ADDR_ACK:
+			event = __TEST_ADDR_ACK;
+			print_ack_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->addr_ack.LOCADDR_offset, p->addr_ack.LOCADDR_length));
+			print_string(child, addr_string(cbuf + p->addr_ack.REMADDR_offset, p->addr_ack.REMADDR_length));
+			break;
+		case T_CAPABILITY_ACK:
+			event = __TEST_CAPABILITY_ACK;
+			print_ack_prim(child, prim_string(p->type));
 			break;
 		default:
-			ret = __RESULT_DECODE_ERROR;
+			event = __EVENT_UNKNOWN;
+			print_no_prim(child, p->type);
 			break;
 		}
 		if (data && data->len >= 0)
 			if (do_decode_data(child, data) != __TEST_DATA)
-				ret = __RESULT_FAILURE;
-		break;
-	default:
-		ret = __RESULT_DECODE_ERROR;
-		break;
+				event = __RESULT_FAILURE;
 	}
-	return (ret);
+	return ((last_event = event));
+}
+
+static int do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
+{
+	if (ctrl->len > 0) {
+		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
+	} else if (data->len > 0) {
+		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
+			return time_event(last_event);
+	}
+	return ((last_event = __EVENT_NO_MSG));
 }
 
 #if 0
@@ -2543,13 +3691,8 @@ int any_wait_event(int source, int wait)
 						fflush(stdout);
 						lockf(fileno(stdout), F_ULOCK, 0);
 					}
-					if (ctrl.len > 0) {
-						if ((last_event = do_decode_ctrl(0, &ctrl, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					} else if (data.len > 0) {
-						if ((last_event = do_decode_data(0, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					}
+					if ((last_event = do_decode_msg(0, &ctrl, &data)) != __EVENT_NO_MSG)
+						return time_event(last_event);
 				}
 			}
 			if (pfd[1].revents) {
@@ -2571,13 +3714,8 @@ int any_wait_event(int source, int wait)
 						fflush(stdout);
 						lockf(fileno(stdout), F_ULOCK, 0);
 					}
-					if (ctrl.len > 0) {
-						if ((last_event = do_decode_ctrl(1, &ctrl, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					} else if (data.len > 0) {
-						if ((last_event = do_decode_data(1, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					}
+					if ((last_event = do_decode_msg(1, &ctrl, &data)) != __EVENT_NO_MSG)
+						return time_event(last_event);
 				}
 			}
 		default:
@@ -2597,52 +3735,60 @@ int wait_event(int child, int wait)
 			last_event = __EVENT_TIMEOUT;
 			return time_event(__EVENT_TIMEOUT);
 		}
-		if (verbose > 4) {
-			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "polling %d:\n", child);
-			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
-		}
+		if (verbose > 4)
+			print_syscall(child, "poll()");
 		pfd[0].fd = test_fd[child];
 		pfd[0].events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			if ((errno == EAGAIN || errno == EINTR))
-				break;
 			print_errno(child, (last_errno = errno));
-			break;
+			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				break;
+			return (__RESULT_FAILURE);
 		case 0:
+			if (verbose > 4)
+				print_success(child);
 			print_nothing(child);
 			last_event = __EVENT_NO_MSG;
 			return time_event(__EVENT_NO_MSG);
 		case 1:
+			if (verbose > 4)
+				print_success(child);
 			if (pfd[0].revents) {
-				int flags = 0;
-				char cbuf[BUFSIZE];
-				char dbuf[BUFSIZE];
-				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
-				struct strbuf data = { BUFSIZE, 0, dbuf };
-				if (verbose > 4) {
-					lockf(fileno(stdout), F_LOCK, 0);
-					fprintf(stdout, "getmsg from %d:\n", child);
-					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+				int ret;
+				ctrl.maxlen = BUFSIZE;
+				ctrl.len = -1;
+				ctrl.buf = cbuf;
+				data.maxlen = BUFSIZE;
+				data.len = -1;
+				data.buf = dbuf;
+				flags = 0;
+				for (;;) {
+					if (verbose > 4)
+						print_syscall(child, "getmsg()");
+					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
+						break;
+					print_errno(child, (last_errno = errno));
+					if (last_errno == EINTR || last_errno == ERESTART)
+						continue;
+					if (last_errno == EAGAIN)
+						break;
+					return __RESULT_FAILURE;
 				}
-				if (getmsg(test_fd[child], &ctrl, &data, &flags) == 0) {
-					if (verbose > 3) {
+				if (ret < 0)
+					break;
+				if (ret == 0) {
+					if (verbose > 4)
+						print_success(child);
+					if (verbose > 4) {
 						lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
 						fflush(stdout);
 						lockf(fileno(stdout), F_ULOCK, 0);
 					}
-					if (ctrl.len > 0) {
-						if ((last_event = do_decode_ctrl(child, &ctrl, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					} else if (data.len > 0) {
-						if ((last_event = do_decode_data(child, &data)) != __EVENT_UNKNOWN)
-							return time_event(last_event);
-					}
+					if ((last_event = do_decode_msg(child, &ctrl, &data)) != __EVENT_NO_MSG)
+						return time_event(last_event);
 				}
 			}
 		default:
@@ -2708,6 +3854,20 @@ int get_data(int child, int action)
 	return (ret);
 }
 
+int expect(int child, int wait, int want)
+{
+	if ((last_event = wait_event(child, wait)) == want)
+		return (__RESULT_SUCCESS);
+	print_expect(child, want);
+	return (__RESULT_FAILURE);
+}
+
+void test_sleep(int child, unsigned long t)
+{
+	print_waiting(child, t);
+	sleep(t);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -2719,7 +3879,7 @@ static int preamble_0(int child)
 {
 	start_tt(1000);
 	return __RESULT_SUCCESS;
-};
+}
 
 static int postamble_0(int child)
 {
@@ -2741,12 +3901,13 @@ static int postamble_0(int child)
 	state++;
 	stop_tt();
 	return __RESULT_SUCCESS;
-};
+}
 
 #if 0
 static int preamble_1_top(int child)
 {
 	start_tt(1000);
+	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -2797,7 +3958,6 @@ struct test_stream {
 };
 
 #define test_group_1 "Pushing and popping the timod module"
-
 #define tgrp_case_1_1 test_group_1
 #define name_case_1_1 "Normal push and pop sequence"
 #define desc_case_1_1 "\
@@ -4125,7 +5285,7 @@ int test_run(struct test_stream *stream[])
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
-			exit(run_stream(2, stream[2]));	/* execute stream[1] state machine */
+			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
 		case -1:	/* error */
 			if (child[0])
 				kill(child[0], SIGKILL);	/* toast stream[0] child */
@@ -4636,7 +5796,7 @@ void version(int argc, char *argv[])
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
 \n\
-    See `%1$s --copying' for copying permissions.\n\
+    See `%1$s --copying' for copying permission.\n\
 \n\
 ", argv[0], ident);
 }
@@ -4694,7 +5854,7 @@ Options:\n\
     -V, --version\n\
         print version and exit\n\
     -C, --copying\n\
-        print copying permissions and exit\n\
+        print copying permission and exit\n\
 \n\
 ", argv[0], devname);
 }
@@ -4882,6 +6042,8 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
+		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
