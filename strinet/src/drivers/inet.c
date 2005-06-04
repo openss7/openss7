@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:28:51 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:51 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 13:39:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:28:51 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:28:51 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -306,7 +306,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:28:51 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -818,7 +818,7 @@ typedef struct ss_event {
 	int state;			/* state at time of event */
 } ss_event_t;
 
-STATIC spinlock_t ss_lock;		/* protects ss_opens lists */
+STATIC spinlock_t ss_lock = SPIN_LOCK_UNLOCKED;	/* protects ss_opens lists */
 STATIC ss_t *ss_opens = NULL;
 
 #if 0
@@ -847,8 +847,7 @@ ss_socket_put(struct socket *sock)
 	struct sock *sk;
 	ensure(sock, return);
 	if ((sk = sock->sk)) {
-		/* 
-		   We don't really need to lock out interrupts here, just bottom halves 'cause a
+		/* We don't really need to lock out interrupts here, just bottom halves 'cause a
 		   read lock is taken in the callback function itself. */
 		write_lock_bh(&sk->sk_callback_lock);
 		{
@@ -864,8 +863,7 @@ ss_socket_put(struct socket *sock)
 				assure(ss);
 		}
 		write_unlock_bh(&sock->sk->sk_callback_lock);
-		/* 
-		   The following will cause the socket to be aborted, particularly for Linux TCP or 
+		/* The following will cause the socket to be aborted, particularly for Linux TCP or 
 		   other orderly release sockets.  XXX: Perhaps should check the state of the
 		   socket and call sk->prot->disconnect() first as well.  SCTP will probably behave 
 		   better that way. */
@@ -881,8 +879,7 @@ ss_socket_get(struct socket *sock, ss_t * ss)
 	struct sock *sk;
 	ensure(sock, return);
 	if ((sk = sock->sk)) {
-		/* 
-		   We don't really need to lock out interrupts here, just bottom halves 'cause a
+		/* We don't really need to lock out interrupts here, just bottom halves 'cause a
 		   read lock is taken in the callback function itself. */
 		write_lock_bh(&sock->sk->sk_callback_lock);
 		{
@@ -1190,13 +1187,16 @@ ss_size_conn_opts(ss_t * ss)
 		size += _T_SPACE_SIZEOF(ss->options.xti.sndlowat);
 	if (ss->p.prot.family == PF_INET) {
 		{
-			/* 
-			   These two have end-to-end significance for connection indications and
+			/* These two have end-to-end significance for connection indications and
 			   responses. */
-			// if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
-			size += _T_SPACE_SIZEOF(ss->options.ip.options);
-			// if (ss_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
-			size += _T_SPACE_SIZEOF(ss->options.ip.tos);
+#if 0
+			if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
+#endif
+				size += _T_SPACE_SIZEOF(ss->options.ip.options);
+#if 0
+			if (ss_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
+#endif
+				size += _T_SPACE_SIZEOF(ss->options.ip.tos);
 		}
 		if (ss_tst_bit(_T_BIT_IP_TTL, ss->options.flags))
 			size += _T_SPACE_SIZEOF(ss->options.ip.ttl);
@@ -1233,7 +1233,7 @@ ss_size_conn_opts(ss_t * ss)
 			if (ss_tst_bit(_T_BIT_TCP_WINDOW_CLAMP, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.tcp.window_clamp);
 #if 0
-			// read only
+			/* read only */
 			if (ss_tst_bit(_T_BIT_TCP_INFO, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.tcp.info);
 #endif
@@ -1277,13 +1277,16 @@ ss_size_conn_opts(ss_t * ss)
 			if (ss_tst_bit(_T_BIT_SCTP_RTO_MAX, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.sctp.rto_max);
 			{
-				/* 
-				   These two have end-to-end significance for connection
+				/* These two have end-to-end significance for connection
 				   indications and connection responses */
-				// if (ss_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
-				size += _T_SPACE_SIZEOF(ss->options.sctp.ostreams);
-				// if (ss_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
-				size += _T_SPACE_SIZEOF(ss->options.sctp.istreams);
+#if 0
+				if (ss_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
+#endif
+					size += _T_SPACE_SIZEOF(ss->options.sctp.ostreams);
+#if 0
+				if (ss_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
+#endif
+					size += _T_SPACE_SIZEOF(ss->options.sctp.istreams);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_COOKIE_INC, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.sctp.cookie_inc);
@@ -1425,14 +1428,18 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 	}
 	if (ss->p.prot.family == PF_INET) {
 		struct inet_opt *np = inet_sk(sk);
-		// if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
-		oh->level = T_INET_IP;
+#if 0
+		if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
+#endif
+			oh->level = T_INET_IP;
 		oh->name = T_IP_OPTIONS;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.ip.options);
 		oh->status = T_SUCCESS;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
-		// if (ss_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
-		oh->level = T_INET_IP;
+#if 0
+		if (ss_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
+#endif
+			oh->level = T_INET_IP;
 		oh->name = T_IP_TOS;
 		oh->len = _T_LENGTH_SIZEOF(ss->options.ip.tos);
 		oh->status = T_SUCCESS;
@@ -1676,7 +1683,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (ss_tst_bit(_T_BIT_TCP_INFO, ss->options.flags)) {
-				// read-only
+				/* read-only */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_QUICKACK, ss->options.flags)) {
 				oh->level = T_INET_TCP;
@@ -1744,17 +1751,17 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_SSN, ss->options.flags)) {
-				// only per-packet
+				/* only per-packet */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_TSN, ss->options.flags)) {
-				// only per-packet
+				/* only per-packet */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_RECVOPT, ss->options.flags)) {
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_RECVOPT;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.recvopt;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -1789,7 +1796,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_PATH_MAX_RETRANS;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) =
 				    ss->options.sctp.path_max_retrans;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1799,7 +1806,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) =
 				    ss->options.sctp.assoc_max_retrans;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1809,7 +1816,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_MAX_INIT_RETRIES;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) =
 				    ss->options.sctp.max_init_retries;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1867,7 +1874,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.rto_max;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
-			// if (ss_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
+#if 0
+			if (ss_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
+#endif
 			{
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_OSTREAMS;
@@ -1881,7 +1890,9 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.ostreams;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
-			// if (ss_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
+#if 0
+			if (ss_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
+#endif
 			{
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_ISTREAMS;
@@ -1996,7 +2007,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_ADD;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.add;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2005,7 +2016,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_SET;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.set;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2014,7 +2025,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_ADD_IP;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.add_ip;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2023,7 +2034,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_DEL_IP;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.del_ip;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2032,7 +2043,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_SET_IP;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.set_ip;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2043,7 +2054,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_PR;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.pr;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2065,12 +2076,12 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 			if (ss_tst_bit(_T_BIT_SCTP_DISPOSITION, ss->options.flags)) {
-				// FIXME: this should probably be read-only
+				/* FIXME: this should probably be read-only */
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.disposition;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2079,7 +2090,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_MAX_BURST;
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->status = T_SUCCESS;
-				// absolute requirement
+				/* absolute requirement */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.max_burst;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
@@ -2109,7 +2120,7 @@ ss_set_options(ss_t * ss)
 	if (!ss || !ss->sock || !(sk = ss->sock->sk))
 		goto eproto;
 	if (ss_tst_bit(_T_BIT_XTI_DEBUG, ss->options.flags)) {
-		// absolute
+		/* absolute */
 	}
 	if (ss_tst_bit(_T_BIT_XTI_LINGER, ss->options.flags)) {
 		struct t_linger *valp = &ss->options.xti.linger;
@@ -2166,7 +2177,7 @@ ss_set_options(ss_t * ss)
 		struct inet_opt *np = inet_sk(sk);
 		if (ss_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags)) {
 			unsigned char *valp = ss->options.ip.options;
-			(void) valp;	// FIXME
+			(void) valp;	/* FIXME */
 		}
 		if (ss_tst_bit(_T_BIT_IP_TOS, ss->options.flags)) {
 			unsigned char *valp = &ss->options.ip.tos;
@@ -2249,42 +2260,42 @@ ss_set_options(ss_t * ss)
 			}
 			if (ss_tst_bit(_T_BIT_TCP_CORK, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.cork;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_KEEPIDLE, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.keepidle;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_KEEPINTVL, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.keepitvl;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_KEEPCNT, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.keepcnt;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_SYNCNT, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.syncnt;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_LINGER2, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.linger2;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_DEFER_ACCEPT, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.defer_accept;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_WINDOW_CLAMP, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.window_clamp;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_INFO, ss->options.flags)) {
-				// read only
+				/* read only */
 			}
 			if (ss_tst_bit(_T_BIT_TCP_QUICKACK, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.tcp.quickack;
-				(void) valp;	// TODO: complete this action
+				(void) valp;	/* TODO: complete this action */
 			}
 			break;
 		}
@@ -2294,7 +2305,7 @@ ss_set_options(ss_t * ss)
 			struct sctp_opt *sp = sctp_sk(sk);
 			if (ss_tst_bit(_T_BIT_SCTP_NODELAY, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.nodelay;
-				(void) *valp;	// TODO: complete this action
+				(void) *valp;	/* TODO: complete this action */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_MAXSEG, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.maxseg;
@@ -2318,8 +2329,7 @@ ss_set_options(ss_t * ss)
 				sp->sid = *valp;
 			}
 #if 0
-			/* 
-			   These are per-packet, read-only, options only. */
+			/* These are per-packet, read-only, options only. */
 			if (ss_tst_bit(_T_BIT_SCTP_SSN, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.ssn;
 			}
@@ -2455,7 +2465,7 @@ ss_set_options(ss_t * ss)
 					valp->hb_itvl = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 				if (valp->hb_itvl < 1000 / HZ)
 					valp->hb_itvl = 1000 / HZ;
-				// FIXME: set values for destination address
+				/* FIXME: set values for destination address */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_RTO, ss->options.flags)) {
 				struct t_sctp_rto *valp = &ss->options.sctp.rto;
@@ -2471,10 +2481,10 @@ ss_set_options(ss_t * ss)
 					valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 				if (valp->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 					valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-				// FIXME: set values for destination address
+				/* FIXME: set values for destination address */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_STATUS, ss->options.flags)) {
-				// this is a read-only option 
+				/* this is a read-only option */
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_DEBUG, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.debug;
@@ -2617,23 +2627,20 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 {
 	struct t_opthdr *ih;
 	struct sock *sk;
-	/* 
-	   clear flags, these flags will be used when sending a connection confirmation to
+	/* clear flags, these flags will be used when sending a connection confirmation to
 	   determine which options to include in the confirmstion. */
 	bzero(ss->options.flags, sizeof(ss->options.flags));
 	if (ip == NULL || ilen == 0)
 		return (0);
 	if (!ss || !ss->sock || !(sk = ss->sock->sk))
 		goto eproto;
-	/* 
-	   For each option recognized, we test the requested value for legallity, and then set the
+	/* For each option recognized, we test the requested value for legallity, and then set the
 	   requested value in the stream's option buffer and mark the option requested in the
 	   options flags.  If it is a request (and not a response), we negotiate the value to the
 	   underlying.  socket.  Once the protocol has completed remote negotiation, we will
 	   determine whether the negotiation was successful or partially successful.  See
 	   ss_build_conn_opts(). */
-	/* 
-	   For connection responses, test the legality of each option and mark the option in the
+	/* For connection responses, test the legality of each option and mark the option in the
 	   options flags.  We do not negotiate to the socket because the final socket is not
 	   present.  ss_set_options() will read the flags and negotiate to the final socket after
 	   the connection has been accepted. */
@@ -2772,7 +2779,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				case T_IP_OPTIONS:
 				{
 					unsigned char *valp = (unsigned char *) T_OPT_DATA(ih);
-					(void) valp;	// FIXME
+					(void) valp;	/* FIXME */
 					ss_set_bit(_T_BIT_IP_OPTIONS, ss->options.flags);
 					continue;
 				}
@@ -2991,7 +2998,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					if (*valp > MAX_TCP_KEEPIDLE)
 						*valp = MAX_TCP_KEEPIDLE;
 					tp->keepalive_time = *valp * HZ;
-					// TODO: need to reset the keepalive timer
+					/* TODO: need to reset the keepalive timer */
 					continue;
 				}
 				case T_TCP_KEEPINTVL:
@@ -3097,11 +3104,11 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 #if 0
 				case T_TCP_INFO:
 				{
-					// read-only
+					/* read-only */
 				}
 				case T_TCP_QUICKACK:
 				{
-					// not valid in this state
+					/* not valid in this state */
 				}
 #endif
 				}
@@ -3184,12 +3191,12 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_SCTP_SSN:
 				{
-					// read-only, and only per-packet
+					/* read-only, and only per-packet */
 					goto einval;
 				}
 				case T_SCTP_TSN:
 				{
-					// read-only, and only per-packet
+					/* read-only, and only per-packet */
 					goto einval;
 				}
 				case T_SCTP_RECVOPT:
@@ -3485,7 +3492,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						valp->hb_itvl = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 					if (valp->hb_itvl < 1000 / HZ)
 						valp->hb_itvl = 1000 / HZ;
-					// FIXME: set values for destination address
+					/* FIXME: set values for destination address */
 					continue;
 				}
 				case T_SCTP_RTO:
@@ -3530,12 +3537,12 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 					if (valp->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
 						valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-					// FIXME: set values for destination address
+					/* FIXME: set values for destination address */
 					continue;
 				}
 				case T_SCTP_STATUS:
 				{
-					// this is a read-only option 
+					/* this is a read-only option */
 					goto eacces;
 				}
 				case T_SCTP_DEBUG:
@@ -3626,8 +3633,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					continue;
 				}
 #if 0
-					/* 
-					   We do not add, delete or set ip addresses on connection
+					/* We do not add, delete or set ip addresses on connection
 					   request or on connection response. */
 				case T_SCTP_ADD_IP:
 				{
@@ -4020,7 +4026,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	// trim length
+	/* trim length */
 	msg->msg_controllen = (unsigned char *) ch - (unsigned char *) msg->msg_control;
 	return (0);
       eproto:
@@ -4053,7 +4059,7 @@ ss_opts_size(ss_t * ss, struct msghdr *msg)
 	for (cmsg = CMSG_FIRSTHDR(msg); cmsg; cmsg = CMSG_NXTHDR(msg, cmsg)) {
 		switch (cmsg->cmsg_level) {
 		case SOL_SOCKET:
-			// Noting on recvmsg. 
+			/* Noting on recvmsg. */
 			continue;
 		case SOL_IP:
 			if (ss->p.prot.family == PF_INET
@@ -4077,12 +4083,10 @@ ss_opts_size(ss_t * ss, struct msghdr *msg)
 			}
 			continue;
 		case SOL_TCP:
-			/* 
-			   TCP does not have any options of end to end significance */
+			/* TCP does not have any options of end to end significance */
 			continue;
 		case SOL_UDP:
-			/* 
-			   Nothing on recvmsg.  Linux is a little deficient here: it should be able 
+			/* Nothing on recvmsg.  Linux is a little deficient here: it should be able 
 			   to indicate whether the incoming datagram was checksummed or not. It
 			   cannot.  T_UDP_CHECKSUM cannot be properly indicated.  Sorry. */
 			continue;
@@ -4181,12 +4185,10 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 			}
 			continue;
 		case SOL_TCP:
-			/* 
-			   TCP does not have any options of end to end significance */
+			/* TCP does not have any options of end to end significance */
 			continue;
 		case SOL_UDP:
-			/* 
-			   Nothing on recvmsg.  Linux is a little deficient here: it should be able 
+			/* Nothing on recvmsg.  Linux is a little deficient here: it should be able 
 			   to indicate whether the incoming datagram was checksummed or not. It
 			   cannot.  T_UDP_CHECKSUM cannot be properly indicated.  Sorry. */
 			continue;
@@ -4238,8 +4240,7 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
 	if (ip == NULL || ilen == 0) {
-		/* 
-		   For zero-length options fake an option header for all names with all levels */
+		/* For zero-length options fake an option header for all names with all levels */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -4404,7 +4405,7 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_INFO:
-					// read only, can't get default
+					/* read only, can't get default */
 					olen += _T_SPACE_SIZEOF(ss_defaults.tcp.info);
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -4584,7 +4585,7 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_STATUS:
-					// read-only, no default
+					/* read-only, no default */
 					olen += _T_SPACE_SIZEOF(ss_defaults.sctp.status);
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -4615,8 +4616,7 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
 	if (ip == NULL || ilen == 0) {
-		/* 
-		   For zero-length options fake an option header for all names with all levels */
+		/* For zero-length options fake an option header for all names with all levels */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -4990,8 +4990,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
 	if (ip == NULL || ilen == 0) {
-		/* 
-		   For zero-length options fake an option header for all names with all levels */
+		/* For zero-length options fake an option header for all names with all levels */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -5471,7 +5470,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_STATUS:
-					// read-only
+					/* read-only */
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -5504,8 +5503,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 	int olen = 0, optlen;
 	struct t_opthdr *ih, all;
 	if (ip == NULL || ilen == 0) {
-		/* 
-		   For zero-length options fake an option header for all names with all levels */
+		/* For zero-length options fake an option header for all names with all levels */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -5744,8 +5742,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_INFO:
-					/* 
-					   If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
+					/* If the status is T_SUCCESS, T_FAILURE, T_NOTSUPPORT or
 					   T_READONLY, the returned option value is the same as the 
 					   one requested on input. */
 					olen += T_SPACE(optlen);
@@ -6038,7 +6035,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_STATUS:
-					// read-only
+					/* read-only */
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -6114,8 +6111,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
 	int optlen;
 	if (ilen == 0) {
-		/* 
-		   For zero-length options fake an option for all names within all levels. */
+		/* For zero-length options fake an option for all names within all levels. */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -6127,7 +6123,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 	     ih && oh;
 	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0), oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)) {
 #if 0
-		// don't need to do this, it was done when we sized options
+		/* don't need to do this, it was done when we sized options */
 		if (ih->len < sizeof(*ih))
 			goto einval;
 		if ((unsigned char *) ih + ih->len > ip + ilen)
@@ -6500,7 +6496,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_TCP_INFO:
-					// read only, can't get default
+					/* read only, can't get default */
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_INFO;
 					oh->len = sizeof(*oh);
@@ -6907,8 +6903,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
 	int optlen;
 	if (ilen == 0) {
-		/* 
-		   For zero-length options fake an option for all names within all levels. */
+		/* For zero-length options fake an option for all names within all levels. */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -6960,7 +6955,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				oh->name = XTI_LINGER;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.linger);
 				oh->status = T_SUCCESS;
-				// refresh current value
+				/* refresh current value */
 				*((struct t_linger *) T_OPT_DATA(oh)) = ss->options.xti.linger;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -6972,7 +6967,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				oh->name = XTI_RCVBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvbuf);
 				oh->status = T_SUCCESS;
-				// refresh current value
+				/* refresh current value */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.rcvbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -6984,7 +6979,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				oh->name = XTI_RCVLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.rcvlowat);
 				oh->status = T_SUCCESS;
-				// refresh current value
+				/* refresh current value */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.rcvlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -6996,7 +6991,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				oh->name = XTI_SNDBUF;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndbuf);
 				oh->status = T_SUCCESS;
-				// refresh current value
+				/* refresh current value */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.sndbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -7008,7 +7003,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				oh->name = XTI_SNDLOWAT;
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.sndlowat);
 				oh->status = T_SUCCESS;
-				// refresh current value
+				/* refresh current value */
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.xti.sndlowat;
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -7041,7 +7036,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_OPTIONS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.options);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					bcopy(ss->options.ip.options, T_OPT_DATA(oh), 40);
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7055,7 +7050,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_TOS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.tos);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((unsigned char *) T_OPT_DATA(oh)) = ss->options.ip.tos;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7068,7 +7063,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_TTL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.ttl);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((unsigned char *) T_OPT_DATA(oh)) = ss->options.ip.ttl;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7081,7 +7076,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_REUSEADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.reuseaddr);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((unsigned int *) T_OPT_DATA(oh)) =
 					    ss->options.ip.reuseaddr;
 					if (ih->name != T_ALLOPT)
@@ -7095,7 +7090,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_DONTROUTE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.dontroute);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((unsigned int *) T_OPT_DATA(oh)) =
 					    ss->options.ip.dontroute;
 					if (ih->name != T_ALLOPT)
@@ -7109,7 +7104,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_BROADCAST;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.broadcast);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((unsigned int *) T_OPT_DATA(oh)) =
 					    ss->options.ip.broadcast;
 					if (ih->name != T_ALLOPT)
@@ -7123,7 +7118,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_IP_ADDR;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.addr);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((uint32_t *) T_OPT_DATA(oh)) = ss->options.ip.addr;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7157,7 +7152,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_UDP_CHECKSUM;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.udp.checksum);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.udp.checksum;
 					if (ih->name != T_ALLOPT)
@@ -7190,7 +7185,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_NODELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.nodelay);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.nodelay;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7201,7 +7196,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.maxseg);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.maxseg;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7212,7 +7207,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPALIVE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.keepalive);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((struct t_kpalive *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.keepalive;
 					if (ih->name != T_ALLOPT)
@@ -7222,7 +7217,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.cork);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.cork;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7231,7 +7226,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPIDLE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.keepidle);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.keepidle;
 					if (ih->name != T_ALLOPT)
@@ -7241,7 +7236,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPINTVL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.keepitvl);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.keepitvl;
 					if (ih->name != T_ALLOPT)
@@ -7251,7 +7246,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPCNT;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.keepcnt);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.keepcnt;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7260,7 +7255,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_SYNCNT;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.syncnt);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.syncnt;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7269,7 +7264,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_LINGER2;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.linger2);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.linger2;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7278,7 +7273,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_DEFER_ACCEPT;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.defer_accept);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.defer_accept;
 					if (ih->name != T_ALLOPT)
@@ -7288,7 +7283,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_WINDOW_CLAMP;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.window_clamp);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.window_clamp;
 					if (ih->name != T_ALLOPT)
@@ -7298,7 +7293,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_INFO;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.info);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((struct t_tcp_info *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.info;
 					if (ih->name != T_ALLOPT)
@@ -7308,7 +7303,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_QUICKACK;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.tcp.quickack);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.tcp.quickack;
 					if (ih->name != T_ALLOPT)
@@ -7346,7 +7341,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_NODELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.nodelay);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.nodelay;
 					if (ih->name != T_ALLOPT)
@@ -7360,7 +7355,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_MAXSEG;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.maxseg);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.maxseg;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7373,7 +7368,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_CORK;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cork);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.cork;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7386,7 +7381,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_PPI;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ppi);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.ppi;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7399,7 +7394,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_SID;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sid);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.sid;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7412,7 +7407,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_SSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ssn);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.ssn;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7425,7 +7420,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_TSN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.tsn);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.tsn;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7438,7 +7433,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_RECVOPT;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.recvopt);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.recvopt;
 					if (ih->name != T_ALLOPT)
@@ -7452,7 +7447,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_life);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.cookie_life;
 					if (ih->name != T_ALLOPT)
@@ -7466,7 +7461,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sack_delay);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.sack_delay;
 					if (ih->name != T_ALLOPT)
@@ -7480,7 +7475,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->len =
 					    _T_LENGTH_SIZEOF(ss->options.sctp.path_max_retrans);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.path_max_retrans;
 					if (ih->name != T_ALLOPT)
@@ -7494,7 +7489,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->len =
 					    _T_LENGTH_SIZEOF(ss->options.sctp.assoc_max_retrans);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.assoc_max_retrans;
 					if (ih->name != T_ALLOPT)
@@ -7508,7 +7503,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->len =
 					    _T_LENGTH_SIZEOF(ss->options.sctp.max_init_retries);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.max_init_retries;
 					if (ih->name != T_ALLOPT)
@@ -7522,7 +7517,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.heartbeat_itvl);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.heartbeat_itvl;
 					if (ih->name != T_ALLOPT)
@@ -7536,7 +7531,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_initial);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.rto_initial;
 					if (ih->name != T_ALLOPT)
@@ -7550,7 +7545,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_RTO_MIN;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_min);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.rto_min;
 					if (ih->name != T_ALLOPT)
@@ -7564,7 +7559,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_RTO_MAX;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_max);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.rto_max;
 					if (ih->name != T_ALLOPT)
@@ -7578,7 +7573,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_OSTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ostreams);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.ostreams;
 					if (ih->name != T_ALLOPT)
@@ -7592,7 +7587,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_ISTREAMS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.istreams);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.istreams;
 					if (ih->name != T_ALLOPT)
@@ -7606,7 +7601,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_inc);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.cookie_inc;
 					if (ih->name != T_ALLOPT)
@@ -7620,7 +7615,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.throttle_itvl);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.throttle_itvl;
 					if (ih->name != T_ALLOPT)
@@ -7634,7 +7629,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.mac_type);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.mac_type;
 					if (ih->name != T_ALLOPT)
@@ -7648,7 +7643,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_HB;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.hb);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((struct t_sctp_hb *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.hb;
 					if (ih->name != T_ALLOPT)
@@ -7662,7 +7657,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_RTO;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((struct t_sctp_rto *) T_OPT_DATA(oh)) =
 					    ss->options.sctp.rto;
 					if (ih->name != T_ALLOPT)
@@ -7676,7 +7671,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_STATUS;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.status);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					bcopy(&ss->options.sctp.status, T_OPT_DATA(oh),
 					      sizeof(struct t_sctp_status) +
 					      sizeof(struct t_sctp_dest_status));
@@ -7691,7 +7686,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_DEBUG;
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.debug);
 					oh->status = T_SUCCESS;
-					// refresh current value
+					/* refresh current value */
 					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.debug;
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -7731,8 +7726,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
 	int optlen;
 	if (ilen == 0) {
-		/* 
-		   For zero-length options fake an option for all names within all levels. */
+		/* For zero-length options fake an option for all names within all levels. */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -8375,7 +8369,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_INFO;
 					oh->len = ih->len;
-					// read-only
+					/* read-only */
 					oh->status = ss_overall_result(&overall, T_READONLY);
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (ih->name != T_ALLOPT)
@@ -8492,8 +8486,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -8631,8 +8626,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -8646,8 +8642,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -8661,8 +8658,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -8677,8 +8675,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9037,8 +9036,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						// t_uscalar_t *valp = (typeof(valp))
-						// T_OPT_DATA(oh);
+#if 0
+						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9079,8 +9079,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 	struct sock *sk = (ss && ss->sock) ? ss->sock->sk : NULL;
 	int optlen;
 	if (ilen == 0) {
-		/* 
-		   For zero-length options fake an option for all names within all levels. */
+		/* For zero-length options fake an option for all names within all levels. */
 		all.level = T_ALLLEVELS;
 		all.name = T_ALLOPT;
 		all.len = sizeof(all);
@@ -9135,7 +9134,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					if (ih->len > sizeof(*ih))
 						bcopy(T_OPT_DATA(ih), valp, ih->len - sizeof(*ih));
 				}
-				if (!capable(CAP_NET_ADMIN)) {	// XXX
+				if (!capable(CAP_NET_ADMIN)) {	/* XXX */
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					break;
 				}
@@ -9776,10 +9775,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9800,10 +9799,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9824,10 +9823,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9848,10 +9847,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9872,10 +9871,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9896,10 +9895,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9920,10 +9919,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9944,10 +9943,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9968,10 +9967,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -9992,10 +9991,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10075,10 +10074,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10101,10 +10100,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10127,10 +10126,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10153,10 +10152,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10179,10 +10178,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10205,10 +10204,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10231,10 +10230,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10257,10 +10256,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10283,10 +10282,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10308,10 +10307,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10333,10 +10332,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10358,10 +10357,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10384,10 +10383,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10410,10 +10409,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* negotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10436,10 +10435,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10462,10 +10461,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10488,10 +10487,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10514,10 +10513,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10540,10 +10539,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10566,10 +10565,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10592,10 +10591,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10618,10 +10617,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10644,10 +10643,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10670,10 +10669,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -10696,10 +10695,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = ss_defaults.tcp.cork;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
-						// negotiate value
+						/* netgotiate value */
 					}
 					ss->options.tcp.cork = *valp;
-					// set value on socket
+					/* set value on socket */
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -11052,8 +11051,7 @@ ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 		sock->ops = ss->sock->ops;
 		lock_sock(sk);
 		if (tp->accept_queue) {
-			/* 
-			   find connection in queue */
+			/* find connection in queue */
 			for (reqp = &tp->accept_queue, req_prev = NULL; *reqp && (*reqp)->sk != ask;
 			     req_prev = (*reqp), reqp = &(*reqp)->dl_next) ;
 			if ((req = *reqp)) {
@@ -11100,8 +11098,7 @@ ss_unbind(ss_t * ss)
 		printd(("%s: %p: SS_UNBIND\n", DRV_NAME, ss));
 		ss_socket_put(xchg(&ss->sock, NULL));
 	}
-	/* 
-	   Note: if the reinitialization of the socket fails, we will attempt again to reinitialize 
+	/* Note: if the reinitialization of the socket fails, we will attempt again to reinitialize 
 	   it when an attempt is ever made to rebind the socket.  We just want to have an
 	   initialized socket around so that we can effect options management on the socket in the
 	   unbound state, if possible. */
@@ -11388,8 +11385,7 @@ t_conn_con(queue_t *q, struct sockaddr *res, mblk_t *dp)
 	size_t res_len = ss_addr_size(ss, res);
 	size_t opt_len = ss_size_conn_opts(ss);
 	int err;
-	/* 
-	   this shouldn't happen, we probably shouldn't even check */
+	/* this shouldn't happen, we probably shouldn't even check */
 	if (canputnext(ss->rq)) {
 		if ((mp = ss_allocb(q, sizeof(*p) + res_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
@@ -11465,8 +11461,7 @@ t_discon_ind(queue_t *q, struct sockaddr *res, uint orig, uint reason, mblk_t *c
 	struct T_discon_ind *p;
 	ulong seq = 0;
 	(void) res;
-	/* 
-	   TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
+	/* TPI spec says that if the interface is in the TS_DATA_XFER, TS_WIND_ORDREL or
 	   TS_WACK_ORDREL [sic] state, the stream must be flushed before sending up the
 	   T_DISCON_IND primitive. */
 	switch (ss_get_state(ss)) {
@@ -11642,8 +11637,7 @@ t_error_ack(queue_t *q, ulong prim, long error)
 	p->TLI_error = error < 0 ? TSYSERR : error;
 	p->UNIX_error = error < 0 ? -error : 0;
 	mp->b_wptr += sizeof(*p);
-	/* 
-	   This is to only try and get the state correct for putnext. */
+	/* This is to only try and get the state correct for putnext. */
 	if (error != TOUTSTATE) {
 		switch (ss_get_state(ss)) {
 #ifdef TS_WACK_OPTREQ
@@ -11678,16 +11672,14 @@ t_error_ack(queue_t *q, ulong prim, long error)
 		case TS_WACK_DREQ11:
 			ss_set_state(ss, TS_WREQ_ORDREL);
 			break;
-			/* 
-			   Note: if we are not in a WACK state we simply do not change state.  This 
+			/* Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
 			   TS_IDLE state. */
 		}
 	}
 	printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, ss));
 	putnext(ss->rq, mp);
-	/* 
-	   Returning -EPROTO here will make sure that the old state is restored correctly.  If we
+	/* Returning -EPROTO here will make sure that the old state is restored correctly.  If we
 	   return QR_DONE, then the state will never be restored. */
 	if (error < 0)
 		return (error);
@@ -11726,8 +11718,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 		case TS_WACK_UREQ:
 			if ((err = ss_unbind(ss)))
 				goto free_error;
-			/* 
-			   TPI spec says that if the provider must flush both queues before
+			/* TPI spec says that if the provider must flush both queues before
 			   responding with a T_OK_ACK primitive when responding to a T_UNBIND_REQ.
 			   This is to flush queued data for connectionless providers. */
 			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
@@ -11768,8 +11759,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 				ss_set_state(ss, TS_WRES_CIND);
 			else {
 				ss_set_state(ss, TS_IDLE);
-				/* 
-				   make sure any backed up indications are processed */
+				/* make sure any backed up indications are processed */
 				qenable(ss->rq);
 			}
 			break;
@@ -11783,8 +11773,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 		case TS_WACK_DREQ11:
 			if ((err = ss_disconnect(ss)))
 				goto free_error;
-			/* 
-			   TPI spec says that if the interface is in the TS_DATA_XFER,
+			/* TPI spec says that if the interface is in the TS_DATA_XFER,
 			   TS_WIND_ORDREL or TS_WACK_ORDREL [sic] state, the stream must be flushed
 			   before responding with the T_OK_ACK primitive. */
 			if (m_flush(q, FLUSHRW, 0) == -ENOBUFS)
@@ -11793,8 +11782,7 @@ t_ok_ack(queue_t *q, ulong prim, mblk_t *cp, ss_t * as)
 			break;
 		default:
 			break;
-			/* 
-			   Note: if we are not in a WACK state we simply do not change state.  This 
+			/* Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
 			   the TS_IDLE state. */
 		}
@@ -12129,8 +12117,7 @@ ss_conn_ind(queue_t *q, mblk_t *cp)
 	case AF_UNIX:
 	{
 		struct sockaddr_un *dst_un = (typeof(dst_un)) & dst;
-		/* 
-		   FIXME: use AF_UNIX states */
+		/* FIXME: use AF_UNIX states */
 		if (!ss->conind || ss->sock->sk->sk_state != TCP_LISTEN)
 			goto nolisten;
 		break;
@@ -12188,8 +12175,7 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
 	err = -EBUSY;
 	if (len > sock_wspace(ss->sock->sk))
 		goto out;
-	/* 
-	   This has the ramification that we can never do zero length writes, but we have
+	/* This has the ramification that we can never do zero length writes, but we have
 	   ~T_SNDZERO set anyway. */
 	{
 		int i;
@@ -12197,8 +12183,7 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
 		msg->msg_flags |= (MSG_DONTWAIT | MSG_NOSIGNAL);
 		msg->msg_iov = iov;
 		msg->msg_iovlen = n;
-		/* 
-		   convert message blocks to an iovec */
+		/* convert message blocks to an iovec */
 		for (i = 0, dp = mp; dp; dp = dp->b_cont) {
 			if (dp->b_datap->db_type == M_DATA && dp->b_wptr > dp->b_rptr) {
 				iov[i].iov_base = dp->b_rptr;
@@ -12233,8 +12218,7 @@ ss_sock_sendmsg(ss_t * ss, mblk_t *mp, struct msghdr *msg)
       out:
 	switch (-err) {
 	case ENOMEM:
-		/* 
-		   This buffer call is just to kick us.  Because LiS uses kmalloc for mblks, if we
+		/* This buffer call is just to kick us.  Because LiS uses kmalloc for mblks, if we
 		   can allocate an mblk, then another kernel routine can allocate that much memory
 		   too. */
 		if (ss->wbid) {
@@ -12387,12 +12371,9 @@ ss_putctl(ss_t * ss, queue_t *q, int type, void (*func) (long), struct sock *sk)
 			freemsg(mp);	/* FIXME */
 		return (void) (0);
 	}
-	/* 
-	   set up bufcall so we don't lose events */
+	/* set up bufcall so we don't lose events */
 	spin_lock_bh(&ss->lock);
-	/* 
-	 * make sure bufcalls don't happen now 
-	 */
+	/* make sure bufcalls don't happen now */
 	if (q == ss->rq) {
 		if (ss->rbid)
 			unbufcall(xchg(&ss->rbid, 0));
@@ -12582,13 +12563,20 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		}
 		ss->dst = *dst;
 		if (mp->b_cont) {
-			if (!putbq(q, mp->b_cont))	/* hold back data */
-				freemsg(mp->b_cont);	/* FIXME */
-			mp->b_cont = NULL;	/* abosrbed mp->b_cont */
+			long mlen, mmax;
+			mlen = msgdsize(mp->b_cont);
+			if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+			    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+				goto baddata;
+			/* FIXME need to generate connect with data */
 		}
 		ss_set_state(ss, TS_WACK_CREQ);
 		return t_ok_ack(q, T_CONN_REQ, NULL, NULL);
 	}
+      baddata:
+	err = TBADDATA;
+	ptrace(("%s: ERROR: bad connection data\n", DRV_NAME));
+	goto error;
       badopt:
 	err = TBADOPT;
 	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
@@ -12671,8 +12659,14 @@ t_conn_res(queue_t *q, mblk_t *mp)
 	opt = mp->b_rptr + p->OPT_offset;
 	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto badopt;
-	if (mp->b_cont != NULL && msgdsize(mp->b_cont))	// XXX
-		goto baddata;
+	if (mp->b_cont) {
+		long mlen, mmax;
+		mlen = msgdsize(mp->b_cont);
+		if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto baddata;
+		/* FIXME need to generate connect with data */
+	}
 	if ((err = ss_parse_conn_opts(as, opt, p->OPT_length, 0)) < 0) {
 		switch (-err) {
 		case EINVAL:
@@ -12683,14 +12677,12 @@ t_conn_res(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	/* 
-	   FIXME: options will be processed on wrong socket!!! When we accept, we will delete this
+	/* FIXME: options will be processed on wrong socket!!! When we accept, we will delete this
 	   socket and create another one that was derived from the listening socket.  We need to
 	   process the options against that socket, not the placeholder.  One way to fix this is to
 	   set flags when we process options against the stream structure and then reprocess those
 	   options once the sockets have been swapped.  See t_ok_ack for details. */
-	/* 
-	   FIXME: The accepting socket does not have to be in the bound state.  The socket will be
+	/* FIXME: The accepting socket does not have to be in the bound state.  The socket will be
 	   autobound to the correct address already. */
 	return t_ok_ack(q, T_CONN_RES, cp, as);
       baddata:
@@ -12754,6 +12746,14 @@ t_discon_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (mp->b_cont) {
+		long mlen, mmax;
+		mlen = msgdsize(mp->b_cont);
+		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto baddata;
+		/* FIXME need to generate disconnect with data */
+	}
 	switch (ss_get_state(ss)) {
 	case TS_WCON_CREQ:
 		ss_set_state(ss, TS_WACK_DREQ6);
@@ -12778,6 +12778,10 @@ t_discon_req(queue_t *q, mblk_t *mp)
       badseq:
 	err = TBADSEQ;
 	ptrace(("%s: ERROR: sequence number is invalid\n", DRV_NAME));
+	goto error;
+      baddata:
+	err = TBADDATA;
+	ptrace(("%s: ERROR: bad disconnection data\n", DRV_NAME));
 	goto error;
       einval:
 	err = -EINVAL;
@@ -12812,8 +12816,8 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -12857,8 +12861,8 @@ t_data_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -12905,8 +12909,8 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen < mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen < mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -13140,8 +13144,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	/* 
-	   FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
+	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
       badopt:
 	ptrace(("%s: ERROR: bad options\n", DRV_NAME));
 	goto error;
@@ -13264,6 +13267,14 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
+	if (mp->b_cont) {
+		long mlen, mmax;
+		mlen = msgdsize(mp->b_cont);
+		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
+		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto baddata;
+		/* FIXME need to generate orderly release with data */
+	}
 	ss->sock->ops->shutdown(ss->sock, SEND_SHUTDOWN - 1);	/* XXX */
 	switch (ss_get_state(ss)) {
 	case TS_DATA_XFER:
@@ -13274,6 +13285,9 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 		break;
 	}
 	return (QR_DONE);
+      baddata:
+	ptrace(("%s: ERROR: bad orderly release data\n", DRV_NAME));
+	goto error;
       outstate:
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
@@ -13496,8 +13510,7 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 	if (rtn < 0) {
 		rare();
 		ss_set_state(ss, oldstate);
-		/* 
-		   The put and srv procedures do not recognize all errors.  Sometimes we return an
+		/* The put and srv procedures do not recognize all errors.  Sometimes we return an
 		   error to here just to restore the previous state. */
 		switch (rtn) {
 		case -EBUSY:
@@ -13568,7 +13581,9 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 	int oldstate = xchg(&ss->tcp_state, p->state);
 	if (!ss->sock)
 		goto discard;
-	// assure(p->state != oldstate);
+#if 0
+	assure(p->state != oldstate);
+#endif
 	printd(("%s: %p: sk_state_change [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(oldstate), p->sk));
 	switch (ss->p.prot.type) {
@@ -13641,11 +13656,9 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 				case TCP_LISTEN:
 				{
 					mblk_t *cp;
-					/* 
-					   state change was on child */
+					/* state change was on child */
 					ss->tcp_state = TCP_LISTEN;
-					/* 
-					   look for the child */
+					/* look for the child */
 					if ((cp = t_seq_find(ss, mp)))
 						return (t_discon_ind
 							(q, NULL, T_PROVIDER, 0, cp, NULL));
@@ -13656,8 +13669,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 			case TCP_ESTABLISHED:
 				switch (oldstate) {
 				case TCP_LISTEN:
-					/* 
-					   state change was on child */
+					/* state change was on child */
 					ss->tcp_state = TCP_LISTEN;
 					return (ss_conn_ind(q, mp));
 				}
@@ -13838,7 +13850,9 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	err = sock_error(p->sk);
 	if (!ss->sock)
 		goto discard;
-	// assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
+#if 0
+	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN);
+#endif
 	printd(("%s: %p: sk_error_report [%s <- %s] %p\n", DRV_NAME, ss, tcp_state_name(p->state),
 		tcp_state_name(ss->tcp_state), p->sk));
 	switch (ss->p.prot.type) {
@@ -13846,7 +13860,9 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_SEQPACKET:
 		switch (ss_get_state(ss)) {
 		default:
-			// fixme(("%s: %p: FIXME: save errors for later\n", DRV_NAME, ss));
+#if 0
+			fixme(("%s: %p: FIXME: save errors for later\n", DRV_NAME, ss));
+#endif
 			return (QR_DONE);
 		case TS_IDLE:
 			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
@@ -13944,9 +13960,7 @@ ss_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 	}
 	if ((locked = ss_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
 		do {
-			/* 
-			 * Fast Path 
-			 */
+			/* Fast Path */
 			if ((rtn = (*proc) (q, mp)) == QR_DONE) {
 				freemsg(mp);
 				break;
@@ -14017,9 +14031,7 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 	if (ss_trylockq(q)) {
 		mblk_t *mp;
 		while ((mp = getq(q))) {
-			/* 
-			 * Fast Path 
-			 */
+			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				freemsg(mp);
 				continue;
@@ -14073,10 +14085,7 @@ ss_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 						freemsg(mp);	/* FIXME */
 					break;
 				}
-				/* 
-				 *  Be careful not to put a priority message
-				 *  back on the queue.
-				 */
+				/* Be careful not to put a priority message back on the queue.  */
 				switch (mp->b_datap->db_type) {
 				case M_PCPROTO:
 					mp->b_datap->db_type = M_PROTO;
@@ -14167,7 +14176,9 @@ ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *c
 {
 	ss_t *ss;
 	if ((ss = kmem_cache_alloc(ss_priv_cachep, SLAB_ATOMIC))) {
-		// printd(("%s: allocated module private structure\n", DRV_NAME));
+#if 0
+		printd(("%s: allocated module private structure\n", DRV_NAME));
+#endif
 		bzero(ss, sizeof(*ss));
 		ss->cmajor = cmajor;
 		ss->cminor = cminor;
@@ -14191,8 +14202,10 @@ ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *c
 		ss->prev = slp;
 		*slp = ss;
 		ss->refcnt++;
-		// printd(("%s: linked private structure, reference count %d\n", DRV_NAME,
-		// ss->refcnt));
+#if 0
+		printd(("%s: linked private structure, reference count %d\n", DRV_NAME,
+			ss->refcnt));
+#endif
 	} else
 		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
 	return (ss);
@@ -14202,17 +14215,22 @@ ss_free_priv(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 	printd(("%s: unlinking private structure, reference count = %d\n", DRV_NAME, ss->refcnt));
-	spin_lock_bh(&ss->lock); {
+	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
+	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
+	if (ss->sock)
+		ss_socket_put(xchg(&ss->sock, NULL));
+	printd(("%s: removed socket, reference count = %d\n", DRV_NAME, ss->refcnt));
+	spin_lock_bh(&ss->lock);
+	{
 		bufq_purge(&ss->conq);
-		if (ss->sock)
-			ss_socket_put(xchg(&ss->sock, NULL));
-		printd(("%s: removed socket, reference count = %d\n", DRV_NAME, ss->refcnt));
 		__ss_unbufcall(q);
 		printd(("%s: removed bufcalls, reference count = %d\n", DRV_NAME, ss->refcnt));
+		spin_lock(&ss_lock);
 		if ((*ss->prev = ss->next))
 			ss->next->prev = ss->prev;
 		ss->next = NULL;
 		ss->prev = NULL;
+		spin_unlock(&ss_lock);
 		ss->refcnt--;
 		printd(("%s: unlinked, reference count = %d\n", DRV_NAME, ss->refcnt));
 		ss->rq->q_ptr = NULL;
@@ -14226,7 +14244,9 @@ ss_free_priv(queue_t *q)
 		printd(("%s: WARNING: ss->refcnt = %d\n", DRV_NAME, ss->refcnt));
 	}
 	kmem_cache_free(ss_priv_cachep, ss);
-	// printd(("%s: freed module private structure\n", DRV_NAME));
+#if 0
+	printd(("%s: freed module private structure\n", DRV_NAME));
+#endif
 	return;
 }
 
@@ -14359,17 +14379,14 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_bh(&ss_lock);
 		return (ENOMEM);
 	}
-	/* 
-	   Create all but raw sockets at open time.  For raw sockets, we do not know the protocol
+	/* Create all but raw sockets at open time.  For raw sockets, we do not know the protocol
 	   to create until the socket is bound to a protocol.  For all others, the protocol is
 	   known and the socket is created so that we can accept options management on unbound
 	   sockets. */
 	spin_unlock_bh(&ss_lock);
 	if ((err = ss_sock_init(ss)) < 0) {
 		ptrace(("%s: ERROR: from ss_sock_init %d\n", DRV_NAME, -err));
-		spin_lock_bh(&ss_lock);
 		ss_free_priv(q);
-		spin_unlock_bh(&ss_lock);
 		return (-err);
 	}
 	qprocson(q);
@@ -14389,13 +14406,12 @@ ss_close(queue_t *q, int flag, cred_t *crp)
 	(void) ss;
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, ss->cmajor, ss->cminor));
 #if defined LIS
-	/* 
-	   protect against LiS bugs */
+	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", DRV_NAME, __FUNCTION__);
 		goto quit;
 	}
-	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+	if (q->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			DRV_NAME, __FUNCTION__);
 		goto skip_pop;
@@ -14404,9 +14420,7 @@ ss_close(queue_t *q, int flag, cred_t *crp)
 	goto skip_pop;
       skip_pop:
 	qprocsoff(q);
-	spin_lock_bh(&ss_lock);
 	ss_free_priv(q);
-	spin_unlock_bh(&ss_lock);
 	goto quit;
       quit:
 	return (0);
