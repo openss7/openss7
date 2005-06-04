@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/03 12:19:16 $ by $Author: brian $
+ Last Modified $Date: 2005/06/03 23:57:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.11  2005/06/03 23:57:35  brian
+ - minor correction
+
  Revision 0.9.2.10  2005/06/03 12:19:16  brian
  - more upgrading of test suites
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:35 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 12:19:16 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:35 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -2537,6 +2540,8 @@ int test_nonblock(int child)
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2546,6 +2551,8 @@ int test_nonblock(int child)
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
 			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2561,6 +2568,8 @@ int test_block(int child)
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2570,6 +2579,8 @@ int test_block(int child)
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
 			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
