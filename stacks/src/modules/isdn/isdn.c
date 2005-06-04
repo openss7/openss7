@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 08:45:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:55 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 08:45:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 08:45:15 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 08:45:15 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -73,7 +73,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:30:55 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 08:45:15 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14416,7 +14416,7 @@ dl_w_prim(queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 // STATIC isdn_t *isdn_list = NULL;
-STATIC spinlock_t isdn_lock;
+STATIC spinlock_t isdn_lock = SPIN_LOCK_UNLOCKED;
 STATIC major_t isdn_majors[ISDN_CMAJORS] = { ISDN_CMAJOR_0, };
 
 /*

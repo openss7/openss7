@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:30:54 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/04 08:45:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:54 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 08:45:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:30:54 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/04 08:45:14 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:30:54 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/04 08:45:14 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -211,7 +211,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:30:54 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/04 08:45:14 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -719,7 +719,7 @@ typedef struct ss_event {
 	int state;			/* state at time of event */
 } ss_event_t;
 
-STATIC spinlock_t ss_lock;		/* protects ss_opens lists */
+STATIC spinlock_t ss_lock = SPIN_LOCK_UNLOCKED;	/* protects ss_opens lists */
 STATIC ss_t *ss_opens = NULL;
 
 #if 0

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:06 $
+ @(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 08:45:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:06 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 08:45:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:06 $"
+#ident "@(#) $RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 08:45:15 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:31:06 $";
+    "$RCSfile: sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 08:45:15 $";
 
 #define __NO_VERSION__
 
@@ -1992,7 +1992,7 @@ sctp_n_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-spinlock_t sctp_n_lock = SPINLOCK_LOCKED;
+spinlock_t sctp_n_lock = SPIN_LOCK_UNLOCKED;
 struct sctp *sctp_n_list = NULL;
 
 STATIC int

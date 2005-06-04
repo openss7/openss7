@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 09:13:55 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 09:13:55 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 13:38:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.10  2005/06/04 13:38:47  brian
+ - final workup of test suites
+
  Revision 0.9.2.9  2005/06/04 09:13:55  brian
  - test suite corrections
 
@@ -123,9 +126,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 09:13:55 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:47 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 09:13:55 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:47 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2348,7 +2351,8 @@ void print_libcall(int child, const char *command)
 	static const char *msgs[] = {
 		"  %-16s->|                                |  |                   [%d]\n",
 		"                    |                                |  |<-%16s [%d]\n",
-		"                    |                                |  |                   [%d]\n",
+		"                    |                                |<-+--%16s [%d]\n",
+		"                    |        [%16s]      |  |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2359,7 +2363,7 @@ void print_terror(int child, long error, long terror)
 	static const char *msgs[] = {
 		"  %-14s<--/|                                |  |                   [%d]\n",
 		"                    |                                |  |\\-->%14s [%d]\n",
-		"                    |                                |  |                   [%d]\n",
+		"                    |                                |\\-+--->%14s [%d]\n",
 		"                    |          [%14s]      |  |                   [%d]\n",
 	};
 	if (verbose > 0)
@@ -2381,10 +2385,10 @@ void print_expect(int child, int want)
 void print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-20s|                               |  |                    \n",
-		"                    |                               |  |%-20s\n",
-		"                    |                               |  |%-20s\n",
-		"                    |       %-20s    |  |                    \n",
+		"%-20s|                                |  |                    \n",
+		"                    |                                |  |%-20s\n",
+		"                    |                                |   %-20s\n",
+		"                    |       %-20s     |  |                    \n",
 	};
 	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
@@ -2401,10 +2405,10 @@ void print_time_state(int child, const char *msgs[], ulong time)
 void print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / |  |                    [%d]\n",
-		"                    | / / / Waiting %03lu seconds / / |  | / / / / / / / / / /[%d]\n",
-		"                    | / / / Waiting %03lu seconds / / |/ | / / / / / / / / / /[%d]\n",
-		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / |/ | / / / / / / / / / /[%d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|  |                   [%d]\n",
+		"                    | / / / Waiting %03lu seconds / / /|  | / / / / / / / / / [%d]\n",
+		"                    | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / / [%d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / / [%d]\n",
 	};
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
@@ -2960,6 +2964,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length));
 		print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
@@ -3110,6 +3115,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_ACK:
 		ctrl->len = sizeof(p->bind_ack);
@@ -3676,6 +3682,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_CONN_IND;
 			last_sequence = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
 			print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
 			break;
 		case T_CONN_CON:
@@ -3707,6 +3714,8 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_ERROR_ACK:
 			event = __TEST_ERROR_ACK;
+			last_t_errno = p->error_ack.TLI_error;
+			last_errno = p->error_ack.UNIX_error;
 			print_ack_prim(child, prim_string(p->type));
 			print_string(child, terrno_string(p->error_ack.TLI_error, p->error_ack.UNIX_error));
 			break;
@@ -4882,7 +4891,7 @@ int test_case_4_2_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TBADDATA)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4894,6 +4903,9 @@ int test_case_4_2_resp(int child)
 {
 	test_sleep(child, 1);
 	state++;
+	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -4901,10 +4913,13 @@ int test_case_4_2_list(int child)
 {
 	test_sleep(child, 1);
 	state++;
+	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
-#define postamble_4_2_conn postamble_1e
+#define postamble_4_2_conn postamble_1
 #define postamble_4_2_resp postamble_1
 #define postamble_4_2_list postamble_1
 
@@ -4921,65 +4936,65 @@ struct test_stream test_4_2_list = { &preamble_4_2_list, &test_case_4_2_list, &p
 #define desc_case_5_1 "\
 Connect, transfer data and perform orderly release."
 
-#define preamble_5_1_conn preamble_2_conn
-#define preamble_5_1_resp preamble_2_resp
-#define preamble_5_1_list preamble_2_list
+int preamble_5_1_conn(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+3);
+	return preamble_2_conn(child);
+}
+int preamble_5_1_resp(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+3);
+	return preamble_2_resp(child);
+}
+int preamble_5_1_list(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+3);
+	return preamble_2_list(child);
+}
 
 int test_case_5_1_conn(int child)
 {
 	static char dat[] = "Orderly release data connecting.";
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
+	int data_seen = 0, data_sent;
+	for (data_sent = 0; data_sent < 4; data_sent++) {
+		test_data = dat;
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			break;
+		case __TEST_DATA_IND:
+			if (data_seen >= 4)
+				goto failure;
+			data_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 	}
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
+	while (data_seen < 4) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			break;
+		case __TEST_DATA_IND:
+			if (data_seen >= 4)
+				goto failure;
+			data_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 	}
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
-	}
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
-	}
-	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -4995,61 +5010,50 @@ int test_case_5_1_conn(int child)
 int test_case_5_1_resp(int child)
 {
 	static char dat[] = "Orderly release data responding.";
-	test_data = dat;
-	MORE_flag = 1;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
+	int data_seen = 0, data_sent, ordrel_seen = 0;
+	for (data_sent = 0; data_sent < 4; data_sent++) {
+		test_data = dat;
+		MORE_flag = 1;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			break;
+		case __TEST_DATA_IND:
+			if (data_seen >= 4)
+				goto failure;
+			data_seen++;
+			break;
+		case __TEST_ORDREL_IND:
+			if (ordrel_seen >= 1)
+				goto failure;
+			ordrel_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 	}
-	state++;
-	test_data = dat;
-	MORE_flag = 1;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
+	while (data_seen < 4 || ordrel_seen < 1) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			break;
+		case __TEST_DATA_IND:
+			if (data_seen >= 4)
+				goto failure;
+			data_seen++;
+			break;
+		case __TEST_ORDREL_IND:
+			if (ordrel_seen >= 1)
+				goto failure;
+			ordrel_seen++;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 	}
-	state++;
-	test_data = dat;
-	MORE_flag = 1;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
-	}
-	state++;
-	test_data = dat;
-	MORE_flag = 1;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (wait_event(child, NORMAL_WAIT)) {
-	case __EVENT_NO_MSG:
-	case __TEST_DATA_IND:
-		break;
-	default:
-		goto failure;
-	}
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -5062,6 +5066,10 @@ int test_case_5_1_resp(int child)
 int test_case_5_1_list(int child)
 {
 	test_sleep(child, 1);
+	state++;
+	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -5082,9 +5090,27 @@ struct test_stream test_5_1_list = { &preamble_5_1_list, &test_case_5_1_list, &p
 Connect, transfer data and perform orderly release but transfer\n\
 data after release has been initiated"
 
-#define preamble_5_2_conn preamble_2_conn
-#define preamble_5_2_resp preamble_2_resp
-#define preamble_5_2_list preamble_2_list
+int preamble_5_2_conn(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+6);
+	return preamble_2_conn(child);
+}
+int preamble_5_2_resp(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+6);
+	return preamble_2_resp(child);
+}
+int preamble_5_2_list(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+6);
+	return preamble_2_list(child);
+}
 
 int test_case_5_2_conn(int child)
 {
@@ -5184,9 +5210,27 @@ Connect, transfer data and perform orderly release but attempt\n\
 to perform a simultaneous release from both sides.  (This might\n\
 or might not result in a simultaneous release attempt.)"
 
-#define preamble_5_3_conn preamble_2_conn
-#define preamble_5_3_resp preamble_2_resp
-#define preamble_5_3_list preamble_2_list
+int preamble_5_3_conn(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+9);
+	return preamble_2_conn(child);
+}
+int preamble_5_3_resp(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+9);
+	return preamble_2_resp(child);
+}
+int preamble_5_3_list(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+9);
+	return preamble_2_list(child);
+}
 
 int test_case_5_3_conn(int child)
 {
@@ -5293,9 +5337,27 @@ struct test_stream test_5_3_list = { &preamble_5_3_list, &test_case_5_3_list, &p
 #define desc_case_5_4 "\
 Connect, transfer data and perform abort."
 
-#define preamble_5_4_conn preamble_2_conn
-#define preamble_5_4_resp preamble_2_resp
-#define preamble_5_4_list preamble_2_list
+int preamble_5_4_conn(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+12);
+	return preamble_2_conn(child);
+}
+int preamble_5_4_resp(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+12);
+	return preamble_2_resp(child);
+}
+int preamble_5_4_list(int child)
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		addrs[i].sin_port = htons(ports[i]+12);
+	return preamble_2_list(child);
+}
 
 int test_case_5_4_conn(int child)
 {
@@ -5445,6 +5507,7 @@ int run_stream(int child, struct test_stream *stream)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	print_preamble(child);
+	state = 100;
 	if (stream->preamble && stream->preamble(child) != __RESULT_SUCCESS) {
 		print_inconclusive(child);
 		result = __RESULT_INCONCLUSIVE;
@@ -5734,16 +5797,16 @@ int do_tests(void)
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (aborted) {
-				tests[i].result = __RESULT_INCONCLUSIVE;
-				inconclusive++;
-				continue;
-			}
 			if (tests[i].result)
 				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				skipped++;
+				continue;
+			}
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
 				continue;
 			}
 			if (verbose > 0) {

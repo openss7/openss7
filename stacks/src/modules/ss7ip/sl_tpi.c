@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:09 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 08:45:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:09 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 08:45:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:09 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 08:45:15 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:09 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 08:45:15 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -414,7 +414,7 @@ sl_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
  *  -------------------------------------------------------------------------
  */
 STATIC mblk_t *sl_bufpool = NULL;
-STATIC spinlock_t sl_bufpool_lock;
+STATIC spinlock_t sl_bufpool_lock = SPIN_LOCK_UNLOCKED;
 
 /*
  *  FAST ALLOCB
