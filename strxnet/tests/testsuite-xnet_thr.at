@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/04 07:07:24 $
+dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/06/04 13:40:35 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/04 07:07:24 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/04 13:40:35 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-xnet_thr.at,v $
+dnl Revision 0.9.2.4  2005/06/04 13:40:35  brian
+dnl - exit early to get proper return code
+dnl
 dnl Revision 0.9.2.3  2005/06/04 07:07:24  brian
 dnl - improving test suites
 dnl
@@ -90,7 +93,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 1.1
+    test-xnet_thr $options -e -o 1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -101,7 +104,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 1.2.1
+    test-xnet_thr $options -e -o 1.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -112,7 +115,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 1.2.2
+    test-xnet_thr $options -e -o 1.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -123,7 +126,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 1.2.3
+    test-xnet_thr $options -e -o 1.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -134,7 +137,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.1
+    test-xnet_thr $options -e -o 2.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -145,7 +148,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.2
+    test-xnet_thr $options -e -o 2.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -156,7 +159,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.3
+    test-xnet_thr $options -e -o 2.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -167,7 +170,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.4
+    test-xnet_thr $options -e -o 2.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -178,7 +181,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.5
+    test-xnet_thr $options -e -o 2.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -189,7 +192,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.6
+    test-xnet_thr $options -e -o 2.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -200,7 +203,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.7
+    test-xnet_thr $options -e -o 2.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -211,7 +214,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.1.8
+    test-xnet_thr $options -e -o 2.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -222,7 +225,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.2
+    test-xnet_thr $options -e -o 2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -233,7 +236,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.1
+    test-xnet_thr $options -e -o 2.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -244,7 +247,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.2
+    test-xnet_thr $options -e -o 2.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -255,7 +258,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.3
+    test-xnet_thr $options -e -o 2.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -266,7 +269,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.4
+    test-xnet_thr $options -e -o 2.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -277,7 +280,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.5
+    test-xnet_thr $options -e -o 2.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -288,7 +291,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.6
+    test-xnet_thr $options -e -o 2.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -299,7 +302,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.7
+    test-xnet_thr $options -e -o 2.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -310,7 +313,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.8
+    test-xnet_thr $options -e -o 2.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -321,7 +324,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.3.9
+    test-xnet_thr $options -e -o 2.3.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -332,7 +335,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.4.1
+    test-xnet_thr $options -e -o 2.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -343,7 +346,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 2.5.1
+    test-xnet_thr $options -e -o 2.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -354,7 +357,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.1.1
+    test-xnet_thr $options -e -o 3.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -365,7 +368,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.2.1
+    test-xnet_thr $options -e -o 3.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -376,7 +379,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.3.1
+    test-xnet_thr $options -e -o 3.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -387,7 +390,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.4.1
+    test-xnet_thr $options -e -o 3.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -398,7 +401,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.4.2
+    test-xnet_thr $options -e -o 3.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -409,7 +412,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.5.1
+    test-xnet_thr $options -e -o 3.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -420,7 +423,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.5.2
+    test-xnet_thr $options -e -o 3.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -431,7 +434,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.6.1
+    test-xnet_thr $options -e -o 3.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -442,7 +445,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 3.7.1
+    test-xnet_thr $options -e -o 3.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -453,7 +456,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.1.1
+    test-xnet_thr $options -e -o 4.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -464,7 +467,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.1.2
+    test-xnet_thr $options -e -o 4.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -475,7 +478,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.2.1
+    test-xnet_thr $options -e -o 4.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -486,7 +489,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.2.2
+    test-xnet_thr $options -e -o 4.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -497,7 +500,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.3.1
+    test-xnet_thr $options -e -o 4.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -508,7 +511,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.1
+    test-xnet_thr $options -e -o 4.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -519,7 +522,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.2
+    test-xnet_thr $options -e -o 4.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -530,7 +533,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.3
+    test-xnet_thr $options -e -o 4.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -541,7 +544,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.4
+    test-xnet_thr $options -e -o 4.4.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -552,7 +555,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.5
+    test-xnet_thr $options -e -o 4.4.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -563,7 +566,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.6
+    test-xnet_thr $options -e -o 4.4.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -574,7 +577,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.7
+    test-xnet_thr $options -e -o 4.4.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -585,7 +588,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.4.8
+    test-xnet_thr $options -e -o 4.4.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -596,7 +599,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.5.1
+    test-xnet_thr $options -e -o 4.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -607,7 +610,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.6.1
+    test-xnet_thr $options -e -o 4.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -618,7 +621,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.6.2
+    test-xnet_thr $options -e -o 4.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -629,7 +632,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.6.3
+    test-xnet_thr $options -e -o 4.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -640,7 +643,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.6.4
+    test-xnet_thr $options -e -o 4.6.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -651,7 +654,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.7.1
+    test-xnet_thr $options -e -o 4.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -662,7 +665,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.7.2
+    test-xnet_thr $options -e -o 4.7.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -673,7 +676,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.7.3
+    test-xnet_thr $options -e -o 4.7.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -684,7 +687,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.7.4
+    test-xnet_thr $options -e -o 4.7.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -695,7 +698,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.8.1
+    test-xnet_thr $options -e -o 4.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -706,7 +709,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.8.2
+    test-xnet_thr $options -e -o 4.8.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -717,7 +720,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.8.3
+    test-xnet_thr $options -e -o 4.8.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -728,7 +731,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 4.9.1
+    test-xnet_thr $options -e -o 4.9.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -739,7 +742,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.1
+    test-xnet_thr $options -e -o 5.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -750,7 +753,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.2
+    test-xnet_thr $options -e -o 5.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -761,7 +764,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.3
+    test-xnet_thr $options -e -o 5.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -772,7 +775,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.4
+    test-xnet_thr $options -e -o 5.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -783,7 +786,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.5
+    test-xnet_thr $options -e -o 5.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -794,7 +797,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.6
+    test-xnet_thr $options -e -o 5.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -805,7 +808,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.7
+    test-xnet_thr $options -e -o 5.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -816,7 +819,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.8
+    test-xnet_thr $options -e -o 5.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -827,7 +830,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.9
+    test-xnet_thr $options -e -o 5.1.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -838,7 +841,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.10
+    test-xnet_thr $options -e -o 5.1.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -849,7 +852,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.11
+    test-xnet_thr $options -e -o 5.1.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -860,7 +863,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.12
+    test-xnet_thr $options -e -o 5.1.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -871,7 +874,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.13
+    test-xnet_thr $options -e -o 5.1.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -882,7 +885,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.14
+    test-xnet_thr $options -e -o 5.1.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -893,7 +896,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.15
+    test-xnet_thr $options -e -o 5.1.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -904,7 +907,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.16
+    test-xnet_thr $options -e -o 5.1.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -915,7 +918,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.17
+    test-xnet_thr $options -e -o 5.1.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -926,7 +929,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.18
+    test-xnet_thr $options -e -o 5.1.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -937,7 +940,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.19
+    test-xnet_thr $options -e -o 5.1.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -948,7 +951,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.20
+    test-xnet_thr $options -e -o 5.1.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -959,7 +962,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.21
+    test-xnet_thr $options -e -o 5.1.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -970,7 +973,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.22
+    test-xnet_thr $options -e -o 5.1.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -981,7 +984,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.23
+    test-xnet_thr $options -e -o 5.1.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -992,7 +995,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.24
+    test-xnet_thr $options -e -o 5.1.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1003,7 +1006,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.25
+    test-xnet_thr $options -e -o 5.1.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1014,7 +1017,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.26
+    test-xnet_thr $options -e -o 5.1.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1025,7 +1028,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.27
+    test-xnet_thr $options -e -o 5.1.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1036,7 +1039,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.1.28
+    test-xnet_thr $options -e -o 5.1.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1047,7 +1050,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.1
+    test-xnet_thr $options -e -o 5.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1058,7 +1061,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.2
+    test-xnet_thr $options -e -o 5.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1069,7 +1072,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.3
+    test-xnet_thr $options -e -o 5.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1080,7 +1083,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.4
+    test-xnet_thr $options -e -o 5.2.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1091,7 +1094,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.5
+    test-xnet_thr $options -e -o 5.2.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1102,7 +1105,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.6
+    test-xnet_thr $options -e -o 5.2.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1113,7 +1116,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.7
+    test-xnet_thr $options -e -o 5.2.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1124,7 +1127,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.8
+    test-xnet_thr $options -e -o 5.2.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1135,7 +1138,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.9
+    test-xnet_thr $options -e -o 5.2.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1146,7 +1149,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.10
+    test-xnet_thr $options -e -o 5.2.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1157,7 +1160,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.11
+    test-xnet_thr $options -e -o 5.2.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1168,7 +1171,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.12
+    test-xnet_thr $options -e -o 5.2.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1179,7 +1182,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.13
+    test-xnet_thr $options -e -o 5.2.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1190,7 +1193,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.14
+    test-xnet_thr $options -e -o 5.2.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1201,7 +1204,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.15
+    test-xnet_thr $options -e -o 5.2.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1212,7 +1215,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.16
+    test-xnet_thr $options -e -o 5.2.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1223,7 +1226,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.17
+    test-xnet_thr $options -e -o 5.2.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1234,7 +1237,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.18
+    test-xnet_thr $options -e -o 5.2.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1245,7 +1248,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.19
+    test-xnet_thr $options -e -o 5.2.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1256,7 +1259,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.20
+    test-xnet_thr $options -e -o 5.2.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1267,7 +1270,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.21
+    test-xnet_thr $options -e -o 5.2.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1278,7 +1281,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.22
+    test-xnet_thr $options -e -o 5.2.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1289,7 +1292,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.23
+    test-xnet_thr $options -e -o 5.2.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1300,7 +1303,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.24
+    test-xnet_thr $options -e -o 5.2.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1311,7 +1314,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.25
+    test-xnet_thr $options -e -o 5.2.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1322,7 +1325,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.26
+    test-xnet_thr $options -e -o 5.2.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1333,7 +1336,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.27
+    test-xnet_thr $options -e -o 5.2.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1344,7 +1347,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.2.28
+    test-xnet_thr $options -e -o 5.2.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1355,7 +1358,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.1
+    test-xnet_thr $options -e -o 5.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1366,7 +1369,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.2
+    test-xnet_thr $options -e -o 5.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1377,7 +1380,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.3
+    test-xnet_thr $options -e -o 5.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1388,7 +1391,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.4
+    test-xnet_thr $options -e -o 5.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1399,7 +1402,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.5
+    test-xnet_thr $options -e -o 5.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1410,7 +1413,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.6
+    test-xnet_thr $options -e -o 5.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1421,7 +1424,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.7
+    test-xnet_thr $options -e -o 5.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1432,7 +1435,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.8
+    test-xnet_thr $options -e -o 5.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1443,7 +1446,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.9
+    test-xnet_thr $options -e -o 5.3.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1454,7 +1457,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.10
+    test-xnet_thr $options -e -o 5.3.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1465,7 +1468,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.11
+    test-xnet_thr $options -e -o 5.3.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1476,7 +1479,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.12
+    test-xnet_thr $options -e -o 5.3.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1487,7 +1490,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.13
+    test-xnet_thr $options -e -o 5.3.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1498,7 +1501,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.14
+    test-xnet_thr $options -e -o 5.3.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1509,7 +1512,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.15
+    test-xnet_thr $options -e -o 5.3.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1520,7 +1523,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.16
+    test-xnet_thr $options -e -o 5.3.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1531,7 +1534,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.17
+    test-xnet_thr $options -e -o 5.3.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1542,7 +1545,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.18
+    test-xnet_thr $options -e -o 5.3.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1553,7 +1556,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.19
+    test-xnet_thr $options -e -o 5.3.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1564,7 +1567,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.20
+    test-xnet_thr $options -e -o 5.3.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1575,7 +1578,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.21
+    test-xnet_thr $options -e -o 5.3.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1586,7 +1589,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.22
+    test-xnet_thr $options -e -o 5.3.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1597,7 +1600,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.23
+    test-xnet_thr $options -e -o 5.3.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1608,7 +1611,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.24
+    test-xnet_thr $options -e -o 5.3.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1619,7 +1622,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.25
+    test-xnet_thr $options -e -o 5.3.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1630,7 +1633,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.26
+    test-xnet_thr $options -e -o 5.3.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1641,7 +1644,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.27
+    test-xnet_thr $options -e -o 5.3.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1652,7 +1655,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 5.3.28
+    test-xnet_thr $options -e -o 5.3.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1663,7 +1666,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.1
+    test-xnet_thr $options -e -o 6.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1674,7 +1677,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.2
+    test-xnet_thr $options -e -o 6.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1685,7 +1688,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.3
+    test-xnet_thr $options -e -o 6.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1696,7 +1699,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.4
+    test-xnet_thr $options -e -o 6.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1707,7 +1710,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.5
+    test-xnet_thr $options -e -o 6.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1718,7 +1721,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.6
+    test-xnet_thr $options -e -o 6.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1729,7 +1732,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.7
+    test-xnet_thr $options -e -o 6.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1740,7 +1743,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.8
+    test-xnet_thr $options -e -o 6.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1751,7 +1754,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.9
+    test-xnet_thr $options -e -o 6.1.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1762,7 +1765,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.10
+    test-xnet_thr $options -e -o 6.1.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1773,7 +1776,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.11
+    test-xnet_thr $options -e -o 6.1.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1784,7 +1787,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.1.12
+    test-xnet_thr $options -e -o 6.1.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1795,7 +1798,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.1
+    test-xnet_thr $options -e -o 6.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1806,7 +1809,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.2
+    test-xnet_thr $options -e -o 6.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1817,7 +1820,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.3
+    test-xnet_thr $options -e -o 6.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1828,7 +1831,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.4
+    test-xnet_thr $options -e -o 6.2.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1839,7 +1842,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.5
+    test-xnet_thr $options -e -o 6.2.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1850,7 +1853,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.2.6
+    test-xnet_thr $options -e -o 6.2.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1861,7 +1864,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.1
+    test-xnet_thr $options -e -o 6.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1872,7 +1875,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.2
+    test-xnet_thr $options -e -o 6.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1883,7 +1886,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.3
+    test-xnet_thr $options -e -o 6.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1894,7 +1897,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.4
+    test-xnet_thr $options -e -o 6.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1905,7 +1908,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.5
+    test-xnet_thr $options -e -o 6.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1916,7 +1919,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.6
+    test-xnet_thr $options -e -o 6.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1927,7 +1930,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.7
+    test-xnet_thr $options -e -o 6.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1938,7 +1941,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.3.8
+    test-xnet_thr $options -e -o 6.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1949,7 +1952,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.1
+    test-xnet_thr $options -e -o 6.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1960,7 +1963,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.2
+    test-xnet_thr $options -e -o 6.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1971,7 +1974,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.3
+    test-xnet_thr $options -e -o 6.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1982,7 +1985,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.4
+    test-xnet_thr $options -e -o 6.4.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1993,7 +1996,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.5
+    test-xnet_thr $options -e -o 6.4.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2004,7 +2007,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.4.6
+    test-xnet_thr $options -e -o 6.4.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2015,7 +2018,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.5.1
+    test-xnet_thr $options -e -o 6.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2026,7 +2029,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.5.2
+    test-xnet_thr $options -e -o 6.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2037,7 +2040,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.5.3
+    test-xnet_thr $options -e -o 6.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2048,7 +2051,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.5.4
+    test-xnet_thr $options -e -o 6.5.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2059,7 +2062,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.5.5
+    test-xnet_thr $options -e -o 6.5.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2070,7 +2073,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.6.1
+    test-xnet_thr $options -e -o 6.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2081,7 +2084,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 6.6.2
+    test-xnet_thr $options -e -o 6.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2092,7 +2095,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.1.1
+    test-xnet_thr $options -e -o 7.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2103,7 +2106,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.1.2
+    test-xnet_thr $options -e -o 7.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2114,7 +2117,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.1.3
+    test-xnet_thr $options -e -o 7.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2125,7 +2128,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.2.1
+    test-xnet_thr $options -e -o 7.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2136,7 +2139,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.3.1
+    test-xnet_thr $options -e -o 7.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2147,7 +2150,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.3.2
+    test-xnet_thr $options -e -o 7.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2158,7 +2161,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.3.3
+    test-xnet_thr $options -e -o 7.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2169,7 +2172,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.3.4
+    test-xnet_thr $options -e -o 7.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2180,7 +2183,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.3.5
+    test-xnet_thr $options -e -o 7.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2191,7 +2194,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.4.1
+    test-xnet_thr $options -e -o 7.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2202,7 +2205,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.4.2
+    test-xnet_thr $options -e -o 7.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2213,7 +2216,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.4.3
+    test-xnet_thr $options -e -o 7.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2224,7 +2227,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.5.1
+    test-xnet_thr $options -e -o 7.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2235,7 +2238,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.5.2
+    test-xnet_thr $options -e -o 7.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2246,7 +2249,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.5.3
+    test-xnet_thr $options -e -o 7.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2257,7 +2260,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.6.1
+    test-xnet_thr $options -e -o 7.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2268,7 +2271,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.6.2
+    test-xnet_thr $options -e -o 7.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2279,7 +2282,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.6.3
+    test-xnet_thr $options -e -o 7.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2290,7 +2293,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.7.1
+    test-xnet_thr $options -e -o 7.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2301,7 +2304,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.7.2
+    test-xnet_thr $options -e -o 7.7.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2312,7 +2315,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.7.3
+    test-xnet_thr $options -e -o 7.7.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2323,7 +2326,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.8.1
+    test-xnet_thr $options -e -o 7.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2334,7 +2337,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.8.2
+    test-xnet_thr $options -e -o 7.8.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2345,7 +2348,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.8.3
+    test-xnet_thr $options -e -o 7.8.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2356,7 +2359,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.9.1
+    test-xnet_thr $options -e -o 7.9.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2367,7 +2370,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.9.2
+    test-xnet_thr $options -e -o 7.9.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2378,7 +2381,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.9.3
+    test-xnet_thr $options -e -o 7.9.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2389,7 +2392,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.10.1
+    test-xnet_thr $options -e -o 7.10.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2400,7 +2403,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.10.2
+    test-xnet_thr $options -e -o 7.10.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2411,7 +2414,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.10.3
+    test-xnet_thr $options -e -o 7.10.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2422,7 +2425,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.11.1
+    test-xnet_thr $options -e -o 7.11.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2433,7 +2436,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.11.2
+    test-xnet_thr $options -e -o 7.11.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2444,7 +2447,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.11.3
+    test-xnet_thr $options -e -o 7.11.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2455,7 +2458,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.12.1
+    test-xnet_thr $options -e -o 7.12.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2466,7 +2469,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.12.2
+    test-xnet_thr $options -e -o 7.12.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2477,7 +2480,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.12.3
+    test-xnet_thr $options -e -o 7.12.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2488,7 +2491,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.13.1
+    test-xnet_thr $options -e -o 7.13.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2499,7 +2502,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.13.2
+    test-xnet_thr $options -e -o 7.13.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2510,7 +2513,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.13.3
+    test-xnet_thr $options -e -o 7.13.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2521,7 +2524,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.14.1
+    test-xnet_thr $options -e -o 7.14.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2532,7 +2535,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.14.2
+    test-xnet_thr $options -e -o 7.14.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2543,7 +2546,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.14.3
+    test-xnet_thr $options -e -o 7.14.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2554,7 +2557,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.15.1
+    test-xnet_thr $options -e -o 7.15.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2565,7 +2568,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.15.2
+    test-xnet_thr $options -e -o 7.15.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2576,7 +2579,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.15.3
+    test-xnet_thr $options -e -o 7.15.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2587,7 +2590,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.16.1
+    test-xnet_thr $options -e -o 7.16.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2598,7 +2601,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.16.2
+    test-xnet_thr $options -e -o 7.16.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2609,7 +2612,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.16.3
+    test-xnet_thr $options -e -o 7.16.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2620,7 +2623,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 7.17.1
+    test-xnet_thr $options -e -o 7.17.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2631,7 +2634,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.1.1
+    test-xnet_thr $options -e -o 8.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2642,7 +2645,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.1.2
+    test-xnet_thr $options -e -o 8.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2653,7 +2656,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.1.3
+    test-xnet_thr $options -e -o 8.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2664,7 +2667,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.1.4
+    test-xnet_thr $options -e -o 8.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2675,7 +2678,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.2.1
+    test-xnet_thr $options -e -o 8.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2686,7 +2689,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.2.2
+    test-xnet_thr $options -e -o 8.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2697,7 +2700,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.2.3
+    test-xnet_thr $options -e -o 8.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2708,7 +2711,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.3.1
+    test-xnet_thr $options -e -o 8.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2719,7 +2722,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.3.2
+    test-xnet_thr $options -e -o 8.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2730,7 +2733,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.4.1
+    test-xnet_thr $options -e -o 8.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2741,7 +2744,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.5.1
+    test-xnet_thr $options -e -o 8.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2752,7 +2755,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.5.2
+    test-xnet_thr $options -e -o 8.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2763,7 +2766,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.5.3
+    test-xnet_thr $options -e -o 8.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2774,7 +2777,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.5.4
+    test-xnet_thr $options -e -o 8.5.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2785,7 +2788,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.6.1
+    test-xnet_thr $options -e -o 8.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2796,7 +2799,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.6.2
+    test-xnet_thr $options -e -o 8.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2807,7 +2810,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.6.3
+    test-xnet_thr $options -e -o 8.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2818,7 +2821,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.7.1
+    test-xnet_thr $options -e -o 8.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -2829,7 +2832,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-xnet_thr $options -o 8.8.1
+    test-xnet_thr $options -e -o 8.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 

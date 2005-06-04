@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 23:57:36 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/03 23:57:36 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 13:38:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.11  2005/06/04 13:38:32  brian
+ - final workup of test suites
+
  Revision 0.9.2.10  2005/06/03 23:57:36  brian
  - minor correction
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 23:57:36 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/03 23:57:36 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -2306,7 +2309,8 @@ void print_libcall(int child, const char *command)
 	static const char *msgs[] = {
 		"  %-16s->|  |                                |                   [%d]\n",
 		"                    |  |                                |<-%16s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |<-%16s [%d]\n",
+		"                    |  |     [%16s]         |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2317,7 +2321,7 @@ void print_terror(int child, long error, long terror)
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                   [%d]\n",
 		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
 		"                    |  |       [%14s]         |                   [%d]\n",
 	};
 	if (verbose > 0)
@@ -2339,10 +2343,10 @@ void print_expect(int child, int want)
 void print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-20s|  |                               |                    \n",
-		"                    |  |                               |%-20s\n",
-		"                    |  |                               |%-20s\n",
-		"                    |  |    %-20s       |                    \n",
+		"%-20s|  |                                |                    \n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |    %-20s        |                    \n",
 	};
 	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
@@ -2359,10 +2363,10 @@ void print_time_state(int child, const char *msgs[], ulong time)
 void print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /|                    [%d]\n",
-		"                    |  |/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
-		"                    | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                   [%d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
 	};
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
@@ -2936,6 +2940,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length));
 		print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
@@ -2970,7 +2975,7 @@ static int do_signal(int child, int action)
 		if (test_resfd == -1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		else
-			return test_insertfd(child, test_resfd, 4, ctrl, data, test_pflags);
+			return test_insertfd(child, test_resfd, 4, ctrl, data, 0);
 	case __TEST_CONN_CON:
 		ctrl->len = sizeof(p->conn_con);
 		p->conn_con.PRIM_type = T_CONN_CON;
@@ -3086,6 +3091,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_ACK:
 		ctrl->len = sizeof(p->bind_ack);
@@ -3939,6 +3945,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_CONN_IND;
 			last_sequence = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
 			print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
 			break;
 		case T_CONN_CON:
@@ -3970,6 +3977,8 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_ERROR_ACK:
 			event = __TEST_ERROR_ACK;
+			last_t_errno = p->error_ack.TLI_error;
+			last_errno = p->error_ack.UNIX_error;
 			print_ack_prim(child, prim_string(p->type));
 			print_string(child, terrno_string(p->error_ack.TLI_error, p->error_ack.UNIX_error));
 			break;
@@ -6050,14 +6059,15 @@ static int test_4_1_1_top(int child)
 }
 static int test_4_1_1_bot(int child)
 {
+	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
-	state++;
+	state = begstate + 1;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
-	state++;
+	state = begstate + 2;
 	start_tt(500);
-	state++;
+	state = begstate + 3;
 	for (;;) {
 		switch (get_event(child)) {
 		case __EVENT_TIMEOUT:
@@ -6065,18 +6075,18 @@ static int test_4_1_1_bot(int child)
 			stop_tt();
 			return (__RESULT_SUCCESS);
 		case __TEST_CONN_RES:
-			if (state != 3)
+			if (state != begstate + 3)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 5;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 6;
 			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
-			state++;
+			state = begstate + 7;
 			return (__RESULT_FAILURE);
 		}
 	}
@@ -6135,47 +6145,48 @@ static int test_4_1_2_top(int child)
 }
 static int test_4_1_2_bot(int child)
 {
+	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
-	state++;
+	state = begstate + 1;
 	last_sequence = 2;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
-	state++;
+	state = begstate + 2;
 	start_tt(1000);
-	state++;
+	state = begstate + 3;
 	for (;;) {
 		switch (get_event(child)) {
 		case __EVENT_TIMEOUT:
-			state++;
+			state = begstate + 4;
 			return (__RESULT_FAILURE);
 		case __TEST_CONN_RES:
-			if (state != 3)
+			if (state != begstate + 3)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 5;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 6;
 			start_tt(200);
 			continue;
 		case __TEST_DISCON_REQ:
-			if (state != 8) {
-				state++;
+			if (state != begstate + 8) {
+				state = begstate + 7;
 				if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 					return (__RESULT_FAILURE);
-				state++;
+				state = begstate + 8;
 				continue;
 			}
-			state++;
+			state = begstate + 9;
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 10;
 			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
-			state++;
+			state = begstate + 11;
 			return (__RESULT_FAILURE);
 		}
 	}
@@ -6265,34 +6276,35 @@ static int test_4_2_2_top(int child)
 }
 static int test_4_2_2_bot(int child)
 {
+	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
-	state++;
+	state = begstate + 1;
 	start_tt(500);
-	state++;
+	state = begstate + 2;
 	for (;;) {
 		switch (get_event(child)) {
 		case __TEST_CONN_REQ:
-			if (state != 2)
+			if (state != begstate + 2)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 3;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 4;
 			continue;
 		case __TEST_DISCON_REQ:
-			state++;
+			state = begstate + 5;
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 				return (__RESULT_FAILURE);
-			state++;
+			state = begstate + 6;
 			return (__RESULT_SUCCESS);
 		case __EVENT_TIMEOUT:
-			state++;
+			state = begstate + 7;
 			return (__RESULT_SUCCESS);
 		default:
-			state++;
+			state = begstate + 8;
 			return (__RESULT_FAILURE);
 		}
 	}
@@ -11251,6 +11263,7 @@ static int test_8_1_3_top(int child)
 }
 static int test_8_1_3_bot(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
@@ -11261,7 +11274,7 @@ static int test_8_1_3_bot(int child)
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11271,7 +11284,7 @@ static int test_8_1_3_bot(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11317,6 +11330,7 @@ static int test_8_1_4_top(int child)
 }
 static int test_8_1_4_bot(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
@@ -11327,7 +11341,7 @@ static int test_8_1_4_bot(int child)
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11337,7 +11351,7 @@ static int test_8_1_4_bot(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11463,6 +11477,7 @@ static int test_8_2_3_top(int child)
 }
 static int test_8_2_3_bot(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
@@ -11473,7 +11488,7 @@ static int test_8_2_3_bot(int child)
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11483,7 +11498,7 @@ static int test_8_2_3_bot(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
 				return (__RESULT_FAILURE);
@@ -11723,6 +11738,7 @@ static struct test_stream test_case_8_5_2_bot = { &preamble_3_bot, &test_8_5_2_b
 This test case tests positive test cases for the t_snd library call."
 static int test_8_5_3_top(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	pause();
@@ -11734,7 +11750,7 @@ static int test_8_5_3_top(int child)
 			test_sndflags = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -11745,7 +11761,7 @@ static int test_8_5_3_top(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -11793,6 +11809,7 @@ static struct test_stream test_case_8_5_3_bot = { &preamble_3_bot, &test_8_5_3_b
 This test case tests positive test cases for the t_snd library call."
 static int test_8_5_4_top(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	pause();
@@ -11804,7 +11821,7 @@ static int test_8_5_4_top(int child)
 			test_sndflags = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -11815,7 +11832,7 @@ static int test_8_5_4_top(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -11959,6 +11976,7 @@ static struct test_stream test_case_8_6_2_bot = { &preamble_3_bot, &test_8_6_2_b
 This test case tests positive test cases for the t_sndv library call."
 static int test_8_6_3_top(int child)
 {
+	int begstate = state;
 	int endstate = state + 19;
 	start_tt(200);
 	pause();
@@ -11970,7 +11988,7 @@ static int test_8_6_3_top(int child)
 			test_sndflags = 0;
 			return (__RESULT_FAILURE);
 		}
-		if (state == 10) {
+		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -11981,7 +11999,7 @@ static int test_8_6_3_top(int child)
 				return (__RESULT_FAILURE);
 			}
 		}
-		if (state == 15) {
+		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
@@ -12895,16 +12913,16 @@ int do_tests(void)
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (aborted) {
-				tests[i].result = __RESULT_INCONCLUSIVE;
-				inconclusive++;
-				continue;
-			}
 			if (tests[i].result)
 				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				skipped++;
+				continue;
+			}
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
 				continue;
 			}
 			if (verbose > 0) {

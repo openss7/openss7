@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/04 15:42:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 13:39:20 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 15:42:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/04 15:42:31 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/04 15:42:31 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -306,7 +306,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/04 13:39:20 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/04 15:42:31 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -365,6 +365,63 @@ MODULE_ALIAS("streams-inet");
 #endif				/* defined HAVE_OPENSS7_SCTP */
 
 #define FREE_CMINOR	50
+
+#ifdef LINUX
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SS__MODID));
+MODULE_ALIAS("streams-driver-inet");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SS__MAJOR));
+MODULE_ALIAS("/dev/streams/inet");
+MODULE_ALIAS("/dev/streams/inet/*");
+MODULE_ALIAS("/dev/streams/clone/inet");
+#endif
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IP_CMINOR));
+MODULE_ALIAS("/dev/ip");
+MODULE_ALIAS("/dev/inet/ip");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(ICMP_CMINOR));
+MODULE_ALIAS("/dev/icmp");
+MODULE_ALIAS("/dev/inet/icmp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(GGP_CMINOR));
+MODULE_ALIAS("/dev/ggp");
+MODULE_ALIAS("/dev/inet/ggp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IPIP_CMINOR));
+MODULE_ALIAS("/dev/ipip");
+MODULE_ALIAS("/dev/inet/ipip");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TCP_CMINOR));
+MODULE_ALIAS("/dev/tcp");
+MODULE_ALIAS("/dev/inet/tcp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(EGP_CMINOR));
+MODULE_ALIAS("/dev/egp");
+MODULE_ALIAS("/dev/inet/egp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(PUP_CMINOR));
+MODULE_ALIAS("/dev/pup");
+MODULE_ALIAS("/dev/inet/pup");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(UDP_CMINOR));
+MODULE_ALIAS("/dev/udp");
+MODULE_ALIAS("/dev/inet/udp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(IDP_CMINOR));
+MODULE_ALIAS("/dev/idp");
+MODULE_ALIAS("/dev/inet/idp");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(RAWIP_CMINOR));
+MODULE_ALIAS("/dev/rawip");
+MODULE_ALIAS("/dev/inet/rawip");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICOTS_ORD_CMINOR));
+MODULE_ALIAS("/dev/ticots_ord");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICOTS_CMINOR));
+MODULE_ALIAS("/dev/ticots");
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(TICLTS_CMINOR));
+MODULE_ALIAS("/dev/ticlts");
+#if defined HAVE_OPENSS7_SCTP
+MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-" __stringify(SCTP_CMINOR));
+MODULE_ALIAS("/dev/sctp");
+MODULE_ALIAS("/dev/inet/sctp");
+#endif				/* HAVE_OPENSS7_SCTP */
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
 
 /*
  *  =========================================================================

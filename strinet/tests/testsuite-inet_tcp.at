@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_tcp.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/04 07:07:24 $
+dnl @(#) $RCSfile: testsuite-inet_tcp.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/04 13:40:02 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/04 07:07:24 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/04 13:40:02 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_tcp.at,v $
+dnl Revision 0.9.2.2  2005/06/04 13:40:02  brian
+dnl - exit early to get proper return code
+dnl
 dnl Revision 0.9.2.1  2005/06/04 07:07:24  brian
 dnl - improving test suites
 dnl
@@ -81,7 +84,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 1.1
+    test-inet_tcp $options -e -o 1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -92,7 +95,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 1.2
+    test-inet_tcp $options -e -o 1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -103,7 +106,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 1.3
+    test-inet_tcp $options -e -o 1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -114,7 +117,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 1.4
+    test-inet_tcp $options -e -o 1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -125,7 +128,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 2.1
+    test-inet_tcp $options -e -o 2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -136,7 +139,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 2.2
+    test-inet_tcp $options -e -o 2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -147,7 +150,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 3.1
+    test-inet_tcp $options -e -o 3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -158,7 +161,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 3.2
+    test-inet_tcp $options -e -o 3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -169,7 +172,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 3.3
+    test-inet_tcp $options -e -o 3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -180,7 +183,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 3.4
+    test-inet_tcp $options -e -o 3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -191,7 +194,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 4.1
+    test-inet_tcp $options -e -o 4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -202,7 +205,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 4.2
+    test-inet_tcp $options -e -o 4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -213,7 +216,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 5.1
+    test-inet_tcp $options -e -o 5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -224,7 +227,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 5.2
+    test-inet_tcp $options -e -o 5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -235,7 +238,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 5.3
+    test-inet_tcp $options -e -o 5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -246,7 +249,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 5.4
+    test-inet_tcp $options -e -o 5.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -257,7 +260,7 @@ AT_CHECK([
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -o 6.1
+    test-inet_tcp $options -e -o 6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-pipemod.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/30 14:25:55 $
+dnl @(#) $RCSfile: testsuite-pipemod.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/04 13:40:29 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/30 14:25:55 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/04 13:40:29 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-pipemod.at,v $
+dnl Revision 0.9.2.3  2005/06/04 13:40:29  brian
+dnl - exit early to get proper return code
+dnl
 dnl Revision 0.9.2.2  2005/05/30 14:25:55  brian
 dnl - packaged standalong test suites
 dnl
@@ -92,7 +95,7 @@ AT_KEYWORDS([pipemod])
 AT_CHECK([
     exit 77
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-pipemod $options -o 1.1
+    test-pipemod $options -e -o 1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -101,7 +104,7 @@ AT_KEYWORDS([pipemod])
 AT_CHECK([
     exit 77
     if test $at_verbose = echo ; then options='-vvv' ; fi
-    test-pipemod $options -o 1.2
+    test-pipemod $options -e -o 1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 

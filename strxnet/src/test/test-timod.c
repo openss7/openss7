@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:36 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/03 23:57:36 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 13:38:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.12  2005/06/04 13:38:30  brian
+ - final workup of test suites
+
  Revision 0.9.2.11  2005/06/03 23:57:36  brian
  - minor correction
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:36 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/03 23:57:36 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -2191,7 +2194,8 @@ void print_libcall(int child, const char *command)
 	static const char *msgs[] = {
 		"  %-16s->|  |                                |                   [%d]\n",
 		"                    |  |                                |<-%16s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |<-%16s [%d]\n",
+		"                    |  |     [%16s]         |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2202,7 +2206,7 @@ void print_terror(int child, long error, long terror)
 	static const char *msgs[] = {
 		"  %-14s<--/|  |                                |                   [%d]\n",
 		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
 		"                    |  |       [%14s]         |                   [%d]\n",
 	};
 	if (verbose > 0)
@@ -2224,10 +2228,10 @@ void print_expect(int child, int want)
 void print_string(int child, const char *string)
 {
 	static const char *msgs[] = {
-		"%-20s|  |                               |                    \n",
-		"                    |  |                               |%-20s\n",
-		"                    |  |                               |%-20s\n",
-		"                    |  |    %-20s       |                    \n",
+		"%-20s|  |                                |                    \n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |                                |%-20s\n",
+		"                    |  |    %-20s        |                    \n",
 	};
 	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
@@ -2244,10 +2248,10 @@ void print_time_state(int child, const char *msgs[], ulong time)
 void print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /|                    [%d]\n",
-		"                    |  |/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
-		"                    | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / /| / / / / / / / / / /[%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                   [%d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
 	};
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
@@ -2817,6 +2821,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length));
 		print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
@@ -2851,7 +2856,7 @@ static int do_signal(int child, int action)
 		if (test_resfd == -1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		else
-			return test_insertfd(child, test_resfd, 4, ctrl, data, test_pflags);
+			return test_insertfd(child, test_resfd, 4, ctrl, data, 0);
 	case __TEST_CONN_CON:
 		ctrl->len = sizeof(p->conn_con);
 		p->conn_con.PRIM_type = T_CONN_CON;
@@ -2967,6 +2972,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_string(child, addr_string(cbuf + p->bind_ack.ADDR_offset, p->bind_ack.ADDR_length));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_ACK:
 		ctrl->len = sizeof(p->bind_ack);
@@ -3533,6 +3539,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_CONN_IND;
 			last_sequence = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
+			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
 			print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
 			break;
 		case T_CONN_CON:
@@ -3564,6 +3571,8 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_ERROR_ACK:
 			event = __TEST_ERROR_ACK;
+			last_t_errno = p->error_ack.TLI_error;
+			last_errno = p->error_ack.UNIX_error;
 			print_ack_prim(child, prim_string(p->type));
 			print_string(child, terrno_string(p->error_ack.TLI_error, p->error_ack.UNIX_error));
 			break;
@@ -5593,16 +5602,16 @@ int do_tests(void)
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (aborted) {
-				tests[i].result = __RESULT_INCONCLUSIVE;
-				inconclusive++;
-				continue;
-			}
 			if (tests[i].result)
 				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				skipped++;
+				continue;
+			}
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
 				continue;
 			}
 			if (verbose > 0) {
