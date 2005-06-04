@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 05:01:41 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 09:13:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 05:01:41 $ by $Author: brian $
+ Last Modified $Date: 2005/06/04 09:13:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.10  2005/06/04 09:13:54  brian
+ - test suite corrections
+
  Revision 0.9.2.9  2005/06/04 05:01:41  brian
  - working up test suite upgrade
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 05:01:41 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 09:13:54 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/04 05:01:41 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 09:13:54 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2980,7 +2983,7 @@ static int do_signal(int child, int action)
 		if (test_resfd == -1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		else
-			return test_insertfd(child, test_resfd, 4, ctrl, data, test_pflags);
+			return test_insertfd(child, test_resfd, 4, ctrl, data, 0);
 	case __TEST_CONN_CON:
 		ctrl->len = sizeof(p->conn_con);
 		p->conn_con.PRIM_type = T_CONN_CON;
