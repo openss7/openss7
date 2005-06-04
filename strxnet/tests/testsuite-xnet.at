@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-xnet.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/30 14:25:57 $
+dnl @(#) $RCSfile: testsuite-xnet.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/04 07:07:24 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/30 14:25:57 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/04 07:07:24 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-xnet.at,v $
+dnl Revision 0.9.2.3  2005/06/04 07:07:24  brian
+dnl - improving test suites
+dnl
 dnl Revision 0.9.2.2  2005/05/30 14:25:57  brian
 dnl - packaged standalong test suites
 dnl
@@ -84,6 +87,9 @@ AT_SETUP([xnet test 1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -92,6 +98,9 @@ AT_SETUP([xnet test 1.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 1.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -100,6 +109,9 @@ AT_SETUP([xnet test 1.2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 1.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -108,6 +120,9 @@ AT_SETUP([xnet test 1.2.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 1.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -116,6 +131,9 @@ AT_SETUP([xnet test 2.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -124,6 +142,9 @@ AT_SETUP([xnet test 2.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -132,6 +153,9 @@ AT_SETUP([xnet test 2.1.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -140,6 +164,9 @@ AT_SETUP([xnet test 2.1.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -148,6 +175,9 @@ AT_SETUP([xnet test 2.1.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -156,6 +186,9 @@ AT_SETUP([xnet test 2.1.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -164,6 +197,9 @@ AT_SETUP([xnet test 2.1.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -172,6 +208,9 @@ AT_SETUP([xnet test 2.1.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -180,6 +219,9 @@ AT_SETUP([xnet test 2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -188,6 +230,9 @@ AT_SETUP([xnet test 2.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -196,6 +241,9 @@ AT_SETUP([xnet test 2.3.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -204,6 +252,9 @@ AT_SETUP([xnet test 2.3.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -212,6 +263,9 @@ AT_SETUP([xnet test 2.3.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -220,6 +274,9 @@ AT_SETUP([xnet test 2.3.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -228,6 +285,9 @@ AT_SETUP([xnet test 2.3.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -236,6 +296,9 @@ AT_SETUP([xnet test 2.3.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -244,6 +307,9 @@ AT_SETUP([xnet test 2.3.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -252,6 +318,9 @@ AT_SETUP([xnet test 2.3.9])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.3.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -260,6 +329,9 @@ AT_SETUP([xnet test 2.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -268,6 +340,9 @@ AT_SETUP([xnet test 2.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 2.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -276,6 +351,9 @@ AT_SETUP([xnet test 3.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -284,6 +362,9 @@ AT_SETUP([xnet test 3.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -292,6 +373,9 @@ AT_SETUP([xnet test 3.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -300,6 +384,9 @@ AT_SETUP([xnet test 3.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -308,6 +395,9 @@ AT_SETUP([xnet test 3.4.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -316,6 +406,9 @@ AT_SETUP([xnet test 3.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -324,6 +417,9 @@ AT_SETUP([xnet test 3.5.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -332,6 +428,9 @@ AT_SETUP([xnet test 3.6.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -340,6 +439,9 @@ AT_SETUP([xnet test 3.7.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 3.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -348,6 +450,9 @@ AT_SETUP([xnet test 4.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -356,6 +461,9 @@ AT_SETUP([xnet test 4.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -364,6 +472,9 @@ AT_SETUP([xnet test 4.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -372,6 +483,9 @@ AT_SETUP([xnet test 4.2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -380,6 +494,9 @@ AT_SETUP([xnet test 4.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -388,6 +505,9 @@ AT_SETUP([xnet test 4.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -396,6 +516,9 @@ AT_SETUP([xnet test 4.4.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -404,6 +527,9 @@ AT_SETUP([xnet test 4.4.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -412,6 +538,9 @@ AT_SETUP([xnet test 4.4.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -420,6 +549,9 @@ AT_SETUP([xnet test 4.4.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -428,6 +560,9 @@ AT_SETUP([xnet test 4.4.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -436,6 +571,9 @@ AT_SETUP([xnet test 4.4.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -444,6 +582,9 @@ AT_SETUP([xnet test 4.4.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.4.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -452,6 +593,9 @@ AT_SETUP([xnet test 4.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -460,6 +604,9 @@ AT_SETUP([xnet test 4.6.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -468,6 +615,9 @@ AT_SETUP([xnet test 4.6.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -476,6 +626,9 @@ AT_SETUP([xnet test 4.6.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -484,6 +637,9 @@ AT_SETUP([xnet test 4.6.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.6.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -492,6 +648,9 @@ AT_SETUP([xnet test 4.7.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -500,6 +659,9 @@ AT_SETUP([xnet test 4.7.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.7.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -508,6 +670,9 @@ AT_SETUP([xnet test 4.7.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.7.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -516,6 +681,9 @@ AT_SETUP([xnet test 4.7.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.7.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -524,6 +692,9 @@ AT_SETUP([xnet test 4.8.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -532,6 +703,9 @@ AT_SETUP([xnet test 4.8.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.8.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -540,6 +714,9 @@ AT_SETUP([xnet test 4.8.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.8.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -548,6 +725,9 @@ AT_SETUP([xnet test 4.9.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 4.9.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -556,6 +736,9 @@ AT_SETUP([xnet test 5.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -564,6 +747,9 @@ AT_SETUP([xnet test 5.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -572,6 +758,9 @@ AT_SETUP([xnet test 5.1.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -580,6 +769,9 @@ AT_SETUP([xnet test 5.1.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -588,6 +780,9 @@ AT_SETUP([xnet test 5.1.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -596,6 +791,9 @@ AT_SETUP([xnet test 5.1.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -604,6 +802,9 @@ AT_SETUP([xnet test 5.1.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -612,6 +813,9 @@ AT_SETUP([xnet test 5.1.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -620,6 +824,9 @@ AT_SETUP([xnet test 5.1.9])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -628,6 +835,9 @@ AT_SETUP([xnet test 5.1.10])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -636,6 +846,9 @@ AT_SETUP([xnet test 5.1.11])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -644,6 +857,9 @@ AT_SETUP([xnet test 5.1.12])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -652,6 +868,9 @@ AT_SETUP([xnet test 5.1.13])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -660,6 +879,9 @@ AT_SETUP([xnet test 5.1.14])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -668,6 +890,9 @@ AT_SETUP([xnet test 5.1.15])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -676,6 +901,9 @@ AT_SETUP([xnet test 5.1.16])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -684,6 +912,9 @@ AT_SETUP([xnet test 5.1.17])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -692,6 +923,9 @@ AT_SETUP([xnet test 5.1.18])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -700,6 +934,9 @@ AT_SETUP([xnet test 5.1.19])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -708,6 +945,9 @@ AT_SETUP([xnet test 5.1.20])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -716,6 +956,9 @@ AT_SETUP([xnet test 5.1.21])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -724,6 +967,9 @@ AT_SETUP([xnet test 5.1.22])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -732,6 +978,9 @@ AT_SETUP([xnet test 5.1.23])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -740,6 +989,9 @@ AT_SETUP([xnet test 5.1.24])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -748,6 +1000,9 @@ AT_SETUP([xnet test 5.1.25])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -756,6 +1011,9 @@ AT_SETUP([xnet test 5.1.26])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -764,6 +1022,9 @@ AT_SETUP([xnet test 5.1.27])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -772,6 +1033,9 @@ AT_SETUP([xnet test 5.1.28])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.1.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -780,6 +1044,9 @@ AT_SETUP([xnet test 5.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -788,6 +1055,9 @@ AT_SETUP([xnet test 5.2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -796,6 +1066,9 @@ AT_SETUP([xnet test 5.2.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -804,6 +1077,9 @@ AT_SETUP([xnet test 5.2.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -812,6 +1088,9 @@ AT_SETUP([xnet test 5.2.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -820,6 +1099,9 @@ AT_SETUP([xnet test 5.2.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -828,6 +1110,9 @@ AT_SETUP([xnet test 5.2.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -836,6 +1121,9 @@ AT_SETUP([xnet test 5.2.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -844,6 +1132,9 @@ AT_SETUP([xnet test 5.2.9])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -852,6 +1143,9 @@ AT_SETUP([xnet test 5.2.10])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -860,6 +1154,9 @@ AT_SETUP([xnet test 5.2.11])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -868,6 +1165,9 @@ AT_SETUP([xnet test 5.2.12])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -876,6 +1176,9 @@ AT_SETUP([xnet test 5.2.13])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -884,6 +1187,9 @@ AT_SETUP([xnet test 5.2.14])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -892,6 +1198,9 @@ AT_SETUP([xnet test 5.2.15])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -900,6 +1209,9 @@ AT_SETUP([xnet test 5.2.16])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -908,6 +1220,9 @@ AT_SETUP([xnet test 5.2.17])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -916,6 +1231,9 @@ AT_SETUP([xnet test 5.2.18])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -924,6 +1242,9 @@ AT_SETUP([xnet test 5.2.19])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -932,6 +1253,9 @@ AT_SETUP([xnet test 5.2.20])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -940,6 +1264,9 @@ AT_SETUP([xnet test 5.2.21])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -948,6 +1275,9 @@ AT_SETUP([xnet test 5.2.22])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -956,6 +1286,9 @@ AT_SETUP([xnet test 5.2.23])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -964,6 +1297,9 @@ AT_SETUP([xnet test 5.2.24])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -972,6 +1308,9 @@ AT_SETUP([xnet test 5.2.25])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -980,6 +1319,9 @@ AT_SETUP([xnet test 5.2.26])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -988,6 +1330,9 @@ AT_SETUP([xnet test 5.2.27])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -996,6 +1341,9 @@ AT_SETUP([xnet test 5.2.28])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.2.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1004,6 +1352,9 @@ AT_SETUP([xnet test 5.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1012,6 +1363,9 @@ AT_SETUP([xnet test 5.3.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1020,6 +1374,9 @@ AT_SETUP([xnet test 5.3.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1028,6 +1385,9 @@ AT_SETUP([xnet test 5.3.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1036,6 +1396,9 @@ AT_SETUP([xnet test 5.3.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1044,6 +1407,9 @@ AT_SETUP([xnet test 5.3.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1052,6 +1418,9 @@ AT_SETUP([xnet test 5.3.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1060,6 +1429,9 @@ AT_SETUP([xnet test 5.3.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1068,6 +1440,9 @@ AT_SETUP([xnet test 5.3.9])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1076,6 +1451,9 @@ AT_SETUP([xnet test 5.3.10])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1084,6 +1462,9 @@ AT_SETUP([xnet test 5.3.11])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1092,6 +1473,9 @@ AT_SETUP([xnet test 5.3.12])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1100,6 +1484,9 @@ AT_SETUP([xnet test 5.3.13])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.13
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1108,6 +1495,9 @@ AT_SETUP([xnet test 5.3.14])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.14
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1116,6 +1506,9 @@ AT_SETUP([xnet test 5.3.15])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.15
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1124,6 +1517,9 @@ AT_SETUP([xnet test 5.3.16])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.16
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1132,6 +1528,9 @@ AT_SETUP([xnet test 5.3.17])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.17
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1140,6 +1539,9 @@ AT_SETUP([xnet test 5.3.18])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.18
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1148,6 +1550,9 @@ AT_SETUP([xnet test 5.3.19])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.19
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1156,6 +1561,9 @@ AT_SETUP([xnet test 5.3.20])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.20
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1164,6 +1572,9 @@ AT_SETUP([xnet test 5.3.21])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.21
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1172,6 +1583,9 @@ AT_SETUP([xnet test 5.3.22])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.22
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1180,6 +1594,9 @@ AT_SETUP([xnet test 5.3.23])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.23
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1188,6 +1605,9 @@ AT_SETUP([xnet test 5.3.24])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.24
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1196,6 +1616,9 @@ AT_SETUP([xnet test 5.3.25])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.25
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1204,6 +1627,9 @@ AT_SETUP([xnet test 5.3.26])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.26
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1212,6 +1638,9 @@ AT_SETUP([xnet test 5.3.27])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.27
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1220,6 +1649,9 @@ AT_SETUP([xnet test 5.3.28])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 5.3.28
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1228,6 +1660,9 @@ AT_SETUP([xnet test 6.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1236,6 +1671,9 @@ AT_SETUP([xnet test 6.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1244,6 +1682,9 @@ AT_SETUP([xnet test 6.1.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1252,6 +1693,9 @@ AT_SETUP([xnet test 6.1.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1260,6 +1704,9 @@ AT_SETUP([xnet test 6.1.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1268,6 +1715,9 @@ AT_SETUP([xnet test 6.1.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1276,6 +1726,9 @@ AT_SETUP([xnet test 6.1.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1284,6 +1737,9 @@ AT_SETUP([xnet test 6.1.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1292,6 +1748,9 @@ AT_SETUP([xnet test 6.1.9])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1300,6 +1759,9 @@ AT_SETUP([xnet test 6.1.10])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.10
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1308,6 +1770,9 @@ AT_SETUP([xnet test 6.1.11])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.11
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1316,6 +1781,9 @@ AT_SETUP([xnet test 6.1.12])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.1.12
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1324,6 +1792,9 @@ AT_SETUP([xnet test 6.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1332,6 +1803,9 @@ AT_SETUP([xnet test 6.2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1340,6 +1814,9 @@ AT_SETUP([xnet test 6.2.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1348,6 +1825,9 @@ AT_SETUP([xnet test 6.2.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1356,6 +1836,9 @@ AT_SETUP([xnet test 6.2.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1364,6 +1847,9 @@ AT_SETUP([xnet test 6.2.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.2.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1372,6 +1858,9 @@ AT_SETUP([xnet test 6.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1380,6 +1869,9 @@ AT_SETUP([xnet test 6.3.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1388,6 +1880,9 @@ AT_SETUP([xnet test 6.3.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1396,6 +1891,9 @@ AT_SETUP([xnet test 6.3.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1404,6 +1902,9 @@ AT_SETUP([xnet test 6.3.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1412,6 +1913,9 @@ AT_SETUP([xnet test 6.3.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1420,6 +1924,9 @@ AT_SETUP([xnet test 6.3.7])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1428,6 +1935,9 @@ AT_SETUP([xnet test 6.3.8])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.3.8
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1436,6 +1946,9 @@ AT_SETUP([xnet test 6.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1444,6 +1957,9 @@ AT_SETUP([xnet test 6.4.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1452,6 +1968,9 @@ AT_SETUP([xnet test 6.4.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1460,6 +1979,9 @@ AT_SETUP([xnet test 6.4.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1468,6 +1990,9 @@ AT_SETUP([xnet test 6.4.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1476,6 +2001,9 @@ AT_SETUP([xnet test 6.4.6])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.4.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1484,6 +2012,9 @@ AT_SETUP([xnet test 6.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1492,6 +2023,9 @@ AT_SETUP([xnet test 6.5.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1500,6 +2034,9 @@ AT_SETUP([xnet test 6.5.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1508,6 +2045,9 @@ AT_SETUP([xnet test 6.5.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.5.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1516,6 +2056,9 @@ AT_SETUP([xnet test 6.5.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.5.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1524,6 +2067,9 @@ AT_SETUP([xnet test 6.6.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1532,6 +2078,9 @@ AT_SETUP([xnet test 6.6.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 6.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1540,6 +2089,9 @@ AT_SETUP([xnet test 7.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1548,6 +2100,9 @@ AT_SETUP([xnet test 7.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1556,6 +2111,9 @@ AT_SETUP([xnet test 7.1.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1564,6 +2122,9 @@ AT_SETUP([xnet test 7.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1572,6 +2133,9 @@ AT_SETUP([xnet test 7.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1580,6 +2144,9 @@ AT_SETUP([xnet test 7.3.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1588,6 +2155,9 @@ AT_SETUP([xnet test 7.3.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.3.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1596,6 +2166,9 @@ AT_SETUP([xnet test 7.3.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1604,6 +2177,9 @@ AT_SETUP([xnet test 7.3.5])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.3.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1612,6 +2188,9 @@ AT_SETUP([xnet test 7.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1620,6 +2199,9 @@ AT_SETUP([xnet test 7.4.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1628,6 +2210,9 @@ AT_SETUP([xnet test 7.4.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.4.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1636,6 +2221,9 @@ AT_SETUP([xnet test 7.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1644,6 +2232,9 @@ AT_SETUP([xnet test 7.5.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1652,6 +2243,9 @@ AT_SETUP([xnet test 7.5.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1660,6 +2254,9 @@ AT_SETUP([xnet test 7.6.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1668,6 +2265,9 @@ AT_SETUP([xnet test 7.6.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1676,6 +2276,9 @@ AT_SETUP([xnet test 7.6.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1684,6 +2287,9 @@ AT_SETUP([xnet test 7.7.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1692,6 +2298,9 @@ AT_SETUP([xnet test 7.7.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.7.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1700,6 +2309,9 @@ AT_SETUP([xnet test 7.7.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.7.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1708,6 +2320,9 @@ AT_SETUP([xnet test 7.8.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1716,6 +2331,9 @@ AT_SETUP([xnet test 7.8.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.8.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1724,6 +2342,9 @@ AT_SETUP([xnet test 7.8.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.8.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1732,6 +2353,9 @@ AT_SETUP([xnet test 7.9.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.9.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1740,6 +2364,9 @@ AT_SETUP([xnet test 7.9.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.9.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1748,6 +2375,9 @@ AT_SETUP([xnet test 7.9.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.9.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1756,6 +2386,9 @@ AT_SETUP([xnet test 7.10.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.10.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1764,6 +2397,9 @@ AT_SETUP([xnet test 7.10.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.10.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1772,6 +2408,9 @@ AT_SETUP([xnet test 7.10.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.10.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1780,6 +2419,9 @@ AT_SETUP([xnet test 7.11.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.11.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1788,6 +2430,9 @@ AT_SETUP([xnet test 7.11.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.11.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1796,6 +2441,9 @@ AT_SETUP([xnet test 7.11.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.11.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1804,6 +2452,9 @@ AT_SETUP([xnet test 7.12.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.12.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1812,6 +2463,9 @@ AT_SETUP([xnet test 7.12.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.12.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1820,6 +2474,9 @@ AT_SETUP([xnet test 7.12.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.12.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1828,6 +2485,9 @@ AT_SETUP([xnet test 7.13.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.13.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1836,6 +2496,9 @@ AT_SETUP([xnet test 7.13.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.13.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1844,6 +2507,9 @@ AT_SETUP([xnet test 7.13.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.13.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1852,6 +2518,9 @@ AT_SETUP([xnet test 7.14.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.14.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1860,6 +2529,9 @@ AT_SETUP([xnet test 7.14.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.14.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1868,6 +2540,9 @@ AT_SETUP([xnet test 7.14.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.14.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1876,6 +2551,9 @@ AT_SETUP([xnet test 7.15.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.15.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1884,6 +2562,9 @@ AT_SETUP([xnet test 7.15.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.15.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1892,6 +2573,9 @@ AT_SETUP([xnet test 7.15.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.15.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1900,6 +2584,9 @@ AT_SETUP([xnet test 7.16.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.16.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1908,6 +2595,9 @@ AT_SETUP([xnet test 7.16.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.16.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1916,6 +2606,9 @@ AT_SETUP([xnet test 7.16.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.16.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1924,6 +2617,9 @@ AT_SETUP([xnet test 7.17.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 7.17.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1932,6 +2628,9 @@ AT_SETUP([xnet test 8.1.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1940,6 +2639,9 @@ AT_SETUP([xnet test 8.1.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1948,6 +2650,9 @@ AT_SETUP([xnet test 8.1.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1956,6 +2661,9 @@ AT_SETUP([xnet test 8.1.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1964,6 +2672,9 @@ AT_SETUP([xnet test 8.2.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1972,6 +2683,9 @@ AT_SETUP([xnet test 8.2.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1980,6 +2694,9 @@ AT_SETUP([xnet test 8.2.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1988,6 +2705,9 @@ AT_SETUP([xnet test 8.3.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.3.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -1996,6 +2716,9 @@ AT_SETUP([xnet test 8.3.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.3.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2004,6 +2727,9 @@ AT_SETUP([xnet test 8.4.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.4.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2012,6 +2738,9 @@ AT_SETUP([xnet test 8.5.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.5.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2020,6 +2749,9 @@ AT_SETUP([xnet test 8.5.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.5.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2028,6 +2760,9 @@ AT_SETUP([xnet test 8.5.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.5.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2036,6 +2771,9 @@ AT_SETUP([xnet test 8.5.4])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.5.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2044,6 +2782,9 @@ AT_SETUP([xnet test 8.6.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.6.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2052,6 +2793,9 @@ AT_SETUP([xnet test 8.6.2])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.6.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2060,6 +2804,9 @@ AT_SETUP([xnet test 8.6.3])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.6.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2068,6 +2815,9 @@ AT_SETUP([xnet test 8.7.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.7.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
@@ -2076,6 +2826,9 @@ AT_SETUP([xnet test 8.8.1])
 AT_KEYWORDS([xnet])
 AT_CHECK([
     if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-xnet $options -o 8.8.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
