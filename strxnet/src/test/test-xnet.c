@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 13:38:32 $ by $Author: brian $
+ Last Modified $Date: 2005/06/05 05:15:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.12  2005/06/05 05:15:15  brian
+ - provide some additiona info and adjust timing
+
  Revision 0.9.2.11  2005/06/04 13:38:32  brian
  - final workup of test suites
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/04 13:38:32 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -1896,6 +1899,38 @@ char *t_errno_string(long err, long syserr)
 	}
 }
 
+char *t_look_string(int look)
+{
+	switch (look) {
+	case 0:
+		return ("(NO EVENT)");
+	case T_LISTEN:
+		return ("(T_LISTEN)");
+	case T_CONNECT:
+		return ("(T_CONNECT)");
+	case T_DATA:
+		return ("(T_DATA)");
+	case T_EXDATA:
+		return ("(T_EXDATA)");
+	case T_DISCONNECT:
+		return ("(T_DISCONNECT)");
+	case T_UDERR:
+		return ("(T_UDERR)");
+	case T_ORDREL:
+		return ("(T_ORDREL)");
+	case T_GODATA:
+		return ("(T_GODATA)");
+	case T_GOEXDATA:
+		return ("(T_GOEXDATA)");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(%d)", look);
+		return buf;
+	}
+	}
+}
+
 void print_less(int child)
 {
 	if (verbose < 1 || !show)
@@ -2326,6 +2361,18 @@ void print_terror(int child, long error, long terror)
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+
+void print_tlook(int child, int tlook)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
+		"                    |  |       [%14s]         |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, t_look_string(tlook));
 }
 
 void print_expect(int child, int want)
@@ -3345,6 +3392,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_BIND:
 		print_libcall(child, "t_bind(3)-------");
@@ -3353,6 +3402,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_CLOSE:
 		print_libcall(child, "t_close(3)------");
@@ -3360,6 +3411,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_CONNECT:
 		print_libcall(child, "t_connect(3)----");
@@ -3367,6 +3420,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_GETINFO:
 		print_libcall(child, "t_getinfo(3)----");
@@ -3374,6 +3429,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_GETPROTADDR:
 		print_libcall(child, "t_getprotaddr(3)");
@@ -3381,6 +3438,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_GETSTATE:
 		print_libcall(child, "t_getstate(3)---");
@@ -3388,6 +3447,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_LISTEN:
 		print_libcall(child, "t_listen(3)-----");
@@ -3396,6 +3457,8 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		last_sequence = test_liscall.sequence;
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_LOOK:
 		print_libcall(child, "t_look(3)-------");
@@ -3403,6 +3466,7 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		print_tlook(child, last_tevent);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_OPTMGMT:
 		print_libcall(child, "t_optmgmt(3)----");
@@ -3410,6 +3474,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCV:
 		print_libcall(child, "t_rcv(3)--------");
@@ -3419,10 +3485,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVCONNECT:
 		print_libcall(child, "t_rcvconnect(3)-");
@@ -3432,10 +3500,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", test_rcvcall.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvcall.udata.len, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVDIS:
 		print_libcall(child, "t_rcvdis(3)-----");
@@ -3445,10 +3515,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVREL:
 		print_libcall(child, "t_rcvrel(3)-----");
@@ -3458,10 +3530,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", 0, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", 0, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVRELDATA:
 		print_libcall(child, "t_rcvreldata(3)-");
@@ -3471,10 +3545,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVUDATA:
 		print_libcall(child, "t_rcvudata(3)---");
@@ -3484,10 +3560,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVUDERR:
 		print_libcall(child, "t_rcvuderr(3)---");
@@ -3495,6 +3573,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVV:
 		test_t_iov[0].iov_base = test_udata;
@@ -3512,10 +3592,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_RCVVUDATA:
 		test_t_iov[0].iov_base = test_udata;
@@ -3533,10 +3615,12 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                               |                    [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
 			fflush(stdout);
 			lockf(fileno(stdout), F_ULOCK, 0);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SND:
 	{
@@ -3546,6 +3630,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
 	case __TEST_T_SNDDIS:
@@ -3555,6 +3641,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SNDREL:
 		print_datcall(child, "t_sndrel(3)-----", 0);
@@ -3562,6 +3650,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SNDRELDATA:
 		test_snddis.udata.len = sprintf(test_udata, "Test t_sndreldata data.");
@@ -3571,6 +3661,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SNDUDATA:
 		test_sndudata.udata.len = sprintf(test_udata, "Test t_sndudata data.");
@@ -3579,6 +3671,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SNDV:
 		test_t_iov[0].iov_base = dbuf;
@@ -3594,6 +3688,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SNDVUDATA:
 		test_t_iov[0].iov_base = dbuf;
@@ -3610,6 +3706,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_SYNC:
 		print_libcall(child, "t_sync(3)-------");
@@ -3617,6 +3715,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_T_UNBIND:
 		print_libcall(child, "t_unbind(3)-----");
@@ -3624,6 +3724,8 @@ static int do_signal(int child, int action)
 			print_terror(child, (last_errno = errno), (last_t_errno = t_errno));
 			return (__RESULT_FAILURE);
 		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	case __TEST_O_TI_GETINFO:
 		ic.ic_cmd = O_TI_GETINFO;
@@ -5450,7 +5552,7 @@ static int test_3_1_1_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(200);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5481,7 +5583,7 @@ static int test_3_1_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != 0)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(200);
+	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
 		return (__RESULT_FAILURE);
@@ -5512,7 +5614,7 @@ static int test_3_2_1_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5583,7 +5685,7 @@ static int test_3_3_1_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5653,7 +5755,7 @@ static int test_3_4_1_top(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	start_tt(200);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5734,7 +5836,7 @@ static int test_3_4_2_top(int child)
 			return (__RESULT_FAILURE);
 	}
 	state++;
-	start_tt(200);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5777,7 +5879,7 @@ static int test_3_4_2_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(200);
+	start_tt(300);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
 		return (__RESULT_FAILURE);
@@ -5805,7 +5907,7 @@ static int test_3_5_1_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5860,7 +5962,7 @@ static int test_3_5_2_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5915,7 +6017,7 @@ static int test_3_6_1_top(int child)
 	if (last_t_errno != TNODATA)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;
@@ -5971,7 +6073,7 @@ static int test_3_7_1_top(int child)
 	if (last_t_errno != TNOUDERR)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	pause();
 	state++;

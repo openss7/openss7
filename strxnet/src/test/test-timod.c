@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 13:38:30 $ by $Author: brian $
+ Last Modified $Date: 2005/06/05 05:15:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.13  2005/06/05 05:15:15  brian
+ - provide some additiona info and adjust timing
+
  Revision 0.9.2.12  2005/06/04 13:38:30  brian
  - final workup of test suites
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/04 13:38:30 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -249,6 +252,7 @@ static int test_mgmtflags = T_NEGOTIATE;
 static struct sockaddr_in *test_addr = NULL;
 static char *test_data = NULL;
 static int test_resfd = -1;
+static int test_timout = 200;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -2757,7 +2761,7 @@ static int do_signal(int child, int action)
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
 	ic.ic_cmd = 0;
-	ic.ic_timout = 200;
+	ic.ic_timout = test_timout;
 	ic.ic_len = sizeof(cbuf);
 	ic.ic_dp = cbuf;
 	ctrl->maxlen = 0;
@@ -4573,13 +4577,14 @@ is given a positive acknowledgement and the other a negative acknowledgement."
 static int test_2_3_top(int child)
 {
 	pid_t fork_child;
+	test_timout = 2000;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	switch ((fork_child = fork())) {
 	case -1:		/* error */
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	case 00:		/* the fork_child */
 		state++;
 		if (do_signal(child, __TEST_TI_GETINFO) == __RESULT_SUCCESS || last_errno == EPROTO)
@@ -4592,11 +4597,11 @@ static int test_2_3_top(int child)
 		int result;
 		state++;
 		if ((result = do_signal(child, __TEST_TI_GETINFO)) != __RESULT_SUCCESS && last_errno != EPROTO)
-			return (__RESULT_FAILURE);
+			goto failure;
 		state++;
 		if (waitpid(fork_child, &status, WUNTRACED) == -1) {
 			state++;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		state++;
 		if (WIFEXITED(status)) {
@@ -4605,17 +4610,19 @@ static int test_2_3_top(int child)
 			if ((result == __RESULT_SUCCESS && cresult == __RESULT_FAILURE) || (cresult == __RESULT_SUCCESS && result == __RESULT_FAILURE))
 				break;
 			state++;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	}
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+    failure:
+	return (__RESULT_FAILURE);
 }
 static int test_2_3_bot(int child)
 {
@@ -4627,10 +4634,10 @@ static int test_2_3_bot(int child)
 		break;
 	case __EVENT_TIMEOUT:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	default:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
 	start_tt(100);
@@ -4640,14 +4647,14 @@ static int test_2_3_bot(int child)
 		break;
 	case __TEST_INFO_REQ:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	default:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
 	if (do_signal(child, __TEST_INFO_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	switch (get_event(child)) {
@@ -4656,14 +4663,16 @@ static int test_2_3_bot(int child)
 		break;
 	case __EVENT_TIMEOUT:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	default:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
+	last_t_errno = TSYSERR;
+	last_errno = EPROTO;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	switch (get_event(child)) {
@@ -4672,10 +4681,12 @@ static int test_2_3_bot(int child)
 		break;
 	default:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+    failure:
+	return (__RESULT_FAILURE);
 }
 struct test_stream test_case_2_3_top = { &preamble_0, &test_2_3_top, &postamble_0 };
 struct test_stream test_case_2_3_bot = { &preamble_0, &test_2_3_bot, &postamble_0 };
