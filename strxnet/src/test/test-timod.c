@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 11:32:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/05 05:15:15 $ by $Author: brian $
+ Last Modified $Date: 2005/06/06 11:32:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.14  2005/06/06 11:32:37  brian
+ - more upgrades to test suites
+
  Revision 0.9.2.13  2005/06/05 05:15:15  brian
  - provide some additiona info and adjust timing
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 11:32:37 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/05 05:15:15 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 11:32:37 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -143,7 +146,7 @@ static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9
  *  To preserve the environment and ensure that the tests are repeatable in
  *  any order, the entire test harness (pipe) is assembled and disassembled
  *  for each test.  A test preamble is used to place the module in the correct
- *  state for a test case to begin and then a postable is used to ensure that
+ *  state for a test case to begin and then a postamble is used to ensure that
  *  the module can be removed correctly.
  */
 
@@ -232,9 +235,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 10
-#define NORMAL_WAIT 100
-#define LONG_WAIT 500
+#define SHORT_WAIT 100		// 10
+#define NORMAL_WAIT 500		// 100
+#define LONG_WAIT 5000		// 500
+#define LONGER_WAIT 10000	// 5000
+
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -250,7 +255,8 @@ static int test_bufsize = 256;
 static int test_tidu = 256;
 static int test_mgmtflags = T_NEGOTIATE;
 static struct sockaddr_in *test_addr = NULL;
-static char *test_data = NULL;
+static socklen_t test_alen = sizeof(*test_addr);
+static const char *test_data = NULL;
 static int test_resfd = -1;
 static int test_timout = 200;
 
@@ -298,6 +304,8 @@ enum {
 	__TEST_PUTMSG_DATA, __TEST_PUTPMSG_DATA, __TEST_PUSH, __TEST_POP,
 	__TEST_READ, __TEST_READV, __TEST_GETMSG, __TEST_GETPMSG,
 	__TEST_DATA,
+	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
+	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -312,6 +320,15 @@ enum {
 	__TEST_TI_SETMYNAME_DATA, __TEST_TI_SETPEERNAME_DATA,
 	__TEST_TI_SETMYNAME_DISC, __TEST_TI_SETPEERNAME_DISC,
 	__TEST_TI_SETMYNAME_DISC_DATA, __TEST_TI_SETPEERNAME_DISC_DATA,
+	__TEST_O_NONBLOCK, __TEST_O_BLOCK,
+	__TEST_T_ACCEPT, __TEST_T_BIND, __TEST_T_CLOSE, __TEST_T_CONNECT,
+	__TEST_T_GETINFO, __TEST_T_GETPROTADDR, __TEST_T_GETSTATE,
+	__TEST_T_LISTEN, __TEST_T_LOOK, __TEST_T_OPTMGMT, __TEST_T_RCV,
+	__TEST_T_RCVCONNECT, __TEST_T_RCVDIS, __TEST_T_RCVREL,
+	__TEST_T_RCVRELDATA, __TEST_T_RCVUDATA, __TEST_T_RCVUDERR,
+	__TEST_T_RCVV, __TEST_T_RCVVUDATA, __TEST_T_SND, __TEST_T_SNDDIS,
+	__TEST_T_SNDREL, __TEST_T_SNDRELDATA, __TEST_T_SNDUDATA,
+	__TEST_T_SNDV, __TEST_T_SNDVUDATA, __TEST_T_SYNC, __TEST_T_UNBIND,
 };
 
 /*
@@ -437,7 +454,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |  | %11.6g                   |                    <%d>\n", t, state);
+		fprintf(stdout, "                    |  | %11.6g                    |                   <%d>\n", t, state);
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -512,45 +529,42 @@ static int stop_tt(void)
 	return __RESULT_SUCCESS;
 }
 
-/* 
+/*
  *  Addresses
  */
 
-/* 
+/*
  *  Options
  */
 
 /*
- * data options 
+ * data options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_data = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 /*
- * connect options 
+ * connect options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_conn = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 /*
- * management options 
+ * management options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_optm = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 #if 1
@@ -1191,6 +1205,50 @@ const char *state_string(ulong state)
 	}
 }
 
+#if 0
+void print_addr(char *add_ptr, size_t add_len)
+{
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+char *addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+void print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	fprintf(stdout, "Stupid!\n");
+}
+#else
 void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
@@ -1217,6 +1275,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
+#endif
 
 char *status_string(struct t_opthdr *oh)
 {
@@ -1431,6 +1490,13 @@ char *yesno_string(struct t_opthdr *oh)
 	}
 }
 
+char *number_string(struct t_opthdr *oh)
+{
+	static char buf[32];
+	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
+	return (buf);
+}
+
 char *value_string(struct t_opthdr *oh)
 {
 #if 0
@@ -1527,41 +1593,29 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_CORK:
 			return yesno_string(oh);
 		case T_SCTP_PPI:
-			break;
+			return number_string(oh);;
 		case T_SCTP_SID:
-			break;
+			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			return number_string(oh);;
 		case T_SCTP_SSN:
-			break;
 		case T_SCTP_TSN:
-			break;
+			return number_string(oh);;
 		case T_SCTP_RECVOPT:
 			return yesno_string(oh);
 		case T_SCTP_COOKIE_LIFE:
-			break;
 		case T_SCTP_SACK_DELAY:
-			break;
 		case T_SCTP_PATH_MAX_RETRANS:
-			break;
 		case T_SCTP_ASSOC_MAX_RETRANS:
-			break;
 		case T_SCTP_MAX_INIT_RETRIES:
-			break;
 		case T_SCTP_HEARTBEAT_ITVL:
-			break;
 		case T_SCTP_RTO_INITIAL:
-			break;
 		case T_SCTP_RTO_MIN:
-			break;
 		case T_SCTP_RTO_MAX:
-			break;
 		case T_SCTP_OSTREAMS:
-			break;
 		case T_SCTP_ISTREAMS:
-			break;
 		case T_SCTP_COOKIE_INC:
-			break;
 		case T_SCTP_THROTTLE_ITVL:
-			break;
+			return number_string(oh);;
 		case T_SCTP_MAC_TYPE:
 			break;
 		case T_SCTP_CKSUM_TYPE:
@@ -1583,17 +1637,12 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PR:
 			break;
 		case T_SCTP_LIFETIME:
-			break;
 		case T_SCTP_DISPOSITION:
-			break;
 		case T_SCTP_MAX_BURST:
-			break;
 		case T_SCTP_HB:
-			break;
 		case T_SCTP_RTO:
-			break;
 		case T_SCTP_MAXSEG:
-			break;
+			return number_string(oh);
 		case T_SCTP_STATUS:
 			break;
 		case T_SCTP_DEBUG:
@@ -1604,6 +1653,34 @@ char *value_string(struct t_opthdr *oh)
 	}
 	return ("(unknown value)");
 }
+
+#if 0
+void parse_options(int fd, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		if (oh->len == sizeof(*oh))
+			continue;
+		switch (oh->level) {
+		case T_INET_SCTP:
+			switch (oh->name) {
+			case T_SCTP_PPI:
+				ppi[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SID:
+				sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SSN:
+				ssn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_TSN:
+				tsn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			}
+		}
+	}
+}
+#endif
 
 char *mgmtflag_string(t_uscalar_t flag)
 {
@@ -1780,6 +1857,38 @@ char *t_errno_string(long err, long syserr)
 	{
 		static char buf[32];
 		snprintf(buf, sizeof(buf), "[%ld]", err);
+		return buf;
+	}
+	}
+}
+
+char *t_look_string(int look)
+{
+	switch (look) {
+	case 0:
+		return ("(NO EVENT)");
+	case T_LISTEN:
+		return ("(T_LISTEN)");
+	case T_CONNECT:
+		return ("(T_CONNECT)");
+	case T_DATA:
+		return ("(T_DATA)");
+	case T_EXDATA:
+		return ("(T_EXDATA)");
+	case T_DISCONNECT:
+		return ("(T_DISCONNECT)");
+	case T_UDERR:
+		return ("(T_UDERR)");
+	case T_ORDREL:
+		return ("(T_ORDREL)");
+	case T_GODATA:
+		return ("(T_GODATA)");
+	case T_GOEXDATA:
+		return ("(T_GOEXDATA)");
+	default:
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(%d)", look);
 		return buf;
 	}
 	}
@@ -2215,6 +2324,18 @@ void print_terror(int child, long error, long terror)
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, t_errno_string(terror, error));
+}
+
+void print_tlook(int child, int tlook)
+{
+	static const char *msgs[] = {
+		"  %-14s<--/|  |                                |                   [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
+		"                    |  |                                |\\-->%14s [%d]\n",
+		"                    |  |       [%14s]         |                   [%d]\n",
+	};
+	if (verbose > 0)
+		print_string_state(child, msgs, t_look_string(tlook));
 }
 
 void print_expect(int child, int want)
@@ -2657,7 +2778,7 @@ int test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int stream_start(int child)
+static int stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
@@ -2715,35 +2836,39 @@ static int stream_stop(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(void)
+static int begin_tests(int index)
 {
 	state = 0;
-	if (stream_start(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(0, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(1, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(2, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	show_acks = 1;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 static int end_tests(void)
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 /*
@@ -2807,10 +2932,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
-		p->conn_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
 		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
 		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
@@ -2965,13 +3090,13 @@ static int do_signal(int child, int action)
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
-		ctrl->len = sizeof(p->bind_req) + (test_addr ? sizeof(*test_addr) : 0);
+		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
 		p->bind_req.PRIM_type = T_BIND_REQ;
-		p->bind_req.ADDR_length = test_addr ? sizeof(*test_addr) : 0;
+		p->bind_req.ADDR_length = test_addr ? test_alen : 0;
 		p->bind_req.ADDR_offset = test_addr ? sizeof(p->bind_req) : 0;
 		p->bind_req.CONIND_number = last_qlen;
 		if (test_addr)
-			bcopy(test_addr, (&p->bind_req) + 1, sizeof(*test_addr));
+			bcopy(test_addr, ctrl->buf + p->bind_req.ADDR_offset, p->bind_req.ADDR_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3021,10 +3146,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
-		p->unitdata_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
 		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
 		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
@@ -3902,7 +4027,7 @@ void test_sleep(int child, unsigned long t)
 static int preamble_0(int child)
 {
 	start_tt(1000);
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 static int postamble_0(int child)
@@ -3924,46 +4049,440 @@ static int postamble_0(int child)
 	}
 	state++;
 	stop_tt();
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 #if 0
-static int preamble_1_top(int child)
+static int preamble_1(int child)
 {
-	start_tt(1000);
+	test_mgmtflags = T_NEGOTIATE;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-static int postamble_1_top(int child)
+static int preamble_1s(int child)
 {
-	while (wait_event(child, 0) != __EVENT_NO_MSG) ;
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	stop_tt();
-	if (do_signal(child, __TEST_POP))
-		return (__RESULT_FAILURE);
+	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-static int postamble_1_bot(int child)
+static int postamble_1(int child)
 {
-	for (;;)
-		switch (get_event(child)) {
-		case __TEST_DISCON_REQ:
-			stop_tt();
-			return __RESULT_SUCCESS;
-		case __EVENT_NO_MSG:
-			break;;
-		default:
-			stop_tt();
-			return (__RESULT_FAILURE);
-		}
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	return __RESULT_SCRIPT_ERROR;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_1e(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_conn(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_resp(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_list(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_list(int child)
+{
+	int failed = -1;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+#if 0
+static int preamble_2b_conn(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = "Hello World";
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_resp(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_list(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = "Hello There!";
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+#endif
+
+static int postamble_3_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_conn(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_resp(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_list(int child)
+{
+	return postamble_2_list(child);
+}
+#endif
+
+#if 0
+static int preamble_3b_conn(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_conn(child);
+}
+static int preamble_3b_resp(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_resp(child);
+}
+static int preamble_3b_list(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_list(child);
+}
+
+static int preamble_4_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_conn(child);
+}
+static int preamble_4_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_list(child);
+}
+static int preamble_4_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_resp(child);
+}
+
+static int preamble_4b_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_conn(child);
+}
+static int preamble_4b_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_list(child);
+}
+static int preamble_4b_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_resp(child);
+}
+
+static int preamble_5_conn(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_conn(child);
+}
+static int preamble_5_list(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_list(child);
+}
+static int preamble_5_resp(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_resp(child);
+}
+
+static int preamble_6_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_conn(child);
+}
+static int preamble_6_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_list(child);
+}
+static int preamble_6_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_resp(child);
+}
+
+static int preamble_7_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+
+static int preamble_8_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
 }
 #endif
 
@@ -3983,13 +4502,15 @@ struct test_stream {
 
 #define test_group_1 "Pushing and popping the timod module"
 #define tgrp_case_1_1 test_group_1
+#define numb_case_1_1 "1.1"
 #define name_case_1_1 "Normal push and pop sequence"
 #define desc_case_1_1 "\
 This test case tests the simple pushing and popping of the timod module.  It\n\
 ensures that pushing the module on an empty stream has no effect, while\n\
 popping the module from the stream results in a T_DISCON_REQ being sent to the\n\
 transport peer."
-static int test_1_1_top(int child)
+
+int test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3999,7 +4520,8 @@ static int test_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_1_1_bot(int child)
+
+int test_case_1_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4014,19 +4536,27 @@ static int test_1_1_bot(int child)
 	state++;
 	return (__RESULT_FAILURE);
 }
-struct test_stream test_case_1_1_top = { &preamble_0, &test_1_1_top, &postamble_0 };
-struct test_stream test_case_1_1_bot = { &preamble_0, &test_1_1_bot, &postamble_0 };
-#define test_case_1_1_stream_top (&test_case_1_1_top)
-#define test_case_1_1_stream_bot (&test_case_1_1_bot)
+
+#define preamble_1_1_top	preamble_0
+#define preamble_1_1_bot	preamble_0
+
+#define postamble_1_1_top	postamble_0
+#define postamble_1_1_bot	postamble_0
+
+struct test_stream test_1_1_top = { &preamble_1_1_top, &test_case_1_1_top, &postamble_1_1_top };
+struct test_stream test_1_1_bot = { &preamble_1_1_bot, &test_case_1_1_bot, &postamble_1_1_bot };
+
 
 #define test_group_2 "Performing IO controls on the timod module"
 
 #define tgrp_case_2_1_1 test_group_2
+#define numb_case_2_1_1 "2.1.1"
 #define name_case_2_1_1 "TI_GETINFO IO control positive acknowledgement"
 #define desc_case_2_1_1 "\
 This test case test the execution of the TI_GETINFO IO control with positive\n\
 results on using the timod module."
-static int test_2_1_top(int child, int command)
+
+int test_case_2_1_top(int child, int command)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4039,7 +4569,8 @@ static int test_2_1_top(int child, int command)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_bot(int child, int signal, int expect)
+
+int test_case_2_1_bot(int child, int signal, int expect)
 {
 	start_tt(200);
 	state++;
@@ -4062,243 +4593,348 @@ static int test_2_1_bot(int child, int signal, int expect)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_1_top(int child)
+
+int test_case_2_1_1_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_GETINFO);
+	return test_case_2_1_top(child, __TEST_TI_GETINFO);
 }
-static int test_2_1_1_bot(int child)
+
+int test_case_2_1_1_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
+	return test_case_2_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
 }
-struct test_stream test_case_2_1_1_top = { &preamble_0, &test_2_1_1_top, &postamble_0 };
-struct test_stream test_case_2_1_1_bot = { &preamble_0, &test_2_1_1_bot, &postamble_0 };
-#define test_case_2_1_1_stream_top (&test_case_2_1_1_top)
-#define test_case_2_1_1_stream_bot (&test_case_2_1_1_bot)
+
+#define preamble_2_1_1_top	preamble_0
+#define preamble_2_1_1_bot	preamble_0
+
+#define postamble_2_1_1_top	postamble_0
+#define postamble_2_1_1_bot	postamble_0
+
+struct test_stream test_2_1_1_top = { &preamble_2_1_1_top, &test_case_2_1_1_top, &postamble_2_1_1_top };
+struct test_stream test_2_1_1_bot = { &preamble_2_1_1_bot, &test_case_2_1_1_bot, &postamble_2_1_1_bot };
 
 #define tgrp_case_2_1_2 test_group_2
+#define numb_case_2_1_2 "2.1.2"
 #define name_case_2_1_2 "TI_OPTMGMT IO control positive acknowledgement"
 #define desc_case_2_1_2 "\
 This test case test the execution of the TI_OPTMGMT IO control with positive\n\
 results on using the timod module."
-static int test_2_1_2_top(int child)
+
+int test_case_2_1_2_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_OPTMGMT);
+	return test_case_2_1_top(child, __TEST_TI_OPTMGMT);
 }
-static int test_2_1_2_bot(int child)
+
+int test_case_2_1_2_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
+	return test_case_2_1_bot(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
 }
-struct test_stream test_case_2_1_2_top = { &preamble_0, &test_2_1_2_top, &postamble_0 };
-struct test_stream test_case_2_1_2_bot = { &preamble_0, &test_2_1_2_bot, &postamble_0 };
-#define test_case_2_1_2_stream_top (&test_case_2_1_2_top)
-#define test_case_2_1_2_stream_bot (&test_case_2_1_2_bot)
+
+#define preamble_2_1_2_top	preamble_0
+#define preamble_2_1_2_bot	preamble_0
+
+#define postamble_2_1_2_top	postamble_0
+#define postamble_2_1_2_bot	postamble_0
+
+struct test_stream test_2_1_2_top = { &preamble_2_1_2_top, &test_case_2_1_2_top, &postamble_2_1_2_top };
+struct test_stream test_2_1_2_bot = { &preamble_2_1_2_bot, &test_case_2_1_2_bot, &postamble_2_1_2_bot };
 
 #define tgrp_case_2_1_3 test_group_2
+#define numb_case_2_1_3 "2.1.3"
 #define name_case_2_1_3 "TI_BIND IO control positive acknowledgement"
 #define desc_case_2_1_3 "\
 This test case test the execution of the TI_BIND IO control with positive\n\
 results on using the timod module."
-static int test_2_1_3_top(int child)
+
+int test_case_2_1_3_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_BIND);
+	return test_case_2_1_top(child, __TEST_TI_BIND);
 }
-static int test_2_1_3_bot(int child)
+
+int test_case_2_1_3_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
+	return test_case_2_1_bot(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
 }
-struct test_stream test_case_2_1_3_top = { &preamble_0, &test_2_1_3_top, &postamble_0 };
-struct test_stream test_case_2_1_3_bot = { &preamble_0, &test_2_1_3_bot, &postamble_0 };
-#define test_case_2_1_3_stream_top (&test_case_2_1_3_top)
-#define test_case_2_1_3_stream_bot (&test_case_2_1_3_bot)
+
+#define preamble_2_1_3_top	preamble_0
+#define preamble_2_1_3_bot	preamble_0
+
+#define postamble_2_1_3_top	postamble_0
+#define postamble_2_1_3_bot	postamble_0
+
+struct test_stream test_2_1_3_top = { &preamble_2_1_3_top, &test_case_2_1_3_top, &postamble_2_1_3_top };
+struct test_stream test_2_1_3_bot = { &preamble_2_1_3_bot, &test_case_2_1_3_bot, &postamble_2_1_3_bot };
 
 #define tgrp_case_2_1_4 test_group_2
+#define numb_case_2_1_4 "2.1.4"
 #define name_case_2_1_4 "TI_UNBIND IO control positive acknowledgement"
 #define desc_case_2_1_4 "\
 This test case test the execution of the TI_UNBIND IO control with positive\n\
 results on using the timod module."
-static int test_2_1_4_top(int child)
+
+int test_case_2_1_4_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_UNBIND);
+	return test_case_2_1_top(child, __TEST_TI_UNBIND);
 }
-static int test_2_1_4_bot(int child)
+
+int test_case_2_1_4_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
+	return test_case_2_1_bot(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_1_4_top = { &preamble_0, &test_2_1_4_top, &postamble_0 };
-struct test_stream test_case_2_1_4_bot = { &preamble_0, &test_2_1_4_bot, &postamble_0 };
-#define test_case_2_1_4_stream_top (&test_case_2_1_4_top)
-#define test_case_2_1_4_stream_bot (&test_case_2_1_4_bot)
+
+#define preamble_2_1_4_top	preamble_0
+#define preamble_2_1_4_bot	preamble_0
+
+#define postamble_2_1_4_top	postamble_0
+#define postamble_2_1_4_bot	postamble_0
+
+struct test_stream test_2_1_4_top = { &preamble_2_1_4_top, &test_case_2_1_4_top, &postamble_2_1_4_top };
+struct test_stream test_2_1_4_bot = { &preamble_2_1_4_bot, &test_case_2_1_4_bot, &postamble_2_1_4_bot };
 
 #define tgrp_case_2_1_5 test_group_2
+#define numb_case_2_1_5 "2.1.5"
 #define name_case_2_1_5 "TI_GETMYNAME IO control positive acknowledgement"
 #define desc_case_2_1_5 "\
 This test case test the execution of the TI_GETMYNAME IO control with positive\n\
 results on using the timod module."
-static int test_2_1_5_top(int child)
+
+int test_case_2_1_5_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_GETMYNAME);
+	return test_case_2_1_top(child, __TEST_TI_GETMYNAME);
 }
-static int test_2_1_5_bot(int child)
+
+int test_case_2_1_5_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
+	return test_case_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
 }
-struct test_stream test_case_2_1_5_top = { &preamble_0, &test_2_1_5_top, &postamble_0 };
-struct test_stream test_case_2_1_5_bot = { &preamble_0, &test_2_1_5_bot, &postamble_0 };
-#define test_case_2_1_5_stream_top (&test_case_2_1_5_top)
-#define test_case_2_1_5_stream_bot (&test_case_2_1_5_bot)
+
+#define preamble_2_1_5_top	preamble_0
+#define preamble_2_1_5_bot	preamble_0
+
+#define postamble_2_1_5_top	postamble_0
+#define postamble_2_1_5_bot	postamble_0
+
+struct test_stream test_2_1_5_top = { &preamble_2_1_5_top, &test_case_2_1_5_top, &postamble_2_1_5_top };
+struct test_stream test_2_1_5_bot = { &preamble_2_1_5_bot, &test_case_2_1_5_bot, &postamble_2_1_5_bot };
 
 #define tgrp_case_2_1_6 test_group_2
+#define numb_case_2_1_6 "2.1.6"
 #define name_case_2_1_6 "TI_GETPEERNAME IO control positive acknowledgement"
 #define desc_case_2_1_6 "\
 This test case test the execution of the TI_GETPEERNAME IO control with positive\n\
 results on using the timod module."
-static int test_2_1_6_top(int child)
+
+int test_case_2_1_6_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_GETPEERNAME);
+	return test_case_2_1_top(child, __TEST_TI_GETPEERNAME);
 }
-static int test_2_1_6_bot(int child)
+
+int test_case_2_1_6_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
+	return test_case_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
 }
-struct test_stream test_case_2_1_6_top = { &preamble_0, &test_2_1_6_top, &postamble_0 };
-struct test_stream test_case_2_1_6_bot = { &preamble_0, &test_2_1_6_bot, &postamble_0 };
-#define test_case_2_1_6_stream_top (&test_case_2_1_6_top)
-#define test_case_2_1_6_stream_bot (&test_case_2_1_6_bot)
+
+#define preamble_2_1_6_top	preamble_0
+#define preamble_2_1_6_bot	preamble_0
+
+#define postamble_2_1_6_top	postamble_0
+#define postamble_2_1_6_bot	postamble_0
+
+struct test_stream test_2_1_6_top = { &preamble_2_1_6_top, &test_case_2_1_6_top, &postamble_2_1_6_top };
+struct test_stream test_2_1_6_bot = { &preamble_2_1_6_bot, &test_case_2_1_6_bot, &postamble_2_1_6_bot };
 
 #define tgrp_case_2_1_7_1 test_group_2
+#define numb_case_2_1_7_1 "2.1.7.1"
 #define name_case_2_1_7_1 "TI_SETMYNAME IO control positive acknowledgement"
 #define desc_case_2_1_7_1 "\
 This test case test the execution of the TI_SETMYNAME IO control with positive\n\
 results on using the timod module."
-static int test_2_1_7_1_top(int child)
+
+int test_case_2_1_7_1_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_SETMYNAME);
+	return test_case_2_1_top(child, __TEST_TI_SETMYNAME);
 }
-static int test_2_1_7_1_bot(int child)
+
+int test_case_2_1_7_1_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
+	return test_case_2_1_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_1_7_1_top = { &preamble_0, &test_2_1_7_1_top, &postamble_0 };
-struct test_stream test_case_2_1_7_1_bot = { &preamble_0, &test_2_1_7_1_bot, &postamble_0 };
-#define test_case_2_1_7_1_stream_top (&test_case_2_1_7_1_top)
-#define test_case_2_1_7_1_stream_bot (&test_case_2_1_7_1_bot)
+
+#define preamble_2_1_7_1_top	preamble_0
+#define preamble_2_1_7_1_bot	preamble_0
+
+#define postamble_2_1_7_1_top	postamble_0
+#define postamble_2_1_7_1_bot	postamble_0
+
+struct test_stream test_2_1_7_1_top = { &preamble_2_1_7_1_top, &test_case_2_1_7_1_top, &postamble_2_1_7_1_top };
+struct test_stream test_2_1_7_1_bot = { &preamble_2_1_7_1_bot, &test_case_2_1_7_1_bot, &postamble_2_1_7_1_bot };
 
 #define tgrp_case_2_1_7_2 test_group_2
+#define numb_case_2_1_7_2 "2.1.7.2"
 #define name_case_2_1_7_2 "TI_SETMYNAME (disconnect) IO control positive acknowledgement"
 #define desc_case_2_1_7_2 "\
 This test case test the execution of the TI_SETMYNAME (disconnect) IO control\n\
 with positive results on using the timod module."
-static int test_2_1_7_2_top(int child)
+
+int test_case_2_1_7_2_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_SETMYNAME_DISC);
+	return test_case_2_1_top(child, __TEST_TI_SETMYNAME_DISC);
 }
-static int test_2_1_7_2_bot(int child)
+
+int test_case_2_1_7_2_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_2_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_1_7_2_top = { &preamble_0, &test_2_1_7_2_top, &postamble_0 };
-struct test_stream test_case_2_1_7_2_bot = { &preamble_0, &test_2_1_7_2_bot, &postamble_0 };
-#define test_case_2_1_7_2_stream_top (&test_case_2_1_7_2_top)
-#define test_case_2_1_7_2_stream_bot (&test_case_2_1_7_2_bot)
+
+#define preamble_2_1_7_2_top	preamble_0
+#define preamble_2_1_7_2_bot	preamble_0
+
+#define postamble_2_1_7_2_top	postamble_0
+#define postamble_2_1_7_2_bot	postamble_0
+
+struct test_stream test_2_1_7_2_top = { &preamble_2_1_7_2_top, &test_case_2_1_7_2_top, &postamble_2_1_7_2_top };
+struct test_stream test_2_1_7_2_bot = { &preamble_2_1_7_2_bot, &test_case_2_1_7_2_bot, &postamble_2_1_7_2_bot };
 
 #define tgrp_case_2_1_8_1 test_group_2
+#define numb_case_2_1_8_1 "2.1.8.1"
 #define name_case_2_1_8_1 "TI_SETPEERNAME IO control positive acknowledgement"
 #define desc_case_2_1_8_1 "\
 This test case test the execution of the TI_SETPEERNAME IO control with positive\n\
 results on using the timod module."
-static int test_2_1_8_1_top(int child)
+
+int test_case_2_1_8_1_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_SETPEERNAME);
+	return test_case_2_1_top(child, __TEST_TI_SETPEERNAME);
 }
-static int test_2_1_8_1_bot(int child)
+
+int test_case_2_1_8_1_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
+	return test_case_2_1_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_1_8_1_top = { &preamble_0, &test_2_1_8_1_top, &postamble_0 };
-struct test_stream test_case_2_1_8_1_bot = { &preamble_0, &test_2_1_8_1_bot, &postamble_0 };
-#define test_case_2_1_8_1_stream_top (&test_case_2_1_8_1_top)
-#define test_case_2_1_8_1_stream_bot (&test_case_2_1_8_1_bot)
+
+#define preamble_2_1_8_1_top	preamble_0
+#define preamble_2_1_8_1_bot	preamble_0
+
+#define postamble_2_1_8_1_top	postamble_0
+#define postamble_2_1_8_1_bot	postamble_0
+
+struct test_stream test_2_1_8_1_top = { &preamble_2_1_8_1_top, &test_case_2_1_8_1_top, &postamble_2_1_8_1_top };
+struct test_stream test_2_1_8_1_bot = { &preamble_2_1_8_1_bot, &test_case_2_1_8_1_bot, &postamble_2_1_8_1_bot };
 
 #define tgrp_case_2_1_8_2 test_group_2
+#define numb_case_2_1_8_2 "2.1.8.2"
 #define name_case_2_1_8_2 "TI_SETPEERNAME (disconnect) IO control positive acknowledgement"
 #define desc_case_2_1_8_2 "\
 This test case test the execution of the TI_SETPEERNAME (disconnect) IO\n\
 control with positive results on using the timod module."
-static int test_2_1_8_2_top(int child)
+
+int test_case_2_1_8_2_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_SETPEERNAME_DISC);
+	return test_case_2_1_top(child, __TEST_TI_SETPEERNAME_DISC);
 }
-static int test_2_1_8_2_bot(int child)
+
+int test_case_2_1_8_2_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_2_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_1_8_2_top = { &preamble_0, &test_2_1_8_2_top, &postamble_0 };
-struct test_stream test_case_2_1_8_2_bot = { &preamble_0, &test_2_1_8_2_bot, &postamble_0 };
-#define test_case_2_1_8_2_stream_top (&test_case_2_1_8_2_top)
-#define test_case_2_1_8_2_stream_bot (&test_case_2_1_8_2_bot)
+
+#define preamble_2_1_8_2_top	preamble_0
+#define preamble_2_1_8_2_bot	preamble_0
+
+#define postamble_2_1_8_2_top	postamble_0
+#define postamble_2_1_8_2_bot	postamble_0
+
+struct test_stream test_2_1_8_2_top = { &preamble_2_1_8_2_top, &test_case_2_1_8_2_top, &postamble_2_1_8_2_top };
+struct test_stream test_2_1_8_2_bot = { &preamble_2_1_8_2_bot, &test_case_2_1_8_2_bot, &postamble_2_1_8_2_bot };
 
 #if 0
 #define tgrp_case_2_1_9 test_group_2
+#define numb_case_2_1_9 "2.1.9"
 #define name_case_2_1_9 "TI_SYNC IO control positive acknowledgement"
 #define desc_case_2_1_9 "\
 This test case test the execution of the TI_SYNC IO control with positive\n\
 results on using the timod module."
-static int test_2_1_9_top(int child)
+
+int test_case_2_1_9_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_SYNC);
+	return test_case_2_1_top(child, __TEST_TI_SYNC);
 }
-static int test_2_1_9_bot(int child)
+
+int test_case_2_1_9_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
+	return test_case_2_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
 }
-struct test_stream test_case_2_1_9_top = { &preamble_0, &test_2_1_9_top, &postamble_0 };
-struct test_stream test_case_2_1_9_bot = { &preamble_0, &test_2_1_9_bot, &postamble_0 };
-#define test_case_2_1_9_stream_top (&test_case_2_1_9_top)
-#define test_case_2_1_9_stream_bot (&test_case_2_1_9_bot)
+
+#define preamble_2_1_9_top	preamble_0
+#define preamble_2_1_9_bot	preamble_0
+
+#define postamble_2_1_9_top	postamble_0
+#define postamble_2_1_9_bot	postamble_0
+
+struct test_stream test_2_1_9_top = { &preamble_2_1_9_top, &test_case_2_1_9_top, &postamble_2_1_9_top };
+struct test_stream test_2_1_9_bot = { &preamble_2_1_9_bot, &test_case_2_1_9_bot, &postamble_2_1_9_bot };
 #endif
 
 #define tgrp_case_2_1_10 test_group_2
+#define numb_case_2_1_10 "2.1.10"
 #define name_case_2_1_10 "TI_GETADDRS IO control positive acknowledgement"
 #define desc_case_2_1_10 "\
 This test case test the execution of the TI_GETADDRS IO control with positive\n\
 results on using the timod module."
-static int test_2_1_10_top(int child)
+
+int test_case_2_1_10_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_GETADDRS);
+	return test_case_2_1_top(child, __TEST_TI_GETADDRS);
 }
-static int test_2_1_10_bot(int child)
+
+int test_case_2_1_10_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
+	return test_case_2_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
 }
-struct test_stream test_case_2_1_10_top = { &preamble_0, &test_2_1_10_top, &postamble_0 };
-struct test_stream test_case_2_1_10_bot = { &preamble_0, &test_2_1_10_bot, &postamble_0 };
-#define test_case_2_1_10_stream_top (&test_case_2_1_10_top)
-#define test_case_2_1_10_stream_bot (&test_case_2_1_10_bot)
+
+#define preamble_2_1_10_top	preamble_0
+#define preamble_2_1_10_bot	preamble_0
+
+#define postamble_2_1_10_top	postamble_0
+#define postamble_2_1_10_bot	postamble_0
+
+struct test_stream test_2_1_10_top = { &preamble_2_1_10_top, &test_case_2_1_10_top, &postamble_2_1_10_top };
+struct test_stream test_2_1_10_bot = { &preamble_2_1_10_bot, &test_case_2_1_10_bot, &postamble_2_1_10_bot };
 
 #define tgrp_case_2_1_11 test_group_2
+#define numb_case_2_1_11 "2.1.11"
 #define name_case_2_1_11 "TI_CAPABILITY IO control positive acknowledgement"
 #define desc_case_2_1_11 "\
 This test case test the execution of the TI_CAPABILITY IO control with positive\n\
 results on using the timod module."
-static int test_2_1_11_top(int child)
+
+int test_case_2_1_11_top(int child)
 {
-	return test_2_1_top(child, __TEST_TI_CAPABILITY);
+	return test_case_2_1_top(child, __TEST_TI_CAPABILITY);
 }
-static int test_2_1_11_bot(int child)
+
+int test_case_2_1_11_bot(int child)
 {
-	return test_2_1_bot(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
+	return test_case_2_1_bot(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
 }
-struct test_stream test_case_2_1_11_top = { &preamble_0, &test_2_1_11_top, &postamble_0 };
-struct test_stream test_case_2_1_11_bot = { &preamble_0, &test_2_1_11_bot, &postamble_0 };
-#define test_case_2_1_11_stream_top (&test_case_2_1_11_top)
-#define test_case_2_1_11_stream_bot (&test_case_2_1_11_bot)
+
+#define preamble_2_1_11_top	preamble_0
+#define preamble_2_1_11_bot	preamble_0
+
+#define postamble_2_1_11_top	postamble_0
+#define postamble_2_1_11_bot	postamble_0
+
+struct test_stream test_2_1_11_top = { &preamble_2_1_11_top, &test_case_2_1_11_top, &postamble_2_1_11_top };
+struct test_stream test_2_1_11_bot = { &preamble_2_1_11_bot, &test_case_2_1_11_bot, &postamble_2_1_11_bot };
 
 #define tgrp_case_2_2_1 test_group_2
+#define numb_case_2_2_1 "2.2.1"
 #define name_case_2_2_1 "TI_GETINFO IO control negative acknowledgement"
 #define desc_case_2_2_1 "\
 This test case test the execution of the TI_GETINFO IO control with negative\n\
 results on using the timod module."
-static int test_2_2_top(int child, int command)
+
+int test_case_2_2_top(int child, int command)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4311,7 +4947,8 @@ static int test_2_2_top(int child, int command)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_2_bot(int child, int signal, int expect)
+
+int test_case_2_2_bot(int child, int signal, int expect)
 {
 	start_tt(200);
 	state++;
@@ -4336,245 +4973,350 @@ static int test_2_2_bot(int child, int signal, int expect)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_2_1_top(int child)
+
+int test_case_2_2_1_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_GETINFO);
+	return test_case_2_2_top(child, __TEST_TI_GETINFO);
 }
-static int test_2_2_1_bot(int child)
+
+int test_case_2_2_1_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_INFO_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_INFO_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_1_top = { &preamble_0, &test_2_2_1_top, &postamble_0 };
-struct test_stream test_case_2_2_1_bot = { &preamble_0, &test_2_2_1_bot, &postamble_0 };
-#define test_case_2_2_1_stream_top (&test_case_2_2_1_top)
-#define test_case_2_2_1_stream_bot (&test_case_2_2_1_bot)
+
+#define preamble_2_2_1_top	preamble_0
+#define preamble_2_2_1_bot	preamble_0
+
+#define postamble_2_2_1_top	postamble_0
+#define postamble_2_2_1_bot	postamble_0
+
+struct test_stream test_2_2_1_top = { &preamble_2_2_1_top, &test_case_2_2_1_top, &postamble_2_2_1_top };
+struct test_stream test_2_2_1_bot = { &preamble_2_2_1_bot, &test_case_2_2_1_bot, &postamble_2_2_1_bot };
 
 #define tgrp_case_2_2_2 test_group_2
+#define numb_case_2_2_2 "2.2.2"
 #define name_case_2_2_2 "TI_OPTMGMT IO control negative acknowledgement"
 #define desc_case_2_2_2 "\
 This test case test the execution of the TI_OPTMGMT IO control with negative\n\
 results on using the timod module."
-static int test_2_2_2_top(int child)
+
+int test_case_2_2_2_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_OPTMGMT);
+	return test_case_2_2_top(child, __TEST_TI_OPTMGMT);
 }
-static int test_2_2_2_bot(int child)
+
+int test_case_2_2_2_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_OPTMGMT_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_OPTMGMT_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_2_top = { &preamble_0, &test_2_2_2_top, &postamble_0 };
-struct test_stream test_case_2_2_2_bot = { &preamble_0, &test_2_2_2_bot, &postamble_0 };
-#define test_case_2_2_2_stream_top (&test_case_2_2_2_top)
-#define test_case_2_2_2_stream_bot (&test_case_2_2_2_bot)
+
+#define preamble_2_2_2_top	preamble_0
+#define preamble_2_2_2_bot	preamble_0
+
+#define postamble_2_2_2_top	postamble_0
+#define postamble_2_2_2_bot	postamble_0
+
+struct test_stream test_2_2_2_top = { &preamble_2_2_2_top, &test_case_2_2_2_top, &postamble_2_2_2_top };
+struct test_stream test_2_2_2_bot = { &preamble_2_2_2_bot, &test_case_2_2_2_bot, &postamble_2_2_2_bot };
 
 #define tgrp_case_2_2_3 test_group_2
+#define numb_case_2_2_3 "2.2.3"
 #define name_case_2_2_3 "TI_BIND IO control negative acknowledgement"
 #define desc_case_2_2_3 "\
 This test case test the execution of the TI_BIND IO control with negative\n\
 results on using the timod module."
-static int test_2_2_3_top(int child)
+
+int test_case_2_2_3_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_BIND);
+	return test_case_2_2_top(child, __TEST_TI_BIND);
 }
-static int test_2_2_3_bot(int child)
+
+int test_case_2_2_3_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_BIND_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_BIND_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_3_top = { &preamble_0, &test_2_2_3_top, &postamble_0 };
-struct test_stream test_case_2_2_3_bot = { &preamble_0, &test_2_2_3_bot, &postamble_0 };
-#define test_case_2_2_3_stream_top (&test_case_2_2_3_top)
-#define test_case_2_2_3_stream_bot (&test_case_2_2_3_bot)
+
+#define preamble_2_2_3_top	preamble_0
+#define preamble_2_2_3_bot	preamble_0
+
+#define postamble_2_2_3_top	postamble_0
+#define postamble_2_2_3_bot	postamble_0
+
+struct test_stream test_2_2_3_top = { &preamble_2_2_3_top, &test_case_2_2_3_top, &postamble_2_2_3_top };
+struct test_stream test_2_2_3_bot = { &preamble_2_2_3_bot, &test_case_2_2_3_bot, &postamble_2_2_3_bot };
 
 #define tgrp_case_2_2_4 test_group_2
+#define numb_case_2_2_4 "2.2.4"
 #define name_case_2_2_4 "TI_UNBIND IO control negative acknowledgement"
 #define desc_case_2_2_4 "\
 This test case test the execution of the TI_UNBIND IO control with negative\n\
 results on using the timod module."
-static int test_2_2_4_top(int child)
+
+int test_case_2_2_4_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_UNBIND);
+	return test_case_2_2_top(child, __TEST_TI_UNBIND);
 }
-static int test_2_2_4_bot(int child)
+
+int test_case_2_2_4_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_UNBIND_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_UNBIND_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_4_top = { &preamble_0, &test_2_2_4_top, &postamble_0 };
-struct test_stream test_case_2_2_4_bot = { &preamble_0, &test_2_2_4_bot, &postamble_0 };
-#define test_case_2_2_4_stream_top (&test_case_2_2_4_top)
-#define test_case_2_2_4_stream_bot (&test_case_2_2_4_bot)
+
+#define preamble_2_2_4_top	preamble_0
+#define preamble_2_2_4_bot	preamble_0
+
+#define postamble_2_2_4_top	postamble_0
+#define postamble_2_2_4_bot	postamble_0
+
+struct test_stream test_2_2_4_top = { &preamble_2_2_4_top, &test_case_2_2_4_top, &postamble_2_2_4_top };
+struct test_stream test_2_2_4_bot = { &preamble_2_2_4_bot, &test_case_2_2_4_bot, &postamble_2_2_4_bot };
 
 #define tgrp_case_2_2_5 test_group_2
+#define numb_case_2_2_5 "2.2.5"
 #define name_case_2_2_5 "TI_GETMYNAME IO control negative acknowledgement"
 #define desc_case_2_2_5 "\
 This test case test the execution of the TI_GETMYNAME IO control with negative\n\
 results on using the timod module."
-static int test_2_2_5_top(int child)
+
+int test_case_2_2_5_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_GETMYNAME);
+	return test_case_2_2_top(child, __TEST_TI_GETMYNAME);
 }
-static int test_2_2_5_bot(int child)
+
+int test_case_2_2_5_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_5_top = { &preamble_0, &test_2_2_5_top, &postamble_0 };
-struct test_stream test_case_2_2_5_bot = { &preamble_0, &test_2_2_5_bot, &postamble_0 };
-#define test_case_2_2_5_stream_top (&test_case_2_2_5_top)
-#define test_case_2_2_5_stream_bot (&test_case_2_2_5_bot)
+
+#define preamble_2_2_5_top	preamble_0
+#define preamble_2_2_5_bot	preamble_0
+
+#define postamble_2_2_5_top	postamble_0
+#define postamble_2_2_5_bot	postamble_0
+
+struct test_stream test_2_2_5_top = { &preamble_2_2_5_top, &test_case_2_2_5_top, &postamble_2_2_5_top };
+struct test_stream test_2_2_5_bot = { &preamble_2_2_5_bot, &test_case_2_2_5_bot, &postamble_2_2_5_bot };
 
 #define tgrp_case_2_2_6 test_group_2
+#define numb_case_2_2_6 "2.2.6"
 #define name_case_2_2_6 "TI_GETPEERNAME IO control negative acknowledgement"
 #define desc_case_2_2_6 "\
 This test case test the execution of the TI_GETPEERNAME IO control with negative\n\
 results on using the timod module."
-static int test_2_2_6_top(int child)
+
+int test_case_2_2_6_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_GETPEERNAME);
+	return test_case_2_2_top(child, __TEST_TI_GETPEERNAME);
 }
-static int test_2_2_6_bot(int child)
+
+int test_case_2_2_6_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_6_top = { &preamble_0, &test_2_2_6_top, &postamble_0 };
-struct test_stream test_case_2_2_6_bot = { &preamble_0, &test_2_2_6_bot, &postamble_0 };
-#define test_case_2_2_6_stream_top (&test_case_2_2_6_top)
-#define test_case_2_2_6_stream_bot (&test_case_2_2_6_bot)
+
+#define preamble_2_2_6_top	preamble_0
+#define preamble_2_2_6_bot	preamble_0
+
+#define postamble_2_2_6_top	postamble_0
+#define postamble_2_2_6_bot	postamble_0
+
+struct test_stream test_2_2_6_top = { &preamble_2_2_6_top, &test_case_2_2_6_top, &postamble_2_2_6_top };
+struct test_stream test_2_2_6_bot = { &preamble_2_2_6_bot, &test_case_2_2_6_bot, &postamble_2_2_6_bot };
 
 #define tgrp_case_2_2_7_1 test_group_2
+#define numb_case_2_2_7_1 "2.2.7.1"
 #define name_case_2_2_7_1 "TI_SETMYNAME IO control negative acknowledgement"
 #define desc_case_2_2_7_1 "\
 This test case test the execution of the TI_SETMYNAME IO control with negative\n\
 results on using the timod module."
-static int test_2_2_7_1_top(int child)
+
+int test_case_2_2_7_1_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_SETMYNAME);
+	return test_case_2_2_top(child, __TEST_TI_SETMYNAME);
 }
-static int test_2_2_7_1_bot(int child)
+
+int test_case_2_2_7_1_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_CONN_RES, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_CONN_RES, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_7_1_top = { &preamble_0, &test_2_2_7_1_top, &postamble_0 };
-struct test_stream test_case_2_2_7_1_bot = { &preamble_0, &test_2_2_7_1_bot, &postamble_0 };
-#define test_case_2_2_7_1_stream_top (&test_case_2_2_7_1_top)
-#define test_case_2_2_7_1_stream_bot (&test_case_2_2_7_1_bot)
+
+#define preamble_2_2_7_1_top	preamble_0
+#define preamble_2_2_7_1_bot	preamble_0
+
+#define postamble_2_2_7_1_top	postamble_0
+#define postamble_2_2_7_1_bot	postamble_0
+
+struct test_stream test_2_2_7_1_top = { &preamble_2_2_7_1_top, &test_case_2_2_7_1_top, &postamble_2_2_7_1_top };
+struct test_stream test_2_2_7_1_bot = { &preamble_2_2_7_1_bot, &test_case_2_2_7_1_bot, &postamble_2_2_7_1_bot };
 
 #define tgrp_case_2_2_7_2 test_group_2
+#define numb_case_2_2_7_2 "2.2.7.2"
 #define name_case_2_2_7_2 "TI_SETMYNAME (disconnect) IO control negative acknowledgement"
 #define desc_case_2_2_7_2 "\
 This test case test the execution of the TI_SETMYNAME (disconnect) IO control\n\
 with negative results on using the timod module."
-static int test_2_2_7_2_top(int child)
+
+int test_case_2_2_7_2_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_SETMYNAME_DISC);
+	return test_case_2_2_top(child, __TEST_TI_SETMYNAME_DISC);
 }
-static int test_2_2_7_2_bot(int child)
+
+int test_case_2_2_7_2_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_DISCON_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_DISCON_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_7_2_top = { &preamble_0, &test_2_2_7_2_top, &postamble_0 };
-struct test_stream test_case_2_2_7_2_bot = { &preamble_0, &test_2_2_7_2_bot, &postamble_0 };
-#define test_case_2_2_7_2_stream_top (&test_case_2_2_7_2_top)
-#define test_case_2_2_7_2_stream_bot (&test_case_2_2_7_2_bot)
+
+#define preamble_2_2_7_2_top	preamble_0
+#define preamble_2_2_7_2_bot	preamble_0
+
+#define postamble_2_2_7_2_top	postamble_0
+#define postamble_2_2_7_2_bot	postamble_0
+
+struct test_stream test_2_2_7_2_top = { &preamble_2_2_7_2_top, &test_case_2_2_7_2_top, &postamble_2_2_7_2_top };
+struct test_stream test_2_2_7_2_bot = { &preamble_2_2_7_2_bot, &test_case_2_2_7_2_bot, &postamble_2_2_7_2_bot };
 
 #define tgrp_case_2_2_8_1 test_group_2
+#define numb_case_2_2_8_1 "2.2.8.1"
 #define name_case_2_2_8_1 "TI_SETPEERNAME IO control negative acknowledgement"
 #define desc_case_2_2_8_1 "\
 This test case test the execution of the TI_SETPEERNAME IO control with negative\n\
 results on using the timod module."
-static int test_2_2_8_1_top(int child)
+
+int test_case_2_2_8_1_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_SETPEERNAME);
+	return test_case_2_2_top(child, __TEST_TI_SETPEERNAME);
 }
-static int test_2_2_8_1_bot(int child)
+
+int test_case_2_2_8_1_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_CONN_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_CONN_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_8_1_top = { &preamble_0, &test_2_2_8_1_top, &postamble_0 };
-struct test_stream test_case_2_2_8_1_bot = { &preamble_0, &test_2_2_8_1_bot, &postamble_0 };
-#define test_case_2_2_8_1_stream_top (&test_case_2_2_8_1_top)
-#define test_case_2_2_8_1_stream_bot (&test_case_2_2_8_1_bot)
+
+#define preamble_2_2_8_1_top	preamble_0
+#define preamble_2_2_8_1_bot	preamble_0
+
+#define postamble_2_2_8_1_top	postamble_0
+#define postamble_2_2_8_1_bot	postamble_0
+
+struct test_stream test_2_2_8_1_top = { &preamble_2_2_8_1_top, &test_case_2_2_8_1_top, &postamble_2_2_8_1_top };
+struct test_stream test_2_2_8_1_bot = { &preamble_2_2_8_1_bot, &test_case_2_2_8_1_bot, &postamble_2_2_8_1_bot };
 
 #define tgrp_case_2_2_8_2 test_group_2
+#define numb_case_2_2_8_2 "2.2.8.2"
 #define name_case_2_2_8_2 "TI_SETPEERNAME (disconnect) IO control negative acknowledgement"
 #define desc_case_2_2_8_2 "\
 This test case test the execution of the TI_SETPEERNAME (disconnect) IO\n\
 control with negative results on using the timod module."
-static int test_2_2_8_2_top(int child)
+
+int test_case_2_2_8_2_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_SETPEERNAME_DISC);
+	return test_case_2_2_top(child, __TEST_TI_SETPEERNAME_DISC);
 }
-static int test_2_2_8_2_bot(int child)
+
+int test_case_2_2_8_2_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_DISCON_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_DISCON_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_8_2_top = { &preamble_0, &test_2_2_8_2_top, &postamble_0 };
-struct test_stream test_case_2_2_8_2_bot = { &preamble_0, &test_2_2_8_2_bot, &postamble_0 };
-#define test_case_2_2_8_2_stream_top (&test_case_2_2_8_2_top)
-#define test_case_2_2_8_2_stream_bot (&test_case_2_2_8_2_bot)
+
+#define preamble_2_2_8_2_top	preamble_0
+#define preamble_2_2_8_2_bot	preamble_0
+
+#define postamble_2_2_8_2_top	postamble_0
+#define postamble_2_2_8_2_bot	postamble_0
+
+struct test_stream test_2_2_8_2_top = { &preamble_2_2_8_2_top, &test_case_2_2_8_2_top, &postamble_2_2_8_2_top };
+struct test_stream test_2_2_8_2_bot = { &preamble_2_2_8_2_bot, &test_case_2_2_8_2_bot, &postamble_2_2_8_2_bot };
 
 #if 0
 #define tgrp_case_2_2_9 test_group_2
+#define numb_case_2_2_9 "2.2.9"
 #define name_case_2_2_9 "TI_SYNC IO control negative acknowledgement"
 #define desc_case_2_2_9 "\
 This test case test the execution of the TI_SYNC IO control with negative\n\
 results on using the timod module."
-static int test_2_2_9_top(int child)
+
+int test_case_2_2_9_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_SYNC);
+	return test_case_2_2_top(child, __TEST_TI_SYNC);
 }
-static int test_2_2_9_bot(int child)
+
+int test_case_2_2_9_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_INFO_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_INFO_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_9_top = { &preamble_0, &test_2_2_9_top, &postamble_0 };
-struct test_stream test_case_2_2_9_bot = { &preamble_0, &test_2_2_9_bot, &postamble_0 };
-#define test_case_2_2_9_stream_top (&test_case_2_2_9_top)
-#define test_case_2_2_9_stream_bot (&test_case_2_2_9_bot)
+
+#define preamble_2_2_9_top	preamble_0
+#define preamble_2_2_9_bot	preamble_0
+
+#define postamble_2_2_9_top	postamble_0
+#define postamble_2_2_9_bot	postamble_0
+
+struct test_stream test_2_2_9_top = { &preamble_2_2_9_top, &test_case_2_2_9_top, &postamble_2_2_9_top };
+struct test_stream test_2_2_9_bot = { &preamble_2_2_9_bot, &test_case_2_2_9_bot, &postamble_2_2_9_bot };
 #endif
 
 #define tgrp_case_2_2_10 test_group_2
+#define numb_case_2_2_10 "2.2.10"
 #define name_case_2_2_10 "TI_GETADDRS IO control negative acknowledgement"
 #define desc_case_2_2_10 "\
 This test case test the execution of the TI_GETADDRS IO control with negative\n\
 results on using the timod module."
-static int test_2_2_10_top(int child)
+
+int test_case_2_2_10_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_GETADDRS);
+	return test_case_2_2_top(child, __TEST_TI_GETADDRS);
 }
-static int test_2_2_10_bot(int child)
+
+int test_case_2_2_10_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_ADDR_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_10_top = { &preamble_0, &test_2_2_10_top, &postamble_0 };
-struct test_stream test_case_2_2_10_bot = { &preamble_0, &test_2_2_10_bot, &postamble_0 };
-#define test_case_2_2_10_stream_top (&test_case_2_2_10_top)
-#define test_case_2_2_10_stream_bot (&test_case_2_2_10_bot)
+
+#define preamble_2_2_10_top	preamble_0
+#define preamble_2_2_10_bot	preamble_0
+
+#define postamble_2_2_10_top	postamble_0
+#define postamble_2_2_10_bot	postamble_0
+
+struct test_stream test_2_2_10_top = { &preamble_2_2_10_top, &test_case_2_2_10_top, &postamble_2_2_10_top };
+struct test_stream test_2_2_10_bot = { &preamble_2_2_10_bot, &test_case_2_2_10_bot, &postamble_2_2_10_bot };
 
 #define tgrp_case_2_2_11 test_group_2
+#define numb_case_2_2_11 "2.2.11"
 #define name_case_2_2_11 "TI_CAPABILITY IO control negative acknowledgement"
 #define desc_case_2_2_11 "\
 This test case test the execution of the TI_CAPABILITY IO control with negative\n\
 results on using the timod module."
-static int test_2_2_11_top(int child)
+
+int test_case_2_2_11_top(int child)
 {
-	return test_2_2_top(child, __TEST_TI_CAPABILITY);
+	return test_case_2_2_top(child, __TEST_TI_CAPABILITY);
 }
-static int test_2_2_11_bot(int child)
+
+int test_case_2_2_11_bot(int child)
 {
-	return test_2_2_bot(child, __TEST_CAPABILITY_REQ, __TEST_ERROR_ACK);
+	return test_case_2_2_bot(child, __TEST_CAPABILITY_REQ, __TEST_ERROR_ACK);
 }
-struct test_stream test_case_2_2_11_top = { &preamble_0, &test_2_2_11_top, &postamble_0 };
-struct test_stream test_case_2_2_11_bot = { &preamble_0, &test_2_2_11_bot, &postamble_0 };
-#define test_case_2_2_11_stream_top (&test_case_2_2_11_top)
-#define test_case_2_2_11_stream_bot (&test_case_2_2_11_bot)
+
+#define preamble_2_2_11_top	preamble_0
+#define preamble_2_2_11_bot	preamble_0
+
+#define postamble_2_2_11_top	postamble_0
+#define postamble_2_2_11_bot	postamble_0
+
+struct test_stream test_2_2_11_top = { &preamble_2_2_11_top, &test_case_2_2_11_top, &postamble_2_2_11_top };
+struct test_stream test_2_2_11_bot = { &preamble_2_2_11_bot, &test_case_2_2_11_bot, &postamble_2_2_11_bot };
 
 #define test_group_3 "Multiple process IO controls"
 
 #define tgrp_case_2_3 test_group_3
+#define numb_case_2_3 "2.3"
 #define name_case_2_3 "Two child processes attempting same IO control"
 #define desc_case_2_3 "\
 This test case tests two child processes attempting the same IO control.  One\n\
 is given a positive acknowledgement and the other a negative acknowledgement."
-static int test_2_3_top(int child)
+
+int test_case_2_3_top(int child)
 {
 	pid_t fork_child;
 	test_timout = 2000;
@@ -4586,11 +5328,14 @@ static int test_2_3_top(int child)
 		state++;
 		goto failure;
 	case 00:		/* the fork_child */
+	{
+		int result;
 		state++;
-		if (do_signal(child, __TEST_TI_GETINFO) == __RESULT_SUCCESS || last_errno == EPROTO)
-			exit(__RESULT_SUCCESS);
+		if ((result = do_signal(child, __TEST_TI_GETINFO)) != __RESULT_SUCCESS && last_errno != EPROTO)
+			exit(__RESULT_INCONCLUSIVE);
 		state++;
-		exit(__RESULT_FAILURE);
+		exit(result);
+	}
 	default:		/* the parent */
 	{
 		int status = 0;
@@ -4624,7 +5369,8 @@ static int test_2_3_top(int child)
     failure:
 	return (__RESULT_FAILURE);
 }
-static int test_2_3_bot(int child)
+
+int test_case_2_3_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4688,19 +5434,26 @@ static int test_2_3_bot(int child)
     failure:
 	return (__RESULT_FAILURE);
 }
-struct test_stream test_case_2_3_top = { &preamble_0, &test_2_3_top, &postamble_0 };
-struct test_stream test_case_2_3_bot = { &preamble_0, &test_2_3_bot, &postamble_0 };
-#define test_case_2_3_stream_top (&test_case_2_3_top)
-#define test_case_2_3_stream_bot (&test_case_2_3_bot)
+
+#define preamble_2_3_top	preamble_0
+#define preamble_2_3_bot	preamble_0
+
+#define postamble_2_3_top	postamble_0
+#define postamble_2_3_bot	postamble_0
+
+struct test_stream test_2_3_top = { &preamble_2_3_top, &test_case_2_3_top, &postamble_2_3_top };
+struct test_stream test_2_3_bot = { &preamble_2_3_bot, &test_case_2_3_bot, &postamble_2_3_bot };
 
 #define test_group_4 "IO controls with data"
 
 #define tgrp_case_2_4_1 test_group_4
+#define numb_case_2_4_1 "2.4.1"
 #define name_case_2_4_1 "TI_SETMYNAME with data"
 #define desc_case_2_4_1 "\
 Tests that IO controls with optional data parts can be sent with data.\n\
 This test case tests the TI_SETMYNAME IO control."
-static int test_2_4_top(int child, int control)
+
+int test_case_2_4_top(int child, int control)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4713,7 +5466,8 @@ static int test_2_4_top(int child, int control)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_4_bot(int child, int signal, int expect)
+
+int test_case_2_4_bot(int child, int signal, int expect)
 {
 	start_tt(200);
 	state++;
@@ -4736,81 +5490,114 @@ static int test_2_4_bot(int child, int signal, int expect)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_4_1_top(int child)
+
+int test_case_2_4_1_top(int child)
 {
-	return test_2_4_top(child, __TEST_TI_SETMYNAME_DATA);
+	return test_case_2_4_top(child, __TEST_TI_SETMYNAME_DATA);
 }
-static int test_2_4_1_bot(int child)
+
+int test_case_2_4_1_bot(int child)
 {
-	return test_2_4_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
+	return test_case_2_4_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_4_1_top = { &preamble_0, &test_2_4_1_top, &postamble_0 };
-struct test_stream test_case_2_4_1_bot = { &preamble_0, &test_2_4_1_bot, &postamble_0 };
-#define test_case_2_4_1_stream_top (&test_case_2_4_1_top)
-#define test_case_2_4_1_stream_bot (&test_case_2_4_1_bot)
+
+#define preamble_2_4_1_top	preamble_0
+#define preamble_2_4_1_bot	preamble_0
+
+#define postamble_2_4_1_top	postamble_0
+#define postamble_2_4_1_bot	postamble_0
+
+struct test_stream test_2_4_1_top = { &preamble_2_4_1_top, &test_case_2_4_1_top, &postamble_2_4_1_top };
+struct test_stream test_2_4_1_bot = { &preamble_2_4_1_bot, &test_case_2_4_1_bot, &postamble_2_4_1_bot };
 
 #define tgrp_case_2_4_2 test_group_4
+#define numb_case_2_4_2 "2.4.2"
 #define name_case_2_4_2 "TI_SETPEERNAME with data"
 #define desc_case_2_4_2 "\
 Tests that IO controls with optional data parts can be sent with data.\n\
 This test case tests the TI_SETPEERNAME IO control."
-static int test_2_4_2_top(int child)
+
+int test_case_2_4_2_top(int child)
 {
-	return test_2_4_top(child, __TEST_TI_SETPEERNAME_DATA);
+	return test_case_2_4_top(child, __TEST_TI_SETPEERNAME_DATA);
 }
-static int test_2_4_2_bot(int child)
+
+int test_case_2_4_2_bot(int child)
 {
-	return test_2_4_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
+	return test_case_2_4_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_4_2_top = { &preamble_0, &test_2_4_2_top, &postamble_0 };
-struct test_stream test_case_2_4_2_bot = { &preamble_0, &test_2_4_2_bot, &postamble_0 };
-#define test_case_2_4_2_stream_top (&test_case_2_4_2_top)
-#define test_case_2_4_2_stream_bot (&test_case_2_4_2_bot)
+
+#define preamble_2_4_2_top	preamble_0
+#define preamble_2_4_2_bot	preamble_0
+
+#define postamble_2_4_2_top	postamble_0
+#define postamble_2_4_2_bot	postamble_0
+
+struct test_stream test_2_4_2_top = { &preamble_2_4_2_top, &test_case_2_4_2_top, &postamble_2_4_2_top };
+struct test_stream test_2_4_2_bot = { &preamble_2_4_2_bot, &test_case_2_4_2_bot, &postamble_2_4_2_bot };
 
 #define tgrp_case_2_4_3 test_group_4
+#define numb_case_2_4_3 "2.4.3"
 #define name_case_2_4_3 "TI_SETMYNAME (disconnect) with data"
 #define desc_case_2_4_3 "\
 Tests that IO controls with optional data parts can be sent with data.\n\
 This test case tests the TI_SETMYNAME (disconnect) IO control."
-static int test_2_4_3_top(int child)
+
+int test_case_2_4_3_top(int child)
 {
-	return test_2_4_top(child, __TEST_TI_SETMYNAME_DISC_DATA);
+	return test_case_2_4_top(child, __TEST_TI_SETMYNAME_DISC_DATA);
 }
-static int test_2_4_3_bot(int child)
+
+int test_case_2_4_3_bot(int child)
 {
-	return test_2_4_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_2_4_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_4_3_top = { &preamble_0, &test_2_4_3_top, &postamble_0 };
-struct test_stream test_case_2_4_3_bot = { &preamble_0, &test_2_4_3_bot, &postamble_0 };
-#define test_case_2_4_3_stream_top (&test_case_2_4_3_top)
-#define test_case_2_4_3_stream_bot (&test_case_2_4_3_bot)
+
+#define preamble_2_4_3_top	preamble_0
+#define preamble_2_4_3_bot	preamble_0
+
+#define postamble_2_4_3_top	postamble_0
+#define postamble_2_4_3_bot	postamble_0
+
+struct test_stream test_2_4_3_top = { &preamble_2_4_3_top, &test_case_2_4_3_top, &postamble_2_4_3_top };
+struct test_stream test_2_4_3_bot = { &preamble_2_4_3_bot, &test_case_2_4_3_bot, &postamble_2_4_3_bot };
 
 #define tgrp_case_2_4_4 test_group_4
+#define numb_case_2_4_4 "2.4.4"
 #define name_case_2_4_4 "TI_SETPEERNAME (disconnect) with data"
 #define desc_case_2_4_4 "\
 Tests that IO controls with optional data parts can be sent with data.\n\
 This test case tests the TI_SETPEERNAME (disconnect) IO control."
-static int test_2_4_4_top(int child)
+
+int test_case_2_4_4_top(int child)
 {
-	return test_2_4_top(child, __TEST_TI_SETPEERNAME_DISC_DATA);
+	return test_case_2_4_top(child, __TEST_TI_SETPEERNAME_DISC_DATA);
 }
-static int test_2_4_4_bot(int child)
+
+int test_case_2_4_4_bot(int child)
 {
-	return test_2_4_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_2_4_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_2_4_4_top = { &preamble_0, &test_2_4_4_top, &postamble_0 };
-struct test_stream test_case_2_4_4_bot = { &preamble_0, &test_2_4_4_bot, &postamble_0 };
-#define test_case_2_4_4_stream_top (&test_case_2_4_4_top)
-#define test_case_2_4_4_stream_bot (&test_case_2_4_4_bot)
+
+#define preamble_2_4_4_top	preamble_0
+#define preamble_2_4_4_bot	preamble_0
+
+#define postamble_2_4_4_top	postamble_0
+#define postamble_2_4_4_bot	postamble_0
+
+struct test_stream test_2_4_4_top = { &preamble_2_4_4_top, &test_case_2_4_4_top, &postamble_2_4_4_top };
+struct test_stream test_2_4_4_bot = { &preamble_2_4_4_bot, &test_case_2_4_4_bot, &postamble_2_4_4_bot };
 
 #define test_group_5 "Non-IO control pass through of TPI messages"
 
 #define tgrp_case_3_1_1 test_group_5
+#define numb_case_3_1_1 "3.1.1"
 #define name_case_3_1_1 "T_INFO_REQ with positive acknowledgement"
 #define desc_case_3_1_1 "\
 This test case test the pass through of T_INFO_REQ with positive\n\
 acknowledgement."
-static int test_3_1_top(int child, int signal, int expect)
+
+int test_case_3_1_top(int child, int signal, int expect)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4832,7 +5619,8 @@ static int test_3_1_top(int child, int signal, int expect)
 	state++;
 	return (__RESULT_FAILURE);
 }
-static int test_3_1_bot(int child, int signal, int expect)
+
+int test_case_3_1_bot(int child, int signal, int expect)
 {
 	start_tt(200);
 	state++;
@@ -4858,169 +5646,242 @@ static int test_3_1_bot(int child, int signal, int expect)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_1_1_top(int child)
+
+int test_case_3_1_1_top(int child)
 {
-	return test_3_1_top(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
+	return test_case_3_1_top(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
 }
-static int test_3_1_1_bot(int child)
+
+int test_case_3_1_1_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
+	return test_case_3_1_bot(child, __TEST_INFO_REQ, __TEST_INFO_ACK);
 }
-struct test_stream test_case_3_1_1_top = { &preamble_0, &test_3_1_1_top, &postamble_0 };
-struct test_stream test_case_3_1_1_bot = { &preamble_0, &test_3_1_1_bot, &postamble_0 };
-#define test_case_3_1_1_stream_top (&test_case_3_1_1_top)
-#define test_case_3_1_1_stream_bot (&test_case_3_1_1_bot)
+
+#define preamble_3_1_1_top	preamble_0
+#define preamble_3_1_1_bot	preamble_0
+
+#define postamble_3_1_1_top	postamble_0
+#define postamble_3_1_1_bot	postamble_0
+
+struct test_stream test_3_1_1_top = { &preamble_3_1_1_top, &test_case_3_1_1_top, &postamble_3_1_1_top };
+struct test_stream test_3_1_1_bot = { &preamble_3_1_1_bot, &test_case_3_1_1_bot, &postamble_3_1_1_bot };
 
 #define tgrp_case_3_1_2 test_group_5
+#define numb_case_3_1_2 "3.1.2"
 #define name_case_3_1_2 "T_CONN_REQ with positive acknowledgement"
 #define desc_case_3_1_2 "\
 This test case test the pass through of T_CONN_REQ with positive\n\
 acknowledgement."
-static int test_3_1_2_top(int child)
+
+int test_case_3_1_2_top(int child)
 {
-	return test_3_1_top(child, __TEST_CONN_REQ, __TEST_OK_ACK);
+	return test_case_3_1_top(child, __TEST_CONN_REQ, __TEST_OK_ACK);
 }
-static int test_3_1_2_bot(int child)
+
+int test_case_3_1_2_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
+	return test_case_3_1_bot(child, __TEST_CONN_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_3_1_2_top = { &preamble_0, &test_3_1_2_top, &postamble_0 };
-struct test_stream test_case_3_1_2_bot = { &preamble_0, &test_3_1_2_bot, &postamble_0 };
-#define test_case_3_1_2_stream_top (&test_case_3_1_2_top)
-#define test_case_3_1_2_stream_bot (&test_case_3_1_2_bot)
+
+#define preamble_3_1_2_top	preamble_0
+#define preamble_3_1_2_bot	preamble_0
+
+#define postamble_3_1_2_top	postamble_0
+#define postamble_3_1_2_bot	postamble_0
+
+struct test_stream test_3_1_2_top = { &preamble_3_1_2_top, &test_case_3_1_2_top, &postamble_3_1_2_top };
+struct test_stream test_3_1_2_bot = { &preamble_3_1_2_bot, &test_case_3_1_2_bot, &postamble_3_1_2_bot };
 
 #define tgrp_case_3_1_3 test_group_5
+#define numb_case_3_1_3 "3.1.3"
 #define name_case_3_1_3 "T_CONN_RES with positive acknowledgement"
 #define desc_case_3_1_3 "\
 This test case test the pass through of T_CONN_RES with positive\n\
 acknowledgement."
-static int test_3_1_3_top(int child)
+
+int test_case_3_1_3_top(int child)
 {
-	return test_3_1_top(child, __TEST_CONN_RES, __TEST_OK_ACK);
+	return test_case_3_1_top(child, __TEST_CONN_RES, __TEST_OK_ACK);
 }
-static int test_3_1_3_bot(int child)
+
+int test_case_3_1_3_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
+	return test_case_3_1_bot(child, __TEST_CONN_RES, __TEST_OK_ACK);
 }
-struct test_stream test_case_3_1_3_top = { &preamble_0, &test_3_1_3_top, &postamble_0 };
-struct test_stream test_case_3_1_3_bot = { &preamble_0, &test_3_1_3_bot, &postamble_0 };
-#define test_case_3_1_3_stream_top (&test_case_3_1_3_top)
-#define test_case_3_1_3_stream_bot (&test_case_3_1_3_bot)
+
+#define preamble_3_1_3_top	preamble_0
+#define preamble_3_1_3_bot	preamble_0
+
+#define postamble_3_1_3_top	postamble_0
+#define postamble_3_1_3_bot	postamble_0
+
+struct test_stream test_3_1_3_top = { &preamble_3_1_3_top, &test_case_3_1_3_top, &postamble_3_1_3_top };
+struct test_stream test_3_1_3_bot = { &preamble_3_1_3_bot, &test_case_3_1_3_bot, &postamble_3_1_3_bot };
 
 #define tgrp_case_3_1_4 test_group_5
+#define numb_case_3_1_4 "3.1.4"
 #define name_case_3_1_4 "T_DISCON_REQ with positive acknowledgement"
 #define desc_case_3_1_4 "\
 This test case test the pass through of T_DISCON_REQ with positive\n\
 acknowledgement."
-static int test_3_1_4_top(int child)
+
+int test_case_3_1_4_top(int child)
 {
-	return test_3_1_top(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_3_1_top(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-static int test_3_1_4_bot(int child)
+
+int test_case_3_1_4_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
+	return test_case_3_1_bot(child, __TEST_DISCON_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_3_1_4_top = { &preamble_0, &test_3_1_4_top, &postamble_0 };
-struct test_stream test_case_3_1_4_bot = { &preamble_0, &test_3_1_4_bot, &postamble_0 };
-#define test_case_3_1_4_stream_top (&test_case_3_1_4_top)
-#define test_case_3_1_4_stream_bot (&test_case_3_1_4_bot)
+
+#define preamble_3_1_4_top	preamble_0
+#define preamble_3_1_4_bot	preamble_0
+
+#define postamble_3_1_4_top	postamble_0
+#define postamble_3_1_4_bot	postamble_0
+
+struct test_stream test_3_1_4_top = { &preamble_3_1_4_top, &test_case_3_1_4_top, &postamble_3_1_4_top };
+struct test_stream test_3_1_4_bot = { &preamble_3_1_4_bot, &test_case_3_1_4_bot, &postamble_3_1_4_bot };
 
 #define tgrp_case_3_1_5 test_group_5
+#define numb_case_3_1_5 "3.1.5"
 #define name_case_3_1_5 "T_BIND_REQ with positive acknowledgement"
 #define desc_case_3_1_5 "\
 This test case test the pass through of T_BIND_REQ with positive\n\
 acknowledgement."
-static int test_3_1_5_top(int child)
+
+int test_case_3_1_5_top(int child)
 {
-	return test_3_1_top(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
+	return test_case_3_1_top(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
 }
-static int test_3_1_5_bot(int child)
+
+int test_case_3_1_5_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
+	return test_case_3_1_bot(child, __TEST_BIND_REQ, __TEST_BIND_ACK);
 }
-struct test_stream test_case_3_1_5_top = { &preamble_0, &test_3_1_5_top, &postamble_0 };
-struct test_stream test_case_3_1_5_bot = { &preamble_0, &test_3_1_5_bot, &postamble_0 };
-#define test_case_3_1_5_stream_top (&test_case_3_1_5_top)
-#define test_case_3_1_5_stream_bot (&test_case_3_1_5_bot)
+
+#define preamble_3_1_5_top	preamble_0
+#define preamble_3_1_5_bot	preamble_0
+
+#define postamble_3_1_5_top	postamble_0
+#define postamble_3_1_5_bot	postamble_0
+
+struct test_stream test_3_1_5_top = { &preamble_3_1_5_top, &test_case_3_1_5_top, &postamble_3_1_5_top };
+struct test_stream test_3_1_5_bot = { &preamble_3_1_5_bot, &test_case_3_1_5_bot, &postamble_3_1_5_bot };
 
 #define tgrp_case_3_1_6 test_group_5
+#define numb_case_3_1_6 "3.1.6"
 #define name_case_3_1_6 "T_UNBIND_REQ with positive acknowledgement"
 #define desc_case_3_1_6 "\
 This test case test the pass through of T_UNBIND_REQ with positive\n\
 acknowledgement."
-static int test_3_1_6_top(int child)
+
+int test_case_3_1_6_top(int child)
 {
-	return test_3_1_top(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
+	return test_case_3_1_top(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
 }
-static int test_3_1_6_bot(int child)
+
+int test_case_3_1_6_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
+	return test_case_3_1_bot(child, __TEST_UNBIND_REQ, __TEST_OK_ACK);
 }
-struct test_stream test_case_3_1_6_top = { &preamble_0, &test_3_1_6_top, &postamble_0 };
-struct test_stream test_case_3_1_6_bot = { &preamble_0, &test_3_1_6_bot, &postamble_0 };
-#define test_case_3_1_6_stream_top (&test_case_3_1_6_top)
-#define test_case_3_1_6_stream_bot (&test_case_3_1_6_bot)
+
+#define preamble_3_1_6_top	preamble_0
+#define preamble_3_1_6_bot	preamble_0
+
+#define postamble_3_1_6_top	postamble_0
+#define postamble_3_1_6_bot	postamble_0
+
+struct test_stream test_3_1_6_top = { &preamble_3_1_6_top, &test_case_3_1_6_top, &postamble_3_1_6_top };
+struct test_stream test_3_1_6_bot = { &preamble_3_1_6_bot, &test_case_3_1_6_bot, &postamble_3_1_6_bot };
 
 #define tgrp_case_3_1_7 test_group_5
+#define numb_case_3_1_7 "3.1.7"
 #define name_case_3_1_7 "T_OPTMGMT_REQ with positive acknowledgement"
 #define desc_case_3_1_7 "\
 This test case test the pass through of T_OPTMGMT_REQ with positive\n\
 acknowledgement."
-static int test_3_1_7_top(int child)
+
+int test_case_3_1_7_top(int child)
 {
-	return test_3_1_top(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
+	return test_case_3_1_top(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
 }
-static int test_3_1_7_bot(int child)
+
+int test_case_3_1_7_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
+	return test_case_3_1_bot(child, __TEST_OPTMGMT_REQ, __TEST_OPTMGMT_ACK);
 }
-struct test_stream test_case_3_1_7_top = { &preamble_0, &test_3_1_7_top, &postamble_0 };
-struct test_stream test_case_3_1_7_bot = { &preamble_0, &test_3_1_7_bot, &postamble_0 };
-#define test_case_3_1_7_stream_top (&test_case_3_1_7_top)
-#define test_case_3_1_7_stream_bot (&test_case_3_1_7_bot)
+
+#define preamble_3_1_7_top	preamble_0
+#define preamble_3_1_7_bot	preamble_0
+
+#define postamble_3_1_7_top	postamble_0
+#define postamble_3_1_7_bot	postamble_0
+
+struct test_stream test_3_1_7_top = { &preamble_3_1_7_top, &test_case_3_1_7_top, &postamble_3_1_7_top };
+struct test_stream test_3_1_7_bot = { &preamble_3_1_7_bot, &test_case_3_1_7_bot, &postamble_3_1_7_bot };
 
 #define tgrp_case_3_1_8 test_group_5
+#define numb_case_3_1_8 "3.1.8"
 #define name_case_3_1_8 "T_ADDR_REQ with positive acknowledgement"
 #define desc_case_3_1_8 "\
 This test case test the pass through of T_ADDR_REQ with positive\n\
 acknowledgement."
-static int test_3_1_8_top(int child)
+
+int test_case_3_1_8_top(int child)
 {
-	return test_3_1_top(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
+	return test_case_3_1_top(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
 }
-static int test_3_1_8_bot(int child)
+
+int test_case_3_1_8_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
+	return test_case_3_1_bot(child, __TEST_ADDR_REQ, __TEST_ADDR_ACK);
 }
-struct test_stream test_case_3_1_8_top = { &preamble_0, &test_3_1_8_top, &postamble_0 };
-struct test_stream test_case_3_1_8_bot = { &preamble_0, &test_3_1_8_bot, &postamble_0 };
-#define test_case_3_1_8_stream_top (&test_case_3_1_8_top)
-#define test_case_3_1_8_stream_bot (&test_case_3_1_8_bot)
+
+#define preamble_3_1_8_top	preamble_0
+#define preamble_3_1_8_bot	preamble_0
+
+#define postamble_3_1_8_top	postamble_0
+#define postamble_3_1_8_bot	postamble_0
+
+struct test_stream test_3_1_8_top = { &preamble_3_1_8_top, &test_case_3_1_8_top, &postamble_3_1_8_top };
+struct test_stream test_3_1_8_bot = { &preamble_3_1_8_bot, &test_case_3_1_8_bot, &postamble_3_1_8_bot };
 
 #define tgrp_case_3_1_9 test_group_5
+#define numb_case_3_1_9 "3.1.9"
 #define name_case_3_1_9 "T_CAPABILITY_REQ with positive acknowledgement"
 #define desc_case_3_1_9 "\
 This test case test the pass through of T_CAPABILITY_REQ with positive\n\
 acknowledgement."
-static int test_3_1_9_top(int child)
+
+int test_case_3_1_9_top(int child)
 {
-	return test_3_1_top(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
+	return test_case_3_1_top(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
 }
-static int test_3_1_9_bot(int child)
+
+int test_case_3_1_9_bot(int child)
 {
-	return test_3_1_bot(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
+	return test_case_3_1_bot(child, __TEST_CAPABILITY_REQ, __TEST_CAPABILITY_ACK);
 }
-struct test_stream test_case_3_1_9_top = { &preamble_0, &test_3_1_9_top, &postamble_0 };
-struct test_stream test_case_3_1_9_bot = { &preamble_0, &test_3_1_9_bot, &postamble_0 };
-#define test_case_3_1_9_stream_top (&test_case_3_1_9_top)
-#define test_case_3_1_9_stream_bot (&test_case_3_1_9_bot)
+
+#define preamble_3_1_9_top	preamble_0
+#define preamble_3_1_9_bot	preamble_0
+
+#define postamble_3_1_9_top	postamble_0
+#define postamble_3_1_9_bot	postamble_0
+
+struct test_stream test_3_1_9_top = { &preamble_3_1_9_top, &test_case_3_1_9_top, &postamble_3_1_9_top };
+struct test_stream test_3_1_9_bot = { &preamble_3_1_9_bot, &test_case_3_1_9_bot, &postamble_3_1_9_bot };
 
 #define tgrp_case_3_2_1 test_group_5
+#define numb_case_3_2_1 "3.2.1"
 #define name_case_3_2_1 "T_INFO_REQ with negative acknowledgement"
 #define desc_case_3_2_1 "\
 This test case test the pass through of T_INFO_REQ with negative\n\
 acknowledgement."
-static int test_3_2_top(int child, int signal)
+
+int test_case_3_2_top(int child, int signal)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5042,7 +5903,8 @@ static int test_3_2_top(int child, int signal)
 	state++;
 	return (__RESULT_FAILURE);
 }
-static int test_3_2_bot(int child, int signal)
+
+int test_case_3_2_bot(int child, int signal)
 {
 	start_tt(200);
 	state++;
@@ -5068,162 +5930,233 @@ static int test_3_2_bot(int child, int signal)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_2_1_top(int child)
+
+int test_case_3_2_1_top(int child)
 {
-	return test_3_2_top(child, __TEST_INFO_REQ);
+	return test_case_3_2_top(child, __TEST_INFO_REQ);
 }
-static int test_3_2_1_bot(int child)
+
+int test_case_3_2_1_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_INFO_REQ);
+	return test_case_3_2_bot(child, __TEST_INFO_REQ);
 }
-struct test_stream test_case_3_2_1_top = { &preamble_0, &test_3_2_1_top, &postamble_0 };
-struct test_stream test_case_3_2_1_bot = { &preamble_0, &test_3_2_1_bot, &postamble_0 };
-#define test_case_3_2_1_stream_top (&test_case_3_2_1_top)
-#define test_case_3_2_1_stream_bot (&test_case_3_2_1_bot)
+
+#define preamble_3_2_1_top	preamble_0
+#define preamble_3_2_1_bot	preamble_0
+
+#define postamble_3_2_1_top	postamble_0
+#define postamble_3_2_1_bot	postamble_0
+
+struct test_stream test_3_2_1_top = { &preamble_3_2_1_top, &test_case_3_2_1_top, &postamble_3_2_1_top };
+struct test_stream test_3_2_1_bot = { &preamble_3_2_1_bot, &test_case_3_2_1_bot, &postamble_3_2_1_bot };
 
 #define tgrp_case_3_2_2 test_group_5
+#define numb_case_3_2_2 "3.2.2"
 #define name_case_3_2_2 "T_CONN_REQ with negative acknowledgement"
 #define desc_case_3_2_2 "\
 This test case test the pass through of T_CONN_REQ with negative\n\
 acknowledgement."
-static int test_3_2_2_top(int child)
+
+int test_case_3_2_2_top(int child)
 {
-	return test_3_2_top(child, __TEST_CONN_REQ);
+	return test_case_3_2_top(child, __TEST_CONN_REQ);
 }
-static int test_3_2_2_bot(int child)
+
+int test_case_3_2_2_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_CONN_REQ);
+	return test_case_3_2_bot(child, __TEST_CONN_REQ);
 }
-struct test_stream test_case_3_2_2_top = { &preamble_0, &test_3_2_2_top, &postamble_0 };
-struct test_stream test_case_3_2_2_bot = { &preamble_0, &test_3_2_2_bot, &postamble_0 };
-#define test_case_3_2_2_stream_top (&test_case_3_2_2_top)
-#define test_case_3_2_2_stream_bot (&test_case_3_2_2_bot)
+
+#define preamble_3_2_2_top	preamble_0
+#define preamble_3_2_2_bot	preamble_0
+
+#define postamble_3_2_2_top	postamble_0
+#define postamble_3_2_2_bot	postamble_0
+
+struct test_stream test_3_2_2_top = { &preamble_3_2_2_top, &test_case_3_2_2_top, &postamble_3_2_2_top };
+struct test_stream test_3_2_2_bot = { &preamble_3_2_2_bot, &test_case_3_2_2_bot, &postamble_3_2_2_bot };
 
 #define tgrp_case_3_2_3 test_group_5
+#define numb_case_3_2_3 "3.2.3"
 #define name_case_3_2_3 "T_CONN_RES with negative acknowledgement"
 #define desc_case_3_2_3 "\
 This test case test the pass through of T_CONN_RES with negative\n\
 acknowledgement."
-static int test_3_2_3_top(int child)
+
+int test_case_3_2_3_top(int child)
 {
-	return test_3_2_top(child, __TEST_CONN_RES);
+	return test_case_3_2_top(child, __TEST_CONN_RES);
 }
-static int test_3_2_3_bot(int child)
+
+int test_case_3_2_3_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_CONN_RES);
+	return test_case_3_2_bot(child, __TEST_CONN_RES);
 }
-struct test_stream test_case_3_2_3_top = { &preamble_0, &test_3_2_3_top, &postamble_0 };
-struct test_stream test_case_3_2_3_bot = { &preamble_0, &test_3_2_3_bot, &postamble_0 };
-#define test_case_3_2_3_stream_top (&test_case_3_2_3_top)
-#define test_case_3_2_3_stream_bot (&test_case_3_2_3_bot)
+
+#define preamble_3_2_3_top	preamble_0
+#define preamble_3_2_3_bot	preamble_0
+
+#define postamble_3_2_3_top	postamble_0
+#define postamble_3_2_3_bot	postamble_0
+
+struct test_stream test_3_2_3_top = { &preamble_3_2_3_top, &test_case_3_2_3_top, &postamble_3_2_3_top };
+struct test_stream test_3_2_3_bot = { &preamble_3_2_3_bot, &test_case_3_2_3_bot, &postamble_3_2_3_bot };
 
 #define tgrp_case_3_2_4 test_group_5
+#define numb_case_3_2_4 "3.2.4"
 #define name_case_3_2_4 "T_DISCON_REQ with negative acknowledgement"
 #define desc_case_3_2_4 "\
 This test case test the pass through of T_DISCON_REQ with negative\n\
 acknowledgement."
-static int test_3_2_4_top(int child)
+
+int test_case_3_2_4_top(int child)
 {
-	return test_3_2_top(child, __TEST_DISCON_REQ);
+	return test_case_3_2_top(child, __TEST_DISCON_REQ);
 }
-static int test_3_2_4_bot(int child)
+
+int test_case_3_2_4_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_DISCON_REQ);
+	return test_case_3_2_bot(child, __TEST_DISCON_REQ);
 }
-struct test_stream test_case_3_2_4_top = { &preamble_0, &test_3_2_4_top, &postamble_0 };
-struct test_stream test_case_3_2_4_bot = { &preamble_0, &test_3_2_4_bot, &postamble_0 };
-#define test_case_3_2_4_stream_top (&test_case_3_2_4_top)
-#define test_case_3_2_4_stream_bot (&test_case_3_2_4_bot)
+
+#define preamble_3_2_4_top	preamble_0
+#define preamble_3_2_4_bot	preamble_0
+
+#define postamble_3_2_4_top	postamble_0
+#define postamble_3_2_4_bot	postamble_0
+
+struct test_stream test_3_2_4_top = { &preamble_3_2_4_top, &test_case_3_2_4_top, &postamble_3_2_4_top };
+struct test_stream test_3_2_4_bot = { &preamble_3_2_4_bot, &test_case_3_2_4_bot, &postamble_3_2_4_bot };
 
 #define tgrp_case_3_2_5 test_group_5
+#define numb_case_3_2_5 "3.2.5"
 #define name_case_3_2_5 "T_BIND_REQ with negative acknowledgement"
 #define desc_case_3_2_5 "\
 This test case test the pass through of T_BIND_REQ with negative\n\
 acknowledgement."
-static int test_3_2_5_top(int child)
+
+int test_case_3_2_5_top(int child)
 {
-	return test_3_2_top(child, __TEST_BIND_REQ);
+	return test_case_3_2_top(child, __TEST_BIND_REQ);
 }
-static int test_3_2_5_bot(int child)
+
+int test_case_3_2_5_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_BIND_REQ);
+	return test_case_3_2_bot(child, __TEST_BIND_REQ);
 }
-struct test_stream test_case_3_2_5_top = { &preamble_0, &test_3_2_5_top, &postamble_0 };
-struct test_stream test_case_3_2_5_bot = { &preamble_0, &test_3_2_5_bot, &postamble_0 };
-#define test_case_3_2_5_stream_top (&test_case_3_2_5_top)
-#define test_case_3_2_5_stream_bot (&test_case_3_2_5_bot)
+
+#define preamble_3_2_5_top	preamble_0
+#define preamble_3_2_5_bot	preamble_0
+
+#define postamble_3_2_5_top	postamble_0
+#define postamble_3_2_5_bot	postamble_0
+
+struct test_stream test_3_2_5_top = { &preamble_3_2_5_top, &test_case_3_2_5_top, &postamble_3_2_5_top };
+struct test_stream test_3_2_5_bot = { &preamble_3_2_5_bot, &test_case_3_2_5_bot, &postamble_3_2_5_bot };
 
 #define tgrp_case_3_2_6 test_group_5
+#define numb_case_3_2_6 "3.2.6"
 #define name_case_3_2_6 "T_UNBIND_REQ with negative acknowledgement"
 #define desc_case_3_2_6 "\
 This test case test the pass through of T_UNBIND_REQ with negative\n\
 acknowledgement."
-static int test_3_2_6_top(int child)
+
+int test_case_3_2_6_top(int child)
 {
-	return test_3_2_top(child, __TEST_UNBIND_REQ);
+	return test_case_3_2_top(child, __TEST_UNBIND_REQ);
 }
-static int test_3_2_6_bot(int child)
+
+int test_case_3_2_6_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_UNBIND_REQ);
+	return test_case_3_2_bot(child, __TEST_UNBIND_REQ);
 }
-struct test_stream test_case_3_2_6_top = { &preamble_0, &test_3_2_6_top, &postamble_0 };
-struct test_stream test_case_3_2_6_bot = { &preamble_0, &test_3_2_6_bot, &postamble_0 };
-#define test_case_3_2_6_stream_top (&test_case_3_2_6_top)
-#define test_case_3_2_6_stream_bot (&test_case_3_2_6_bot)
+
+#define preamble_3_2_6_top	preamble_0
+#define preamble_3_2_6_bot	preamble_0
+
+#define postamble_3_2_6_top	postamble_0
+#define postamble_3_2_6_bot	postamble_0
+
+struct test_stream test_3_2_6_top = { &preamble_3_2_6_top, &test_case_3_2_6_top, &postamble_3_2_6_top };
+struct test_stream test_3_2_6_bot = { &preamble_3_2_6_bot, &test_case_3_2_6_bot, &postamble_3_2_6_bot };
 
 #define tgrp_case_3_2_7 test_group_5
+#define numb_case_3_2_7 "3.2.7"
 #define name_case_3_2_7 "T_OPTMGMT_REQ with negative acknowledgement"
 #define desc_case_3_2_7 "\
 This test case test the pass through of T_OPTMGMT_REQ with negative\n\
 acknowledgement."
-static int test_3_2_7_top(int child)
+
+int test_case_3_2_7_top(int child)
 {
-	return test_3_2_top(child, __TEST_OPTMGMT_REQ);
+	return test_case_3_2_top(child, __TEST_OPTMGMT_REQ);
 }
-static int test_3_2_7_bot(int child)
+
+int test_case_3_2_7_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_OPTMGMT_REQ);
+	return test_case_3_2_bot(child, __TEST_OPTMGMT_REQ);
 }
-struct test_stream test_case_3_2_7_top = { &preamble_0, &test_3_2_7_top, &postamble_0 };
-struct test_stream test_case_3_2_7_bot = { &preamble_0, &test_3_2_7_bot, &postamble_0 };
-#define test_case_3_2_7_stream_top (&test_case_3_2_7_top)
-#define test_case_3_2_7_stream_bot (&test_case_3_2_7_bot)
+
+#define preamble_3_2_7_top	preamble_0
+#define preamble_3_2_7_bot	preamble_0
+
+#define postamble_3_2_7_top	postamble_0
+#define postamble_3_2_7_bot	postamble_0
+
+struct test_stream test_3_2_7_top = { &preamble_3_2_7_top, &test_case_3_2_7_top, &postamble_3_2_7_top };
+struct test_stream test_3_2_7_bot = { &preamble_3_2_7_bot, &test_case_3_2_7_bot, &postamble_3_2_7_bot };
 
 #define tgrp_case_3_2_8 test_group_5
+#define numb_case_3_2_8 "3.2.8"
 #define name_case_3_2_8 "T_ADDR_REQ with negative acknowledgement"
 #define desc_case_3_2_8 "\
 This test case test the pass through of T_ADDR_REQ with negative\n\
 acknowledgement."
-static int test_3_2_8_top(int child)
+
+int test_case_3_2_8_top(int child)
 {
-	return test_3_2_top(child, __TEST_ADDR_REQ);
+	return test_case_3_2_top(child, __TEST_ADDR_REQ);
 }
-static int test_3_2_8_bot(int child)
+
+int test_case_3_2_8_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_ADDR_REQ);
+	return test_case_3_2_bot(child, __TEST_ADDR_REQ);
 }
-struct test_stream test_case_3_2_8_top = { &preamble_0, &test_3_2_8_top, &postamble_0 };
-struct test_stream test_case_3_2_8_bot = { &preamble_0, &test_3_2_8_bot, &postamble_0 };
-#define test_case_3_2_8_stream_top (&test_case_3_2_8_top)
-#define test_case_3_2_8_stream_bot (&test_case_3_2_8_bot)
+
+#define preamble_3_2_8_top	preamble_0
+#define preamble_3_2_8_bot	preamble_0
+
+#define postamble_3_2_8_top	postamble_0
+#define postamble_3_2_8_bot	postamble_0
+
+struct test_stream test_3_2_8_top = { &preamble_3_2_8_top, &test_case_3_2_8_top, &postamble_3_2_8_top };
+struct test_stream test_3_2_8_bot = { &preamble_3_2_8_bot, &test_case_3_2_8_bot, &postamble_3_2_8_bot };
 
 #define tgrp_case_3_2_9 test_group_5
+#define numb_case_3_2_9 "3.2.9"
 #define name_case_3_2_9 "T_CAPABILITY_REQ with negative acknowledgement"
 #define desc_case_3_2_9 "\
 This test case test the pass through of T_CAPABILITY_REQ with negative\n\
 acknowledgement."
-static int test_3_2_9_top(int child)
+
+int test_case_3_2_9_top(int child)
 {
-	return test_3_2_top(child, __TEST_CAPABILITY_REQ);
+	return test_case_3_2_top(child, __TEST_CAPABILITY_REQ);
 }
-static int test_3_2_9_bot(int child)
+
+int test_case_3_2_9_bot(int child)
 {
-	return test_3_2_bot(child, __TEST_CAPABILITY_REQ);
+	return test_case_3_2_bot(child, __TEST_CAPABILITY_REQ);
 }
-struct test_stream test_case_3_2_9_top = { &preamble_0, &test_3_2_9_top, &postamble_0 };
-struct test_stream test_case_3_2_9_bot = { &preamble_0, &test_3_2_9_bot, &postamble_0 };
-#define test_case_3_2_9_stream_top (&test_case_3_2_9_top)
-#define test_case_3_2_9_stream_bot (&test_case_3_2_9_bot)
+
+#define preamble_3_2_9_top	preamble_0
+#define preamble_3_2_9_bot	preamble_0
+
+#define postamble_3_2_9_top	postamble_0
+#define postamble_3_2_9_bot	postamble_0
+
+struct test_stream test_3_2_9_top = { &preamble_3_2_9_top, &test_case_3_2_9_top, &postamble_3_2_9_top };
+struct test_stream test_3_2_9_bot = { &preamble_3_2_9_bot, &test_case_3_2_9_bot, &postamble_3_2_9_bot };
 
 /*
  *  -------------------------------------------------------------------------
@@ -5474,111 +6407,62 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
-		"1.1", tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
-	test_case_1_1_stream_top, test_case_1_1_stream_bot, NULL}, 0, 0}, {
-		"2.1.1", tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, {
-	test_case_2_1_1_stream_top, test_case_2_1_1_stream_bot, NULL}, 0, 0}, {
-		"2.1.2", tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, {
-	test_case_2_1_2_stream_top, test_case_2_1_2_stream_bot, NULL}, 0, 0}, {
-		"2.1.3", tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, {
-	test_case_2_1_3_stream_top, test_case_2_1_3_stream_bot, NULL}, 0, 0}, {
-		"2.1.4", tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, {
-	test_case_2_1_4_stream_top, test_case_2_1_4_stream_bot, NULL}, 0, 0}, {
-		"2.1.5", tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, {
-	test_case_2_1_5_stream_top, test_case_2_1_5_stream_bot, NULL}, 0, 0}, {
-		"2.1.6", tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, {
-	test_case_2_1_6_stream_top, test_case_2_1_6_stream_bot, NULL}, 0, 0}, {
-		"2.1.7.1", tgrp_case_2_1_7_1, name_case_2_1_7_1, desc_case_2_1_7_1, {
-	test_case_2_1_7_1_stream_top, test_case_2_1_7_1_stream_bot, NULL}, 0, 0}, {
-		"2.1.7.2", tgrp_case_2_1_7_2, name_case_2_1_7_2, desc_case_2_1_7_2, {
-	test_case_2_1_7_2_stream_top, test_case_2_1_7_2_stream_bot, NULL}, 0, 0}, {
-		"2.1.8.1", tgrp_case_2_1_8_1, name_case_2_1_8_1, desc_case_2_1_8_1, {
-	test_case_2_1_8_1_stream_top, test_case_2_1_8_1_stream_bot, NULL}, 0, 0}, {
-		"2.1.8.2", tgrp_case_2_1_8_2, name_case_2_1_8_2, desc_case_2_1_8_2, {
-	test_case_2_1_8_2_stream_top, test_case_2_1_8_2_stream_bot, NULL}, 0, 0}, {
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, { &test_1_1_top, &test_1_1_bot, NULL}, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, { &test_2_1_1_top, &test_2_1_1_bot, NULL}, 0, 0}, {
+		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, { &test_2_1_2_top, &test_2_1_2_bot, NULL}, 0, 0}, {
+		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, { &test_2_1_3_top, &test_2_1_3_bot, NULL}, 0, 0}, {
+		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, { &test_2_1_4_top, &test_2_1_4_bot, NULL}, 0, 0}, {
+		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, { &test_2_1_5_top, &test_2_1_5_bot, NULL}, 0, 0}, {
+		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, { &test_2_1_6_top, &test_2_1_6_bot, NULL}, 0, 0}, {
+		numb_case_2_1_7_1, tgrp_case_2_1_7_1, name_case_2_1_7_1, desc_case_2_1_7_1, { &test_2_1_7_1_top, &test_2_1_7_1_bot, NULL}, 0, 0}, {
+		numb_case_2_1_7_2, tgrp_case_2_1_7_2, name_case_2_1_7_2, desc_case_2_1_7_2, { &test_2_1_7_2_top, &test_2_1_7_2_bot, NULL}, 0, 0}, {
+		numb_case_2_1_8_1, tgrp_case_2_1_8_1, name_case_2_1_8_1, desc_case_2_1_8_1, { &test_2_1_8_1_top, &test_2_1_8_1_bot, NULL}, 0, 0}, {
+		numb_case_2_1_8_2, tgrp_case_2_1_8_2, name_case_2_1_8_2, desc_case_2_1_8_2, { &test_2_1_8_2_top, &test_2_1_8_2_bot, NULL}, 0, 0}, {
 #if 0
-		"2.1.9", tgrp_case_2_1_9, name_case_2_1_9, desc_case_2_1_9, {
-	test_case_2_1_9_stream_top, test_case_2_1_9_stream_bot, NULL}, 0, 0}, {
+		numb_case_2_1_9, tgrp_case_2_1_9, name_case_2_1_9, desc_case_2_1_9, { &test_2_1_9_top, &test_2_1_9_bot, NULL}, 0, 0}, {
 #endif
-		"2.1.10", tgrp_case_2_1_10, name_case_2_1_10, desc_case_2_1_10, {
-	test_case_2_1_10_stream_top, test_case_2_1_10_stream_bot, NULL}, 0, 0}, {
-		"2.1.11", tgrp_case_2_1_11, name_case_2_1_11, desc_case_2_1_11, {
-	test_case_2_1_11_stream_top, test_case_2_1_11_stream_bot, NULL}, 0, 0}, {
-		"2.2.1", tgrp_case_2_2_1, name_case_2_2_1, desc_case_2_2_1, {
-	test_case_2_2_1_stream_top, test_case_2_2_1_stream_bot, NULL}, 0, 0}, {
-		"2.2.2", tgrp_case_2_2_2, name_case_2_2_2, desc_case_2_2_2, {
-	test_case_2_2_2_stream_top, test_case_2_2_2_stream_bot, NULL}, 0, 0}, {
-		"2.2.3", tgrp_case_2_2_3, name_case_2_2_3, desc_case_2_2_3, {
-	test_case_2_2_3_stream_top, test_case_2_2_3_stream_bot, NULL}, 0, 0}, {
-		"2.2.4", tgrp_case_2_2_4, name_case_2_2_4, desc_case_2_2_4, {
-	test_case_2_2_4_stream_top, test_case_2_2_4_stream_bot, NULL}, 0, 0}, {
-		"2.2.5", tgrp_case_2_2_5, name_case_2_2_5, desc_case_2_2_5, {
-	test_case_2_2_5_stream_top, test_case_2_2_5_stream_bot, NULL}, 0, 0}, {
-		"2.2.6", tgrp_case_2_2_6, name_case_2_2_6, desc_case_2_2_6, {
-	test_case_2_2_6_stream_top, test_case_2_2_6_stream_bot, NULL}, 0, 0}, {
-		"2.2.7.1", tgrp_case_2_2_7_1, name_case_2_2_7_1, desc_case_2_2_7_1, {
-	test_case_2_2_7_1_stream_top, test_case_2_2_7_1_stream_bot, NULL}, 0, 0}, {
-		"2.2.7.2", tgrp_case_2_2_7_2, name_case_2_2_7_2, desc_case_2_2_7_2, {
-	test_case_2_2_7_2_stream_top, test_case_2_2_7_2_stream_bot, NULL}, 0, 0}, {
-		"2.2.8.1", tgrp_case_2_2_8_1, name_case_2_2_8_1, desc_case_2_2_8_1, {
-	test_case_2_2_8_1_stream_top, test_case_2_2_8_1_stream_bot, NULL}, 0, 0}, {
-		"2.2.8.2", tgrp_case_2_2_8_2, name_case_2_2_8_2, desc_case_2_2_8_2, {
-	test_case_2_2_8_2_stream_top, test_case_2_2_8_2_stream_bot, NULL}, 0, 0}, {
+		numb_case_2_1_10, tgrp_case_2_1_10, name_case_2_1_10, desc_case_2_1_10, { &test_2_1_10_top, &test_2_1_10_bot, NULL}, 0, 0}, {
+		numb_case_2_1_11, tgrp_case_2_1_11, name_case_2_1_11, desc_case_2_1_11, { &test_2_1_11_top, &test_2_1_11_bot, NULL}, 0, 0}, {
+		numb_case_2_2_1, tgrp_case_2_2_1, name_case_2_2_1, desc_case_2_2_1, { &test_2_2_1_top, &test_2_2_1_bot, NULL}, 0, 0}, {
+		numb_case_2_2_2, tgrp_case_2_2_2, name_case_2_2_2, desc_case_2_2_2, { &test_2_2_2_top, &test_2_2_2_bot, NULL}, 0, 0}, {
+		numb_case_2_2_3, tgrp_case_2_2_3, name_case_2_2_3, desc_case_2_2_3, { &test_2_2_3_top, &test_2_2_3_bot, NULL}, 0, 0}, {
+		numb_case_2_2_4, tgrp_case_2_2_4, name_case_2_2_4, desc_case_2_2_4, { &test_2_2_4_top, &test_2_2_4_bot, NULL}, 0, 0}, {
+		numb_case_2_2_5, tgrp_case_2_2_5, name_case_2_2_5, desc_case_2_2_5, { &test_2_2_5_top, &test_2_2_5_bot, NULL}, 0, 0}, {
+		numb_case_2_2_6, tgrp_case_2_2_6, name_case_2_2_6, desc_case_2_2_6, { &test_2_2_6_top, &test_2_2_6_bot, NULL}, 0, 0}, {
+		numb_case_2_2_7_1, tgrp_case_2_2_7_1, name_case_2_2_7_1, desc_case_2_2_7_1, { &test_2_2_7_1_top, &test_2_2_7_1_bot, NULL}, 0, 0}, {
+		numb_case_2_2_7_2, tgrp_case_2_2_7_2, name_case_2_2_7_2, desc_case_2_2_7_2, { &test_2_2_7_2_top, &test_2_2_7_2_bot, NULL}, 0, 0}, {
+		numb_case_2_2_8_1, tgrp_case_2_2_8_1, name_case_2_2_8_1, desc_case_2_2_8_1, { &test_2_2_8_1_top, &test_2_2_8_1_bot, NULL}, 0, 0}, {
+		numb_case_2_2_8_2, tgrp_case_2_2_8_2, name_case_2_2_8_2, desc_case_2_2_8_2, { &test_2_2_8_2_top, &test_2_2_8_2_bot, NULL}, 0, 0}, {
 #if 0
-		"2.2.9", tgrp_case_2_2_9, name_case_2_2_9, desc_case_2_2_9, {
-	test_case_2_2_9_stream_top, test_case_2_2_9_stream_bot, NULL}, 0, 0}, {
+		numb_case_2_2_9, tgrp_case_2_2_9, name_case_2_2_9, desc_case_2_2_9, { &test_2_2_9_top, &test_2_2_9_bot, NULL}, 0, 0}, {
 #endif
-		"2.2.10", tgrp_case_2_2_10, name_case_2_2_10, desc_case_2_2_10, {
-	test_case_2_2_10_stream_top, test_case_2_2_10_stream_bot, NULL}, 0, 0}, {
-		"2.2.11", tgrp_case_2_2_11, name_case_2_2_11, desc_case_2_2_11, {
-	test_case_2_2_11_stream_top, test_case_2_2_11_stream_bot, NULL}, 0, 0}, {
-		"2.3", tgrp_case_2_3, name_case_2_3, desc_case_2_3, {
-	test_case_2_3_stream_top, test_case_2_3_stream_bot, NULL}, 0, 0}, {
-		"2.4.1", tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, {
-	test_case_2_4_1_stream_top, test_case_2_4_1_stream_bot, NULL}, 0, 0}, {
-		"2.4.2", tgrp_case_2_4_2, name_case_2_4_2, desc_case_2_4_2, {
-	test_case_2_4_2_stream_top, test_case_2_4_2_stream_bot, NULL}, 0, 0}, {
-		"2.4.3", tgrp_case_2_4_3, name_case_2_4_3, desc_case_2_4_3, {
-	test_case_2_4_3_stream_top, test_case_2_4_3_stream_bot, NULL}, 0, 0}, {
-		"2.4.4", tgrp_case_2_4_4, name_case_2_4_4, desc_case_2_4_4, {
-	test_case_2_4_4_stream_top, test_case_2_4_4_stream_bot, NULL}, 0, 0}, {
-		"3.1.1", tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, {
-	test_case_3_1_1_stream_top, test_case_3_1_1_stream_bot, NULL}, 0, 0}, {
-		"3.1.2", tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, {
-	test_case_3_1_2_stream_top, test_case_3_1_2_stream_bot, NULL}, 0, 0}, {
-		"3.1.3", tgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, {
-	test_case_3_1_3_stream_top, test_case_3_1_3_stream_bot, NULL}, 0, 0}, {
-		"3.1.4", tgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, {
-	test_case_3_1_4_stream_top, test_case_3_1_4_stream_bot, NULL}, 0, 0}, {
-		"3.1.5", tgrp_case_3_1_5, name_case_3_1_5, desc_case_3_1_5, {
-	test_case_3_1_5_stream_top, test_case_3_1_5_stream_bot, NULL}, 0, 0}, {
-		"3.1.6", tgrp_case_3_1_6, name_case_3_1_6, desc_case_3_1_6, {
-	test_case_3_1_6_stream_top, test_case_3_1_6_stream_bot, NULL}, 0, 0}, {
-		"3.1.7", tgrp_case_3_1_7, name_case_3_1_7, desc_case_3_1_7, {
-	test_case_3_1_7_stream_top, test_case_3_1_7_stream_bot, NULL}, 0, 0}, {
-		"3.1.8", tgrp_case_3_1_8, name_case_3_1_8, desc_case_3_1_8, {
-	test_case_3_1_8_stream_top, test_case_3_1_8_stream_bot, NULL}, 0, 0}, {
-		"3.1.9", tgrp_case_3_1_9, name_case_3_1_9, desc_case_3_1_9, {
-	test_case_3_1_9_stream_top, test_case_3_1_9_stream_bot, NULL}, 0, 0}, {
-		"3.2.1", tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, {
-	test_case_3_2_1_stream_top, test_case_3_2_1_stream_bot, NULL}, 0, 0}, {
-		"3.2.2", tgrp_case_3_2_2, name_case_3_2_2, desc_case_3_2_2, {
-	test_case_3_2_2_stream_top, test_case_3_2_2_stream_bot, NULL}, 0, 0}, {
-		"3.2.3", tgrp_case_3_2_3, name_case_3_2_3, desc_case_3_2_3, {
-	test_case_3_2_3_stream_top, test_case_3_2_3_stream_bot, NULL}, 0, 0}, {
-		"3.2.4", tgrp_case_3_2_4, name_case_3_2_4, desc_case_3_2_4, {
-	test_case_3_2_4_stream_top, test_case_3_2_4_stream_bot, NULL}, 0, 0}, {
-		"3.2.5", tgrp_case_3_2_5, name_case_3_2_5, desc_case_3_2_5, {
-	test_case_3_2_5_stream_top, test_case_3_2_5_stream_bot, NULL}, 0, 0}, {
-		"3.2.6", tgrp_case_3_2_6, name_case_3_2_6, desc_case_3_2_6, {
-	test_case_3_2_6_stream_top, test_case_3_2_6_stream_bot, NULL}, 0, 0}, {
-		"3.2.7", tgrp_case_3_2_7, name_case_3_2_7, desc_case_3_2_7, {
-	test_case_3_2_7_stream_top, test_case_3_2_7_stream_bot, NULL}, 0, 0}, {
-		"3.2.8", tgrp_case_3_2_8, name_case_3_2_8, desc_case_3_2_8, {
-	test_case_3_2_8_stream_top, test_case_3_2_8_stream_bot, NULL}, 0, 0}, {
-		"3.2.9", tgrp_case_3_2_9, name_case_3_2_9, desc_case_3_2_9, {
-	test_case_3_2_9_stream_top, test_case_3_2_9_stream_bot, NULL}, 0, 0}, {
-NULL,}};
+		numb_case_2_2_10, tgrp_case_2_2_10, name_case_2_2_10, desc_case_2_2_10, { &test_2_2_10_top, &test_2_2_10_bot, NULL}, 0, 0}, {
+		numb_case_2_2_11, tgrp_case_2_2_11, name_case_2_2_11, desc_case_2_2_11, { &test_2_2_11_top, &test_2_2_11_bot, NULL}, 0, 0}, {
+		numb_case_2_3, tgrp_case_2_3, name_case_2_3, desc_case_2_3, { &test_2_3_top, &test_2_3_bot, NULL}, 0, 0}, {
+		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, { &test_2_4_1_top, &test_2_4_1_bot, NULL}, 0, 0}, {
+		numb_case_2_4_2, tgrp_case_2_4_2, name_case_2_4_2, desc_case_2_4_2, { &test_2_4_2_top, &test_2_4_2_bot, NULL}, 0, 0}, {
+		numb_case_2_4_3, tgrp_case_2_4_3, name_case_2_4_3, desc_case_2_4_3, { &test_2_4_3_top, &test_2_4_3_bot, NULL}, 0, 0}, {
+		numb_case_2_4_4, tgrp_case_2_4_4, name_case_2_4_4, desc_case_2_4_4, { &test_2_4_4_top, &test_2_4_4_bot, NULL}, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, { &test_3_1_1_top, &test_3_1_1_bot, NULL}, 0, 0}, {
+		numb_case_3_1_2, tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, { &test_3_1_2_top, &test_3_1_2_bot, NULL}, 0, 0}, {
+		numb_case_3_1_3, tgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, { &test_3_1_3_top, &test_3_1_3_bot, NULL}, 0, 0}, {
+		numb_case_3_1_4, tgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, { &test_3_1_4_top, &test_3_1_4_bot, NULL}, 0, 0}, {
+		numb_case_3_1_5, tgrp_case_3_1_5, name_case_3_1_5, desc_case_3_1_5, { &test_3_1_5_top, &test_3_1_5_bot, NULL}, 0, 0}, {
+		numb_case_3_1_6, tgrp_case_3_1_6, name_case_3_1_6, desc_case_3_1_6, { &test_3_1_6_top, &test_3_1_6_bot, NULL}, 0, 0}, {
+		numb_case_3_1_7, tgrp_case_3_1_7, name_case_3_1_7, desc_case_3_1_7, { &test_3_1_7_top, &test_3_1_7_bot, NULL}, 0, 0}, {
+		numb_case_3_1_8, tgrp_case_3_1_8, name_case_3_1_8, desc_case_3_1_8, { &test_3_1_8_top, &test_3_1_8_bot, NULL}, 0, 0}, {
+		numb_case_3_1_9, tgrp_case_3_1_9, name_case_3_1_9, desc_case_3_1_9, { &test_3_1_9_top, &test_3_1_9_bot, NULL}, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, { &test_3_2_1_top, &test_3_2_1_bot, NULL}, 0, 0}, {
+		numb_case_3_2_2, tgrp_case_3_2_2, name_case_3_2_2, desc_case_3_2_2, { &test_3_2_2_top, &test_3_2_2_bot, NULL}, 0, 0}, {
+		numb_case_3_2_3, tgrp_case_3_2_3, name_case_3_2_3, desc_case_3_2_3, { &test_3_2_3_top, &test_3_2_3_bot, NULL}, 0, 0}, {
+		numb_case_3_2_4, tgrp_case_3_2_4, name_case_3_2_4, desc_case_3_2_4, { &test_3_2_4_top, &test_3_2_4_bot, NULL}, 0, 0}, {
+		numb_case_3_2_5, tgrp_case_3_2_5, name_case_3_2_5, desc_case_3_2_5, { &test_3_2_5_top, &test_3_2_5_bot, NULL}, 0, 0}, {
+		numb_case_3_2_6, tgrp_case_3_2_6, name_case_3_2_6, desc_case_3_2_6, { &test_3_2_6_top, &test_3_2_6_bot, NULL}, 0, 0}, {
+		numb_case_3_2_7, tgrp_case_3_2_7, name_case_3_2_7, desc_case_3_2_7, { &test_3_2_7_top, &test_3_2_7_bot, NULL}, 0, 0}, {
+		numb_case_3_2_8, tgrp_case_3_2_8, name_case_3_2_8, desc_case_3_2_8, { &test_3_2_8_top, &test_3_2_8_bot, NULL}, 0, 0}, {
+		numb_case_3_2_9, tgrp_case_3_2_9, name_case_3_2_9, desc_case_3_2_9, { &test_3_2_9_top, &test_3_2_9_bot, NULL}, 0, 0}, {
+	NULL,}
+};
 
 static int summary = 0;
 
@@ -5609,7 +6493,7 @@ int do_tests(void)
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests() == __RESULT_SUCCESS) {
+	if (begin_tests(0) == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
@@ -5635,7 +6519,7 @@ int do_tests(void)
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests()) != __RESULT_SUCCESS)
+			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
 				goto inconclusive;
 			result = test_run(tests[i].stream);
 			end_tests();
@@ -6079,7 +6963,7 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* 
+	/*
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)

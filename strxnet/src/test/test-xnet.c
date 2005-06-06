@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/05 05:15:15 $ by $Author: brian $
+ Last Modified $Date: 2005/06/06 11:32:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.13  2005/06/06 11:32:40  brian
+ - more upgrades to test suites
+
  Revision 0.9.2.12  2005/06/05 05:15:15  brian
  - provide some additiona info and adjust timing
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/05 05:15:15 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -239,9 +242,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 10
-#define NORMAL_WAIT 100
-#define LONG_WAIT 500
+#define SHORT_WAIT 100		// 10
+#define NORMAL_WAIT 500		// 100
+#define LONG_WAIT 5000		// 500
+#define LONGER_WAIT 10000	// 5000
+
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -259,8 +264,10 @@ static int test_bufsize = 256;
 static int test_tidu = 256;
 static int test_mgmtflags = T_NEGOTIATE;
 static struct sockaddr_in *test_addr = NULL;
-static char *test_data = NULL;
+static socklen_t test_alen = sizeof(*test_addr);
+static const char *test_data = NULL;
 static int test_resfd = -1;
+static int test_timout = 200;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -403,6 +410,8 @@ enum {
 	__TEST_PUTMSG_DATA, __TEST_PUTPMSG_DATA, __TEST_PUSH, __TEST_POP,
 	__TEST_READ, __TEST_READV, __TEST_GETMSG, __TEST_GETPMSG,
 	__TEST_DATA,
+	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
+	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -551,7 +560,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |  | %11.6g                   |                    <%d>\n", t, state);
+		fprintf(stdout, "                    |  | %11.6g                    |                   <%d>\n", t, state);
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -626,45 +635,42 @@ static int stop_tt(void)
 	return __RESULT_SUCCESS;
 }
 
-/* 
+/*
  *  Addresses
  */
 
-/* 
+/*
  *  Options
  */
 
 /*
- * data options 
+ * data options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_data = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 /*
- * connect options 
+ * connect options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_conn = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 /*
- * management options 
+ * management options
  */
 struct {
 	struct t_opthdr xti_hdr __attribute__ ((packed));
 	t_scalar_t xti_val __attribute__ ((packed));
 } opt_optm = {
-	{
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
+	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
 #if 1
@@ -1305,6 +1311,50 @@ const char *state_string(ulong state)
 	}
 }
 
+#if 0
+void print_addr(char *add_ptr, size_t add_len)
+{
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+char *addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+void print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	fprintf(stdout, "Stupid!\n");
+}
+#else
 void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
@@ -1331,6 +1381,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
+#endif
 
 char *status_string(struct t_opthdr *oh)
 {
@@ -1545,6 +1596,13 @@ char *yesno_string(struct t_opthdr *oh)
 	}
 }
 
+char *number_string(struct t_opthdr *oh)
+{
+	static char buf[32];
+	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
+	return (buf);
+}
+
 char *value_string(struct t_opthdr *oh)
 {
 #if 0
@@ -1641,41 +1699,29 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_CORK:
 			return yesno_string(oh);
 		case T_SCTP_PPI:
-			break;
+			return number_string(oh);;
 		case T_SCTP_SID:
-			break;
+			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			return number_string(oh);;
 		case T_SCTP_SSN:
-			break;
 		case T_SCTP_TSN:
-			break;
+			return number_string(oh);;
 		case T_SCTP_RECVOPT:
 			return yesno_string(oh);
 		case T_SCTP_COOKIE_LIFE:
-			break;
 		case T_SCTP_SACK_DELAY:
-			break;
 		case T_SCTP_PATH_MAX_RETRANS:
-			break;
 		case T_SCTP_ASSOC_MAX_RETRANS:
-			break;
 		case T_SCTP_MAX_INIT_RETRIES:
-			break;
 		case T_SCTP_HEARTBEAT_ITVL:
-			break;
 		case T_SCTP_RTO_INITIAL:
-			break;
 		case T_SCTP_RTO_MIN:
-			break;
 		case T_SCTP_RTO_MAX:
-			break;
 		case T_SCTP_OSTREAMS:
-			break;
 		case T_SCTP_ISTREAMS:
-			break;
 		case T_SCTP_COOKIE_INC:
-			break;
 		case T_SCTP_THROTTLE_ITVL:
-			break;
+			return number_string(oh);;
 		case T_SCTP_MAC_TYPE:
 			break;
 		case T_SCTP_CKSUM_TYPE:
@@ -1697,17 +1743,12 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PR:
 			break;
 		case T_SCTP_LIFETIME:
-			break;
 		case T_SCTP_DISPOSITION:
-			break;
 		case T_SCTP_MAX_BURST:
-			break;
 		case T_SCTP_HB:
-			break;
 		case T_SCTP_RTO:
-			break;
 		case T_SCTP_MAXSEG:
-			break;
+			return number_string(oh);
 		case T_SCTP_STATUS:
 			break;
 		case T_SCTP_DEBUG:
@@ -1718,6 +1759,34 @@ char *value_string(struct t_opthdr *oh)
 	}
 	return ("(unknown value)");
 }
+
+#if 0
+void parse_options(int fd, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		if (oh->len == sizeof(*oh))
+			continue;
+		switch (oh->level) {
+		case T_INET_SCTP:
+			switch (oh->name) {
+			case T_SCTP_PPI:
+				ppi[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SID:
+				sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SSN:
+				ssn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_TSN:
+				tsn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			}
+		}
+	}
+}
+#endif
 
 char *mgmtflag_string(t_uscalar_t flag)
 {
@@ -2815,7 +2884,7 @@ int test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int stream_start(int child)
+static int stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
@@ -2873,35 +2942,39 @@ static int stream_stop(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(void)
+static int begin_tests(int index)
 {
 	state = 0;
-	if (stream_start(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(0, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(1, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(2, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	show_acks = 1;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 static int end_tests(void)
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 /*
@@ -2919,7 +2992,7 @@ static int do_signal(int child, int action)
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
 	ic.ic_cmd = 0;
-	ic.ic_timout = 200;
+	ic.ic_timout = test_timout;
 	ic.ic_len = sizeof(cbuf);
 	ic.ic_dp = cbuf;
 	ctrl->maxlen = 0;
@@ -2969,10 +3042,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
-		p->conn_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
 		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
 		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
@@ -3127,13 +3200,13 @@ static int do_signal(int child, int action)
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
-		ctrl->len = sizeof(p->bind_req) + (test_addr ? sizeof(*test_addr) : 0);
+		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
 		p->bind_req.PRIM_type = T_BIND_REQ;
-		p->bind_req.ADDR_length = test_addr ? sizeof(*test_addr) : 0;
+		p->bind_req.ADDR_length = test_addr ? test_alen : 0;
 		p->bind_req.ADDR_offset = test_addr ? sizeof(p->bind_req) : 0;
 		p->bind_req.CONIND_number = last_qlen;
 		if (test_addr)
-			bcopy(test_addr, (&p->bind_req) + 1, sizeof(*test_addr));
+			bcopy(test_addr, ctrl->buf + p->bind_req.ADDR_offset, p->bind_req.ADDR_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3183,10 +3256,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
-		p->unitdata_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
 		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
 		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
@@ -4406,7 +4479,7 @@ void test_sleep(int child, unsigned long t)
 static int preamble_0(int child)
 {
 	start_tt(1000);
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 static int postamble_0(int child)
@@ -4428,7 +4501,7 @@ static int postamble_0(int child)
 	}
 	state++;
 	stop_tt();
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 static int preamble_1_top(int child)
@@ -4747,6 +4820,440 @@ static int postamble_3s_bot(int child)
 	return postamble_3_bot(child);
 }
 
+#if 0
+static int preamble_1(int child)
+{
+	test_mgmtflags = T_NEGOTIATE;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_1s(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_1(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_1e(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_conn(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_resp(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_list(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_list(int child)
+{
+	int failed = -1;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+#if 0
+static int preamble_2b_conn(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = "Hello World";
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_resp(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_list(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = "Hello There!";
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+#endif
+
+static int postamble_3_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_conn(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_resp(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_list(int child)
+{
+	return postamble_2_list(child);
+}
+#endif
+
+#if 0
+static int preamble_3b_conn(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_conn(child);
+}
+static int preamble_3b_resp(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_resp(child);
+}
+static int preamble_3b_list(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_list(child);
+}
+
+static int preamble_4_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_conn(child);
+}
+static int preamble_4_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_list(child);
+}
+static int preamble_4_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_resp(child);
+}
+
+static int preamble_4b_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_conn(child);
+}
+static int preamble_4b_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_list(child);
+}
+static int preamble_4b_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_resp(child);
+}
+
+static int preamble_5_conn(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_conn(child);
+}
+static int preamble_5_list(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_list(child);
+}
+static int preamble_5_resp(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_resp(child);
+}
+
+static int preamble_6_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_conn(child);
+}
+static int preamble_6_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_list(child);
+}
+static int preamble_6_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_resp(child);
+}
+
+static int preamble_7_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+
+static int preamble_8_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+#endif
+
 /*
  *  =========================================================================
  *
@@ -4763,13 +5270,15 @@ struct test_stream {
 
 #define test_group_1 "Pushing and popping the timod module"
 #define tgrp_case_1_1 test_group_1
+#define numb_case_1_1 "1.1"
 #define name_case_1_1 "Normal push and pop sequence"
 #define desc_case_1_1 "\
 This test case tests the simple pushing and popping of the timod module.  It\n\
 ensures that pushing the module on an empty stream has no effect, while\n\
 popping the module from the stream results in a T_DISCON_REQ being sent to the\n\
 transport peer."
-static int test_1_1_top(int child)
+
+int test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4779,7 +5288,8 @@ static int test_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_1_1_bot(int child)
+
+int test_case_1_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4794,18 +5304,25 @@ static int test_1_1_bot(int child)
 	state++;
 	return (__RESULT_FAILURE);
 }
-static struct test_stream test_case_1_1_top = { &preamble_0, &test_1_1_top, &postamble_0 };
-static struct test_stream test_case_1_1_bot = { &preamble_0, &test_1_1_bot, &postamble_0 };
-#define test_case_1_1_stream_top (&test_case_1_1_top)
-#define test_case_1_1_stream_bot (&test_case_1_1_bot)
+
+#define preamble_1_1_top preamble_0
+#define preamble_1_1_bot preamble_0
+
+#define postamble_1_1_top postamble_0
+#define postamble_1_1_bot postamble_0
+
+static struct test_stream test_1_1_top = { &preamble_1_1_top, &test_case_1_1_top, &postamble_1_1_top };
+static struct test_stream test_1_1_bot = { &preamble_1_1_bot, &test_case_1_1_bot, &postamble_1_1_bot };
 
 #define test_group_2 "Syncrhonizing the library to a file descriptor"
 #define tgrp_case_1_2_1 test_group_2
+#define numb_case_1_2_1 "1.2.1"
 #define name_case_1_2_1 "Syncrhonization after \"timod\" pushed -- normal operation"
 #define desc_case_1_2_1 "\
 This test case tests syncrhonization of the XTI library to a file descriptor\n\
 on the test harness upon which the \"timod\" module has been pushed."
-static int test_1_2_1_top(int child)
+
+int test_case_1_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4818,7 +5335,8 @@ static int test_1_2_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_1_2_1_bot(int child)
+
+int test_case_1_2_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4834,17 +5352,24 @@ static int test_1_2_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_1_2_1_top = { &preamble_0, &test_1_2_1_top, &postamble_0 };
-static struct test_stream test_case_1_2_1_bot = { &preamble_0, &test_1_2_1_bot, &postamble_0 };
-#define test_case_1_2_1_stream_top (&test_case_1_2_1_top)
-#define test_case_1_2_1_stream_bot (&test_case_1_2_1_bot)
+
+#define preamble_1_2_1_top preamble_0
+#define preamble_1_2_1_bot preamble_0
+
+#define postamble_1_2_1_top postamble_0
+#define postamble_1_2_1_bot postamble_0
+
+static struct test_stream test_1_2_1_top = { &preamble_1_2_1_top, &test_case_1_2_1_top, &postamble_1_2_1_top };
+static struct test_stream test_1_2_1_bot = { &preamble_1_2_1_bot, &test_case_1_2_1_bot, &postamble_1_2_1_bot };
 
 #define tgrp_case_1_2_2 test_group_2
+#define numb_case_1_2_2 "1.2.2"
 #define name_case_1_2_2 "Syncrhonization after \"timod\" pushed -- closed file descriptor"
 #define desc_case_1_2_2 "\
 This test case tests synchronization of the XTI library to a file descriptor\n\
 that is closed."
-static int test_1_2_2_top(int child)
+
+int test_case_1_2_2_top(int child)
 {
 	int old_fd = test_fd[child];
 	close(10);
@@ -4856,7 +5381,8 @@ static int test_1_2_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_1_2_2_bot(int child)
+
+int test_case_1_2_2_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4865,17 +5391,24 @@ static int test_1_2_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_1_2_2_top = { &preamble_0, &test_1_2_2_top, &postamble_0 };
-static struct test_stream test_case_1_2_2_bot = { &preamble_0, &test_1_2_2_bot, &postamble_0 };
-#define test_case_1_2_2_stream_top (&test_case_1_2_2_top)
-#define test_case_1_2_2_stream_bot (&test_case_1_2_2_bot)
+
+#define preamble_1_2_2_top preamble_0
+#define preamble_1_2_2_bot preamble_0
+
+#define postamble_1_2_2_top postamble_0
+#define postamble_1_2_2_bot postamble_0
+
+static struct test_stream test_1_2_2_top = { &preamble_1_2_2_top, &test_case_1_2_2_top, &postamble_1_2_2_top };
+static struct test_stream test_1_2_2_bot = { &preamble_1_2_2_bot, &test_case_1_2_2_bot, &postamble_1_2_2_bot };
 
 #define tgrp_case_1_2_3 test_group_2
+#define numb_case_1_2_3 "1.2.3"
 #define name_case_1_2_3 "Synchronization after \"timod\" pushed -- system error"
 #define desc_case_1_2_3 "\
 This test case tests synchronization of the XTI library to a file descriptor\n\
 on the test harness with a system error (ENOMEM)."
-static int test_1_2_3_top(int child)
+
+int test_case_1_2_3_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -4885,7 +5418,8 @@ static int test_1_2_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_1_2_3_bot(int child)
+
+int test_case_1_2_3_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4903,24 +5437,32 @@ static int test_1_2_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_1_2_3_top = { &preamble_0, &test_1_2_3_top, &postamble_0 };
-static struct test_stream test_case_1_2_3_bot = { &preamble_0, &test_1_2_3_bot, &postamble_0 };
-#define test_case_1_2_3_stream_top (&test_case_1_2_3_top)
-#define test_case_1_2_3_stream_bot (&test_case_1_2_3_bot)
+
+#define preamble_1_2_3_top preamble_0
+#define preamble_1_2_3_bot preamble_0
+
+#define postamble_1_2_3_top postamble_0
+#define postamble_1_2_3_bot postamble_0
+
+static struct test_stream test_1_2_3_top = { &preamble_1_2_3_top, &test_case_1_2_3_top, &postamble_1_2_3_top };
+static struct test_stream test_1_2_3_bot = { &preamble_1_2_3_bot, &test_case_1_2_3_bot, &postamble_1_2_3_bot };
 
 #define test_group_3 "Binding to an address"
 #define tgrp_case_2_1_1 test_group_3
+#define numb_case_2_1_1 "2.1.1"
 #define name_case_2_1_1 "Successful bind operation"
 #define desc_case_2_1_1 "\
 This test case tests successful bind of the XTI stream."
-static int test_2_1_1_top(int child)
+
+int test_case_2_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_1_bot(int child)
+
+int test_case_2_1_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -4932,23 +5474,31 @@ static int test_2_1_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_1_1_top = { &preamble_1_top, &test_2_1_1_top, &postamble_1_top };
-static struct test_stream test_case_2_1_1_bot = { &preamble_1_bot, &test_2_1_1_bot, &postamble_1_bot };
-#define test_case_2_1_1_stream_top (&test_case_2_1_1_top)
-#define test_case_2_1_1_stream_bot (&test_case_2_1_1_bot)
+
+#define preamble_2_1_1_top preamble_1_top
+#define preamble_2_1_1_bot preamble_1_bot
+
+#define postamble_2_1_1_top postamble_1_top
+#define postamble_2_1_1_bot postamble_1_bot
+
+static struct test_stream test_2_1_1_top = { &preamble_2_1_1_top, &test_case_2_1_1_top, &postamble_2_1_1_top };
+static struct test_stream test_2_1_1_bot = { &preamble_2_1_1_bot, &test_case_2_1_1_bot, &postamble_2_1_1_bot };
 
 #define tgrp_case_2_1_2 test_group_3
+#define numb_case_2_1_2 "2.1.2"
 #define name_case_2_1_2 "Unsuccessful bind operation -- TACCES error"
 #define desc_case_2_1_2 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_x_top(int child, int terror)
+
+int test_case_2_1_x_top(int child, int terror)
 {
 	if (do_signal(child, __TEST_T_BIND) == __RESULT_SUCCESS || last_t_errno != terror)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_x_bot(int child, int terror)
+
+int test_case_2_1_x_bot(int child, int terror)
 {
 	start_tt(200);
 	state++;
@@ -4962,109 +5512,158 @@ static int test_2_1_x_bot(int child, int terror)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_2_top(int child)
+
+int test_case_2_1_2_top(int child)
 {
-	return test_2_1_x_top(child, TACCES);
+	return test_case_2_1_x_top(child, TACCES);
 }
-static int test_2_1_2_bot(int child)
+
+int test_case_2_1_2_bot(int child)
 {
-	return test_2_1_x_bot(child, TACCES);
+	return test_case_2_1_x_bot(child, TACCES);
 }
-static struct test_stream test_case_2_1_2_top = { &preamble_1_top, &test_2_1_2_top, &postamble_1_top };
-static struct test_stream test_case_2_1_2_bot = { &preamble_1_bot, &test_2_1_2_bot, &postamble_1_bot };
-#define test_case_2_1_2_stream_top (&test_case_2_1_2_top)
-#define test_case_2_1_2_stream_bot (&test_case_2_1_2_bot)
+
+#define preamble_2_1_2_top preamble_1_top
+#define preamble_2_1_2_bot preamble_1_bot
+
+#define postamble_2_1_2_top postamble_1_top
+#define postamble_2_1_2_bot postamble_1_bot
+
+static struct test_stream test_2_1_2_top = { &preamble_2_1_2_top, &test_case_2_1_2_top, &postamble_2_1_2_top };
+static struct test_stream test_2_1_2_bot = { &preamble_2_1_2_bot, &test_case_2_1_2_bot, &postamble_2_1_2_bot };
 
 #define tgrp_case_2_1_3 test_group_3
+#define numb_case_2_1_3 "2.1.3"
 #define name_case_2_1_3 "Unsuccessful bind operation -- TADDRBUSY error"
 #define desc_case_2_1_3 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_3_top(int child)
+
+int test_case_2_1_3_top(int child)
 {
-	return test_2_1_x_top(child, TADDRBUSY);
+	return test_case_2_1_x_top(child, TADDRBUSY);
 }
-static int test_2_1_3_bot(int child)
+
+int test_case_2_1_3_bot(int child)
 {
-	return test_2_1_x_bot(child, TADDRBUSY);
+	return test_case_2_1_x_bot(child, TADDRBUSY);
 }
-static struct test_stream test_case_2_1_3_top = { &preamble_1_top, &test_2_1_3_top, &postamble_1_top };
-static struct test_stream test_case_2_1_3_bot = { &preamble_1_bot, &test_2_1_3_bot, &postamble_1_bot };
-#define test_case_2_1_3_stream_top (&test_case_2_1_3_top)
-#define test_case_2_1_3_stream_bot (&test_case_2_1_3_bot)
+
+#define preamble_2_1_3_top preamble_1_top
+#define preamble_2_1_3_bot preamble_1_bot
+
+#define postamble_2_1_3_top postamble_1_top
+#define postamble_2_1_3_bot postamble_1_bot
+
+static struct test_stream test_2_1_3_top = { &preamble_2_1_3_top, &test_case_2_1_3_top, &postamble_2_1_3_top };
+static struct test_stream test_2_1_3_bot = { &preamble_2_1_3_bot, &test_case_2_1_3_bot, &postamble_2_1_3_bot };
 
 #define tgrp_case_2_1_4 test_group_3
+#define numb_case_2_1_4 "2.1.4"
 #define name_case_2_1_4 "Unsuccessful bind operation -- TBADADDR error"
 #define desc_case_2_1_4 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_4_top(int child)
+
+int test_case_2_1_4_top(int child)
 {
-	return test_2_1_x_top(child, TBADADDR);
+	return test_case_2_1_x_top(child, TBADADDR);
 }
-static int test_2_1_4_bot(int child)
+
+int test_case_2_1_4_bot(int child)
 {
-	return test_2_1_x_bot(child, TBADADDR);
+	return test_case_2_1_x_bot(child, TBADADDR);
 }
-static struct test_stream test_case_2_1_4_top = { &preamble_1_top, &test_2_1_4_top, &postamble_1_top };
-static struct test_stream test_case_2_1_4_bot = { &preamble_1_bot, &test_2_1_4_bot, &postamble_1_bot };
-#define test_case_2_1_4_stream_top (&test_case_2_1_4_top)
-#define test_case_2_1_4_stream_bot (&test_case_2_1_4_bot)
+
+#define preamble_2_1_4_top preamble_1_top
+#define preamble_2_1_4_bot preamble_1_bot
+
+#define postamble_2_1_4_top postamble_1_top
+#define postamble_2_1_4_bot postamble_1_bot
+
+static struct test_stream test_2_1_4_top = { &preamble_2_1_4_top, &test_case_2_1_4_top, &postamble_2_1_4_top };
+static struct test_stream test_2_1_4_bot = { &preamble_2_1_4_bot, &test_case_2_1_4_bot, &postamble_2_1_4_bot };
 
 #define tgrp_case_2_1_5 test_group_3
+#define numb_case_2_1_5 "2.1.5"
 #define name_case_2_1_5 "Unsuccessful bind operation -- TOUTSTATE error"
 #define desc_case_2_1_5 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_5_top(int child)
+
+int test_case_2_1_5_top(int child)
 {
-	return test_2_1_x_top(child, TOUTSTATE);
+	return test_case_2_1_x_top(child, TOUTSTATE);
 }
-static int test_2_1_5_bot(int child)
+
+int test_case_2_1_5_bot(int child)
 {
-	return test_2_1_x_bot(child, TOUTSTATE);
+	return test_case_2_1_x_bot(child, TOUTSTATE);
 }
-static struct test_stream test_case_2_1_5_top = { &preamble_1_top, &test_2_1_5_top, &postamble_1_top };
-static struct test_stream test_case_2_1_5_bot = { &preamble_1_bot, &test_2_1_5_bot, &postamble_1_bot };
-#define test_case_2_1_5_stream_top (&test_case_2_1_5_top)
-#define test_case_2_1_5_stream_bot (&test_case_2_1_5_bot)
+
+#define preamble_2_1_5_top preamble_1_top
+#define preamble_2_1_5_bot preamble_1_bot
+
+#define postamble_2_1_5_top postamble_1_top
+#define postamble_2_1_5_bot postamble_1_bot
+
+static struct test_stream test_2_1_5_top = { &preamble_2_1_5_top, &test_case_2_1_5_top, &postamble_2_1_5_top };
+static struct test_stream test_2_1_5_bot = { &preamble_2_1_5_bot, &test_case_2_1_5_bot, &postamble_2_1_5_bot };
 
 #define tgrp_case_2_1_6 test_group_3
+#define numb_case_2_1_6 "2.1.6"
 #define name_case_2_1_6 "Unsuccessful bind operation -- TNOADDR error"
 #define desc_case_2_1_6 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_6_top(int child)
+
+int test_case_2_1_6_top(int child)
 {
-	return test_2_1_x_top(child, TNOADDR);
+	return test_case_2_1_x_top(child, TNOADDR);
 }
-static int test_2_1_6_bot(int child)
+
+int test_case_2_1_6_bot(int child)
 {
-	return test_2_1_x_bot(child, TNOADDR);
+	return test_case_2_1_x_bot(child, TNOADDR);
 }
-static struct test_stream test_case_2_1_6_top = { &preamble_1_top, &test_2_1_6_top, &postamble_1_top };
-static struct test_stream test_case_2_1_6_bot = { &preamble_1_bot, &test_2_1_6_bot, &postamble_1_bot };
-#define test_case_2_1_6_stream_top (&test_case_2_1_6_top)
-#define test_case_2_1_6_stream_bot (&test_case_2_1_6_bot)
+
+#define preamble_2_1_6_top preamble_1_top
+#define preamble_2_1_6_bot preamble_1_bot
+
+#define postamble_2_1_6_top postamble_1_top
+#define postamble_2_1_6_bot postamble_1_bot
+
+static struct test_stream test_2_1_6_top = { &preamble_2_1_6_top, &test_case_2_1_6_top, &postamble_2_1_6_top };
+static struct test_stream test_2_1_6_bot = { &preamble_2_1_6_bot, &test_case_2_1_6_bot, &postamble_2_1_6_bot };
 
 #define tgrp_case_2_1_7 test_group_3
+#define numb_case_2_1_7 "2.1.7"
 #define name_case_2_1_7 "Unsuccessful bind operation -- TOUTSTATE error"
 #define desc_case_2_1_7 "\
 This test case test unsuccessful bind of the XTI stream."
-static int test_2_1_7_top(int child)
+
+int test_case_2_1_7_top(int child)
 {
-	return test_2_1_x_top(child, TOUTSTATE);
+	return test_case_2_1_x_top(child, TOUTSTATE);
 }
-static int test_2_1_7_bot(int child)
+
+int test_case_2_1_7_bot(int child)
 {
-	return test_2_1_x_bot(child, TOUTSTATE);
+	return test_case_2_1_x_bot(child, TOUTSTATE);
 }
-static struct test_stream test_case_2_1_7_top = { &preamble_1_top, &test_2_1_7_top, &postamble_1_top };
-static struct test_stream test_case_2_1_7_bot = { &preamble_1_bot, &test_2_1_7_bot, &postamble_1_bot };
-#define test_case_2_1_7_stream_top (&test_case_2_1_7_top)
-#define test_case_2_1_7_stream_bot (&test_case_2_1_7_bot)
+
+#define preamble_2_1_7_top preamble_1_top
+#define preamble_2_1_7_bot preamble_1_bot
+
+#define postamble_2_1_7_top postamble_1_top
+#define postamble_2_1_7_bot postamble_1_bot
+
+static struct test_stream test_2_1_7_top = { &preamble_2_1_7_top, &test_case_2_1_7_top, &postamble_2_1_7_top };
+static struct test_stream test_2_1_7_bot = { &preamble_2_1_7_bot, &test_case_2_1_7_bot, &postamble_2_1_7_bot };
 
 #define tgrp_case_2_1_8 test_group_3
+#define numb_case_2_1_8 "2.1.8"
 #define name_case_2_1_8 "Unsuccessful bind operation -- double bind error"
 #define desc_case_2_1_8 "\
 This test case tests unsuccessful bind of the XTI stream."
-static int test_2_1_8_top(int child)
+
+int test_case_2_1_8_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5077,7 +5676,8 @@ static int test_2_1_8_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_1_8_bot(int child)
+
+int test_case_2_1_8_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5102,16 +5702,23 @@ static int test_2_1_8_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_1_8_top = { &preamble_1_top, &test_2_1_8_top, &postamble_1_top };
-static struct test_stream test_case_2_1_8_bot = { &preamble_1_bot, &test_2_1_8_bot, &postamble_1_bot };
-#define test_case_2_1_8_stream_top (&test_case_2_1_8_top)
-#define test_case_2_1_8_stream_bot (&test_case_2_1_8_bot)
+
+#define preamble_2_1_8_top preamble_1_top
+#define preamble_2_1_8_bot preamble_1_bot
+
+#define postamble_2_1_8_top postamble_1_top
+#define postamble_2_1_8_bot postamble_1_bot
+
+static struct test_stream test_2_1_8_top = { &preamble_2_1_8_top, &test_case_2_1_8_top, &postamble_2_1_8_top };
+static struct test_stream test_2_1_8_bot = { &preamble_2_1_8_bot, &test_case_2_1_8_bot, &postamble_2_1_8_bot };
 
 #define tgrp_case_2_2 test_group_3
+#define numb_case_2_2 "2.2"
 #define name_case_2_2 "Successful bind and unbind operation"
 #define desc_case_2_2 "\
 This test case tests successful bind and unbind of the XTI stream."
-static int test_2_2_top(int child)
+
+int test_case_2_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5121,7 +5728,8 @@ static int test_2_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_2_bot(int child)
+
+int test_case_2_2_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5141,17 +5749,24 @@ static int test_2_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_2_top = { &preamble_1_top, &test_2_2_top, &postamble_1_top };
-static struct test_stream test_case_2_2_bot = { &preamble_1_bot, &test_2_2_bot, &postamble_1_bot };
-#define test_case_2_2_stream_top (&test_case_2_2_top)
-#define test_case_2_2_stream_bot (&test_case_2_2_bot)
+
+#define preamble_2_2_top preamble_1_top
+#define preamble_2_2_bot preamble_1_bot
+
+#define postamble_2_2_top postamble_1_top
+#define postamble_2_2_bot postamble_1_bot
+
+static struct test_stream test_2_2_top = { &preamble_2_2_top, &test_case_2_2_top, &postamble_2_2_top };
+static struct test_stream test_2_2_bot = { &preamble_2_2_bot, &test_case_2_2_bot, &postamble_2_2_bot };
 
 #define test_group_4 "Connecting to an address"
 #define tgrp_case_2_3_1 test_group_4
+#define numb_case_2_3_1 "2.3.1"
 #define name_case_2_3_1 "Successful connect and disconnect operation -- immediate confirmation, synchronous mode"
 #define desc_case_2_3_1 "\
 This test case tests successful connect and disconnect of the XTI stream."
-static int test_2_3_1_top(int child)
+
+int test_case_2_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5161,7 +5776,8 @@ static int test_2_3_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_3_1_bot(int child)
+
+int test_case_2_3_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5184,16 +5800,23 @@ static int test_2_3_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_3_1_top = { &preamble_2_top, &test_2_3_1_top, &postamble_2_top };
-static struct test_stream test_case_2_3_1_bot = { &preamble_2_bot, &test_2_3_1_bot, &postamble_2_bot };
-#define test_case_2_3_1_stream_top (&test_case_2_3_1_top)
-#define test_case_2_3_1_stream_bot (&test_case_2_3_1_bot)
+
+#define preamble_2_3_1_top preamble_2_top
+#define preamble_2_3_1_bot preamble_2_bot
+
+#define postamble_2_3_1_top postamble_2_top
+#define postamble_2_3_1_bot postamble_2_bot
+
+static struct test_stream test_2_3_1_top = { &preamble_2_3_1_top, &test_case_2_3_1_top, &postamble_2_3_1_top };
+static struct test_stream test_2_3_1_bot = { &preamble_2_3_1_bot, &test_case_2_3_1_bot, &postamble_2_3_1_bot };
 
 #define tgrp_case_2_3_2 test_group_4
+#define numb_case_2_3_2 "2.3.2"
 #define name_case_2_3_2 "Successful connect and disconnect operation -- delayed confirmation, synchronous mode"
 #define desc_case_2_3_2 "\
 This test case tests successful connect and disconnect of the XTI stream."
-static int test_2_3_2_top(int child)
+
+int test_case_2_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5203,7 +5826,8 @@ static int test_2_3_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_3_2_bot(int child)
+
+int test_case_2_3_2_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5231,16 +5855,23 @@ static int test_2_3_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_3_2_top = { &preamble_2_top, &test_2_3_2_top, &postamble_2_top };
-static struct test_stream test_case_2_3_2_bot = { &preamble_2_bot, &test_2_3_2_bot, &postamble_2_bot };
-#define test_case_2_3_2_stream_top (&test_case_2_3_2_top)
-#define test_case_2_3_2_stream_bot (&test_case_2_3_2_bot)
+
+#define preamble_2_3_2_top preamble_2_top
+#define preamble_2_3_2_bot preamble_2_bot
+
+#define postamble_2_3_2_top postamble_2_top
+#define postamble_2_3_2_bot postamble_2_bot
+
+static struct test_stream test_2_3_2_top = { &preamble_2_3_2_top, &test_case_2_3_2_top, &postamble_2_3_2_top };
+static struct test_stream test_2_3_2_bot = { &preamble_2_3_2_bot, &test_case_2_3_2_bot, &postamble_2_3_2_bot };
 
 #define tgrp_case_2_3_3 test_group_4
+#define numb_case_2_3_3 "2.3.3"
 #define name_case_2_3_3 "Successful connect and disconnect operation -- delayed confirmation, asynchronous mode"
 #define desc_case_2_3_3 "\
 This test case tests successful connect and disconnect of the XTI stream."
-static int test_2_3_3_top(int child)
+
+int test_case_2_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5263,7 +5894,8 @@ static int test_2_3_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_3_3_bot(int child)
+
+int test_case_2_3_3_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5291,24 +5923,32 @@ static int test_2_3_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_3_3_top = { &preamble_2_top, &test_2_3_3_top, &postamble_2_top };
-static struct test_stream test_case_2_3_3_bot = { &preamble_2_bot, &test_2_3_3_bot, &postamble_2_bot };
-#define test_case_2_3_3_stream_top (&test_case_2_3_3_top)
-#define test_case_2_3_3_stream_bot (&test_case_2_3_3_bot)
+
+#define preamble_2_3_3_top preamble_2_top
+#define preamble_2_3_3_bot preamble_2_bot
+
+#define postamble_2_3_3_top postamble_2_top
+#define postamble_2_3_3_bot postamble_2_bot
+
+static struct test_stream test_2_3_3_top = { &preamble_2_3_3_top, &test_case_2_3_3_top, &postamble_2_3_3_top };
+static struct test_stream test_2_3_3_bot = { &preamble_2_3_3_bot, &test_case_2_3_3_bot, &postamble_2_3_3_bot };
 
 #define tgrp_case_2_3_4 test_group_4
+#define numb_case_2_3_4 "2.3.4"
 #define name_case_2_3_4 "Unsuccessful connect operation -- TACCES error"
 #define desc_case_2_3_4 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TACCES error."
-static int test_2_3_x_top(int child, int terror)
+
+int test_case_2_3_x_top(int child, int terror)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS || last_t_errno != terror)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_3_x_bot(int child, int terror)
+
+int test_case_2_3_x_bot(int child, int terror)
 {
 	start_tt(200);
 	state++;
@@ -5322,116 +5962,165 @@ static int test_2_3_x_bot(int child, int terror)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_3_4_top(int child)
+
+int test_case_2_3_4_top(int child)
 {
-	return test_2_3_x_top(child, TACCES);
+	return test_case_2_3_x_top(child, TACCES);
 }
-static int test_2_3_4_bot(int child)
+
+int test_case_2_3_4_bot(int child)
 {
-	return test_2_3_x_bot(child, TACCES);
+	return test_case_2_3_x_bot(child, TACCES);
 }
-static struct test_stream test_case_2_3_4_top = { &preamble_2_top, &test_2_3_4_top, &postamble_2_top };
-static struct test_stream test_case_2_3_4_bot = { &preamble_2_bot, &test_2_3_4_bot, &postamble_2_bot };
-#define test_case_2_3_4_stream_top (&test_case_2_3_4_top)
-#define test_case_2_3_4_stream_bot (&test_case_2_3_4_bot)
+
+#define preamble_2_3_4_top preamble_2_top
+#define preamble_2_3_4_bot preamble_2_bot
+
+#define postamble_2_3_4_top postamble_2_top
+#define postamble_2_3_4_bot postamble_2_bot
+
+static struct test_stream test_2_3_4_top = { &preamble_2_3_4_top, &test_case_2_3_4_top, &postamble_2_3_4_top };
+static struct test_stream test_2_3_4_bot = { &preamble_2_3_4_bot, &test_case_2_3_4_bot, &postamble_2_3_4_bot };
 
 #define tgrp_case_2_3_5 test_group_4
+#define numb_case_2_3_5 "2.3.5"
 #define name_case_2_3_5 "Unsuccessful connect operation -- TADDRBUSY error"
 #define desc_case_2_3_5 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TADDRBUSY error."
-static int test_2_3_5_top(int child)
+
+int test_case_2_3_5_top(int child)
 {
-	return test_2_3_x_top(child, TADDRBUSY);
+	return test_case_2_3_x_top(child, TADDRBUSY);
 }
-static int test_2_3_5_bot(int child)
+
+int test_case_2_3_5_bot(int child)
 {
-	return test_2_3_x_bot(child, TADDRBUSY);
+	return test_case_2_3_x_bot(child, TADDRBUSY);
 }
-static struct test_stream test_case_2_3_5_top = { &preamble_2_top, &test_2_3_5_top, &postamble_2_top };
-static struct test_stream test_case_2_3_5_bot = { &preamble_2_bot, &test_2_3_5_bot, &postamble_2_bot };
-#define test_case_2_3_5_stream_top (&test_case_2_3_5_top)
-#define test_case_2_3_5_stream_bot (&test_case_2_3_5_bot)
+
+#define preamble_2_3_5_top preamble_2_top
+#define preamble_2_3_5_bot preamble_2_bot
+
+#define postamble_2_3_5_top postamble_2_top
+#define postamble_2_3_5_bot postamble_2_bot
+
+static struct test_stream test_2_3_5_top = { &preamble_2_3_5_top, &test_case_2_3_5_top, &postamble_2_3_5_top };
+static struct test_stream test_2_3_5_bot = { &preamble_2_3_5_bot, &test_case_2_3_5_bot, &postamble_2_3_5_bot };
 
 #define tgrp_case_2_3_6 test_group_4
+#define numb_case_2_3_6 "2.3.6"
 #define name_case_2_3_6 "Unsuccessful connect operation -- TBADADDR error"
 #define desc_case_2_3_6 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TBADADDR error."
-static int test_2_3_6_top(int child)
+
+int test_case_2_3_6_top(int child)
 {
-	return test_2_3_x_top(child, TBADADDR);
+	return test_case_2_3_x_top(child, TBADADDR);
 }
-static int test_2_3_6_bot(int child)
+
+int test_case_2_3_6_bot(int child)
 {
-	return test_2_3_x_bot(child, TBADADDR);
+	return test_case_2_3_x_bot(child, TBADADDR);
 }
-static struct test_stream test_case_2_3_6_top = { &preamble_2_top, &test_2_3_6_top, &postamble_2_top };
-static struct test_stream test_case_2_3_6_bot = { &preamble_2_bot, &test_2_3_6_bot, &postamble_2_bot };
-#define test_case_2_3_6_stream_top (&test_case_2_3_6_top)
-#define test_case_2_3_6_stream_bot (&test_case_2_3_6_bot)
+
+#define preamble_2_3_6_top preamble_2_top
+#define preamble_2_3_6_bot preamble_2_bot
+
+#define postamble_2_3_6_top postamble_2_top
+#define postamble_2_3_6_bot postamble_2_bot
+
+static struct test_stream test_2_3_6_top = { &preamble_2_3_6_top, &test_case_2_3_6_top, &postamble_2_3_6_top };
+static struct test_stream test_2_3_6_bot = { &preamble_2_3_6_bot, &test_case_2_3_6_bot, &postamble_2_3_6_bot };
 
 #define tgrp_case_2_3_7 test_group_4
+#define numb_case_2_3_7 "2.3.7"
 #define name_case_2_3_7 "Unsuccessful connect operation -- TBADOPT error"
 #define desc_case_2_3_7 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TBADOPT error."
-static int test_2_3_7_top(int child)
+
+int test_case_2_3_7_top(int child)
 {
-	return test_2_3_x_top(child, TBADOPT);
+	return test_case_2_3_x_top(child, TBADOPT);
 }
-static int test_2_3_7_bot(int child)
+
+int test_case_2_3_7_bot(int child)
 {
-	return test_2_3_x_bot(child, TBADOPT);
+	return test_case_2_3_x_bot(child, TBADOPT);
 }
-static struct test_stream test_case_2_3_7_top = { &preamble_2_top, &test_2_3_7_top, &postamble_2_top };
-static struct test_stream test_case_2_3_7_bot = { &preamble_2_bot, &test_2_3_7_bot, &postamble_2_bot };
-#define test_case_2_3_7_stream_top (&test_case_2_3_7_top)
-#define test_case_2_3_7_stream_bot (&test_case_2_3_7_bot)
+
+#define preamble_2_3_7_top preamble_2_top
+#define preamble_2_3_7_bot preamble_2_bot
+
+#define postamble_2_3_7_top postamble_2_top
+#define postamble_2_3_7_bot postamble_2_bot
+
+static struct test_stream test_2_3_7_top = { &preamble_2_3_7_top, &test_case_2_3_7_top, &postamble_2_3_7_top };
+static struct test_stream test_2_3_7_bot = { &preamble_2_3_7_bot, &test_case_2_3_7_bot, &postamble_2_3_7_bot };
 
 #define tgrp_case_2_3_8 test_group_4
+#define numb_case_2_3_8 "2.3.8"
 #define name_case_2_3_8 "Unsuccessful connect operation -- TNOTSUPPORT error"
 #define desc_case_2_3_8 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TNOTSUPPORT error."
-static int test_2_3_8_top(int child)
+
+int test_case_2_3_8_top(int child)
 {
-	return test_2_3_x_top(child, TNOTSUPPORT);
+	return test_case_2_3_x_top(child, TNOTSUPPORT);
 }
-static int test_2_3_8_bot(int child)
+
+int test_case_2_3_8_bot(int child)
 {
-	return test_2_3_x_bot(child, TNOTSUPPORT);
+	return test_case_2_3_x_bot(child, TNOTSUPPORT);
 }
-static struct test_stream test_case_2_3_8_top = { &preamble_2_top, &test_2_3_8_top, &postamble_2_top };
-static struct test_stream test_case_2_3_8_bot = { &preamble_2_bot, &test_2_3_8_bot, &postamble_2_bot };
-#define test_case_2_3_8_stream_top (&test_case_2_3_8_top)
-#define test_case_2_3_8_stream_bot (&test_case_2_3_8_bot)
+
+#define preamble_2_3_8_top preamble_2_top
+#define preamble_2_3_8_bot preamble_2_bot
+
+#define postamble_2_3_8_top postamble_2_top
+#define postamble_2_3_8_bot postamble_2_bot
+
+static struct test_stream test_2_3_8_top = { &preamble_2_3_8_top, &test_case_2_3_8_top, &postamble_2_3_8_top };
+static struct test_stream test_2_3_8_bot = { &preamble_2_3_8_bot, &test_case_2_3_8_bot, &postamble_2_3_8_bot };
 
 #define tgrp_case_2_3_9 test_group_4
+#define numb_case_2_3_9 "2.3.9"
 #define name_case_2_3_9 "Unsuccessful connect operation -- TOUTSTATE error"
 #define desc_case_2_3_9 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TOUTSTATE error."
-static int test_2_3_9_top(int child)
+
+int test_case_2_3_9_top(int child)
 {
-	return test_2_3_x_top(child, TOUTSTATE);
+	return test_case_2_3_x_top(child, TOUTSTATE);
 }
-static int test_2_3_9_bot(int child)
+
+int test_case_2_3_9_bot(int child)
 {
-	return test_2_3_x_bot(child, TOUTSTATE);
+	return test_case_2_3_x_bot(child, TOUTSTATE);
 }
-static struct test_stream test_case_2_3_9_top = { &preamble_2_top, &test_2_3_9_top, &postamble_2_top };
-static struct test_stream test_case_2_3_9_bot = { &preamble_2_bot, &test_2_3_9_bot, &postamble_2_bot };
-#define test_case_2_3_9_stream_top (&test_case_2_3_9_top)
-#define test_case_2_3_9_stream_bot (&test_case_2_3_9_bot)
+
+#define preamble_2_3_9_top preamble_2_top
+#define preamble_2_3_9_bot preamble_2_bot
+
+#define postamble_2_3_9_top postamble_2_top
+#define postamble_2_3_9_bot postamble_2_bot
+
+static struct test_stream test_2_3_9_top = { &preamble_2_3_9_top, &test_case_2_3_9_top, &postamble_2_3_9_top };
+static struct test_stream test_2_3_9_bot = { &preamble_2_3_9_bot, &test_case_2_3_9_bot, &postamble_2_3_9_bot };
 
 #define test_group_5 "Connection from an address"
 #define tgrp_case_2_4_1 test_group_5
+#define numb_case_2_4_1 "2.4.1"
 #define name_case_2_4_1 "Successful connection and disconnection operation -- synchronous mode"
 #define desc_case_2_4_1 "\
 This test case tests successful incoming connection and disconnection of\n\
 the XTI stream."
-static int test_2_4_1_top(int child)
+
+int test_case_2_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5441,7 +6130,8 @@ static int test_2_4_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_4_1_bot(int child)
+
+int test_case_2_4_1_bot(int child)
 {
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5456,18 +6146,25 @@ static int test_2_4_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_4_1_top = { &preamble_2_top, &test_2_4_1_top, &postamble_2_top };
-static struct test_stream test_case_2_4_1_bot = { &preamble_2_bot, &test_2_4_1_bot, &postamble_2_bot };
-#define test_case_2_4_1_stream_top (&test_case_2_4_1_top)
-#define test_case_2_4_1_stream_bot (&test_case_2_4_1_bot)
+
+#define preamble_2_4_1_top preamble_2_top
+#define preamble_2_4_1_bot preamble_2_bot
+
+#define postamble_2_4_1_top postamble_2_top
+#define postamble_2_4_1_bot postamble_2_bot
+
+static struct test_stream test_2_4_1_top = { &preamble_2_4_1_top, &test_case_2_4_1_top, &postamble_2_4_1_top };
+static struct test_stream test_2_4_1_bot = { &preamble_2_4_1_bot, &test_case_2_4_1_bot, &postamble_2_4_1_bot };
 
 #define test_group_6 "Connection collision"
 #define tgrp_case_2_5_1 test_group_6
+#define numb_case_2_5_1 "2.5.1"
 #define name_case_2_5_1 "Incoming connection before outgoing"
 #define desc_case_2_5_1 "\
 This test case tests unsuccessful outgoing connection due to incoming\n\
 connection indication on an XTI stream."
-static int test_2_5_1_top(int child)
+
+int test_case_2_5_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -5500,7 +6197,8 @@ static int test_2_5_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_2_5_1_bot(int child)
+
+int test_case_2_5_1_bot(int child)
 {
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5530,18 +6228,25 @@ static int test_2_5_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_2_5_1_top = { &preamble_2_top, &test_2_5_1_top, &postamble_2_top };
-static struct test_stream test_case_2_5_1_bot = { &preamble_2_bot, &test_2_5_1_bot, &postamble_2_bot };
-#define test_case_2_5_1_stream_top (&test_case_2_5_1_top)
-#define test_case_2_5_1_stream_bot (&test_case_2_5_1_bot)
+
+#define preamble_2_5_1_top preamble_2_top
+#define preamble_2_5_1_bot preamble_2_bot
+
+#define postamble_2_5_1_top postamble_2_top
+#define postamble_2_5_1_bot postamble_2_bot
+
+static struct test_stream test_2_5_1_top = { &preamble_2_5_1_top, &test_case_2_5_1_top, &postamble_2_5_1_top };
+static struct test_stream test_2_5_1_bot = { &preamble_2_5_1_bot, &test_case_2_5_1_bot, &postamble_2_5_1_bot };
 
 #define test_group_7 "t_look response to events"
 #define tgrp_case_3_1_1 test_group_7
+#define numb_case_3_1_1 "3.1.1"
 #define name_case_3_1_1 "T_CONN_IND event"
 #define desc_case_3_1_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_CONN_IND TPI event."
-static int test_3_1_1_top(int child)
+
+int test_case_3_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5573,7 +6278,8 @@ static int test_3_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_1_1_bot(int child)
+
+int test_case_3_1_1_bot(int child)
 {
 	start_tt(50);
 	state++;
@@ -5593,17 +6299,24 @@ static int test_3_1_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_1_1_top = { &preamble_2_top, &test_3_1_1_top, &postamble_2_top };
-static struct test_stream test_case_3_1_1_bot = { &preamble_2_bot, &test_3_1_1_bot, &postamble_2_bot };
-#define test_case_3_1_1_stream_top (&test_case_3_1_1_top)
-#define test_case_3_1_1_stream_bot (&test_case_3_1_1_bot)
+
+#define preamble_3_1_1_top preamble_2_top
+#define preamble_3_1_1_bot preamble_2_bot
+
+#define postamble_3_1_1_top postamble_2_top
+#define postamble_3_1_1_bot postamble_2_bot
+
+static struct test_stream test_3_1_1_top = { &preamble_3_1_1_top, &test_case_3_1_1_top, &postamble_3_1_1_top };
+static struct test_stream test_3_1_1_bot = { &preamble_3_1_1_bot, &test_case_3_1_1_bot, &postamble_3_1_1_bot };
 
 #define tgrp_case_3_2_1 test_group_7
+#define numb_case_3_2_1 "3.2.1"
 #define name_case_3_2_1 "T_CONN_CON event"
 #define desc_case_3_2_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_CONN_CON TPI event."
-static int test_3_2_1_top(int child)
+
+int test_case_3_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5636,7 +6349,8 @@ static int test_3_2_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_2_1_bot(int child)
+
+int test_case_3_2_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5664,17 +6378,24 @@ static int test_3_2_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_2_1_top = { &preamble_2_top, &test_3_2_1_top, &postamble_2_top };
-static struct test_stream test_case_3_2_1_bot = { &preamble_2_bot, &test_3_2_1_bot, &postamble_2_bot };
-#define test_case_3_2_1_stream_top (&test_case_3_2_1_top)
-#define test_case_3_2_1_stream_bot (&test_case_3_2_1_bot)
+
+#define preamble_3_2_1_top preamble_2_top
+#define preamble_3_2_1_bot preamble_2_bot
+
+#define postamble_3_2_1_top postamble_2_top
+#define postamble_3_2_1_bot postamble_2_bot
+
+static struct test_stream test_3_2_1_top = { &preamble_3_2_1_top, &test_case_3_2_1_top, &postamble_3_2_1_top };
+static struct test_stream test_3_2_1_bot = { &preamble_3_2_1_bot, &test_case_3_2_1_bot, &postamble_3_2_1_bot };
 
 #define tgrp_case_3_3_1 test_group_7
+#define numb_case_3_3_1 "3.3.1"
 #define name_case_3_3_1 "T_DISCON_IND event"
 #define desc_case_3_3_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DISCON_IND TPI event."
-static int test_3_3_1_top(int child)
+
+int test_case_3_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5703,7 +6424,8 @@ static int test_3_3_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_3_1_bot(int child)
+
+int test_case_3_3_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5724,17 +6446,24 @@ static int test_3_3_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_3_1_top = { &preamble_2_top, &test_3_3_1_top, &postamble_2_top };
-static struct test_stream test_case_3_3_1_bot = { &preamble_2_bot, &test_3_3_1_bot, &postamble_2_bot };
-#define test_case_3_3_1_stream_top (&test_case_3_3_1_top)
-#define test_case_3_3_1_stream_bot (&test_case_3_3_1_bot)
+
+#define preamble_3_3_1_top preamble_2_top
+#define preamble_3_3_1_bot preamble_2_bot
+
+#define postamble_3_3_1_top postamble_2_top
+#define postamble_3_3_1_bot postamble_2_bot
+
+static struct test_stream test_3_3_1_top = { &preamble_3_3_1_top, &test_case_3_3_1_top, &postamble_3_3_1_top };
+static struct test_stream test_3_3_1_bot = { &preamble_3_3_1_bot, &test_case_3_3_1_bot, &postamble_3_3_1_bot };
 
 #define tgrp_case_3_4_1 test_group_7
+#define numb_case_3_4_1 "3.4.1"
 #define name_case_3_4_1 "T_ORDREL_IND event"
 #define desc_case_3_4_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_ORDREL_IND TPI event."
-static int test_3_4_1_top(int child)
+
+int test_case_3_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5776,7 +6505,8 @@ static int test_3_4_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_4_1_bot(int child)
+
+int test_case_3_4_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5798,24 +6528,31 @@ static int test_3_4_1_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(200);
+	start_tt(400);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_4_1_top = { &preamble_2_top, &test_3_4_1_top, &postamble_2_top };
-static struct test_stream test_case_3_4_1_bot = { &preamble_2_bot, &test_3_4_1_bot, &postamble_2_bot };
-#define test_case_3_4_1_stream_top (&test_case_3_4_1_top)
-#define test_case_3_4_1_stream_bot (&test_case_3_4_1_bot)
+
+#define preamble_3_4_1_top preamble_2_top
+#define preamble_3_4_1_bot preamble_2_bot
+
+#define postamble_3_4_1_top postamble_2_top
+#define postamble_3_4_1_bot postamble_2_bot
+
+static struct test_stream test_3_4_1_top = { &preamble_3_4_1_top, &test_case_3_4_1_top, &postamble_3_4_1_top };
+static struct test_stream test_3_4_1_bot = { &preamble_3_4_1_bot, &test_case_3_4_1_bot, &postamble_3_4_1_bot };
 
 #define tgrp_case_3_4_2 test_group_7
+#define numb_case_3_4_2 "3.4.2"
 #define name_case_3_4_2 "T_ORDREL_IND w/ DATA event"
 #define desc_case_3_4_2 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_ORDREL_IND w/ DATA TPI event."
-static int test_3_4_2_top(int child)
+
+int test_case_3_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5857,7 +6594,8 @@ static int test_3_4_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_4_2_bot(int child)
+
+int test_case_3_4_2_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5879,24 +6617,31 @@ static int test_3_4_2_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	start_tt(300);
+	start_tt(400);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_4_2_top = { &preamble_2_top, &test_3_4_2_top, &postamble_2_top };
-static struct test_stream test_case_3_4_2_bot = { &preamble_2_bot, &test_3_4_2_bot, &postamble_2_bot };
-#define test_case_3_4_2_stream_top (&test_case_3_4_2_top)
-#define test_case_3_4_2_stream_bot (&test_case_3_4_2_bot)
+
+#define preamble_3_4_2_top preamble_2_top
+#define preamble_3_4_2_bot preamble_2_bot
+
+#define postamble_3_4_2_top postamble_2_top
+#define postamble_3_4_2_bot postamble_2_bot
+
+static struct test_stream test_3_4_2_top = { &preamble_3_4_2_top, &test_case_3_4_2_top, &postamble_3_4_2_top };
+static struct test_stream test_3_4_2_bot = { &preamble_3_4_2_bot, &test_case_3_4_2_bot, &postamble_3_4_2_bot };
 
 #define tgrp_case_3_5_1 test_group_7
+#define numb_case_3_5_1 "3.5.1"
 #define name_case_3_5_1 "T_DATA_IND event -- t_rcv used as receive function"
 #define desc_case_3_5_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DATA_IND TPI event."
-static int test_3_5_1_top(int child)
+
+int test_case_3_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5927,7 +6672,8 @@ static int test_3_5_1_top(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-static int test_3_5_1_bot(int child)
+
+int test_case_3_5_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5941,17 +6687,24 @@ static int test_3_5_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_5_1_top = { &preamble_3_top, &test_3_5_1_top, &postamble_3_top };
-static struct test_stream test_case_3_5_1_bot = { &preamble_3_bot, &test_3_5_1_bot, &postamble_3_bot };
-#define test_case_3_5_1_stream_top (&test_case_3_5_1_top)
-#define test_case_3_5_1_stream_bot (&test_case_3_5_1_bot)
+
+#define preamble_3_5_1_top preamble_3_top
+#define preamble_3_5_1_bot preamble_3_bot
+
+#define postamble_3_5_1_top postamble_3_top
+#define postamble_3_5_1_bot postamble_3_bot
+
+static struct test_stream test_3_5_1_top = { &preamble_3_5_1_top, &test_case_3_5_1_top, &postamble_3_5_1_top };
+static struct test_stream test_3_5_1_bot = { &preamble_3_5_1_bot, &test_case_3_5_1_bot, &postamble_3_5_1_bot };
 
 #define tgrp_case_3_5_2 test_group_7
+#define numb_case_3_5_2 "3.5.2"
 #define name_case_3_5_2 "T_DATA_IND event -- t_rcvv used as receive function"
 #define desc_case_3_5_2 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DATA_IND TPI event."
-static int test_3_5_2_top(int child)
+
+int test_case_3_5_2_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -5982,7 +6735,8 @@ static int test_3_5_2_top(int child)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-static int test_3_5_2_bot(int child)
+
+int test_case_3_5_2_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -5996,17 +6750,24 @@ static int test_3_5_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_5_2_top = { &preamble_3_top, &test_3_5_2_top, &postamble_3_top };
-static struct test_stream test_case_3_5_2_bot = { &preamble_3_bot, &test_3_5_2_bot, &postamble_3_bot };
-#define test_case_3_5_2_stream_top (&test_case_3_5_2_top)
-#define test_case_3_5_2_stream_bot (&test_case_3_5_2_bot)
+
+#define preamble_3_5_2_top preamble_3_top
+#define preamble_3_5_2_bot preamble_3_bot
+
+#define postamble_3_5_2_top postamble_3_top
+#define postamble_3_5_2_bot postamble_3_bot
+
+static struct test_stream test_3_5_2_top = { &preamble_3_5_2_top, &test_case_3_5_2_top, &postamble_3_5_2_top };
+static struct test_stream test_3_5_2_bot = { &preamble_3_5_2_bot, &test_case_3_5_2_bot, &postamble_3_5_2_bot };
 
 #define tgrp_case_3_6_1 test_group_7
+#define numb_case_3_6_1 "3.6.1"
 #define name_case_3_6_1 "T_UNITDATA_IND event"
 #define desc_case_3_6_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_UNITDATA_IND TPI event."
-static int test_3_6_1_top(int child)
+
+int test_case_3_6_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6038,7 +6799,8 @@ static int test_3_6_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_6_1_bot(int child)
+
+int test_case_3_6_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -6052,17 +6814,24 @@ static int test_3_6_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_6_1_top = { &preamble_2cl_top, &test_3_6_1_top, &postamble_2cl_top };
-static struct test_stream test_case_3_6_1_bot = { &preamble_2cl_bot, &test_3_6_1_bot, &postamble_2cl_bot };
-#define test_case_3_6_1_stream_top (&test_case_3_6_1_top)
-#define test_case_3_6_1_stream_bot (&test_case_3_6_1_bot)
+
+#define preamble_3_6_1_top preamble_2cl_top
+#define preamble_3_6_1_bot preamble_2cl_bot
+
+#define postamble_3_6_1_top postamble_2cl_top
+#define postamble_3_6_1_bot postamble_2cl_bot
+
+static struct test_stream test_3_6_1_top = { &preamble_3_6_1_top, &test_case_3_6_1_top, &postamble_3_6_1_top };
+static struct test_stream test_3_6_1_bot = { &preamble_3_6_1_bot, &test_case_3_6_1_bot, &postamble_3_6_1_bot };
 
 #define tgrp_case_3_7_1 test_group_7
+#define numb_case_3_7_1 "3.7.1"
 #define name_case_3_7_1 "T_UDERROR_IND event"
 #define desc_case_3_7_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_UDERROR_IND TPI event."
-static int test_3_7_1_top(int child)
+
+int test_case_3_7_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6094,7 +6863,8 @@ static int test_3_7_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_3_7_1_bot(int child)
+
+int test_case_3_7_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -6108,18 +6878,25 @@ static int test_3_7_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_3_7_1_top = { &preamble_2cl_top, &test_3_7_1_top, &postamble_2cl_top };
-static struct test_stream test_case_3_7_1_bot = { &preamble_2cl_bot, &test_3_7_1_bot, &postamble_2cl_bot };
-#define test_case_3_7_1_stream_top (&test_case_3_7_1_top)
-#define test_case_3_7_1_stream_bot (&test_case_3_7_1_bot)
+
+#define preamble_3_7_1_top preamble_2cl_top
+#define preamble_3_7_1_bot preamble_2cl_bot
+
+#define postamble_3_7_1_top postamble_2cl_top
+#define postamble_3_7_1_bot postamble_2cl_bot
+
+static struct test_stream test_3_7_1_top = { &preamble_3_7_1_top, &test_case_3_7_1_top, &postamble_3_7_1_top };
+static struct test_stream test_3_7_1_bot = { &preamble_3_7_1_bot, &test_case_3_7_1_bot, &postamble_3_7_1_bot };
 
 #define test_group_8 "Asynchronous operation -- TLOOK response to various calls"
 #define tgrp_case_4_1_1 test_group_8
+#define numb_case_4_1_1 "4.1.1"
 #define name_case_4_1_1 "t_accept library call"
 #define desc_case_4_1_1 "\
 This test case tests the response of the t_accept library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_1_1_top(int child)
+
+int test_case_4_1_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6159,7 +6936,8 @@ static int test_4_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_1_1_bot(int child)
+
+int test_case_4_1_1_bot(int child)
 {
 	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -6193,17 +6971,24 @@ static int test_4_1_1_bot(int child)
 		}
 	}
 }
-static struct test_stream test_case_4_1_1_top = { &preamble_2_top, &test_4_1_1_top, &postamble_2_top };
-static struct test_stream test_case_4_1_1_bot = { &preamble_2_bot, &test_4_1_1_bot, &postamble_2_bot };
-#define test_case_4_1_1_stream_top (&test_case_4_1_1_top)
-#define test_case_4_1_1_stream_bot (&test_case_4_1_1_bot)
+
+#define preamble_4_1_1_top preamble_2_top
+#define preamble_4_1_1_bot preamble_2_bot
+
+#define postamble_4_1_1_top postamble_2_top
+#define postamble_4_1_1_bot postamble_2_bot
+
+static struct test_stream test_4_1_1_top = { &preamble_4_1_1_top, &test_case_4_1_1_top, &postamble_4_1_1_top };
+static struct test_stream test_4_1_1_bot = { &preamble_4_1_1_bot, &test_case_4_1_1_bot, &postamble_4_1_1_bot };
 
 #define tgrp_case_4_1_2 test_group_8
+#define numb_case_4_1_2 "4.1.2"
 #define name_case_4_1_2 "t_accept library call"
 #define desc_case_4_1_2 "\
 This test case tests the response of the t_accept library call to an\n\
 asynchronous T_LISTEN event."
-static int test_4_1_2_top(int child)
+
+int test_case_4_1_2_top(int child)
 {
 	int seq;
 	start_tt(200);
@@ -6245,7 +7030,8 @@ static int test_4_1_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_1_2_bot(int child)
+
+int test_case_4_1_2_bot(int child)
 {
 	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -6293,17 +7079,24 @@ static int test_4_1_2_bot(int child)
 		}
 	}
 }
-static struct test_stream test_case_4_1_2_top = { &preamble_2_top, &test_4_1_2_top, &postamble_2_top };
-static struct test_stream test_case_4_1_2_bot = { &preamble_2_bot, &test_4_1_2_bot, &postamble_2_bot };
-#define test_case_4_1_2_stream_top (&test_case_4_1_2_top)
-#define test_case_4_1_2_stream_bot (&test_case_4_1_2_bot)
+
+#define preamble_4_1_2_top preamble_2_top
+#define preamble_4_1_2_bot preamble_2_bot
+
+#define postamble_4_1_2_top postamble_2_top
+#define postamble_4_1_2_bot postamble_2_bot
+
+static struct test_stream test_4_1_2_top = { &preamble_4_1_2_top, &test_case_4_1_2_top, &postamble_4_1_2_top };
+static struct test_stream test_4_1_2_bot = { &preamble_4_1_2_bot, &test_case_4_1_2_bot, &postamble_4_1_2_bot };
 
 #define tgrp_case_4_2_1 test_group_8
+#define numb_case_4_2_1 "4.2.1"
 #define name_case_4_2_1 "t_connect library call"
 #define desc_case_4_2_1 "\
 This test case tests the response of the t_connect library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_2_1_top(int child)
+
+int test_case_4_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6322,7 +7115,8 @@ static int test_4_2_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_2_1_bot(int child)
+
+int test_case_4_2_1_bot(int child)
 {
 	start_tt(500);
 	state++;
@@ -6337,17 +7131,24 @@ static int test_4_2_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_2_1_top = { &preamble_2_top, &test_4_2_1_top, &postamble_2_top };
-static struct test_stream test_case_4_2_1_bot = { &preamble_2_bot, &test_4_2_1_bot, &postamble_2_bot };
-#define test_case_4_2_1_stream_top (&test_case_4_2_1_top)
-#define test_case_4_2_1_stream_bot (&test_case_4_2_1_bot)
+
+#define preamble_4_2_1_top preamble_2_top
+#define preamble_4_2_1_bot preamble_2_bot
+
+#define postamble_4_2_1_top postamble_2_top
+#define postamble_4_2_1_bot postamble_2_bot
+
+static struct test_stream test_4_2_1_top = { &preamble_4_2_1_top, &test_case_4_2_1_top, &postamble_4_2_1_top };
+static struct test_stream test_4_2_1_bot = { &preamble_4_2_1_bot, &test_case_4_2_1_bot, &postamble_4_2_1_bot };
 
 #define tgrp_case_4_2_2 test_group_8
+#define numb_case_4_2_2 "4.2.2"
 #define name_case_4_2_2 "t_connect library call"
 #define desc_case_4_2_2 "\
 This test case tests the response of the t_connect library call to an\n\
 asynchronous T_LISTEN event."
-static int test_4_2_2_top(int child)
+
+int test_case_4_2_2_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6376,7 +7177,8 @@ static int test_4_2_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_2_2_bot(int child)
+
+int test_case_4_2_2_bot(int child)
 {
 	int begstate = state;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -6411,17 +7213,24 @@ static int test_4_2_2_bot(int child)
 		}
 	}
 }
-static struct test_stream test_case_4_2_2_top = { &preamble_2_top, &test_4_2_2_top, &postamble_2_top };
-static struct test_stream test_case_4_2_2_bot = { &preamble_2_bot, &test_4_2_2_bot, &postamble_2_bot };
-#define test_case_4_2_2_stream_top (&test_case_4_2_2_top)
-#define test_case_4_2_2_stream_bot (&test_case_4_2_2_bot)
+
+#define preamble_4_2_2_top preamble_2_top
+#define preamble_4_2_2_bot preamble_2_bot
+
+#define postamble_4_2_2_top postamble_2_top
+#define postamble_4_2_2_bot postamble_2_bot
+
+static struct test_stream test_4_2_2_top = { &preamble_4_2_2_top, &test_case_4_2_2_top, &postamble_4_2_2_top };
+static struct test_stream test_4_2_2_bot = { &preamble_4_2_2_bot, &test_case_4_2_2_bot, &postamble_4_2_2_bot };
 
 #define tgrp_case_4_3_1 test_group_8
+#define numb_case_4_3_1 "4.3.1"
 #define name_case_4_3_1 "t_listen library call"
 #define desc_case_4_3_1 "\
 This test case tests the response of the t_listen library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_3_1_top(int child)
+
+int test_case_4_3_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6450,7 +7259,8 @@ static int test_4_3_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_3_1_bot(int child)
+
+int test_case_4_3_1_bot(int child)
 {
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6460,17 +7270,24 @@ static int test_4_3_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_3_1_top = { &preamble_2_top, &test_4_3_1_top, &postamble_2_top };
-static struct test_stream test_case_4_3_1_bot = { &preamble_2_bot, &test_4_3_1_bot, &postamble_2_bot };
-#define test_case_4_3_1_stream_top (&test_case_4_3_1_top)
-#define test_case_4_3_1_stream_bot (&test_case_4_3_1_bot)
+
+#define preamble_4_3_1_top preamble_2_top
+#define preamble_4_3_1_bot preamble_2_bot
+
+#define postamble_4_3_1_top postamble_2_top
+#define postamble_4_3_1_bot postamble_2_bot
+
+static struct test_stream test_4_3_1_top = { &preamble_4_3_1_top, &test_case_4_3_1_top, &postamble_4_3_1_top };
+static struct test_stream test_4_3_1_bot = { &preamble_4_3_1_bot, &test_case_4_3_1_bot, &postamble_4_3_1_bot };
 
 #define tgrp_case_4_4_1 test_group_8
+#define numb_case_4_4_1 "4.4.1"
 #define name_case_4_4_1 "t_rcv library call"
 #define desc_case_4_4_1 "\
 This test case tests the response of the t_rcv library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_4_1_top(int child)
+
+int test_case_4_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6489,24 +7306,32 @@ static int test_4_4_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_1_bot(int child)
+
+int test_case_4_4_1_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_1_top = { &preamble_3_top, &test_4_4_1_top, &postamble_2_top };
-static struct test_stream test_case_4_4_1_bot = { &preamble_3_bot, &test_4_4_1_bot, &postamble_2_bot };
-#define test_case_4_4_1_stream_top (&test_case_4_4_1_top)
-#define test_case_4_4_1_stream_bot (&test_case_4_4_1_bot)
+
+#define preamble_4_4_1_top preamble_3_top
+#define preamble_4_4_1_bot preamble_3_bot
+
+#define postamble_4_4_1_top postamble_2_top
+#define postamble_4_4_1_bot postamble_2_bot
+
+static struct test_stream test_4_4_1_top = { &preamble_4_4_1_top, &test_case_4_4_1_top, &postamble_4_4_1_top };
+static struct test_stream test_4_4_1_bot = { &preamble_4_4_1_bot, &test_case_4_4_1_bot, &postamble_4_4_1_bot };
 
 #define tgrp_case_4_4_2 test_group_8
+#define numb_case_4_4_2 "4.4.2"
 #define name_case_4_4_2 "t_rcv library call"
 #define desc_case_4_4_2 "\
 This test case tests the response of the t_rcv library call to an\n\
 asynchronous T_ORDREL event."
-static int test_4_4_2_top(int child)
+
+int test_case_4_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6528,7 +7353,8 @@ static int test_4_4_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_2_bot(int child)
+
+int test_case_4_4_2_bot(int child)
 {
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6540,17 +7366,24 @@ static int test_4_4_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_2_top = { &preamble_3_top, &test_4_4_2_top, &postamble_2_top };
-static struct test_stream test_case_4_4_2_bot = { &preamble_3_bot, &test_4_4_2_bot, &postamble_2_bot };
-#define test_case_4_4_2_stream_top (&test_case_4_4_2_top)
-#define test_case_4_4_2_stream_bot (&test_case_4_4_2_bot)
+
+#define preamble_4_4_2_top preamble_3_top
+#define preamble_4_4_2_bot preamble_3_bot
+
+#define postamble_4_4_2_top postamble_2_top
+#define postamble_4_4_2_bot postamble_2_bot
+
+static struct test_stream test_4_4_2_top = { &preamble_4_4_2_top, &test_case_4_4_2_top, &postamble_4_4_2_top };
+static struct test_stream test_4_4_2_bot = { &preamble_4_4_2_bot, &test_case_4_4_2_bot, &postamble_4_4_2_bot };
 
 #define tgrp_case_4_4_3 test_group_8
+#define numb_case_4_4_3 "4.4.3"
 #define name_case_4_4_3 "t_rcvv library call"
 #define desc_case_4_4_3 "\
 This test case tests the response of the t_rcvv library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_4_3_top(int child)
+
+int test_case_4_4_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6569,24 +7402,32 @@ static int test_4_4_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_3_bot(int child)
+
+int test_case_4_4_3_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_3_top = { &preamble_3_top, &test_4_4_3_top, &postamble_2_top };
-static struct test_stream test_case_4_4_3_bot = { &preamble_3_bot, &test_4_4_3_bot, &postamble_2_bot };
-#define test_case_4_4_3_stream_top (&test_case_4_4_3_top)
-#define test_case_4_4_3_stream_bot (&test_case_4_4_3_bot)
+
+#define preamble_4_4_3_top preamble_3_top
+#define preamble_4_4_3_bot preamble_3_bot
+
+#define postamble_4_4_3_top postamble_2_top
+#define postamble_4_4_3_bot postamble_2_bot
+
+static struct test_stream test_4_4_3_top = { &preamble_4_4_3_top, &test_case_4_4_3_top, &postamble_4_4_3_top };
+static struct test_stream test_4_4_3_bot = { &preamble_4_4_3_bot, &test_case_4_4_3_bot, &postamble_4_4_3_bot };
 
 #define tgrp_case_4_4_4 test_group_8
+#define numb_case_4_4_4 "4.4.4"
 #define name_case_4_4_4 "t_rcvv library call"
 #define desc_case_4_4_4 "\
 This test case tests the response of the t_rcvv library call to an\n\
 asynchronous T_ORDREL event."
-static int test_4_4_4_top(int child)
+
+int test_case_4_4_4_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6608,7 +7449,8 @@ static int test_4_4_4_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_4_bot(int child)
+
+int test_case_4_4_4_bot(int child)
 {
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6620,17 +7462,24 @@ static int test_4_4_4_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_4_top = { &preamble_3_top, &test_4_4_4_top, &postamble_2_top };
-static struct test_stream test_case_4_4_4_bot = { &preamble_3_bot, &test_4_4_4_bot, &postamble_2_bot };
-#define test_case_4_4_4_stream_top (&test_case_4_4_4_top)
-#define test_case_4_4_4_stream_bot (&test_case_4_4_4_bot)
+
+#define preamble_4_4_4_top preamble_3_top
+#define preamble_4_4_4_bot preamble_3_bot
+
+#define postamble_4_4_4_top postamble_2_top
+#define postamble_4_4_4_bot postamble_2_bot
+
+static struct test_stream test_4_4_4_top = { &preamble_4_4_4_top, &test_case_4_4_4_top, &postamble_4_4_4_top };
+static struct test_stream test_4_4_4_bot = { &preamble_4_4_4_bot, &test_case_4_4_4_bot, &postamble_4_4_4_bot };
 
 #define tgrp_case_4_4_5 test_group_8
+#define numb_case_4_4_5 "4.4.5"
 #define name_case_4_4_5 "t_snd library call"
 #define desc_case_4_4_5 "\
 This test case tests the response of the t_snd library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_4_5_top(int child)
+
+int test_case_4_4_5_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6656,24 +7505,32 @@ static int test_4_4_5_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_5_bot(int child)
+
+int test_case_4_4_5_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_5_top = { &preamble_3_top, &test_4_4_5_top, &postamble_2_top };
-static struct test_stream test_case_4_4_5_bot = { &preamble_3_bot, &test_4_4_5_bot, &postamble_2_bot };
-#define test_case_4_4_5_stream_top (&test_case_4_4_5_top)
-#define test_case_4_4_5_stream_bot (&test_case_4_4_5_bot)
+
+#define preamble_4_4_5_top preamble_3_top
+#define preamble_4_4_5_bot preamble_3_bot
+
+#define postamble_4_4_5_top postamble_2_top
+#define postamble_4_4_5_bot postamble_2_bot
+
+static struct test_stream test_4_4_5_top = { &preamble_4_4_5_top, &test_case_4_4_5_top, &postamble_4_4_5_top };
+static struct test_stream test_4_4_5_bot = { &preamble_4_4_5_bot, &test_case_4_4_5_bot, &postamble_4_4_5_bot };
 
 #define tgrp_case_4_4_6 test_group_8
+#define numb_case_4_4_6 "4.4.6"
 #define name_case_4_4_6 "t_snd library call"
 #define desc_case_4_4_6 "\
 This test case tests the response of the t_snd library call to an\n\
 asynchronous T_ORDREL event."
-static int test_4_4_6_top(int child)
+
+int test_case_4_4_6_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6702,7 +7559,8 @@ static int test_4_4_6_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_6_bot(int child)
+
+int test_case_4_4_6_bot(int child)
 {
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6714,17 +7572,24 @@ static int test_4_4_6_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_6_top = { &preamble_3_top, &test_4_4_6_top, &postamble_2_top };
-static struct test_stream test_case_4_4_6_bot = { &preamble_3_bot, &test_4_4_6_bot, &postamble_2_bot };
-#define test_case_4_4_6_stream_top (&test_case_4_4_6_top)
-#define test_case_4_4_6_stream_bot (&test_case_4_4_6_bot)
+
+#define preamble_4_4_6_top preamble_3_top
+#define preamble_4_4_6_bot preamble_3_bot
+
+#define postamble_4_4_6_top postamble_2_top
+#define postamble_4_4_6_bot postamble_2_bot
+
+static struct test_stream test_4_4_6_top = { &preamble_4_4_6_top, &test_case_4_4_6_top, &postamble_4_4_6_top };
+static struct test_stream test_4_4_6_bot = { &preamble_4_4_6_bot, &test_case_4_4_6_bot, &postamble_4_4_6_bot };
 
 #define tgrp_case_4_4_7 test_group_8
+#define numb_case_4_4_7 "4.4.7"
 #define name_case_4_4_7 "t_sndv library call"
 #define desc_case_4_4_7 "\
 This test case tests the response of the t_sndv library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_4_7_top(int child)
+
+int test_case_4_4_7_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6750,24 +7615,32 @@ static int test_4_4_7_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_7_bot(int child)
+
+int test_case_4_4_7_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_7_top = { &preamble_3_top, &test_4_4_7_top, &postamble_2_top };
-static struct test_stream test_case_4_4_7_bot = { &preamble_3_bot, &test_4_4_7_bot, &postamble_2_bot };
-#define test_case_4_4_7_stream_top (&test_case_4_4_7_top)
-#define test_case_4_4_7_stream_bot (&test_case_4_4_7_bot)
+
+#define preamble_4_4_7_top preamble_3_top
+#define preamble_4_4_7_bot preamble_3_bot
+
+#define postamble_4_4_7_top postamble_2_top
+#define postamble_4_4_7_bot postamble_2_bot
+
+static struct test_stream test_4_4_7_top = { &preamble_4_4_7_top, &test_case_4_4_7_top, &postamble_4_4_7_top };
+static struct test_stream test_4_4_7_bot = { &preamble_4_4_7_bot, &test_case_4_4_7_bot, &postamble_4_4_7_bot };
 
 #define tgrp_case_4_4_8 test_group_8
+#define numb_case_4_4_8 "4.4.8"
 #define name_case_4_4_8 "t_sndv library call"
 #define desc_case_4_4_8 "\
 This test case tests the response of the t_sndv library call to an\n\
 asynchronous T_ORDREL event."
-static int test_4_4_8_top(int child)
+
+int test_case_4_4_8_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6796,7 +7669,8 @@ static int test_4_4_8_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_4_8_bot(int child)
+
+int test_case_4_4_8_bot(int child)
 {
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6808,17 +7682,24 @@ static int test_4_4_8_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_4_8_top = { &preamble_3_top, &test_4_4_8_top, &postamble_2_top };
-static struct test_stream test_case_4_4_8_bot = { &preamble_3_bot, &test_4_4_8_bot, &postamble_2_bot };
-#define test_case_4_4_8_stream_top (&test_case_4_4_8_top)
-#define test_case_4_4_8_stream_bot (&test_case_4_4_8_bot)
+
+#define preamble_4_4_8_top preamble_3_top
+#define preamble_4_4_8_bot preamble_3_bot
+
+#define postamble_4_4_8_top postamble_2_top
+#define postamble_4_4_8_bot postamble_2_bot
+
+static struct test_stream test_4_4_8_top = { &preamble_4_4_8_top, &test_case_4_4_8_top, &postamble_4_4_8_top };
+static struct test_stream test_4_4_8_bot = { &preamble_4_4_8_bot, &test_case_4_4_8_bot, &postamble_4_4_8_bot };
 
 #define tgrp_case_4_5_1 test_group_8
+#define numb_case_4_5_1 "4.5.1"
 #define name_case_4_5_1 "t_rcvconnect library call"
 #define desc_case_4_5_1 "\
 This test case tests the response of the t_rcvconnect library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_5_1_top(int child)
+
+int test_case_4_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -6853,7 +7734,8 @@ static int test_4_5_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_5_1_bot(int child)
+
+int test_case_4_5_1_bot(int child)
 {
 	start_tt(500);
 	state++;
@@ -6873,17 +7755,24 @@ static int test_4_5_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_5_1_top = { &preamble_2_top, &test_4_5_1_top, &postamble_2_top };
-static struct test_stream test_case_4_5_1_bot = { &preamble_2_bot, &test_4_5_1_bot, &postamble_2_bot };
-#define test_case_4_5_1_stream_top (&test_case_4_5_1_top)
-#define test_case_4_5_1_stream_bot (&test_case_4_5_1_bot)
+
+#define preamble_4_5_1_top preamble_2_top
+#define preamble_4_5_1_bot preamble_2_bot
+
+#define postamble_4_5_1_top postamble_2_top
+#define postamble_4_5_1_bot postamble_2_bot
+
+static struct test_stream test_4_5_1_top = { &preamble_4_5_1_top, &test_case_4_5_1_top, &postamble_4_5_1_top };
+static struct test_stream test_4_5_1_bot = { &preamble_4_5_1_bot, &test_case_4_5_1_bot, &postamble_4_5_1_bot };
 
 #define tgrp_case_4_6_1 test_group_8
+#define numb_case_4_6_1 "4.6.1"
 #define name_case_4_6_1 "t_rcvrel library call"
 #define desc_case_4_6_1 "\
 This test case tests the response of the t_rcvrel library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_6_1_top(int child)
+
+int test_case_4_6_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6909,24 +7798,32 @@ static int test_4_6_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_6_1_bot(int child)
+
+int test_case_4_6_1_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_6_1_top = { &preamble_3_top, &test_4_6_1_top, &postamble_2_top };
-static struct test_stream test_case_4_6_1_bot = { &preamble_3_bot, &test_4_6_1_bot, &postamble_2_bot };
-#define test_case_4_6_1_stream_top (&test_case_4_6_1_top)
-#define test_case_4_6_1_stream_bot (&test_case_4_6_1_bot)
+
+#define preamble_4_6_1_top preamble_3_top
+#define preamble_4_6_1_bot preamble_3_bot
+
+#define postamble_4_6_1_top postamble_2_top
+#define postamble_4_6_1_bot postamble_2_bot
+
+static struct test_stream test_4_6_1_top = { &preamble_4_6_1_top, &test_case_4_6_1_top, &postamble_4_6_1_top };
+static struct test_stream test_4_6_1_bot = { &preamble_4_6_1_bot, &test_case_4_6_1_bot, &postamble_4_6_1_bot };
 
 #define tgrp_case_4_6_2 test_group_8
+#define numb_case_4_6_2 "4.6.2"
 #define name_case_4_6_2 "t_rcvreldata library call"
 #define desc_case_4_6_2 "\
 This test case tests the response of the t_rcvreldata library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_6_2_top(int child)
+
+int test_case_4_6_2_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6952,24 +7849,32 @@ static int test_4_6_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_6_2_bot(int child)
+
+int test_case_4_6_2_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_6_2_top = { &preamble_3_top, &test_4_6_2_top, &postamble_2_top };
-static struct test_stream test_case_4_6_2_bot = { &preamble_3_bot, &test_4_6_2_bot, &postamble_2_bot };
-#define test_case_4_6_2_stream_top (&test_case_4_6_2_top)
-#define test_case_4_6_2_stream_bot (&test_case_4_6_2_bot)
+
+#define preamble_4_6_2_top preamble_3_top
+#define preamble_4_6_2_bot preamble_3_bot
+
+#define postamble_4_6_2_top postamble_2_top
+#define postamble_4_6_2_bot postamble_2_bot
+
+static struct test_stream test_4_6_2_top = { &preamble_4_6_2_top, &test_case_4_6_2_top, &postamble_4_6_2_top };
+static struct test_stream test_4_6_2_bot = { &preamble_4_6_2_bot, &test_case_4_6_2_bot, &postamble_4_6_2_bot };
 
 #define tgrp_case_4_6_3 test_group_8
+#define numb_case_4_6_3 "4.6.3"
 #define name_case_4_6_3 "t_sndrel library call"
 #define desc_case_4_6_3 "\
 This test case tests the response of the t_sndrel library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_6_3_top(int child)
+
+int test_case_4_6_3_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -6995,24 +7900,32 @@ static int test_4_6_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_6_3_bot(int child)
+
+int test_case_4_6_3_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_6_3_top = { &preamble_3_top, &test_4_6_3_top, &postamble_2_top };
-static struct test_stream test_case_4_6_3_bot = { &preamble_3_bot, &test_4_6_3_bot, &postamble_2_bot };
-#define test_case_4_6_3_stream_top (&test_case_4_6_3_top)
-#define test_case_4_6_3_stream_bot (&test_case_4_6_3_bot)
+
+#define preamble_4_6_3_top preamble_3_top
+#define preamble_4_6_3_bot preamble_3_bot
+
+#define postamble_4_6_3_top postamble_2_top
+#define postamble_4_6_3_bot postamble_2_bot
+
+static struct test_stream test_4_6_3_top = { &preamble_4_6_3_top, &test_case_4_6_3_top, &postamble_4_6_3_top };
+static struct test_stream test_4_6_3_bot = { &preamble_4_6_3_bot, &test_case_4_6_3_bot, &postamble_4_6_3_bot };
 
 #define tgrp_case_4_6_4 test_group_8
+#define numb_case_4_6_4 "4.6.4"
 #define name_case_4_6_4 "t_sndreldata library call"
 #define desc_case_4_6_4 "\
 This test case tests the response of the t_sndreldata library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_6_4_top(int child)
+
+int test_case_4_6_4_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7038,24 +7951,32 @@ static int test_4_6_4_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_6_4_bot(int child)
+
+int test_case_4_6_4_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_6_4_top = { &preamble_3_top, &test_4_6_4_top, &postamble_2_top };
-static struct test_stream test_case_4_6_4_bot = { &preamble_3_bot, &test_4_6_4_bot, &postamble_2_bot };
-#define test_case_4_6_4_stream_top (&test_case_4_6_4_top)
-#define test_case_4_6_4_stream_bot (&test_case_4_6_4_bot)
+
+#define preamble_4_6_4_top preamble_3_top
+#define preamble_4_6_4_bot preamble_3_bot
+
+#define postamble_4_6_4_top postamble_2_top
+#define postamble_4_6_4_bot postamble_2_bot
+
+static struct test_stream test_4_6_4_top = { &preamble_4_6_4_top, &test_case_4_6_4_top, &postamble_4_6_4_top };
+static struct test_stream test_4_6_4_bot = { &preamble_4_6_4_bot, &test_case_4_6_4_bot, &postamble_4_6_4_bot };
 
 #define tgrp_case_4_7_1 test_group_8
+#define numb_case_4_7_1 "4.7.1"
 #define name_case_4_7_1 "t_rcvudata library call"
 #define desc_case_4_7_1 "\
 This test case tests the response of the t_rcvudata library call to an\n\
 asynchronous T_UDERR event."
-static int test_4_7_1_top(int child)
+
+int test_case_4_7_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7081,24 +8002,32 @@ static int test_4_7_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_7_1_bot(int child)
+
+int test_case_4_7_1_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_7_1_top = { &preamble_2cl_top, &test_4_7_1_top, &postamble_2cl_top };
-static struct test_stream test_case_4_7_1_bot = { &preamble_2cl_bot, &test_4_7_1_bot, &postamble_2cl_bot };
-#define test_case_4_7_1_stream_top (&test_case_4_7_1_top)
-#define test_case_4_7_1_stream_bot (&test_case_4_7_1_bot)
+
+#define preamble_4_7_1_top preamble_2cl_top
+#define preamble_4_7_1_bot preamble_2cl_bot
+
+#define postamble_4_7_1_top postamble_2cl_top
+#define postamble_4_7_1_bot postamble_2cl_bot
+
+static struct test_stream test_4_7_1_top = { &preamble_4_7_1_top, &test_case_4_7_1_top, &postamble_4_7_1_top };
+static struct test_stream test_4_7_1_bot = { &preamble_4_7_1_bot, &test_case_4_7_1_bot, &postamble_4_7_1_bot };
 
 #define tgrp_case_4_7_2 test_group_8
+#define numb_case_4_7_2 "4.7.2"
 #define name_case_4_7_2 "t_rcvvudata library call"
 #define desc_case_4_7_2 "\
 This test case tests the response of the t_rcvvudata library call to an\n\
 asynchronous T_UDERR event."
-static int test_4_7_2_top(int child)
+
+int test_case_4_7_2_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7124,24 +8053,32 @@ static int test_4_7_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_7_2_bot(int child)
+
+int test_case_4_7_2_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_7_2_top = { &preamble_2cl_top, &test_4_7_2_top, &postamble_2cl_top };
-static struct test_stream test_case_4_7_2_bot = { &preamble_2cl_bot, &test_4_7_2_bot, &postamble_2cl_bot };
-#define test_case_4_7_2_stream_top (&test_case_4_7_2_top)
-#define test_case_4_7_2_stream_bot (&test_case_4_7_2_bot)
+
+#define preamble_4_7_2_top preamble_2cl_top
+#define preamble_4_7_2_bot preamble_2cl_bot
+
+#define postamble_4_7_2_top postamble_2cl_top
+#define postamble_4_7_2_bot postamble_2cl_bot
+
+static struct test_stream test_4_7_2_top = { &preamble_4_7_2_top, &test_case_4_7_2_top, &postamble_4_7_2_top };
+static struct test_stream test_4_7_2_bot = { &preamble_4_7_2_bot, &test_case_4_7_2_bot, &postamble_4_7_2_bot };
 
 #define tgrp_case_4_7_3 test_group_8
+#define numb_case_4_7_3 "4.7.3"
 #define name_case_4_7_3 "t_sndudata library call"
 #define desc_case_4_7_3 "\
 This test case tests the response of the t_sndudata library call to an\n\
 asynchronous T_UDERR event."
-static int test_4_7_3_top(int child)
+
+int test_case_4_7_3_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7167,24 +8104,32 @@ static int test_4_7_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_7_3_bot(int child)
+
+int test_case_4_7_3_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_7_3_top = { &preamble_2cl_top, &test_4_7_3_top, &postamble_2cl_top };
-static struct test_stream test_case_4_7_3_bot = { &preamble_2cl_bot, &test_4_7_3_bot, &postamble_2cl_bot };
-#define test_case_4_7_3_stream_top (&test_case_4_7_3_top)
-#define test_case_4_7_3_stream_bot (&test_case_4_7_3_bot)
+
+#define preamble_4_7_3_top preamble_2cl_top
+#define preamble_4_7_3_bot preamble_2cl_bot
+
+#define postamble_4_7_3_top postamble_2cl_top
+#define postamble_4_7_3_bot postamble_2cl_bot
+
+static struct test_stream test_4_7_3_top = { &preamble_4_7_3_top, &test_case_4_7_3_top, &postamble_4_7_3_top };
+static struct test_stream test_4_7_3_bot = { &preamble_4_7_3_bot, &test_case_4_7_3_bot, &postamble_4_7_3_bot };
 
 #define tgrp_case_4_7_4 test_group_8
+#define numb_case_4_7_4 "4.7.4"
 #define name_case_4_7_4 "t_sndvudata library call"
 #define desc_case_4_7_4 "\
 This test case tests the response of the t_sndvudata library call to an\n\
 asynchronous T_UDERR event."
-static int test_4_7_4_top(int child)
+
+int test_case_4_7_4_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7210,24 +8155,32 @@ static int test_4_7_4_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_7_4_bot(int child)
+
+int test_case_4_7_4_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_7_4_top = { &preamble_2cl_top, &test_4_7_4_top, &postamble_2cl_top };
-static struct test_stream test_case_4_7_4_bot = { &preamble_2cl_bot, &test_4_7_4_bot, &postamble_2cl_bot };
-#define test_case_4_7_4_stream_top (&test_case_4_7_4_top)
-#define test_case_4_7_4_stream_bot (&test_case_4_7_4_bot)
+
+#define preamble_4_7_4_top preamble_2cl_top
+#define preamble_4_7_4_bot preamble_2cl_bot
+
+#define postamble_4_7_4_top postamble_2cl_top
+#define postamble_4_7_4_bot postamble_2cl_bot
+
+static struct test_stream test_4_7_4_top = { &preamble_4_7_4_top, &test_case_4_7_4_top, &postamble_4_7_4_top };
+static struct test_stream test_4_7_4_bot = { &preamble_4_7_4_bot, &test_case_4_7_4_bot, &postamble_4_7_4_bot };
 
 #define tgrp_case_4_8_1 test_group_8
+#define numb_case_4_8_1 "4.8.1"
 #define name_case_4_8_1 "t_unbind library call"
 #define desc_case_4_8_1 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_LISTEN event."
-static int test_4_8_1_top(int child)
+
+int test_case_4_8_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7256,7 +8209,8 @@ static int test_4_8_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_8_1_bot(int child)
+
+int test_case_4_8_1_bot(int child)
 {
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -7271,17 +8225,24 @@ static int test_4_8_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_8_1_top = { &preamble_2_top, &test_4_8_1_top, &postamble_2_top };
-static struct test_stream test_case_4_8_1_bot = { &preamble_2_bot, &test_4_8_1_bot, &postamble_2_bot };
-#define test_case_4_8_1_stream_top (&test_case_4_8_1_top)
-#define test_case_4_8_1_stream_bot (&test_case_4_8_1_bot)
+
+#define preamble_4_8_1_top preamble_2_top
+#define preamble_4_8_1_bot preamble_2_bot
+
+#define postamble_4_8_1_top postamble_2_top
+#define postamble_4_8_1_bot postamble_2_bot
+
+static struct test_stream test_4_8_1_top = { &preamble_4_8_1_top, &test_case_4_8_1_top, &postamble_4_8_1_top };
+static struct test_stream test_4_8_1_bot = { &preamble_4_8_1_bot, &test_case_4_8_1_bot, &postamble_4_8_1_bot };
 
 #define tgrp_case_4_8_2 test_group_8
+#define numb_case_4_8_2 "4.8.2"
 #define name_case_4_8_2 "t_unbind library call"
 #define desc_case_4_8_2 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_DATA event."
-static int test_4_8_2_top(int child)
+
+int test_case_4_8_2_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7307,24 +8268,32 @@ static int test_4_8_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_8_2_bot(int child)
+
+int test_case_4_8_2_bot(int child)
 {
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_8_2_top = { &preamble_2cl_top, &test_4_8_2_top, &postamble_2cl_top };
-static struct test_stream test_case_4_8_2_bot = { &preamble_2cl_bot, &test_4_8_2_bot, &postamble_2cl_bot };
-#define test_case_4_8_2_stream_top (&test_case_4_8_2_top)
-#define test_case_4_8_2_stream_bot (&test_case_4_8_2_bot)
+
+#define preamble_4_8_2_top preamble_2cl_top
+#define preamble_4_8_2_bot preamble_2cl_bot
+
+#define postamble_4_8_2_top postamble_2cl_top
+#define postamble_4_8_2_bot postamble_2cl_bot
+
+static struct test_stream test_4_8_2_top = { &preamble_4_8_2_top, &test_case_4_8_2_top, &postamble_4_8_2_top };
+static struct test_stream test_4_8_2_bot = { &preamble_4_8_2_bot, &test_case_4_8_2_bot, &postamble_4_8_2_bot };
 
 #define tgrp_case_4_8_3 test_group_8
+#define numb_case_4_8_3 "4.8.3"
 #define name_case_4_8_3 "t_unbind library call"
 #define desc_case_4_8_3 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_UDERR event."
-static int test_4_8_3_top(int child)
+
+int test_case_4_8_3_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7350,24 +8319,32 @@ static int test_4_8_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_8_3_bot(int child)
+
+int test_case_4_8_3_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_8_3_top = { &preamble_2cl_top, &test_4_8_3_top, &postamble_2cl_top };
-static struct test_stream test_case_4_8_3_bot = { &preamble_2cl_bot, &test_4_8_3_bot, &postamble_2cl_bot };
-#define test_case_4_8_3_stream_top (&test_case_4_8_3_top)
-#define test_case_4_8_3_stream_bot (&test_case_4_8_3_bot)
+
+#define preamble_4_8_3_top preamble_2cl_top
+#define preamble_4_8_3_bot preamble_2cl_bot
+
+#define postamble_4_8_3_top postamble_2cl_top
+#define postamble_4_8_3_bot postamble_2cl_bot
+
+static struct test_stream test_4_8_3_top = { &preamble_4_8_3_top, &test_case_4_8_3_top, &postamble_4_8_3_top };
+static struct test_stream test_4_8_3_bot = { &preamble_4_8_3_bot, &test_case_4_8_3_bot, &postamble_4_8_3_bot };
 
 #define tgrp_case_4_9_1 test_group_8
+#define numb_case_4_9_1 "4.9.1"
 #define name_case_4_9_1 "t_snddis library call"
 #define desc_case_4_9_1 "\
 This test case tests the response of the t_snddis library call to an\n\
 asynchronous T_DISCONNECT event."
-static int test_4_9_1_top(int child)
+
+int test_case_4_9_1_top(int child)
 {
 	start_tt(200);
 	state++;
@@ -7393,24 +8370,32 @@ static int test_4_9_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_4_9_1_bot(int child)
+
+int test_case_4_9_1_bot(int child)
 {
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_4_9_1_top = { &preamble_3_top, &test_4_9_1_top, &postamble_2_top };
-static struct test_stream test_case_4_9_1_bot = { &preamble_3_bot, &test_4_9_1_bot, &postamble_2_bot };
-#define test_case_4_9_1_stream_top (&test_case_4_9_1_top)
-#define test_case_4_9_1_stream_bot (&test_case_4_9_1_bot)
+
+#define preamble_4_9_1_top preamble_3_top
+#define preamble_4_9_1_bot preamble_3_bot
+
+#define postamble_4_9_1_top postamble_2_top
+#define postamble_4_9_1_bot postamble_2_bot
+
+static struct test_stream test_4_9_1_top = { &preamble_4_9_1_top, &test_case_4_9_1_top, &postamble_4_9_1_top };
+static struct test_stream test_4_9_1_bot = { &preamble_4_9_1_bot, &test_case_4_9_1_bot, &postamble_4_9_1_bot };
 
 #define test_group_9 "Operations on a closed file descriptor"
 #define tgrp_case_5_1_1 test_group_9
+#define numb_case_5_1_1 "5.1.1"
 #define name_case_5_1_1 "t_accept operation"
 #define desc_case_5_1_1 "\
 This test case tests the t_accept operation on a closed file descriptor."
-static int test_5_1_x_top(int child, int function)
+
+int test_case_5_1_x_top(int child, int function)
 {
 	int old_fd = test_fd[child];
 	close(10);
@@ -7422,488 +8407,714 @@ static int test_5_1_x_top(int child, int function)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_5_1_x_bot(int child, int function)
+
+int test_case_5_1_x_bot(int child, int function)
 {
 	return (__RESULT_SUCCESS);
 }
-static int test_5_1_1_top(int child)
+
+int test_case_5_1_1_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_ACCEPT);
+	return test_case_5_1_x_top(child, __TEST_T_ACCEPT);
 }
-static int test_5_1_1_bot(int child)
+
+int test_case_5_1_1_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_ACCEPT);
+	return test_case_5_1_x_bot(child, __TEST_T_ACCEPT);
 }
-static struct test_stream test_case_5_1_1_top = { &preamble_0, &test_5_1_1_top, &postamble_0 };
-static struct test_stream test_case_5_1_1_bot = { &preamble_0, &test_5_1_1_bot, &postamble_0 };
-#define test_case_5_1_1_stream_top (&test_case_5_1_1_top)
-#define test_case_5_1_1_stream_bot (&test_case_5_1_1_bot)
+
+#define preamble_5_1_1_top preamble_0
+#define preamble_5_1_1_bot preamble_0
+
+#define postamble_5_1_1_top postamble_0
+#define postamble_5_1_1_bot postamble_0
+
+static struct test_stream test_5_1_1_top = { &preamble_5_1_1_top, &test_case_5_1_1_top, &postamble_5_1_1_top };
+static struct test_stream test_5_1_1_bot = { &preamble_5_1_1_bot, &test_case_5_1_1_bot, &postamble_5_1_1_bot };
 
 #define tgrp_case_5_1_2 test_group_9
+#define numb_case_5_1_2 "5.1.2"
 #define name_case_5_1_2 "t_bind operation"
 #define desc_case_5_1_2 "\
 This test case tests the t_bind operation on a closed file descriptor."
-static int test_5_1_2_top(int child)
+
+int test_case_5_1_2_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_BIND);
+	return test_case_5_1_x_top(child, __TEST_T_BIND);
 }
-static int test_5_1_2_bot(int child)
+
+int test_case_5_1_2_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_BIND);
+	return test_case_5_1_x_bot(child, __TEST_T_BIND);
 }
-static struct test_stream test_case_5_1_2_top = { &preamble_0, &test_5_1_2_top, &postamble_0 };
-static struct test_stream test_case_5_1_2_bot = { &preamble_0, &test_5_1_2_bot, &postamble_0 };
-#define test_case_5_1_2_stream_top (&test_case_5_1_2_top)
-#define test_case_5_1_2_stream_bot (&test_case_5_1_2_bot)
+
+#define preamble_5_1_2_top preamble_0
+#define preamble_5_1_2_bot preamble_0
+
+#define postamble_5_1_2_top postamble_0
+#define postamble_5_1_2_bot postamble_0
+
+static struct test_stream test_5_1_2_top = { &preamble_5_1_2_top, &test_case_5_1_2_top, &postamble_5_1_2_top };
+static struct test_stream test_5_1_2_bot = { &preamble_5_1_2_bot, &test_case_5_1_2_bot, &postamble_5_1_2_bot };
 
 #define tgrp_case_5_1_3 test_group_9
+#define numb_case_5_1_3 "5.1.3"
 #define name_case_5_1_3 "t_close operation"
 #define desc_case_5_1_3 "\
 This test case tests the t_close operation on a closed file descriptor."
-static int test_5_1_3_top(int child)
+
+int test_case_5_1_3_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_CLOSE);
+	return test_case_5_1_x_top(child, __TEST_T_CLOSE);
 }
-static int test_5_1_3_bot(int child)
+
+int test_case_5_1_3_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_CLOSE);
+	return test_case_5_1_x_bot(child, __TEST_T_CLOSE);
 }
-static struct test_stream test_case_5_1_3_top = { &preamble_0, &test_5_1_3_top, &postamble_0 };
-static struct test_stream test_case_5_1_3_bot = { &preamble_0, &test_5_1_3_bot, &postamble_0 };
-#define test_case_5_1_3_stream_top (&test_case_5_1_3_top)
-#define test_case_5_1_3_stream_bot (&test_case_5_1_3_bot)
+
+#define preamble_5_1_3_top preamble_0
+#define preamble_5_1_3_bot preamble_0
+
+#define postamble_5_1_3_top postamble_0
+#define postamble_5_1_3_bot postamble_0
+
+static struct test_stream test_5_1_3_top = { &preamble_5_1_3_top, &test_case_5_1_3_top, &postamble_5_1_3_top };
+static struct test_stream test_5_1_3_bot = { &preamble_5_1_3_bot, &test_case_5_1_3_bot, &postamble_5_1_3_bot };
 
 #define tgrp_case_5_1_4 test_group_9
+#define numb_case_5_1_4 "5.1.4"
 #define name_case_5_1_4 "t_connect operation"
 #define desc_case_5_1_4 "\
 This test case tests the t_connect operation on a closed file descriptor."
-static int test_5_1_4_top(int child)
+
+int test_case_5_1_4_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_CONNECT);
+	return test_case_5_1_x_top(child, __TEST_T_CONNECT);
 }
-static int test_5_1_4_bot(int child)
+
+int test_case_5_1_4_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_CONNECT);
+	return test_case_5_1_x_bot(child, __TEST_T_CONNECT);
 }
-static struct test_stream test_case_5_1_4_top = { &preamble_0, &test_5_1_4_top, &postamble_0 };
-static struct test_stream test_case_5_1_4_bot = { &preamble_0, &test_5_1_4_bot, &postamble_0 };
-#define test_case_5_1_4_stream_top (&test_case_5_1_4_top)
-#define test_case_5_1_4_stream_bot (&test_case_5_1_4_bot)
+
+#define preamble_5_1_4_top preamble_0
+#define preamble_5_1_4_bot preamble_0
+
+#define postamble_5_1_4_top postamble_0
+#define postamble_5_1_4_bot postamble_0
+
+static struct test_stream test_5_1_4_top = { &preamble_5_1_4_top, &test_case_5_1_4_top, &postamble_5_1_4_top };
+static struct test_stream test_5_1_4_bot = { &preamble_5_1_4_bot, &test_case_5_1_4_bot, &postamble_5_1_4_bot };
 
 #define tgrp_case_5_1_5 test_group_9
+#define numb_case_5_1_5 "5.1.5"
 #define name_case_5_1_5 "t_getinfo operation"
 #define desc_case_5_1_5 "\
 This test case tests the t_getinfo operation on a closed file descriptor."
-static int test_5_1_5_top(int child)
+
+int test_case_5_1_5_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_GETINFO);
+	return test_case_5_1_x_top(child, __TEST_T_GETINFO);
 }
-static int test_5_1_5_bot(int child)
+
+int test_case_5_1_5_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_GETINFO);
+	return test_case_5_1_x_bot(child, __TEST_T_GETINFO);
 }
-static struct test_stream test_case_5_1_5_top = { &preamble_0, &test_5_1_5_top, &postamble_0 };
-static struct test_stream test_case_5_1_5_bot = { &preamble_0, &test_5_1_5_bot, &postamble_0 };
-#define test_case_5_1_5_stream_top (&test_case_5_1_5_top)
-#define test_case_5_1_5_stream_bot (&test_case_5_1_5_bot)
+
+#define preamble_5_1_5_top preamble_0
+#define preamble_5_1_5_bot preamble_0
+
+#define postamble_5_1_5_top postamble_0
+#define postamble_5_1_5_bot postamble_0
+
+static struct test_stream test_5_1_5_top = { &preamble_5_1_5_top, &test_case_5_1_5_top, &postamble_5_1_5_top };
+static struct test_stream test_5_1_5_bot = { &preamble_5_1_5_bot, &test_case_5_1_5_bot, &postamble_5_1_5_bot };
 
 #define tgrp_case_5_1_6 test_group_9
+#define numb_case_5_1_6 "5.1.6"
 #define name_case_5_1_6 "t_getprotaddr operation"
 #define desc_case_5_1_6 "\
 This test case tests the t_getprotaddr operation on a closed file descriptor."
-static int test_5_1_6_top(int child)
+
+int test_case_5_1_6_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_GETPROTADDR);
+	return test_case_5_1_x_top(child, __TEST_T_GETPROTADDR);
 }
-static int test_5_1_6_bot(int child)
+
+int test_case_5_1_6_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_GETPROTADDR);
+	return test_case_5_1_x_bot(child, __TEST_T_GETPROTADDR);
 }
-static struct test_stream test_case_5_1_6_top = { &preamble_0, &test_5_1_6_top, &postamble_0 };
-static struct test_stream test_case_5_1_6_bot = { &preamble_0, &test_5_1_6_bot, &postamble_0 };
-#define test_case_5_1_6_stream_top (&test_case_5_1_6_top)
-#define test_case_5_1_6_stream_bot (&test_case_5_1_6_bot)
+
+#define preamble_5_1_6_top preamble_0
+#define preamble_5_1_6_bot preamble_0
+
+#define postamble_5_1_6_top postamble_0
+#define postamble_5_1_6_bot postamble_0
+
+static struct test_stream test_5_1_6_top = { &preamble_5_1_6_top, &test_case_5_1_6_top, &postamble_5_1_6_top };
+static struct test_stream test_5_1_6_bot = { &preamble_5_1_6_bot, &test_case_5_1_6_bot, &postamble_5_1_6_bot };
 
 #define tgrp_case_5_1_7 test_group_9
+#define numb_case_5_1_7 "5.1.7"
 #define name_case_5_1_7 "t_getstate operation"
 #define desc_case_5_1_7 "\
 This test case tests the t_getstate operation on a closed file descriptor."
-static int test_5_1_7_top(int child)
+
+int test_case_5_1_7_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_GETSTATE);
+	return test_case_5_1_x_top(child, __TEST_T_GETSTATE);
 }
-static int test_5_1_7_bot(int child)
+
+int test_case_5_1_7_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_GETSTATE);
+	return test_case_5_1_x_bot(child, __TEST_T_GETSTATE);
 }
-static struct test_stream test_case_5_1_7_top = { &preamble_0, &test_5_1_7_top, &postamble_0 };
-static struct test_stream test_case_5_1_7_bot = { &preamble_0, &test_5_1_7_bot, &postamble_0 };
-#define test_case_5_1_7_stream_top (&test_case_5_1_7_top)
-#define test_case_5_1_7_stream_bot (&test_case_5_1_7_bot)
+
+#define preamble_5_1_7_top preamble_0
+#define preamble_5_1_7_bot preamble_0
+
+#define postamble_5_1_7_top postamble_0
+#define postamble_5_1_7_bot postamble_0
+
+static struct test_stream test_5_1_7_top = { &preamble_5_1_7_top, &test_case_5_1_7_top, &postamble_5_1_7_top };
+static struct test_stream test_5_1_7_bot = { &preamble_5_1_7_bot, &test_case_5_1_7_bot, &postamble_5_1_7_bot };
 
 #define tgrp_case_5_1_8 test_group_9
+#define numb_case_5_1_8 "5.1.8"
 #define name_case_5_1_8 "t_listen operation"
 #define desc_case_5_1_8 "\
 This test case tests the t_listen operation on a closed file descriptor."
-static int test_5_1_8_top(int child)
+
+int test_case_5_1_8_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_LISTEN);
+	return test_case_5_1_x_top(child, __TEST_T_LISTEN);
 }
-static int test_5_1_8_bot(int child)
+
+int test_case_5_1_8_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_LISTEN);
+	return test_case_5_1_x_bot(child, __TEST_T_LISTEN);
 }
-static struct test_stream test_case_5_1_8_top = { &preamble_0, &test_5_1_8_top, &postamble_0 };
-static struct test_stream test_case_5_1_8_bot = { &preamble_0, &test_5_1_8_bot, &postamble_0 };
-#define test_case_5_1_8_stream_top (&test_case_5_1_8_top)
-#define test_case_5_1_8_stream_bot (&test_case_5_1_8_bot)
+
+#define preamble_5_1_8_top preamble_0
+#define preamble_5_1_8_bot preamble_0
+
+#define postamble_5_1_8_top postamble_0
+#define postamble_5_1_8_bot postamble_0
+
+static struct test_stream test_5_1_8_top = { &preamble_5_1_8_top, &test_case_5_1_8_top, &postamble_5_1_8_top };
+static struct test_stream test_5_1_8_bot = { &preamble_5_1_8_bot, &test_case_5_1_8_bot, &postamble_5_1_8_bot };
 
 #define tgrp_case_5_1_9 test_group_9
+#define numb_case_5_1_9 "5.1.9"
 #define name_case_5_1_9 "t_look operation"
 #define desc_case_5_1_9 "\
 This test case tests the t_look operation on a closed file descriptor."
-static int test_5_1_9_top(int child)
+
+int test_case_5_1_9_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_LOOK);
+	return test_case_5_1_x_top(child, __TEST_T_LOOK);
 }
-static int test_5_1_9_bot(int child)
+
+int test_case_5_1_9_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_LOOK);
+	return test_case_5_1_x_bot(child, __TEST_T_LOOK);
 }
-static struct test_stream test_case_5_1_9_top = { &preamble_0, &test_5_1_9_top, &postamble_0 };
-static struct test_stream test_case_5_1_9_bot = { &preamble_0, &test_5_1_9_bot, &postamble_0 };
-#define test_case_5_1_9_stream_top (&test_case_5_1_9_top)
-#define test_case_5_1_9_stream_bot (&test_case_5_1_9_bot)
+
+#define preamble_5_1_9_top preamble_0
+#define preamble_5_1_9_bot preamble_0
+
+#define postamble_5_1_9_top postamble_0
+#define postamble_5_1_9_bot postamble_0
+
+static struct test_stream test_5_1_9_top = { &preamble_5_1_9_top, &test_case_5_1_9_top, &postamble_5_1_9_top };
+static struct test_stream test_5_1_9_bot = { &preamble_5_1_9_bot, &test_case_5_1_9_bot, &postamble_5_1_9_bot };
 
 #define tgrp_case_5_1_10 test_group_9
+#define numb_case_5_1_10 "5.1.10"
 #define name_case_5_1_10 "t_optmgmt operation"
 #define desc_case_5_1_10 "\
 This test case tests the t_optmgmt operation on a closed file descriptor."
-static int test_5_1_10_top(int child)
+
+int test_case_5_1_10_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_OPTMGMT);
+	return test_case_5_1_x_top(child, __TEST_T_OPTMGMT);
 }
-static int test_5_1_10_bot(int child)
+
+int test_case_5_1_10_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_OPTMGMT);
+	return test_case_5_1_x_bot(child, __TEST_T_OPTMGMT);
 }
-static struct test_stream test_case_5_1_10_top = { &preamble_0, &test_5_1_10_top, &postamble_0 };
-static struct test_stream test_case_5_1_10_bot = { &preamble_0, &test_5_1_10_bot, &postamble_0 };
-#define test_case_5_1_10_stream_top (&test_case_5_1_10_top)
-#define test_case_5_1_10_stream_bot (&test_case_5_1_10_bot)
+
+#define preamble_5_1_10_top preamble_0
+#define preamble_5_1_10_bot preamble_0
+
+#define postamble_5_1_10_top postamble_0
+#define postamble_5_1_10_bot postamble_0
+
+static struct test_stream test_5_1_10_top = { &preamble_5_1_10_top, &test_case_5_1_10_top, &postamble_5_1_10_top };
+static struct test_stream test_5_1_10_bot = { &preamble_5_1_10_bot, &test_case_5_1_10_bot, &postamble_5_1_10_bot };
 
 #define tgrp_case_5_1_11 test_group_9
+#define numb_case_5_1_11 "5.1.11"
 #define name_case_5_1_11 "t_rcv operation"
 #define desc_case_5_1_11 "\
 This test case tests the t_rcv operation on a closed file descriptor."
-static int test_5_1_11_top(int child)
+
+int test_case_5_1_11_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCV);
+	return test_case_5_1_x_top(child, __TEST_T_RCV);
 }
-static int test_5_1_11_bot(int child)
+
+int test_case_5_1_11_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCV);
+	return test_case_5_1_x_bot(child, __TEST_T_RCV);
 }
-static struct test_stream test_case_5_1_11_top = { &preamble_0, &test_5_1_11_top, &postamble_0 };
-static struct test_stream test_case_5_1_11_bot = { &preamble_0, &test_5_1_11_bot, &postamble_0 };
-#define test_case_5_1_11_stream_top (&test_case_5_1_11_top)
-#define test_case_5_1_11_stream_bot (&test_case_5_1_11_bot)
+
+#define preamble_5_1_11_top preamble_0
+#define preamble_5_1_11_bot preamble_0
+
+#define postamble_5_1_11_top postamble_0
+#define postamble_5_1_11_bot postamble_0
+
+static struct test_stream test_5_1_11_top = { &preamble_5_1_11_top, &test_case_5_1_11_top, &postamble_5_1_11_top };
+static struct test_stream test_5_1_11_bot = { &preamble_5_1_11_bot, &test_case_5_1_11_bot, &postamble_5_1_11_bot };
 
 #define tgrp_case_5_1_12 test_group_9
+#define numb_case_5_1_12 "5.1.12"
 #define name_case_5_1_12 "t_rcvconnect operation"
 #define desc_case_5_1_12 "\
 This test case tests the t_rcvconnect operation on a closed file descriptor."
-static int test_5_1_12_top(int child)
+
+int test_case_5_1_12_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVCONNECT);
+	return test_case_5_1_x_top(child, __TEST_T_RCVCONNECT);
 }
-static int test_5_1_12_bot(int child)
+
+int test_case_5_1_12_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVCONNECT);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVCONNECT);
 }
-static struct test_stream test_case_5_1_12_top = { &preamble_0, &test_5_1_12_top, &postamble_0 };
-static struct test_stream test_case_5_1_12_bot = { &preamble_0, &test_5_1_12_bot, &postamble_0 };
-#define test_case_5_1_12_stream_top (&test_case_5_1_12_top)
-#define test_case_5_1_12_stream_bot (&test_case_5_1_12_bot)
+
+#define preamble_5_1_12_top preamble_0
+#define preamble_5_1_12_bot preamble_0
+
+#define postamble_5_1_12_top postamble_0
+#define postamble_5_1_12_bot postamble_0
+
+static struct test_stream test_5_1_12_top = { &preamble_5_1_12_top, &test_case_5_1_12_top, &postamble_5_1_12_top };
+static struct test_stream test_5_1_12_bot = { &preamble_5_1_12_bot, &test_case_5_1_12_bot, &postamble_5_1_12_bot };
 
 #define tgrp_case_5_1_13 test_group_9
+#define numb_case_5_1_13 "5.1.13"
 #define name_case_5_1_13 "t_rcvdis operation"
 #define desc_case_5_1_13 "\
 This test case tests the t_rcvdis operation on a closed file descriptor."
-static int test_5_1_13_top(int child)
+
+int test_case_5_1_13_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVDIS);
+	return test_case_5_1_x_top(child, __TEST_T_RCVDIS);
 }
-static int test_5_1_13_bot(int child)
+
+int test_case_5_1_13_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVDIS);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVDIS);
 }
-static struct test_stream test_case_5_1_13_top = { &preamble_0, &test_5_1_13_top, &postamble_0 };
-static struct test_stream test_case_5_1_13_bot = { &preamble_0, &test_5_1_13_bot, &postamble_0 };
-#define test_case_5_1_13_stream_top (&test_case_5_1_13_top)
-#define test_case_5_1_13_stream_bot (&test_case_5_1_13_bot)
+
+#define preamble_5_1_13_top preamble_0
+#define preamble_5_1_13_bot preamble_0
+
+#define postamble_5_1_13_top postamble_0
+#define postamble_5_1_13_bot postamble_0
+
+static struct test_stream test_5_1_13_top = { &preamble_5_1_13_top, &test_case_5_1_13_top, &postamble_5_1_13_top };
+static struct test_stream test_5_1_13_bot = { &preamble_5_1_13_bot, &test_case_5_1_13_bot, &postamble_5_1_13_bot };
 
 #define tgrp_case_5_1_14 test_group_9
+#define numb_case_5_1_14 "5.1.14"
 #define name_case_5_1_14 "t_rcvrel operation"
 #define desc_case_5_1_14 "\
 This test case tests the t_rcvrel operation on a closed file descriptor."
-static int test_5_1_14_top(int child)
+
+int test_case_5_1_14_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVREL);
+	return test_case_5_1_x_top(child, __TEST_T_RCVREL);
 }
-static int test_5_1_14_bot(int child)
+
+int test_case_5_1_14_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVREL);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVREL);
 }
-static struct test_stream test_case_5_1_14_top = { &preamble_0, &test_5_1_14_top, &postamble_0 };
-static struct test_stream test_case_5_1_14_bot = { &preamble_0, &test_5_1_14_bot, &postamble_0 };
-#define test_case_5_1_14_stream_top (&test_case_5_1_14_top)
-#define test_case_5_1_14_stream_bot (&test_case_5_1_14_bot)
+
+#define preamble_5_1_14_top preamble_0
+#define preamble_5_1_14_bot preamble_0
+
+#define postamble_5_1_14_top postamble_0
+#define postamble_5_1_14_bot postamble_0
+
+static struct test_stream test_5_1_14_top = { &preamble_5_1_14_top, &test_case_5_1_14_top, &postamble_5_1_14_top };
+static struct test_stream test_5_1_14_bot = { &preamble_5_1_14_bot, &test_case_5_1_14_bot, &postamble_5_1_14_bot };
 
 #define tgrp_case_5_1_15 test_group_9
+#define numb_case_5_1_15 "5.1.15"
 #define name_case_5_1_15 "t_rcvreldata operation"
 #define desc_case_5_1_15 "\
 This test case tests the t_rcvreldata operation on a closed file descriptor."
-static int test_5_1_15_top(int child)
+
+int test_case_5_1_15_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVRELDATA);
+	return test_case_5_1_x_top(child, __TEST_T_RCVRELDATA);
 }
-static int test_5_1_15_bot(int child)
+
+int test_case_5_1_15_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVRELDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVRELDATA);
 }
-static struct test_stream test_case_5_1_15_top = { &preamble_0, &test_5_1_15_top, &postamble_0 };
-static struct test_stream test_case_5_1_15_bot = { &preamble_0, &test_5_1_15_bot, &postamble_0 };
-#define test_case_5_1_15_stream_top (&test_case_5_1_15_top)
-#define test_case_5_1_15_stream_bot (&test_case_5_1_15_bot)
+
+#define preamble_5_1_15_top preamble_0
+#define preamble_5_1_15_bot preamble_0
+
+#define postamble_5_1_15_top postamble_0
+#define postamble_5_1_15_bot postamble_0
+
+static struct test_stream test_5_1_15_top = { &preamble_5_1_15_top, &test_case_5_1_15_top, &postamble_5_1_15_top };
+static struct test_stream test_5_1_15_bot = { &preamble_5_1_15_bot, &test_case_5_1_15_bot, &postamble_5_1_15_bot };
 
 #define tgrp_case_5_1_16 test_group_9
+#define numb_case_5_1_16 "5.1.16"
 #define name_case_5_1_16 "t_rcvudata operation"
 #define desc_case_5_1_16 "\
 This test case tests the t_rcvudata operation on a closed file descriptor."
-static int test_5_1_16_top(int child)
+
+int test_case_5_1_16_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVUDATA);
+	return test_case_5_1_x_top(child, __TEST_T_RCVUDATA);
 }
-static int test_5_1_16_bot(int child)
+
+int test_case_5_1_16_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVUDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVUDATA);
 }
-static struct test_stream test_case_5_1_16_top = { &preamble_0, &test_5_1_16_top, &postamble_0 };
-static struct test_stream test_case_5_1_16_bot = { &preamble_0, &test_5_1_16_bot, &postamble_0 };
-#define test_case_5_1_16_stream_top (&test_case_5_1_16_top)
-#define test_case_5_1_16_stream_bot (&test_case_5_1_16_bot)
+
+#define preamble_5_1_16_top preamble_0
+#define preamble_5_1_16_bot preamble_0
+
+#define postamble_5_1_16_top postamble_0
+#define postamble_5_1_16_bot postamble_0
+
+static struct test_stream test_5_1_16_top = { &preamble_5_1_16_top, &test_case_5_1_16_top, &postamble_5_1_16_top };
+static struct test_stream test_5_1_16_bot = { &preamble_5_1_16_bot, &test_case_5_1_16_bot, &postamble_5_1_16_bot };
 
 #define tgrp_case_5_1_17 test_group_9
+#define numb_case_5_1_17 "5.1.17"
 #define name_case_5_1_17 "t_rcvuderr operation"
 #define desc_case_5_1_17 "\
 This test case tests the t_rcvuderr operation on a closed file descriptor."
-static int test_5_1_17_top(int child)
+
+int test_case_5_1_17_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVUDERR);
+	return test_case_5_1_x_top(child, __TEST_T_RCVUDERR);
 }
-static int test_5_1_17_bot(int child)
+
+int test_case_5_1_17_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVUDERR);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVUDERR);
 }
-static struct test_stream test_case_5_1_17_top = { &preamble_0, &test_5_1_17_top, &postamble_0 };
-static struct test_stream test_case_5_1_17_bot = { &preamble_0, &test_5_1_17_bot, &postamble_0 };
-#define test_case_5_1_17_stream_top (&test_case_5_1_17_top)
-#define test_case_5_1_17_stream_bot (&test_case_5_1_17_bot)
+
+#define preamble_5_1_17_top preamble_0
+#define preamble_5_1_17_bot preamble_0
+
+#define postamble_5_1_17_top postamble_0
+#define postamble_5_1_17_bot postamble_0
+
+static struct test_stream test_5_1_17_top = { &preamble_5_1_17_top, &test_case_5_1_17_top, &postamble_5_1_17_top };
+static struct test_stream test_5_1_17_bot = { &preamble_5_1_17_bot, &test_case_5_1_17_bot, &postamble_5_1_17_bot };
 
 #define tgrp_case_5_1_18 test_group_9
+#define numb_case_5_1_18 "5.1.18"
 #define name_case_5_1_18 "t_rcvv operation"
 #define desc_case_5_1_18 "\
 This test case tests the t_rcvv operation on a closed file descriptor."
-static int test_5_1_18_top(int child)
+
+int test_case_5_1_18_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVV);
+	return test_case_5_1_x_top(child, __TEST_T_RCVV);
 }
-static int test_5_1_18_bot(int child)
+
+int test_case_5_1_18_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVV);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVV);
 }
-static struct test_stream test_case_5_1_18_top = { &preamble_0, &test_5_1_18_top, &postamble_0 };
-static struct test_stream test_case_5_1_18_bot = { &preamble_0, &test_5_1_18_bot, &postamble_0 };
-#define test_case_5_1_18_stream_top (&test_case_5_1_18_top)
-#define test_case_5_1_18_stream_bot (&test_case_5_1_18_bot)
+
+#define preamble_5_1_18_top preamble_0
+#define preamble_5_1_18_bot preamble_0
+
+#define postamble_5_1_18_top postamble_0
+#define postamble_5_1_18_bot postamble_0
+
+static struct test_stream test_5_1_18_top = { &preamble_5_1_18_top, &test_case_5_1_18_top, &postamble_5_1_18_top };
+static struct test_stream test_5_1_18_bot = { &preamble_5_1_18_bot, &test_case_5_1_18_bot, &postamble_5_1_18_bot };
 
 #define tgrp_case_5_1_19 test_group_9
+#define numb_case_5_1_19 "5.1.19"
 #define name_case_5_1_19 "t_rcvvudata operation"
 #define desc_case_5_1_19 "\
 This test case tests the t_rcvvudata operation on a closed file descriptor."
-static int test_5_1_19_top(int child)
+
+int test_case_5_1_19_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_RCVVUDATA);
+	return test_case_5_1_x_top(child, __TEST_T_RCVVUDATA);
 }
-static int test_5_1_19_bot(int child)
+
+int test_case_5_1_19_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_RCVVUDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_RCVVUDATA);
 }
-static struct test_stream test_case_5_1_19_top = { &preamble_0, &test_5_1_19_top, &postamble_0 };
-static struct test_stream test_case_5_1_19_bot = { &preamble_0, &test_5_1_19_bot, &postamble_0 };
-#define test_case_5_1_19_stream_top (&test_case_5_1_19_top)
-#define test_case_5_1_19_stream_bot (&test_case_5_1_19_bot)
+
+#define preamble_5_1_19_top preamble_0
+#define preamble_5_1_19_bot preamble_0
+
+#define postamble_5_1_19_top postamble_0
+#define postamble_5_1_19_bot postamble_0
+
+static struct test_stream test_5_1_19_top = { &preamble_5_1_19_top, &test_case_5_1_19_top, &postamble_5_1_19_top };
+static struct test_stream test_5_1_19_bot = { &preamble_5_1_19_bot, &test_case_5_1_19_bot, &postamble_5_1_19_bot };
 
 #define tgrp_case_5_1_20 test_group_9
+#define numb_case_5_1_20 "5.1.20"
 #define name_case_5_1_20 "t_snd operation"
 #define desc_case_5_1_20 "\
 This test case tests the t_snd operation on a closed file descriptor."
-static int test_5_1_20_top(int child)
+
+int test_case_5_1_20_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SND);
+	return test_case_5_1_x_top(child, __TEST_T_SND);
 }
-static int test_5_1_20_bot(int child)
+
+int test_case_5_1_20_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SND);
+	return test_case_5_1_x_bot(child, __TEST_T_SND);
 }
-static struct test_stream test_case_5_1_20_top = { &preamble_0, &test_5_1_20_top, &postamble_0 };
-static struct test_stream test_case_5_1_20_bot = { &preamble_0, &test_5_1_20_bot, &postamble_0 };
-#define test_case_5_1_20_stream_top (&test_case_5_1_20_top)
-#define test_case_5_1_20_stream_bot (&test_case_5_1_20_bot)
+
+#define preamble_5_1_20_top preamble_0
+#define preamble_5_1_20_bot preamble_0
+
+#define postamble_5_1_20_top postamble_0
+#define postamble_5_1_20_bot postamble_0
+
+static struct test_stream test_5_1_20_top = { &preamble_5_1_20_top, &test_case_5_1_20_top, &postamble_5_1_20_top };
+static struct test_stream test_5_1_20_bot = { &preamble_5_1_20_bot, &test_case_5_1_20_bot, &postamble_5_1_20_bot };
 
 #define tgrp_case_5_1_21 test_group_9
+#define numb_case_5_1_21 "5.1.21"
 #define name_case_5_1_21 "t_snddis operation"
 #define desc_case_5_1_21 "\
 This test case tests the t_snddis operation on a closed file descriptor."
-static int test_5_1_21_top(int child)
+
+int test_case_5_1_21_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDDIS);
+	return test_case_5_1_x_top(child, __TEST_T_SNDDIS);
 }
-static int test_5_1_21_bot(int child)
+
+int test_case_5_1_21_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDDIS);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDDIS);
 }
-static struct test_stream test_case_5_1_21_top = { &preamble_0, &test_5_1_21_top, &postamble_0 };
-static struct test_stream test_case_5_1_21_bot = { &preamble_0, &test_5_1_21_bot, &postamble_0 };
-#define test_case_5_1_21_stream_top (&test_case_5_1_21_top)
-#define test_case_5_1_21_stream_bot (&test_case_5_1_21_bot)
+
+#define preamble_5_1_21_top preamble_0
+#define preamble_5_1_21_bot preamble_0
+
+#define postamble_5_1_21_top postamble_0
+#define postamble_5_1_21_bot postamble_0
+
+static struct test_stream test_5_1_21_top = { &preamble_5_1_21_top, &test_case_5_1_21_top, &postamble_5_1_21_top };
+static struct test_stream test_5_1_21_bot = { &preamble_5_1_21_bot, &test_case_5_1_21_bot, &postamble_5_1_21_bot };
 
 #define tgrp_case_5_1_22 test_group_9
+#define numb_case_5_1_22 "5.1.22"
 #define name_case_5_1_22 "t_sndrel operation"
 #define desc_case_5_1_22 "\
 This test case tests the t_sndrel operation on a closed file descriptor."
-static int test_5_1_22_top(int child)
+
+int test_case_5_1_22_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDREL);
+	return test_case_5_1_x_top(child, __TEST_T_SNDREL);
 }
-static int test_5_1_22_bot(int child)
+
+int test_case_5_1_22_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDREL);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDREL);
 }
-static struct test_stream test_case_5_1_22_top = { &preamble_0, &test_5_1_22_top, &postamble_0 };
-static struct test_stream test_case_5_1_22_bot = { &preamble_0, &test_5_1_22_bot, &postamble_0 };
-#define test_case_5_1_22_stream_top (&test_case_5_1_22_top)
-#define test_case_5_1_22_stream_bot (&test_case_5_1_22_bot)
+
+#define preamble_5_1_22_top preamble_0
+#define preamble_5_1_22_bot preamble_0
+
+#define postamble_5_1_22_top postamble_0
+#define postamble_5_1_22_bot postamble_0
+
+static struct test_stream test_5_1_22_top = { &preamble_5_1_22_top, &test_case_5_1_22_top, &postamble_5_1_22_top };
+static struct test_stream test_5_1_22_bot = { &preamble_5_1_22_bot, &test_case_5_1_22_bot, &postamble_5_1_22_bot };
 
 #define tgrp_case_5_1_23 test_group_9
+#define numb_case_5_1_23 "5.1.23"
 #define name_case_5_1_23 "t_sndreldata operation"
 #define desc_case_5_1_23 "\
 This test case tests the t_sndreldata operation on a closed file descriptor."
-static int test_5_1_23_top(int child)
+
+int test_case_5_1_23_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDRELDATA);
+	return test_case_5_1_x_top(child, __TEST_T_SNDRELDATA);
 }
-static int test_5_1_23_bot(int child)
+
+int test_case_5_1_23_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDRELDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDRELDATA);
 }
-static struct test_stream test_case_5_1_23_top = { &preamble_0, &test_5_1_23_top, &postamble_0 };
-static struct test_stream test_case_5_1_23_bot = { &preamble_0, &test_5_1_23_bot, &postamble_0 };
-#define test_case_5_1_23_stream_top (&test_case_5_1_23_top)
-#define test_case_5_1_23_stream_bot (&test_case_5_1_23_bot)
+
+#define preamble_5_1_23_top preamble_0
+#define preamble_5_1_23_bot preamble_0
+
+#define postamble_5_1_23_top postamble_0
+#define postamble_5_1_23_bot postamble_0
+
+static struct test_stream test_5_1_23_top = { &preamble_5_1_23_top, &test_case_5_1_23_top, &postamble_5_1_23_top };
+static struct test_stream test_5_1_23_bot = { &preamble_5_1_23_bot, &test_case_5_1_23_bot, &postamble_5_1_23_bot };
 
 #define tgrp_case_5_1_24 test_group_9
+#define numb_case_5_1_24 "5.1.24"
 #define name_case_5_1_24 "t_sndudata operation"
 #define desc_case_5_1_24 "\
 This test case tests the t_sndudata operation on a closed file descriptor."
-static int test_5_1_24_top(int child)
+
+int test_case_5_1_24_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDUDATA);
+	return test_case_5_1_x_top(child, __TEST_T_SNDUDATA);
 }
-static int test_5_1_24_bot(int child)
+
+int test_case_5_1_24_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDUDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDUDATA);
 }
-static struct test_stream test_case_5_1_24_top = { &preamble_0, &test_5_1_24_top, &postamble_0 };
-static struct test_stream test_case_5_1_24_bot = { &preamble_0, &test_5_1_24_bot, &postamble_0 };
-#define test_case_5_1_24_stream_top (&test_case_5_1_24_top)
-#define test_case_5_1_24_stream_bot (&test_case_5_1_24_bot)
+
+#define preamble_5_1_24_top preamble_0
+#define preamble_5_1_24_bot preamble_0
+
+#define postamble_5_1_24_top postamble_0
+#define postamble_5_1_24_bot postamble_0
+
+static struct test_stream test_5_1_24_top = { &preamble_5_1_24_top, &test_case_5_1_24_top, &postamble_5_1_24_top };
+static struct test_stream test_5_1_24_bot = { &preamble_5_1_24_bot, &test_case_5_1_24_bot, &postamble_5_1_24_bot };
 
 #define tgrp_case_5_1_25 test_group_9
+#define numb_case_5_1_25 "5.1.25"
 #define name_case_5_1_25 "t_sndv operation"
 #define desc_case_5_1_25 "\
 This test case tests the t_sndv operation on a closed file descriptor."
-static int test_5_1_25_top(int child)
+
+int test_case_5_1_25_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDV);
+	return test_case_5_1_x_top(child, __TEST_T_SNDV);
 }
-static int test_5_1_25_bot(int child)
+
+int test_case_5_1_25_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDV);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDV);
 }
-static struct test_stream test_case_5_1_25_top = { &preamble_0, &test_5_1_25_top, &postamble_0 };
-static struct test_stream test_case_5_1_25_bot = { &preamble_0, &test_5_1_25_bot, &postamble_0 };
-#define test_case_5_1_25_stream_top (&test_case_5_1_25_top)
-#define test_case_5_1_25_stream_bot (&test_case_5_1_25_bot)
+
+#define preamble_5_1_25_top preamble_0
+#define preamble_5_1_25_bot preamble_0
+
+#define postamble_5_1_25_top postamble_0
+#define postamble_5_1_25_bot postamble_0
+
+static struct test_stream test_5_1_25_top = { &preamble_5_1_25_top, &test_case_5_1_25_top, &postamble_5_1_25_top };
+static struct test_stream test_5_1_25_bot = { &preamble_5_1_25_bot, &test_case_5_1_25_bot, &postamble_5_1_25_bot };
 
 #define tgrp_case_5_1_26 test_group_9
+#define numb_case_5_1_26 "5.1.26"
 #define name_case_5_1_26 "t_sndvudata operation"
 #define desc_case_5_1_26 "\
 This test case tests the t_sndvudata operation on a closed file descriptor."
-static int test_5_1_26_top(int child)
+
+int test_case_5_1_26_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SNDVUDATA);
+	return test_case_5_1_x_top(child, __TEST_T_SNDVUDATA);
 }
-static int test_5_1_26_bot(int child)
+
+int test_case_5_1_26_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SNDVUDATA);
+	return test_case_5_1_x_bot(child, __TEST_T_SNDVUDATA);
 }
-static struct test_stream test_case_5_1_26_top = { &preamble_0, &test_5_1_26_top, &postamble_0 };
-static struct test_stream test_case_5_1_26_bot = { &preamble_0, &test_5_1_26_bot, &postamble_0 };
-#define test_case_5_1_26_stream_top (&test_case_5_1_26_top)
-#define test_case_5_1_26_stream_bot (&test_case_5_1_26_bot)
+
+#define preamble_5_1_26_top preamble_0
+#define preamble_5_1_26_bot preamble_0
+
+#define postamble_5_1_26_top postamble_0
+#define postamble_5_1_26_bot postamble_0
+
+static struct test_stream test_5_1_26_top = { &preamble_5_1_26_top, &test_case_5_1_26_top, &postamble_5_1_26_top };
+static struct test_stream test_5_1_26_bot = { &preamble_5_1_26_bot, &test_case_5_1_26_bot, &postamble_5_1_26_bot };
 
 #define tgrp_case_5_1_27 test_group_9
+#define numb_case_5_1_27 "5.1.27"
 #define name_case_5_1_27 "t_sync operation"
 #define desc_case_5_1_27 "\
 This test case tests the t_sync operation on a closed file descriptor."
-static int test_5_1_27_top(int child)
+
+int test_case_5_1_27_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_SYNC);
+	return test_case_5_1_x_top(child, __TEST_T_SYNC);
 }
-static int test_5_1_27_bot(int child)
+
+int test_case_5_1_27_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_SYNC);
+	return test_case_5_1_x_bot(child, __TEST_T_SYNC);
 }
-static struct test_stream test_case_5_1_27_top = { &preamble_0, &test_5_1_27_top, &postamble_0 };
-static struct test_stream test_case_5_1_27_bot = { &preamble_0, &test_5_1_27_bot, &postamble_0 };
-#define test_case_5_1_27_stream_top (&test_case_5_1_27_top)
-#define test_case_5_1_27_stream_bot (&test_case_5_1_27_bot)
+
+#define preamble_5_1_27_top preamble_0
+#define preamble_5_1_27_bot preamble_0
+
+#define postamble_5_1_27_top postamble_0
+#define postamble_5_1_27_bot postamble_0
+
+static struct test_stream test_5_1_27_top = { &preamble_5_1_27_top, &test_case_5_1_27_top, &postamble_5_1_27_top };
+static struct test_stream test_5_1_27_bot = { &preamble_5_1_27_bot, &test_case_5_1_27_bot, &postamble_5_1_27_bot };
 
 #define tgrp_case_5_1_28 test_group_9
+#define numb_case_5_1_28 "5.1.28"
 #define name_case_5_1_28 "t_unbind operation"
 #define desc_case_5_1_28 "\
 This test case tests the t_unbind operation on a closed file descriptor."
-static int test_5_1_28_top(int child)
+
+int test_case_5_1_28_top(int child)
 {
-	return test_5_1_x_top(child, __TEST_T_UNBIND);
+	return test_case_5_1_x_top(child, __TEST_T_UNBIND);
 }
-static int test_5_1_28_bot(int child)
+
+int test_case_5_1_28_bot(int child)
 {
-	return test_5_1_x_bot(child, __TEST_T_UNBIND);
+	return test_case_5_1_x_bot(child, __TEST_T_UNBIND);
 }
-static struct test_stream test_case_5_1_28_top = { &preamble_0, &test_5_1_28_top, &postamble_0 };
-static struct test_stream test_case_5_1_28_bot = { &preamble_0, &test_5_1_28_bot, &postamble_0 };
-#define test_case_5_1_28_stream_top (&test_case_5_1_28_top)
-#define test_case_5_1_28_stream_bot (&test_case_5_1_28_bot)
+
+#define preamble_5_1_28_top preamble_0
+#define preamble_5_1_28_bot preamble_0
+
+#define postamble_5_1_28_top postamble_0
+#define postamble_5_1_28_bot postamble_0
+
+static struct test_stream test_5_1_28_top = { &preamble_5_1_28_top, &test_case_5_1_28_top, &postamble_5_1_28_top };
+static struct test_stream test_5_1_28_bot = { &preamble_5_1_28_bot, &test_case_5_1_28_bot, &postamble_5_1_28_bot };
 
 #define test_group_10 "Operations on a non-STREAMS file descriptor"
 #define tgrp_case_5_2_1 test_group_10
+#define numb_case_5_2_1 "5.2.1"
 #define name_case_5_2_1 "t_accept operation"
 #define desc_case_5_2_1 "\
 This test case tests the t_accept operation on a non-STREAMS file descriptor."
-static int test_5_2_x_top(int child, int function)
+
+int test_case_5_2_x_top(int child, int function)
 {
 	test_fd[0] = fileno(stderr);
 	state++;
@@ -7913,7 +9124,8 @@ static int test_5_2_x_top(int child, int function)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_5_2_x_bot(int child, int function)
+
+int test_case_5_2_x_bot(int child, int function)
 {
 	start_tt(200);
 	state++;
@@ -7922,491 +9134,717 @@ static int test_5_2_x_bot(int child, int function)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_5_2_1_top(int child)
+
+int test_case_5_2_1_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_ACCEPT);
+	return test_case_5_2_x_top(child, __TEST_T_ACCEPT);
 }
-static int test_5_2_1_bot(int child)
+
+int test_case_5_2_1_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_ACCEPT);
+	return test_case_5_2_x_bot(child, __TEST_T_ACCEPT);
 }
-static struct test_stream test_case_5_2_1_top = { &preamble_0, &test_5_2_1_top, &postamble_0 };
-static struct test_stream test_case_5_2_1_bot = { &preamble_0, &test_5_2_1_bot, &postamble_0 };
-#define test_case_5_2_1_stream_top (&test_case_5_2_1_top)
-#define test_case_5_2_1_stream_bot (&test_case_5_2_1_bot)
+
+#define preamble_5_2_1_top preamble_0
+#define preamble_5_2_1_bot preamble_0
+
+#define postamble_5_2_1_top postamble_0
+#define postamble_5_2_1_bot postamble_0
+
+static struct test_stream test_5_2_1_top = { &preamble_5_2_1_top, &test_case_5_2_1_top, &postamble_5_2_1_top };
+static struct test_stream test_5_2_1_bot = { &preamble_5_2_1_bot, &test_case_5_2_1_bot, &postamble_5_2_1_bot };
 
 #define tgrp_case_5_2_2 test_group_10
+#define numb_case_5_2_2 "5.2.2"
 #define name_case_5_2_2 "t_bind operation"
 #define desc_case_5_2_2 "\
 This test case tests the t_bind operation on a non-STREAMS file descriptor."
-static int test_5_2_2_top(int child)
+
+int test_case_5_2_2_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_BIND);
+	return test_case_5_2_x_top(child, __TEST_T_BIND);
 }
-static int test_5_2_2_bot(int child)
+
+int test_case_5_2_2_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_BIND);
+	return test_case_5_2_x_bot(child, __TEST_T_BIND);
 }
-static struct test_stream test_case_5_2_2_top = { &preamble_0, &test_5_2_2_top, &postamble_0 };
-static struct test_stream test_case_5_2_2_bot = { &preamble_0, &test_5_2_2_bot, &postamble_0 };
-#define test_case_5_2_2_stream_top (&test_case_5_2_2_top)
-#define test_case_5_2_2_stream_bot (&test_case_5_2_2_bot)
+
+#define preamble_5_2_2_top preamble_0
+#define preamble_5_2_2_bot preamble_0
+
+#define postamble_5_2_2_top postamble_0
+#define postamble_5_2_2_bot postamble_0
+
+static struct test_stream test_5_2_2_top = { &preamble_5_2_2_top, &test_case_5_2_2_top, &postamble_5_2_2_top };
+static struct test_stream test_5_2_2_bot = { &preamble_5_2_2_bot, &test_case_5_2_2_bot, &postamble_5_2_2_bot };
 
 #define tgrp_case_5_2_3 test_group_10
+#define numb_case_5_2_3 "5.2.3"
 #define name_case_5_2_3 "t_close operation"
 #define desc_case_5_2_3 "\
 This test case tests the t_close operation on a non-STREAMS file descriptor."
-static int test_5_2_3_top(int child)
+
+int test_case_5_2_3_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_CLOSE);
+	return test_case_5_2_x_top(child, __TEST_T_CLOSE);
 }
-static int test_5_2_3_bot(int child)
+
+int test_case_5_2_3_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_CLOSE);
+	return test_case_5_2_x_bot(child, __TEST_T_CLOSE);
 }
-static struct test_stream test_case_5_2_3_top = { &preamble_0, &test_5_2_3_top, &postamble_0 };
-static struct test_stream test_case_5_2_3_bot = { &preamble_0, &test_5_2_3_bot, &postamble_0 };
-#define test_case_5_2_3_stream_top (&test_case_5_2_3_top)
-#define test_case_5_2_3_stream_bot (&test_case_5_2_3_bot)
+
+#define preamble_5_2_3_top preamble_0
+#define preamble_5_2_3_bot preamble_0
+
+#define postamble_5_2_3_top postamble_0
+#define postamble_5_2_3_bot postamble_0
+
+static struct test_stream test_5_2_3_top = { &preamble_5_2_3_top, &test_case_5_2_3_top, &postamble_5_2_3_top };
+static struct test_stream test_5_2_3_bot = { &preamble_5_2_3_bot, &test_case_5_2_3_bot, &postamble_5_2_3_bot };
 
 #define tgrp_case_5_2_4 test_group_10
+#define numb_case_5_2_4 "5.2.4"
 #define name_case_5_2_4 "t_connect operation"
 #define desc_case_5_2_4 "\
 This test case tests the t_connect operation on a non-STREAMS file descriptor."
-static int test_5_2_4_top(int child)
+
+int test_case_5_2_4_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_CONNECT);
+	return test_case_5_2_x_top(child, __TEST_T_CONNECT);
 }
-static int test_5_2_4_bot(int child)
+
+int test_case_5_2_4_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_CONNECT);
+	return test_case_5_2_x_bot(child, __TEST_T_CONNECT);
 }
-static struct test_stream test_case_5_2_4_top = { &preamble_0, &test_5_2_4_top, &postamble_0 };
-static struct test_stream test_case_5_2_4_bot = { &preamble_0, &test_5_2_4_bot, &postamble_0 };
-#define test_case_5_2_4_stream_top (&test_case_5_2_4_top)
-#define test_case_5_2_4_stream_bot (&test_case_5_2_4_bot)
+
+#define preamble_5_2_4_top preamble_0
+#define preamble_5_2_4_bot preamble_0
+
+#define postamble_5_2_4_top postamble_0
+#define postamble_5_2_4_bot postamble_0
+
+static struct test_stream test_5_2_4_top = { &preamble_5_2_4_top, &test_case_5_2_4_top, &postamble_5_2_4_top };
+static struct test_stream test_5_2_4_bot = { &preamble_5_2_4_bot, &test_case_5_2_4_bot, &postamble_5_2_4_bot };
 
 #define tgrp_case_5_2_5 test_group_10
+#define numb_case_5_2_5 "5.2.5"
 #define name_case_5_2_5 "t_getinfo operation"
 #define desc_case_5_2_5 "\
 This test case tests the t_getinfo operation on a non-STREAMS file descriptor."
-static int test_5_2_5_top(int child)
+
+int test_case_5_2_5_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_GETINFO);
+	return test_case_5_2_x_top(child, __TEST_T_GETINFO);
 }
-static int test_5_2_5_bot(int child)
+
+int test_case_5_2_5_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_GETINFO);
+	return test_case_5_2_x_bot(child, __TEST_T_GETINFO);
 }
-static struct test_stream test_case_5_2_5_top = { &preamble_0, &test_5_2_5_top, &postamble_0 };
-static struct test_stream test_case_5_2_5_bot = { &preamble_0, &test_5_2_5_bot, &postamble_0 };
-#define test_case_5_2_5_stream_top (&test_case_5_2_5_top)
-#define test_case_5_2_5_stream_bot (&test_case_5_2_5_bot)
+
+#define preamble_5_2_5_top preamble_0
+#define preamble_5_2_5_bot preamble_0
+
+#define postamble_5_2_5_top postamble_0
+#define postamble_5_2_5_bot postamble_0
+
+static struct test_stream test_5_2_5_top = { &preamble_5_2_5_top, &test_case_5_2_5_top, &postamble_5_2_5_top };
+static struct test_stream test_5_2_5_bot = { &preamble_5_2_5_bot, &test_case_5_2_5_bot, &postamble_5_2_5_bot };
 
 #define tgrp_case_5_2_6 test_group_10
+#define numb_case_5_2_6 "5.2.6"
 #define name_case_5_2_6 "t_getprotaddr operation"
 #define desc_case_5_2_6 "\
 This test case tests the t_getprotaddr operation on a non-STREAMS file descriptor."
-static int test_5_2_6_top(int child)
+
+int test_case_5_2_6_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_GETPROTADDR);
+	return test_case_5_2_x_top(child, __TEST_T_GETPROTADDR);
 }
-static int test_5_2_6_bot(int child)
+
+int test_case_5_2_6_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_GETPROTADDR);
+	return test_case_5_2_x_bot(child, __TEST_T_GETPROTADDR);
 }
-static struct test_stream test_case_5_2_6_top = { &preamble_0, &test_5_2_6_top, &postamble_0 };
-static struct test_stream test_case_5_2_6_bot = { &preamble_0, &test_5_2_6_bot, &postamble_0 };
-#define test_case_5_2_6_stream_top (&test_case_5_2_6_top)
-#define test_case_5_2_6_stream_bot (&test_case_5_2_6_bot)
+
+#define preamble_5_2_6_top preamble_0
+#define preamble_5_2_6_bot preamble_0
+
+#define postamble_5_2_6_top postamble_0
+#define postamble_5_2_6_bot postamble_0
+
+static struct test_stream test_5_2_6_top = { &preamble_5_2_6_top, &test_case_5_2_6_top, &postamble_5_2_6_top };
+static struct test_stream test_5_2_6_bot = { &preamble_5_2_6_bot, &test_case_5_2_6_bot, &postamble_5_2_6_bot };
 
 #define tgrp_case_5_2_7 test_group_10
+#define numb_case_5_2_7 "5.2.7"
 #define name_case_5_2_7 "t_getstate operation"
 #define desc_case_5_2_7 "\
 This test case tests the t_getstate operation on a non-STREAMS file descriptor."
-static int test_5_2_7_top(int child)
+
+int test_case_5_2_7_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_GETSTATE);
+	return test_case_5_2_x_top(child, __TEST_T_GETSTATE);
 }
-static int test_5_2_7_bot(int child)
+
+int test_case_5_2_7_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_GETSTATE);
+	return test_case_5_2_x_bot(child, __TEST_T_GETSTATE);
 }
-static struct test_stream test_case_5_2_7_top = { &preamble_0, &test_5_2_7_top, &postamble_0 };
-static struct test_stream test_case_5_2_7_bot = { &preamble_0, &test_5_2_7_bot, &postamble_0 };
-#define test_case_5_2_7_stream_top (&test_case_5_2_7_top)
-#define test_case_5_2_7_stream_bot (&test_case_5_2_7_bot)
+
+#define preamble_5_2_7_top preamble_0
+#define preamble_5_2_7_bot preamble_0
+
+#define postamble_5_2_7_top postamble_0
+#define postamble_5_2_7_bot postamble_0
+
+static struct test_stream test_5_2_7_top = { &preamble_5_2_7_top, &test_case_5_2_7_top, &postamble_5_2_7_top };
+static struct test_stream test_5_2_7_bot = { &preamble_5_2_7_bot, &test_case_5_2_7_bot, &postamble_5_2_7_bot };
 
 #define tgrp_case_5_2_8 test_group_10
+#define numb_case_5_2_8 "5.2.8"
 #define name_case_5_2_8 "t_listen operation"
 #define desc_case_5_2_8 "\
 This test case tests the t_listen operation on a non-STREAMS file descriptor."
-static int test_5_2_8_top(int child)
+
+int test_case_5_2_8_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_LISTEN);
+	return test_case_5_2_x_top(child, __TEST_T_LISTEN);
 }
-static int test_5_2_8_bot(int child)
+
+int test_case_5_2_8_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_LISTEN);
+	return test_case_5_2_x_bot(child, __TEST_T_LISTEN);
 }
-static struct test_stream test_case_5_2_8_top = { &preamble_0, &test_5_2_8_top, &postamble_0 };
-static struct test_stream test_case_5_2_8_bot = { &preamble_0, &test_5_2_8_bot, &postamble_0 };
-#define test_case_5_2_8_stream_top (&test_case_5_2_8_top)
-#define test_case_5_2_8_stream_bot (&test_case_5_2_8_bot)
+
+#define preamble_5_2_8_top preamble_0
+#define preamble_5_2_8_bot preamble_0
+
+#define postamble_5_2_8_top postamble_0
+#define postamble_5_2_8_bot postamble_0
+
+static struct test_stream test_5_2_8_top = { &preamble_5_2_8_top, &test_case_5_2_8_top, &postamble_5_2_8_top };
+static struct test_stream test_5_2_8_bot = { &preamble_5_2_8_bot, &test_case_5_2_8_bot, &postamble_5_2_8_bot };
 
 #define tgrp_case_5_2_9 test_group_10
+#define numb_case_5_2_9 "5.2.9"
 #define name_case_5_2_9 "t_look operation"
 #define desc_case_5_2_9 "\
 This test case tests the t_look operation on a non-STREAMS file descriptor."
-static int test_5_2_9_top(int child)
+
+int test_case_5_2_9_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_LOOK);
+	return test_case_5_2_x_top(child, __TEST_T_LOOK);
 }
-static int test_5_2_9_bot(int child)
+
+int test_case_5_2_9_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_LOOK);
+	return test_case_5_2_x_bot(child, __TEST_T_LOOK);
 }
-static struct test_stream test_case_5_2_9_top = { &preamble_0, &test_5_2_9_top, &postamble_0 };
-static struct test_stream test_case_5_2_9_bot = { &preamble_0, &test_5_2_9_bot, &postamble_0 };
-#define test_case_5_2_9_stream_top (&test_case_5_2_9_top)
-#define test_case_5_2_9_stream_bot (&test_case_5_2_9_bot)
+
+#define preamble_5_2_9_top preamble_0
+#define preamble_5_2_9_bot preamble_0
+
+#define postamble_5_2_9_top postamble_0
+#define postamble_5_2_9_bot postamble_0
+
+static struct test_stream test_5_2_9_top = { &preamble_5_2_9_top, &test_case_5_2_9_top, &postamble_5_2_9_top };
+static struct test_stream test_5_2_9_bot = { &preamble_5_2_9_bot, &test_case_5_2_9_bot, &postamble_5_2_9_bot };
 
 #define tgrp_case_5_2_10 test_group_10
+#define numb_case_5_2_10 "5.2.10"
 #define name_case_5_2_10 "t_optmgmt operation"
 #define desc_case_5_2_10 "\
 This test case tests the t_optmgmt operation on a non-STREAMS file descriptor."
-static int test_5_2_10_top(int child)
+
+int test_case_5_2_10_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_OPTMGMT);
+	return test_case_5_2_x_top(child, __TEST_T_OPTMGMT);
 }
-static int test_5_2_10_bot(int child)
+
+int test_case_5_2_10_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_OPTMGMT);
+	return test_case_5_2_x_bot(child, __TEST_T_OPTMGMT);
 }
-static struct test_stream test_case_5_2_10_top = { &preamble_0, &test_5_2_10_top, &postamble_0 };
-static struct test_stream test_case_5_2_10_bot = { &preamble_0, &test_5_2_10_bot, &postamble_0 };
-#define test_case_5_2_10_stream_top (&test_case_5_2_10_top)
-#define test_case_5_2_10_stream_bot (&test_case_5_2_10_bot)
+
+#define preamble_5_2_10_top preamble_0
+#define preamble_5_2_10_bot preamble_0
+
+#define postamble_5_2_10_top postamble_0
+#define postamble_5_2_10_bot postamble_0
+
+static struct test_stream test_5_2_10_top = { &preamble_5_2_10_top, &test_case_5_2_10_top, &postamble_5_2_10_top };
+static struct test_stream test_5_2_10_bot = { &preamble_5_2_10_bot, &test_case_5_2_10_bot, &postamble_5_2_10_bot };
 
 #define tgrp_case_5_2_11 test_group_10
+#define numb_case_5_2_11 "5.2.11"
 #define name_case_5_2_11 "t_rcv operation"
 #define desc_case_5_2_11 "\
 This test case tests the t_rcv operation on a non-STREAMS file descriptor."
-static int test_5_2_11_top(int child)
+
+int test_case_5_2_11_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCV);
+	return test_case_5_2_x_top(child, __TEST_T_RCV);
 }
-static int test_5_2_11_bot(int child)
+
+int test_case_5_2_11_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCV);
+	return test_case_5_2_x_bot(child, __TEST_T_RCV);
 }
-static struct test_stream test_case_5_2_11_top = { &preamble_0, &test_5_2_11_top, &postamble_0 };
-static struct test_stream test_case_5_2_11_bot = { &preamble_0, &test_5_2_11_bot, &postamble_0 };
-#define test_case_5_2_11_stream_top (&test_case_5_2_11_top)
-#define test_case_5_2_11_stream_bot (&test_case_5_2_11_bot)
+
+#define preamble_5_2_11_top preamble_0
+#define preamble_5_2_11_bot preamble_0
+
+#define postamble_5_2_11_top postamble_0
+#define postamble_5_2_11_bot postamble_0
+
+static struct test_stream test_5_2_11_top = { &preamble_5_2_11_top, &test_case_5_2_11_top, &postamble_5_2_11_top };
+static struct test_stream test_5_2_11_bot = { &preamble_5_2_11_bot, &test_case_5_2_11_bot, &postamble_5_2_11_bot };
 
 #define tgrp_case_5_2_12 test_group_10
+#define numb_case_5_2_12 "5.2.12"
 #define name_case_5_2_12 "t_rcvconnect operation"
 #define desc_case_5_2_12 "\
 This test case tests the t_rcvconnect operation on a non-STREAMS file descriptor."
-static int test_5_2_12_top(int child)
+
+int test_case_5_2_12_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVCONNECT);
+	return test_case_5_2_x_top(child, __TEST_T_RCVCONNECT);
 }
-static int test_5_2_12_bot(int child)
+
+int test_case_5_2_12_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVCONNECT);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVCONNECT);
 }
-static struct test_stream test_case_5_2_12_top = { &preamble_0, &test_5_2_12_top, &postamble_0 };
-static struct test_stream test_case_5_2_12_bot = { &preamble_0, &test_5_2_12_bot, &postamble_0 };
-#define test_case_5_2_12_stream_top (&test_case_5_2_12_top)
-#define test_case_5_2_12_stream_bot (&test_case_5_2_12_bot)
+
+#define preamble_5_2_12_top preamble_0
+#define preamble_5_2_12_bot preamble_0
+
+#define postamble_5_2_12_top postamble_0
+#define postamble_5_2_12_bot postamble_0
+
+static struct test_stream test_5_2_12_top = { &preamble_5_2_12_top, &test_case_5_2_12_top, &postamble_5_2_12_top };
+static struct test_stream test_5_2_12_bot = { &preamble_5_2_12_bot, &test_case_5_2_12_bot, &postamble_5_2_12_bot };
 
 #define tgrp_case_5_2_13 test_group_10
+#define numb_case_5_2_13 "5.2.13"
 #define name_case_5_2_13 "t_rcvdis operation"
 #define desc_case_5_2_13 "\
 This test case tests the t_rcvdis operation on a non-STREAMS file descriptor."
-static int test_5_2_13_top(int child)
+
+int test_case_5_2_13_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVDIS);
+	return test_case_5_2_x_top(child, __TEST_T_RCVDIS);
 }
-static int test_5_2_13_bot(int child)
+
+int test_case_5_2_13_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVDIS);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVDIS);
 }
-static struct test_stream test_case_5_2_13_top = { &preamble_0, &test_5_2_13_top, &postamble_0 };
-static struct test_stream test_case_5_2_13_bot = { &preamble_0, &test_5_2_13_bot, &postamble_0 };
-#define test_case_5_2_13_stream_top (&test_case_5_2_13_top)
-#define test_case_5_2_13_stream_bot (&test_case_5_2_13_bot)
+
+#define preamble_5_2_13_top preamble_0
+#define preamble_5_2_13_bot preamble_0
+
+#define postamble_5_2_13_top postamble_0
+#define postamble_5_2_13_bot postamble_0
+
+static struct test_stream test_5_2_13_top = { &preamble_5_2_13_top, &test_case_5_2_13_top, &postamble_5_2_13_top };
+static struct test_stream test_5_2_13_bot = { &preamble_5_2_13_bot, &test_case_5_2_13_bot, &postamble_5_2_13_bot };
 
 #define tgrp_case_5_2_14 test_group_10
+#define numb_case_5_2_14 "5.2.14"
 #define name_case_5_2_14 "t_rcvrel operation"
 #define desc_case_5_2_14 "\
 This test case tests the t_rcvrel operation on a non-STREAMS file descriptor."
-static int test_5_2_14_top(int child)
+
+int test_case_5_2_14_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVREL);
+	return test_case_5_2_x_top(child, __TEST_T_RCVREL);
 }
-static int test_5_2_14_bot(int child)
+
+int test_case_5_2_14_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVREL);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVREL);
 }
-static struct test_stream test_case_5_2_14_top = { &preamble_0, &test_5_2_14_top, &postamble_0 };
-static struct test_stream test_case_5_2_14_bot = { &preamble_0, &test_5_2_14_bot, &postamble_0 };
-#define test_case_5_2_14_stream_top (&test_case_5_2_14_top)
-#define test_case_5_2_14_stream_bot (&test_case_5_2_14_bot)
+
+#define preamble_5_2_14_top preamble_0
+#define preamble_5_2_14_bot preamble_0
+
+#define postamble_5_2_14_top postamble_0
+#define postamble_5_2_14_bot postamble_0
+
+static struct test_stream test_5_2_14_top = { &preamble_5_2_14_top, &test_case_5_2_14_top, &postamble_5_2_14_top };
+static struct test_stream test_5_2_14_bot = { &preamble_5_2_14_bot, &test_case_5_2_14_bot, &postamble_5_2_14_bot };
 
 #define tgrp_case_5_2_15 test_group_10
+#define numb_case_5_2_15 "5.2.15"
 #define name_case_5_2_15 "t_rcvreldata operation"
 #define desc_case_5_2_15 "\
 This test case tests the t_rcvreldata operation on a non-STREAMS file descriptor."
-static int test_5_2_15_top(int child)
+
+int test_case_5_2_15_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVRELDATA);
+	return test_case_5_2_x_top(child, __TEST_T_RCVRELDATA);
 }
-static int test_5_2_15_bot(int child)
+
+int test_case_5_2_15_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVRELDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVRELDATA);
 }
-static struct test_stream test_case_5_2_15_top = { &preamble_0, &test_5_2_15_top, &postamble_0 };
-static struct test_stream test_case_5_2_15_bot = { &preamble_0, &test_5_2_15_bot, &postamble_0 };
-#define test_case_5_2_15_stream_top (&test_case_5_2_15_top)
-#define test_case_5_2_15_stream_bot (&test_case_5_2_15_bot)
+
+#define preamble_5_2_15_top preamble_0
+#define preamble_5_2_15_bot preamble_0
+
+#define postamble_5_2_15_top postamble_0
+#define postamble_5_2_15_bot postamble_0
+
+static struct test_stream test_5_2_15_top = { &preamble_5_2_15_top, &test_case_5_2_15_top, &postamble_5_2_15_top };
+static struct test_stream test_5_2_15_bot = { &preamble_5_2_15_bot, &test_case_5_2_15_bot, &postamble_5_2_15_bot };
 
 #define tgrp_case_5_2_16 test_group_10
+#define numb_case_5_2_16 "5.2.16"
 #define name_case_5_2_16 "t_rcvudata operation"
 #define desc_case_5_2_16 "\
 This test case tests the t_rcvudata operation on a non-STREAMS file descriptor."
-static int test_5_2_16_top(int child)
+
+int test_case_5_2_16_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVUDATA);
+	return test_case_5_2_x_top(child, __TEST_T_RCVUDATA);
 }
-static int test_5_2_16_bot(int child)
+
+int test_case_5_2_16_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVUDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVUDATA);
 }
-static struct test_stream test_case_5_2_16_top = { &preamble_0, &test_5_2_16_top, &postamble_0 };
-static struct test_stream test_case_5_2_16_bot = { &preamble_0, &test_5_2_16_bot, &postamble_0 };
-#define test_case_5_2_16_stream_top (&test_case_5_2_16_top)
-#define test_case_5_2_16_stream_bot (&test_case_5_2_16_bot)
+
+#define preamble_5_2_16_top preamble_0
+#define preamble_5_2_16_bot preamble_0
+
+#define postamble_5_2_16_top postamble_0
+#define postamble_5_2_16_bot postamble_0
+
+static struct test_stream test_5_2_16_top = { &preamble_5_2_16_top, &test_case_5_2_16_top, &postamble_5_2_16_top };
+static struct test_stream test_5_2_16_bot = { &preamble_5_2_16_bot, &test_case_5_2_16_bot, &postamble_5_2_16_bot };
 
 #define tgrp_case_5_2_17 test_group_10
+#define numb_case_5_2_17 "5.2.17"
 #define name_case_5_2_17 "t_rcvuderr operation"
 #define desc_case_5_2_17 "\
 This test case tests the t_rcvuderr operation on a non-STREAMS file descriptor."
-static int test_5_2_17_top(int child)
+
+int test_case_5_2_17_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVUDERR);
+	return test_case_5_2_x_top(child, __TEST_T_RCVUDERR);
 }
-static int test_5_2_17_bot(int child)
+
+int test_case_5_2_17_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVUDERR);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVUDERR);
 }
-static struct test_stream test_case_5_2_17_top = { &preamble_0, &test_5_2_17_top, &postamble_0 };
-static struct test_stream test_case_5_2_17_bot = { &preamble_0, &test_5_2_17_bot, &postamble_0 };
-#define test_case_5_2_17_stream_top (&test_case_5_2_17_top)
-#define test_case_5_2_17_stream_bot (&test_case_5_2_17_bot)
+
+#define preamble_5_2_17_top preamble_0
+#define preamble_5_2_17_bot preamble_0
+
+#define postamble_5_2_17_top postamble_0
+#define postamble_5_2_17_bot postamble_0
+
+static struct test_stream test_5_2_17_top = { &preamble_5_2_17_top, &test_case_5_2_17_top, &postamble_5_2_17_top };
+static struct test_stream test_5_2_17_bot = { &preamble_5_2_17_bot, &test_case_5_2_17_bot, &postamble_5_2_17_bot };
 
 #define tgrp_case_5_2_18 test_group_10
+#define numb_case_5_2_18 "5.2.18"
 #define name_case_5_2_18 "t_rcvv operation"
 #define desc_case_5_2_18 "\
 This test case tests the t_rcvv operation on a non-STREAMS file descriptor."
-static int test_5_2_18_top(int child)
+
+int test_case_5_2_18_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVV);
+	return test_case_5_2_x_top(child, __TEST_T_RCVV);
 }
-static int test_5_2_18_bot(int child)
+
+int test_case_5_2_18_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVV);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVV);
 }
-static struct test_stream test_case_5_2_18_top = { &preamble_0, &test_5_2_18_top, &postamble_0 };
-static struct test_stream test_case_5_2_18_bot = { &preamble_0, &test_5_2_18_bot, &postamble_0 };
-#define test_case_5_2_18_stream_top (&test_case_5_2_18_top)
-#define test_case_5_2_18_stream_bot (&test_case_5_2_18_bot)
+
+#define preamble_5_2_18_top preamble_0
+#define preamble_5_2_18_bot preamble_0
+
+#define postamble_5_2_18_top postamble_0
+#define postamble_5_2_18_bot postamble_0
+
+static struct test_stream test_5_2_18_top = { &preamble_5_2_18_top, &test_case_5_2_18_top, &postamble_5_2_18_top };
+static struct test_stream test_5_2_18_bot = { &preamble_5_2_18_bot, &test_case_5_2_18_bot, &postamble_5_2_18_bot };
 
 #define tgrp_case_5_2_19 test_group_10
+#define numb_case_5_2_19 "5.2.19"
 #define name_case_5_2_19 "t_rcvvudata operation"
 #define desc_case_5_2_19 "\
 This test case tests the t_rcvvudata operation on a non-STREAMS file descriptor."
-static int test_5_2_19_top(int child)
+
+int test_case_5_2_19_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_RCVVUDATA);
+	return test_case_5_2_x_top(child, __TEST_T_RCVVUDATA);
 }
-static int test_5_2_19_bot(int child)
+
+int test_case_5_2_19_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_RCVVUDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_RCVVUDATA);
 }
-static struct test_stream test_case_5_2_19_top = { &preamble_0, &test_5_2_19_top, &postamble_0 };
-static struct test_stream test_case_5_2_19_bot = { &preamble_0, &test_5_2_19_bot, &postamble_0 };
-#define test_case_5_2_19_stream_top (&test_case_5_2_19_top)
-#define test_case_5_2_19_stream_bot (&test_case_5_2_19_bot)
+
+#define preamble_5_2_19_top preamble_0
+#define preamble_5_2_19_bot preamble_0
+
+#define postamble_5_2_19_top postamble_0
+#define postamble_5_2_19_bot postamble_0
+
+static struct test_stream test_5_2_19_top = { &preamble_5_2_19_top, &test_case_5_2_19_top, &postamble_5_2_19_top };
+static struct test_stream test_5_2_19_bot = { &preamble_5_2_19_bot, &test_case_5_2_19_bot, &postamble_5_2_19_bot };
 
 #define tgrp_case_5_2_20 test_group_10
+#define numb_case_5_2_20 "5.2.20"
 #define name_case_5_2_20 "t_snd operation"
 #define desc_case_5_2_20 "\
 This test case tests the t_snd operation on a non-STREAMS file descriptor."
-static int test_5_2_20_top(int child)
+
+int test_case_5_2_20_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SND);
+	return test_case_5_2_x_top(child, __TEST_T_SND);
 }
-static int test_5_2_20_bot(int child)
+
+int test_case_5_2_20_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SND);
+	return test_case_5_2_x_bot(child, __TEST_T_SND);
 }
-static struct test_stream test_case_5_2_20_top = { &preamble_0, &test_5_2_20_top, &postamble_0 };
-static struct test_stream test_case_5_2_20_bot = { &preamble_0, &test_5_2_20_bot, &postamble_0 };
-#define test_case_5_2_20_stream_top (&test_case_5_2_20_top)
-#define test_case_5_2_20_stream_bot (&test_case_5_2_20_bot)
+
+#define preamble_5_2_20_top preamble_0
+#define preamble_5_2_20_bot preamble_0
+
+#define postamble_5_2_20_top postamble_0
+#define postamble_5_2_20_bot postamble_0
+
+static struct test_stream test_5_2_20_top = { &preamble_5_2_20_top, &test_case_5_2_20_top, &postamble_5_2_20_top };
+static struct test_stream test_5_2_20_bot = { &preamble_5_2_20_bot, &test_case_5_2_20_bot, &postamble_5_2_20_bot };
 
 #define tgrp_case_5_2_21 test_group_10
+#define numb_case_5_2_21 "5.2.21"
 #define name_case_5_2_21 "t_snddis operation"
 #define desc_case_5_2_21 "\
 This test case tests the t_snddis operation on a non-STREAMS file descriptor."
-static int test_5_2_21_top(int child)
+
+int test_case_5_2_21_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDDIS);
+	return test_case_5_2_x_top(child, __TEST_T_SNDDIS);
 }
-static int test_5_2_21_bot(int child)
+
+int test_case_5_2_21_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDDIS);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDDIS);
 }
-static struct test_stream test_case_5_2_21_top = { &preamble_0, &test_5_2_21_top, &postamble_0 };
-static struct test_stream test_case_5_2_21_bot = { &preamble_0, &test_5_2_21_bot, &postamble_0 };
-#define test_case_5_2_21_stream_top (&test_case_5_2_21_top)
-#define test_case_5_2_21_stream_bot (&test_case_5_2_21_bot)
+
+#define preamble_5_2_21_top preamble_0
+#define preamble_5_2_21_bot preamble_0
+
+#define postamble_5_2_21_top postamble_0
+#define postamble_5_2_21_bot postamble_0
+
+static struct test_stream test_5_2_21_top = { &preamble_5_2_21_top, &test_case_5_2_21_top, &postamble_5_2_21_top };
+static struct test_stream test_5_2_21_bot = { &preamble_5_2_21_bot, &test_case_5_2_21_bot, &postamble_5_2_21_bot };
 
 #define tgrp_case_5_2_22 test_group_10
+#define numb_case_5_2_22 "5.2.22"
 #define name_case_5_2_22 "t_sndrel operation"
 #define desc_case_5_2_22 "\
 This test case tests the t_sndrel operation on a non-STREAMS file descriptor."
-static int test_5_2_22_top(int child)
+
+int test_case_5_2_22_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDREL);
+	return test_case_5_2_x_top(child, __TEST_T_SNDREL);
 }
-static int test_5_2_22_bot(int child)
+
+int test_case_5_2_22_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDREL);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDREL);
 }
-static struct test_stream test_case_5_2_22_top = { &preamble_0, &test_5_2_22_top, &postamble_0 };
-static struct test_stream test_case_5_2_22_bot = { &preamble_0, &test_5_2_22_bot, &postamble_0 };
-#define test_case_5_2_22_stream_top (&test_case_5_2_22_top)
-#define test_case_5_2_22_stream_bot (&test_case_5_2_22_bot)
+
+#define preamble_5_2_22_top preamble_0
+#define preamble_5_2_22_bot preamble_0
+
+#define postamble_5_2_22_top postamble_0
+#define postamble_5_2_22_bot postamble_0
+
+static struct test_stream test_5_2_22_top = { &preamble_5_2_22_top, &test_case_5_2_22_top, &postamble_5_2_22_top };
+static struct test_stream test_5_2_22_bot = { &preamble_5_2_22_bot, &test_case_5_2_22_bot, &postamble_5_2_22_bot };
 
 #define tgrp_case_5_2_23 test_group_10
+#define numb_case_5_2_23 "5.2.23"
 #define name_case_5_2_23 "t_sndreldata operation"
 #define desc_case_5_2_23 "\
 This test case tests the t_sndreldata operation on a non-STREAMS file descriptor."
-static int test_5_2_23_top(int child)
+
+int test_case_5_2_23_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDRELDATA);
+	return test_case_5_2_x_top(child, __TEST_T_SNDRELDATA);
 }
-static int test_5_2_23_bot(int child)
+
+int test_case_5_2_23_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDRELDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDRELDATA);
 }
-static struct test_stream test_case_5_2_23_top = { &preamble_0, &test_5_2_23_top, &postamble_0 };
-static struct test_stream test_case_5_2_23_bot = { &preamble_0, &test_5_2_23_bot, &postamble_0 };
-#define test_case_5_2_23_stream_top (&test_case_5_2_23_top)
-#define test_case_5_2_23_stream_bot (&test_case_5_2_23_bot)
+
+#define preamble_5_2_23_top preamble_0
+#define preamble_5_2_23_bot preamble_0
+
+#define postamble_5_2_23_top postamble_0
+#define postamble_5_2_23_bot postamble_0
+
+static struct test_stream test_5_2_23_top = { &preamble_5_2_23_top, &test_case_5_2_23_top, &postamble_5_2_23_top };
+static struct test_stream test_5_2_23_bot = { &preamble_5_2_23_bot, &test_case_5_2_23_bot, &postamble_5_2_23_bot };
 
 #define tgrp_case_5_2_24 test_group_10
+#define numb_case_5_2_24 "5.2.24"
 #define name_case_5_2_24 "t_sndudata operation"
 #define desc_case_5_2_24 "\
 This test case tests the t_sndudata operation on a non-STREAMS file descriptor."
-static int test_5_2_24_top(int child)
+
+int test_case_5_2_24_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDUDATA);
+	return test_case_5_2_x_top(child, __TEST_T_SNDUDATA);
 }
-static int test_5_2_24_bot(int child)
+
+int test_case_5_2_24_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDUDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDUDATA);
 }
-static struct test_stream test_case_5_2_24_top = { &preamble_0, &test_5_2_24_top, &postamble_0 };
-static struct test_stream test_case_5_2_24_bot = { &preamble_0, &test_5_2_24_bot, &postamble_0 };
-#define test_case_5_2_24_stream_top (&test_case_5_2_24_top)
-#define test_case_5_2_24_stream_bot (&test_case_5_2_24_bot)
+
+#define preamble_5_2_24_top preamble_0
+#define preamble_5_2_24_bot preamble_0
+
+#define postamble_5_2_24_top postamble_0
+#define postamble_5_2_24_bot postamble_0
+
+static struct test_stream test_5_2_24_top = { &preamble_5_2_24_top, &test_case_5_2_24_top, &postamble_5_2_24_top };
+static struct test_stream test_5_2_24_bot = { &preamble_5_2_24_bot, &test_case_5_2_24_bot, &postamble_5_2_24_bot };
 
 #define tgrp_case_5_2_25 test_group_10
+#define numb_case_5_2_25 "5.2.25"
 #define name_case_5_2_25 "t_sndv operation"
 #define desc_case_5_2_25 "\
 This test case tests the t_sndv operation on a non-STREAMS file descriptor."
-static int test_5_2_25_top(int child)
+
+int test_case_5_2_25_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDV);
+	return test_case_5_2_x_top(child, __TEST_T_SNDV);
 }
-static int test_5_2_25_bot(int child)
+
+int test_case_5_2_25_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDV);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDV);
 }
-static struct test_stream test_case_5_2_25_top = { &preamble_0, &test_5_2_25_top, &postamble_0 };
-static struct test_stream test_case_5_2_25_bot = { &preamble_0, &test_5_2_25_bot, &postamble_0 };
-#define test_case_5_2_25_stream_top (&test_case_5_2_25_top)
-#define test_case_5_2_25_stream_bot (&test_case_5_2_25_bot)
+
+#define preamble_5_2_25_top preamble_0
+#define preamble_5_2_25_bot preamble_0
+
+#define postamble_5_2_25_top postamble_0
+#define postamble_5_2_25_bot postamble_0
+
+static struct test_stream test_5_2_25_top = { &preamble_5_2_25_top, &test_case_5_2_25_top, &postamble_5_2_25_top };
+static struct test_stream test_5_2_25_bot = { &preamble_5_2_25_bot, &test_case_5_2_25_bot, &postamble_5_2_25_bot };
 
 #define tgrp_case_5_2_26 test_group_10
+#define numb_case_5_2_26 "5.2.26"
 #define name_case_5_2_26 "t_sndvudata operation"
 #define desc_case_5_2_26 "\
 This test case tests the t_sndvudata operation on a non-STREAMS file descriptor."
-static int test_5_2_26_top(int child)
+
+int test_case_5_2_26_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SNDVUDATA);
+	return test_case_5_2_x_top(child, __TEST_T_SNDVUDATA);
 }
-static int test_5_2_26_bot(int child)
+
+int test_case_5_2_26_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SNDVUDATA);
+	return test_case_5_2_x_bot(child, __TEST_T_SNDVUDATA);
 }
-static struct test_stream test_case_5_2_26_top = { &preamble_0, &test_5_2_26_top, &postamble_0 };
-static struct test_stream test_case_5_2_26_bot = { &preamble_0, &test_5_2_26_bot, &postamble_0 };
-#define test_case_5_2_26_stream_top (&test_case_5_2_26_top)
-#define test_case_5_2_26_stream_bot (&test_case_5_2_26_bot)
+
+#define preamble_5_2_26_top preamble_0
+#define preamble_5_2_26_bot preamble_0
+
+#define postamble_5_2_26_top postamble_0
+#define postamble_5_2_26_bot postamble_0
+
+static struct test_stream test_5_2_26_top = { &preamble_5_2_26_top, &test_case_5_2_26_top, &postamble_5_2_26_top };
+static struct test_stream test_5_2_26_bot = { &preamble_5_2_26_bot, &test_case_5_2_26_bot, &postamble_5_2_26_bot };
 
 #define tgrp_case_5_2_27 test_group_10
+#define numb_case_5_2_27 "5.2.27"
 #define name_case_5_2_27 "t_sync operation"
 #define desc_case_5_2_27 "\
 This test case tests the t_sync operation on a non-STREAMS file descriptor."
-static int test_5_2_27_top(int child)
+
+int test_case_5_2_27_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_SYNC);
+	return test_case_5_2_x_top(child, __TEST_T_SYNC);
 }
-static int test_5_2_27_bot(int child)
+
+int test_case_5_2_27_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_SYNC);
+	return test_case_5_2_x_bot(child, __TEST_T_SYNC);
 }
-static struct test_stream test_case_5_2_27_top = { &preamble_0, &test_5_2_27_top, &postamble_0 };
-static struct test_stream test_case_5_2_27_bot = { &preamble_0, &test_5_2_27_bot, &postamble_0 };
-#define test_case_5_2_27_stream_top (&test_case_5_2_27_top)
-#define test_case_5_2_27_stream_bot (&test_case_5_2_27_bot)
+
+#define preamble_5_2_27_top preamble_0
+#define preamble_5_2_27_bot preamble_0
+
+#define postamble_5_2_27_top postamble_0
+#define postamble_5_2_27_bot postamble_0
+
+static struct test_stream test_5_2_27_top = { &preamble_5_2_27_top, &test_case_5_2_27_top, &postamble_5_2_27_top };
+static struct test_stream test_5_2_27_bot = { &preamble_5_2_27_bot, &test_case_5_2_27_bot, &postamble_5_2_27_bot };
 
 #define tgrp_case_5_2_28 test_group_10
+#define numb_case_5_2_28 "5.2.28"
 #define name_case_5_2_28 "t_unbind operation"
 #define desc_case_5_2_28 "\
 This test case tests the t_unbind operation on a non-STREAMS file descriptor."
-static int test_5_2_28_top(int child)
+
+int test_case_5_2_28_top(int child)
 {
-	return test_5_2_x_top(child, __TEST_T_UNBIND);
+	return test_case_5_2_x_top(child, __TEST_T_UNBIND);
 }
-static int test_5_2_28_bot(int child)
+
+int test_case_5_2_28_bot(int child)
 {
-	return test_5_2_x_bot(child, __TEST_T_UNBIND);
+	return test_case_5_2_x_bot(child, __TEST_T_UNBIND);
 }
-static struct test_stream test_case_5_2_28_top = { &preamble_0, &test_5_2_28_top, &postamble_0 };
-static struct test_stream test_case_5_2_28_bot = { &preamble_0, &test_5_2_28_bot, &postamble_0 };
-#define test_case_5_2_28_stream_top (&test_case_5_2_28_top)
-#define test_case_5_2_28_stream_bot (&test_case_5_2_28_bot)
+
+#define preamble_5_2_28_top preamble_0
+#define preamble_5_2_28_bot preamble_0
+
+#define postamble_5_2_28_top postamble_0
+#define postamble_5_2_28_bot postamble_0
+
+static struct test_stream test_5_2_28_top = { &preamble_5_2_28_top, &test_case_5_2_28_top, &postamble_5_2_28_top };
+static struct test_stream test_5_2_28_bot = { &preamble_5_2_28_bot, &test_case_5_2_28_bot, &postamble_5_2_28_bot };
 
 #define test_group_11 "Operations on a STREAMS file descriptor"
 #define tgrp_case_5_3_1 test_group_11
+#define numb_case_5_3_1 "5.3.1"
 #define name_case_5_3_1 "Without \"timod\" pushed -- t_accept operation"
 #define desc_case_5_3_1 "\
 This test case tests the t_accept operation on a STREAMS file descriptor."
-static int test_5_3_x_top(int child, int function)
+
+int test_case_5_3_x_top(int child, int function)
 {
 	if (do_signal(child, function) == __RESULT_SUCCESS || last_t_errno != TBADF)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_5_3_x_bot(int child, int function)
+
+int test_case_5_3_x_bot(int child, int function)
 {
 	start_tt(200);
 	state++;
@@ -8415,485 +9853,710 @@ static int test_5_3_x_bot(int child, int function)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_5_3_1_top(int child)
+
+int test_case_5_3_1_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_ACCEPT);
+	return test_case_5_3_x_top(child, __TEST_T_ACCEPT);
 }
-static int test_5_3_1_bot(int child)
+
+int test_case_5_3_1_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_ACCEPT);
+	return test_case_5_3_x_bot(child, __TEST_T_ACCEPT);
 }
-static struct test_stream test_case_5_3_1_top = { &preamble_0, &test_5_3_1_top, &postamble_0 };
-static struct test_stream test_case_5_3_1_bot = { &preamble_0, &test_5_3_1_bot, &postamble_0 };
-#define test_case_5_3_1_stream_top (&test_case_5_3_1_top)
-#define test_case_5_3_1_stream_bot (&test_case_5_3_1_bot)
+
+#define preamble_5_3_1_top preamble_0
+#define preamble_5_3_1_bot preamble_0
+
+#define postamble_5_3_1_top postamble_0
+#define postamble_5_3_1_bot postamble_0
+
+static struct test_stream test_5_3_1_top = { &preamble_5_3_1_top, &test_case_5_3_1_top, &postamble_5_3_1_top };
+static struct test_stream test_5_3_1_bot = { &preamble_5_3_1_bot, &test_case_5_3_1_bot, &postamble_5_3_1_bot };
 
 #define tgrp_case_5_3_2 test_group_11
+#define numb_case_5_3_2 "5.3.2"
 #define name_case_5_3_2 "Without \"timod\" pushed -- t_bind operation"
 #define desc_case_5_3_2 "\
 This test case tests the t_bind operation on a STREAMS file descriptor."
-static int test_5_3_2_top(int child)
+
+int test_case_5_3_2_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_BIND);
+	return test_case_5_3_x_top(child, __TEST_T_BIND);
 }
-static int test_5_3_2_bot(int child)
+
+int test_case_5_3_2_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_BIND);
+	return test_case_5_3_x_bot(child, __TEST_T_BIND);
 }
-static struct test_stream test_case_5_3_2_top = { &preamble_0, &test_5_3_2_top, &postamble_0 };
-static struct test_stream test_case_5_3_2_bot = { &preamble_0, &test_5_3_2_bot, &postamble_0 };
-#define test_case_5_3_2_stream_top (&test_case_5_3_2_top)
-#define test_case_5_3_2_stream_bot (&test_case_5_3_2_bot)
+
+#define preamble_5_3_2_top preamble_0
+#define preamble_5_3_2_bot preamble_0
+
+#define postamble_5_3_2_top postamble_0
+#define postamble_5_3_2_bot postamble_0
+
+static struct test_stream test_5_3_2_top = { &preamble_5_3_2_top, &test_case_5_3_2_top, &postamble_5_3_2_top };
+static struct test_stream test_5_3_2_bot = { &preamble_5_3_2_bot, &test_case_5_3_2_bot, &postamble_5_3_2_bot };
 
 #define tgrp_case_5_3_3 test_group_11
+#define numb_case_5_3_3 "5.3.3"
 #define name_case_5_3_3 "Without \"timod\" pushed -- t_close operation"
 #define desc_case_5_3_3 "\
 This test case tests the t_close operation on a STREAMS file descriptor."
-static int test_5_3_3_top(int child)
+
+int test_case_5_3_3_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_CLOSE);
+	return test_case_5_3_x_top(child, __TEST_T_CLOSE);
 }
-static int test_5_3_3_bot(int child)
+
+int test_case_5_3_3_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_CLOSE);
+	return test_case_5_3_x_bot(child, __TEST_T_CLOSE);
 }
-static struct test_stream test_case_5_3_3_top = { &preamble_0, &test_5_3_3_top, &postamble_0 };
-static struct test_stream test_case_5_3_3_bot = { &preamble_0, &test_5_3_3_bot, &postamble_0 };
-#define test_case_5_3_3_stream_top (&test_case_5_3_3_top)
-#define test_case_5_3_3_stream_bot (&test_case_5_3_3_bot)
+
+#define preamble_5_3_3_top preamble_0
+#define preamble_5_3_3_bot preamble_0
+
+#define postamble_5_3_3_top postamble_0
+#define postamble_5_3_3_bot postamble_0
+
+static struct test_stream test_5_3_3_top = { &preamble_5_3_3_top, &test_case_5_3_3_top, &postamble_5_3_3_top };
+static struct test_stream test_5_3_3_bot = { &preamble_5_3_3_bot, &test_case_5_3_3_bot, &postamble_5_3_3_bot };
 
 #define tgrp_case_5_3_4 test_group_11
+#define numb_case_5_3_4 "5.3.4"
 #define name_case_5_3_4 "Without \"timod\" pushed -- t_connect operation"
 #define desc_case_5_3_4 "\
 This test case tests the t_connect operation on a STREAMS file descriptor."
-static int test_5_3_4_top(int child)
+
+int test_case_5_3_4_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_CONNECT);
+	return test_case_5_3_x_top(child, __TEST_T_CONNECT);
 }
-static int test_5_3_4_bot(int child)
+
+int test_case_5_3_4_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_CONNECT);
+	return test_case_5_3_x_bot(child, __TEST_T_CONNECT);
 }
-static struct test_stream test_case_5_3_4_top = { &preamble_0, &test_5_3_4_top, &postamble_0 };
-static struct test_stream test_case_5_3_4_bot = { &preamble_0, &test_5_3_4_bot, &postamble_0 };
-#define test_case_5_3_4_stream_top (&test_case_5_3_4_top)
-#define test_case_5_3_4_stream_bot (&test_case_5_3_4_bot)
+
+#define preamble_5_3_4_top preamble_0
+#define preamble_5_3_4_bot preamble_0
+
+#define postamble_5_3_4_top postamble_0
+#define postamble_5_3_4_bot postamble_0
+
+static struct test_stream test_5_3_4_top = { &preamble_5_3_4_top, &test_case_5_3_4_top, &postamble_5_3_4_top };
+static struct test_stream test_5_3_4_bot = { &preamble_5_3_4_bot, &test_case_5_3_4_bot, &postamble_5_3_4_bot };
 
 #define tgrp_case_5_3_5 test_group_11
+#define numb_case_5_3_5 "5.3.5"
 #define name_case_5_3_5 "Without \"timod\" pushed -- t_getinfo operation"
 #define desc_case_5_3_5 "\
 This test case tests the t_getinfo operation on a STREAMS file descriptor."
-static int test_5_3_5_top(int child)
+
+int test_case_5_3_5_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_GETINFO);
+	return test_case_5_3_x_top(child, __TEST_T_GETINFO);
 }
-static int test_5_3_5_bot(int child)
+
+int test_case_5_3_5_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_GETINFO);
+	return test_case_5_3_x_bot(child, __TEST_T_GETINFO);
 }
-static struct test_stream test_case_5_3_5_top = { &preamble_0, &test_5_3_5_top, &postamble_0 };
-static struct test_stream test_case_5_3_5_bot = { &preamble_0, &test_5_3_5_bot, &postamble_0 };
-#define test_case_5_3_5_stream_top (&test_case_5_3_5_top)
-#define test_case_5_3_5_stream_bot (&test_case_5_3_5_bot)
+
+#define preamble_5_3_5_top preamble_0
+#define preamble_5_3_5_bot preamble_0
+
+#define postamble_5_3_5_top postamble_0
+#define postamble_5_3_5_bot postamble_0
+
+static struct test_stream test_5_3_5_top = { &preamble_5_3_5_top, &test_case_5_3_5_top, &postamble_5_3_5_top };
+static struct test_stream test_5_3_5_bot = { &preamble_5_3_5_bot, &test_case_5_3_5_bot, &postamble_5_3_5_bot };
 
 #define tgrp_case_5_3_6 test_group_11
+#define numb_case_5_3_6 "5.3.6"
 #define name_case_5_3_6 "Without \"timod\" pushed -- t_getprotaddr operation"
 #define desc_case_5_3_6 "\
 This test case tests the t_getprotaddr operation on a STREAMS file descriptor."
-static int test_5_3_6_top(int child)
+
+int test_case_5_3_6_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_GETPROTADDR);
+	return test_case_5_3_x_top(child, __TEST_T_GETPROTADDR);
 }
-static int test_5_3_6_bot(int child)
+
+int test_case_5_3_6_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_GETPROTADDR);
+	return test_case_5_3_x_bot(child, __TEST_T_GETPROTADDR);
 }
-static struct test_stream test_case_5_3_6_top = { &preamble_0, &test_5_3_6_top, &postamble_0 };
-static struct test_stream test_case_5_3_6_bot = { &preamble_0, &test_5_3_6_bot, &postamble_0 };
-#define test_case_5_3_6_stream_top (&test_case_5_3_6_top)
-#define test_case_5_3_6_stream_bot (&test_case_5_3_6_bot)
+
+#define preamble_5_3_6_top preamble_0
+#define preamble_5_3_6_bot preamble_0
+
+#define postamble_5_3_6_top postamble_0
+#define postamble_5_3_6_bot postamble_0
+
+static struct test_stream test_5_3_6_top = { &preamble_5_3_6_top, &test_case_5_3_6_top, &postamble_5_3_6_top };
+static struct test_stream test_5_3_6_bot = { &preamble_5_3_6_bot, &test_case_5_3_6_bot, &postamble_5_3_6_bot };
 
 #define tgrp_case_5_3_7 test_group_11
+#define numb_case_5_3_7 "5.3.7"
 #define name_case_5_3_7 "Without \"timod\" pushed -- t_getstate operation"
 #define desc_case_5_3_7 "\
 This test case tests the t_getstate operation on a STREAMS file descriptor."
-static int test_5_3_7_top(int child)
+
+int test_case_5_3_7_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_GETSTATE);
+	return test_case_5_3_x_top(child, __TEST_T_GETSTATE);
 }
-static int test_5_3_7_bot(int child)
+
+int test_case_5_3_7_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_GETSTATE);
+	return test_case_5_3_x_bot(child, __TEST_T_GETSTATE);
 }
-static struct test_stream test_case_5_3_7_top = { &preamble_0, &test_5_3_7_top, &postamble_0 };
-static struct test_stream test_case_5_3_7_bot = { &preamble_0, &test_5_3_7_bot, &postamble_0 };
-#define test_case_5_3_7_stream_top (&test_case_5_3_7_top)
-#define test_case_5_3_7_stream_bot (&test_case_5_3_7_bot)
+
+#define preamble_5_3_7_top preamble_0
+#define preamble_5_3_7_bot preamble_0
+
+#define postamble_5_3_7_top postamble_0
+#define postamble_5_3_7_bot postamble_0
+
+static struct test_stream test_5_3_7_top = { &preamble_5_3_7_top, &test_case_5_3_7_top, &postamble_5_3_7_top };
+static struct test_stream test_5_3_7_bot = { &preamble_5_3_7_bot, &test_case_5_3_7_bot, &postamble_5_3_7_bot };
 
 #define tgrp_case_5_3_8 test_group_11
+#define numb_case_5_3_8 "5.3.8"
 #define name_case_5_3_8 "Without \"timod\" pushed -- t_listen operation"
 #define desc_case_5_3_8 "\
 This test case tests the t_listen operation on a STREAMS file descriptor."
-static int test_5_3_8_top(int child)
+
+int test_case_5_3_8_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_LISTEN);
+	return test_case_5_3_x_top(child, __TEST_T_LISTEN);
 }
-static int test_5_3_8_bot(int child)
+
+int test_case_5_3_8_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_LISTEN);
+	return test_case_5_3_x_bot(child, __TEST_T_LISTEN);
 }
-static struct test_stream test_case_5_3_8_top = { &preamble_0, &test_5_3_8_top, &postamble_0 };
-static struct test_stream test_case_5_3_8_bot = { &preamble_0, &test_5_3_8_bot, &postamble_0 };
-#define test_case_5_3_8_stream_top (&test_case_5_3_8_top)
-#define test_case_5_3_8_stream_bot (&test_case_5_3_8_bot)
+
+#define preamble_5_3_8_top preamble_0
+#define preamble_5_3_8_bot preamble_0
+
+#define postamble_5_3_8_top postamble_0
+#define postamble_5_3_8_bot postamble_0
+
+static struct test_stream test_5_3_8_top = { &preamble_5_3_8_top, &test_case_5_3_8_top, &postamble_5_3_8_top };
+static struct test_stream test_5_3_8_bot = { &preamble_5_3_8_bot, &test_case_5_3_8_bot, &postamble_5_3_8_bot };
 
 #define tgrp_case_5_3_9 test_group_11
+#define numb_case_5_3_9 "5.3.9"
 #define name_case_5_3_9 "Without \"timod\" pushed -- t_look operation"
 #define desc_case_5_3_9 "\
 This test case tests the t_look operation on a STREAMS file descriptor."
-static int test_5_3_9_top(int child)
+
+int test_case_5_3_9_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_LOOK);
+	return test_case_5_3_x_top(child, __TEST_T_LOOK);
 }
-static int test_5_3_9_bot(int child)
+
+int test_case_5_3_9_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_LOOK);
+	return test_case_5_3_x_bot(child, __TEST_T_LOOK);
 }
-static struct test_stream test_case_5_3_9_top = { &preamble_0, &test_5_3_9_top, &postamble_0 };
-static struct test_stream test_case_5_3_9_bot = { &preamble_0, &test_5_3_9_bot, &postamble_0 };
-#define test_case_5_3_9_stream_top (&test_case_5_3_9_top)
-#define test_case_5_3_9_stream_bot (&test_case_5_3_9_bot)
+
+#define preamble_5_3_9_top preamble_0
+#define preamble_5_3_9_bot preamble_0
+
+#define postamble_5_3_9_top postamble_0
+#define postamble_5_3_9_bot postamble_0
+
+static struct test_stream test_5_3_9_top = { &preamble_5_3_9_top, &test_case_5_3_9_top, &postamble_5_3_9_top };
+static struct test_stream test_5_3_9_bot = { &preamble_5_3_9_bot, &test_case_5_3_9_bot, &postamble_5_3_9_bot };
 
 #define tgrp_case_5_3_10 test_group_11
+#define numb_case_5_3_10 "5.3.10"
 #define name_case_5_3_10 "Without \"timod\" pushed -- t_optmgmt operation"
 #define desc_case_5_3_10 "\
 This test case tests the t_optmgmt operation on a STREAMS file descriptor."
-static int test_5_3_10_top(int child)
+
+int test_case_5_3_10_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_OPTMGMT);
+	return test_case_5_3_x_top(child, __TEST_T_OPTMGMT);
 }
-static int test_5_3_10_bot(int child)
+
+int test_case_5_3_10_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_OPTMGMT);
+	return test_case_5_3_x_bot(child, __TEST_T_OPTMGMT);
 }
-static struct test_stream test_case_5_3_10_top = { &preamble_0, &test_5_3_10_top, &postamble_0 };
-static struct test_stream test_case_5_3_10_bot = { &preamble_0, &test_5_3_10_bot, &postamble_0 };
-#define test_case_5_3_10_stream_top (&test_case_5_3_10_top)
-#define test_case_5_3_10_stream_bot (&test_case_5_3_10_bot)
+
+#define preamble_5_3_10_top preamble_0
+#define preamble_5_3_10_bot preamble_0
+
+#define postamble_5_3_10_top postamble_0
+#define postamble_5_3_10_bot postamble_0
+
+static struct test_stream test_5_3_10_top = { &preamble_5_3_10_top, &test_case_5_3_10_top, &postamble_5_3_10_top };
+static struct test_stream test_5_3_10_bot = { &preamble_5_3_10_bot, &test_case_5_3_10_bot, &postamble_5_3_10_bot };
 
 #define tgrp_case_5_3_11 test_group_11
+#define numb_case_5_3_11 "5.3.11"
 #define name_case_5_3_11 "Without \"timod\" pushed -- t_rcv operation"
 #define desc_case_5_3_11 "\
 This test case tests the t_rcv operation on a STREAMS file descriptor."
-static int test_5_3_11_top(int child)
+
+int test_case_5_3_11_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCV);
+	return test_case_5_3_x_top(child, __TEST_T_RCV);
 }
-static int test_5_3_11_bot(int child)
+
+int test_case_5_3_11_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCV);
+	return test_case_5_3_x_bot(child, __TEST_T_RCV);
 }
-static struct test_stream test_case_5_3_11_top = { &preamble_0, &test_5_3_11_top, &postamble_0 };
-static struct test_stream test_case_5_3_11_bot = { &preamble_0, &test_5_3_11_bot, &postamble_0 };
-#define test_case_5_3_11_stream_top (&test_case_5_3_11_top)
-#define test_case_5_3_11_stream_bot (&test_case_5_3_11_bot)
+
+#define preamble_5_3_11_top preamble_0
+#define preamble_5_3_11_bot preamble_0
+
+#define postamble_5_3_11_top postamble_0
+#define postamble_5_3_11_bot postamble_0
+
+static struct test_stream test_5_3_11_top = { &preamble_5_3_11_top, &test_case_5_3_11_top, &postamble_5_3_11_top };
+static struct test_stream test_5_3_11_bot = { &preamble_5_3_11_bot, &test_case_5_3_11_bot, &postamble_5_3_11_bot };
 
 #define tgrp_case_5_3_12 test_group_11
+#define numb_case_5_3_12 "5.3.12"
 #define name_case_5_3_12 "Without \"timod\" pushed -- t_rcvconnect operation"
 #define desc_case_5_3_12 "\
 This test case tests the t_rcvconnect operation on a STREAMS file descriptor."
-static int test_5_3_12_top(int child)
+
+int test_case_5_3_12_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVCONNECT);
+	return test_case_5_3_x_top(child, __TEST_T_RCVCONNECT);
 }
-static int test_5_3_12_bot(int child)
+
+int test_case_5_3_12_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVCONNECT);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVCONNECT);
 }
-static struct test_stream test_case_5_3_12_top = { &preamble_0, &test_5_3_12_top, &postamble_0 };
-static struct test_stream test_case_5_3_12_bot = { &preamble_0, &test_5_3_12_bot, &postamble_0 };
-#define test_case_5_3_12_stream_top (&test_case_5_3_12_top)
-#define test_case_5_3_12_stream_bot (&test_case_5_3_12_bot)
+
+#define preamble_5_3_12_top preamble_0
+#define preamble_5_3_12_bot preamble_0
+
+#define postamble_5_3_12_top postamble_0
+#define postamble_5_3_12_bot postamble_0
+
+static struct test_stream test_5_3_12_top = { &preamble_5_3_12_top, &test_case_5_3_12_top, &postamble_5_3_12_top };
+static struct test_stream test_5_3_12_bot = { &preamble_5_3_12_bot, &test_case_5_3_12_bot, &postamble_5_3_12_bot };
 
 #define tgrp_case_5_3_13 test_group_11
+#define numb_case_5_3_13 "5.3.13"
 #define name_case_5_3_13 "Without \"timod\" pushed -- t_rcvdis operation"
 #define desc_case_5_3_13 "\
 This test case tests the t_rcvdis operation on a STREAMS file descriptor."
-static int test_5_3_13_top(int child)
+
+int test_case_5_3_13_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVDIS);
+	return test_case_5_3_x_top(child, __TEST_T_RCVDIS);
 }
-static int test_5_3_13_bot(int child)
+
+int test_case_5_3_13_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVDIS);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVDIS);
 }
-static struct test_stream test_case_5_3_13_top = { &preamble_0, &test_5_3_13_top, &postamble_0 };
-static struct test_stream test_case_5_3_13_bot = { &preamble_0, &test_5_3_13_bot, &postamble_0 };
-#define test_case_5_3_13_stream_top (&test_case_5_3_13_top)
-#define test_case_5_3_13_stream_bot (&test_case_5_3_13_bot)
+
+#define preamble_5_3_13_top preamble_0
+#define preamble_5_3_13_bot preamble_0
+
+#define postamble_5_3_13_top postamble_0
+#define postamble_5_3_13_bot postamble_0
+
+static struct test_stream test_5_3_13_top = { &preamble_5_3_13_top, &test_case_5_3_13_top, &postamble_5_3_13_top };
+static struct test_stream test_5_3_13_bot = { &preamble_5_3_13_bot, &test_case_5_3_13_bot, &postamble_5_3_13_bot };
 
 #define tgrp_case_5_3_14 test_group_11
+#define numb_case_5_3_14 "5.3.14"
 #define name_case_5_3_14 "Without \"timod\" pushed -- t_rcvrel operation"
 #define desc_case_5_3_14 "\
 This test case tests the t_rcvrel operation on a STREAMS file descriptor."
-static int test_5_3_14_top(int child)
+
+int test_case_5_3_14_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVREL);
+	return test_case_5_3_x_top(child, __TEST_T_RCVREL);
 }
-static int test_5_3_14_bot(int child)
+
+int test_case_5_3_14_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVREL);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVREL);
 }
-static struct test_stream test_case_5_3_14_top = { &preamble_0, &test_5_3_14_top, &postamble_0 };
-static struct test_stream test_case_5_3_14_bot = { &preamble_0, &test_5_3_14_bot, &postamble_0 };
-#define test_case_5_3_14_stream_top (&test_case_5_3_14_top)
-#define test_case_5_3_14_stream_bot (&test_case_5_3_14_bot)
+
+#define preamble_5_3_14_top preamble_0
+#define preamble_5_3_14_bot preamble_0
+
+#define postamble_5_3_14_top postamble_0
+#define postamble_5_3_14_bot postamble_0
+
+static struct test_stream test_5_3_14_top = { &preamble_5_3_14_top, &test_case_5_3_14_top, &postamble_5_3_14_top };
+static struct test_stream test_5_3_14_bot = { &preamble_5_3_14_bot, &test_case_5_3_14_bot, &postamble_5_3_14_bot };
 
 #define tgrp_case_5_3_15 test_group_11
+#define numb_case_5_3_15 "5.3.15"
 #define name_case_5_3_15 "Without \"timod\" pushed -- t_rcvreldata operation"
 #define desc_case_5_3_15 "\
 This test case tests the t_rcvreldata operation on a STREAMS file descriptor."
-static int test_5_3_15_top(int child)
+
+int test_case_5_3_15_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVRELDATA);
+	return test_case_5_3_x_top(child, __TEST_T_RCVRELDATA);
 }
-static int test_5_3_15_bot(int child)
+
+int test_case_5_3_15_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVRELDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVRELDATA);
 }
-static struct test_stream test_case_5_3_15_top = { &preamble_0, &test_5_3_15_top, &postamble_0 };
-static struct test_stream test_case_5_3_15_bot = { &preamble_0, &test_5_3_15_bot, &postamble_0 };
-#define test_case_5_3_15_stream_top (&test_case_5_3_15_top)
-#define test_case_5_3_15_stream_bot (&test_case_5_3_15_bot)
+
+#define preamble_5_3_15_top preamble_0
+#define preamble_5_3_15_bot preamble_0
+
+#define postamble_5_3_15_top postamble_0
+#define postamble_5_3_15_bot postamble_0
+
+static struct test_stream test_5_3_15_top = { &preamble_5_3_15_top, &test_case_5_3_15_top, &postamble_5_3_15_top };
+static struct test_stream test_5_3_15_bot = { &preamble_5_3_15_bot, &test_case_5_3_15_bot, &postamble_5_3_15_bot };
 
 #define tgrp_case_5_3_16 test_group_11
+#define numb_case_5_3_16 "5.3.16"
 #define name_case_5_3_16 "Without \"timod\" pushed -- t_rcvudata operation"
 #define desc_case_5_3_16 "\
 This test case tests the t_rcvudata operation on a STREAMS file descriptor."
-static int test_5_3_16_top(int child)
+
+int test_case_5_3_16_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVUDATA);
+	return test_case_5_3_x_top(child, __TEST_T_RCVUDATA);
 }
-static int test_5_3_16_bot(int child)
+
+int test_case_5_3_16_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVUDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVUDATA);
 }
-static struct test_stream test_case_5_3_16_top = { &preamble_0, &test_5_3_16_top, &postamble_0 };
-static struct test_stream test_case_5_3_16_bot = { &preamble_0, &test_5_3_16_bot, &postamble_0 };
-#define test_case_5_3_16_stream_top (&test_case_5_3_16_top)
-#define test_case_5_3_16_stream_bot (&test_case_5_3_16_bot)
+
+#define preamble_5_3_16_top preamble_0
+#define preamble_5_3_16_bot preamble_0
+
+#define postamble_5_3_16_top postamble_0
+#define postamble_5_3_16_bot postamble_0
+
+static struct test_stream test_5_3_16_top = { &preamble_5_3_16_top, &test_case_5_3_16_top, &postamble_5_3_16_top };
+static struct test_stream test_5_3_16_bot = { &preamble_5_3_16_bot, &test_case_5_3_16_bot, &postamble_5_3_16_bot };
 
 #define tgrp_case_5_3_17 test_group_11
+#define numb_case_5_3_17 "5.3.17"
 #define name_case_5_3_17 "Without \"timod\" pushed -- t_rcvuderr operation"
 #define desc_case_5_3_17 "\
 This test case tests the t_rcvuderr operation on a STREAMS file descriptor."
-static int test_5_3_17_top(int child)
+
+int test_case_5_3_17_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVUDERR);
+	return test_case_5_3_x_top(child, __TEST_T_RCVUDERR);
 }
-static int test_5_3_17_bot(int child)
+
+int test_case_5_3_17_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVUDERR);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVUDERR);
 }
-static struct test_stream test_case_5_3_17_top = { &preamble_0, &test_5_3_17_top, &postamble_0 };
-static struct test_stream test_case_5_3_17_bot = { &preamble_0, &test_5_3_17_bot, &postamble_0 };
-#define test_case_5_3_17_stream_top (&test_case_5_3_17_top)
-#define test_case_5_3_17_stream_bot (&test_case_5_3_17_bot)
+
+#define preamble_5_3_17_top preamble_0
+#define preamble_5_3_17_bot preamble_0
+
+#define postamble_5_3_17_top postamble_0
+#define postamble_5_3_17_bot postamble_0
+
+static struct test_stream test_5_3_17_top = { &preamble_5_3_17_top, &test_case_5_3_17_top, &postamble_5_3_17_top };
+static struct test_stream test_5_3_17_bot = { &preamble_5_3_17_bot, &test_case_5_3_17_bot, &postamble_5_3_17_bot };
 
 #define tgrp_case_5_3_18 test_group_11
+#define numb_case_5_3_18 "5.3.18"
 #define name_case_5_3_18 "Without \"timod\" pushed -- t_rcvv operation"
 #define desc_case_5_3_18 "\
 This test case tests the t_rcvv operation on a STREAMS file descriptor."
-static int test_5_3_18_top(int child)
+
+int test_case_5_3_18_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVV);
+	return test_case_5_3_x_top(child, __TEST_T_RCVV);
 }
-static int test_5_3_18_bot(int child)
+
+int test_case_5_3_18_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVV);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVV);
 }
-static struct test_stream test_case_5_3_18_top = { &preamble_0, &test_5_3_18_top, &postamble_0 };
-static struct test_stream test_case_5_3_18_bot = { &preamble_0, &test_5_3_18_bot, &postamble_0 };
-#define test_case_5_3_18_stream_top (&test_case_5_3_18_top)
-#define test_case_5_3_18_stream_bot (&test_case_5_3_18_bot)
+
+#define preamble_5_3_18_top preamble_0
+#define preamble_5_3_18_bot preamble_0
+
+#define postamble_5_3_18_top postamble_0
+#define postamble_5_3_18_bot postamble_0
+
+static struct test_stream test_5_3_18_top = { &preamble_5_3_18_top, &test_case_5_3_18_top, &postamble_5_3_18_top };
+static struct test_stream test_5_3_18_bot = { &preamble_5_3_18_bot, &test_case_5_3_18_bot, &postamble_5_3_18_bot };
 
 #define tgrp_case_5_3_19 test_group_11
+#define numb_case_5_3_19 "5.3.19"
 #define name_case_5_3_19 "Without \"timod\" pushed -- t_rcvvudata operation"
 #define desc_case_5_3_19 "\
 This test case tests the t_rcvvudata operation on a STREAMS file descriptor."
-static int test_5_3_19_top(int child)
+
+int test_case_5_3_19_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_RCVVUDATA);
+	return test_case_5_3_x_top(child, __TEST_T_RCVVUDATA);
 }
-static int test_5_3_19_bot(int child)
+
+int test_case_5_3_19_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_RCVVUDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_RCVVUDATA);
 }
-static struct test_stream test_case_5_3_19_top = { &preamble_0, &test_5_3_19_top, &postamble_0 };
-static struct test_stream test_case_5_3_19_bot = { &preamble_0, &test_5_3_19_bot, &postamble_0 };
-#define test_case_5_3_19_stream_top (&test_case_5_3_19_top)
-#define test_case_5_3_19_stream_bot (&test_case_5_3_19_bot)
+
+#define preamble_5_3_19_top preamble_0
+#define preamble_5_3_19_bot preamble_0
+
+#define postamble_5_3_19_top postamble_0
+#define postamble_5_3_19_bot postamble_0
+
+static struct test_stream test_5_3_19_top = { &preamble_5_3_19_top, &test_case_5_3_19_top, &postamble_5_3_19_top };
+static struct test_stream test_5_3_19_bot = { &preamble_5_3_19_bot, &test_case_5_3_19_bot, &postamble_5_3_19_bot };
 
 #define tgrp_case_5_3_20 test_group_11
+#define numb_case_5_3_20 "5.3.20"
 #define name_case_5_3_20 "Without \"timod\" pushed -- t_snd operation"
 #define desc_case_5_3_20 "\
 This test case tests the t_snd operation on a STREAMS file descriptor."
-static int test_5_3_20_top(int child)
+
+int test_case_5_3_20_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SND);
+	return test_case_5_3_x_top(child, __TEST_T_SND);
 }
-static int test_5_3_20_bot(int child)
+
+int test_case_5_3_20_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SND);
+	return test_case_5_3_x_bot(child, __TEST_T_SND);
 }
-static struct test_stream test_case_5_3_20_top = { &preamble_0, &test_5_3_20_top, &postamble_0 };
-static struct test_stream test_case_5_3_20_bot = { &preamble_0, &test_5_3_20_bot, &postamble_0 };
-#define test_case_5_3_20_stream_top (&test_case_5_3_20_top)
-#define test_case_5_3_20_stream_bot (&test_case_5_3_20_bot)
+
+#define preamble_5_3_20_top preamble_0
+#define preamble_5_3_20_bot preamble_0
+
+#define postamble_5_3_20_top postamble_0
+#define postamble_5_3_20_bot postamble_0
+
+static struct test_stream test_5_3_20_top = { &preamble_5_3_20_top, &test_case_5_3_20_top, &postamble_5_3_20_top };
+static struct test_stream test_5_3_20_bot = { &preamble_5_3_20_bot, &test_case_5_3_20_bot, &postamble_5_3_20_bot };
 
 #define tgrp_case_5_3_21 test_group_11
+#define numb_case_5_3_21 "5.3.21"
 #define name_case_5_3_21 "Without \"timod\" pushed -- t_snddis operation"
 #define desc_case_5_3_21 "\
 This test case tests the t_snddis operation on a STREAMS file descriptor."
-static int test_5_3_21_top(int child)
+
+int test_case_5_3_21_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDDIS);
+	return test_case_5_3_x_top(child, __TEST_T_SNDDIS);
 }
-static int test_5_3_21_bot(int child)
+
+int test_case_5_3_21_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDDIS);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDDIS);
 }
-static struct test_stream test_case_5_3_21_top = { &preamble_0, &test_5_3_21_top, &postamble_0 };
-static struct test_stream test_case_5_3_21_bot = { &preamble_0, &test_5_3_21_bot, &postamble_0 };
-#define test_case_5_3_21_stream_top (&test_case_5_3_21_top)
-#define test_case_5_3_21_stream_bot (&test_case_5_3_21_bot)
+
+#define preamble_5_3_21_top preamble_0
+#define preamble_5_3_21_bot preamble_0
+
+#define postamble_5_3_21_top postamble_0
+#define postamble_5_3_21_bot postamble_0
+
+static struct test_stream test_5_3_21_top = { &preamble_5_3_21_top, &test_case_5_3_21_top, &postamble_5_3_21_top };
+static struct test_stream test_5_3_21_bot = { &preamble_5_3_21_bot, &test_case_5_3_21_bot, &postamble_5_3_21_bot };
 
 #define tgrp_case_5_3_22 test_group_11
+#define numb_case_5_3_22 "5.3.22"
 #define name_case_5_3_22 "Without \"timod\" pushed -- t_sndrel operation"
 #define desc_case_5_3_22 "\
 This test case tests the t_sndrel operation on a STREAMS file descriptor."
-static int test_5_3_22_top(int child)
+
+int test_case_5_3_22_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDREL);
+	return test_case_5_3_x_top(child, __TEST_T_SNDREL);
 }
-static int test_5_3_22_bot(int child)
+
+int test_case_5_3_22_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDREL);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDREL);
 }
-static struct test_stream test_case_5_3_22_top = { &preamble_0, &test_5_3_22_top, &postamble_0 };
-static struct test_stream test_case_5_3_22_bot = { &preamble_0, &test_5_3_22_bot, &postamble_0 };
-#define test_case_5_3_22_stream_top (&test_case_5_3_22_top)
-#define test_case_5_3_22_stream_bot (&test_case_5_3_22_bot)
+
+#define preamble_5_3_22_top preamble_0
+#define preamble_5_3_22_bot preamble_0
+
+#define postamble_5_3_22_top postamble_0
+#define postamble_5_3_22_bot postamble_0
+
+static struct test_stream test_5_3_22_top = { &preamble_5_3_22_top, &test_case_5_3_22_top, &postamble_5_3_22_top };
+static struct test_stream test_5_3_22_bot = { &preamble_5_3_22_bot, &test_case_5_3_22_bot, &postamble_5_3_22_bot };
 
 #define tgrp_case_5_3_23 test_group_11
+#define numb_case_5_3_23 "5.3.23"
 #define name_case_5_3_23 "Without \"timod\" pushed -- t_sndreldata operation"
 #define desc_case_5_3_23 "\
 This test case tests the t_sndreldata operation on a STREAMS file descriptor."
-static int test_5_3_23_top(int child)
+
+int test_case_5_3_23_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDRELDATA);
+	return test_case_5_3_x_top(child, __TEST_T_SNDRELDATA);
 }
-static int test_5_3_23_bot(int child)
+
+int test_case_5_3_23_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDRELDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDRELDATA);
 }
-static struct test_stream test_case_5_3_23_top = { &preamble_0, &test_5_3_23_top, &postamble_0 };
-static struct test_stream test_case_5_3_23_bot = { &preamble_0, &test_5_3_23_bot, &postamble_0 };
-#define test_case_5_3_23_stream_top (&test_case_5_3_23_top)
-#define test_case_5_3_23_stream_bot (&test_case_5_3_23_bot)
+
+#define preamble_5_3_23_top preamble_0
+#define preamble_5_3_23_bot preamble_0
+
+#define postamble_5_3_23_top postamble_0
+#define postamble_5_3_23_bot postamble_0
+
+static struct test_stream test_5_3_23_top = { &preamble_5_3_23_top, &test_case_5_3_23_top, &postamble_5_3_23_top };
+static struct test_stream test_5_3_23_bot = { &preamble_5_3_23_bot, &test_case_5_3_23_bot, &postamble_5_3_23_bot };
 
 #define tgrp_case_5_3_24 test_group_11
+#define numb_case_5_3_24 "5.3.24"
 #define name_case_5_3_24 "Without \"timod\" pushed -- t_sndudata operation"
 #define desc_case_5_3_24 "\
 This test case tests the t_sndudata operation on a STREAMS file descriptor."
-static int test_5_3_24_top(int child)
+
+int test_case_5_3_24_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDUDATA);
+	return test_case_5_3_x_top(child, __TEST_T_SNDUDATA);
 }
-static int test_5_3_24_bot(int child)
+
+int test_case_5_3_24_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDUDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDUDATA);
 }
-static struct test_stream test_case_5_3_24_top = { &preamble_0, &test_5_3_24_top, &postamble_0 };
-static struct test_stream test_case_5_3_24_bot = { &preamble_0, &test_5_3_24_bot, &postamble_0 };
-#define test_case_5_3_24_stream_top (&test_case_5_3_24_top)
-#define test_case_5_3_24_stream_bot (&test_case_5_3_24_bot)
+
+#define preamble_5_3_24_top preamble_0
+#define preamble_5_3_24_bot preamble_0
+
+#define postamble_5_3_24_top postamble_0
+#define postamble_5_3_24_bot postamble_0
+
+static struct test_stream test_5_3_24_top = { &preamble_5_3_24_top, &test_case_5_3_24_top, &postamble_5_3_24_top };
+static struct test_stream test_5_3_24_bot = { &preamble_5_3_24_bot, &test_case_5_3_24_bot, &postamble_5_3_24_bot };
 
 #define tgrp_case_5_3_25 test_group_11
+#define numb_case_5_3_25 "5.3.25"
 #define name_case_5_3_25 "Without \"timod\" pushed -- t_sndv operation"
 #define desc_case_5_3_25 "\
 This test case tests the t_sndv operation on a STREAMS file descriptor."
-static int test_5_3_25_top(int child)
+
+int test_case_5_3_25_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDV);
+	return test_case_5_3_x_top(child, __TEST_T_SNDV);
 }
-static int test_5_3_25_bot(int child)
+
+int test_case_5_3_25_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDV);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDV);
 }
-static struct test_stream test_case_5_3_25_top = { &preamble_0, &test_5_3_25_top, &postamble_0 };
-static struct test_stream test_case_5_3_25_bot = { &preamble_0, &test_5_3_25_bot, &postamble_0 };
-#define test_case_5_3_25_stream_top (&test_case_5_3_25_top)
-#define test_case_5_3_25_stream_bot (&test_case_5_3_25_bot)
+
+#define preamble_5_3_25_top preamble_0
+#define preamble_5_3_25_bot preamble_0
+
+#define postamble_5_3_25_top postamble_0
+#define postamble_5_3_25_bot postamble_0
+
+static struct test_stream test_5_3_25_top = { &preamble_5_3_25_top, &test_case_5_3_25_top, &postamble_5_3_25_top };
+static struct test_stream test_5_3_25_bot = { &preamble_5_3_25_bot, &test_case_5_3_25_bot, &postamble_5_3_25_bot };
 
 #define tgrp_case_5_3_26 test_group_11
+#define numb_case_5_3_26 "5.3.26"
 #define name_case_5_3_26 "Without \"timod\" pushed -- t_sndvudata operation"
 #define desc_case_5_3_26 "\
 This test case tests the t_sndvudata operation on a STREAMS file descriptor."
-static int test_5_3_26_top(int child)
+
+int test_case_5_3_26_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SNDVUDATA);
+	return test_case_5_3_x_top(child, __TEST_T_SNDVUDATA);
 }
-static int test_5_3_26_bot(int child)
+
+int test_case_5_3_26_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SNDVUDATA);
+	return test_case_5_3_x_bot(child, __TEST_T_SNDVUDATA);
 }
-static struct test_stream test_case_5_3_26_top = { &preamble_0, &test_5_3_26_top, &postamble_0 };
-static struct test_stream test_case_5_3_26_bot = { &preamble_0, &test_5_3_26_bot, &postamble_0 };
-#define test_case_5_3_26_stream_top (&test_case_5_3_26_top)
-#define test_case_5_3_26_stream_bot (&test_case_5_3_26_bot)
+
+#define preamble_5_3_26_top preamble_0
+#define preamble_5_3_26_bot preamble_0
+
+#define postamble_5_3_26_top postamble_0
+#define postamble_5_3_26_bot postamble_0
+
+static struct test_stream test_5_3_26_top = { &preamble_5_3_26_top, &test_case_5_3_26_top, &postamble_5_3_26_top };
+static struct test_stream test_5_3_26_bot = { &preamble_5_3_26_bot, &test_case_5_3_26_bot, &postamble_5_3_26_bot };
 
 #define tgrp_case_5_3_27 test_group_11
+#define numb_case_5_3_27 "5.3.27"
 #define name_case_5_3_27 "Without \"timod\" pushed -- t_sync operation"
 #define desc_case_5_3_27 "\
 This test case tests the t_sync operation on a STREAMS file descriptor."
-static int test_5_3_27_top(int child)
+
+int test_case_5_3_27_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_SYNC);
+	return test_case_5_3_x_top(child, __TEST_T_SYNC);
 }
-static int test_5_3_27_bot(int child)
+
+int test_case_5_3_27_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_SYNC);
+	return test_case_5_3_x_bot(child, __TEST_T_SYNC);
 }
-static struct test_stream test_case_5_3_27_top = { &preamble_0, &test_5_3_27_top, &postamble_0 };
-static struct test_stream test_case_5_3_27_bot = { &preamble_0, &test_5_3_27_bot, &postamble_0 };
-#define test_case_5_3_27_stream_top (&test_case_5_3_27_top)
-#define test_case_5_3_27_stream_bot (&test_case_5_3_27_bot)
+
+#define preamble_5_3_27_top preamble_0
+#define preamble_5_3_27_bot preamble_0
+
+#define postamble_5_3_27_top postamble_0
+#define postamble_5_3_27_bot postamble_0
+
+static struct test_stream test_5_3_27_top = { &preamble_5_3_27_top, &test_case_5_3_27_top, &postamble_5_3_27_top };
+static struct test_stream test_5_3_27_bot = { &preamble_5_3_27_bot, &test_case_5_3_27_bot, &postamble_5_3_27_bot };
 
 #define tgrp_case_5_3_28 test_group_11
+#define numb_case_5_3_28 "5.3.28"
 #define name_case_5_3_28 "Without \"timod\" pushed -- t_unbind operation"
 #define desc_case_5_3_28 "\
 This test case tests the t_unbind operation on a STREAMS file descriptor."
-static int test_5_3_28_top(int child)
+
+int test_case_5_3_28_top(int child)
 {
-	return test_5_3_x_top(child, __TEST_T_UNBIND);
+	return test_case_5_3_x_top(child, __TEST_T_UNBIND);
 }
-static int test_5_3_28_bot(int child)
+
+int test_case_5_3_28_bot(int child)
 {
-	return test_5_3_x_bot(child, __TEST_T_UNBIND);
+	return test_case_5_3_x_bot(child, __TEST_T_UNBIND);
 }
-static struct test_stream test_case_5_3_28_top = { &preamble_0, &test_5_3_28_top, &postamble_0 };
-static struct test_stream test_case_5_3_28_bot = { &preamble_0, &test_5_3_28_bot, &postamble_0 };
-#define test_case_5_3_28_stream_top (&test_case_5_3_28_top)
-#define test_case_5_3_28_stream_bot (&test_case_5_3_28_bot)
+
+#define preamble_5_3_28_top preamble_0
+#define preamble_5_3_28_bot preamble_0
+
+#define postamble_5_3_28_top postamble_0
+#define postamble_5_3_28_bot postamble_0
+
+static struct test_stream test_5_3_28_top = { &preamble_5_3_28_top, &test_case_5_3_28_top, &postamble_5_3_28_top };
+static struct test_stream test_5_3_28_bot = { &preamble_5_3_28_bot, &test_case_5_3_28_bot, &postamble_5_3_28_bot };
 
 #define test_group_12 "Valid TPI error acknowledgements for all calls"
 #define tgrp_case_6_1_1 test_group_12
+#define numb_case_6_1_1 "6.1.1"
 #define name_case_6_1_1 "t_accept library call -- TACCES error"
 #define desc_case_6_1_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_x_top(int child, int terror, int error)
+
+int test_case_6_1_x_top(int child, int terror, int error)
 {
 	start_tt(200);
 	state++;
@@ -8919,7 +10582,8 @@ static int test_6_1_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_1_x_bot(int child, int terror, int error)
+
+int test_case_6_1_x_bot(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -8944,223 +10608,320 @@ static int test_6_1_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_1_1_top(int child)
+
+int test_case_6_1_1_top(int child)
 {
-	return test_6_1_x_top(child, TACCES, 0);
+	return test_case_6_1_x_top(child, TACCES, 0);
 }
-static int test_6_1_1_bot(int child)
+
+int test_case_6_1_1_bot(int child)
 {
-	return test_6_1_x_bot(child, TACCES, 0);
+	return test_case_6_1_x_bot(child, TACCES, 0);
 }
-static struct test_stream test_case_6_1_1_top = { &preamble_2_top, &test_6_1_1_top, &postamble_2_top };
-static struct test_stream test_case_6_1_1_bot = { &preamble_2_bot, &test_6_1_1_bot, &postamble_2_bot };
-#define test_case_6_1_1_stream_top (&test_case_6_1_1_top)
-#define test_case_6_1_1_stream_bot (&test_case_6_1_1_bot)
+
+#define preamble_6_1_1_top preamble_2_top
+#define preamble_6_1_1_bot preamble_2_bot
+
+#define postamble_6_1_1_top postamble_2_top
+#define postamble_6_1_1_bot postamble_2_bot
+
+static struct test_stream test_6_1_1_top = { &preamble_6_1_1_top, &test_case_6_1_1_top, &postamble_6_1_1_top };
+static struct test_stream test_6_1_1_bot = { &preamble_6_1_1_bot, &test_case_6_1_1_bot, &postamble_6_1_1_bot };
 
 #define tgrp_case_6_1_2 test_group_12
+#define numb_case_6_1_2 "6.1.2"
 #define name_case_6_1_2 "t_accept library call -- TBADADDR error"
 #define desc_case_6_1_2 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_2_top(int child)
+
+int test_case_6_1_2_top(int child)
 {
-	return test_6_1_x_top(child, TBADADDR, 0);
+	return test_case_6_1_x_top(child, TBADADDR, 0);
 }
-static int test_6_1_2_bot(int child)
+
+int test_case_6_1_2_bot(int child)
 {
-	return test_6_1_x_bot(child, TBADADDR, 0);
+	return test_case_6_1_x_bot(child, TBADADDR, 0);
 }
-static struct test_stream test_case_6_1_2_top = { &preamble_2_top, &test_6_1_2_top, &postamble_2_top };
-static struct test_stream test_case_6_1_2_bot = { &preamble_2_bot, &test_6_1_2_bot, &postamble_2_bot };
-#define test_case_6_1_2_stream_top (&test_case_6_1_2_top)
-#define test_case_6_1_2_stream_bot (&test_case_6_1_2_bot)
+
+#define preamble_6_1_2_top preamble_2_top
+#define preamble_6_1_2_bot preamble_2_bot
+
+#define postamble_6_1_2_top postamble_2_top
+#define postamble_6_1_2_bot postamble_2_bot
+
+static struct test_stream test_6_1_2_top = { &preamble_6_1_2_top, &test_case_6_1_2_top, &postamble_6_1_2_top };
+static struct test_stream test_6_1_2_bot = { &preamble_6_1_2_bot, &test_case_6_1_2_bot, &postamble_6_1_2_bot };
 
 #define tgrp_case_6_1_3 test_group_12
+#define numb_case_6_1_3 "6.1.3"
 #define name_case_6_1_3 "t_accept library call -- TBADDATA error"
 #define desc_case_6_1_3 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_3_top(int child)
+
+int test_case_6_1_3_top(int child)
 {
-	return test_6_1_x_top(child, TBADDATA, 0);
+	return test_case_6_1_x_top(child, TBADDATA, 0);
 }
-static int test_6_1_3_bot(int child)
+
+int test_case_6_1_3_bot(int child)
 {
-	return test_6_1_x_bot(child, TBADDATA, 0);
+	return test_case_6_1_x_bot(child, TBADDATA, 0);
 }
-static struct test_stream test_case_6_1_3_top = { &preamble_2_top, &test_6_1_3_top, &postamble_2_top };
-static struct test_stream test_case_6_1_3_bot = { &preamble_2_bot, &test_6_1_3_bot, &postamble_2_bot };
-#define test_case_6_1_3_stream_top (&test_case_6_1_3_top)
-#define test_case_6_1_3_stream_bot (&test_case_6_1_3_bot)
+
+#define preamble_6_1_3_top preamble_2_top
+#define preamble_6_1_3_bot preamble_2_bot
+
+#define postamble_6_1_3_top postamble_2_top
+#define postamble_6_1_3_bot postamble_2_bot
+
+static struct test_stream test_6_1_3_top = { &preamble_6_1_3_top, &test_case_6_1_3_top, &postamble_6_1_3_top };
+static struct test_stream test_6_1_3_bot = { &preamble_6_1_3_bot, &test_case_6_1_3_bot, &postamble_6_1_3_bot };
 
 #define tgrp_case_6_1_4 test_group_12
+#define numb_case_6_1_4 "6.1.4"
 #define name_case_6_1_4 "t_accept library call -- TBADF error"
 #define desc_case_6_1_4 "\
 This test case tests the TBADF error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_4_top(int child)
+
+int test_case_6_1_4_top(int child)
 {
-	return test_6_1_x_top(child, TBADF, 0);
+	return test_case_6_1_x_top(child, TBADF, 0);
 }
-static int test_6_1_4_bot(int child)
+
+int test_case_6_1_4_bot(int child)
 {
-	return test_6_1_x_bot(child, TBADF, 0);
+	return test_case_6_1_x_bot(child, TBADF, 0);
 }
-static struct test_stream test_case_6_1_4_top = { &preamble_2_top, &test_6_1_4_top, &postamble_2_top };
-static struct test_stream test_case_6_1_4_bot = { &preamble_2_bot, &test_6_1_4_bot, &postamble_2_bot };
-#define test_case_6_1_4_stream_top (&test_case_6_1_4_top)
-#define test_case_6_1_4_stream_bot (&test_case_6_1_4_bot)
+
+#define preamble_6_1_4_top preamble_2_top
+#define preamble_6_1_4_bot preamble_2_bot
+
+#define postamble_6_1_4_top postamble_2_top
+#define postamble_6_1_4_bot postamble_2_bot
+
+static struct test_stream test_6_1_4_top = { &preamble_6_1_4_top, &test_case_6_1_4_top, &postamble_6_1_4_top };
+static struct test_stream test_6_1_4_bot = { &preamble_6_1_4_bot, &test_case_6_1_4_bot, &postamble_6_1_4_bot };
 
 #define tgrp_case_6_1_5 test_group_12
+#define numb_case_6_1_5 "6.1.5"
 #define name_case_6_1_5 "t_accept library call -- TBADOPT error"
 #define desc_case_6_1_5 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_5_top(int child)
+
+int test_case_6_1_5_top(int child)
 {
-	return test_6_1_x_top(child, TBADOPT, 0);
+	return test_case_6_1_x_top(child, TBADOPT, 0);
 }
-static int test_6_1_5_bot(int child)
+
+int test_case_6_1_5_bot(int child)
 {
-	return test_6_1_x_bot(child, TBADOPT, 0);
+	return test_case_6_1_x_bot(child, TBADOPT, 0);
 }
-static struct test_stream test_case_6_1_5_top = { &preamble_2_top, &test_6_1_5_top, &postamble_2_top };
-static struct test_stream test_case_6_1_5_bot = { &preamble_2_bot, &test_6_1_5_bot, &postamble_2_bot };
-#define test_case_6_1_5_stream_top (&test_case_6_1_5_top)
-#define test_case_6_1_5_stream_bot (&test_case_6_1_5_bot)
+
+#define preamble_6_1_5_top preamble_2_top
+#define preamble_6_1_5_bot preamble_2_bot
+
+#define postamble_6_1_5_top postamble_2_top
+#define postamble_6_1_5_bot postamble_2_bot
+
+static struct test_stream test_6_1_5_top = { &preamble_6_1_5_top, &test_case_6_1_5_top, &postamble_6_1_5_top };
+static struct test_stream test_6_1_5_bot = { &preamble_6_1_5_bot, &test_case_6_1_5_bot, &postamble_6_1_5_bot };
 
 #define tgrp_case_6_1_6 test_group_12
+#define numb_case_6_1_6 "6.1.6"
 #define name_case_6_1_6 "t_accept library call -- TBADSEQ error"
 #define desc_case_6_1_6 "\
 This test case tests the TBADSEQ error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_6_top(int child)
+
+int test_case_6_1_6_top(int child)
 {
-	return test_6_1_x_top(child, TBADSEQ, 0);
+	return test_case_6_1_x_top(child, TBADSEQ, 0);
 }
-static int test_6_1_6_bot(int child)
+
+int test_case_6_1_6_bot(int child)
 {
-	return test_6_1_x_bot(child, TBADSEQ, 0);
+	return test_case_6_1_x_bot(child, TBADSEQ, 0);
 }
-static struct test_stream test_case_6_1_6_top = { &preamble_2_top, &test_6_1_6_top, &postamble_2_top };
-static struct test_stream test_case_6_1_6_bot = { &preamble_2_bot, &test_6_1_6_bot, &postamble_2_bot };
-#define test_case_6_1_6_stream_top (&test_case_6_1_6_top)
-#define test_case_6_1_6_stream_bot (&test_case_6_1_6_bot)
+
+#define preamble_6_1_6_top preamble_2_top
+#define preamble_6_1_6_bot preamble_2_bot
+
+#define postamble_6_1_6_top postamble_2_top
+#define postamble_6_1_6_bot postamble_2_bot
+
+static struct test_stream test_6_1_6_top = { &preamble_6_1_6_top, &test_case_6_1_6_top, &postamble_6_1_6_top };
+static struct test_stream test_6_1_6_bot = { &preamble_6_1_6_bot, &test_case_6_1_6_bot, &postamble_6_1_6_bot };
 
 #define tgrp_case_6_1_7 test_group_12
+#define numb_case_6_1_7 "6.1.7"
 #define name_case_6_1_7 "t_accept library call -- TNOTSUPPORT error"
 #define desc_case_6_1_7 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_7_top(int child)
+
+int test_case_6_1_7_top(int child)
 {
-	return test_6_1_x_top(child, TNOTSUPPORT, 0);
+	return test_case_6_1_x_top(child, TNOTSUPPORT, 0);
 }
-static int test_6_1_7_bot(int child)
+
+int test_case_6_1_7_bot(int child)
 {
-	return test_6_1_x_bot(child, TNOTSUPPORT, 0);
+	return test_case_6_1_x_bot(child, TNOTSUPPORT, 0);
 }
-static struct test_stream test_case_6_1_7_top = { &preamble_2_top, &test_6_1_7_top, &postamble_2_top };
-static struct test_stream test_case_6_1_7_bot = { &preamble_2_bot, &test_6_1_7_bot, &postamble_2_bot };
-#define test_case_6_1_7_stream_top (&test_case_6_1_7_top)
-#define test_case_6_1_7_stream_bot (&test_case_6_1_7_bot)
+
+#define preamble_6_1_7_top preamble_2_top
+#define preamble_6_1_7_bot preamble_2_bot
+
+#define postamble_6_1_7_top postamble_2_top
+#define postamble_6_1_7_bot postamble_2_bot
+
+static struct test_stream test_6_1_7_top = { &preamble_6_1_7_top, &test_case_6_1_7_top, &postamble_6_1_7_top };
+static struct test_stream test_6_1_7_bot = { &preamble_6_1_7_bot, &test_case_6_1_7_bot, &postamble_6_1_7_bot };
 
 #define tgrp_case_6_1_8 test_group_12
+#define numb_case_6_1_8 "6.1.8"
 #define name_case_6_1_8 "t_accept library call -- TOUTSTATE error"
 #define desc_case_6_1_8 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_8_top(int child)
+
+int test_case_6_1_8_top(int child)
 {
-	return test_6_1_x_top(child, TOUTSTATE, 0);
+	return test_case_6_1_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_1_8_bot(int child)
+
+int test_case_6_1_8_bot(int child)
 {
-	return test_6_1_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_1_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_1_8_top = { &preamble_2_top, &test_6_1_8_top, &postamble_2_top };
-static struct test_stream test_case_6_1_8_bot = { &preamble_2_bot, &test_6_1_8_bot, &postamble_2_bot };
-#define test_case_6_1_8_stream_top (&test_case_6_1_8_top)
-#define test_case_6_1_8_stream_bot (&test_case_6_1_8_bot)
+
+#define preamble_6_1_8_top preamble_2_top
+#define preamble_6_1_8_bot preamble_2_bot
+
+#define postamble_6_1_8_top postamble_2_top
+#define postamble_6_1_8_bot postamble_2_bot
+
+static struct test_stream test_6_1_8_top = { &preamble_6_1_8_top, &test_case_6_1_8_top, &postamble_6_1_8_top };
+static struct test_stream test_6_1_8_bot = { &preamble_6_1_8_bot, &test_case_6_1_8_bot, &postamble_6_1_8_bot };
 
 #define tgrp_case_6_1_9 test_group_12
+#define numb_case_6_1_9 "6.1.9"
 #define name_case_6_1_9 "t_accept library call -- TPROVMISMATCH error"
 #define desc_case_6_1_9 "\
 This test case tests the TPROVMISMATCH error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_9_top(int child)
+
+int test_case_6_1_9_top(int child)
 {
-	return test_6_1_x_top(child, TPROVMISMATCH, 0);
+	return test_case_6_1_x_top(child, TPROVMISMATCH, 0);
 }
-static int test_6_1_9_bot(int child)
+
+int test_case_6_1_9_bot(int child)
 {
-	return test_6_1_x_bot(child, TPROVMISMATCH, 0);
+	return test_case_6_1_x_bot(child, TPROVMISMATCH, 0);
 }
-static struct test_stream test_case_6_1_9_top = { &preamble_2_top, &test_6_1_9_top, &postamble_2_top };
-static struct test_stream test_case_6_1_9_bot = { &preamble_2_bot, &test_6_1_9_bot, &postamble_2_bot };
-#define test_case_6_1_9_stream_top (&test_case_6_1_9_top)
-#define test_case_6_1_9_stream_bot (&test_case_6_1_9_bot)
+
+#define preamble_6_1_9_top preamble_2_top
+#define preamble_6_1_9_bot preamble_2_bot
+
+#define postamble_6_1_9_top postamble_2_top
+#define postamble_6_1_9_bot postamble_2_bot
+
+static struct test_stream test_6_1_9_top = { &preamble_6_1_9_top, &test_case_6_1_9_top, &postamble_6_1_9_top };
+static struct test_stream test_6_1_9_bot = { &preamble_6_1_9_bot, &test_case_6_1_9_bot, &postamble_6_1_9_bot };
 
 #define tgrp_case_6_1_10 test_group_12
+#define numb_case_6_1_10 "6.1.10"
 #define name_case_6_1_10 "t_accept library call -- TRESADDR error"
 #define desc_case_6_1_10 "\
 This test case tests the TRESADDR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_10_top(int child)
+
+int test_case_6_1_10_top(int child)
 {
-	return test_6_1_x_top(child, TRESADDR, 0);
+	return test_case_6_1_x_top(child, TRESADDR, 0);
 }
-static int test_6_1_10_bot(int child)
+
+int test_case_6_1_10_bot(int child)
 {
-	return test_6_1_x_bot(child, TRESADDR, 0);
+	return test_case_6_1_x_bot(child, TRESADDR, 0);
 }
-static struct test_stream test_case_6_1_10_top = { &preamble_2_top, &test_6_1_10_top, &postamble_2_top };
-static struct test_stream test_case_6_1_10_bot = { &preamble_2_bot, &test_6_1_10_bot, &postamble_2_bot };
-#define test_case_6_1_10_stream_top (&test_case_6_1_10_top)
-#define test_case_6_1_10_stream_bot (&test_case_6_1_10_bot)
+
+#define preamble_6_1_10_top preamble_2_top
+#define preamble_6_1_10_bot preamble_2_bot
+
+#define postamble_6_1_10_top postamble_2_top
+#define postamble_6_1_10_bot postamble_2_bot
+
+static struct test_stream test_6_1_10_top = { &preamble_6_1_10_top, &test_case_6_1_10_top, &postamble_6_1_10_top };
+static struct test_stream test_6_1_10_bot = { &preamble_6_1_10_bot, &test_case_6_1_10_bot, &postamble_6_1_10_bot };
 
 #define tgrp_case_6_1_11 test_group_12
+#define numb_case_6_1_11 "6.1.11"
 #define name_case_6_1_11 "t_accept library call -- TRESQLEN error"
 #define desc_case_6_1_11 "\
 This test case tests the TRESQLEN error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_11_top(int child)
+
+int test_case_6_1_11_top(int child)
 {
-	return test_6_1_x_top(child, TRESQLEN, 0);
+	return test_case_6_1_x_top(child, TRESQLEN, 0);
 }
-static int test_6_1_11_bot(int child)
+
+int test_case_6_1_11_bot(int child)
 {
-	return test_6_1_x_bot(child, TRESQLEN, 0);
+	return test_case_6_1_x_bot(child, TRESQLEN, 0);
 }
-static struct test_stream test_case_6_1_11_top = { &preamble_2_top, &test_6_1_11_top, &postamble_2_top };
-static struct test_stream test_case_6_1_11_bot = { &preamble_2_bot, &test_6_1_11_bot, &postamble_2_bot };
-#define test_case_6_1_11_stream_top (&test_case_6_1_11_top)
-#define test_case_6_1_11_stream_bot (&test_case_6_1_11_bot)
+
+#define preamble_6_1_11_top preamble_2_top
+#define preamble_6_1_11_bot preamble_2_bot
+
+#define postamble_6_1_11_top postamble_2_top
+#define postamble_6_1_11_bot postamble_2_bot
+
+static struct test_stream test_6_1_11_top = { &preamble_6_1_11_top, &test_case_6_1_11_top, &postamble_6_1_11_top };
+static struct test_stream test_6_1_11_bot = { &preamble_6_1_11_bot, &test_case_6_1_11_bot, &postamble_6_1_11_bot };
 
 #define tgrp_case_6_1_12 test_group_12
+#define numb_case_6_1_12 "6.1.12"
 #define name_case_6_1_12 "t_accept library call -- TSYSERR error"
 #define desc_case_6_1_12 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
-static int test_6_1_12_top(int child)
+
+int test_case_6_1_12_top(int child)
 {
-	return test_6_1_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_1_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_1_12_bot(int child)
+
+int test_case_6_1_12_bot(int child)
 {
-	return test_6_1_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_1_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_1_12_top = { &preamble_2_top, &test_6_1_12_top, &postamble_2_top };
-static struct test_stream test_case_6_1_12_bot = { &preamble_2_bot, &test_6_1_12_bot, &postamble_2_bot };
-#define test_case_6_1_12_stream_top (&test_case_6_1_12_top)
-#define test_case_6_1_12_stream_bot (&test_case_6_1_12_bot)
+
+#define preamble_6_1_12_top preamble_2_top
+#define preamble_6_1_12_bot preamble_2_bot
+
+#define postamble_6_1_12_top postamble_2_top
+#define postamble_6_1_12_bot postamble_2_bot
+
+static struct test_stream test_6_1_12_top = { &preamble_6_1_12_top, &test_case_6_1_12_top, &postamble_6_1_12_top };
+static struct test_stream test_6_1_12_bot = { &preamble_6_1_12_bot, &test_case_6_1_12_bot, &postamble_6_1_12_bot };
 
 #define tgrp_case_6_2_1 test_group_12
+#define numb_case_6_2_1 "6.2.1"
 #define name_case_6_2_1 "t_bind library call -- TACCES error"
 #define desc_case_6_2_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_x_top(int child, int terror, int error)
+
+int test_case_6_2_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_BIND) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9171,7 +10932,8 @@ static int test_6_2_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_2_x_bot(int child, int terror, int error)
+
+int test_case_6_2_x_bot(int child, int terror, int error)
 {
 	start_tt(200);
 	state++;
@@ -9185,115 +10947,164 @@ static int test_6_2_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_2_1_top(int child)
+
+int test_case_6_2_1_top(int child)
 {
-	return test_6_2_x_top(child, TACCES, 0);
+	return test_case_6_2_x_top(child, TACCES, 0);
 }
-static int test_6_2_1_bot(int child)
+
+int test_case_6_2_1_bot(int child)
 {
-	return test_6_2_x_bot(child, TACCES, 0);
+	return test_case_6_2_x_bot(child, TACCES, 0);
 }
-static struct test_stream test_case_6_2_1_top = { &preamble_1_top, &test_6_2_1_top, &postamble_1_top };
-static struct test_stream test_case_6_2_1_bot = { &preamble_1_bot, &test_6_2_1_bot, &postamble_1_bot };
-#define test_case_6_2_1_stream_top (&test_case_6_2_1_top)
-#define test_case_6_2_1_stream_bot (&test_case_6_2_1_bot)
+
+#define preamble_6_2_1_top preamble_1_top
+#define preamble_6_2_1_bot preamble_1_bot
+
+#define postamble_6_2_1_top postamble_1_top
+#define postamble_6_2_1_bot postamble_1_bot
+
+static struct test_stream test_6_2_1_top = { &preamble_6_2_1_top, &test_case_6_2_1_top, &postamble_6_2_1_top };
+static struct test_stream test_6_2_1_bot = { &preamble_6_2_1_bot, &test_case_6_2_1_bot, &postamble_6_2_1_bot };
 
 #define tgrp_case_6_2_2 test_group_12
+#define numb_case_6_2_2 "6.2.2"
 #define name_case_6_2_2 "t_bind library call -- TADDRBUSY error"
 #define desc_case_6_2_2 "\
 This test case tests the TADDRBUSY error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_2_top(int child)
+
+int test_case_6_2_2_top(int child)
 {
-	return test_6_2_x_top(child, TADDRBUSY, 0);
+	return test_case_6_2_x_top(child, TADDRBUSY, 0);
 }
-static int test_6_2_2_bot(int child)
+
+int test_case_6_2_2_bot(int child)
 {
-	return test_6_2_x_bot(child, TADDRBUSY, 0);
+	return test_case_6_2_x_bot(child, TADDRBUSY, 0);
 }
-static struct test_stream test_case_6_2_2_top = { &preamble_1_top, &test_6_2_2_top, &postamble_1_top };
-static struct test_stream test_case_6_2_2_bot = { &preamble_1_bot, &test_6_2_2_bot, &postamble_1_bot };
-#define test_case_6_2_2_stream_top (&test_case_6_2_2_top)
-#define test_case_6_2_2_stream_bot (&test_case_6_2_2_bot)
+
+#define preamble_6_2_2_top preamble_1_top
+#define preamble_6_2_2_bot preamble_1_bot
+
+#define postamble_6_2_2_top postamble_1_top
+#define postamble_6_2_2_bot postamble_1_bot
+
+static struct test_stream test_6_2_2_top = { &preamble_6_2_2_top, &test_case_6_2_2_top, &postamble_6_2_2_top };
+static struct test_stream test_6_2_2_bot = { &preamble_6_2_2_bot, &test_case_6_2_2_bot, &postamble_6_2_2_bot };
 
 #define tgrp_case_6_2_3 test_group_12
+#define numb_case_6_2_3 "6.2.3"
 #define name_case_6_2_3 "t_bind library call -- TBADADDR error"
 #define desc_case_6_2_3 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_3_top(int child)
+
+int test_case_6_2_3_top(int child)
 {
-	return test_6_2_x_top(child, TBADADDR, 0);
+	return test_case_6_2_x_top(child, TBADADDR, 0);
 }
-static int test_6_2_3_bot(int child)
+
+int test_case_6_2_3_bot(int child)
 {
-	return test_6_2_x_bot(child, TBADADDR, 0);
+	return test_case_6_2_x_bot(child, TBADADDR, 0);
 }
-static struct test_stream test_case_6_2_3_top = { &preamble_1_top, &test_6_2_3_top, &postamble_1_top };
-static struct test_stream test_case_6_2_3_bot = { &preamble_1_bot, &test_6_2_3_bot, &postamble_1_bot };
-#define test_case_6_2_3_stream_top (&test_case_6_2_3_top)
-#define test_case_6_2_3_stream_bot (&test_case_6_2_3_bot)
+
+#define preamble_6_2_3_top preamble_1_top
+#define preamble_6_2_3_bot preamble_1_bot
+
+#define postamble_6_2_3_top postamble_1_top
+#define postamble_6_2_3_bot postamble_1_bot
+
+static struct test_stream test_6_2_3_top = { &preamble_6_2_3_top, &test_case_6_2_3_top, &postamble_6_2_3_top };
+static struct test_stream test_6_2_3_bot = { &preamble_6_2_3_bot, &test_case_6_2_3_bot, &postamble_6_2_3_bot };
 
 #define tgrp_case_6_2_4 test_group_12
+#define numb_case_6_2_4 "6.2.4"
 #define name_case_6_2_4 "t_bind library call -- TNOADDR error"
 #define desc_case_6_2_4 "\
 This test case tests the TNOADDR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_4_top(int child)
+
+int test_case_6_2_4_top(int child)
 {
-	return test_6_2_x_top(child, TNOADDR, 0);
+	return test_case_6_2_x_top(child, TNOADDR, 0);
 }
-static int test_6_2_4_bot(int child)
+
+int test_case_6_2_4_bot(int child)
 {
-	return test_6_2_x_bot(child, TNOADDR, 0);
+	return test_case_6_2_x_bot(child, TNOADDR, 0);
 }
-static struct test_stream test_case_6_2_4_top = { &preamble_1_top, &test_6_2_4_top, &postamble_1_top };
-static struct test_stream test_case_6_2_4_bot = { &preamble_1_bot, &test_6_2_4_bot, &postamble_1_bot };
-#define test_case_6_2_4_stream_top (&test_case_6_2_4_top)
-#define test_case_6_2_4_stream_bot (&test_case_6_2_4_bot)
+
+#define preamble_6_2_4_top preamble_1_top
+#define preamble_6_2_4_bot preamble_1_bot
+
+#define postamble_6_2_4_top postamble_1_top
+#define postamble_6_2_4_bot postamble_1_bot
+
+static struct test_stream test_6_2_4_top = { &preamble_6_2_4_top, &test_case_6_2_4_top, &postamble_6_2_4_top };
+static struct test_stream test_6_2_4_bot = { &preamble_6_2_4_bot, &test_case_6_2_4_bot, &postamble_6_2_4_bot };
 
 #define tgrp_case_6_2_5 test_group_12
+#define numb_case_6_2_5 "6.2.5"
 #define name_case_6_2_5 "t_bind library call -- TOUTSTATE error"
 #define desc_case_6_2_5 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_5_top(int child)
+
+int test_case_6_2_5_top(int child)
 {
-	return test_6_2_x_top(child, TOUTSTATE, 0);
+	return test_case_6_2_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_2_5_bot(int child)
+
+int test_case_6_2_5_bot(int child)
 {
-	return test_6_2_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_2_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_2_5_top = { &preamble_1_top, &test_6_2_5_top, &postamble_1_top };
-static struct test_stream test_case_6_2_5_bot = { &preamble_1_bot, &test_6_2_5_bot, &postamble_1_bot };
-#define test_case_6_2_5_stream_top (&test_case_6_2_5_top)
-#define test_case_6_2_5_stream_bot (&test_case_6_2_5_bot)
+
+#define preamble_6_2_5_top preamble_1_top
+#define preamble_6_2_5_bot preamble_1_bot
+
+#define postamble_6_2_5_top postamble_1_top
+#define postamble_6_2_5_bot postamble_1_bot
+
+static struct test_stream test_6_2_5_top = { &preamble_6_2_5_top, &test_case_6_2_5_top, &postamble_6_2_5_top };
+static struct test_stream test_6_2_5_bot = { &preamble_6_2_5_bot, &test_case_6_2_5_bot, &postamble_6_2_5_bot };
 
 #define tgrp_case_6_2_6 test_group_12
+#define numb_case_6_2_6 "6.2.6"
 #define name_case_6_2_6 "t_bind library call -- TSYSERR error"
 #define desc_case_6_2_6 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
-static int test_6_2_6_top(int child)
+
+int test_case_6_2_6_top(int child)
 {
-	return test_6_2_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_2_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_2_6_bot(int child)
+
+int test_case_6_2_6_bot(int child)
 {
-	return test_6_2_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_2_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_2_6_top = { &preamble_1_top, &test_6_2_6_top, &postamble_1_top };
-static struct test_stream test_case_6_2_6_bot = { &preamble_1_bot, &test_6_2_6_bot, &postamble_1_bot };
-#define test_case_6_2_6_stream_top (&test_case_6_2_6_top)
-#define test_case_6_2_6_stream_bot (&test_case_6_2_6_bot)
+
+#define preamble_6_2_6_top preamble_1_top
+#define preamble_6_2_6_bot preamble_1_bot
+
+#define postamble_6_2_6_top postamble_1_top
+#define postamble_6_2_6_bot postamble_1_bot
+
+static struct test_stream test_6_2_6_top = { &preamble_6_2_6_top, &test_case_6_2_6_top, &postamble_6_2_6_top };
+static struct test_stream test_6_2_6_bot = { &preamble_6_2_6_bot, &test_case_6_2_6_bot, &postamble_6_2_6_bot };
 
 #define tgrp_case_6_3_1 test_group_12
+#define numb_case_6_3_1 "6.3.1"
 #define name_case_6_3_1 "t_connect library call -- TACCES error"
 #define desc_case_6_3_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_x_top(int child, int terror, int error)
+
+int test_case_6_3_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9306,7 +11117,8 @@ static int test_6_3_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_3_x_bot(int child, int terror, int error)
+
+int test_case_6_3_x_bot(int child, int terror, int error)
 {
 	start_tt(500);
 	state++;
@@ -9320,151 +11132,216 @@ static int test_6_3_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_3_1_top(int child)
+
+int test_case_6_3_1_top(int child)
 {
-	return test_6_3_x_top(child, TACCES, 0);
+	return test_case_6_3_x_top(child, TACCES, 0);
 }
-static int test_6_3_1_bot(int child)
+
+int test_case_6_3_1_bot(int child)
 {
-	return test_6_3_x_bot(child, TACCES, 0);
+	return test_case_6_3_x_bot(child, TACCES, 0);
 }
-static struct test_stream test_case_6_3_1_top = { &preamble_2_top, &test_6_3_1_top, &postamble_2_top };
-static struct test_stream test_case_6_3_1_bot = { &preamble_2_bot, &test_6_3_1_bot, &postamble_2_bot };
-#define test_case_6_3_1_stream_top (&test_case_6_3_1_top)
-#define test_case_6_3_1_stream_bot (&test_case_6_3_1_bot)
+
+#define preamble_6_3_1_top preamble_2_top
+#define preamble_6_3_1_bot preamble_2_bot
+
+#define postamble_6_3_1_top postamble_2_top
+#define postamble_6_3_1_bot postamble_2_bot
+
+static struct test_stream test_6_3_1_top = { &preamble_6_3_1_top, &test_case_6_3_1_top, &postamble_6_3_1_top };
+static struct test_stream test_6_3_1_bot = { &preamble_6_3_1_bot, &test_case_6_3_1_bot, &postamble_6_3_1_bot };
 
 #define tgrp_case_6_3_2 test_group_12
+#define numb_case_6_3_2 "6.3.2"
 #define name_case_6_3_2 "t_connect library call -- TADDRBUSY error"
 #define desc_case_6_3_2 "\
 This test case tests the TADDRBUSY error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_2_top(int child)
+
+int test_case_6_3_2_top(int child)
 {
-	return test_6_3_x_top(child, TADDRBUSY, 0);
+	return test_case_6_3_x_top(child, TADDRBUSY, 0);
 }
-static int test_6_3_2_bot(int child)
+
+int test_case_6_3_2_bot(int child)
 {
-	return test_6_3_x_bot(child, TADDRBUSY, 0);
+	return test_case_6_3_x_bot(child, TADDRBUSY, 0);
 }
-static struct test_stream test_case_6_3_2_top = { &preamble_2_top, &test_6_3_2_top, &postamble_2_top };
-static struct test_stream test_case_6_3_2_bot = { &preamble_2_bot, &test_6_3_2_bot, &postamble_2_bot };
-#define test_case_6_3_2_stream_top (&test_case_6_3_2_top)
-#define test_case_6_3_2_stream_bot (&test_case_6_3_2_bot)
+
+#define preamble_6_3_2_top preamble_2_top
+#define preamble_6_3_2_bot preamble_2_bot
+
+#define postamble_6_3_2_top postamble_2_top
+#define postamble_6_3_2_bot postamble_2_bot
+
+static struct test_stream test_6_3_2_top = { &preamble_6_3_2_top, &test_case_6_3_2_top, &postamble_6_3_2_top };
+static struct test_stream test_6_3_2_bot = { &preamble_6_3_2_bot, &test_case_6_3_2_bot, &postamble_6_3_2_bot };
 
 #define tgrp_case_6_3_3 test_group_12
+#define numb_case_6_3_3 "6.3.3"
 #define name_case_6_3_3 "t_connect library call -- TBADADDR error"
 #define desc_case_6_3_3 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_3_top(int child)
+
+int test_case_6_3_3_top(int child)
 {
-	return test_6_3_x_top(child, TBADADDR, 0);
+	return test_case_6_3_x_top(child, TBADADDR, 0);
 }
-static int test_6_3_3_bot(int child)
+
+int test_case_6_3_3_bot(int child)
 {
-	return test_6_3_x_bot(child, TBADADDR, 0);
+	return test_case_6_3_x_bot(child, TBADADDR, 0);
 }
-static struct test_stream test_case_6_3_3_top = { &preamble_2_top, &test_6_3_3_top, &postamble_2_top };
-static struct test_stream test_case_6_3_3_bot = { &preamble_2_bot, &test_6_3_3_bot, &postamble_2_bot };
-#define test_case_6_3_3_stream_top (&test_case_6_3_3_top)
-#define test_case_6_3_3_stream_bot (&test_case_6_3_3_bot)
+
+#define preamble_6_3_3_top preamble_2_top
+#define preamble_6_3_3_bot preamble_2_bot
+
+#define postamble_6_3_3_top postamble_2_top
+#define postamble_6_3_3_bot postamble_2_bot
+
+static struct test_stream test_6_3_3_top = { &preamble_6_3_3_top, &test_case_6_3_3_top, &postamble_6_3_3_top };
+static struct test_stream test_6_3_3_bot = { &preamble_6_3_3_bot, &test_case_6_3_3_bot, &postamble_6_3_3_bot };
 
 #define tgrp_case_6_3_4 test_group_12
+#define numb_case_6_3_4 "6.3.4"
 #define name_case_6_3_4 "t_connect library call -- TBADDATA error"
 #define desc_case_6_3_4 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_4_top(int child)
+
+int test_case_6_3_4_top(int child)
 {
-	return test_6_3_x_top(child, TBADDATA, 0);
+	return test_case_6_3_x_top(child, TBADDATA, 0);
 }
-static int test_6_3_4_bot(int child)
+
+int test_case_6_3_4_bot(int child)
 {
-	return test_6_3_x_bot(child, TBADDATA, 0);
+	return test_case_6_3_x_bot(child, TBADDATA, 0);
 }
-static struct test_stream test_case_6_3_4_top = { &preamble_2_top, &test_6_3_4_top, &postamble_2_top };
-static struct test_stream test_case_6_3_4_bot = { &preamble_2_bot, &test_6_3_4_bot, &postamble_2_bot };
-#define test_case_6_3_4_stream_top (&test_case_6_3_4_top)
-#define test_case_6_3_4_stream_bot (&test_case_6_3_4_bot)
+
+#define preamble_6_3_4_top preamble_2_top
+#define preamble_6_3_4_bot preamble_2_bot
+
+#define postamble_6_3_4_top postamble_2_top
+#define postamble_6_3_4_bot postamble_2_bot
+
+static struct test_stream test_6_3_4_top = { &preamble_6_3_4_top, &test_case_6_3_4_top, &postamble_6_3_4_top };
+static struct test_stream test_6_3_4_bot = { &preamble_6_3_4_bot, &test_case_6_3_4_bot, &postamble_6_3_4_bot };
 
 #define tgrp_case_6_3_5 test_group_12
+#define numb_case_6_3_5 "6.3.5"
 #define name_case_6_3_5 "t_connect library call -- TBADOPT error"
 #define desc_case_6_3_5 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_5_top(int child)
+
+int test_case_6_3_5_top(int child)
 {
-	return test_6_3_x_top(child, TBADOPT, 0);
+	return test_case_6_3_x_top(child, TBADOPT, 0);
 }
-static int test_6_3_5_bot(int child)
+
+int test_case_6_3_5_bot(int child)
 {
-	return test_6_3_x_bot(child, TBADOPT, 0);
+	return test_case_6_3_x_bot(child, TBADOPT, 0);
 }
-static struct test_stream test_case_6_3_5_top = { &preamble_2_top, &test_6_3_5_top, &postamble_2_top };
-static struct test_stream test_case_6_3_5_bot = { &preamble_2_bot, &test_6_3_5_bot, &postamble_2_bot };
-#define test_case_6_3_5_stream_top (&test_case_6_3_5_top)
-#define test_case_6_3_5_stream_bot (&test_case_6_3_5_bot)
+
+#define preamble_6_3_5_top preamble_2_top
+#define preamble_6_3_5_bot preamble_2_bot
+
+#define postamble_6_3_5_top postamble_2_top
+#define postamble_6_3_5_bot postamble_2_bot
+
+static struct test_stream test_6_3_5_top = { &preamble_6_3_5_top, &test_case_6_3_5_top, &postamble_6_3_5_top };
+static struct test_stream test_6_3_5_bot = { &preamble_6_3_5_bot, &test_case_6_3_5_bot, &postamble_6_3_5_bot };
 
 #define tgrp_case_6_3_6 test_group_12
+#define numb_case_6_3_6 "6.3.6"
 #define name_case_6_3_6 "t_connect library call -- TNOTSUPPORT error"
 #define desc_case_6_3_6 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_6_top(int child)
+
+int test_case_6_3_6_top(int child)
 {
-	return test_6_3_x_top(child, TNOTSUPPORT, 0);
+	return test_case_6_3_x_top(child, TNOTSUPPORT, 0);
 }
-static int test_6_3_6_bot(int child)
+
+int test_case_6_3_6_bot(int child)
 {
-	return test_6_3_x_bot(child, TNOTSUPPORT, 0);
+	return test_case_6_3_x_bot(child, TNOTSUPPORT, 0);
 }
-static struct test_stream test_case_6_3_6_top = { &preamble_2_top, &test_6_3_6_top, &postamble_2_top };
-static struct test_stream test_case_6_3_6_bot = { &preamble_2_bot, &test_6_3_6_bot, &postamble_2_bot };
-#define test_case_6_3_6_stream_top (&test_case_6_3_6_top)
-#define test_case_6_3_6_stream_bot (&test_case_6_3_6_bot)
+
+#define preamble_6_3_6_top preamble_2_top
+#define preamble_6_3_6_bot preamble_2_bot
+
+#define postamble_6_3_6_top postamble_2_top
+#define postamble_6_3_6_bot postamble_2_bot
+
+static struct test_stream test_6_3_6_top = { &preamble_6_3_6_top, &test_case_6_3_6_top, &postamble_6_3_6_top };
+static struct test_stream test_6_3_6_bot = { &preamble_6_3_6_bot, &test_case_6_3_6_bot, &postamble_6_3_6_bot };
 
 #define tgrp_case_6_3_7 test_group_12
+#define numb_case_6_3_7 "6.3.7"
 #define name_case_6_3_7 "t_connect library call -- TOUTSTATE error"
 #define desc_case_6_3_7 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_7_top(int child)
+
+int test_case_6_3_7_top(int child)
 {
-	return test_6_3_x_top(child, TOUTSTATE, 0);
+	return test_case_6_3_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_3_7_bot(int child)
+
+int test_case_6_3_7_bot(int child)
 {
-	return test_6_3_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_3_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_3_7_top = { &preamble_2_top, &test_6_3_7_top, &postamble_2_top };
-static struct test_stream test_case_6_3_7_bot = { &preamble_2_bot, &test_6_3_7_bot, &postamble_2_bot };
-#define test_case_6_3_7_stream_top (&test_case_6_3_7_top)
-#define test_case_6_3_7_stream_bot (&test_case_6_3_7_bot)
+
+#define preamble_6_3_7_top preamble_2_top
+#define preamble_6_3_7_bot preamble_2_bot
+
+#define postamble_6_3_7_top postamble_2_top
+#define postamble_6_3_7_bot postamble_2_bot
+
+static struct test_stream test_6_3_7_top = { &preamble_6_3_7_top, &test_case_6_3_7_top, &postamble_6_3_7_top };
+static struct test_stream test_6_3_7_bot = { &preamble_6_3_7_bot, &test_case_6_3_7_bot, &postamble_6_3_7_bot };
 
 #define tgrp_case_6_3_8 test_group_12
+#define numb_case_6_3_8 "6.3.8"
 #define name_case_6_3_8 "t_connect library call -- TSYSERR error"
 #define desc_case_6_3_8 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
-static int test_6_3_8_top(int child)
+
+int test_case_6_3_8_top(int child)
 {
-	return test_6_3_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_3_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_3_8_bot(int child)
+
+int test_case_6_3_8_bot(int child)
 {
-	return test_6_3_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_3_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_3_8_top = { &preamble_2_top, &test_6_3_8_top, &postamble_2_top };
-static struct test_stream test_case_6_3_8_bot = { &preamble_2_bot, &test_6_3_8_bot, &postamble_2_bot };
-#define test_case_6_3_8_stream_top (&test_case_6_3_8_top)
-#define test_case_6_3_8_stream_bot (&test_case_6_3_8_bot)
+
+#define preamble_6_3_8_top preamble_2_top
+#define preamble_6_3_8_bot preamble_2_bot
+
+#define postamble_6_3_8_top postamble_2_top
+#define postamble_6_3_8_bot postamble_2_bot
+
+static struct test_stream test_6_3_8_top = { &preamble_6_3_8_top, &test_case_6_3_8_top, &postamble_6_3_8_top };
+static struct test_stream test_6_3_8_bot = { &preamble_6_3_8_bot, &test_case_6_3_8_bot, &postamble_6_3_8_bot };
 
 #define tgrp_case_6_4_1 test_group_12
+#define numb_case_6_4_1 "6.4.1"
 #define name_case_6_4_1 "t_optmgmt library call -- TACCES error"
 #define desc_case_6_4_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_x_top(int child, int terror, int error)
+
+int test_case_6_4_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_OPTMGMT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9477,7 +11354,8 @@ static int test_6_4_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_4_x_bot(int child, int terror, int error)
+
+int test_case_6_4_x_bot(int child, int terror, int error)
 {
 	start_tt(500);
 	state++;
@@ -9491,115 +11369,164 @@ static int test_6_4_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_4_1_top(int child)
+
+int test_case_6_4_1_top(int child)
 {
-	return test_6_4_x_top(child, TACCES, 0);
+	return test_case_6_4_x_top(child, TACCES, 0);
 }
-static int test_6_4_1_bot(int child)
+
+int test_case_6_4_1_bot(int child)
 {
-	return test_6_4_x_bot(child, TACCES, 0);
+	return test_case_6_4_x_bot(child, TACCES, 0);
 }
-static struct test_stream test_case_6_4_1_top = { &preamble_2_top, &test_6_4_1_top, &postamble_2_top };
-static struct test_stream test_case_6_4_1_bot = { &preamble_2_bot, &test_6_4_1_bot, &postamble_2_bot };
-#define test_case_6_4_1_stream_top (&test_case_6_4_1_top)
-#define test_case_6_4_1_stream_bot (&test_case_6_4_1_bot)
+
+#define preamble_6_4_1_top preamble_2_top
+#define preamble_6_4_1_bot preamble_2_bot
+
+#define postamble_6_4_1_top postamble_2_top
+#define postamble_6_4_1_bot postamble_2_bot
+
+static struct test_stream test_6_4_1_top = { &preamble_6_4_1_top, &test_case_6_4_1_top, &postamble_6_4_1_top };
+static struct test_stream test_6_4_1_bot = { &preamble_6_4_1_bot, &test_case_6_4_1_bot, &postamble_6_4_1_bot };
 
 #define tgrp_case_6_4_2 test_group_12
+#define numb_case_6_4_2 "6.4.2"
 #define name_case_6_4_2 "t_optmgmt library call -- TBADFLAG error"
 #define desc_case_6_4_2 "\
 This test case tests the TBADFLAG error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_2_top(int child)
+
+int test_case_6_4_2_top(int child)
 {
-	return test_6_4_x_top(child, TBADFLAG, 0);
+	return test_case_6_4_x_top(child, TBADFLAG, 0);
 }
-static int test_6_4_2_bot(int child)
+
+int test_case_6_4_2_bot(int child)
 {
-	return test_6_4_x_bot(child, TBADFLAG, 0);
+	return test_case_6_4_x_bot(child, TBADFLAG, 0);
 }
-static struct test_stream test_case_6_4_2_top = { &preamble_2_top, &test_6_4_2_top, &postamble_2_top };
-static struct test_stream test_case_6_4_2_bot = { &preamble_2_bot, &test_6_4_2_bot, &postamble_2_bot };
-#define test_case_6_4_2_stream_top (&test_case_6_4_2_top)
-#define test_case_6_4_2_stream_bot (&test_case_6_4_2_bot)
+
+#define preamble_6_4_2_top preamble_2_top
+#define preamble_6_4_2_bot preamble_2_bot
+
+#define postamble_6_4_2_top postamble_2_top
+#define postamble_6_4_2_bot postamble_2_bot
+
+static struct test_stream test_6_4_2_top = { &preamble_6_4_2_top, &test_case_6_4_2_top, &postamble_6_4_2_top };
+static struct test_stream test_6_4_2_bot = { &preamble_6_4_2_bot, &test_case_6_4_2_bot, &postamble_6_4_2_bot };
 
 #define tgrp_case_6_4_3 test_group_12
+#define numb_case_6_4_3 "6.4.3"
 #define name_case_6_4_3 "t_optmgmt library call -- TBADOPT error"
 #define desc_case_6_4_3 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_3_top(int child)
+
+int test_case_6_4_3_top(int child)
 {
-	return test_6_4_x_top(child, TBADOPT, 0);
+	return test_case_6_4_x_top(child, TBADOPT, 0);
 }
-static int test_6_4_3_bot(int child)
+
+int test_case_6_4_3_bot(int child)
 {
-	return test_6_4_x_bot(child, TBADOPT, 0);
+	return test_case_6_4_x_bot(child, TBADOPT, 0);
 }
-static struct test_stream test_case_6_4_3_top = { &preamble_2_top, &test_6_4_3_top, &postamble_2_top };
-static struct test_stream test_case_6_4_3_bot = { &preamble_2_bot, &test_6_4_3_bot, &postamble_2_bot };
-#define test_case_6_4_3_stream_top (&test_case_6_4_3_top)
-#define test_case_6_4_3_stream_bot (&test_case_6_4_3_bot)
+
+#define preamble_6_4_3_top preamble_2_top
+#define preamble_6_4_3_bot preamble_2_bot
+
+#define postamble_6_4_3_top postamble_2_top
+#define postamble_6_4_3_bot postamble_2_bot
+
+static struct test_stream test_6_4_3_top = { &preamble_6_4_3_top, &test_case_6_4_3_top, &postamble_6_4_3_top };
+static struct test_stream test_6_4_3_bot = { &preamble_6_4_3_bot, &test_case_6_4_3_bot, &postamble_6_4_3_bot };
 
 #define tgrp_case_6_4_4 test_group_12
+#define numb_case_6_4_4 "6.4.4"
 #define name_case_6_4_4 "t_optmgmt library call -- TOUTSTATE error"
 #define desc_case_6_4_4 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_4_top(int child)
+
+int test_case_6_4_4_top(int child)
 {
-	return test_6_4_x_top(child, TOUTSTATE, 0);
+	return test_case_6_4_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_4_4_bot(int child)
+
+int test_case_6_4_4_bot(int child)
 {
-	return test_6_4_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_4_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_4_4_top = { &preamble_2_top, &test_6_4_4_top, &postamble_2_top };
-static struct test_stream test_case_6_4_4_bot = { &preamble_2_bot, &test_6_4_4_bot, &postamble_2_bot };
-#define test_case_6_4_4_stream_top (&test_case_6_4_4_top)
-#define test_case_6_4_4_stream_bot (&test_case_6_4_4_bot)
+
+#define preamble_6_4_4_top preamble_2_top
+#define preamble_6_4_4_bot preamble_2_bot
+
+#define postamble_6_4_4_top postamble_2_top
+#define postamble_6_4_4_bot postamble_2_bot
+
+static struct test_stream test_6_4_4_top = { &preamble_6_4_4_top, &test_case_6_4_4_top, &postamble_6_4_4_top };
+static struct test_stream test_6_4_4_bot = { &preamble_6_4_4_bot, &test_case_6_4_4_bot, &postamble_6_4_4_bot };
 
 #define tgrp_case_6_4_5 test_group_12
+#define numb_case_6_4_5 "6.4.5"
 #define name_case_6_4_5 "t_optmgmt library call -- TNOTSUPPORT error"
 #define desc_case_6_4_5 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_5_top(int child)
+
+int test_case_6_4_5_top(int child)
 {
-	return test_6_4_x_top(child, TNOTSUPPORT, 0);
+	return test_case_6_4_x_top(child, TNOTSUPPORT, 0);
 }
-static int test_6_4_5_bot(int child)
+
+int test_case_6_4_5_bot(int child)
 {
-	return test_6_4_x_bot(child, TNOTSUPPORT, 0);
+	return test_case_6_4_x_bot(child, TNOTSUPPORT, 0);
 }
-static struct test_stream test_case_6_4_5_top = { &preamble_2_top, &test_6_4_5_top, &postamble_2_top };
-static struct test_stream test_case_6_4_5_bot = { &preamble_2_bot, &test_6_4_5_bot, &postamble_2_bot };
-#define test_case_6_4_5_stream_top (&test_case_6_4_5_top)
-#define test_case_6_4_5_stream_bot (&test_case_6_4_5_bot)
+
+#define preamble_6_4_5_top preamble_2_top
+#define preamble_6_4_5_bot preamble_2_bot
+
+#define postamble_6_4_5_top postamble_2_top
+#define postamble_6_4_5_bot postamble_2_bot
+
+static struct test_stream test_6_4_5_top = { &preamble_6_4_5_top, &test_case_6_4_5_top, &postamble_6_4_5_top };
+static struct test_stream test_6_4_5_bot = { &preamble_6_4_5_bot, &test_case_6_4_5_bot, &postamble_6_4_5_bot };
 
 #define tgrp_case_6_4_6 test_group_12
+#define numb_case_6_4_6 "6.4.6"
 #define name_case_6_4_6 "t_optmgmt library call -- TSYSERR error"
 #define desc_case_6_4_6 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
-static int test_6_4_6_top(int child)
+
+int test_case_6_4_6_top(int child)
 {
-	return test_6_4_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_4_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_4_6_bot(int child)
+
+int test_case_6_4_6_bot(int child)
 {
-	return test_6_4_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_4_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_4_6_top = { &preamble_2_top, &test_6_4_6_top, &postamble_2_top };
-static struct test_stream test_case_6_4_6_bot = { &preamble_2_bot, &test_6_4_6_bot, &postamble_2_bot };
-#define test_case_6_4_6_stream_top (&test_case_6_4_6_top)
-#define test_case_6_4_6_stream_bot (&test_case_6_4_6_bot)
+
+#define preamble_6_4_6_top preamble_2_top
+#define preamble_6_4_6_bot preamble_2_bot
+
+#define postamble_6_4_6_top postamble_2_top
+#define postamble_6_4_6_bot postamble_2_bot
+
+static struct test_stream test_6_4_6_top = { &preamble_6_4_6_top, &test_case_6_4_6_top, &postamble_6_4_6_top };
+static struct test_stream test_6_4_6_bot = { &preamble_6_4_6_bot, &test_case_6_4_6_bot, &postamble_6_4_6_bot };
 
 #define tgrp_case_6_5_1 test_group_12
+#define numb_case_6_5_1 "6.5.1"
 #define name_case_6_5_1 "t_snddis library call -- TBADDATA error"
 #define desc_case_6_5_1 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
-static int test_6_5_x_top(int child, int terror, int error)
+
+int test_case_6_5_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_SNDDIS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9612,7 +11539,8 @@ static int test_6_5_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_5_x_bot(int child, int terror, int error)
+
+int test_case_6_5_x_bot(int child, int terror, int error)
 {
 	start_tt(500);
 	state++;
@@ -9626,97 +11554,138 @@ static int test_6_5_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_5_1_top(int child)
+
+int test_case_6_5_1_top(int child)
 {
-	return test_6_5_x_top(child, TBADDATA, 0);
+	return test_case_6_5_x_top(child, TBADDATA, 0);
 }
-static int test_6_5_1_bot(int child)
+
+int test_case_6_5_1_bot(int child)
 {
-	return test_6_5_x_bot(child, TBADDATA, 0);
+	return test_case_6_5_x_bot(child, TBADDATA, 0);
 }
-static struct test_stream test_case_6_5_1_top = { &preamble_3_top, &test_6_5_1_top, &postamble_3_top };
-static struct test_stream test_case_6_5_1_bot = { &preamble_3_bot, &test_6_5_1_bot, &postamble_3_bot };
-#define test_case_6_5_1_stream_top (&test_case_6_5_1_top)
-#define test_case_6_5_1_stream_bot (&test_case_6_5_1_bot)
+
+#define preamble_6_5_1_top preamble_3_top
+#define preamble_6_5_1_bot preamble_3_bot
+
+#define postamble_6_5_1_top postamble_3_top
+#define postamble_6_5_1_bot postamble_3_bot
+
+static struct test_stream test_6_5_1_top = { &preamble_6_5_1_top, &test_case_6_5_1_top, &postamble_6_5_1_top };
+static struct test_stream test_6_5_1_bot = { &preamble_6_5_1_bot, &test_case_6_5_1_bot, &postamble_6_5_1_bot };
 
 #define tgrp_case_6_5_2 test_group_12
+#define numb_case_6_5_2 "6.5.2"
 #define name_case_6_5_2 "t_snddis library call -- TBADSEQ error"
 #define desc_case_6_5_2 "\
 This test case tests the TBADSEQ error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
-static int test_6_5_2_top(int child)
+
+int test_case_6_5_2_top(int child)
 {
-	return test_6_5_x_top(child, TBADSEQ, 0);
+	return test_case_6_5_x_top(child, TBADSEQ, 0);
 }
-static int test_6_5_2_bot(int child)
+
+int test_case_6_5_2_bot(int child)
 {
-	return test_6_5_x_bot(child, TBADSEQ, 0);
+	return test_case_6_5_x_bot(child, TBADSEQ, 0);
 }
-static struct test_stream test_case_6_5_2_top = { &preamble_3_top, &test_6_5_2_top, &postamble_3_top };
-static struct test_stream test_case_6_5_2_bot = { &preamble_3_bot, &test_6_5_2_bot, &postamble_3_bot };
-#define test_case_6_5_2_stream_top (&test_case_6_5_2_top)
-#define test_case_6_5_2_stream_bot (&test_case_6_5_2_bot)
+
+#define preamble_6_5_2_top preamble_3_top
+#define preamble_6_5_2_bot preamble_3_bot
+
+#define postamble_6_5_2_top postamble_3_top
+#define postamble_6_5_2_bot postamble_3_bot
+
+static struct test_stream test_6_5_2_top = { &preamble_6_5_2_top, &test_case_6_5_2_top, &postamble_6_5_2_top };
+static struct test_stream test_6_5_2_bot = { &preamble_6_5_2_bot, &test_case_6_5_2_bot, &postamble_6_5_2_bot };
 
 #define tgrp_case_6_5_3 test_group_12
+#define numb_case_6_5_3 "6.5.3"
 #define name_case_6_5_3 "t_snddis library call -- TNOTSUPPORT error"
 #define desc_case_6_5_3 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
-static int test_6_5_3_top(int child)
+
+int test_case_6_5_3_top(int child)
 {
-	return test_6_5_x_top(child, TNOTSUPPORT, 0);
+	return test_case_6_5_x_top(child, TNOTSUPPORT, 0);
 }
-static int test_6_5_3_bot(int child)
+
+int test_case_6_5_3_bot(int child)
 {
-	return test_6_5_x_bot(child, TNOTSUPPORT, 0);
+	return test_case_6_5_x_bot(child, TNOTSUPPORT, 0);
 }
-static struct test_stream test_case_6_5_3_top = { &preamble_3_top, &test_6_5_3_top, &postamble_3_top };
-static struct test_stream test_case_6_5_3_bot = { &preamble_3_bot, &test_6_5_3_bot, &postamble_3_bot };
-#define test_case_6_5_3_stream_top (&test_case_6_5_3_top)
-#define test_case_6_5_3_stream_bot (&test_case_6_5_3_bot)
+
+#define preamble_6_5_3_top preamble_3_top
+#define preamble_6_5_3_bot preamble_3_bot
+
+#define postamble_6_5_3_top postamble_3_top
+#define postamble_6_5_3_bot postamble_3_bot
+
+static struct test_stream test_6_5_3_top = { &preamble_6_5_3_top, &test_case_6_5_3_top, &postamble_6_5_3_top };
+static struct test_stream test_6_5_3_bot = { &preamble_6_5_3_bot, &test_case_6_5_3_bot, &postamble_6_5_3_bot };
 
 #define tgrp_case_6_5_4 test_group_12
+#define numb_case_6_5_4 "6.5.4"
 #define name_case_6_5_4 "t_snddis library call -- TOUTSTATE error"
 #define desc_case_6_5_4 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
-static int test_6_5_4_top(int child)
+
+int test_case_6_5_4_top(int child)
 {
-	return test_6_5_x_top(child, TOUTSTATE, 0);
+	return test_case_6_5_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_5_4_bot(int child)
+
+int test_case_6_5_4_bot(int child)
 {
-	return test_6_5_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_5_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_5_4_top = { &preamble_3_top, &test_6_5_4_top, &postamble_3_top };
-static struct test_stream test_case_6_5_4_bot = { &preamble_3_bot, &test_6_5_4_bot, &postamble_3_bot };
-#define test_case_6_5_4_stream_top (&test_case_6_5_4_top)
-#define test_case_6_5_4_stream_bot (&test_case_6_5_4_bot)
+
+#define preamble_6_5_4_top preamble_3_top
+#define preamble_6_5_4_bot preamble_3_bot
+
+#define postamble_6_5_4_top postamble_3_top
+#define postamble_6_5_4_bot postamble_3_bot
+
+static struct test_stream test_6_5_4_top = { &preamble_6_5_4_top, &test_case_6_5_4_top, &postamble_6_5_4_top };
+static struct test_stream test_6_5_4_bot = { &preamble_6_5_4_bot, &test_case_6_5_4_bot, &postamble_6_5_4_bot };
 
 #define tgrp_case_6_5_5 test_group_12
+#define numb_case_6_5_5 "6.5.5"
 #define name_case_6_5_5 "t_snddis library call -- TSYSERR error"
 #define desc_case_6_5_5 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
-static int test_6_5_5_top(int child)
+
+int test_case_6_5_5_top(int child)
 {
-	return test_6_5_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_5_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_5_5_bot(int child)
+
+int test_case_6_5_5_bot(int child)
 {
-	return test_6_5_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_5_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_5_5_top = { &preamble_3_top, &test_6_5_5_top, &postamble_3_top };
-static struct test_stream test_case_6_5_5_bot = { &preamble_3_bot, &test_6_5_5_bot, &postamble_3_bot };
-#define test_case_6_5_5_stream_top (&test_case_6_5_5_top)
-#define test_case_6_5_5_stream_bot (&test_case_6_5_5_bot)
+
+#define preamble_6_5_5_top preamble_3_top
+#define preamble_6_5_5_bot preamble_3_bot
+
+#define postamble_6_5_5_top postamble_3_top
+#define postamble_6_5_5_bot postamble_3_bot
+
+static struct test_stream test_6_5_5_top = { &preamble_6_5_5_top, &test_case_6_5_5_top, &postamble_6_5_5_top };
+static struct test_stream test_6_5_5_bot = { &preamble_6_5_5_bot, &test_case_6_5_5_bot, &postamble_6_5_5_bot };
 
 #define tgrp_case_6_6_1 test_group_12
+#define numb_case_6_6_1 "6.6.1"
 #define name_case_6_6_1 "t_unbind library call -- TOUTSTATE error"
 #define desc_case_6_6_1 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_unbind library call."
-static int test_6_6_x_top(int child, int terror, int error)
+
+int test_case_6_6_x_top(int child, int terror, int error)
 {
 	start_tt(500);
 	state++;
@@ -9731,7 +11700,8 @@ static int test_6_6_x_top(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_6_x_bot(int child, int terror, int error)
+
+int test_case_6_6_x_bot(int child, int terror, int error)
 {
 	start_tt(500);
 	state++;
@@ -9745,44 +11715,61 @@ static int test_6_6_x_bot(int child, int terror, int error)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_6_6_1_top(int child)
+
+int test_case_6_6_1_top(int child)
 {
-	return test_6_6_x_top(child, TOUTSTATE, 0);
+	return test_case_6_6_x_top(child, TOUTSTATE, 0);
 }
-static int test_6_6_1_bot(int child)
+
+int test_case_6_6_1_bot(int child)
 {
-	return test_6_6_x_bot(child, TOUTSTATE, 0);
+	return test_case_6_6_x_bot(child, TOUTSTATE, 0);
 }
-static struct test_stream test_case_6_6_1_top = { &preamble_2cl_top, &test_6_6_1_top, &postamble_2cl_top };
-static struct test_stream test_case_6_6_1_bot = { &preamble_2cl_bot, &test_6_6_1_bot, &postamble_2cl_bot };
-#define test_case_6_6_1_stream_top (&test_case_6_6_1_top)
-#define test_case_6_6_1_stream_bot (&test_case_6_6_1_bot)
+
+#define preamble_6_6_1_top preamble_2cl_top
+#define preamble_6_6_1_bot preamble_2cl_bot
+
+#define postamble_6_6_1_top postamble_2cl_top
+#define postamble_6_6_1_bot postamble_2cl_bot
+
+static struct test_stream test_6_6_1_top = { &preamble_6_6_1_top, &test_case_6_6_1_top, &postamble_6_6_1_top };
+static struct test_stream test_6_6_1_bot = { &preamble_6_6_1_bot, &test_case_6_6_1_bot, &postamble_6_6_1_bot };
 
 #define tgrp_case_6_6_2 test_group_12
+#define numb_case_6_6_2 "6.6.2"
 #define name_case_6_6_2 "t_unbind library call -- TSYSERR error"
 #define desc_case_6_6_2 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_unbind library call."
-static int test_6_6_2_top(int child)
+
+int test_case_6_6_2_top(int child)
 {
-	return test_6_6_x_top(child, TSYSERR, EPROTO);
+	return test_case_6_6_x_top(child, TSYSERR, EPROTO);
 }
-static int test_6_6_2_bot(int child)
+
+int test_case_6_6_2_bot(int child)
 {
-	return test_6_6_x_bot(child, TSYSERR, EPROTO);
+	return test_case_6_6_x_bot(child, TSYSERR, EPROTO);
 }
-static struct test_stream test_case_6_6_2_top = { &preamble_2cl_top, &test_6_6_2_top, &postamble_2cl_top };
-static struct test_stream test_case_6_6_2_bot = { &preamble_2cl_bot, &test_6_6_2_bot, &postamble_2cl_bot };
-#define test_case_6_6_2_stream_top (&test_case_6_6_2_top)
-#define test_case_6_6_2_stream_bot (&test_case_6_6_2_bot)
+
+#define preamble_6_6_2_top preamble_2cl_top
+#define preamble_6_6_2_bot preamble_2cl_bot
+
+#define postamble_6_6_2_top postamble_2cl_top
+#define postamble_6_6_2_bot postamble_2cl_bot
+
+static struct test_stream test_6_6_2_top = { &preamble_6_6_2_top, &test_case_6_6_2_top, &postamble_6_6_2_top };
+static struct test_stream test_6_6_2_bot = { &preamble_6_6_2_bot, &test_case_6_6_2_bot, &postamble_6_6_2_bot };
 
 #define test_group_13 "Error codes returned by the XTI library"
 #define tgrp_case_7_1_1 test_group_13
+#define numb_case_7_1_1 "7.1.1"
 #define name_case_7_1_1 "t_accept library call -- TINDOUT error"
 #define desc_case_7_1_1 "\
 This test case tests the TINDOUT error from the XTI library in response to\n\
 the t_accept library call."
-static int test_7_1_1_top(int child)
+
+int test_case_7_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9806,7 +11793,8 @@ static int test_7_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_1_1_bot(int child)
+
+int test_case_7_1_1_bot(int child)
 {
 	last_sequence = 1;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -9830,17 +11818,24 @@ static int test_7_1_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_1_1_top = { &preamble_2_top, &test_7_1_1_top, &postamble_2_top };
-static struct test_stream test_case_7_1_1_bot = { &preamble_2_bot, &test_7_1_1_bot, &postamble_2_bot };
-#define test_case_7_1_1_stream_top (&test_case_7_1_1_top)
-#define test_case_7_1_1_stream_bot (&test_case_7_1_1_bot)
+
+#define preamble_7_1_1_top preamble_2_top
+#define preamble_7_1_1_bot preamble_2_bot
+
+#define postamble_7_1_1_top postamble_2_top
+#define postamble_7_1_1_bot postamble_2_bot
+
+static struct test_stream test_7_1_1_top = { &preamble_7_1_1_top, &test_case_7_1_1_top, &postamble_7_1_1_top };
+static struct test_stream test_7_1_1_bot = { &preamble_7_1_1_bot, &test_case_7_1_1_bot, &postamble_7_1_1_bot };
 
 #define tgrp_case_7_1_2 test_group_13
+#define numb_case_7_1_2 "7.1.2"
 #define name_case_7_1_2 "t_accept library call -- TNOTSUPPORT error"
 #define desc_case_7_1_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_accept library call."
-static int test_7_1_2_top(int child)
+
+int test_case_7_1_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9850,21 +11845,29 @@ static int test_7_1_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_1_2_bot(int child)
+
+int test_case_7_1_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_1_2_top = { &preamble_2cl_top, &test_7_1_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_1_2_bot = { &preamble_2cl_bot, &test_7_1_2_bot, &postamble_2cl_bot };
-#define test_case_7_1_2_stream_top (&test_case_7_1_2_top)
-#define test_case_7_1_2_stream_bot (&test_case_7_1_2_bot)
+
+#define preamble_7_1_2_top preamble_2cl_top
+#define preamble_7_1_2_bot preamble_2cl_bot
+
+#define postamble_7_1_2_top postamble_2cl_top
+#define postamble_7_1_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_1_2_top = { &preamble_7_1_2_top, &test_case_7_1_2_top, &postamble_7_1_2_top };
+static struct test_stream test_7_1_2_bot = { &preamble_7_1_2_bot, &test_case_7_1_2_bot, &postamble_7_1_2_bot };
 
 #define tgrp_case_7_1_3 test_group_13
+#define numb_case_7_1_3 "7.1.3"
 #define name_case_7_1_3 "t_accept library call -- TOUTSTATE error"
 #define desc_case_7_1_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_accept library call."
-static int test_7_1_3_top(int child)
+
+int test_case_7_1_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9874,21 +11877,29 @@ static int test_7_1_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_1_3_bot(int child)
+
+int test_case_7_1_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_1_3_top = { &preamble_2_top, &test_7_1_3_top, &postamble_2_top };
-static struct test_stream test_case_7_1_3_bot = { &preamble_2_bot, &test_7_1_3_bot, &postamble_2_bot };
-#define test_case_7_1_3_stream_top (&test_case_7_1_3_top)
-#define test_case_7_1_3_stream_bot (&test_case_7_1_3_bot)
+
+#define preamble_7_1_3_top preamble_2_top
+#define preamble_7_1_3_bot preamble_2_bot
+
+#define postamble_7_1_3_top postamble_2_top
+#define postamble_7_1_3_bot postamble_2_bot
+
+static struct test_stream test_7_1_3_top = { &preamble_7_1_3_top, &test_case_7_1_3_top, &postamble_7_1_3_top };
+static struct test_stream test_7_1_3_bot = { &preamble_7_1_3_bot, &test_case_7_1_3_bot, &postamble_7_1_3_bot };
 
 #define tgrp_case_7_2_1 test_group_13
+#define numb_case_7_2_1 "7.2.1"
 #define name_case_7_2_1 "t_connect library call -- TOUTSTATE error"
 #define desc_case_7_2_1 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_connect library call."
-static int test_7_2_1_top(int child)
+
+int test_case_7_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9898,21 +11909,29 @@ static int test_7_2_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_2_1_bot(int child)
+
+int test_case_7_2_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_2_1_top = { &preamble_3_top, &test_7_2_1_top, &postamble_3_top };
-static struct test_stream test_case_7_2_1_bot = { &preamble_3_bot, &test_7_2_1_bot, &postamble_3_bot };
-#define test_case_7_2_1_stream_top (&test_case_7_2_1_top)
-#define test_case_7_2_1_stream_bot (&test_case_7_2_1_bot)
+
+#define preamble_7_2_1_top preamble_3_top
+#define preamble_7_2_1_bot preamble_3_bot
+
+#define postamble_7_2_1_top postamble_3_top
+#define postamble_7_2_1_bot postamble_3_bot
+
+static struct test_stream test_7_2_1_top = { &preamble_7_2_1_top, &test_case_7_2_1_top, &postamble_7_2_1_top };
+static struct test_stream test_7_2_1_bot = { &preamble_7_2_1_bot, &test_case_7_2_1_bot, &postamble_7_2_1_bot };
 
 #define tgrp_case_7_3_1 test_group_13
+#define numb_case_7_3_1 "7.3.1"
 #define name_case_7_3_1 "t_listen library call -- TBADQLEN error"
 #define desc_case_7_3_1 "\
 This test case tests the TBADQLEN error from the XTI library in response to\n\
 the t_listen library call."
-static int test_7_3_1_top(int child)
+
+int test_case_7_3_1_top(int child)
 {
 	last_qlen = 0;
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
@@ -9929,7 +11948,8 @@ static int test_7_3_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_3_1_bot(int child)
+
+int test_case_7_3_1_bot(int child)
 {
 	if (get_event(child) != __TEST_BIND_REQ)
 		return (__RESULT_FAILURE);
@@ -9946,17 +11966,24 @@ static int test_7_3_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_3_1_top = { &preamble_1_top, &test_7_3_1_top, &postamble_1_top };
-static struct test_stream test_case_7_3_1_bot = { &preamble_1_bot, &test_7_3_1_bot, &postamble_1_bot };
-#define test_case_7_3_1_stream_top (&test_case_7_3_1_top)
-#define test_case_7_3_1_stream_bot (&test_case_7_3_1_bot)
+
+#define preamble_7_3_1_top preamble_1_top
+#define preamble_7_3_1_bot preamble_1_bot
+
+#define postamble_7_3_1_top postamble_1_top
+#define postamble_7_3_1_bot postamble_1_bot
+
+static struct test_stream test_7_3_1_top = { &preamble_7_3_1_top, &test_case_7_3_1_top, &postamble_7_3_1_top };
+static struct test_stream test_7_3_1_bot = { &preamble_7_3_1_bot, &test_case_7_3_1_bot, &postamble_7_3_1_bot };
 
 #define tgrp_case_7_3_2 test_group_13
+#define numb_case_7_3_2 "7.3.2"
 #define name_case_7_3_2 "t_listen library call -- TNOTSUPPORT error"
 #define desc_case_7_3_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_listen library call."
-static int test_7_3_2_top(int child)
+
+int test_case_7_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9966,21 +11993,29 @@ static int test_7_3_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_3_2_bot(int child)
+
+int test_case_7_3_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_3_2_top = { &preamble_2cl_top, &test_7_3_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_3_2_bot = { &preamble_2cl_bot, &test_7_3_2_bot, &postamble_2cl_bot };
-#define test_case_7_3_2_stream_top (&test_case_7_3_2_top)
-#define test_case_7_3_2_stream_bot (&test_case_7_3_2_bot)
+
+#define preamble_7_3_2_top preamble_2cl_top
+#define preamble_7_3_2_bot preamble_2cl_bot
+
+#define postamble_7_3_2_top postamble_2cl_top
+#define postamble_7_3_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_3_2_top = { &preamble_7_3_2_top, &test_case_7_3_2_top, &postamble_7_3_2_top };
+static struct test_stream test_7_3_2_bot = { &preamble_7_3_2_bot, &test_case_7_3_2_bot, &postamble_7_3_2_bot };
 
 #define tgrp_case_7_3_3 test_group_13
+#define numb_case_7_3_3 "7.3.3"
 #define name_case_7_3_3 "t_listen library call -- TOUTSTATE error"
 #define desc_case_7_3_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_listen library call."
-static int test_7_3_3_top(int child)
+
+int test_case_7_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -9990,21 +12025,29 @@ static int test_7_3_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_3_3_bot(int child)
+
+int test_case_7_3_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_3_3_top = { &preamble_3_top, &test_7_3_3_top, &postamble_3_top };
-static struct test_stream test_case_7_3_3_bot = { &preamble_3_bot, &test_7_3_3_bot, &postamble_3_bot };
-#define test_case_7_3_3_stream_top (&test_case_7_3_3_top)
-#define test_case_7_3_3_stream_bot (&test_case_7_3_3_bot)
+
+#define preamble_7_3_3_top preamble_3_top
+#define preamble_7_3_3_bot preamble_3_bot
+
+#define postamble_7_3_3_top postamble_3_top
+#define postamble_7_3_3_bot postamble_3_bot
+
+static struct test_stream test_7_3_3_top = { &preamble_7_3_3_top, &test_case_7_3_3_top, &postamble_7_3_3_top };
+static struct test_stream test_7_3_3_bot = { &preamble_7_3_3_bot, &test_case_7_3_3_bot, &postamble_7_3_3_bot };
 
 #define tgrp_case_7_3_4 test_group_13
+#define numb_case_7_3_4 "7.3.4"
 #define name_case_7_3_4 "t_listen library call -- TQFULL error"
 #define desc_case_7_3_4 "\
 This test case tests the TQFULL error from the XTI library in response to\n\
 the t_listen library call."
-static int test_7_3_4_top(int child)
+
+int test_case_7_3_4_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10026,7 +12069,8 @@ static int test_7_3_4_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_3_4_bot(int child)
+
+int test_case_7_3_4_bot(int child)
 {
 	last_sequence = 1;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -10050,17 +12094,24 @@ static int test_7_3_4_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_3_4_top = { &preamble_2_top, &test_7_3_4_top, &postamble_2_top };
-static struct test_stream test_case_7_3_4_bot = { &preamble_2_bot, &test_7_3_4_bot, &postamble_2_bot };
-#define test_case_7_3_4_stream_top (&test_case_7_3_4_top)
-#define test_case_7_3_4_stream_bot (&test_case_7_3_4_bot)
+
+#define preamble_7_3_4_top preamble_2_top
+#define preamble_7_3_4_bot preamble_2_bot
+
+#define postamble_7_3_4_top postamble_2_top
+#define postamble_7_3_4_bot postamble_2_bot
+
+static struct test_stream test_7_3_4_top = { &preamble_7_3_4_top, &test_case_7_3_4_top, &postamble_7_3_4_top };
+static struct test_stream test_7_3_4_bot = { &preamble_7_3_4_bot, &test_case_7_3_4_bot, &postamble_7_3_4_bot };
 
 #define tgrp_case_7_3_5 test_group_13
+#define numb_case_7_3_5 "7.3.5"
 #define name_case_7_3_5 "t_listen library call -- TNODATA error"
 #define desc_case_7_3_5 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_listen library call."
-static int test_7_3_5_top(int child)
+
+int test_case_7_3_5_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10073,21 +12124,29 @@ static int test_7_3_5_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_3_5_bot(int child)
+
+int test_case_7_3_5_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_3_5_top = { &preamble_2_top, &test_7_3_5_top, &postamble_2_top };
-static struct test_stream test_case_7_3_5_bot = { &preamble_2_bot, &test_7_3_5_bot, &postamble_2_bot };
-#define test_case_7_3_5_stream_top (&test_case_7_3_5_top)
-#define test_case_7_3_5_stream_bot (&test_case_7_3_5_bot)
+
+#define preamble_7_3_5_top preamble_2_top
+#define preamble_7_3_5_bot preamble_2_bot
+
+#define postamble_7_3_5_top postamble_2_top
+#define postamble_7_3_5_bot postamble_2_bot
+
+static struct test_stream test_7_3_5_top = { &preamble_7_3_5_top, &test_case_7_3_5_top, &postamble_7_3_5_top };
+static struct test_stream test_7_3_5_bot = { &preamble_7_3_5_bot, &test_case_7_3_5_bot, &postamble_7_3_5_bot };
 
 #define tgrp_case_7_4_1 test_group_13
+#define numb_case_7_4_1 "7.4.1"
 #define name_case_7_4_1 "t_rcv library call -- TNODATA error"
 #define desc_case_7_4_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcv library call."
-static int test_7_4_1_top(int child)
+
+int test_case_7_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10100,21 +12159,29 @@ static int test_7_4_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_4_1_bot(int child)
+
+int test_case_7_4_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_4_1_top = { &preamble_3_top, &test_7_4_1_top, &postamble_3_top };
-static struct test_stream test_case_7_4_1_bot = { &preamble_3_bot, &test_7_4_1_bot, &postamble_3_bot };
-#define test_case_7_4_1_stream_top (&test_case_7_4_1_top)
-#define test_case_7_4_1_stream_bot (&test_case_7_4_1_bot)
+
+#define preamble_7_4_1_top preamble_3_top
+#define preamble_7_4_1_bot preamble_3_bot
+
+#define postamble_7_4_1_top postamble_3_top
+#define postamble_7_4_1_bot postamble_3_bot
+
+static struct test_stream test_7_4_1_top = { &preamble_7_4_1_top, &test_case_7_4_1_top, &postamble_7_4_1_top };
+static struct test_stream test_7_4_1_bot = { &preamble_7_4_1_bot, &test_case_7_4_1_bot, &postamble_7_4_1_bot };
 
 #define tgrp_case_7_4_2 test_group_13
+#define numb_case_7_4_2 "7.4.2"
 #define name_case_7_4_2 "t_rcv library call -- TNOTSUPPORT error"
 #define desc_case_7_4_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcv library call."
-static int test_7_4_2_top(int child)
+
+int test_case_7_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10124,21 +12191,29 @@ static int test_7_4_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_4_2_bot(int child)
+
+int test_case_7_4_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_4_2_top = { &preamble_2cl_top, &test_7_4_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_4_2_bot = { &preamble_2cl_bot, &test_7_4_2_bot, &postamble_2cl_bot };
-#define test_case_7_4_2_stream_top (&test_case_7_4_2_top)
-#define test_case_7_4_2_stream_bot (&test_case_7_4_2_bot)
+
+#define preamble_7_4_2_top preamble_2cl_top
+#define preamble_7_4_2_bot preamble_2cl_bot
+
+#define postamble_7_4_2_top postamble_2cl_top
+#define postamble_7_4_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_4_2_top = { &preamble_7_4_2_top, &test_case_7_4_2_top, &postamble_7_4_2_top };
+static struct test_stream test_7_4_2_bot = { &preamble_7_4_2_bot, &test_case_7_4_2_bot, &postamble_7_4_2_bot };
 
 #define tgrp_case_7_4_3 test_group_13
+#define numb_case_7_4_3 "7.4.3"
 #define name_case_7_4_3 "t_rcv library call -- TOUTSTATE error"
 #define desc_case_7_4_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcv library call."
-static int test_7_4_3_top(int child)
+
+int test_case_7_4_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10148,21 +12223,29 @@ static int test_7_4_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_4_3_bot(int child)
+
+int test_case_7_4_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_4_3_top = { &preamble_2_top, &test_7_4_3_top, &postamble_2_top };
-static struct test_stream test_case_7_4_3_bot = { &preamble_2_bot, &test_7_4_3_bot, &postamble_2_bot };
-#define test_case_7_4_3_stream_top (&test_case_7_4_3_top)
-#define test_case_7_4_3_stream_bot (&test_case_7_4_3_bot)
+
+#define preamble_7_4_3_top preamble_2_top
+#define preamble_7_4_3_bot preamble_2_bot
+
+#define postamble_7_4_3_top postamble_2_top
+#define postamble_7_4_3_bot postamble_2_bot
+
+static struct test_stream test_7_4_3_top = { &preamble_7_4_3_top, &test_case_7_4_3_top, &postamble_7_4_3_top };
+static struct test_stream test_7_4_3_bot = { &preamble_7_4_3_bot, &test_case_7_4_3_bot, &postamble_7_4_3_bot };
 
 #define tgrp_case_7_5_1 test_group_13
+#define numb_case_7_5_1 "7.5.1"
 #define name_case_7_5_1 "t_rcvv library call -- TNODATA error"
 #define desc_case_7_5_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvv library call."
-static int test_7_5_1_top(int child)
+
+int test_case_7_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10175,21 +12258,29 @@ static int test_7_5_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_5_1_bot(int child)
+
+int test_case_7_5_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_5_1_top = { &preamble_3_top, &test_7_5_1_top, &postamble_3_top };
-static struct test_stream test_case_7_5_1_bot = { &preamble_3_bot, &test_7_5_1_bot, &postamble_3_bot };
-#define test_case_7_5_1_stream_top (&test_case_7_5_1_top)
-#define test_case_7_5_1_stream_bot (&test_case_7_5_1_bot)
+
+#define preamble_7_5_1_top preamble_3_top
+#define preamble_7_5_1_bot preamble_3_bot
+
+#define postamble_7_5_1_top postamble_3_top
+#define postamble_7_5_1_bot postamble_3_bot
+
+static struct test_stream test_7_5_1_top = { &preamble_7_5_1_top, &test_case_7_5_1_top, &postamble_7_5_1_top };
+static struct test_stream test_7_5_1_bot = { &preamble_7_5_1_bot, &test_case_7_5_1_bot, &postamble_7_5_1_bot };
 
 #define tgrp_case_7_5_2 test_group_13
+#define numb_case_7_5_2 "7.5.2"
 #define name_case_7_5_2 "t_rcvv library call -- TNOTSUPPORT error"
 #define desc_case_7_5_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvv library call."
-static int test_7_5_2_top(int child)
+
+int test_case_7_5_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10199,21 +12290,29 @@ static int test_7_5_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_5_2_bot(int child)
+
+int test_case_7_5_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_5_2_top = { &preamble_2cl_top, &test_7_5_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_5_2_bot = { &preamble_2cl_bot, &test_7_5_2_bot, &postamble_2cl_bot };
-#define test_case_7_5_2_stream_top (&test_case_7_5_2_top)
-#define test_case_7_5_2_stream_bot (&test_case_7_5_2_bot)
+
+#define preamble_7_5_2_top preamble_2cl_top
+#define preamble_7_5_2_bot preamble_2cl_bot
+
+#define postamble_7_5_2_top postamble_2cl_top
+#define postamble_7_5_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_5_2_top = { &preamble_7_5_2_top, &test_case_7_5_2_top, &postamble_7_5_2_top };
+static struct test_stream test_7_5_2_bot = { &preamble_7_5_2_bot, &test_case_7_5_2_bot, &postamble_7_5_2_bot };
 
 #define tgrp_case_7_5_3 test_group_13
+#define numb_case_7_5_3 "7.5.3"
 #define name_case_7_5_3 "t_rcvv library call -- TOUTSTATE error"
 #define desc_case_7_5_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvv library call."
-static int test_7_5_3_top(int child)
+
+int test_case_7_5_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10223,21 +12322,29 @@ static int test_7_5_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_5_3_bot(int child)
+
+int test_case_7_5_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_5_3_top = { &preamble_2_top, &test_7_5_3_top, &postamble_2_top };
-static struct test_stream test_case_7_5_3_bot = { &preamble_2_bot, &test_7_5_3_bot, &postamble_2_bot };
-#define test_case_7_5_3_stream_top (&test_case_7_5_3_top)
-#define test_case_7_5_3_stream_bot (&test_case_7_5_3_bot)
+
+#define preamble_7_5_3_top preamble_2_top
+#define preamble_7_5_3_bot preamble_2_bot
+
+#define postamble_7_5_3_top postamble_2_top
+#define postamble_7_5_3_bot postamble_2_bot
+
+static struct test_stream test_7_5_3_top = { &preamble_7_5_3_top, &test_case_7_5_3_top, &postamble_7_5_3_top };
+static struct test_stream test_7_5_3_bot = { &preamble_7_5_3_bot, &test_case_7_5_3_bot, &postamble_7_5_3_bot };
 
 #define tgrp_case_7_6_1 test_group_13
+#define numb_case_7_6_1 "7.6.1"
 #define name_case_7_6_1 "t_rcvconnect library call -- TNODATA error"
 #define desc_case_7_6_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvconnect library call."
-static int test_7_6_1_top(int child)
+
+int test_case_7_6_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10259,7 +12366,8 @@ static int test_7_6_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_6_1_bot(int child)
+
+int test_case_7_6_1_bot(int child)
 {
 	if (get_event(child) != __TEST_CONN_REQ)
 		return (__RESULT_FAILURE);
@@ -10275,17 +12383,24 @@ static int test_7_6_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_6_1_top = { &preamble_2_top, &test_7_6_1_top, &postamble_2_top };
-static struct test_stream test_case_7_6_1_bot = { &preamble_2_bot, &test_7_6_1_bot, &postamble_2_bot };
-#define test_case_7_6_1_stream_top (&test_case_7_6_1_top)
-#define test_case_7_6_1_stream_bot (&test_case_7_6_1_bot)
+
+#define preamble_7_6_1_top preamble_2_top
+#define preamble_7_6_1_bot preamble_2_bot
+
+#define postamble_7_6_1_top postamble_2_top
+#define postamble_7_6_1_bot postamble_2_bot
+
+static struct test_stream test_7_6_1_top = { &preamble_7_6_1_top, &test_case_7_6_1_top, &postamble_7_6_1_top };
+static struct test_stream test_7_6_1_bot = { &preamble_7_6_1_bot, &test_case_7_6_1_bot, &postamble_7_6_1_bot };
 
 #define tgrp_case_7_6_2 test_group_13
+#define numb_case_7_6_2 "7.6.2"
 #define name_case_7_6_2 "t_rcvconnect library call -- TNOTSUPPORT error"
 #define desc_case_7_6_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvconnect library call."
-static int test_7_6_2_top(int child)
+
+int test_case_7_6_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10295,21 +12410,29 @@ static int test_7_6_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_6_2_bot(int child)
+
+int test_case_7_6_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_6_2_top = { &preamble_2cl_top, &test_7_6_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_6_2_bot = { &preamble_2cl_bot, &test_7_6_2_bot, &postamble_2cl_bot };
-#define test_case_7_6_2_stream_top (&test_case_7_6_2_top)
-#define test_case_7_6_2_stream_bot (&test_case_7_6_2_bot)
+
+#define preamble_7_6_2_top preamble_2cl_top
+#define preamble_7_6_2_bot preamble_2cl_bot
+
+#define postamble_7_6_2_top postamble_2cl_top
+#define postamble_7_6_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_6_2_top = { &preamble_7_6_2_top, &test_case_7_6_2_top, &postamble_7_6_2_top };
+static struct test_stream test_7_6_2_bot = { &preamble_7_6_2_bot, &test_case_7_6_2_bot, &postamble_7_6_2_bot };
 
 #define tgrp_case_7_6_3 test_group_13
+#define numb_case_7_6_3 "7.6.3"
 #define name_case_7_6_3 "t_rcvconnect library call -- TOUTSTATE error"
 #define desc_case_7_6_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvconnect library call."
-static int test_7_6_3_top(int child)
+
+int test_case_7_6_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10319,21 +12442,29 @@ static int test_7_6_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_6_3_bot(int child)
+
+int test_case_7_6_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_6_3_top = { &preamble_2_top, &test_7_6_3_top, &postamble_2_top };
-static struct test_stream test_case_7_6_3_bot = { &preamble_2_bot, &test_7_6_3_bot, &postamble_2_bot };
-#define test_case_7_6_3_stream_top (&test_case_7_6_3_top)
-#define test_case_7_6_3_stream_bot (&test_case_7_6_3_bot)
+
+#define preamble_7_6_3_top preamble_2_top
+#define preamble_7_6_3_bot preamble_2_bot
+
+#define postamble_7_6_3_top postamble_2_top
+#define postamble_7_6_3_bot postamble_2_bot
+
+static struct test_stream test_7_6_3_top = { &preamble_7_6_3_top, &test_case_7_6_3_top, &postamble_7_6_3_top };
+static struct test_stream test_7_6_3_bot = { &preamble_7_6_3_bot, &test_case_7_6_3_bot, &postamble_7_6_3_bot };
 
 #define tgrp_case_7_7_1 test_group_13
+#define numb_case_7_7_1 "7.7.1"
 #define name_case_7_7_1 "t_rcvdis library call -- TNODIS error"
 #define desc_case_7_7_1 "\
 This test case tests the TNODIS error from the XTI library in response to\n\
 the t_rcvdis library call."
-static int test_7_7_1_top(int child)
+
+int test_case_7_7_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10346,21 +12477,29 @@ static int test_7_7_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_7_1_bot(int child)
+
+int test_case_7_7_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_7_1_top = { &preamble_3_top, &test_7_7_1_top, &postamble_3_top };
-static struct test_stream test_case_7_7_1_bot = { &preamble_3_bot, &test_7_7_1_bot, &postamble_3_bot };
-#define test_case_7_7_1_stream_top (&test_case_7_7_1_top)
-#define test_case_7_7_1_stream_bot (&test_case_7_7_1_bot)
+
+#define preamble_7_7_1_top preamble_3_top
+#define preamble_7_7_1_bot preamble_3_bot
+
+#define postamble_7_7_1_top postamble_3_top
+#define postamble_7_7_1_bot postamble_3_bot
+
+static struct test_stream test_7_7_1_top = { &preamble_7_7_1_top, &test_case_7_7_1_top, &postamble_7_7_1_top };
+static struct test_stream test_7_7_1_bot = { &preamble_7_7_1_bot, &test_case_7_7_1_bot, &postamble_7_7_1_bot };
 
 #define tgrp_case_7_7_2 test_group_13
+#define numb_case_7_7_2 "7.7.2"
 #define name_case_7_7_2 "t_rcvdis library call -- TNOTSUPPORT error"
 #define desc_case_7_7_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvdis library call."
-static int test_7_7_2_top(int child)
+
+int test_case_7_7_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10370,21 +12509,29 @@ static int test_7_7_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_7_2_bot(int child)
+
+int test_case_7_7_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_7_2_top = { &preamble_2cl_top, &test_7_7_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_7_2_bot = { &preamble_2cl_bot, &test_7_7_2_bot, &postamble_2cl_bot };
-#define test_case_7_7_2_stream_top (&test_case_7_7_2_top)
-#define test_case_7_7_2_stream_bot (&test_case_7_7_2_bot)
+
+#define preamble_7_7_2_top preamble_2cl_top
+#define preamble_7_7_2_bot preamble_2cl_bot
+
+#define postamble_7_7_2_top postamble_2cl_top
+#define postamble_7_7_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_7_2_top = { &preamble_7_7_2_top, &test_case_7_7_2_top, &postamble_7_7_2_top };
+static struct test_stream test_7_7_2_bot = { &preamble_7_7_2_bot, &test_case_7_7_2_bot, &postamble_7_7_2_bot };
 
 #define tgrp_case_7_7_3 test_group_13
+#define numb_case_7_7_3 "7.7.3"
 #define name_case_7_7_3 "t_rcvdis library call -- TOUTSTATE error"
 #define desc_case_7_7_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvdis library call."
-static int test_7_7_3_top(int child)
+
+int test_case_7_7_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10394,21 +12541,29 @@ static int test_7_7_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_7_3_bot(int child)
+
+int test_case_7_7_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_7_3_top = { &preamble_2_top, &test_7_7_3_top, &postamble_2_top };
-static struct test_stream test_case_7_7_3_bot = { &preamble_2_bot, &test_7_7_3_bot, &postamble_2_bot };
-#define test_case_7_7_3_stream_top (&test_case_7_7_3_top)
-#define test_case_7_7_3_stream_bot (&test_case_7_7_3_bot)
+
+#define preamble_7_7_3_top preamble_2_top
+#define preamble_7_7_3_bot preamble_2_bot
+
+#define postamble_7_7_3_top postamble_2_top
+#define postamble_7_7_3_bot postamble_2_bot
+
+static struct test_stream test_7_7_3_top = { &preamble_7_7_3_top, &test_case_7_7_3_top, &postamble_7_7_3_top };
+static struct test_stream test_7_7_3_bot = { &preamble_7_7_3_bot, &test_case_7_7_3_bot, &postamble_7_7_3_bot };
 
 #define tgrp_case_7_8_1 test_group_13
+#define numb_case_7_8_1 "7.8.1"
 #define name_case_7_8_1 "t_rcvrel library call -- TNOREL error"
 #define desc_case_7_8_1 "\
 This test case tests the TNOREL error from the XTI library in response to\n\
 the t_rcvrel library call."
-static int test_7_8_1_top(int child)
+
+int test_case_7_8_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10421,21 +12576,29 @@ static int test_7_8_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_8_1_bot(int child)
+
+int test_case_7_8_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_8_1_top = { &preamble_3_top, &test_7_8_1_top, &postamble_3_top };
-static struct test_stream test_case_7_8_1_bot = { &preamble_3_bot, &test_7_8_1_bot, &postamble_3_bot };
-#define test_case_7_8_1_stream_top (&test_case_7_8_1_top)
-#define test_case_7_8_1_stream_bot (&test_case_7_8_1_bot)
+
+#define preamble_7_8_1_top preamble_3_top
+#define preamble_7_8_1_bot preamble_3_bot
+
+#define postamble_7_8_1_top postamble_3_top
+#define postamble_7_8_1_bot postamble_3_bot
+
+static struct test_stream test_7_8_1_top = { &preamble_7_8_1_top, &test_case_7_8_1_top, &postamble_7_8_1_top };
+static struct test_stream test_7_8_1_bot = { &preamble_7_8_1_bot, &test_case_7_8_1_bot, &postamble_7_8_1_bot };
 
 #define tgrp_case_7_8_2 test_group_13
+#define numb_case_7_8_2 "7.8.2"
 #define name_case_7_8_2 "t_rcvrel library call -- TNOTSUPPORT error"
 #define desc_case_7_8_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvrel library call."
-static int test_7_8_2_top(int child)
+
+int test_case_7_8_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10445,21 +12608,29 @@ static int test_7_8_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_8_2_bot(int child)
+
+int test_case_7_8_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_8_2_top = { &preamble_2cl_top, &test_7_8_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_8_2_bot = { &preamble_2cl_bot, &test_7_8_2_bot, &postamble_2cl_bot };
-#define test_case_7_8_2_stream_top (&test_case_7_8_2_top)
-#define test_case_7_8_2_stream_bot (&test_case_7_8_2_bot)
+
+#define preamble_7_8_2_top preamble_2cl_top
+#define preamble_7_8_2_bot preamble_2cl_bot
+
+#define postamble_7_8_2_top postamble_2cl_top
+#define postamble_7_8_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_8_2_top = { &preamble_7_8_2_top, &test_case_7_8_2_top, &postamble_7_8_2_top };
+static struct test_stream test_7_8_2_bot = { &preamble_7_8_2_bot, &test_case_7_8_2_bot, &postamble_7_8_2_bot };
 
 #define tgrp_case_7_8_3 test_group_13
+#define numb_case_7_8_3 "7.8.3"
 #define name_case_7_8_3 "t_rcvrel library call -- TOUTSTATE error"
 #define desc_case_7_8_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvrel library call."
-static int test_7_8_3_top(int child)
+
+int test_case_7_8_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10469,21 +12640,29 @@ static int test_7_8_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_8_3_bot(int child)
+
+int test_case_7_8_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_8_3_top = { &preamble_2_top, &test_7_8_3_top, &postamble_2_top };
-static struct test_stream test_case_7_8_3_bot = { &preamble_2_bot, &test_7_8_3_bot, &postamble_2_bot };
-#define test_case_7_8_3_stream_top (&test_case_7_8_3_top)
-#define test_case_7_8_3_stream_bot (&test_case_7_8_3_bot)
+
+#define preamble_7_8_3_top preamble_2_top
+#define preamble_7_8_3_bot preamble_2_bot
+
+#define postamble_7_8_3_top postamble_2_top
+#define postamble_7_8_3_bot postamble_2_bot
+
+static struct test_stream test_7_8_3_top = { &preamble_7_8_3_top, &test_case_7_8_3_top, &postamble_7_8_3_top };
+static struct test_stream test_7_8_3_bot = { &preamble_7_8_3_bot, &test_case_7_8_3_bot, &postamble_7_8_3_bot };
 
 #define tgrp_case_7_9_1 test_group_13
+#define numb_case_7_9_1 "7.9.1"
 #define name_case_7_9_1 "t_rcvreldata library call -- TNOREL error"
 #define desc_case_7_9_1 "\
 This test case tests the TNOREL error from the XTI library in response to\n\
 the t_rcvreldata library call."
-static int test_7_9_1_top(int child)
+
+int test_case_7_9_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10496,21 +12675,29 @@ static int test_7_9_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_9_1_bot(int child)
+
+int test_case_7_9_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_9_1_top = { &preamble_3_top, &test_7_9_1_top, &postamble_3_top };
-static struct test_stream test_case_7_9_1_bot = { &preamble_3_bot, &test_7_9_1_bot, &postamble_3_bot };
-#define test_case_7_9_1_stream_top (&test_case_7_9_1_top)
-#define test_case_7_9_1_stream_bot (&test_case_7_9_1_bot)
+
+#define preamble_7_9_1_top preamble_3_top
+#define preamble_7_9_1_bot preamble_3_bot
+
+#define postamble_7_9_1_top postamble_3_top
+#define postamble_7_9_1_bot postamble_3_bot
+
+static struct test_stream test_7_9_1_top = { &preamble_7_9_1_top, &test_case_7_9_1_top, &postamble_7_9_1_top };
+static struct test_stream test_7_9_1_bot = { &preamble_7_9_1_bot, &test_case_7_9_1_bot, &postamble_7_9_1_bot };
 
 #define tgrp_case_7_9_2 test_group_13
+#define numb_case_7_9_2 "7.9.2"
 #define name_case_7_9_2 "t_rcvreldata library call -- TNOTSUPPORT error"
 #define desc_case_7_9_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvreldata library call."
-static int test_7_9_2_top(int child)
+
+int test_case_7_9_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10520,21 +12707,29 @@ static int test_7_9_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_9_2_bot(int child)
+
+int test_case_7_9_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_9_2_top = { &preamble_2cl_top, &test_7_9_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_9_2_bot = { &preamble_2cl_bot, &test_7_9_2_bot, &postamble_2cl_bot };
-#define test_case_7_9_2_stream_top (&test_case_7_9_2_top)
-#define test_case_7_9_2_stream_bot (&test_case_7_9_2_bot)
+
+#define preamble_7_9_2_top preamble_2cl_top
+#define preamble_7_9_2_bot preamble_2cl_bot
+
+#define postamble_7_9_2_top postamble_2cl_top
+#define postamble_7_9_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_9_2_top = { &preamble_7_9_2_top, &test_case_7_9_2_top, &postamble_7_9_2_top };
+static struct test_stream test_7_9_2_bot = { &preamble_7_9_2_bot, &test_case_7_9_2_bot, &postamble_7_9_2_bot };
 
 #define tgrp_case_7_9_3 test_group_13
+#define numb_case_7_9_3 "7.9.3"
 #define name_case_7_9_3 "t_rcvreldata library call -- TOUTSTATE error"
 #define desc_case_7_9_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvreldata library call."
-static int test_7_9_3_top(int child)
+
+int test_case_7_9_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10544,21 +12739,29 @@ static int test_7_9_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_9_3_bot(int child)
+
+int test_case_7_9_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_9_3_top = { &preamble_2_top, &test_7_9_3_top, &postamble_2_top };
-static struct test_stream test_case_7_9_3_bot = { &preamble_2_bot, &test_7_9_3_bot, &postamble_2_bot };
-#define test_case_7_9_3_stream_top (&test_case_7_9_3_top)
-#define test_case_7_9_3_stream_bot (&test_case_7_9_3_bot)
+
+#define preamble_7_9_3_top preamble_2_top
+#define preamble_7_9_3_bot preamble_2_bot
+
+#define postamble_7_9_3_top postamble_2_top
+#define postamble_7_9_3_bot postamble_2_bot
+
+static struct test_stream test_7_9_3_top = { &preamble_7_9_3_top, &test_case_7_9_3_top, &postamble_7_9_3_top };
+static struct test_stream test_7_9_3_bot = { &preamble_7_9_3_bot, &test_case_7_9_3_bot, &postamble_7_9_3_bot };
 
 #define tgrp_case_7_10_1 test_group_13
+#define numb_case_7_10_1 "7.10.1"
 #define name_case_7_10_1 "t_rcvudata library call -- TNODATA error"
 #define desc_case_7_10_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvudata library call."
-static int test_7_10_1_top(int child)
+
+int test_case_7_10_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10571,21 +12774,29 @@ static int test_7_10_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_10_1_bot(int child)
+
+int test_case_7_10_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_10_1_top = { &preamble_2cl_top, &test_7_10_1_top, &postamble_2cl_top };
-static struct test_stream test_case_7_10_1_bot = { &preamble_2cl_bot, &test_7_10_1_bot, &postamble_2cl_bot };
-#define test_case_7_10_1_stream_top (&test_case_7_10_1_top)
-#define test_case_7_10_1_stream_bot (&test_case_7_10_1_bot)
+
+#define preamble_7_10_1_top preamble_2cl_top
+#define preamble_7_10_1_bot preamble_2cl_bot
+
+#define postamble_7_10_1_top postamble_2cl_top
+#define postamble_7_10_1_bot postamble_2cl_bot
+
+static struct test_stream test_7_10_1_top = { &preamble_7_10_1_top, &test_case_7_10_1_top, &postamble_7_10_1_top };
+static struct test_stream test_7_10_1_bot = { &preamble_7_10_1_bot, &test_case_7_10_1_bot, &postamble_7_10_1_bot };
 
 #define tgrp_case_7_10_2 test_group_13
+#define numb_case_7_10_2 "7.10.2"
 #define name_case_7_10_2 "t_rcvudata library call -- TNOTSUPPORT error"
 #define desc_case_7_10_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvudata library call."
-static int test_7_10_2_top(int child)
+
+int test_case_7_10_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10595,21 +12806,29 @@ static int test_7_10_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_10_2_bot(int child)
+
+int test_case_7_10_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_10_2_top = { &preamble_2_top, &test_7_10_2_top, &postamble_2_top };
-static struct test_stream test_case_7_10_2_bot = { &preamble_2_bot, &test_7_10_2_bot, &postamble_2_bot };
-#define test_case_7_10_2_stream_top (&test_case_7_10_2_top)
-#define test_case_7_10_2_stream_bot (&test_case_7_10_2_bot)
+
+#define preamble_7_10_2_top preamble_2_top
+#define preamble_7_10_2_bot preamble_2_bot
+
+#define postamble_7_10_2_top postamble_2_top
+#define postamble_7_10_2_bot postamble_2_bot
+
+static struct test_stream test_7_10_2_top = { &preamble_7_10_2_top, &test_case_7_10_2_top, &postamble_7_10_2_top };
+static struct test_stream test_7_10_2_bot = { &preamble_7_10_2_bot, &test_case_7_10_2_bot, &postamble_7_10_2_bot };
 
 #define tgrp_case_7_10_3 test_group_13
+#define numb_case_7_10_3 "7.10.3"
 #define name_case_7_10_3 "t_rcvudata library call -- TOUTSTATE error"
 #define desc_case_7_10_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvudata library call."
-static int test_7_10_3_top(int child)
+
+int test_case_7_10_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10619,21 +12838,29 @@ static int test_7_10_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_10_3_bot(int child)
+
+int test_case_7_10_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_10_3_top = { &preamble_1cl_top, &test_7_10_3_top, &postamble_1cl_top };
-static struct test_stream test_case_7_10_3_bot = { &preamble_1cl_bot, &test_7_10_3_bot, &postamble_1cl_bot };
-#define test_case_7_10_3_stream_top (&test_case_7_10_3_top)
-#define test_case_7_10_3_stream_bot (&test_case_7_10_3_bot)
+
+#define preamble_7_10_3_top preamble_1cl_top
+#define preamble_7_10_3_bot preamble_1cl_bot
+
+#define postamble_7_10_3_top postamble_1cl_top
+#define postamble_7_10_3_bot postamble_1cl_bot
+
+static struct test_stream test_7_10_3_top = { &preamble_7_10_3_top, &test_case_7_10_3_top, &postamble_7_10_3_top };
+static struct test_stream test_7_10_3_bot = { &preamble_7_10_3_bot, &test_case_7_10_3_bot, &postamble_7_10_3_bot };
 
 #define tgrp_case_7_11_1 test_group_13
+#define numb_case_7_11_1 "7.11.1"
 #define name_case_7_11_1 "t_rcvvudata library call -- TNODATA error"
 #define desc_case_7_11_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvvudata library call."
-static int test_7_11_1_top(int child)
+
+int test_case_7_11_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10646,21 +12873,29 @@ static int test_7_11_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_11_1_bot(int child)
+
+int test_case_7_11_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_11_1_top = { &preamble_2cl_top, &test_7_11_1_top, &postamble_2cl_top };
-static struct test_stream test_case_7_11_1_bot = { &preamble_2cl_bot, &test_7_11_1_bot, &postamble_2cl_bot };
-#define test_case_7_11_1_stream_top (&test_case_7_11_1_top)
-#define test_case_7_11_1_stream_bot (&test_case_7_11_1_bot)
+
+#define preamble_7_11_1_top preamble_2cl_top
+#define preamble_7_11_1_bot preamble_2cl_bot
+
+#define postamble_7_11_1_top postamble_2cl_top
+#define postamble_7_11_1_bot postamble_2cl_bot
+
+static struct test_stream test_7_11_1_top = { &preamble_7_11_1_top, &test_case_7_11_1_top, &postamble_7_11_1_top };
+static struct test_stream test_7_11_1_bot = { &preamble_7_11_1_bot, &test_case_7_11_1_bot, &postamble_7_11_1_bot };
 
 #define tgrp_case_7_11_2 test_group_13
+#define numb_case_7_11_2 "7.11.2"
 #define name_case_7_11_2 "t_rcvvudata library call -- TNOTSUPPORT error"
 #define desc_case_7_11_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvvudata library call."
-static int test_7_11_2_top(int child)
+
+int test_case_7_11_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10670,21 +12905,29 @@ static int test_7_11_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_11_2_bot(int child)
+
+int test_case_7_11_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_11_2_top = { &preamble_2_top, &test_7_11_2_top, &postamble_2_top };
-static struct test_stream test_case_7_11_2_bot = { &preamble_2_bot, &test_7_11_2_bot, &postamble_2_bot };
-#define test_case_7_11_2_stream_top (&test_case_7_11_2_top)
-#define test_case_7_11_2_stream_bot (&test_case_7_11_2_bot)
+
+#define preamble_7_11_2_top preamble_2_top
+#define preamble_7_11_2_bot preamble_2_bot
+
+#define postamble_7_11_2_top postamble_2_top
+#define postamble_7_11_2_bot postamble_2_bot
+
+static struct test_stream test_7_11_2_top = { &preamble_7_11_2_top, &test_case_7_11_2_top, &postamble_7_11_2_top };
+static struct test_stream test_7_11_2_bot = { &preamble_7_11_2_bot, &test_case_7_11_2_bot, &postamble_7_11_2_bot };
 
 #define tgrp_case_7_11_3 test_group_13
+#define numb_case_7_11_3 "7.11.3"
 #define name_case_7_11_3 "t_rcvvudata library call -- TOUTSTATE error"
 #define desc_case_7_11_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvvudata library call."
-static int test_7_11_3_top(int child)
+
+int test_case_7_11_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10694,21 +12937,29 @@ static int test_7_11_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_11_3_bot(int child)
+
+int test_case_7_11_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_11_3_top = { &preamble_1cl_top, &test_7_11_3_top, &postamble_1cl_top };
-static struct test_stream test_case_7_11_3_bot = { &preamble_1cl_bot, &test_7_11_3_bot, &postamble_1cl_bot };
-#define test_case_7_11_3_stream_top (&test_case_7_11_3_top)
-#define test_case_7_11_3_stream_bot (&test_case_7_11_3_bot)
+
+#define preamble_7_11_3_top preamble_1cl_top
+#define preamble_7_11_3_bot preamble_1cl_bot
+
+#define postamble_7_11_3_top postamble_1cl_top
+#define postamble_7_11_3_bot postamble_1cl_bot
+
+static struct test_stream test_7_11_3_top = { &preamble_7_11_3_top, &test_case_7_11_3_top, &postamble_7_11_3_top };
+static struct test_stream test_7_11_3_bot = { &preamble_7_11_3_bot, &test_case_7_11_3_bot, &postamble_7_11_3_bot };
 
 #define tgrp_case_7_12_1 test_group_13
+#define numb_case_7_12_1 "7.12.1"
 #define name_case_7_12_1 "t_rcvuderr library call -- TNOUDERR error"
 #define desc_case_7_12_1 "\
 This test case tests the TNOUDERR error from the XTI library in response to\n\
 the t_rcvuderr library call."
-static int test_7_12_1_top(int child)
+
+int test_case_7_12_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10721,21 +12972,29 @@ static int test_7_12_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_12_1_bot(int child)
+
+int test_case_7_12_1_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_12_1_top = { &preamble_2cl_top, &test_7_12_1_top, &postamble_2cl_top };
-static struct test_stream test_case_7_12_1_bot = { &preamble_2cl_bot, &test_7_12_1_bot, &postamble_2cl_bot };
-#define test_case_7_12_1_stream_top (&test_case_7_12_1_top)
-#define test_case_7_12_1_stream_bot (&test_case_7_12_1_bot)
+
+#define preamble_7_12_1_top preamble_2cl_top
+#define preamble_7_12_1_bot preamble_2cl_bot
+
+#define postamble_7_12_1_top postamble_2cl_top
+#define postamble_7_12_1_bot postamble_2cl_bot
+
+static struct test_stream test_7_12_1_top = { &preamble_7_12_1_top, &test_case_7_12_1_top, &postamble_7_12_1_top };
+static struct test_stream test_7_12_1_bot = { &preamble_7_12_1_bot, &test_case_7_12_1_bot, &postamble_7_12_1_bot };
 
 #define tgrp_case_7_12_2 test_group_13
+#define numb_case_7_12_2 "7.12.2"
 #define name_case_7_12_2 "t_rcvuderr library call -- TNOTSUPPORT error"
 #define desc_case_7_12_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvuderr library call."
-static int test_7_12_2_top(int child)
+
+int test_case_7_12_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10745,21 +13004,29 @@ static int test_7_12_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_12_2_bot(int child)
+
+int test_case_7_12_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_12_2_top = { &preamble_2_top, &test_7_12_2_top, &postamble_2_top };
-static struct test_stream test_case_7_12_2_bot = { &preamble_2_bot, &test_7_12_2_bot, &postamble_2_bot };
-#define test_case_7_12_2_stream_top (&test_case_7_12_2_top)
-#define test_case_7_12_2_stream_bot (&test_case_7_12_2_bot)
+
+#define preamble_7_12_2_top preamble_2_top
+#define preamble_7_12_2_bot preamble_2_bot
+
+#define postamble_7_12_2_top postamble_2_top
+#define postamble_7_12_2_bot postamble_2_bot
+
+static struct test_stream test_7_12_2_top = { &preamble_7_12_2_top, &test_case_7_12_2_top, &postamble_7_12_2_top };
+static struct test_stream test_7_12_2_bot = { &preamble_7_12_2_bot, &test_case_7_12_2_bot, &postamble_7_12_2_bot };
 
 #define tgrp_case_7_12_3 test_group_13
+#define numb_case_7_12_3 "7.12.3"
 #define name_case_7_12_3 "t_rcvuderr library call -- TOUTSTATE error"
 #define desc_case_7_12_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvuderr library call."
-static int test_7_12_3_top(int child)
+
+int test_case_7_12_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10769,21 +13036,29 @@ static int test_7_12_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_12_3_bot(int child)
+
+int test_case_7_12_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_12_3_top = { &preamble_1cl_top, &test_7_12_3_top, &postamble_1cl_top };
-static struct test_stream test_case_7_12_3_bot = { &preamble_1cl_bot, &test_7_12_3_bot, &postamble_1cl_bot };
-#define test_case_7_12_3_stream_top (&test_case_7_12_3_top)
-#define test_case_7_12_3_stream_bot (&test_case_7_12_3_bot)
+
+#define preamble_7_12_3_top preamble_1cl_top
+#define preamble_7_12_3_bot preamble_1cl_bot
+
+#define postamble_7_12_3_top postamble_1cl_top
+#define postamble_7_12_3_bot postamble_1cl_bot
+
+static struct test_stream test_7_12_3_top = { &preamble_7_12_3_top, &test_case_7_12_3_top, &postamble_7_12_3_top };
+static struct test_stream test_7_12_3_bot = { &preamble_7_12_3_bot, &test_case_7_12_3_bot, &postamble_7_12_3_bot };
 
 #define tgrp_case_7_13_1 test_group_13
+#define numb_case_7_13_1 "7.13.1"
 #define name_case_7_13_1 "t_snd library call -- TFLOW error"
 #define desc_case_7_13_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_snd library call."
-static int test_7_13_1_top(int child)
+
+int test_case_7_13_1_top(int child)
 {
 	start_tt(5000);
 	state++;
@@ -10809,7 +13084,8 @@ static int test_7_13_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_13_1_bot(int child)
+
+int test_case_7_13_1_bot(int child)
 {
 	start_tt(5000);
 	state++;
@@ -10834,17 +13110,24 @@ static int test_7_13_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_13_1_top = { &preamble_3_top, &test_7_13_1_top, &postamble_3_top };
-static struct test_stream test_case_7_13_1_bot = { &preamble_3_bot, &test_7_13_1_bot, &postamble_3_bot };
-#define test_case_7_13_1_stream_top (&test_case_7_13_1_top)
-#define test_case_7_13_1_stream_bot (&test_case_7_13_1_bot)
+
+#define preamble_7_13_1_top preamble_3_top
+#define preamble_7_13_1_bot preamble_3_bot
+
+#define postamble_7_13_1_top postamble_3_top
+#define postamble_7_13_1_bot postamble_3_bot
+
+static struct test_stream test_7_13_1_top = { &preamble_7_13_1_top, &test_case_7_13_1_top, &postamble_7_13_1_top };
+static struct test_stream test_7_13_1_bot = { &preamble_7_13_1_bot, &test_case_7_13_1_bot, &postamble_7_13_1_bot };
 
 #define tgrp_case_7_13_2 test_group_13
+#define numb_case_7_13_2 "7.13.2"
 #define name_case_7_13_2 "t_snd library call -- TNOTSUPPORT error"
 #define desc_case_7_13_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_snd library call."
-static int test_7_13_2_top(int child)
+
+int test_case_7_13_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10854,21 +13137,29 @@ static int test_7_13_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_13_2_bot(int child)
+
+int test_case_7_13_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_13_2_top = { &preamble_2cl_top, &test_7_13_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_13_2_bot = { &preamble_2cl_bot, &test_7_13_2_bot, &postamble_2cl_bot };
-#define test_case_7_13_2_stream_top (&test_case_7_13_2_top)
-#define test_case_7_13_2_stream_bot (&test_case_7_13_2_bot)
+
+#define preamble_7_13_2_top preamble_2cl_top
+#define preamble_7_13_2_bot preamble_2cl_bot
+
+#define postamble_7_13_2_top postamble_2cl_top
+#define postamble_7_13_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_13_2_top = { &preamble_7_13_2_top, &test_case_7_13_2_top, &postamble_7_13_2_top };
+static struct test_stream test_7_13_2_bot = { &preamble_7_13_2_bot, &test_case_7_13_2_bot, &postamble_7_13_2_bot };
 
 #define tgrp_case_7_13_3 test_group_13
+#define numb_case_7_13_3 "7.13.3"
 #define name_case_7_13_3 "t_snd library call -- TOUTSTATE error"
 #define desc_case_7_13_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_snd library call."
-static int test_7_13_3_top(int child)
+
+int test_case_7_13_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10878,21 +13169,29 @@ static int test_7_13_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_13_3_bot(int child)
+
+int test_case_7_13_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_13_3_top = { &preamble_2_top, &test_7_13_3_top, &postamble_2_top };
-static struct test_stream test_case_7_13_3_bot = { &preamble_2_bot, &test_7_13_3_bot, &postamble_2_bot };
-#define test_case_7_13_3_stream_top (&test_case_7_13_3_top)
-#define test_case_7_13_3_stream_bot (&test_case_7_13_3_bot)
+
+#define preamble_7_13_3_top preamble_2_top
+#define preamble_7_13_3_bot preamble_2_bot
+
+#define postamble_7_13_3_top postamble_2_top
+#define postamble_7_13_3_bot postamble_2_bot
+
+static struct test_stream test_7_13_3_top = { &preamble_7_13_3_top, &test_case_7_13_3_top, &postamble_7_13_3_top };
+static struct test_stream test_7_13_3_bot = { &preamble_7_13_3_bot, &test_case_7_13_3_bot, &postamble_7_13_3_bot };
 
 #define tgrp_case_7_14_1 test_group_13
+#define numb_case_7_14_1 "7.14.1"
 #define name_case_7_14_1 "t_sndv library call -- TFLOW error"
 #define desc_case_7_14_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndv library call."
-static int test_7_14_1_top(int child)
+
+int test_case_7_14_1_top(int child)
 {
 	start_tt(5000);
 	state++;
@@ -10918,7 +13217,8 @@ static int test_7_14_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_14_1_bot(int child)
+
+int test_case_7_14_1_bot(int child)
 {
 	start_tt(5000);
 	state++;
@@ -10943,17 +13243,24 @@ static int test_7_14_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_14_1_top = { &preamble_3_top, &test_7_14_1_top, &postamble_3_top };
-static struct test_stream test_case_7_14_1_bot = { &preamble_3_bot, &test_7_14_1_bot, &postamble_3_bot };
-#define test_case_7_14_1_stream_top (&test_case_7_14_1_top)
-#define test_case_7_14_1_stream_bot (&test_case_7_14_1_bot)
+
+#define preamble_7_14_1_top preamble_3_top
+#define preamble_7_14_1_bot preamble_3_bot
+
+#define postamble_7_14_1_top postamble_3_top
+#define postamble_7_14_1_bot postamble_3_bot
+
+static struct test_stream test_7_14_1_top = { &preamble_7_14_1_top, &test_case_7_14_1_top, &postamble_7_14_1_top };
+static struct test_stream test_7_14_1_bot = { &preamble_7_14_1_bot, &test_case_7_14_1_bot, &postamble_7_14_1_bot };
 
 #define tgrp_case_7_14_2 test_group_13
+#define numb_case_7_14_2 "7.14.2"
 #define name_case_7_14_2 "t_sndv library call -- TNOTSUPPORT error"
 #define desc_case_7_14_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndv library call."
-static int test_7_14_2_top(int child)
+
+int test_case_7_14_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10963,21 +13270,29 @@ static int test_7_14_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_14_2_bot(int child)
+
+int test_case_7_14_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_14_2_top = { &preamble_2cl_top, &test_7_14_2_top, &postamble_2cl_top };
-static struct test_stream test_case_7_14_2_bot = { &preamble_2cl_bot, &test_7_14_2_bot, &postamble_2cl_bot };
-#define test_case_7_14_2_stream_top (&test_case_7_14_2_top)
-#define test_case_7_14_2_stream_bot (&test_case_7_14_2_bot)
+
+#define preamble_7_14_2_top preamble_2cl_top
+#define preamble_7_14_2_bot preamble_2cl_bot
+
+#define postamble_7_14_2_top postamble_2cl_top
+#define postamble_7_14_2_bot postamble_2cl_bot
+
+static struct test_stream test_7_14_2_top = { &preamble_7_14_2_top, &test_case_7_14_2_top, &postamble_7_14_2_top };
+static struct test_stream test_7_14_2_bot = { &preamble_7_14_2_bot, &test_case_7_14_2_bot, &postamble_7_14_2_bot };
 
 #define tgrp_case_7_14_3 test_group_13
+#define numb_case_7_14_3 "7.14.3"
 #define name_case_7_14_3 "t_sndv library call -- TOUTSTATE error"
 #define desc_case_7_14_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndv library call."
-static int test_7_14_3_top(int child)
+
+int test_case_7_14_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -10987,21 +13302,29 @@ static int test_7_14_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_14_3_bot(int child)
+
+int test_case_7_14_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_14_3_top = { &preamble_2_top, &test_7_14_3_top, &postamble_2_top };
-static struct test_stream test_case_7_14_3_bot = { &preamble_2_bot, &test_7_14_3_bot, &postamble_2_bot };
-#define test_case_7_14_3_stream_top (&test_case_7_14_3_top)
-#define test_case_7_14_3_stream_bot (&test_case_7_14_3_bot)
+
+#define preamble_7_14_3_top preamble_2_top
+#define preamble_7_14_3_bot preamble_2_bot
+
+#define postamble_7_14_3_top postamble_2_top
+#define postamble_7_14_3_bot postamble_2_bot
+
+static struct test_stream test_7_14_3_top = { &preamble_7_14_3_top, &test_case_7_14_3_top, &postamble_7_14_3_top };
+static struct test_stream test_7_14_3_bot = { &preamble_7_14_3_bot, &test_case_7_14_3_bot, &postamble_7_14_3_bot };
 
 #define tgrp_case_7_15_1 test_group_13
+#define numb_case_7_15_1 "7.15.1"
 #define name_case_7_15_1 "t_sndudata library call -- TFLOW error"
 #define desc_case_7_15_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndudata library call."
-static int test_7_15_1_top(int child)
+
+int test_case_7_15_1_top(int child)
 {
 	start_tt(5000);
 	state++;
@@ -11027,7 +13350,8 @@ static int test_7_15_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_15_1_bot(int child)
+
+int test_case_7_15_1_bot(int child)
 {
 	start_tt(5000);
 	state++;
@@ -11052,17 +13376,24 @@ static int test_7_15_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_15_1_top = { &preamble_2cl_top, &test_7_15_1_top, &postamble_2cl_top };
-static struct test_stream test_case_7_15_1_bot = { &preamble_2cl_bot, &test_7_15_1_bot, &postamble_2cl_bot };
-#define test_case_7_15_1_stream_top (&test_case_7_15_1_top)
-#define test_case_7_15_1_stream_bot (&test_case_7_15_1_bot)
+
+#define preamble_7_15_1_top preamble_2cl_top
+#define preamble_7_15_1_bot preamble_2cl_bot
+
+#define postamble_7_15_1_top postamble_2cl_top
+#define postamble_7_15_1_bot postamble_2cl_bot
+
+static struct test_stream test_7_15_1_top = { &preamble_7_15_1_top, &test_case_7_15_1_top, &postamble_7_15_1_top };
+static struct test_stream test_7_15_1_bot = { &preamble_7_15_1_bot, &test_case_7_15_1_bot, &postamble_7_15_1_bot };
 
 #define tgrp_case_7_15_2 test_group_13
+#define numb_case_7_15_2 "7.15.2"
 #define name_case_7_15_2 "t_sndudata library call -- TNOTSUPPORT error"
 #define desc_case_7_15_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndudata library call."
-static int test_7_15_2_top(int child)
+
+int test_case_7_15_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -11072,21 +13403,29 @@ static int test_7_15_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_15_2_bot(int child)
+
+int test_case_7_15_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_15_2_top = { &preamble_2_top, &test_7_15_2_top, &postamble_2_top };
-static struct test_stream test_case_7_15_2_bot = { &preamble_2_bot, &test_7_15_2_bot, &postamble_2_bot };
-#define test_case_7_15_2_stream_top (&test_case_7_15_2_top)
-#define test_case_7_15_2_stream_bot (&test_case_7_15_2_bot)
+
+#define preamble_7_15_2_top preamble_2_top
+#define preamble_7_15_2_bot preamble_2_bot
+
+#define postamble_7_15_2_top postamble_2_top
+#define postamble_7_15_2_bot postamble_2_bot
+
+static struct test_stream test_7_15_2_top = { &preamble_7_15_2_top, &test_case_7_15_2_top, &postamble_7_15_2_top };
+static struct test_stream test_7_15_2_bot = { &preamble_7_15_2_bot, &test_case_7_15_2_bot, &postamble_7_15_2_bot };
 
 #define tgrp_case_7_15_3 test_group_13
+#define numb_case_7_15_3 "7.15.3"
 #define name_case_7_15_3 "t_sndudata library call -- TOUTSTATE error"
 #define desc_case_7_15_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndudata library call."
-static int test_7_15_3_top(int child)
+
+int test_case_7_15_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -11096,21 +13435,29 @@ static int test_7_15_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_15_3_bot(int child)
+
+int test_case_7_15_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_15_3_top = { &preamble_1cl_top, &test_7_15_3_top, &postamble_1cl_top };
-static struct test_stream test_case_7_15_3_bot = { &preamble_1cl_bot, &test_7_15_3_bot, &postamble_1cl_bot };
-#define test_case_7_15_3_stream_top (&test_case_7_15_3_top)
-#define test_case_7_15_3_stream_bot (&test_case_7_15_3_bot)
+
+#define preamble_7_15_3_top preamble_1cl_top
+#define preamble_7_15_3_bot preamble_1cl_bot
+
+#define postamble_7_15_3_top postamble_1cl_top
+#define postamble_7_15_3_bot postamble_1cl_bot
+
+static struct test_stream test_7_15_3_top = { &preamble_7_15_3_top, &test_case_7_15_3_top, &postamble_7_15_3_top };
+static struct test_stream test_7_15_3_bot = { &preamble_7_15_3_bot, &test_case_7_15_3_bot, &postamble_7_15_3_bot };
 
 #define tgrp_case_7_16_1 test_group_13
+#define numb_case_7_16_1 "7.16.1"
 #define name_case_7_16_1 "t_sndvudata library call -- TFLOW error"
 #define desc_case_7_16_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndvudata library call."
-static int test_7_16_1_top(int child)
+
+int test_case_7_16_1_top(int child)
 {
 	start_tt(5000);
 	state++;
@@ -11136,7 +13483,8 @@ static int test_7_16_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_16_1_bot(int child)
+
+int test_case_7_16_1_bot(int child)
 {
 	start_tt(5000);
 	state++;
@@ -11161,17 +13509,24 @@ static int test_7_16_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_16_1_top = { &preamble_2cl_top, &test_7_16_1_top, &postamble_2cl_top };
-static struct test_stream test_case_7_16_1_bot = { &preamble_2cl_bot, &test_7_16_1_bot, &postamble_2cl_bot };
-#define test_case_7_16_1_stream_top (&test_case_7_16_1_top)
-#define test_case_7_16_1_stream_bot (&test_case_7_16_1_bot)
+
+#define preamble_7_16_1_top preamble_2cl_top
+#define preamble_7_16_1_bot preamble_2cl_bot
+
+#define postamble_7_16_1_top postamble_2cl_top
+#define postamble_7_16_1_bot postamble_2cl_bot
+
+static struct test_stream test_7_16_1_top = { &preamble_7_16_1_top, &test_case_7_16_1_top, &postamble_7_16_1_top };
+static struct test_stream test_7_16_1_bot = { &preamble_7_16_1_bot, &test_case_7_16_1_bot, &postamble_7_16_1_bot };
 
 #define tgrp_case_7_16_2 test_group_13
+#define numb_case_7_16_2 "7.16.2"
 #define name_case_7_16_2 "t_sndvudata library call -- TNOTSUPPORT error"
 #define desc_case_7_16_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndvudata library call."
-static int test_7_16_2_top(int child)
+
+int test_case_7_16_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -11181,21 +13536,29 @@ static int test_7_16_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_16_2_bot(int child)
+
+int test_case_7_16_2_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_16_2_top = { &preamble_2_top, &test_7_16_2_top, &postamble_2_top };
-static struct test_stream test_case_7_16_2_bot = { &preamble_2_bot, &test_7_16_2_bot, &postamble_2_bot };
-#define test_case_7_16_2_stream_top (&test_case_7_16_2_top)
-#define test_case_7_16_2_stream_bot (&test_case_7_16_2_bot)
+
+#define preamble_7_16_2_top preamble_2_top
+#define preamble_7_16_2_bot preamble_2_bot
+
+#define postamble_7_16_2_top postamble_2_top
+#define postamble_7_16_2_bot postamble_2_bot
+
+static struct test_stream test_7_16_2_top = { &preamble_7_16_2_top, &test_case_7_16_2_top, &postamble_7_16_2_top };
+static struct test_stream test_7_16_2_bot = { &preamble_7_16_2_bot, &test_case_7_16_2_bot, &postamble_7_16_2_bot };
 
 #define tgrp_case_7_16_3 test_group_13
+#define numb_case_7_16_3 "7.16.3"
 #define name_case_7_16_3 "t_sndvudata library call -- TOUTSTATE error"
 #define desc_case_7_16_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndvudata library call."
-static int test_7_16_3_top(int child)
+
+int test_case_7_16_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -11205,21 +13568,29 @@ static int test_7_16_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_16_3_bot(int child)
+
+int test_case_7_16_3_bot(int child)
 {
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_16_3_top = { &preamble_1cl_top, &test_7_16_3_top, &postamble_1cl_top };
-static struct test_stream test_case_7_16_3_bot = { &preamble_1cl_bot, &test_7_16_3_bot, &postamble_1cl_bot };
-#define test_case_7_16_3_stream_top (&test_case_7_16_3_top)
-#define test_case_7_16_3_stream_bot (&test_case_7_16_3_bot)
+
+#define preamble_7_16_3_top preamble_1cl_top
+#define preamble_7_16_3_bot preamble_1cl_bot
+
+#define postamble_7_16_3_top postamble_1cl_top
+#define postamble_7_16_3_bot postamble_1cl_bot
+
+static struct test_stream test_7_16_3_top = { &preamble_7_16_3_top, &test_case_7_16_3_top, &postamble_7_16_3_top };
+static struct test_stream test_7_16_3_bot = { &preamble_7_16_3_bot, &test_case_7_16_3_bot, &postamble_7_16_3_bot };
 
 #define tgrp_case_7_17_1 test_group_13
+#define numb_case_7_17_1 "7.17.1"
 #define name_case_7_17_1 "t_sync library call -- TSTATECHNG error"
 #define desc_case_7_17_1 "\
 This test case tests the TSTATECHNG error from the XTI library in response to\n\
 the t_sync library call."
-static int test_7_17_1_top(int child)
+
+int test_case_7_17_1_top(int child)
 {
 	start_tt(1000);
 	state++;
@@ -11240,7 +13611,8 @@ static int test_7_17_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_7_17_1_bot(int child)
+
+int test_case_7_17_1_bot(int child)
 {
 	start_tt(200);
 	state++;
@@ -11253,17 +13625,24 @@ static int test_7_17_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_7_17_1_top = { &preamble_0, &test_7_17_1_top, &postamble_0 };
-static struct test_stream test_case_7_17_1_bot = { &preamble_0, &test_7_17_1_bot, &postamble_0 };
-#define test_case_7_17_1_stream_top (&test_case_7_17_1_top)
-#define test_case_7_17_1_stream_bot (&test_case_7_17_1_bot)
+
+#define preamble_7_17_1_top preamble_0
+#define preamble_7_17_1_bot preamble_0
+
+#define postamble_7_17_1_top postamble_0
+#define postamble_7_17_1_bot postamble_0
+
+static struct test_stream test_7_17_1_top = { &preamble_7_17_1_top, &test_case_7_17_1_top, &postamble_7_17_1_top };
+static struct test_stream test_7_17_1_bot = { &preamble_7_17_1_bot, &test_case_7_17_1_bot, &postamble_7_17_1_bot };
 
 #define test_group_14 "Passing data"
 #define tgrp_case_8_1_1 test_group_14
+#define numb_case_8_1_1 "8.1.1"
 #define name_case_8_1_1 "receiving data with t_rcv -- normal data"
 #define desc_case_8_1_1 "\
 This test case tests positive test cases for the t_rcv library call."
-static int test_8_1_1_top(int child)
+
+int test_case_8_1_1_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
@@ -11279,7 +13658,8 @@ static int test_8_1_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_1_1_bot(int child)
+
+int test_case_8_1_1_bot(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11296,16 +13676,23 @@ static int test_8_1_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_1_1_top = { &preamble_3_top, &test_8_1_1_top, &postamble_3_top };
-static struct test_stream test_case_8_1_1_bot = { &preamble_3_bot, &test_8_1_1_bot, &postamble_3_bot };
-#define test_case_8_1_1_stream_top (&test_case_8_1_1_top)
-#define test_case_8_1_1_stream_bot (&test_case_8_1_1_bot)
+
+#define preamble_8_1_1_top preamble_3_top
+#define preamble_8_1_1_bot preamble_3_bot
+
+#define postamble_8_1_1_top postamble_3_top
+#define postamble_8_1_1_bot postamble_3_bot
+
+static struct test_stream test_8_1_1_top = { &preamble_8_1_1_top, &test_case_8_1_1_top, &postamble_8_1_1_top };
+static struct test_stream test_8_1_1_bot = { &preamble_8_1_1_bot, &test_case_8_1_1_bot, &postamble_8_1_1_bot };
 
 #define tgrp_case_8_1_2 test_group_14
+#define numb_case_8_1_2 "8.1.2"
 #define name_case_8_1_2 "receiving data with t_rcv -- expedited data"
 #define desc_case_8_1_2 "\
 This test case tests positive test cases for the t_rcv library call."
-static int test_8_1_2_top(int child)
+
+int test_case_8_1_2_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
@@ -11321,7 +13708,8 @@ static int test_8_1_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_1_2_bot(int child)
+
+int test_case_8_1_2_bot(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11338,16 +13726,23 @@ static int test_8_1_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_1_2_top = { &preamble_3_top, &test_8_1_2_top, &postamble_3_top };
-static struct test_stream test_case_8_1_2_bot = { &preamble_3_bot, &test_8_1_2_bot, &postamble_3_bot };
-#define test_case_8_1_2_stream_top (&test_case_8_1_2_top)
-#define test_case_8_1_2_stream_bot (&test_case_8_1_2_bot)
+
+#define preamble_8_1_2_top preamble_3_top
+#define preamble_8_1_2_bot preamble_3_bot
+
+#define postamble_8_1_2_top postamble_3_top
+#define postamble_8_1_2_bot postamble_3_bot
+
+static struct test_stream test_8_1_2_top = { &preamble_8_1_2_top, &test_case_8_1_2_top, &postamble_8_1_2_top };
+static struct test_stream test_8_1_2_bot = { &preamble_8_1_2_bot, &test_case_8_1_2_bot, &postamble_8_1_2_bot };
 
 #define tgrp_case_8_1_3 test_group_14
+#define numb_case_8_1_3 "8.1.3"
 #define name_case_8_1_3 "receiving data with t_rcv -- normal data with intermingled expedited data"
 #define desc_case_8_1_3 "\
 This test case tests positive test cases for the t_rcv library call."
-static int test_8_1_3_top(int child)
+
+int test_case_8_1_3_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
@@ -11363,7 +13758,8 @@ static int test_8_1_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_1_3_bot(int child)
+
+int test_case_8_1_3_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -11401,16 +13797,23 @@ static int test_8_1_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_1_3_top = { &preamble_3_top, &test_8_1_3_top, &postamble_3_top };
-static struct test_stream test_case_8_1_3_bot = { &preamble_3_bot, &test_8_1_3_bot, &postamble_3_bot };
-#define test_case_8_1_3_stream_top (&test_case_8_1_3_top)
-#define test_case_8_1_3_stream_bot (&test_case_8_1_3_bot)
+
+#define preamble_8_1_3_top preamble_3_top
+#define preamble_8_1_3_bot preamble_3_bot
+
+#define postamble_8_1_3_top postamble_3_top
+#define postamble_8_1_3_bot postamble_3_bot
+
+static struct test_stream test_8_1_3_top = { &preamble_8_1_3_top, &test_case_8_1_3_top, &postamble_8_1_3_top };
+static struct test_stream test_8_1_3_bot = { &preamble_8_1_3_bot, &test_case_8_1_3_bot, &postamble_8_1_3_bot };
 
 #define tgrp_case_8_1_4 test_group_14
+#define numb_case_8_1_4 "8.1.4"
 #define name_case_8_1_4 "receiving data with t_rcv -- normal data with intermingled expedited data -- receive buffer smaller that received data"
 #define desc_case_8_1_4 "\
 This test case tests positive test cases for the t_rcv library call."
-static int test_8_1_4_top(int child)
+
+int test_case_8_1_4_top(int child)
 {
 	test_bufsize = 12;
 	for (start_tt(500);; start_tt(500), state++) {
@@ -11430,7 +13833,8 @@ static int test_8_1_4_top(int child)
 	test_bufsize = 256;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_1_4_bot(int child)
+
+int test_case_8_1_4_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -11468,16 +13872,23 @@ static int test_8_1_4_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_1_4_top = { &preamble_3_top, &test_8_1_4_top, &postamble_3_top };
-static struct test_stream test_case_8_1_4_bot = { &preamble_3_bot, &test_8_1_4_bot, &postamble_3_bot };
-#define test_case_8_1_4_stream_top (&test_case_8_1_4_top)
-#define test_case_8_1_4_stream_bot (&test_case_8_1_4_bot)
+
+#define preamble_8_1_4_top preamble_3_top
+#define preamble_8_1_4_bot preamble_3_bot
+
+#define postamble_8_1_4_top postamble_3_top
+#define postamble_8_1_4_bot postamble_3_bot
+
+static struct test_stream test_8_1_4_top = { &preamble_8_1_4_top, &test_case_8_1_4_top, &postamble_8_1_4_top };
+static struct test_stream test_8_1_4_bot = { &preamble_8_1_4_bot, &test_case_8_1_4_bot, &postamble_8_1_4_bot };
 
 #define tgrp_case_8_2_1 test_group_14
+#define numb_case_8_2_1 "8.2.1"
 #define name_case_8_2_1 "receiving data with t_rcvv -- normal data"
 #define desc_case_8_2_1 "\
 This test case tests positive test cases for the t_rcvv library call."
-static int test_8_2_1_top(int child)
+
+int test_case_8_2_1_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
@@ -11493,7 +13904,8 @@ static int test_8_2_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_2_1_bot(int child)
+
+int test_case_8_2_1_bot(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11510,16 +13922,23 @@ static int test_8_2_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_2_1_top = { &preamble_3_top, &test_8_2_1_top, &postamble_3_top };
-static struct test_stream test_case_8_2_1_bot = { &preamble_3_bot, &test_8_2_1_bot, &postamble_3_bot };
-#define test_case_8_2_1_stream_top (&test_case_8_2_1_top)
-#define test_case_8_2_1_stream_bot (&test_case_8_2_1_bot)
+
+#define preamble_8_2_1_top preamble_3_top
+#define preamble_8_2_1_bot preamble_3_bot
+
+#define postamble_8_2_1_top postamble_3_top
+#define postamble_8_2_1_bot postamble_3_bot
+
+static struct test_stream test_8_2_1_top = { &preamble_8_2_1_top, &test_case_8_2_1_top, &postamble_8_2_1_top };
+static struct test_stream test_8_2_1_bot = { &preamble_8_2_1_bot, &test_case_8_2_1_bot, &postamble_8_2_1_bot };
 
 #define tgrp_case_8_2_2 test_group_14
+#define numb_case_8_2_2 "8.2.2"
 #define name_case_8_2_2 "receiving data with t_rcvv -- expedited data"
 #define desc_case_8_2_2 "\
 This test case tests positive test cases for the t_rcvv library call."
-static int test_8_2_2_top(int child)
+
+int test_case_8_2_2_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
@@ -11535,7 +13954,8 @@ static int test_8_2_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_2_2_bot(int child)
+
+int test_case_8_2_2_bot(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11552,16 +13972,23 @@ static int test_8_2_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_2_2_top = { &preamble_3_top, &test_8_2_2_top, &postamble_3_top };
-static struct test_stream test_case_8_2_2_bot = { &preamble_3_bot, &test_8_2_2_bot, &postamble_3_bot };
-#define test_case_8_2_2_stream_top (&test_case_8_2_2_top)
-#define test_case_8_2_2_stream_bot (&test_case_8_2_2_bot)
+
+#define preamble_8_2_2_top preamble_3_top
+#define preamble_8_2_2_bot preamble_3_bot
+
+#define postamble_8_2_2_top postamble_3_top
+#define postamble_8_2_2_bot postamble_3_bot
+
+static struct test_stream test_8_2_2_top = { &preamble_8_2_2_top, &test_case_8_2_2_top, &postamble_8_2_2_top };
+static struct test_stream test_8_2_2_bot = { &preamble_8_2_2_bot, &test_case_8_2_2_bot, &postamble_8_2_2_bot };
 
 #define tgrp_case_8_2_3 test_group_14
+#define numb_case_8_2_3 "8.2.3"
 #define name_case_8_2_3 "receiving data with t_rcvv -- normal data with intermingled expedited data"
 #define desc_case_8_2_3 "\
 This test case tests positive test cases for the t_rcvv library call."
-static int test_8_2_3_top(int child)
+
+int test_case_8_2_3_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
@@ -11577,7 +14004,8 @@ static int test_8_2_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_2_3_bot(int child)
+
+int test_case_8_2_3_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -11615,16 +14043,23 @@ static int test_8_2_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_2_3_top = { &preamble_3_top, &test_8_2_3_top, &postamble_3_top };
-static struct test_stream test_case_8_2_3_bot = { &preamble_3_bot, &test_8_2_3_bot, &postamble_3_bot };
-#define test_case_8_2_3_stream_top (&test_case_8_2_3_top)
-#define test_case_8_2_3_stream_bot (&test_case_8_2_3_bot)
+
+#define preamble_8_2_3_top preamble_3_top
+#define preamble_8_2_3_bot preamble_3_bot
+
+#define postamble_8_2_3_top postamble_3_top
+#define postamble_8_2_3_bot postamble_3_bot
+
+static struct test_stream test_8_2_3_top = { &preamble_8_2_3_top, &test_case_8_2_3_top, &postamble_8_2_3_top };
+static struct test_stream test_8_2_3_bot = { &preamble_8_2_3_bot, &test_case_8_2_3_bot, &postamble_8_2_3_bot };
 
 #define tgrp_case_8_3_1 test_group_14
+#define numb_case_8_3_1 "8.3.1"
 #define name_case_8_3_1 "receiving data with t_rcvudata -- within TIDU sized data"
 #define desc_case_8_3_1 "\
 This test case tests positive test cases for the t_rcvudata library call."
-static int test_8_3_1_top(int child)
+
+int test_case_8_3_1_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCVUDATA)) {
@@ -11640,7 +14075,8 @@ static int test_8_3_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_3_1_bot(int child)
+
+int test_case_8_3_1_bot(int child)
 {
 	int endstate = state + 20;
 	start_tt(200);
@@ -11653,16 +14089,23 @@ static int test_8_3_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_3_1_top = { &preamble_2cl_top, &test_8_3_1_top, &postamble_2cl_top };
-static struct test_stream test_case_8_3_1_bot = { &preamble_2cl_bot, &test_8_3_1_bot, &postamble_2cl_bot };
-#define test_case_8_3_1_stream_top (&test_case_8_3_1_top)
-#define test_case_8_3_1_stream_bot (&test_case_8_3_1_bot)
+
+#define preamble_8_3_1_top preamble_2cl_top
+#define preamble_8_3_1_bot preamble_2cl_bot
+
+#define postamble_8_3_1_top postamble_2cl_top
+#define postamble_8_3_1_bot postamble_2cl_bot
+
+static struct test_stream test_8_3_1_top = { &preamble_8_3_1_top, &test_case_8_3_1_top, &postamble_8_3_1_top };
+static struct test_stream test_8_3_1_bot = { &preamble_8_3_1_bot, &test_case_8_3_1_bot, &postamble_8_3_1_bot };
 
 #define tgrp_case_8_3_2 test_group_14
+#define numb_case_8_3_2 "8.3.2"
 #define name_case_8_3_2 "receiving data with t_rcvudata -- within TIDU sized data -- receive buffer smaller than received data size"
 #define desc_case_8_3_2 "\
 This test case tests positive test cases for the t_rcvudata library call."
-static int test_8_3_2_top(int child)
+
+int test_case_8_3_2_top(int child)
 {
 	test_rcvudata.udata.maxlen = 12;
 	for (start_tt(500);; start_tt(500), state++) {
@@ -11682,7 +14125,8 @@ static int test_8_3_2_top(int child)
 	test_rcvudata.udata.maxlen = 256;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_3_2_bot(int child)
+
+int test_case_8_3_2_bot(int child)
 {
 	int endstate = state + 20;
 	start_tt(200);
@@ -11695,16 +14139,23 @@ static int test_8_3_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_3_2_top = { &preamble_2cl_top, &test_8_3_2_top, &postamble_2cl_top };
-static struct test_stream test_case_8_3_2_bot = { &preamble_2cl_bot, &test_8_3_2_bot, &postamble_2cl_bot };
-#define test_case_8_3_2_stream_top (&test_case_8_3_2_top)
-#define test_case_8_3_2_stream_bot (&test_case_8_3_2_bot)
+
+#define preamble_8_3_2_top preamble_2cl_top
+#define preamble_8_3_2_bot preamble_2cl_bot
+
+#define postamble_8_3_2_top postamble_2cl_top
+#define postamble_8_3_2_bot postamble_2cl_bot
+
+static struct test_stream test_8_3_2_top = { &preamble_8_3_2_top, &test_case_8_3_2_top, &postamble_8_3_2_top };
+static struct test_stream test_8_3_2_bot = { &preamble_8_3_2_bot, &test_case_8_3_2_bot, &postamble_8_3_2_bot };
 
 #define tgrp_case_8_4_1 test_group_14
+#define numb_case_8_4_1 "8.4.1"
 #define name_case_8_4_1 "receiving data with t_rcvvudata -- within TIDU sized data"
 #define desc_case_8_4_1 "\
 This test case tests positive test cases for the t_rcvvudata library call."
-static int test_8_4_1_top(int child)
+
+int test_case_8_4_1_top(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (do_signal(child, __TEST_T_RCVVUDATA)) {
@@ -11720,7 +14171,8 @@ static int test_8_4_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_4_1_bot(int child)
+
+int test_case_8_4_1_bot(int child)
 {
 	int endstate = state + 20;
 	start_tt(200);
@@ -11733,16 +14185,23 @@ static int test_8_4_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_4_1_top = { &preamble_2cl_top, &test_8_4_1_top, &postamble_2cl_top };
-static struct test_stream test_case_8_4_1_bot = { &preamble_2cl_bot, &test_8_4_1_bot, &postamble_2cl_bot };
-#define test_case_8_4_1_stream_top (&test_case_8_4_1_top)
-#define test_case_8_4_1_stream_bot (&test_case_8_4_1_bot)
+
+#define preamble_8_4_1_top preamble_2cl_top
+#define preamble_8_4_1_bot preamble_2cl_bot
+
+#define postamble_8_4_1_top postamble_2cl_top
+#define postamble_8_4_1_bot postamble_2cl_bot
+
+static struct test_stream test_8_4_1_top = { &preamble_8_4_1_top, &test_case_8_4_1_top, &postamble_8_4_1_top };
+static struct test_stream test_8_4_1_bot = { &preamble_8_4_1_bot, &test_case_8_4_1_bot, &postamble_8_4_1_bot };
 
 #define tgrp_case_8_5_1 test_group_14
+#define numb_case_8_5_1 "8.5.1"
 #define name_case_8_5_1 "sending data with t_snd -- normal data"
 #define desc_case_8_5_1 "\
 This test case tests positive test cases for the t_snd library call."
-static int test_8_5_1_top(int child)
+
+int test_case_8_5_1_top(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11764,7 +14223,8 @@ static int test_8_5_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_5_1_bot(int child)
+
+int test_case_8_5_1_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -11781,16 +14241,23 @@ static int test_8_5_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_5_1_top = { &preamble_3_top, &test_8_5_1_top, &postamble_3_top };
-static struct test_stream test_case_8_5_1_bot = { &preamble_3_bot, &test_8_5_1_bot, &postamble_3_bot };
-#define test_case_8_5_1_stream_top (&test_case_8_5_1_top)
-#define test_case_8_5_1_stream_bot (&test_case_8_5_1_bot)
+
+#define preamble_8_5_1_top preamble_3_top
+#define preamble_8_5_1_bot preamble_3_bot
+
+#define postamble_8_5_1_top postamble_3_top
+#define postamble_8_5_1_bot postamble_3_bot
+
+static struct test_stream test_8_5_1_top = { &preamble_8_5_1_top, &test_case_8_5_1_top, &postamble_8_5_1_top };
+static struct test_stream test_8_5_1_bot = { &preamble_8_5_1_bot, &test_case_8_5_1_bot, &postamble_8_5_1_bot };
 
 #define tgrp_case_8_5_2 test_group_14
+#define numb_case_8_5_2 "8.5.2"
 #define name_case_8_5_2 "sending data with t_snd -- expedited data"
 #define desc_case_8_5_2 "\
 This test case tests positive test cases for the t_snd library call."
-static int test_8_5_2_top(int child)
+
+int test_case_8_5_2_top(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -11812,7 +14279,8 @@ static int test_8_5_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_5_2_bot(int child)
+
+int test_case_8_5_2_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -11829,16 +14297,23 @@ static int test_8_5_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_5_2_top = { &preamble_3_top, &test_8_5_2_top, &postamble_3_top };
-static struct test_stream test_case_8_5_2_bot = { &preamble_3_bot, &test_8_5_2_bot, &postamble_3_bot };
-#define test_case_8_5_2_stream_top (&test_case_8_5_2_top)
-#define test_case_8_5_2_stream_bot (&test_case_8_5_2_bot)
+
+#define preamble_8_5_2_top preamble_3_top
+#define preamble_8_5_2_bot preamble_3_bot
+
+#define postamble_8_5_2_top postamble_3_top
+#define postamble_8_5_2_bot postamble_3_bot
+
+static struct test_stream test_8_5_2_top = { &preamble_8_5_2_top, &test_case_8_5_2_top, &postamble_8_5_2_top };
+static struct test_stream test_8_5_2_bot = { &preamble_8_5_2_bot, &test_case_8_5_2_bot, &postamble_8_5_2_bot };
 
 #define tgrp_case_8_5_3 test_group_14
+#define numb_case_8_5_3 "8.5.3"
 #define name_case_8_5_3 "sending data with t_snd -- expedited data intermingled with normal data"
 #define desc_case_8_5_3 "\
 This test case tests positive test cases for the t_snd library call."
-static int test_8_5_3_top(int child)
+
+int test_case_8_5_3_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -11883,7 +14358,8 @@ static int test_8_5_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_5_3_bot(int child)
+
+int test_case_8_5_3_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -11900,16 +14376,23 @@ static int test_8_5_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_5_3_top = { &preamble_3_top, &test_8_5_3_top, &postamble_3_top };
-static struct test_stream test_case_8_5_3_bot = { &preamble_3_bot, &test_8_5_3_bot, &postamble_3_bot };
-#define test_case_8_5_3_stream_top (&test_case_8_5_3_top)
-#define test_case_8_5_3_stream_bot (&test_case_8_5_3_bot)
+
+#define preamble_8_5_3_top preamble_3_top
+#define preamble_8_5_3_bot preamble_3_bot
+
+#define postamble_8_5_3_top postamble_3_top
+#define postamble_8_5_3_bot postamble_3_bot
+
+static struct test_stream test_8_5_3_top = { &preamble_8_5_3_top, &test_case_8_5_3_top, &postamble_8_5_3_top };
+static struct test_stream test_8_5_3_bot = { &preamble_8_5_3_bot, &test_case_8_5_3_bot, &postamble_8_5_3_bot };
 
 #define tgrp_case_8_5_4 test_group_14
+#define numb_case_8_5_4 "8.5.4"
 #define name_case_8_5_4 "sending data with t_snd -- expedited data intermingled with normal data -- data larget than TIDU size"
 #define desc_case_8_5_4 "\
 This test case tests positive test cases for the t_snd library call."
-static int test_8_5_4_top(int child)
+
+int test_case_8_5_4_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -11954,7 +14437,8 @@ static int test_8_5_4_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_5_4_bot(int child)
+
+int test_case_8_5_4_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -11971,16 +14455,23 @@ static int test_8_5_4_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_5_4_top = { &preamble_3s_top, &test_8_5_4_top, &postamble_3s_top };
-static struct test_stream test_case_8_5_4_bot = { &preamble_3s_bot, &test_8_5_4_bot, &postamble_3s_bot };
-#define test_case_8_5_4_stream_top (&test_case_8_5_4_top)
-#define test_case_8_5_4_stream_bot (&test_case_8_5_4_bot)
+
+#define preamble_8_5_4_top preamble_3s_top
+#define preamble_8_5_4_bot preamble_3s_bot
+
+#define postamble_8_5_4_top postamble_3s_top
+#define postamble_8_5_4_bot postamble_3s_bot
+
+static struct test_stream test_8_5_4_top = { &preamble_8_5_4_top, &test_case_8_5_4_top, &postamble_8_5_4_top };
+static struct test_stream test_8_5_4_bot = { &preamble_8_5_4_bot, &test_case_8_5_4_bot, &postamble_8_5_4_bot };
 
 #define tgrp_case_8_6_1 test_group_14
+#define numb_case_8_6_1 "8.6.1"
 #define name_case_8_6_1 "sending data with t_sndv -- normal data"
 #define desc_case_8_6_1 "\
 This test case tests positive test cases for the t_sndv library call."
-static int test_8_6_1_top(int child)
+
+int test_case_8_6_1_top(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -12002,7 +14493,8 @@ static int test_8_6_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_6_1_bot(int child)
+
+int test_case_8_6_1_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -12019,16 +14511,23 @@ static int test_8_6_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_6_1_top = { &preamble_3_top, &test_8_6_1_top, &postamble_3_top };
-static struct test_stream test_case_8_6_1_bot = { &preamble_3_bot, &test_8_6_1_bot, &postamble_3_bot };
-#define test_case_8_6_1_stream_top (&test_case_8_6_1_top)
-#define test_case_8_6_1_stream_bot (&test_case_8_6_1_bot)
+
+#define preamble_8_6_1_top preamble_3_top
+#define preamble_8_6_1_bot preamble_3_bot
+
+#define postamble_8_6_1_top postamble_3_top
+#define postamble_8_6_1_bot postamble_3_bot
+
+static struct test_stream test_8_6_1_top = { &preamble_8_6_1_top, &test_case_8_6_1_top, &postamble_8_6_1_top };
+static struct test_stream test_8_6_1_bot = { &preamble_8_6_1_bot, &test_case_8_6_1_bot, &postamble_8_6_1_bot };
 
 #define tgrp_case_8_6_2 test_group_14
+#define numb_case_8_6_2 "8.6.2"
 #define name_case_8_6_2 "sending data with t_sndv -- expedited data"
 #define desc_case_8_6_2 "\
 This test case tests positive test cases for the t_sndv library call."
-static int test_8_6_2_top(int child)
+
+int test_case_8_6_2_top(int child)
 {
 	int endstate = state + 19;
 	start_tt(200);
@@ -12050,7 +14549,8 @@ static int test_8_6_2_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_6_2_bot(int child)
+
+int test_case_8_6_2_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -12067,16 +14567,23 @@ static int test_8_6_2_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_6_2_top = { &preamble_3_top, &test_8_6_2_top, &postamble_3_top };
-static struct test_stream test_case_8_6_2_bot = { &preamble_3_bot, &test_8_6_2_bot, &postamble_3_bot };
-#define test_case_8_6_2_stream_top (&test_case_8_6_2_top)
-#define test_case_8_6_2_stream_bot (&test_case_8_6_2_bot)
+
+#define preamble_8_6_2_top preamble_3_top
+#define preamble_8_6_2_bot preamble_3_bot
+
+#define postamble_8_6_2_top postamble_3_top
+#define postamble_8_6_2_bot postamble_3_bot
+
+static struct test_stream test_8_6_2_top = { &preamble_8_6_2_top, &test_case_8_6_2_top, &postamble_8_6_2_top };
+static struct test_stream test_8_6_2_bot = { &preamble_8_6_2_bot, &test_case_8_6_2_bot, &postamble_8_6_2_bot };
 
 #define tgrp_case_8_6_3 test_group_14
+#define numb_case_8_6_3 "8.6.3"
 #define name_case_8_6_3 "sending data with t_sndv -- expedited data intermingled with normal data"
 #define desc_case_8_6_3 "\
 This test case tests positive test cases for the t_sndv library call."
-static int test_8_6_3_top(int child)
+
+int test_case_8_6_3_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
@@ -12121,7 +14628,8 @@ static int test_8_6_3_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_6_3_bot(int child)
+
+int test_case_8_6_3_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -12138,16 +14646,23 @@ static int test_8_6_3_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_6_3_top = { &preamble_3_top, &test_8_6_3_top, &postamble_3_top };
-static struct test_stream test_case_8_6_3_bot = { &preamble_3_bot, &test_8_6_3_bot, &postamble_3_bot };
-#define test_case_8_6_3_stream_top (&test_case_8_6_3_top)
-#define test_case_8_6_3_stream_bot (&test_case_8_6_3_bot)
+
+#define preamble_8_6_3_top preamble_3_top
+#define preamble_8_6_3_bot preamble_3_bot
+
+#define postamble_8_6_3_top postamble_3_top
+#define postamble_8_6_3_bot postamble_3_bot
+
+static struct test_stream test_8_6_3_top = { &preamble_8_6_3_top, &test_case_8_6_3_top, &postamble_8_6_3_top };
+static struct test_stream test_8_6_3_bot = { &preamble_8_6_3_bot, &test_case_8_6_3_bot, &postamble_8_6_3_bot };
 
 #define tgrp_case_8_7_1 test_group_14
+#define numb_case_8_7_1 "8.7.1"
 #define name_case_8_7_1 "sending data with t_sndudata -- within TIDU sized data"
 #define desc_case_8_7_1 "\
 This test case tests positive test cases for the t_sndudata library call."
-static int test_8_7_1_top(int child)
+
+int test_case_8_7_1_top(int child)
 {
 	int endstate = state + 20;
 	start_tt(200);
@@ -12166,7 +14681,8 @@ static int test_8_7_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_7_1_bot(int child)
+
+int test_case_8_7_1_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -12182,16 +14698,23 @@ static int test_8_7_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_7_1_top = { &preamble_2cl_top, &test_8_7_1_top, &postamble_2cl_top };
-static struct test_stream test_case_8_7_1_bot = { &preamble_2cl_bot, &test_8_7_1_bot, &postamble_2cl_bot };
-#define test_case_8_7_1_stream_top (&test_case_8_7_1_top)
-#define test_case_8_7_1_stream_bot (&test_case_8_7_1_bot)
+
+#define preamble_8_7_1_top preamble_2cl_top
+#define preamble_8_7_1_bot preamble_2cl_bot
+
+#define postamble_8_7_1_top postamble_2cl_top
+#define postamble_8_7_1_bot postamble_2cl_bot
+
+static struct test_stream test_8_7_1_top = { &preamble_8_7_1_top, &test_case_8_7_1_top, &postamble_8_7_1_top };
+static struct test_stream test_8_7_1_bot = { &preamble_8_7_1_bot, &test_case_8_7_1_bot, &postamble_8_7_1_bot };
 
 #define tgrp_case_8_8_1 test_group_14
+#define numb_case_8_8_1 "8.8.1"
 #define name_case_8_8_1 "sending data with t_sndvudata -- within TIDU sized data"
 #define desc_case_8_8_1 "\
 This test case tests positive test cases for the t_sndvudata library call."
-static int test_8_8_1_top(int child)
+
+int test_case_8_8_1_top(int child)
 {
 	int endstate = state + 20;
 	start_tt(200);
@@ -12210,7 +14733,8 @@ static int test_8_8_1_top(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static int test_8_8_1_bot(int child)
+
+int test_case_8_8_1_bot(int child)
 {
 	for (start_tt(500);; start_tt(500), state++) {
 		switch (get_event(child)) {
@@ -12226,10 +14750,15 @@ static int test_8_8_1_bot(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-static struct test_stream test_case_8_8_1_top = { &preamble_2cl_top, &test_8_8_1_top, &postamble_2cl_top };
-static struct test_stream test_case_8_8_1_bot = { &preamble_2cl_bot, &test_8_8_1_bot, &postamble_2cl_bot };
-#define test_case_8_8_1_stream_top (&test_case_8_8_1_top)
-#define test_case_8_8_1_stream_bot (&test_case_8_8_1_bot)
+
+#define preamble_8_8_1_top preamble_2cl_top
+#define preamble_8_8_1_bot preamble_2cl_bot
+
+#define postamble_8_8_1_top postamble_2cl_top
+#define postamble_8_8_1_bot postamble_2cl_bot
+
+static struct test_stream test_8_8_1_top = { &preamble_8_8_1_top, &test_case_8_8_1_top, &postamble_8_8_1_top };
+static struct test_stream test_8_8_1_bot = { &preamble_8_8_1_bot, &test_case_8_8_1_bot, &postamble_8_8_1_bot };
 
 /*
  *  -------------------------------------------------------------------------
@@ -12480,506 +15009,506 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
-		"1.1", tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
-	test_case_1_1_stream_top, test_case_1_1_stream_bot, NULL}, 0, 0}, {
-		"1.2.1", tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, {
-	test_case_1_2_1_stream_top, test_case_1_2_1_stream_bot, NULL}, 0, 0}, {
-		"1.2.2", tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, {
-	test_case_1_2_2_stream_top, test_case_1_2_2_stream_bot, NULL}, 0, 0}, {
-		"1.2.3", tgrp_case_1_2_3, name_case_1_2_3, desc_case_1_2_3, {
-	test_case_1_2_3_stream_top, test_case_1_2_3_stream_bot, NULL}, 0, 0}, {
-		"2.1.1", tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, {
-	test_case_2_1_1_stream_top, test_case_2_1_1_stream_bot, NULL}, 0, 0}, {
-		"2.1.2", tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, {
-	test_case_2_1_2_stream_top, test_case_2_1_2_stream_bot, NULL}, 0, 0}, {
-		"2.1.3", tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, {
-	test_case_2_1_3_stream_top, test_case_2_1_3_stream_bot, NULL}, 0, 0}, {
-		"2.1.4", tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, {
-	test_case_2_1_4_stream_top, test_case_2_1_4_stream_bot, NULL}, 0, 0}, {
-		"2.1.5", tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, {
-	test_case_2_1_5_stream_top, test_case_2_1_5_stream_bot, NULL}, 0, 0}, {
-		"2.1.6", tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, {
-	test_case_2_1_6_stream_top, test_case_2_1_6_stream_bot, NULL}, 0, 0}, {
-		"2.1.7", tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, {
-	test_case_2_1_7_stream_top, test_case_2_1_7_stream_bot, NULL}, 0, 0}, {
-		"2.1.8", tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, {
-	test_case_2_1_8_stream_top, test_case_2_1_8_stream_bot, NULL}, 0, 0}, {
-		"2.2", tgrp_case_2_2, name_case_2_2, desc_case_2_2, {
-	test_case_2_2_stream_top, test_case_2_2_stream_bot, NULL}, 0, 0}, {
-		"2.3.1", tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, {
-	test_case_2_3_1_stream_top, test_case_2_3_1_stream_bot, NULL}, 0, 0}, {
-		"2.3.2", tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, {
-	test_case_2_3_2_stream_top, test_case_2_3_2_stream_bot, NULL}, 0, 0}, {
-		"2.3.3", tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, {
-	test_case_2_3_3_stream_top, test_case_2_3_3_stream_bot, NULL}, 0, 0}, {
-		"2.3.4", tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, {
-	test_case_2_3_4_stream_top, test_case_2_3_4_stream_bot, NULL}, 0, 0}, {
-		"2.3.5", tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, {
-	test_case_2_3_5_stream_top, test_case_2_3_5_stream_bot, NULL}, 0, 0}, {
-		"2.3.6", tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, {
-	test_case_2_3_6_stream_top, test_case_2_3_6_stream_bot, NULL}, 0, 0}, {
-		"2.3.7", tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, {
-	test_case_2_3_7_stream_top, test_case_2_3_7_stream_bot, NULL}, 0, 0}, {
-		"2.3.8", tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, {
-	test_case_2_3_8_stream_top, test_case_2_3_8_stream_bot, NULL}, 0, 0}, {
-		"2.3.9", tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, {
-	test_case_2_3_9_stream_top, test_case_2_3_9_stream_bot, NULL}, 0, 0}, {
-		"2.4.1", tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, {
-	test_case_2_4_1_stream_top, test_case_2_4_1_stream_bot, NULL}, 0, 0}, {
-		"2.5.1", tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, {
-	test_case_2_5_1_stream_top, test_case_2_5_1_stream_bot, NULL}, 0, 0}, {
-		"3.1.1", tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, {
-	test_case_3_1_1_stream_top, test_case_3_1_1_stream_bot, NULL}, 0, 0}, {
-		"3.2.1", tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, {
-	test_case_3_2_1_stream_top, test_case_3_2_1_stream_bot, NULL}, 0, 0}, {
-		"3.3.1", tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, {
-	test_case_3_3_1_stream_top, test_case_3_3_1_stream_bot, NULL}, 0, 0}, {
-		"3.4.1", tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, {
-	test_case_3_4_1_stream_top, test_case_3_4_1_stream_bot, NULL}, 0, 0}, {
-		"3.4.2", tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, {
-	test_case_3_4_2_stream_top, test_case_3_4_2_stream_bot, NULL}, 0, 0}, {
-		"3.5.1", tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, {
-	test_case_3_5_1_stream_top, test_case_3_5_1_stream_bot, NULL}, 0, 0}, {
-		"3.5.2", tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, {
-	test_case_3_5_2_stream_top, test_case_3_5_2_stream_bot, NULL}, 0, 0}, {
-		"3.6.1", tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, {
-	test_case_3_6_1_stream_top, test_case_3_6_1_stream_bot, NULL}, 0, 0}, {
-		"3.7.1", tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, {
-	test_case_3_7_1_stream_top, test_case_3_7_1_stream_bot, NULL}, 0, 0}, {
-		"4.1.1", tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, {
-	test_case_4_1_1_stream_top, test_case_4_1_1_stream_bot, NULL}, 0, 0}, {
-		"4.1.2", tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, {
-	test_case_4_1_2_stream_top, test_case_4_1_2_stream_bot, NULL}, 0, 0}, {
-		"4.2.1", tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, {
-	test_case_4_2_1_stream_top, test_case_4_2_1_stream_bot, NULL}, 0, 0}, {
-		"4.2.2", tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, {
-	test_case_4_2_2_stream_top, test_case_4_2_2_stream_bot, NULL}, 0, 0}, {
-		"4.3.1", tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, {
-	test_case_4_3_1_stream_top, test_case_4_3_1_stream_bot, NULL}, 0, 0}, {
-		"4.4.1", tgrp_case_4_4_1, name_case_4_4_1, desc_case_4_4_1, {
-	test_case_4_4_1_stream_top, test_case_4_4_1_stream_bot, NULL}, 0, 0}, {
-		"4.4.2", tgrp_case_4_4_2, name_case_4_4_2, desc_case_4_4_2, {
-	test_case_4_4_2_stream_top, test_case_4_4_2_stream_bot, NULL}, 0, 0}, {
-		"4.4.3", tgrp_case_4_4_3, name_case_4_4_3, desc_case_4_4_3, {
-	test_case_4_4_3_stream_top, test_case_4_4_3_stream_bot, NULL}, 0, 0}, {
-		"4.4.4", tgrp_case_4_4_4, name_case_4_4_4, desc_case_4_4_4, {
-	test_case_4_4_4_stream_top, test_case_4_4_4_stream_bot, NULL}, 0, 0}, {
-		"4.4.5", tgrp_case_4_4_5, name_case_4_4_5, desc_case_4_4_5, {
-	test_case_4_4_5_stream_top, test_case_4_4_5_stream_bot, NULL}, 0, 0}, {
-		"4.4.6", tgrp_case_4_4_6, name_case_4_4_6, desc_case_4_4_6, {
-	test_case_4_4_6_stream_top, test_case_4_4_6_stream_bot, NULL}, 0, 0}, {
-		"4.4.7", tgrp_case_4_4_7, name_case_4_4_7, desc_case_4_4_7, {
-	test_case_4_4_7_stream_top, test_case_4_4_7_stream_bot, NULL}, 0, 0}, {
-		"4.4.8", tgrp_case_4_4_8, name_case_4_4_8, desc_case_4_4_8, {
-	test_case_4_4_8_stream_top, test_case_4_4_8_stream_bot, NULL}, 0, 0}, {
-		"4.5.1", tgrp_case_4_5_1, name_case_4_5_1, desc_case_4_5_1, {
-	test_case_4_5_1_stream_top, test_case_4_5_1_stream_bot, NULL}, 0, 0}, {
-		"4.6.1", tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, {
-	test_case_4_6_1_stream_top, test_case_4_6_1_stream_bot, NULL}, 0, 0}, {
-		"4.6.2", tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, {
-	test_case_4_6_2_stream_top, test_case_4_6_2_stream_bot, NULL}, 0, 0}, {
-		"4.6.3", tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, {
-	test_case_4_6_3_stream_top, test_case_4_6_3_stream_bot, NULL}, 0, 0}, {
-		"4.6.4", tgrp_case_4_6_4, name_case_4_6_4, desc_case_4_6_4, {
-	test_case_4_6_4_stream_top, test_case_4_6_4_stream_bot, NULL}, 0, 0}, {
-		"4.7.1", tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, {
-	test_case_4_7_1_stream_top, test_case_4_7_1_stream_bot, NULL}, 0, 0}, {
-		"4.7.2", tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, {
-	test_case_4_7_2_stream_top, test_case_4_7_2_stream_bot, NULL}, 0, 0}, {
-		"4.7.3", tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, {
-	test_case_4_7_3_stream_top, test_case_4_7_3_stream_bot, NULL}, 0, 0}, {
-		"4.7.4", tgrp_case_4_7_4, name_case_4_7_4, desc_case_4_7_4, {
-	test_case_4_7_4_stream_top, test_case_4_7_4_stream_bot, NULL}, 0, 0}, {
-		"4.8.1", tgrp_case_4_8_1, name_case_4_8_1, desc_case_4_8_1, {
-	test_case_4_8_1_stream_top, test_case_4_8_1_stream_bot, NULL}, 0, 0}, {
-		"4.8.2", tgrp_case_4_8_2, name_case_4_8_2, desc_case_4_8_2, {
-	test_case_4_8_2_stream_top, test_case_4_8_2_stream_bot, NULL}, 0, 0}, {
-		"4.8.3", tgrp_case_4_8_3, name_case_4_8_3, desc_case_4_8_3, {
-	test_case_4_8_3_stream_top, test_case_4_8_3_stream_bot, NULL}, 0, 0}, {
-		"4.9.1", tgrp_case_4_9_1, name_case_4_9_1, desc_case_4_9_1, {
-	test_case_4_9_1_stream_top, test_case_4_9_1_stream_bot, NULL}, 0, 0}, {
-		"5.1.1", tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, {
-	test_case_5_1_1_stream_top, test_case_5_1_1_stream_bot, NULL}, 0, 0}, {
-		"5.1.2", tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, {
-	test_case_5_1_2_stream_top, test_case_5_1_2_stream_bot, NULL}, 0, 0}, {
-		"5.1.3", tgrp_case_5_1_3, name_case_5_1_3, desc_case_5_1_3, {
-	test_case_5_1_3_stream_top, test_case_5_1_3_stream_bot, NULL}, 0, 0}, {
-		"5.1.4", tgrp_case_5_1_4, name_case_5_1_4, desc_case_5_1_4, {
-	test_case_5_1_4_stream_top, test_case_5_1_4_stream_bot, NULL}, 0, 0}, {
-		"5.1.5", tgrp_case_5_1_5, name_case_5_1_5, desc_case_5_1_5, {
-	test_case_5_1_5_stream_top, test_case_5_1_5_stream_bot, NULL}, 0, 0}, {
-		"5.1.6", tgrp_case_5_1_6, name_case_5_1_6, desc_case_5_1_6, {
-	test_case_5_1_6_stream_top, test_case_5_1_6_stream_bot, NULL}, 0, 0}, {
-		"5.1.7", tgrp_case_5_1_7, name_case_5_1_7, desc_case_5_1_7, {
-	test_case_5_1_7_stream_top, test_case_5_1_7_stream_bot, NULL}, 0, 0}, {
-		"5.1.8", tgrp_case_5_1_8, name_case_5_1_8, desc_case_5_1_8, {
-	test_case_5_1_8_stream_top, test_case_5_1_8_stream_bot, NULL}, 0, 0}, {
-		"5.1.9", tgrp_case_5_1_9, name_case_5_1_9, desc_case_5_1_9, {
-	test_case_5_1_9_stream_top, test_case_5_1_9_stream_bot, NULL}, 0, 0}, {
-		"5.1.10", tgrp_case_5_1_10, name_case_5_1_10, desc_case_5_1_10, {
-	test_case_5_1_10_stream_top, test_case_5_1_10_stream_bot, NULL}, 0, 0}, {
-		"5.1.11", tgrp_case_5_1_11, name_case_5_1_11, desc_case_5_1_11, {
-	test_case_5_1_11_stream_top, test_case_5_1_11_stream_bot, NULL}, 0, 0}, {
-		"5.1.12", tgrp_case_5_1_12, name_case_5_1_12, desc_case_5_1_12, {
-	test_case_5_1_12_stream_top, test_case_5_1_12_stream_bot, NULL}, 0, 0}, {
-		"5.1.13", tgrp_case_5_1_13, name_case_5_1_13, desc_case_5_1_13, {
-	test_case_5_1_13_stream_top, test_case_5_1_13_stream_bot, NULL}, 0, 0}, {
-		"5.1.14", tgrp_case_5_1_14, name_case_5_1_14, desc_case_5_1_14, {
-	test_case_5_1_14_stream_top, test_case_5_1_14_stream_bot, NULL}, 0, 0}, {
-		"5.1.15", tgrp_case_5_1_15, name_case_5_1_15, desc_case_5_1_15, {
-	test_case_5_1_15_stream_top, test_case_5_1_15_stream_bot, NULL}, 0, 0}, {
-		"5.1.16", tgrp_case_5_1_16, name_case_5_1_16, desc_case_5_1_16, {
-	test_case_5_1_16_stream_top, test_case_5_1_16_stream_bot, NULL}, 0, 0}, {
-		"5.1.17", tgrp_case_5_1_17, name_case_5_1_17, desc_case_5_1_17, {
-	test_case_5_1_17_stream_top, test_case_5_1_17_stream_bot, NULL}, 0, 0}, {
-		"5.1.18", tgrp_case_5_1_18, name_case_5_1_18, desc_case_5_1_18, {
-	test_case_5_1_18_stream_top, test_case_5_1_18_stream_bot, NULL}, 0, 0}, {
-		"5.1.19", tgrp_case_5_1_19, name_case_5_1_19, desc_case_5_1_19, {
-	test_case_5_1_19_stream_top, test_case_5_1_19_stream_bot, NULL}, 0, 0}, {
-		"5.1.20", tgrp_case_5_1_20, name_case_5_1_20, desc_case_5_1_20, {
-	test_case_5_1_20_stream_top, test_case_5_1_20_stream_bot, NULL}, 0, 0}, {
-		"5.1.21", tgrp_case_5_1_21, name_case_5_1_21, desc_case_5_1_21, {
-	test_case_5_1_21_stream_top, test_case_5_1_21_stream_bot, NULL}, 0, 0}, {
-		"5.1.22", tgrp_case_5_1_22, name_case_5_1_22, desc_case_5_1_22, {
-	test_case_5_1_22_stream_top, test_case_5_1_22_stream_bot, NULL}, 0, 0}, {
-		"5.1.23", tgrp_case_5_1_23, name_case_5_1_23, desc_case_5_1_23, {
-	test_case_5_1_23_stream_top, test_case_5_1_23_stream_bot, NULL}, 0, 0}, {
-		"5.1.24", tgrp_case_5_1_24, name_case_5_1_24, desc_case_5_1_24, {
-	test_case_5_1_24_stream_top, test_case_5_1_24_stream_bot, NULL}, 0, 0}, {
-		"5.1.25", tgrp_case_5_1_25, name_case_5_1_25, desc_case_5_1_25, {
-	test_case_5_1_25_stream_top, test_case_5_1_25_stream_bot, NULL}, 0, 0}, {
-		"5.1.26", tgrp_case_5_1_26, name_case_5_1_26, desc_case_5_1_26, {
-	test_case_5_1_26_stream_top, test_case_5_1_26_stream_bot, NULL}, 0, 0}, {
-		"5.1.27", tgrp_case_5_1_27, name_case_5_1_27, desc_case_5_1_27, {
-	test_case_5_1_27_stream_top, test_case_5_1_27_stream_bot, NULL}, 0, 0}, {
-		"5.1.28", tgrp_case_5_1_28, name_case_5_1_28, desc_case_5_1_28, {
-	test_case_5_1_28_stream_top, test_case_5_1_28_stream_bot, NULL}, 0, 0}, {
-		"5.2.1", tgrp_case_5_2_1, name_case_5_2_1, desc_case_5_2_1, {
-	test_case_5_2_1_stream_top, test_case_5_2_1_stream_bot, NULL}, 0, 0}, {
-		"5.2.2", tgrp_case_5_2_2, name_case_5_2_2, desc_case_5_2_2, {
-	test_case_5_2_2_stream_top, test_case_5_2_2_stream_bot, NULL}, 0, 0}, {
-		"5.2.3", tgrp_case_5_2_3, name_case_5_2_3, desc_case_5_2_3, {
-	test_case_5_2_3_stream_top, test_case_5_2_3_stream_bot, NULL}, 0, 0}, {
-		"5.2.4", tgrp_case_5_2_4, name_case_5_2_4, desc_case_5_2_4, {
-	test_case_5_2_4_stream_top, test_case_5_2_4_stream_bot, NULL}, 0, 0}, {
-		"5.2.5", tgrp_case_5_2_5, name_case_5_2_5, desc_case_5_2_5, {
-	test_case_5_2_5_stream_top, test_case_5_2_5_stream_bot, NULL}, 0, 0}, {
-		"5.2.6", tgrp_case_5_2_6, name_case_5_2_6, desc_case_5_2_6, {
-	test_case_5_2_6_stream_top, test_case_5_2_6_stream_bot, NULL}, 0, 0}, {
-		"5.2.7", tgrp_case_5_2_7, name_case_5_2_7, desc_case_5_2_7, {
-	test_case_5_2_7_stream_top, test_case_5_2_7_stream_bot, NULL}, 0, 0}, {
-		"5.2.8", tgrp_case_5_2_8, name_case_5_2_8, desc_case_5_2_8, {
-	test_case_5_2_8_stream_top, test_case_5_2_8_stream_bot, NULL}, 0, 0}, {
-		"5.2.9", tgrp_case_5_2_9, name_case_5_2_9, desc_case_5_2_9, {
-	test_case_5_2_9_stream_top, test_case_5_2_9_stream_bot, NULL}, 0, 0}, {
-		"5.2.10", tgrp_case_5_2_10, name_case_5_2_10, desc_case_5_2_10, {
-	test_case_5_2_10_stream_top, test_case_5_2_10_stream_bot, NULL}, 0, 0}, {
-		"5.2.11", tgrp_case_5_2_11, name_case_5_2_11, desc_case_5_2_11, {
-	test_case_5_2_11_stream_top, test_case_5_2_11_stream_bot, NULL}, 0, 0}, {
-		"5.2.12", tgrp_case_5_2_12, name_case_5_2_12, desc_case_5_2_12, {
-	test_case_5_2_12_stream_top, test_case_5_2_12_stream_bot, NULL}, 0, 0}, {
-		"5.2.13", tgrp_case_5_2_13, name_case_5_2_13, desc_case_5_2_13, {
-	test_case_5_2_13_stream_top, test_case_5_2_13_stream_bot, NULL}, 0, 0}, {
-		"5.2.14", tgrp_case_5_2_14, name_case_5_2_14, desc_case_5_2_14, {
-	test_case_5_2_14_stream_top, test_case_5_2_14_stream_bot, NULL}, 0, 0}, {
-		"5.2.15", tgrp_case_5_2_15, name_case_5_2_15, desc_case_5_2_15, {
-	test_case_5_2_15_stream_top, test_case_5_2_15_stream_bot, NULL}, 0, 0}, {
-		"5.2.16", tgrp_case_5_2_16, name_case_5_2_16, desc_case_5_2_16, {
-	test_case_5_2_16_stream_top, test_case_5_2_16_stream_bot, NULL}, 0, 0}, {
-		"5.2.17", tgrp_case_5_2_17, name_case_5_2_17, desc_case_5_2_17, {
-	test_case_5_2_17_stream_top, test_case_5_2_17_stream_bot, NULL}, 0, 0}, {
-		"5.2.18", tgrp_case_5_2_18, name_case_5_2_18, desc_case_5_2_18, {
-	test_case_5_2_18_stream_top, test_case_5_2_18_stream_bot, NULL}, 0, 0}, {
-		"5.2.19", tgrp_case_5_2_19, name_case_5_2_19, desc_case_5_2_19, {
-	test_case_5_2_19_stream_top, test_case_5_2_19_stream_bot, NULL}, 0, 0}, {
-		"5.2.20", tgrp_case_5_2_20, name_case_5_2_20, desc_case_5_2_20, {
-	test_case_5_2_20_stream_top, test_case_5_2_20_stream_bot, NULL}, 0, 0}, {
-		"5.2.21", tgrp_case_5_2_21, name_case_5_2_21, desc_case_5_2_21, {
-	test_case_5_2_21_stream_top, test_case_5_2_21_stream_bot, NULL}, 0, 0}, {
-		"5.2.22", tgrp_case_5_2_22, name_case_5_2_22, desc_case_5_2_22, {
-	test_case_5_2_22_stream_top, test_case_5_2_22_stream_bot, NULL}, 0, 0}, {
-		"5.2.23", tgrp_case_5_2_23, name_case_5_2_23, desc_case_5_2_23, {
-	test_case_5_2_23_stream_top, test_case_5_2_23_stream_bot, NULL}, 0, 0}, {
-		"5.2.24", tgrp_case_5_2_24, name_case_5_2_24, desc_case_5_2_24, {
-	test_case_5_2_24_stream_top, test_case_5_2_24_stream_bot, NULL}, 0, 0}, {
-		"5.2.25", tgrp_case_5_2_25, name_case_5_2_25, desc_case_5_2_25, {
-	test_case_5_2_25_stream_top, test_case_5_2_25_stream_bot, NULL}, 0, 0}, {
-		"5.2.26", tgrp_case_5_2_26, name_case_5_2_26, desc_case_5_2_26, {
-	test_case_5_2_26_stream_top, test_case_5_2_26_stream_bot, NULL}, 0, 0}, {
-		"5.2.27", tgrp_case_5_2_27, name_case_5_2_27, desc_case_5_2_27, {
-	test_case_5_2_27_stream_top, test_case_5_2_27_stream_bot, NULL}, 0, 0}, {
-		"5.2.28", tgrp_case_5_2_28, name_case_5_2_28, desc_case_5_2_28, {
-	test_case_5_2_28_stream_top, test_case_5_2_28_stream_bot, NULL}, 0, 0}, {
-		"5.3.1", tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, {
-	test_case_5_3_1_stream_top, test_case_5_3_1_stream_bot, NULL}, 0, 0}, {
-		"5.3.2", tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, {
-	test_case_5_3_2_stream_top, test_case_5_3_2_stream_bot, NULL}, 0, 0}, {
-		"5.3.3", tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, {
-	test_case_5_3_3_stream_top, test_case_5_3_3_stream_bot, NULL}, 0, 0}, {
-		"5.3.4", tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, {
-	test_case_5_3_4_stream_top, test_case_5_3_4_stream_bot, NULL}, 0, 0}, {
-		"5.3.5", tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, {
-	test_case_5_3_5_stream_top, test_case_5_3_5_stream_bot, NULL}, 0, 0}, {
-		"5.3.6", tgrp_case_5_3_6, name_case_5_3_6, desc_case_5_3_6, {
-	test_case_5_3_6_stream_top, test_case_5_3_6_stream_bot, NULL}, 0, 0}, {
-		"5.3.7", tgrp_case_5_3_7, name_case_5_3_7, desc_case_5_3_7, {
-	test_case_5_3_7_stream_top, test_case_5_3_7_stream_bot, NULL}, 0, 0}, {
-		"5.3.8", tgrp_case_5_3_8, name_case_5_3_8, desc_case_5_3_8, {
-	test_case_5_3_8_stream_top, test_case_5_3_8_stream_bot, NULL}, 0, 0}, {
-		"5.3.9", tgrp_case_5_3_9, name_case_5_3_9, desc_case_5_3_9, {
-	test_case_5_3_9_stream_top, test_case_5_3_9_stream_bot, NULL}, 0, 0}, {
-		"5.3.10", tgrp_case_5_3_10, name_case_5_3_10, desc_case_5_3_10, {
-	test_case_5_3_10_stream_top, test_case_5_3_10_stream_bot, NULL}, 0, 0}, {
-		"5.3.11", tgrp_case_5_3_11, name_case_5_3_11, desc_case_5_3_11, {
-	test_case_5_3_11_stream_top, test_case_5_3_11_stream_bot, NULL}, 0, 0}, {
-		"5.3.12", tgrp_case_5_3_12, name_case_5_3_12, desc_case_5_3_12, {
-	test_case_5_3_12_stream_top, test_case_5_3_12_stream_bot, NULL}, 0, 0}, {
-		"5.3.13", tgrp_case_5_3_13, name_case_5_3_13, desc_case_5_3_13, {
-	test_case_5_3_13_stream_top, test_case_5_3_13_stream_bot, NULL}, 0, 0}, {
-		"5.3.14", tgrp_case_5_3_14, name_case_5_3_14, desc_case_5_3_14, {
-	test_case_5_3_14_stream_top, test_case_5_3_14_stream_bot, NULL}, 0, 0}, {
-		"5.3.15", tgrp_case_5_3_15, name_case_5_3_15, desc_case_5_3_15, {
-	test_case_5_3_15_stream_top, test_case_5_3_15_stream_bot, NULL}, 0, 0}, {
-		"5.3.16", tgrp_case_5_3_16, name_case_5_3_16, desc_case_5_3_16, {
-	test_case_5_3_16_stream_top, test_case_5_3_16_stream_bot, NULL}, 0, 0}, {
-		"5.3.17", tgrp_case_5_3_17, name_case_5_3_17, desc_case_5_3_17, {
-	test_case_5_3_17_stream_top, test_case_5_3_17_stream_bot, NULL}, 0, 0}, {
-		"5.3.18", tgrp_case_5_3_18, name_case_5_3_18, desc_case_5_3_18, {
-	test_case_5_3_18_stream_top, test_case_5_3_18_stream_bot, NULL}, 0, 0}, {
-		"5.3.19", tgrp_case_5_3_19, name_case_5_3_19, desc_case_5_3_19, {
-	test_case_5_3_19_stream_top, test_case_5_3_19_stream_bot, NULL}, 0, 0}, {
-		"5.3.20", tgrp_case_5_3_20, name_case_5_3_20, desc_case_5_3_20, {
-	test_case_5_3_20_stream_top, test_case_5_3_20_stream_bot, NULL}, 0, 0}, {
-		"5.3.21", tgrp_case_5_3_21, name_case_5_3_21, desc_case_5_3_21, {
-	test_case_5_3_21_stream_top, test_case_5_3_21_stream_bot, NULL}, 0, 0}, {
-		"5.3.22", tgrp_case_5_3_22, name_case_5_3_22, desc_case_5_3_22, {
-	test_case_5_3_22_stream_top, test_case_5_3_22_stream_bot, NULL}, 0, 0}, {
-		"5.3.23", tgrp_case_5_3_23, name_case_5_3_23, desc_case_5_3_23, {
-	test_case_5_3_23_stream_top, test_case_5_3_23_stream_bot, NULL}, 0, 0}, {
-		"5.3.24", tgrp_case_5_3_24, name_case_5_3_24, desc_case_5_3_24, {
-	test_case_5_3_24_stream_top, test_case_5_3_24_stream_bot, NULL}, 0, 0}, {
-		"5.3.25", tgrp_case_5_3_25, name_case_5_3_25, desc_case_5_3_25, {
-	test_case_5_3_25_stream_top, test_case_5_3_25_stream_bot, NULL}, 0, 0}, {
-		"5.3.26", tgrp_case_5_3_26, name_case_5_3_26, desc_case_5_3_26, {
-	test_case_5_3_26_stream_top, test_case_5_3_26_stream_bot, NULL}, 0, 0}, {
-		"5.3.27", tgrp_case_5_3_27, name_case_5_3_27, desc_case_5_3_27, {
-	test_case_5_3_27_stream_top, test_case_5_3_27_stream_bot, NULL}, 0, 0}, {
-		"5.3.28", tgrp_case_5_3_28, name_case_5_3_28, desc_case_5_3_28, {
-	test_case_5_3_28_stream_top, test_case_5_3_28_stream_bot, NULL}, 0, 0}, {
-		"6.1.1", tgrp_case_6_1_1, name_case_6_1_1, desc_case_6_1_1, {
-	test_case_6_1_1_stream_top, test_case_6_1_1_stream_bot, NULL}, 0, 0}, {
-		"6.1.2", tgrp_case_6_1_2, name_case_6_1_2, desc_case_6_1_2, {
-	test_case_6_1_2_stream_top, test_case_6_1_2_stream_bot, NULL}, 0, 0}, {
-		"6.1.3", tgrp_case_6_1_3, name_case_6_1_3, desc_case_6_1_3, {
-	test_case_6_1_3_stream_top, test_case_6_1_3_stream_bot, NULL}, 0, 0}, {
-		"6.1.4", tgrp_case_6_1_4, name_case_6_1_4, desc_case_6_1_4, {
-	test_case_6_1_4_stream_top, test_case_6_1_4_stream_bot, NULL}, 0, 0}, {
-		"6.1.5", tgrp_case_6_1_5, name_case_6_1_5, desc_case_6_1_5, {
-	test_case_6_1_5_stream_top, test_case_6_1_5_stream_bot, NULL}, 0, 0}, {
-		"6.1.6", tgrp_case_6_1_6, name_case_6_1_6, desc_case_6_1_6, {
-	test_case_6_1_6_stream_top, test_case_6_1_6_stream_bot, NULL}, 0, 0}, {
-		"6.1.7", tgrp_case_6_1_7, name_case_6_1_7, desc_case_6_1_7, {
-	test_case_6_1_7_stream_top, test_case_6_1_7_stream_bot, NULL}, 0, 0}, {
-		"6.1.8", tgrp_case_6_1_8, name_case_6_1_8, desc_case_6_1_8, {
-	test_case_6_1_8_stream_top, test_case_6_1_8_stream_bot, NULL}, 0, 0}, {
-		"6.1.9", tgrp_case_6_1_9, name_case_6_1_9, desc_case_6_1_9, {
-	test_case_6_1_9_stream_top, test_case_6_1_9_stream_bot, NULL}, 0, 0}, {
-		"6.1.10", tgrp_case_6_1_10, name_case_6_1_10, desc_case_6_1_10, {
-	test_case_6_1_10_stream_top, test_case_6_1_10_stream_bot, NULL}, 0, 0}, {
-		"6.1.11", tgrp_case_6_1_11, name_case_6_1_11, desc_case_6_1_11, {
-	test_case_6_1_11_stream_top, test_case_6_1_11_stream_bot, NULL}, 0, 0}, {
-		"6.1.12", tgrp_case_6_1_12, name_case_6_1_12, desc_case_6_1_12, {
-	test_case_6_1_12_stream_top, test_case_6_1_12_stream_bot, NULL}, 0, 0}, {
-		"6.2.1", tgrp_case_6_2_1, name_case_6_2_1, desc_case_6_2_1, {
-	test_case_6_2_1_stream_top, test_case_6_2_1_stream_bot, NULL}, 0, 0}, {
-		"6.2.2", tgrp_case_6_2_2, name_case_6_2_2, desc_case_6_2_2, {
-	test_case_6_2_2_stream_top, test_case_6_2_2_stream_bot, NULL}, 0, 0}, {
-		"6.2.3", tgrp_case_6_2_3, name_case_6_2_3, desc_case_6_2_3, {
-	test_case_6_2_3_stream_top, test_case_6_2_3_stream_bot, NULL}, 0, 0}, {
-		"6.2.4", tgrp_case_6_2_4, name_case_6_2_4, desc_case_6_2_4, {
-	test_case_6_2_4_stream_top, test_case_6_2_4_stream_bot, NULL}, 0, 0}, {
-		"6.2.5", tgrp_case_6_2_5, name_case_6_2_5, desc_case_6_2_5, {
-	test_case_6_2_5_stream_top, test_case_6_2_5_stream_bot, NULL}, 0, 0}, {
-		"6.2.6", tgrp_case_6_2_6, name_case_6_2_6, desc_case_6_2_6, {
-	test_case_6_2_6_stream_top, test_case_6_2_6_stream_bot, NULL}, 0, 0}, {
-		"6.3.1", tgrp_case_6_3_1, name_case_6_3_1, desc_case_6_3_1, {
-	test_case_6_3_1_stream_top, test_case_6_3_1_stream_bot, NULL}, 0, 0}, {
-		"6.3.2", tgrp_case_6_3_2, name_case_6_3_2, desc_case_6_3_2, {
-	test_case_6_3_2_stream_top, test_case_6_3_2_stream_bot, NULL}, 0, 0}, {
-		"6.3.3", tgrp_case_6_3_3, name_case_6_3_3, desc_case_6_3_3, {
-	test_case_6_3_3_stream_top, test_case_6_3_3_stream_bot, NULL}, 0, 0}, {
-		"6.3.4", tgrp_case_6_3_4, name_case_6_3_4, desc_case_6_3_4, {
-	test_case_6_3_4_stream_top, test_case_6_3_4_stream_bot, NULL}, 0, 0}, {
-		"6.3.5", tgrp_case_6_3_5, name_case_6_3_5, desc_case_6_3_5, {
-	test_case_6_3_5_stream_top, test_case_6_3_5_stream_bot, NULL}, 0, 0}, {
-		"6.3.6", tgrp_case_6_3_6, name_case_6_3_6, desc_case_6_3_6, {
-	test_case_6_3_6_stream_top, test_case_6_3_6_stream_bot, NULL}, 0, 0}, {
-		"6.3.7", tgrp_case_6_3_7, name_case_6_3_7, desc_case_6_3_7, {
-	test_case_6_3_7_stream_top, test_case_6_3_7_stream_bot, NULL}, 0, 0}, {
-		"6.3.8", tgrp_case_6_3_8, name_case_6_3_8, desc_case_6_3_8, {
-	test_case_6_3_8_stream_top, test_case_6_3_8_stream_bot, NULL}, 0, 0}, {
-		"6.4.1", tgrp_case_6_4_1, name_case_6_4_1, desc_case_6_4_1, {
-	test_case_6_4_1_stream_top, test_case_6_4_1_stream_bot, NULL}, 0, 0}, {
-		"6.4.2", tgrp_case_6_4_2, name_case_6_4_2, desc_case_6_4_2, {
-	test_case_6_4_2_stream_top, test_case_6_4_2_stream_bot, NULL}, 0, 0}, {
-		"6.4.3", tgrp_case_6_4_3, name_case_6_4_3, desc_case_6_4_3, {
-	test_case_6_4_3_stream_top, test_case_6_4_3_stream_bot, NULL}, 0, 0}, {
-		"6.4.4", tgrp_case_6_4_4, name_case_6_4_4, desc_case_6_4_4, {
-	test_case_6_4_4_stream_top, test_case_6_4_4_stream_bot, NULL}, 0, 0}, {
-		"6.4.5", tgrp_case_6_4_5, name_case_6_4_5, desc_case_6_4_5, {
-	test_case_6_4_5_stream_top, test_case_6_4_5_stream_bot, NULL}, 0, 0}, {
-		"6.4.6", tgrp_case_6_4_6, name_case_6_4_6, desc_case_6_4_6, {
-	test_case_6_4_6_stream_top, test_case_6_4_6_stream_bot, NULL}, 0, 0}, {
-		"6.5.1", tgrp_case_6_5_1, name_case_6_5_1, desc_case_6_5_1, {
-	test_case_6_5_1_stream_top, test_case_6_5_1_stream_bot, NULL}, 0, 0}, {
-		"6.5.2", tgrp_case_6_5_2, name_case_6_5_2, desc_case_6_5_2, {
-	test_case_6_5_2_stream_top, test_case_6_5_2_stream_bot, NULL}, 0, 0}, {
-		"6.5.3", tgrp_case_6_5_3, name_case_6_5_3, desc_case_6_5_3, {
-	test_case_6_5_3_stream_top, test_case_6_5_3_stream_bot, NULL}, 0, 0}, {
-		"6.5.4", tgrp_case_6_5_4, name_case_6_5_4, desc_case_6_5_4, {
-	test_case_6_5_4_stream_top, test_case_6_5_4_stream_bot, NULL}, 0, 0}, {
-		"6.5.5", tgrp_case_6_5_5, name_case_6_5_5, desc_case_6_5_5, {
-	test_case_6_5_5_stream_top, test_case_6_5_5_stream_bot, NULL}, 0, 0}, {
-		"6.6.1", tgrp_case_6_6_1, name_case_6_6_1, desc_case_6_6_1, {
-	test_case_6_6_1_stream_top, test_case_6_6_1_stream_bot, NULL}, 0, 0}, {
-		"6.6.2", tgrp_case_6_6_2, name_case_6_6_2, desc_case_6_6_2, {
-	test_case_6_6_2_stream_top, test_case_6_6_2_stream_bot, NULL}, 0, 0}, {
-		"7.1.1", tgrp_case_7_1_1, name_case_7_1_1, desc_case_7_1_1, {
-	test_case_7_1_1_stream_top, test_case_7_1_1_stream_bot, NULL}, 0, 0}, {
-		"7.1.2", tgrp_case_7_1_2, name_case_7_1_2, desc_case_7_1_2, {
-	test_case_7_1_2_stream_top, test_case_7_1_2_stream_bot, NULL}, 0, 0}, {
-		"7.1.3", tgrp_case_7_1_3, name_case_7_1_3, desc_case_7_1_3, {
-	test_case_7_1_3_stream_top, test_case_7_1_3_stream_bot, NULL}, 0, 0}, {
-		"7.2.1", tgrp_case_7_2_1, name_case_7_2_1, desc_case_7_2_1, {
-	test_case_7_2_1_stream_top, test_case_7_2_1_stream_bot, NULL}, 0, 0}, {
-		"7.3.1", tgrp_case_7_3_1, name_case_7_3_1, desc_case_7_3_1, {
-	test_case_7_3_1_stream_top, test_case_7_3_1_stream_bot, NULL}, 0, 0}, {
-		"7.3.2", tgrp_case_7_3_2, name_case_7_3_2, desc_case_7_3_2, {
-	test_case_7_3_2_stream_top, test_case_7_3_2_stream_bot, NULL}, 0, 0}, {
-		"7.3.3", tgrp_case_7_3_3, name_case_7_3_3, desc_case_7_3_3, {
-	test_case_7_3_3_stream_top, test_case_7_3_3_stream_bot, NULL}, 0, 0}, {
-		"7.3.4", tgrp_case_7_3_4, name_case_7_3_4, desc_case_7_3_4, {
-	test_case_7_3_4_stream_top, test_case_7_3_4_stream_bot, NULL}, 0, 0}, {
-		"7.3.5", tgrp_case_7_3_5, name_case_7_3_5, desc_case_7_3_5, {
-	test_case_7_3_5_stream_top, test_case_7_3_5_stream_bot, NULL}, 0, 0}, {
-		"7.4.1", tgrp_case_7_4_1, name_case_7_4_1, desc_case_7_4_1, {
-	test_case_7_4_1_stream_top, test_case_7_4_1_stream_bot, NULL}, 0, 0}, {
-		"7.4.2", tgrp_case_7_4_2, name_case_7_4_2, desc_case_7_4_2, {
-	test_case_7_4_2_stream_top, test_case_7_4_2_stream_bot, NULL}, 0, 0}, {
-		"7.4.3", tgrp_case_7_4_3, name_case_7_4_3, desc_case_7_4_3, {
-	test_case_7_4_3_stream_top, test_case_7_4_3_stream_bot, NULL}, 0, 0}, {
-		"7.5.1", tgrp_case_7_5_1, name_case_7_5_1, desc_case_7_5_1, {
-	test_case_7_5_1_stream_top, test_case_7_5_1_stream_bot, NULL}, 0, 0}, {
-		"7.5.2", tgrp_case_7_5_2, name_case_7_5_2, desc_case_7_5_2, {
-	test_case_7_5_2_stream_top, test_case_7_5_2_stream_bot, NULL}, 0, 0}, {
-		"7.5.3", tgrp_case_7_5_3, name_case_7_5_3, desc_case_7_5_3, {
-	test_case_7_5_3_stream_top, test_case_7_5_3_stream_bot, NULL}, 0, 0}, {
-		"7.6.1", tgrp_case_7_6_1, name_case_7_6_1, desc_case_7_6_1, {
-	test_case_7_6_1_stream_top, test_case_7_6_1_stream_bot, NULL}, 0, 0}, {
-		"7.6.2", tgrp_case_7_6_2, name_case_7_6_2, desc_case_7_6_2, {
-	test_case_7_6_2_stream_top, test_case_7_6_2_stream_bot, NULL}, 0, 0}, {
-		"7.6.3", tgrp_case_7_6_3, name_case_7_6_3, desc_case_7_6_3, {
-	test_case_7_6_3_stream_top, test_case_7_6_3_stream_bot, NULL}, 0, 0}, {
-		"7.7.1", tgrp_case_7_7_1, name_case_7_7_1, desc_case_7_7_1, {
-	test_case_7_7_1_stream_top, test_case_7_7_1_stream_bot, NULL}, 0, 0}, {
-		"7.7.2", tgrp_case_7_7_2, name_case_7_7_2, desc_case_7_7_2, {
-	test_case_7_7_2_stream_top, test_case_7_7_2_stream_bot, NULL}, 0, 0}, {
-		"7.7.3", tgrp_case_7_7_3, name_case_7_7_3, desc_case_7_7_3, {
-	test_case_7_7_3_stream_top, test_case_7_7_3_stream_bot, NULL}, 0, 0}, {
-		"7.8.1", tgrp_case_7_8_1, name_case_7_8_1, desc_case_7_8_1, {
-	test_case_7_8_1_stream_top, test_case_7_8_1_stream_bot, NULL}, 0, 0}, {
-		"7.8.2", tgrp_case_7_8_2, name_case_7_8_2, desc_case_7_8_2, {
-	test_case_7_8_2_stream_top, test_case_7_8_2_stream_bot, NULL}, 0, 0}, {
-		"7.8.3", tgrp_case_7_8_3, name_case_7_8_3, desc_case_7_8_3, {
-	test_case_7_8_3_stream_top, test_case_7_8_3_stream_bot, NULL}, 0, 0}, {
-		"7.9.1", tgrp_case_7_9_1, name_case_7_9_1, desc_case_7_9_1, {
-	test_case_7_9_1_stream_top, test_case_7_9_1_stream_bot, NULL}, 0, 0}, {
-		"7.9.2", tgrp_case_7_9_2, name_case_7_9_2, desc_case_7_9_2, {
-	test_case_7_9_2_stream_top, test_case_7_9_2_stream_bot, NULL}, 0, 0}, {
-		"7.9.3", tgrp_case_7_9_3, name_case_7_9_3, desc_case_7_9_3, {
-	test_case_7_9_3_stream_top, test_case_7_9_3_stream_bot, NULL}, 0, 0}, {
-		"7.10.1", tgrp_case_7_10_1, name_case_7_10_1, desc_case_7_10_1, {
-	test_case_7_10_1_stream_top, test_case_7_10_1_stream_bot, NULL}, 0, 0}, {
-		"7.10.2", tgrp_case_7_10_2, name_case_7_10_2, desc_case_7_10_2, {
-	test_case_7_10_2_stream_top, test_case_7_10_2_stream_bot, NULL}, 0, 0}, {
-		"7.10.3", tgrp_case_7_10_3, name_case_7_10_3, desc_case_7_10_3, {
-	test_case_7_10_3_stream_top, test_case_7_10_3_stream_bot, NULL}, 0, 0}, {
-		"7.11.1", tgrp_case_7_11_1, name_case_7_11_1, desc_case_7_11_1, {
-	test_case_7_11_1_stream_top, test_case_7_11_1_stream_bot, NULL}, 0, 0}, {
-		"7.11.2", tgrp_case_7_11_2, name_case_7_11_2, desc_case_7_11_2, {
-	test_case_7_11_2_stream_top, test_case_7_11_2_stream_bot, NULL}, 0, 0}, {
-		"7.11.3", tgrp_case_7_11_3, name_case_7_11_3, desc_case_7_11_3, {
-	test_case_7_11_3_stream_top, test_case_7_11_3_stream_bot, NULL}, 0, 0}, {
-		"7.12.1", tgrp_case_7_12_1, name_case_7_12_1, desc_case_7_12_1, {
-	test_case_7_12_1_stream_top, test_case_7_12_1_stream_bot, NULL}, 0, 0}, {
-		"7.12.2", tgrp_case_7_12_2, name_case_7_12_2, desc_case_7_12_2, {
-	test_case_7_12_2_stream_top, test_case_7_12_2_stream_bot, NULL}, 0, 0}, {
-		"7.12.3", tgrp_case_7_12_3, name_case_7_12_3, desc_case_7_12_3, {
-	test_case_7_12_3_stream_top, test_case_7_12_3_stream_bot, NULL}, 0, 0}, {
-		"7.13.1", tgrp_case_7_13_1, name_case_7_13_1, desc_case_7_13_1, {
-	test_case_7_13_1_stream_top, test_case_7_13_1_stream_bot, NULL}, 0, 0}, {
-		"7.13.2", tgrp_case_7_13_2, name_case_7_13_2, desc_case_7_13_2, {
-	test_case_7_13_2_stream_top, test_case_7_13_2_stream_bot, NULL}, 0, 0}, {
-		"7.13.3", tgrp_case_7_13_3, name_case_7_13_3, desc_case_7_13_3, {
-	test_case_7_13_3_stream_top, test_case_7_13_3_stream_bot, NULL}, 0, 0}, {
-		"7.14.1", tgrp_case_7_14_1, name_case_7_14_1, desc_case_7_14_1, {
-	test_case_7_14_1_stream_top, test_case_7_14_1_stream_bot, NULL}, 0, 0}, {
-		"7.14.2", tgrp_case_7_14_2, name_case_7_14_2, desc_case_7_14_2, {
-	test_case_7_14_2_stream_top, test_case_7_14_2_stream_bot, NULL}, 0, 0}, {
-		"7.14.3", tgrp_case_7_14_3, name_case_7_14_3, desc_case_7_14_3, {
-	test_case_7_14_3_stream_top, test_case_7_14_3_stream_bot, NULL}, 0, 0}, {
-		"7.15.1", tgrp_case_7_15_1, name_case_7_15_1, desc_case_7_15_1, {
-	test_case_7_15_1_stream_top, test_case_7_15_1_stream_bot, NULL}, 0, 0}, {
-		"7.15.2", tgrp_case_7_15_2, name_case_7_15_2, desc_case_7_15_2, {
-	test_case_7_15_2_stream_top, test_case_7_15_2_stream_bot, NULL}, 0, 0}, {
-		"7.15.3", tgrp_case_7_15_3, name_case_7_15_3, desc_case_7_15_3, {
-	test_case_7_15_3_stream_top, test_case_7_15_3_stream_bot, NULL}, 0, 0}, {
-		"7.16.1", tgrp_case_7_16_1, name_case_7_16_1, desc_case_7_16_1, {
-	test_case_7_16_1_stream_top, test_case_7_16_1_stream_bot, NULL}, 0, 0}, {
-		"7.16.2", tgrp_case_7_16_2, name_case_7_16_2, desc_case_7_16_2, {
-	test_case_7_16_2_stream_top, test_case_7_16_2_stream_bot, NULL}, 0, 0}, {
-		"7.16.3", tgrp_case_7_16_3, name_case_7_16_3, desc_case_7_16_3, {
-	test_case_7_16_3_stream_top, test_case_7_16_3_stream_bot, NULL}, 0, 0}, {
-		"7.17.1", tgrp_case_7_17_1, name_case_7_17_1, desc_case_7_17_1, {
-	test_case_7_17_1_stream_top, test_case_7_17_1_stream_bot, NULL}, 0, 0}, {
-		"8.1.1", tgrp_case_8_1_1, name_case_8_1_1, desc_case_8_1_1, {
-	test_case_8_1_1_stream_top, test_case_8_1_1_stream_bot, NULL}, 0, 0}, {
-		"8.1.2", tgrp_case_8_1_2, name_case_8_1_2, desc_case_8_1_2, {
-	test_case_8_1_2_stream_top, test_case_8_1_2_stream_bot, NULL}, 0, 0}, {
-		"8.1.3", tgrp_case_8_1_3, name_case_8_1_3, desc_case_8_1_3, {
-	test_case_8_1_3_stream_top, test_case_8_1_3_stream_bot, NULL}, 0, 0}, {
-		"8.1.4", tgrp_case_8_1_4, name_case_8_1_4, desc_case_8_1_4, {
-	test_case_8_1_4_stream_top, test_case_8_1_4_stream_bot, NULL}, 0, 0}, {
-		"8.2.1", tgrp_case_8_2_1, name_case_8_2_1, desc_case_8_2_1, {
-	test_case_8_2_1_stream_top, test_case_8_2_1_stream_bot, NULL}, 0, 0}, {
-		"8.2.2", tgrp_case_8_2_2, name_case_8_2_2, desc_case_8_2_2, {
-	test_case_8_2_2_stream_top, test_case_8_2_2_stream_bot, NULL}, 0, 0}, {
-		"8.2.3", tgrp_case_8_2_3, name_case_8_2_3, desc_case_8_2_3, {
-	test_case_8_2_3_stream_top, test_case_8_2_3_stream_bot, NULL}, 0, 0}, {
-		"8.3.1", tgrp_case_8_3_1, name_case_8_3_1, desc_case_8_3_1, {
-	test_case_8_3_1_stream_top, test_case_8_3_1_stream_bot, NULL}, 0, 0}, {
-		"8.3.2", tgrp_case_8_3_2, name_case_8_3_2, desc_case_8_3_2, {
-	test_case_8_3_2_stream_top, test_case_8_3_2_stream_bot, NULL}, 0, 0}, {
-		"8.4.1", tgrp_case_8_4_1, name_case_8_4_1, desc_case_8_4_1, {
-	test_case_8_4_1_stream_top, test_case_8_4_1_stream_bot, NULL}, 0, 0}, {
-		"8.5.1", tgrp_case_8_5_1, name_case_8_5_1, desc_case_8_5_1, {
-	test_case_8_5_1_stream_top, test_case_8_5_1_stream_bot, NULL}, 0, 0}, {
-		"8.5.2", tgrp_case_8_5_2, name_case_8_5_2, desc_case_8_5_2, {
-	test_case_8_5_2_stream_top, test_case_8_5_2_stream_bot, NULL}, 0, 0}, {
-		"8.5.3", tgrp_case_8_5_3, name_case_8_5_3, desc_case_8_5_3, {
-	test_case_8_5_3_stream_top, test_case_8_5_3_stream_bot, NULL}, 0, 0}, {
-		"8.5.4", tgrp_case_8_5_4, name_case_8_5_4, desc_case_8_5_4, {
-	test_case_8_5_4_stream_top, test_case_8_5_4_stream_bot, NULL}, 0, 0}, {
-		"8.6.1", tgrp_case_8_6_1, name_case_8_6_1, desc_case_8_6_1, {
-	test_case_8_6_1_stream_top, test_case_8_6_1_stream_bot, NULL}, 0, 0}, {
-		"8.6.2", tgrp_case_8_6_2, name_case_8_6_2, desc_case_8_6_2, {
-	test_case_8_6_2_stream_top, test_case_8_6_2_stream_bot, NULL}, 0, 0}, {
-		"8.6.3", tgrp_case_8_6_3, name_case_8_6_3, desc_case_8_6_3, {
-	test_case_8_6_3_stream_top, test_case_8_6_3_stream_bot, NULL}, 0, 0}, {
-		"8.7.1", tgrp_case_8_7_1, name_case_8_7_1, desc_case_8_7_1, {
-	test_case_8_7_1_stream_top, test_case_8_7_1_stream_bot, NULL}, 0, 0}, {
-		"8.8.1", tgrp_case_8_8_1, name_case_8_8_1, desc_case_8_8_1, {
-	test_case_8_8_1_stream_top, test_case_8_8_1_stream_bot, NULL}, 0, 0}, {
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
+	&test_1_1_top, &test_1_1_bot, NULL}, 0, 0}, {
+		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, {
+	&test_1_2_1_top, &test_1_2_1_bot, NULL}, 0, 0}, {
+		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, {
+	&test_1_2_2_top, &test_1_2_2_bot, NULL}, 0, 0}, {
+		numb_case_1_2_3, tgrp_case_1_2_3, name_case_1_2_3, desc_case_1_2_3, {
+	&test_1_2_3_top, &test_1_2_3_bot, NULL}, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, {
+	&test_2_1_1_top, &test_2_1_1_bot, NULL}, 0, 0}, {
+		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, {
+	&test_2_1_2_top, &test_2_1_2_bot, NULL}, 0, 0}, {
+		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, {
+	&test_2_1_3_top, &test_2_1_3_bot, NULL}, 0, 0}, {
+		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, {
+	&test_2_1_4_top, &test_2_1_4_bot, NULL}, 0, 0}, {
+		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, {
+	&test_2_1_5_top, &test_2_1_5_bot, NULL}, 0, 0}, {
+		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, {
+	&test_2_1_6_top, &test_2_1_6_bot, NULL}, 0, 0}, {
+		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, {
+	&test_2_1_7_top, &test_2_1_7_bot, NULL}, 0, 0}, {
+		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, {
+	&test_2_1_8_top, &test_2_1_8_bot, NULL}, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, {
+	&test_2_2_top, &test_2_2_bot, NULL}, 0, 0}, {
+		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, {
+	&test_2_3_1_top, &test_2_3_1_bot, NULL}, 0, 0}, {
+		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, {
+	&test_2_3_2_top, &test_2_3_2_bot, NULL}, 0, 0}, {
+		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, {
+	&test_2_3_3_top, &test_2_3_3_bot, NULL}, 0, 0}, {
+		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, {
+	&test_2_3_4_top, &test_2_3_4_bot, NULL}, 0, 0}, {
+		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, {
+	&test_2_3_5_top, &test_2_3_5_bot, NULL}, 0, 0}, {
+		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, {
+	&test_2_3_6_top, &test_2_3_6_bot, NULL}, 0, 0}, {
+		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, {
+	&test_2_3_7_top, &test_2_3_7_bot, NULL}, 0, 0}, {
+		numb_case_2_3_8, tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, {
+	&test_2_3_8_top, &test_2_3_8_bot, NULL}, 0, 0}, {
+		numb_case_2_3_9, tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, {
+	&test_2_3_9_top, &test_2_3_9_bot, NULL}, 0, 0}, {
+		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, {
+	&test_2_4_1_top, &test_2_4_1_bot, NULL}, 0, 0}, {
+		numb_case_2_5_1, tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, {
+	&test_2_5_1_top, &test_2_5_1_bot, NULL}, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, {
+	&test_3_1_1_top, &test_3_1_1_bot, NULL}, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, {
+	&test_3_2_1_top, &test_3_2_1_bot, NULL}, 0, 0}, {
+		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, {
+	&test_3_3_1_top, &test_3_3_1_bot, NULL}, 0, 0}, {
+		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, {
+	&test_3_4_1_top, &test_3_4_1_bot, NULL}, 0, 0}, {
+		numb_case_3_4_2, tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, {
+	&test_3_4_2_top, &test_3_4_2_bot, NULL}, 0, 0}, {
+		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, {
+	&test_3_5_1_top, &test_3_5_1_bot, NULL}, 0, 0}, {
+		numb_case_3_5_2, tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, {
+	&test_3_5_2_top, &test_3_5_2_bot, NULL}, 0, 0}, {
+		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, {
+	&test_3_6_1_top, &test_3_6_1_bot, NULL}, 0, 0}, {
+		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, {
+	&test_3_7_1_top, &test_3_7_1_bot, NULL}, 0, 0}, {
+		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, {
+	&test_4_1_1_top, &test_4_1_1_bot, NULL}, 0, 0}, {
+		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, {
+	&test_4_1_2_top, &test_4_1_2_bot, NULL}, 0, 0}, {
+		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, {
+	&test_4_2_1_top, &test_4_2_1_bot, NULL}, 0, 0}, {
+		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, {
+	&test_4_2_2_top, &test_4_2_2_bot, NULL}, 0, 0}, {
+		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, {
+	&test_4_3_1_top, &test_4_3_1_bot, NULL}, 0, 0}, {
+		numb_case_4_4_1, tgrp_case_4_4_1, name_case_4_4_1, desc_case_4_4_1, {
+	&test_4_4_1_top, &test_4_4_1_bot, NULL}, 0, 0}, {
+		numb_case_4_4_2, tgrp_case_4_4_2, name_case_4_4_2, desc_case_4_4_2, {
+	&test_4_4_2_top, &test_4_4_2_bot, NULL}, 0, 0}, {
+		numb_case_4_4_3, tgrp_case_4_4_3, name_case_4_4_3, desc_case_4_4_3, {
+	&test_4_4_3_top, &test_4_4_3_bot, NULL}, 0, 0}, {
+		numb_case_4_4_4, tgrp_case_4_4_4, name_case_4_4_4, desc_case_4_4_4, {
+	&test_4_4_4_top, &test_4_4_4_bot, NULL}, 0, 0}, {
+		numb_case_4_4_5, tgrp_case_4_4_5, name_case_4_4_5, desc_case_4_4_5, {
+	&test_4_4_5_top, &test_4_4_5_bot, NULL}, 0, 0}, {
+		numb_case_4_4_6, tgrp_case_4_4_6, name_case_4_4_6, desc_case_4_4_6, {
+	&test_4_4_6_top, &test_4_4_6_bot, NULL}, 0, 0}, {
+		numb_case_4_4_7, tgrp_case_4_4_7, name_case_4_4_7, desc_case_4_4_7, {
+	&test_4_4_7_top, &test_4_4_7_bot, NULL}, 0, 0}, {
+		numb_case_4_4_8, tgrp_case_4_4_8, name_case_4_4_8, desc_case_4_4_8, {
+	&test_4_4_8_top, &test_4_4_8_bot, NULL}, 0, 0}, {
+		numb_case_4_5_1, tgrp_case_4_5_1, name_case_4_5_1, desc_case_4_5_1, {
+	&test_4_5_1_top, &test_4_5_1_bot, NULL}, 0, 0}, {
+		numb_case_4_6_1, tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, {
+	&test_4_6_1_top, &test_4_6_1_bot, NULL}, 0, 0}, {
+		numb_case_4_6_2, tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, {
+	&test_4_6_2_top, &test_4_6_2_bot, NULL}, 0, 0}, {
+		numb_case_4_6_3, tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, {
+	&test_4_6_3_top, &test_4_6_3_bot, NULL}, 0, 0}, {
+		numb_case_4_6_4, tgrp_case_4_6_4, name_case_4_6_4, desc_case_4_6_4, {
+	&test_4_6_4_top, &test_4_6_4_bot, NULL}, 0, 0}, {
+		numb_case_4_7_1, tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, {
+	&test_4_7_1_top, &test_4_7_1_bot, NULL}, 0, 0}, {
+		numb_case_4_7_2, tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, {
+	&test_4_7_2_top, &test_4_7_2_bot, NULL}, 0, 0}, {
+		numb_case_4_7_3, tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, {
+	&test_4_7_3_top, &test_4_7_3_bot, NULL}, 0, 0}, {
+		numb_case_4_7_4, tgrp_case_4_7_4, name_case_4_7_4, desc_case_4_7_4, {
+	&test_4_7_4_top, &test_4_7_4_bot, NULL}, 0, 0}, {
+		numb_case_4_8_1, tgrp_case_4_8_1, name_case_4_8_1, desc_case_4_8_1, {
+	&test_4_8_1_top, &test_4_8_1_bot, NULL}, 0, 0}, {
+		numb_case_4_8_2, tgrp_case_4_8_2, name_case_4_8_2, desc_case_4_8_2, {
+	&test_4_8_2_top, &test_4_8_2_bot, NULL}, 0, 0}, {
+		numb_case_4_8_3, tgrp_case_4_8_3, name_case_4_8_3, desc_case_4_8_3, {
+	&test_4_8_3_top, &test_4_8_3_bot, NULL}, 0, 0}, {
+		numb_case_4_9_1, tgrp_case_4_9_1, name_case_4_9_1, desc_case_4_9_1, {
+	&test_4_9_1_top, &test_4_9_1_bot, NULL}, 0, 0}, {
+		numb_case_5_1_1, tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, {
+	&test_5_1_1_top, &test_5_1_1_bot, NULL}, 0, 0}, {
+		numb_case_5_1_2, tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, {
+	&test_5_1_2_top, &test_5_1_2_bot, NULL}, 0, 0}, {
+		numb_case_5_1_3, tgrp_case_5_1_3, name_case_5_1_3, desc_case_5_1_3, {
+	&test_5_1_3_top, &test_5_1_3_bot, NULL}, 0, 0}, {
+		numb_case_5_1_4, tgrp_case_5_1_4, name_case_5_1_4, desc_case_5_1_4, {
+	&test_5_1_4_top, &test_5_1_4_bot, NULL}, 0, 0}, {
+		numb_case_5_1_5, tgrp_case_5_1_5, name_case_5_1_5, desc_case_5_1_5, {
+	&test_5_1_5_top, &test_5_1_5_bot, NULL}, 0, 0}, {
+		numb_case_5_1_6, tgrp_case_5_1_6, name_case_5_1_6, desc_case_5_1_6, {
+	&test_5_1_6_top, &test_5_1_6_bot, NULL}, 0, 0}, {
+		numb_case_5_1_7, tgrp_case_5_1_7, name_case_5_1_7, desc_case_5_1_7, {
+	&test_5_1_7_top, &test_5_1_7_bot, NULL}, 0, 0}, {
+		numb_case_5_1_8, tgrp_case_5_1_8, name_case_5_1_8, desc_case_5_1_8, {
+	&test_5_1_8_top, &test_5_1_8_bot, NULL}, 0, 0}, {
+		numb_case_5_1_9, tgrp_case_5_1_9, name_case_5_1_9, desc_case_5_1_9, {
+	&test_5_1_9_top, &test_5_1_9_bot, NULL}, 0, 0}, {
+		numb_case_5_1_10, tgrp_case_5_1_10, name_case_5_1_10, desc_case_5_1_10, {
+	&test_5_1_10_top, &test_5_1_10_bot, NULL}, 0, 0}, {
+		numb_case_5_1_11, tgrp_case_5_1_11, name_case_5_1_11, desc_case_5_1_11, {
+	&test_5_1_11_top, &test_5_1_11_bot, NULL}, 0, 0}, {
+		numb_case_5_1_12, tgrp_case_5_1_12, name_case_5_1_12, desc_case_5_1_12, {
+	&test_5_1_12_top, &test_5_1_12_bot, NULL}, 0, 0}, {
+		numb_case_5_1_13, tgrp_case_5_1_13, name_case_5_1_13, desc_case_5_1_13, {
+	&test_5_1_13_top, &test_5_1_13_bot, NULL}, 0, 0}, {
+		numb_case_5_1_14, tgrp_case_5_1_14, name_case_5_1_14, desc_case_5_1_14, {
+	&test_5_1_14_top, &test_5_1_14_bot, NULL}, 0, 0}, {
+		numb_case_5_1_15, tgrp_case_5_1_15, name_case_5_1_15, desc_case_5_1_15, {
+	&test_5_1_15_top, &test_5_1_15_bot, NULL}, 0, 0}, {
+		numb_case_5_1_16, tgrp_case_5_1_16, name_case_5_1_16, desc_case_5_1_16, {
+	&test_5_1_16_top, &test_5_1_16_bot, NULL}, 0, 0}, {
+		numb_case_5_1_17, tgrp_case_5_1_17, name_case_5_1_17, desc_case_5_1_17, {
+	&test_5_1_17_top, &test_5_1_17_bot, NULL}, 0, 0}, {
+		numb_case_5_1_18, tgrp_case_5_1_18, name_case_5_1_18, desc_case_5_1_18, {
+	&test_5_1_18_top, &test_5_1_18_bot, NULL}, 0, 0}, {
+		numb_case_5_1_19, tgrp_case_5_1_19, name_case_5_1_19, desc_case_5_1_19, {
+	&test_5_1_19_top, &test_5_1_19_bot, NULL}, 0, 0}, {
+		numb_case_5_1_20, tgrp_case_5_1_20, name_case_5_1_20, desc_case_5_1_20, {
+	&test_5_1_20_top, &test_5_1_20_bot, NULL}, 0, 0}, {
+		numb_case_5_1_21, tgrp_case_5_1_21, name_case_5_1_21, desc_case_5_1_21, {
+	&test_5_1_21_top, &test_5_1_21_bot, NULL}, 0, 0}, {
+		numb_case_5_1_22, tgrp_case_5_1_22, name_case_5_1_22, desc_case_5_1_22, {
+	&test_5_1_22_top, &test_5_1_22_bot, NULL}, 0, 0}, {
+		numb_case_5_1_23, tgrp_case_5_1_23, name_case_5_1_23, desc_case_5_1_23, {
+	&test_5_1_23_top, &test_5_1_23_bot, NULL}, 0, 0}, {
+		numb_case_5_1_24, tgrp_case_5_1_24, name_case_5_1_24, desc_case_5_1_24, {
+	&test_5_1_24_top, &test_5_1_24_bot, NULL}, 0, 0}, {
+		numb_case_5_1_25, tgrp_case_5_1_25, name_case_5_1_25, desc_case_5_1_25, {
+	&test_5_1_25_top, &test_5_1_25_bot, NULL}, 0, 0}, {
+		numb_case_5_1_26, tgrp_case_5_1_26, name_case_5_1_26, desc_case_5_1_26, {
+	&test_5_1_26_top, &test_5_1_26_bot, NULL}, 0, 0}, {
+		numb_case_5_1_27, tgrp_case_5_1_27, name_case_5_1_27, desc_case_5_1_27, {
+	&test_5_1_27_top, &test_5_1_27_bot, NULL}, 0, 0}, {
+		numb_case_5_1_28, tgrp_case_5_1_28, name_case_5_1_28, desc_case_5_1_28, {
+	&test_5_1_28_top, &test_5_1_28_bot, NULL}, 0, 0}, {
+		numb_case_5_2_1, tgrp_case_5_2_1, name_case_5_2_1, desc_case_5_2_1, {
+	&test_5_2_1_top, &test_5_2_1_bot, NULL}, 0, 0}, {
+		numb_case_5_2_2, tgrp_case_5_2_2, name_case_5_2_2, desc_case_5_2_2, {
+	&test_5_2_2_top, &test_5_2_2_bot, NULL}, 0, 0}, {
+		numb_case_5_2_3, tgrp_case_5_2_3, name_case_5_2_3, desc_case_5_2_3, {
+	&test_5_2_3_top, &test_5_2_3_bot, NULL}, 0, 0}, {
+		numb_case_5_2_4, tgrp_case_5_2_4, name_case_5_2_4, desc_case_5_2_4, {
+	&test_5_2_4_top, &test_5_2_4_bot, NULL}, 0, 0}, {
+		numb_case_5_2_5, tgrp_case_5_2_5, name_case_5_2_5, desc_case_5_2_5, {
+	&test_5_2_5_top, &test_5_2_5_bot, NULL}, 0, 0}, {
+		numb_case_5_2_6, tgrp_case_5_2_6, name_case_5_2_6, desc_case_5_2_6, {
+	&test_5_2_6_top, &test_5_2_6_bot, NULL}, 0, 0}, {
+		numb_case_5_2_7, tgrp_case_5_2_7, name_case_5_2_7, desc_case_5_2_7, {
+	&test_5_2_7_top, &test_5_2_7_bot, NULL}, 0, 0}, {
+		numb_case_5_2_8, tgrp_case_5_2_8, name_case_5_2_8, desc_case_5_2_8, {
+	&test_5_2_8_top, &test_5_2_8_bot, NULL}, 0, 0}, {
+		numb_case_5_2_9, tgrp_case_5_2_9, name_case_5_2_9, desc_case_5_2_9, {
+	&test_5_2_9_top, &test_5_2_9_bot, NULL}, 0, 0}, {
+		numb_case_5_2_10, tgrp_case_5_2_10, name_case_5_2_10, desc_case_5_2_10, {
+	&test_5_2_10_top, &test_5_2_10_bot, NULL}, 0, 0}, {
+		numb_case_5_2_11, tgrp_case_5_2_11, name_case_5_2_11, desc_case_5_2_11, {
+	&test_5_2_11_top, &test_5_2_11_bot, NULL}, 0, 0}, {
+		numb_case_5_2_12, tgrp_case_5_2_12, name_case_5_2_12, desc_case_5_2_12, {
+	&test_5_2_12_top, &test_5_2_12_bot, NULL}, 0, 0}, {
+		numb_case_5_2_13, tgrp_case_5_2_13, name_case_5_2_13, desc_case_5_2_13, {
+	&test_5_2_13_top, &test_5_2_13_bot, NULL}, 0, 0}, {
+		numb_case_5_2_14, tgrp_case_5_2_14, name_case_5_2_14, desc_case_5_2_14, {
+	&test_5_2_14_top, &test_5_2_14_bot, NULL}, 0, 0}, {
+		numb_case_5_2_15, tgrp_case_5_2_15, name_case_5_2_15, desc_case_5_2_15, {
+	&test_5_2_15_top, &test_5_2_15_bot, NULL}, 0, 0}, {
+		numb_case_5_2_16, tgrp_case_5_2_16, name_case_5_2_16, desc_case_5_2_16, {
+	&test_5_2_16_top, &test_5_2_16_bot, NULL}, 0, 0}, {
+		numb_case_5_2_17, tgrp_case_5_2_17, name_case_5_2_17, desc_case_5_2_17, {
+	&test_5_2_17_top, &test_5_2_17_bot, NULL}, 0, 0}, {
+		numb_case_5_2_18, tgrp_case_5_2_18, name_case_5_2_18, desc_case_5_2_18, {
+	&test_5_2_18_top, &test_5_2_18_bot, NULL}, 0, 0}, {
+		numb_case_5_2_19, tgrp_case_5_2_19, name_case_5_2_19, desc_case_5_2_19, {
+	&test_5_2_19_top, &test_5_2_19_bot, NULL}, 0, 0}, {
+		numb_case_5_2_20, tgrp_case_5_2_20, name_case_5_2_20, desc_case_5_2_20, {
+	&test_5_2_20_top, &test_5_2_20_bot, NULL}, 0, 0}, {
+		numb_case_5_2_21, tgrp_case_5_2_21, name_case_5_2_21, desc_case_5_2_21, {
+	&test_5_2_21_top, &test_5_2_21_bot, NULL}, 0, 0}, {
+		numb_case_5_2_22, tgrp_case_5_2_22, name_case_5_2_22, desc_case_5_2_22, {
+	&test_5_2_22_top, &test_5_2_22_bot, NULL}, 0, 0}, {
+		numb_case_5_2_23, tgrp_case_5_2_23, name_case_5_2_23, desc_case_5_2_23, {
+	&test_5_2_23_top, &test_5_2_23_bot, NULL}, 0, 0}, {
+		numb_case_5_2_24, tgrp_case_5_2_24, name_case_5_2_24, desc_case_5_2_24, {
+	&test_5_2_24_top, &test_5_2_24_bot, NULL}, 0, 0}, {
+		numb_case_5_2_25, tgrp_case_5_2_25, name_case_5_2_25, desc_case_5_2_25, {
+	&test_5_2_25_top, &test_5_2_25_bot, NULL}, 0, 0}, {
+		numb_case_5_2_26, tgrp_case_5_2_26, name_case_5_2_26, desc_case_5_2_26, {
+	&test_5_2_26_top, &test_5_2_26_bot, NULL}, 0, 0}, {
+		numb_case_5_2_27, tgrp_case_5_2_27, name_case_5_2_27, desc_case_5_2_27, {
+	&test_5_2_27_top, &test_5_2_27_bot, NULL}, 0, 0}, {
+		numb_case_5_2_28, tgrp_case_5_2_28, name_case_5_2_28, desc_case_5_2_28, {
+	&test_5_2_28_top, &test_5_2_28_bot, NULL}, 0, 0}, {
+		numb_case_5_3_1, tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, {
+	&test_5_3_1_top, &test_5_3_1_bot, NULL}, 0, 0}, {
+		numb_case_5_3_2, tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, {
+	&test_5_3_2_top, &test_5_3_2_bot, NULL}, 0, 0}, {
+		numb_case_5_3_3, tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, {
+	&test_5_3_3_top, &test_5_3_3_bot, NULL}, 0, 0}, {
+		numb_case_5_3_4, tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, {
+	&test_5_3_4_top, &test_5_3_4_bot, NULL}, 0, 0}, {
+		numb_case_5_3_5, tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, {
+	&test_5_3_5_top, &test_5_3_5_bot, NULL}, 0, 0}, {
+		numb_case_5_3_6, tgrp_case_5_3_6, name_case_5_3_6, desc_case_5_3_6, {
+	&test_5_3_6_top, &test_5_3_6_bot, NULL}, 0, 0}, {
+		numb_case_5_3_7, tgrp_case_5_3_7, name_case_5_3_7, desc_case_5_3_7, {
+	&test_5_3_7_top, &test_5_3_7_bot, NULL}, 0, 0}, {
+		numb_case_5_3_8, tgrp_case_5_3_8, name_case_5_3_8, desc_case_5_3_8, {
+	&test_5_3_8_top, &test_5_3_8_bot, NULL}, 0, 0}, {
+		numb_case_5_3_9, tgrp_case_5_3_9, name_case_5_3_9, desc_case_5_3_9, {
+	&test_5_3_9_top, &test_5_3_9_bot, NULL}, 0, 0}, {
+		numb_case_5_3_10, tgrp_case_5_3_10, name_case_5_3_10, desc_case_5_3_10, {
+	&test_5_3_10_top, &test_5_3_10_bot, NULL}, 0, 0}, {
+		numb_case_5_3_11, tgrp_case_5_3_11, name_case_5_3_11, desc_case_5_3_11, {
+	&test_5_3_11_top, &test_5_3_11_bot, NULL}, 0, 0}, {
+		numb_case_5_3_12, tgrp_case_5_3_12, name_case_5_3_12, desc_case_5_3_12, {
+	&test_5_3_12_top, &test_5_3_12_bot, NULL}, 0, 0}, {
+		numb_case_5_3_13, tgrp_case_5_3_13, name_case_5_3_13, desc_case_5_3_13, {
+	&test_5_3_13_top, &test_5_3_13_bot, NULL}, 0, 0}, {
+		numb_case_5_3_14, tgrp_case_5_3_14, name_case_5_3_14, desc_case_5_3_14, {
+	&test_5_3_14_top, &test_5_3_14_bot, NULL}, 0, 0}, {
+		numb_case_5_3_15, tgrp_case_5_3_15, name_case_5_3_15, desc_case_5_3_15, {
+	&test_5_3_15_top, &test_5_3_15_bot, NULL}, 0, 0}, {
+		numb_case_5_3_16, tgrp_case_5_3_16, name_case_5_3_16, desc_case_5_3_16, {
+	&test_5_3_16_top, &test_5_3_16_bot, NULL}, 0, 0}, {
+		numb_case_5_3_17, tgrp_case_5_3_17, name_case_5_3_17, desc_case_5_3_17, {
+	&test_5_3_17_top, &test_5_3_17_bot, NULL}, 0, 0}, {
+		numb_case_5_3_18, tgrp_case_5_3_18, name_case_5_3_18, desc_case_5_3_18, {
+	&test_5_3_18_top, &test_5_3_18_bot, NULL}, 0, 0}, {
+		numb_case_5_3_19, tgrp_case_5_3_19, name_case_5_3_19, desc_case_5_3_19, {
+	&test_5_3_19_top, &test_5_3_19_bot, NULL}, 0, 0}, {
+		numb_case_5_3_20, tgrp_case_5_3_20, name_case_5_3_20, desc_case_5_3_20, {
+	&test_5_3_20_top, &test_5_3_20_bot, NULL}, 0, 0}, {
+		numb_case_5_3_21, tgrp_case_5_3_21, name_case_5_3_21, desc_case_5_3_21, {
+	&test_5_3_21_top, &test_5_3_21_bot, NULL}, 0, 0}, {
+		numb_case_5_3_22, tgrp_case_5_3_22, name_case_5_3_22, desc_case_5_3_22, {
+	&test_5_3_22_top, &test_5_3_22_bot, NULL}, 0, 0}, {
+		numb_case_5_3_23, tgrp_case_5_3_23, name_case_5_3_23, desc_case_5_3_23, {
+	&test_5_3_23_top, &test_5_3_23_bot, NULL}, 0, 0}, {
+		numb_case_5_3_24, tgrp_case_5_3_24, name_case_5_3_24, desc_case_5_3_24, {
+	&test_5_3_24_top, &test_5_3_24_bot, NULL}, 0, 0}, {
+		numb_case_5_3_25, tgrp_case_5_3_25, name_case_5_3_25, desc_case_5_3_25, {
+	&test_5_3_25_top, &test_5_3_25_bot, NULL}, 0, 0}, {
+		numb_case_5_3_26, tgrp_case_5_3_26, name_case_5_3_26, desc_case_5_3_26, {
+	&test_5_3_26_top, &test_5_3_26_bot, NULL}, 0, 0}, {
+		numb_case_5_3_27, tgrp_case_5_3_27, name_case_5_3_27, desc_case_5_3_27, {
+	&test_5_3_27_top, &test_5_3_27_bot, NULL}, 0, 0}, {
+		numb_case_5_3_28, tgrp_case_5_3_28, name_case_5_3_28, desc_case_5_3_28, {
+	&test_5_3_28_top, &test_5_3_28_bot, NULL}, 0, 0}, {
+		numb_case_6_1_1, tgrp_case_6_1_1, name_case_6_1_1, desc_case_6_1_1, {
+	&test_6_1_1_top, &test_6_1_1_bot, NULL}, 0, 0}, {
+		numb_case_6_1_2, tgrp_case_6_1_2, name_case_6_1_2, desc_case_6_1_2, {
+	&test_6_1_2_top, &test_6_1_2_bot, NULL}, 0, 0}, {
+		numb_case_6_1_3, tgrp_case_6_1_3, name_case_6_1_3, desc_case_6_1_3, {
+	&test_6_1_3_top, &test_6_1_3_bot, NULL}, 0, 0}, {
+		numb_case_6_1_4, tgrp_case_6_1_4, name_case_6_1_4, desc_case_6_1_4, {
+	&test_6_1_4_top, &test_6_1_4_bot, NULL}, 0, 0}, {
+		numb_case_6_1_5, tgrp_case_6_1_5, name_case_6_1_5, desc_case_6_1_5, {
+	&test_6_1_5_top, &test_6_1_5_bot, NULL}, 0, 0}, {
+		numb_case_6_1_6, tgrp_case_6_1_6, name_case_6_1_6, desc_case_6_1_6, {
+	&test_6_1_6_top, &test_6_1_6_bot, NULL}, 0, 0}, {
+		numb_case_6_1_7, tgrp_case_6_1_7, name_case_6_1_7, desc_case_6_1_7, {
+	&test_6_1_7_top, &test_6_1_7_bot, NULL}, 0, 0}, {
+		numb_case_6_1_8, tgrp_case_6_1_8, name_case_6_1_8, desc_case_6_1_8, {
+	&test_6_1_8_top, &test_6_1_8_bot, NULL}, 0, 0}, {
+		numb_case_6_1_9, tgrp_case_6_1_9, name_case_6_1_9, desc_case_6_1_9, {
+	&test_6_1_9_top, &test_6_1_9_bot, NULL}, 0, 0}, {
+		numb_case_6_1_10, tgrp_case_6_1_10, name_case_6_1_10, desc_case_6_1_10, {
+	&test_6_1_10_top, &test_6_1_10_bot, NULL}, 0, 0}, {
+		numb_case_6_1_11, tgrp_case_6_1_11, name_case_6_1_11, desc_case_6_1_11, {
+	&test_6_1_11_top, &test_6_1_11_bot, NULL}, 0, 0}, {
+		numb_case_6_1_12, tgrp_case_6_1_12, name_case_6_1_12, desc_case_6_1_12, {
+	&test_6_1_12_top, &test_6_1_12_bot, NULL}, 0, 0}, {
+		numb_case_6_2_1, tgrp_case_6_2_1, name_case_6_2_1, desc_case_6_2_1, {
+	&test_6_2_1_top, &test_6_2_1_bot, NULL}, 0, 0}, {
+		numb_case_6_2_2, tgrp_case_6_2_2, name_case_6_2_2, desc_case_6_2_2, {
+	&test_6_2_2_top, &test_6_2_2_bot, NULL}, 0, 0}, {
+		numb_case_6_2_3, tgrp_case_6_2_3, name_case_6_2_3, desc_case_6_2_3, {
+	&test_6_2_3_top, &test_6_2_3_bot, NULL}, 0, 0}, {
+		numb_case_6_2_4, tgrp_case_6_2_4, name_case_6_2_4, desc_case_6_2_4, {
+	&test_6_2_4_top, &test_6_2_4_bot, NULL}, 0, 0}, {
+		numb_case_6_2_5, tgrp_case_6_2_5, name_case_6_2_5, desc_case_6_2_5, {
+	&test_6_2_5_top, &test_6_2_5_bot, NULL}, 0, 0}, {
+		numb_case_6_2_6, tgrp_case_6_2_6, name_case_6_2_6, desc_case_6_2_6, {
+	&test_6_2_6_top, &test_6_2_6_bot, NULL}, 0, 0}, {
+		numb_case_6_3_1, tgrp_case_6_3_1, name_case_6_3_1, desc_case_6_3_1, {
+	&test_6_3_1_top, &test_6_3_1_bot, NULL}, 0, 0}, {
+		numb_case_6_3_2, tgrp_case_6_3_2, name_case_6_3_2, desc_case_6_3_2, {
+	&test_6_3_2_top, &test_6_3_2_bot, NULL}, 0, 0}, {
+		numb_case_6_3_3, tgrp_case_6_3_3, name_case_6_3_3, desc_case_6_3_3, {
+	&test_6_3_3_top, &test_6_3_3_bot, NULL}, 0, 0}, {
+		numb_case_6_3_4, tgrp_case_6_3_4, name_case_6_3_4, desc_case_6_3_4, {
+	&test_6_3_4_top, &test_6_3_4_bot, NULL}, 0, 0}, {
+		numb_case_6_3_5, tgrp_case_6_3_5, name_case_6_3_5, desc_case_6_3_5, {
+	&test_6_3_5_top, &test_6_3_5_bot, NULL}, 0, 0}, {
+		numb_case_6_3_6, tgrp_case_6_3_6, name_case_6_3_6, desc_case_6_3_6, {
+	&test_6_3_6_top, &test_6_3_6_bot, NULL}, 0, 0}, {
+		numb_case_6_3_7, tgrp_case_6_3_7, name_case_6_3_7, desc_case_6_3_7, {
+	&test_6_3_7_top, &test_6_3_7_bot, NULL}, 0, 0}, {
+		numb_case_6_3_8, tgrp_case_6_3_8, name_case_6_3_8, desc_case_6_3_8, {
+	&test_6_3_8_top, &test_6_3_8_bot, NULL}, 0, 0}, {
+		numb_case_6_4_1, tgrp_case_6_4_1, name_case_6_4_1, desc_case_6_4_1, {
+	&test_6_4_1_top, &test_6_4_1_bot, NULL}, 0, 0}, {
+		numb_case_6_4_2, tgrp_case_6_4_2, name_case_6_4_2, desc_case_6_4_2, {
+	&test_6_4_2_top, &test_6_4_2_bot, NULL}, 0, 0}, {
+		numb_case_6_4_3, tgrp_case_6_4_3, name_case_6_4_3, desc_case_6_4_3, {
+	&test_6_4_3_top, &test_6_4_3_bot, NULL}, 0, 0}, {
+		numb_case_6_4_4, tgrp_case_6_4_4, name_case_6_4_4, desc_case_6_4_4, {
+	&test_6_4_4_top, &test_6_4_4_bot, NULL}, 0, 0}, {
+		numb_case_6_4_5, tgrp_case_6_4_5, name_case_6_4_5, desc_case_6_4_5, {
+	&test_6_4_5_top, &test_6_4_5_bot, NULL}, 0, 0}, {
+		numb_case_6_4_6, tgrp_case_6_4_6, name_case_6_4_6, desc_case_6_4_6, {
+	&test_6_4_6_top, &test_6_4_6_bot, NULL}, 0, 0}, {
+		numb_case_6_5_1, tgrp_case_6_5_1, name_case_6_5_1, desc_case_6_5_1, {
+	&test_6_5_1_top, &test_6_5_1_bot, NULL}, 0, 0}, {
+		numb_case_6_5_2, tgrp_case_6_5_2, name_case_6_5_2, desc_case_6_5_2, {
+	&test_6_5_2_top, &test_6_5_2_bot, NULL}, 0, 0}, {
+		numb_case_6_5_3, tgrp_case_6_5_3, name_case_6_5_3, desc_case_6_5_3, {
+	&test_6_5_3_top, &test_6_5_3_bot, NULL}, 0, 0}, {
+		numb_case_6_5_4, tgrp_case_6_5_4, name_case_6_5_4, desc_case_6_5_4, {
+	&test_6_5_4_top, &test_6_5_4_bot, NULL}, 0, 0}, {
+		numb_case_6_5_5, tgrp_case_6_5_5, name_case_6_5_5, desc_case_6_5_5, {
+	&test_6_5_5_top, &test_6_5_5_bot, NULL}, 0, 0}, {
+		numb_case_6_6_1, tgrp_case_6_6_1, name_case_6_6_1, desc_case_6_6_1, {
+	&test_6_6_1_top, &test_6_6_1_bot, NULL}, 0, 0}, {
+		numb_case_6_6_2, tgrp_case_6_6_2, name_case_6_6_2, desc_case_6_6_2, {
+	&test_6_6_2_top, &test_6_6_2_bot, NULL}, 0, 0}, {
+		numb_case_7_1_1, tgrp_case_7_1_1, name_case_7_1_1, desc_case_7_1_1, {
+	&test_7_1_1_top, &test_7_1_1_bot, NULL}, 0, 0}, {
+		numb_case_7_1_2, tgrp_case_7_1_2, name_case_7_1_2, desc_case_7_1_2, {
+	&test_7_1_2_top, &test_7_1_2_bot, NULL}, 0, 0}, {
+		numb_case_7_1_3, tgrp_case_7_1_3, name_case_7_1_3, desc_case_7_1_3, {
+	&test_7_1_3_top, &test_7_1_3_bot, NULL}, 0, 0}, {
+		numb_case_7_2_1, tgrp_case_7_2_1, name_case_7_2_1, desc_case_7_2_1, {
+	&test_7_2_1_top, &test_7_2_1_bot, NULL}, 0, 0}, {
+		numb_case_7_3_1, tgrp_case_7_3_1, name_case_7_3_1, desc_case_7_3_1, {
+	&test_7_3_1_top, &test_7_3_1_bot, NULL}, 0, 0}, {
+		numb_case_7_3_2, tgrp_case_7_3_2, name_case_7_3_2, desc_case_7_3_2, {
+	&test_7_3_2_top, &test_7_3_2_bot, NULL}, 0, 0}, {
+		numb_case_7_3_3, tgrp_case_7_3_3, name_case_7_3_3, desc_case_7_3_3, {
+	&test_7_3_3_top, &test_7_3_3_bot, NULL}, 0, 0}, {
+		numb_case_7_3_4, tgrp_case_7_3_4, name_case_7_3_4, desc_case_7_3_4, {
+	&test_7_3_4_top, &test_7_3_4_bot, NULL}, 0, 0}, {
+		numb_case_7_3_5, tgrp_case_7_3_5, name_case_7_3_5, desc_case_7_3_5, {
+	&test_7_3_5_top, &test_7_3_5_bot, NULL}, 0, 0}, {
+		numb_case_7_4_1, tgrp_case_7_4_1, name_case_7_4_1, desc_case_7_4_1, {
+	&test_7_4_1_top, &test_7_4_1_bot, NULL}, 0, 0}, {
+		numb_case_7_4_2, tgrp_case_7_4_2, name_case_7_4_2, desc_case_7_4_2, {
+	&test_7_4_2_top, &test_7_4_2_bot, NULL}, 0, 0}, {
+		numb_case_7_4_3, tgrp_case_7_4_3, name_case_7_4_3, desc_case_7_4_3, {
+	&test_7_4_3_top, &test_7_4_3_bot, NULL}, 0, 0}, {
+		numb_case_7_5_1, tgrp_case_7_5_1, name_case_7_5_1, desc_case_7_5_1, {
+	&test_7_5_1_top, &test_7_5_1_bot, NULL}, 0, 0}, {
+		numb_case_7_5_2, tgrp_case_7_5_2, name_case_7_5_2, desc_case_7_5_2, {
+	&test_7_5_2_top, &test_7_5_2_bot, NULL}, 0, 0}, {
+		numb_case_7_5_3, tgrp_case_7_5_3, name_case_7_5_3, desc_case_7_5_3, {
+	&test_7_5_3_top, &test_7_5_3_bot, NULL}, 0, 0}, {
+		numb_case_7_6_1, tgrp_case_7_6_1, name_case_7_6_1, desc_case_7_6_1, {
+	&test_7_6_1_top, &test_7_6_1_bot, NULL}, 0, 0}, {
+		numb_case_7_6_2, tgrp_case_7_6_2, name_case_7_6_2, desc_case_7_6_2, {
+	&test_7_6_2_top, &test_7_6_2_bot, NULL}, 0, 0}, {
+		numb_case_7_6_3, tgrp_case_7_6_3, name_case_7_6_3, desc_case_7_6_3, {
+	&test_7_6_3_top, &test_7_6_3_bot, NULL}, 0, 0}, {
+		numb_case_7_7_1, tgrp_case_7_7_1, name_case_7_7_1, desc_case_7_7_1, {
+	&test_7_7_1_top, &test_7_7_1_bot, NULL}, 0, 0}, {
+		numb_case_7_7_2, tgrp_case_7_7_2, name_case_7_7_2, desc_case_7_7_2, {
+	&test_7_7_2_top, &test_7_7_2_bot, NULL}, 0, 0}, {
+		numb_case_7_7_3, tgrp_case_7_7_3, name_case_7_7_3, desc_case_7_7_3, {
+	&test_7_7_3_top, &test_7_7_3_bot, NULL}, 0, 0}, {
+		numb_case_7_8_1, tgrp_case_7_8_1, name_case_7_8_1, desc_case_7_8_1, {
+	&test_7_8_1_top, &test_7_8_1_bot, NULL}, 0, 0}, {
+		numb_case_7_8_2, tgrp_case_7_8_2, name_case_7_8_2, desc_case_7_8_2, {
+	&test_7_8_2_top, &test_7_8_2_bot, NULL}, 0, 0}, {
+		numb_case_7_8_3, tgrp_case_7_8_3, name_case_7_8_3, desc_case_7_8_3, {
+	&test_7_8_3_top, &test_7_8_3_bot, NULL}, 0, 0}, {
+		numb_case_7_9_1, tgrp_case_7_9_1, name_case_7_9_1, desc_case_7_9_1, {
+	&test_7_9_1_top, &test_7_9_1_bot, NULL}, 0, 0}, {
+		numb_case_7_9_2, tgrp_case_7_9_2, name_case_7_9_2, desc_case_7_9_2, {
+	&test_7_9_2_top, &test_7_9_2_bot, NULL}, 0, 0}, {
+		numb_case_7_9_3, tgrp_case_7_9_3, name_case_7_9_3, desc_case_7_9_3, {
+	&test_7_9_3_top, &test_7_9_3_bot, NULL}, 0, 0}, {
+		numb_case_7_10_1, tgrp_case_7_10_1, name_case_7_10_1, desc_case_7_10_1, {
+	&test_7_10_1_top, &test_7_10_1_bot, NULL}, 0, 0}, {
+		numb_case_7_10_2, tgrp_case_7_10_2, name_case_7_10_2, desc_case_7_10_2, {
+	&test_7_10_2_top, &test_7_10_2_bot, NULL}, 0, 0}, {
+		numb_case_7_10_3, tgrp_case_7_10_3, name_case_7_10_3, desc_case_7_10_3, {
+	&test_7_10_3_top, &test_7_10_3_bot, NULL}, 0, 0}, {
+		numb_case_7_11_1, tgrp_case_7_11_1, name_case_7_11_1, desc_case_7_11_1, {
+	&test_7_11_1_top, &test_7_11_1_bot, NULL}, 0, 0}, {
+		numb_case_7_11_2, tgrp_case_7_11_2, name_case_7_11_2, desc_case_7_11_2, {
+	&test_7_11_2_top, &test_7_11_2_bot, NULL}, 0, 0}, {
+		numb_case_7_11_3, tgrp_case_7_11_3, name_case_7_11_3, desc_case_7_11_3, {
+	&test_7_11_3_top, &test_7_11_3_bot, NULL}, 0, 0}, {
+		numb_case_7_12_1, tgrp_case_7_12_1, name_case_7_12_1, desc_case_7_12_1, {
+	&test_7_12_1_top, &test_7_12_1_bot, NULL}, 0, 0}, {
+		numb_case_7_12_2, tgrp_case_7_12_2, name_case_7_12_2, desc_case_7_12_2, {
+	&test_7_12_2_top, &test_7_12_2_bot, NULL}, 0, 0}, {
+		numb_case_7_12_3, tgrp_case_7_12_3, name_case_7_12_3, desc_case_7_12_3, {
+	&test_7_12_3_top, &test_7_12_3_bot, NULL}, 0, 0}, {
+		numb_case_7_13_1, tgrp_case_7_13_1, name_case_7_13_1, desc_case_7_13_1, {
+	&test_7_13_1_top, &test_7_13_1_bot, NULL}, 0, 0}, {
+		numb_case_7_13_2, tgrp_case_7_13_2, name_case_7_13_2, desc_case_7_13_2, {
+	&test_7_13_2_top, &test_7_13_2_bot, NULL}, 0, 0}, {
+		numb_case_7_13_3, tgrp_case_7_13_3, name_case_7_13_3, desc_case_7_13_3, {
+	&test_7_13_3_top, &test_7_13_3_bot, NULL}, 0, 0}, {
+		numb_case_7_14_1, tgrp_case_7_14_1, name_case_7_14_1, desc_case_7_14_1, {
+	&test_7_14_1_top, &test_7_14_1_bot, NULL}, 0, 0}, {
+		numb_case_7_14_2, tgrp_case_7_14_2, name_case_7_14_2, desc_case_7_14_2, {
+	&test_7_14_2_top, &test_7_14_2_bot, NULL}, 0, 0}, {
+		numb_case_7_14_3, tgrp_case_7_14_3, name_case_7_14_3, desc_case_7_14_3, {
+	&test_7_14_3_top, &test_7_14_3_bot, NULL}, 0, 0}, {
+		numb_case_7_15_1, tgrp_case_7_15_1, name_case_7_15_1, desc_case_7_15_1, {
+	&test_7_15_1_top, &test_7_15_1_bot, NULL}, 0, 0}, {
+		numb_case_7_15_2, tgrp_case_7_15_2, name_case_7_15_2, desc_case_7_15_2, {
+	&test_7_15_2_top, &test_7_15_2_bot, NULL}, 0, 0}, {
+		numb_case_7_15_3, tgrp_case_7_15_3, name_case_7_15_3, desc_case_7_15_3, {
+	&test_7_15_3_top, &test_7_15_3_bot, NULL}, 0, 0}, {
+		numb_case_7_16_1, tgrp_case_7_16_1, name_case_7_16_1, desc_case_7_16_1, {
+	&test_7_16_1_top, &test_7_16_1_bot, NULL}, 0, 0}, {
+		numb_case_7_16_2, tgrp_case_7_16_2, name_case_7_16_2, desc_case_7_16_2, {
+	&test_7_16_2_top, &test_7_16_2_bot, NULL}, 0, 0}, {
+		numb_case_7_16_3, tgrp_case_7_16_3, name_case_7_16_3, desc_case_7_16_3, {
+	&test_7_16_3_top, &test_7_16_3_bot, NULL}, 0, 0}, {
+		numb_case_7_17_1, tgrp_case_7_17_1, name_case_7_17_1, desc_case_7_17_1, {
+	&test_7_17_1_top, &test_7_17_1_bot, NULL}, 0, 0}, {
+		numb_case_8_1_1, tgrp_case_8_1_1, name_case_8_1_1, desc_case_8_1_1, {
+	&test_8_1_1_top, &test_8_1_1_bot, NULL}, 0, 0}, {
+		numb_case_8_1_2, tgrp_case_8_1_2, name_case_8_1_2, desc_case_8_1_2, {
+	&test_8_1_2_top, &test_8_1_2_bot, NULL}, 0, 0}, {
+		numb_case_8_1_3, tgrp_case_8_1_3, name_case_8_1_3, desc_case_8_1_3, {
+	&test_8_1_3_top, &test_8_1_3_bot, NULL}, 0, 0}, {
+		numb_case_8_1_4, tgrp_case_8_1_4, name_case_8_1_4, desc_case_8_1_4, {
+	&test_8_1_4_top, &test_8_1_4_bot, NULL}, 0, 0}, {
+		numb_case_8_2_1, tgrp_case_8_2_1, name_case_8_2_1, desc_case_8_2_1, {
+	&test_8_2_1_top, &test_8_2_1_bot, NULL}, 0, 0}, {
+		numb_case_8_2_2, tgrp_case_8_2_2, name_case_8_2_2, desc_case_8_2_2, {
+	&test_8_2_2_top, &test_8_2_2_bot, NULL}, 0, 0}, {
+		numb_case_8_2_3, tgrp_case_8_2_3, name_case_8_2_3, desc_case_8_2_3, {
+	&test_8_2_3_top, &test_8_2_3_bot, NULL}, 0, 0}, {
+		numb_case_8_3_1, tgrp_case_8_3_1, name_case_8_3_1, desc_case_8_3_1, {
+	&test_8_3_1_top, &test_8_3_1_bot, NULL}, 0, 0}, {
+		numb_case_8_3_2, tgrp_case_8_3_2, name_case_8_3_2, desc_case_8_3_2, {
+	&test_8_3_2_top, &test_8_3_2_bot, NULL}, 0, 0}, {
+		numb_case_8_4_1, tgrp_case_8_4_1, name_case_8_4_1, desc_case_8_4_1, {
+	&test_8_4_1_top, &test_8_4_1_bot, NULL}, 0, 0}, {
+		numb_case_8_5_1, tgrp_case_8_5_1, name_case_8_5_1, desc_case_8_5_1, {
+	&test_8_5_1_top, &test_8_5_1_bot, NULL}, 0, 0}, {
+		numb_case_8_5_2, tgrp_case_8_5_2, name_case_8_5_2, desc_case_8_5_2, {
+	&test_8_5_2_top, &test_8_5_2_bot, NULL}, 0, 0}, {
+		numb_case_8_5_3, tgrp_case_8_5_3, name_case_8_5_3, desc_case_8_5_3, {
+	&test_8_5_3_top, &test_8_5_3_bot, NULL}, 0, 0}, {
+		numb_case_8_5_4, tgrp_case_8_5_4, name_case_8_5_4, desc_case_8_5_4, {
+	&test_8_5_4_top, &test_8_5_4_bot, NULL}, 0, 0}, {
+		numb_case_8_6_1, tgrp_case_8_6_1, name_case_8_6_1, desc_case_8_6_1, {
+	&test_8_6_1_top, &test_8_6_1_bot, NULL}, 0, 0}, {
+		numb_case_8_6_2, tgrp_case_8_6_2, name_case_8_6_2, desc_case_8_6_2, {
+	&test_8_6_2_top, &test_8_6_2_bot, NULL}, 0, 0}, {
+		numb_case_8_6_3, tgrp_case_8_6_3, name_case_8_6_3, desc_case_8_6_3, {
+	&test_8_6_3_top, &test_8_6_3_bot, NULL}, 0, 0}, {
+		numb_case_8_7_1, tgrp_case_8_7_1, name_case_8_7_1, desc_case_8_7_1, {
+	&test_8_7_1_top, &test_8_7_1_bot, NULL}, 0, 0}, {
+		numb_case_8_8_1, tgrp_case_8_8_1, name_case_8_8_1, desc_case_8_8_1, {
+	&test_8_8_1_top, &test_8_8_1_bot, NULL}, 0, 0}, {
 NULL,}};
 
 static int summary = 0;
@@ -13011,7 +15540,7 @@ int do_tests(void)
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests() == __RESULT_SUCCESS) {
+	if (begin_tests(0) == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
@@ -13037,7 +15566,7 @@ int do_tests(void)
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests()) != __RESULT_SUCCESS)
+			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
 				goto inconclusive;
 			result = test_run(tests[i].stream);
 			end_tests();
@@ -13481,19 +16010,23 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* 
+	/*
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
+	switch (tests_to_run) {
+	case 0:
 		if (verbose > 0) {
 			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
 			fflush(stderr);
 		}
 		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
 	do_tests();
 	exit(0);
 }
