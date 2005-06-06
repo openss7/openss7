@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:48 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/04 13:38:48 $ by $Author: brian $
+ Last Modified $Date: 2005/06/06 12:11:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.11  2005/06/06 12:11:46  brian
+ - more upgrades to test suites
+
  Revision 0.9.2.10  2005/06/04 13:38:48  brian
  - final workup of test suites
 
@@ -141,9 +144,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:48 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/04 13:38:48 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $";
 
 /*
  *  Simple test program for INET streams.
@@ -235,9 +238,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 10
-#define NORMAL_WAIT 100
-#define LONG_WAIT 500
+#define SHORT_WAIT 100		// 10
+#define NORMAL_WAIT 500		// 100
+#define LONG_WAIT 5000		// 500
+#define LONGER_WAIT 10000	// 5000
+
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -253,6 +258,7 @@ static int test_bufsize = 256;
 static int test_tidu = 256;
 static int test_mgmtflags = T_NEGOTIATE;
 static struct sockaddr_in *test_addr = NULL;
+static socklen_t test_alen = sizeof(*test_addr);
 static const char *test_data = NULL;
 static int test_resfd = -1;
 
@@ -300,6 +306,8 @@ enum {
 	__TEST_PUTMSG_DATA, __TEST_PUTPMSG_DATA, __TEST_PUSH, __TEST_POP,
 	__TEST_READ, __TEST_READV, __TEST_GETMSG, __TEST_GETPMSG,
 	__TEST_DATA,
+	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
+	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -439,7 +447,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                   |  |                    <%d>\n", t, state);
+		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -526,7 +534,7 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  */
 
 /*
- * data options 
+ * data options
  */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
@@ -537,22 +545,25 @@ struct {
 	t_scalar_t drt_val __attribute__ ((packed));
 	struct t_opthdr csm_hdr __attribute__ ((packed));
 	t_scalar_t csm_val __attribute__ ((packed));
+#if 0
 	struct t_opthdr ppi_hdr __attribute__ ((packed));
 	t_scalar_t ppi_val __attribute__ ((packed));
 	struct t_opthdr sid_hdr __attribute__ ((packed));
 	t_scalar_t sid_val __attribute__ ((packed));
+#endif
 } opt_data = {
-	{
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS} , 10, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS} , 0
+	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+#if 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
+#endif
 };
 
 /*
- * connect options 
+ * connect options
  */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
@@ -565,25 +576,26 @@ struct {
 	t_scalar_t bca_val __attribute__ ((packed));
 	struct t_opthdr reu_hdr __attribute__ ((packed));
 	t_scalar_t reu_val __attribute__ ((packed));
+#if 0
 	struct t_opthdr ist_hdr __attribute__ ((packed));
 	t_scalar_t ist_val __attribute__ ((packed));
 	struct t_opthdr ost_hdr __attribute__ ((packed));
 	t_scalar_t ost_val __attribute__ ((packed));
+#endif
 } opt_conn = {
-	{
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
-, 1};
+	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+#if 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}, 1
+#endif
+};
 
 /*
- * management options 
+ * management options
  */
 struct {
 	struct t_opthdr tos_hdr __attribute__ ((packed));
@@ -649,65 +661,38 @@ struct {
 	t_scalar_t dbg_val __attribute__ ((packed));
 #endif
 } opt_optm = {
-	{
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0, {
-	sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 #if 0
-	    , {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}
-	, 576, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}
-	, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
 #endif
-	    , {
-	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS} , T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 #if 0
-	, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}
-	, T_YES, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}
-	, T_YES, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}
-	, 10, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}
-	, T_NO, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}
-	, 60000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}
-	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}
-	, 12, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}
-	, 200, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}
-	, 0, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}
-	, 1, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS}
-	, 1000, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS}
-	, 50, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}
-	, T_SCTP_HMAC_NONE, {
-	sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}
-	, 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}, 60000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS}, 200
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}, 5
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}, 12
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}, 12
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}, 1000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}, 200
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}, 2000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS}, 1000
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS}, 50
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}, T_SCTP_HMAC_NONE
+	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}, 0
 #endif
 };
 
@@ -1349,6 +1334,50 @@ const char *state_string(ulong state)
 	}
 }
 
+#if 0
+void print_addr(char *add_ptr, size_t add_len)
+{
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			fprintf(stdout, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+char *addr_string(char *add_ptr, size_t add_len)
+{
+	static char buf[128];
+	size_t len = 0;
+	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
+	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
+	if (add_len) {
+		int i;
+		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a->port));
+		for (i = 0; i < anum; i++) {
+			len += snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d", i ? "," : "", (a->addr[i] >> 0) & 0xff, (a->addr[i] >> 8) & 0xff, (a->addr[i] >> 16) & 0xff, (a->addr[i] >> 24) & 0xff);
+		}
+	} else
+		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	return buf;
+}
+void print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	fprintf(stdout, "Stupid!\n");
+}
+#else
 void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
@@ -1375,6 +1404,7 @@ char *addr_string(char *add_ptr, size_t add_len)
 	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
 }
+#endif
 
 char *status_string(struct t_opthdr *oh)
 {
@@ -1405,9 +1435,9 @@ char *level_string(struct t_opthdr *oh)
 		return ("T_INET_IP");
 	case T_INET_UDP:
 		return ("T_INET_UDP");
-#if 0
 	case T_INET_TCP:
 		return ("T_INET_TCP");
+#if 0
 	case T_INET_SCTP:
 		return ("T_INET_SCTP");
 #endif
@@ -1461,7 +1491,6 @@ char *name_string(struct t_opthdr *oh)
 			return ("T_UDP_CHECKSUM");
 		}
 		break;
-#if 0
 	case T_INET_TCP:
 		switch (oh->name) {
 		case T_TCP_NODELAY:
@@ -1492,6 +1521,7 @@ char *name_string(struct t_opthdr *oh)
 			return ("T_TCP_QUICKACK");
 		}
 		break;
+#if 0
 	case T_INET_SCTP:
 		switch (oh->name) {
 		case T_SCTP_NODELAY:
@@ -1589,6 +1619,13 @@ char *yesno_string(struct t_opthdr *oh)
 	}
 }
 
+char *number_string(struct t_opthdr *oh)
+{
+	static char buf[32];
+	snprintf(buf, 32, "%d", *((t_scalar_t *) T_OPT_DATA(oh)));
+	return (buf);
+}
+
 char *value_string(struct t_opthdr *oh)
 {
 	static char buf[64] = "(invalid)";
@@ -1643,7 +1680,6 @@ char *value_string(struct t_opthdr *oh)
 			return yesno_string(oh);
 		}
 		break;
-#if 0
 	case T_INET_TCP:
 		switch (oh->name) {
 		case T_TCP_NODELAY:
@@ -1676,6 +1712,7 @@ char *value_string(struct t_opthdr *oh)
 			break;
 		}
 		break;
+#if 0
 	case T_INET_SCTP:
 		switch (oh->name) {
 		case T_SCTP_NODELAY:
@@ -1683,41 +1720,29 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_CORK:
 			return yesno_string(oh);
 		case T_SCTP_PPI:
-			break;
+			return number_string(oh);;
 		case T_SCTP_SID:
-			break;
+			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			return number_string(oh);;
 		case T_SCTP_SSN:
-			break;
 		case T_SCTP_TSN:
-			break;
+			return number_string(oh);;
 		case T_SCTP_RECVOPT:
 			return yesno_string(oh);
 		case T_SCTP_COOKIE_LIFE:
-			break;
 		case T_SCTP_SACK_DELAY:
-			break;
 		case T_SCTP_PATH_MAX_RETRANS:
-			break;
 		case T_SCTP_ASSOC_MAX_RETRANS:
-			break;
 		case T_SCTP_MAX_INIT_RETRIES:
-			break;
 		case T_SCTP_HEARTBEAT_ITVL:
-			break;
 		case T_SCTP_RTO_INITIAL:
-			break;
 		case T_SCTP_RTO_MIN:
-			break;
 		case T_SCTP_RTO_MAX:
-			break;
 		case T_SCTP_OSTREAMS:
-			break;
 		case T_SCTP_ISTREAMS:
-			break;
 		case T_SCTP_COOKIE_INC:
-			break;
 		case T_SCTP_THROTTLE_ITVL:
-			break;
+			return number_string(oh);;
 		case T_SCTP_MAC_TYPE:
 			break;
 		case T_SCTP_CKSUM_TYPE:
@@ -1739,17 +1764,12 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PR:
 			break;
 		case T_SCTP_LIFETIME:
-			break;
 		case T_SCTP_DISPOSITION:
-			break;
 		case T_SCTP_MAX_BURST:
-			break;
 		case T_SCTP_HB:
-			break;
 		case T_SCTP_RTO:
-			break;
 		case T_SCTP_MAXSEG:
-			break;
+			return number_string(oh);
 		case T_SCTP_STATUS:
 			break;
 		case T_SCTP_DEBUG:
@@ -1760,6 +1780,34 @@ char *value_string(struct t_opthdr *oh)
 	}
 	return ("(unknown value)");
 }
+
+#if 0
+void parse_options(int fd, char *opt_ptr, size_t opt_len)
+{
+	struct t_opthdr *oh;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		if (oh->len == sizeof(*oh))
+			continue;
+		switch (oh->level) {
+		case T_INET_SCTP:
+			switch (oh->name) {
+			case T_SCTP_PPI:
+				ppi[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SID:
+				sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_SSN:
+				ssn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			case T_SCTP_TSN:
+				tsn[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+				continue;
+			}
+		}
+	}
+}
+#endif
 
 char *mgmtflag_string(t_uscalar_t flag)
 {
@@ -2813,17 +2861,18 @@ int test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int stream_start(int child)
+static int stream_start(int child, int index)
 {
+	int offset = 3 * index;
 	addrs[3].sin_family = AF_INET;
-	addrs[3].sin_port = htons(ports[3]);
+	addrs[3].sin_port = htons(ports[3] + offset);
 	inet_aton(addr_strings[3], &addrs[3].sin_addr);
 	switch (child) {
 	case 1:
 	case 2:
 	case 0:
 		addrs[child].sin_family = AF_INET;
-		addrs[child].sin_port = htons(ports[child]);
+		addrs[child].sin_port = htons(ports[child] + offset);
 		inet_aton(addr_strings[child], &addrs[child].sin_addr);
 		if (test_open(child, devname) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
@@ -2857,35 +2906,39 @@ static int stream_stop(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(void)
+static int begin_tests(int index)
 {
 	state = 0;
-	if (stream_start(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(0, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(1, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (stream_start(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+	if (stream_start(2, index) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	show_acks = 1;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 static int end_tests(void)
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(1) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	if (stream_stop(0) != __RESULT_SUCCESS)
-		return __RESULT_FAILURE;
+		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
+      failure:
+	return __RESULT_FAILURE;
 }
 
 /*
@@ -2949,10 +3002,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
-		p->conn_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
 		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
 		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
@@ -3107,13 +3160,13 @@ static int do_signal(int child, int action)
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
-		ctrl->len = sizeof(p->bind_req) + (test_addr ? sizeof(*test_addr) : 0);
+		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
 		p->bind_req.PRIM_type = T_BIND_REQ;
-		p->bind_req.ADDR_length = test_addr ? sizeof(*test_addr) : 0;
+		p->bind_req.ADDR_length = test_addr ? test_alen : 0;
 		p->bind_req.ADDR_offset = test_addr ? sizeof(p->bind_req) : 0;
 		p->bind_req.CONIND_number = last_qlen;
 		if (test_addr)
-			bcopy(test_addr, (&p->bind_req) + 1, sizeof(*test_addr));
+			bcopy(test_addr, ctrl->buf + p->bind_req.ADDR_offset, p->bind_req.ADDR_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3163,10 +3216,10 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
-		    + (test_addr ? sizeof(*test_addr) : 0)
+		    + (test_addr ? test_alen : 0)
 		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
-		p->unitdata_req.DEST_length = test_addr ? sizeof(*test_addr) : 0;
+		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
 		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
 		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
@@ -4044,7 +4097,7 @@ void test_sleep(int child, unsigned long t)
 static int preamble_0(int child)
 {
 	start_tt(1000);
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 static int postamble_0(int child)
@@ -4066,59 +4119,442 @@ static int postamble_0(int child)
 	}
 	state++;
 	stop_tt();
-	return __RESULT_SUCCESS;
+	return (__RESULT_SUCCESS);
 }
 
 static int preamble_1(int child)
 {
 	test_mgmtflags = T_NEGOTIATE;
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int preamble_1s(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_1(int child)
 {
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_1e(int child)
 {
 	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
 		expect(child, SHORT_WAIT, __TEST_OK_ACK);
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
+
+#if 0
+static int preamble_2_conn(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_resp(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2_list(int child)
+{
+	if (preamble_1s(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_2_list(int child)
+{
+	int failed = -1;
+	if (postamble_1(child) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+#if 0
+static int preamble_2b_conn(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = "Hello World";
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_resp(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+static int preamble_2b_list(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = "Hello There!";
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+#endif
+
+static int postamble_3_conn(int child)
+{
+	int failed = -1;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_conn(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_resp(int child)
+{
+	int failed = -1;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1) {
+		state += 10;
+		if (postamble_2_resp(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	} else {
+		if (postamble_1(child) != __RESULT_SUCCESS)
+			failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+
+static int postamble_3_list(int child)
+{
+	return postamble_2_list(child);
+}
+#endif
+
+#if 0
+static int preamble_3b_conn(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_conn(child);
+}
+static int preamble_3b_resp(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_resp(child);
+}
+static int preamble_3b_list(int child)
+{
+	opt_optm.rcv_val = T_YES;
+	opt_optm.ist_val = 32;
+	opt_optm.ost_val = 32;
+	opt_conn.ist_val = 32;
+	opt_conn.ost_val = 32;
+	return preamble_2_list(child);
+}
+
+static int preamble_4_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_conn(child);
+}
+static int preamble_4_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_list(child);
+}
+static int preamble_4_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_DROPPING;
+	return preamble_2_resp(child);
+}
+
+static int preamble_4b_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_conn(child);
+}
+static int preamble_4b_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_list(child);
+}
+static int preamble_4b_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_2_resp(child);
+}
+
+static int preamble_5_conn(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_conn(child);
+}
+static int preamble_5_list(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_list(child);
+}
+static int preamble_5_resp(int child)
+{
+	// opt_optm.dbg_val = SCTP_OPTION_BREAK|SCTP_OPTION_DBREAK|SCTP_OPTION_DROPPING;
+	opt_optm.dbg_val = SCTP_OPTION_BREAK;
+	return preamble_2_resp(child);
+}
+
+static int preamble_6_conn(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_conn(child);
+}
+static int preamble_6_list(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_list(child);
+}
+static int preamble_6_resp(int child)
+{
+	opt_optm.dbg_val = SCTP_OPTION_RANDOM;
+	return preamble_3b_resp(child);
+}
+
+static int preamble_7_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+static int preamble_7_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_SHA1;
+	return preamble_1(child);
+}
+
+static int preamble_8_conn(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_list(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+static int preamble_8_resp(int child)
+{
+	opt_optm.mac_val = T_SCTP_HMAC_MD5;
+	return preamble_1(child);
+}
+#endif
 
 /*
  *  =========================================================================
@@ -4139,26 +4575,27 @@ struct test_stream {
  */
 #define test_group_1 "Opening and closing streams"
 #define tgrp_case_1_1 test_group_1
+#define numb_case_1_1 "1.1"
 #define name_case_1_1 "Open and close 3 streams"
 #define desc_case_1_1 "\
 Checks that three streams can be opened and closed."
-
-#define preamble_1_1_conn preamble_0
-#define preamble_1_1_resp preamble_0
-#define preamble_1_1_list preamble_0
 
 int test_case_1_1(int child)
 {
 	return (__RESULT_SUCCESS);
 }
 
-#define test_case_1_1_conn test_case_1_1
-#define test_case_1_1_resp test_case_1_1
-#define test_case_1_1_list test_case_1_1
+#define test_case_1_1_conn	test_case_1_1
+#define test_case_1_1_resp	test_case_1_1
+#define test_case_1_1_list	test_case_1_1
 
-#define postamble_1_1_conn postamble_0
-#define postamble_1_1_resp postamble_0
-#define postamble_1_1_list postamble_0
+#define preamble_1_1_conn	preamble_0
+#define preamble_1_1_resp	preamble_0
+#define preamble_1_1_list	preamble_0
+
+#define postamble_1_1_conn	postamble_0
+#define postamble_1_1_resp	postamble_0
+#define postamble_1_1_list	postamble_0
 
 struct test_stream test_1_1_conn = { &preamble_1_1_conn, &test_case_1_1_conn, &postamble_1_1_conn };
 struct test_stream test_1_1_resp = { &preamble_1_1_resp, &test_case_1_1_resp, &postamble_1_1_resp };
@@ -4168,13 +4605,10 @@ struct test_stream test_1_1_list = { &preamble_1_1_list, &test_case_1_1_list, &p
  *  Request information.
  */
 #define tgrp_case_1_2 test_group_1
+#define numb_case_1_2 "1.2"
 #define name_case_1_2 "Request information."
 #define desc_case_1_2 "\
 Checks that information can be requested on each of three streasm."
-
-#define preamble_1_2_conn preamble_0
-#define preamble_1_2_resp preamble_0
-#define preamble_1_2_list preamble_0
 
 int test_case_1_2(int child)
 {
@@ -4189,13 +4623,17 @@ int test_case_1_2(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_2_conn test_case_1_2
-#define test_case_1_2_resp test_case_1_2
-#define test_case_1_2_list test_case_1_2
+#define test_case_1_2_conn	test_case_1_2
+#define test_case_1_2_resp	test_case_1_2
+#define test_case_1_2_list	test_case_1_2
 
-#define postamble_1_2_conn postamble_0
-#define postamble_1_2_resp postamble_0
-#define postamble_1_2_list postamble_0
+#define preamble_1_2_conn	preamble_0
+#define preamble_1_2_resp	preamble_0
+#define preamble_1_2_list	preamble_0
+
+#define postamble_1_2_conn	postamble_0
+#define postamble_1_2_resp	postamble_0
+#define postamble_1_2_list	postamble_0
 
 struct test_stream test_1_2_conn = { &preamble_1_2_conn, &test_case_1_2_conn, &postamble_1_2_conn };
 struct test_stream test_1_2_resp = { &preamble_1_2_resp, &test_case_1_2_resp, &postamble_1_2_resp };
@@ -4205,13 +4643,10 @@ struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &p
  *  Request capabilities.
  */
 #define tgrp_case_1_3 test_group_1
+#define numb_case_1_3 "1.3"
 #define name_case_1_3 "Request capabilities."
 #define desc_case_1_3 "\
 Checks that capabilities can be requested on each of three streasm."
-
-#define preamble_1_3_conn preamble_0
-#define preamble_1_3_resp preamble_0
-#define preamble_1_3_list preamble_0
 
 int test_case_1_3(int child)
 {
@@ -4226,13 +4661,17 @@ int test_case_1_3(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_3_conn test_case_1_3
-#define test_case_1_3_resp test_case_1_3
-#define test_case_1_3_list test_case_1_3
+#define test_case_1_3_conn	test_case_1_3
+#define test_case_1_3_resp	test_case_1_3
+#define test_case_1_3_list	test_case_1_3
 
-#define postamble_1_3_conn postamble_0
-#define postamble_1_3_resp postamble_0
-#define postamble_1_3_list postamble_0
+#define preamble_1_3_conn	preamble_0
+#define preamble_1_3_resp	preamble_0
+#define preamble_1_3_list	preamble_0
+
+#define postamble_1_3_conn	postamble_0
+#define postamble_1_3_resp	postamble_0
+#define postamble_1_3_list	postamble_0
 
 struct test_stream test_1_3_conn = { &preamble_1_3_conn, &test_case_1_3_conn, &postamble_1_3_conn };
 struct test_stream test_1_3_resp = { &preamble_1_3_resp, &test_case_1_3_resp, &postamble_1_3_resp };
@@ -4242,13 +4681,10 @@ struct test_stream test_1_3_list = { &preamble_1_3_list, &test_case_1_3_list, &p
  *  Request addresses.
  */
 #define tgrp_case_1_4 test_group_1
+#define numb_case_1_4 "1.4"
 #define name_case_1_4 "Request addresses."
 #define desc_case_1_4 "\
 Checks that addresses can be requested on each of three streasm."
-
-#define preamble_1_4_conn preamble_0
-#define preamble_1_4_resp preamble_0
-#define preamble_1_4_list preamble_0
 
 int test_case_1_4(int child)
 {
@@ -4263,13 +4699,17 @@ int test_case_1_4(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_4_conn test_case_1_4
-#define test_case_1_4_resp test_case_1_4
-#define test_case_1_4_list test_case_1_4
+#define test_case_1_4_conn	test_case_1_4
+#define test_case_1_4_resp	test_case_1_4
+#define test_case_1_4_list	test_case_1_4
 
-#define postamble_1_4_conn postamble_0
-#define postamble_1_4_resp postamble_0
-#define postamble_1_4_list postamble_0
+#define preamble_1_4_conn	preamble_0
+#define preamble_1_4_resp	preamble_0
+#define preamble_1_4_list	preamble_0
+
+#define postamble_1_4_conn	postamble_0
+#define postamble_1_4_resp	postamble_0
+#define postamble_1_4_list	postamble_0
 
 struct test_stream test_1_4_conn = { &preamble_1_4_conn, &test_case_1_4_conn, &postamble_1_4_conn };
 struct test_stream test_1_4_resp = { &preamble_1_4_resp, &test_case_1_4_resp, &postamble_1_4_resp };
@@ -4280,13 +4720,10 @@ struct test_stream test_1_4_list = { &preamble_1_4_list, &test_case_1_4_list, &p
  */
 #define test_group_2 "Options management"
 #define tgrp_case_2_1 test_group_2
+#define numb_case_2_1 "2.1"
 #define name_case_2_1 "Perform options management."
 #define desc_case_2_1 "\
 Checks that options management can be performed on several streams."
-
-#define preamble_2_1_conn preamble_0
-#define preamble_2_1_resp preamble_0
-#define preamble_2_1_list preamble_0
 
 int test_case_2_1(int child)
 {
@@ -4323,13 +4760,17 @@ int test_case_2_1(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_2_1_conn test_case_2_1
-#define test_case_2_1_resp test_case_2_1
-#define test_case_2_1_list test_case_2_1
+#define test_case_2_1_conn	test_case_2_1
+#define test_case_2_1_resp	test_case_2_1
+#define test_case_2_1_list	test_case_2_1
 
-#define postamble_2_1_conn postamble_0
-#define postamble_2_1_resp postamble_0
-#define postamble_2_1_list postamble_0
+#define preamble_2_1_conn	preamble_0
+#define preamble_2_1_resp	preamble_0
+#define preamble_2_1_list	preamble_0
+
+#define postamble_2_1_conn	postamble_0
+#define postamble_2_1_resp	postamble_0
+#define postamble_2_1_list	postamble_0
 
 struct test_stream test_2_1_conn = { &preamble_2_1_conn, &test_case_2_1_conn, &postamble_2_1_conn };
 struct test_stream test_2_1_resp = { &preamble_2_1_resp, &test_case_2_1_resp, &postamble_2_1_resp };
@@ -4339,19 +4780,17 @@ struct test_stream test_2_1_list = { &preamble_2_1_list, &test_case_2_1_list, &p
  *  Bind and unbind three streams.
  */
 #define tgrp_case_2_2 test_group_2
+#define numb_case_2_2 "2.2"
 #define name_case_2_2 "Bind and unbind three streams."
 #define desc_case_2_2 "\
 Checks that three streams can be bound and unbound.  One is bound to\n\
 a normal address, another to a null address, the last to a wildcard\n\
 address."
 
-#define preamble_2_2_conn preamble_0
-#define preamble_2_2_resp preamble_0
-#define preamble_2_2_list preamble_0
-
-int test_case_2_2(int child, struct sockaddr_in *addr)
+int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 {
 	test_addr = addr;
+	test_alen = len;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -4378,21 +4817,25 @@ int test_case_2_2(int child, struct sockaddr_in *addr)
 
 int test_case_2_2_conn(int child)
 {
-	return test_case_2_2(child, &addrs[0]);
+	return test_case_2_2(child, &addrs[0], sizeof(addrs[0]));
 }
 int test_case_2_2_resp(int child)
 {
-	return test_case_2_2(child, NULL);
+	return test_case_2_2(child, NULL, 0);
 }
 int test_case_2_2_list(int child)
 {
 	addrs[3].sin_addr.s_addr = INADDR_ANY;
-	return test_case_2_2(child, &addrs[3]);
+	return test_case_2_2(child, &addrs[3], sizeof(addrs[3]));
 }
 
-#define postamble_2_2_conn postamble_0
-#define postamble_2_2_resp postamble_0
-#define postamble_2_2_list postamble_0
+#define preamble_2_2_conn	preamble_0
+#define preamble_2_2_resp	preamble_0
+#define preamble_2_2_list	preamble_0
+
+#define postamble_2_2_conn	postamble_0
+#define postamble_2_2_resp	postamble_0
+#define postamble_2_2_list	postamble_0
 
 struct test_stream test_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
 struct test_stream test_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
@@ -4403,18 +4846,16 @@ struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &p
  */
 #define test_group_3 "Data transfer"
 #define tgrp_case_3_1 test_group_3
+#define numb_case_3_1 "3.1"
 #define name_case_3_1 "Transfer connectionless data."
 #define desc_case_3_1 "\
 Attempts to transfer connectionless data."
 
-#define preamble_3_1_conn preamble_1s
-#define preamble_3_1_resp preamble_1s
-#define preamble_3_1_list preamble_1s
-
-int test_case_3_1(int child, struct sockaddr_in *addr)
+int test_case_3_1(int child, struct sockaddr_in *addr, socklen_t len)
 {
 	const char msg[] = "Unit test data.";
 	test_addr = addr;
+	test_alen = len;
 	test_data = msg;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -4429,20 +4870,24 @@ int test_case_3_1(int child, struct sockaddr_in *addr)
 
 int test_case_3_1_conn(int child)
 {
-	return test_case_3_1(child, &addrs[1]);
+	return test_case_3_1(child, &addrs[1], sizeof(addrs[1]));
 }
 int test_case_3_1_resp(int child)
 {
-	return test_case_3_1(child, &addrs[2]);
+	return test_case_3_1(child, &addrs[2], sizeof(addrs[2]));
 }
 int test_case_3_1_list(int child)
 {
-	return test_case_3_1(child, &addrs[0]);
+	return test_case_3_1(child, &addrs[0], sizeof(addrs[0]));
 }
 
-#define postamble_3_1_conn postamble_1
-#define postamble_3_1_resp postamble_1
-#define postamble_3_1_list postamble_1
+#define preamble_3_1_conn	preamble_1s
+#define preamble_3_1_resp	preamble_1s
+#define preamble_3_1_list	preamble_1s
+
+#define postamble_3_1_conn	postamble_1
+#define postamble_3_1_resp	postamble_1
+#define postamble_3_1_list	postamble_1
 
 struct test_stream test_3_1_conn = { &preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
 struct test_stream test_3_1_resp = { &preamble_3_1_resp, &test_case_3_1_resp, &postamble_3_1_resp };
@@ -4453,19 +4898,17 @@ struct test_stream test_3_1_list = { &preamble_3_1_list, &test_case_3_1_list, &p
  */
 #define test_group_4 "Negative test cases"
 #define tgrp_case_4_1 test_group_4
+#define numb_case_4_1 "4.1"
 #define name_case_4_1 "Unsupported T_CONN_REQ."
 #define desc_case_4_1 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_CONN_REQ."
 
-#define preamble_4_1_conn preamble_1
-#define preamble_4_1_resp preamble_1
-#define preamble_4_1_list preamble_1
-
 int test_case_4_1(int child)
 {
 	static char dat[] = "Dummy message.";
 	test_addr = &addrs[0];
+	test_alen = sizeof(addrs[0]);
 	test_data = dat;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -4478,13 +4921,17 @@ int test_case_4_1(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_1_conn test_case_4_1
-#define test_case_4_1_resp test_case_4_1
-#define test_case_4_1_list test_case_4_1
+#define test_case_4_1_conn	test_case_4_1
+#define test_case_4_1_resp	test_case_4_1
+#define test_case_4_1_list	test_case_4_1
 
-#define postamble_4_1_conn postamble_1
-#define postamble_4_1_resp postamble_1
-#define postamble_4_1_list postamble_1
+#define preamble_4_1_conn	preamble_1
+#define preamble_4_1_resp	preamble_1
+#define preamble_4_1_list	preamble_1
+
+#define postamble_4_1_conn	postamble_1
+#define postamble_4_1_resp	postamble_1
+#define postamble_4_1_list	postamble_1
 
 struct test_stream test_4_1_conn = { &preamble_4_1_conn, &test_case_4_1_conn, &postamble_4_1_conn };
 struct test_stream test_4_1_resp = { &preamble_4_1_resp, &test_case_4_1_resp, &postamble_4_1_resp };
@@ -4494,14 +4941,11 @@ struct test_stream test_4_1_list = { &preamble_4_1_list, &test_case_4_1_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_2 test_group_4
+#define numb_case_4_2 "4.2"
 #define name_case_4_2 "Unsupported T_CONN_RES."
 #define desc_case_4_2 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_CONN_RES."
-
-#define preamble_4_2_conn preamble_1
-#define preamble_4_2_resp preamble_1
-#define preamble_4_2_list preamble_1
 
 int test_case_4_2(int child)
 {
@@ -4519,13 +4963,17 @@ int test_case_4_2(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_2_conn test_case_4_2
-#define test_case_4_2_resp test_case_4_2
-#define test_case_4_2_list test_case_4_2
+#define test_case_4_2_conn	test_case_4_2
+#define test_case_4_2_resp	test_case_4_2
+#define test_case_4_2_list	test_case_4_2
 
-#define postamble_4_2_conn postamble_1
-#define postamble_4_2_resp postamble_1
-#define postamble_4_2_list postamble_1
+#define preamble_4_2_conn	preamble_1
+#define preamble_4_2_resp	preamble_1
+#define preamble_4_2_list	preamble_1
+
+#define postamble_4_2_conn	postamble_1
+#define postamble_4_2_resp	postamble_1
+#define postamble_4_2_list	postamble_1
 
 struct test_stream test_4_2_conn = { &preamble_4_2_conn, &test_case_4_2_conn, &postamble_4_2_conn };
 struct test_stream test_4_2_resp = { &preamble_4_2_resp, &test_case_4_2_resp, &postamble_4_2_resp };
@@ -4535,14 +4983,11 @@ struct test_stream test_4_2_list = { &preamble_4_2_list, &test_case_4_2_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_3 test_group_4
+#define numb_case_4_3 "4.3"
 #define name_case_4_3 "Unsupported T_DISCON_REQ."
 #define desc_case_4_3 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_DISCON_REQ."
-
-#define preamble_4_3_conn preamble_1
-#define preamble_4_3_resp preamble_1
-#define preamble_4_3_list preamble_1
 
 int test_case_4_3(int child)
 {
@@ -4560,13 +5005,17 @@ int test_case_4_3(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_3_conn test_case_4_3
-#define test_case_4_3_resp test_case_4_3
-#define test_case_4_3_list test_case_4_3
+#define test_case_4_3_conn	test_case_4_3
+#define test_case_4_3_resp	test_case_4_3
+#define test_case_4_3_list	test_case_4_3
 
-#define postamble_4_3_conn postamble_1
-#define postamble_4_3_resp postamble_1
-#define postamble_4_3_list postamble_1
+#define preamble_4_3_conn	preamble_1
+#define preamble_4_3_resp	preamble_1
+#define preamble_4_3_list	preamble_1
+
+#define postamble_4_3_conn	postamble_1
+#define postamble_4_3_resp	postamble_1
+#define postamble_4_3_list	postamble_1
 
 struct test_stream test_4_3_conn = { &preamble_4_3_conn, &test_case_4_3_conn, &postamble_4_3_conn };
 struct test_stream test_4_3_resp = { &preamble_4_3_resp, &test_case_4_3_resp, &postamble_4_3_resp };
@@ -4576,14 +5025,11 @@ struct test_stream test_4_3_list = { &preamble_4_3_list, &test_case_4_3_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_4 test_group_4
+#define numb_case_4_4 "4.4"
 #define name_case_4_4 "Unsupported T_DATA_REQ."
 #define desc_case_4_4 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_DATA_REQ."
-
-#define preamble_4_4_conn preamble_1
-#define preamble_4_4_resp preamble_1
-#define preamble_4_4_list preamble_1
 
 int test_case_4_4(int child)
 {
@@ -4601,13 +5047,17 @@ int test_case_4_4(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_4_conn test_case_4_4
-#define test_case_4_4_resp test_case_4_4
-#define test_case_4_4_list test_case_4_4
+#define test_case_4_4_conn	test_case_4_4
+#define test_case_4_4_resp	test_case_4_4
+#define test_case_4_4_list	test_case_4_4
 
-#define postamble_4_4_conn postamble_1e
-#define postamble_4_4_resp postamble_1e
-#define postamble_4_4_list postamble_1e
+#define preamble_4_4_conn	preamble_1
+#define preamble_4_4_resp	preamble_1
+#define preamble_4_4_list	preamble_1
+
+#define postamble_4_4_conn	postamble_1e
+#define postamble_4_4_resp	postamble_1e
+#define postamble_4_4_list	postamble_1e
 
 struct test_stream test_4_4_conn = { &preamble_4_4_conn, &test_case_4_4_conn, &postamble_4_4_conn };
 struct test_stream test_4_4_resp = { &preamble_4_4_resp, &test_case_4_4_resp, &postamble_4_4_resp };
@@ -4617,14 +5067,11 @@ struct test_stream test_4_4_list = { &preamble_4_4_list, &test_case_4_4_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_5 test_group_4
+#define numb_case_4_5 "4.5"
 #define name_case_4_5 "Unsupported T_EXDATA_REQ."
 #define desc_case_4_5 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_EXDATA_REQ."
-
-#define preamble_4_5_conn preamble_1
-#define preamble_4_5_resp preamble_1
-#define preamble_4_5_list preamble_1
 
 int test_case_4_5(int child)
 {
@@ -4642,13 +5089,17 @@ int test_case_4_5(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_5_conn test_case_4_5
-#define test_case_4_5_resp test_case_4_5
-#define test_case_4_5_list test_case_4_5
+#define test_case_4_5_conn	test_case_4_5
+#define test_case_4_5_resp	test_case_4_5
+#define test_case_4_5_list	test_case_4_5
 
-#define postamble_4_5_conn postamble_1e
-#define postamble_4_5_resp postamble_1e
-#define postamble_4_5_list postamble_1e
+#define preamble_4_5_conn	preamble_1
+#define preamble_4_5_resp	preamble_1
+#define preamble_4_5_list	preamble_1
+
+#define postamble_4_5_conn	postamble_1e
+#define postamble_4_5_resp	postamble_1e
+#define postamble_4_5_list	postamble_1e
 
 struct test_stream test_4_5_conn = { &preamble_4_5_conn, &test_case_4_5_conn, &postamble_4_5_conn };
 struct test_stream test_4_5_resp = { &preamble_4_5_resp, &test_case_4_5_resp, &postamble_4_5_resp };
@@ -4658,14 +5109,11 @@ struct test_stream test_4_5_list = { &preamble_4_5_list, &test_case_4_5_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_6 test_group_4
+#define numb_case_4_6 "4.6"
 #define name_case_4_6 "Unsupported T_OPTDATA_REQ."
 #define desc_case_4_6 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_OPTDATA_REQ."
-
-#define preamble_4_6_conn preamble_1
-#define preamble_4_6_resp preamble_1
-#define preamble_4_6_list preamble_1
 
 int test_case_4_6(int child)
 {
@@ -4683,13 +5131,17 @@ int test_case_4_6(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_6_conn test_case_4_6
-#define test_case_4_6_resp test_case_4_6
-#define test_case_4_6_list test_case_4_6
+#define test_case_4_6_conn	test_case_4_6
+#define test_case_4_6_resp	test_case_4_6
+#define test_case_4_6_list	test_case_4_6
 
-#define postamble_4_6_conn postamble_1e
-#define postamble_4_6_resp postamble_1e
-#define postamble_4_6_list postamble_1e
+#define preamble_4_6_conn	preamble_1
+#define preamble_4_6_resp	preamble_1
+#define preamble_4_6_list	preamble_1
+
+#define postamble_4_6_conn	postamble_1e
+#define postamble_4_6_resp	postamble_1e
+#define postamble_4_6_list	postamble_1e
 
 struct test_stream test_4_6_conn = { &preamble_4_6_conn, &test_case_4_6_conn, &postamble_4_6_conn };
 struct test_stream test_4_6_resp = { &preamble_4_6_resp, &test_case_4_6_resp, &postamble_4_6_resp };
@@ -4699,14 +5151,11 @@ struct test_stream test_4_6_list = { &preamble_4_6_list, &test_case_4_6_list, &p
  *  Negative test cases on connection oriented primitives.
  */
 #define tgrp_case_4_7 test_group_4
+#define numb_case_4_7 "4.7"
 #define name_case_4_7 "Unsupported T_ORDREL_REQ."
 #define desc_case_4_7 "\
 Attempts to invoke connection oriented primitives.\n\
 - T_ORDREL_REQ."
-
-#define preamble_4_7_conn preamble_1
-#define preamble_4_7_resp preamble_1
-#define preamble_4_7_list preamble_1
 
 int test_case_4_7(int child)
 {
@@ -4723,13 +5172,17 @@ int test_case_4_7(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_4_7_conn test_case_4_7
-#define test_case_4_7_resp test_case_4_7
-#define test_case_4_7_list test_case_4_7
+#define test_case_4_7_conn	test_case_4_7
+#define test_case_4_7_resp	test_case_4_7
+#define test_case_4_7_list	test_case_4_7
 
-#define postamble_4_7_conn postamble_1e
-#define postamble_4_7_resp postamble_1e
-#define postamble_4_7_list postamble_1e
+#define preamble_4_7_conn	preamble_1
+#define preamble_4_7_resp	preamble_1
+#define preamble_4_7_list	preamble_1
+
+#define postamble_4_7_conn	postamble_1e
+#define postamble_4_7_resp	postamble_1e
+#define postamble_4_7_list	postamble_1e
 
 struct test_stream test_4_7_conn = { &preamble_4_7_conn, &test_case_4_7_conn, &postamble_4_7_conn };
 struct test_stream test_4_7_resp = { &preamble_4_7_resp, &test_case_4_7_resp, &postamble_4_7_resp };
@@ -4983,20 +5436,20 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
-		"1.1", tgrp_case_1_1, name_case_1_1, desc_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, 0, 0}, {
-		"1.2", tgrp_case_1_2, name_case_1_2, desc_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
-		"1.3", tgrp_case_1_3, name_case_1_3, desc_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
-		"1.4", tgrp_case_1_4, name_case_1_4, desc_case_1_4, { &test_1_4_conn, &test_1_4_resp, &test_1_4_list }, 0, 0}, {
-		"2.1", tgrp_case_2_1, name_case_2_1, desc_case_2_1, { &test_2_1_conn, &test_2_1_resp, &test_2_1_list }, 0, 0}, {
-		"2.2", tgrp_case_2_2, name_case_2_2, desc_case_2_2, { &test_2_2_conn, &test_2_2_resp, &test_2_2_list }, 0, 0}, {
-		"3.1", tgrp_case_3_1, name_case_3_1, desc_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
-		"4.1", tgrp_case_4_1, name_case_4_1, desc_case_4_1, { &test_4_1_conn, &test_4_1_resp, &test_4_1_list }, 0, 0}, {
-		"4.2", tgrp_case_4_2, name_case_4_2, desc_case_4_2, { &test_4_2_conn, &test_4_2_resp, &test_4_2_list }, 0, 0}, {
-		"4.3", tgrp_case_4_3, name_case_4_3, desc_case_4_3, { &test_4_3_conn, &test_4_3_resp, &test_4_3_list }, 0, 0}, {
-		"4.4", tgrp_case_4_4, name_case_4_4, desc_case_4_4, { &test_4_4_conn, &test_4_4_resp, &test_4_4_list }, 0, 0}, {
-		"4.5", tgrp_case_4_5, name_case_4_5, desc_case_4_5, { &test_4_5_conn, &test_4_5_resp, &test_4_5_list }, 0, 0}, {
-		"4.6", tgrp_case_4_6, name_case_4_6, desc_case_4_6, { &test_4_6_conn, &test_4_6_resp, &test_4_6_list }, 0, 0}, {
-		"4.7", tgrp_case_4_7, name_case_4_7, desc_case_4_7, { &test_4_7_conn, &test_4_7_resp, &test_4_7_list }, 0, 0}, {
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, 0, 0}, {
+		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
+		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
+		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, { &test_1_4_conn, &test_1_4_resp, &test_1_4_list }, 0, 0}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, { &test_2_1_conn, &test_2_1_resp, &test_2_1_list }, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, { &test_2_2_conn, &test_2_2_resp, &test_2_2_list }, 0, 0}, {
+		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
+		numb_case_4_1, tgrp_case_4_1, name_case_4_1, desc_case_4_1, { &test_4_1_conn, &test_4_1_resp, &test_4_1_list }, 0, 0}, {
+		numb_case_4_2, tgrp_case_4_2, name_case_4_2, desc_case_4_2, { &test_4_2_conn, &test_4_2_resp, &test_4_2_list }, 0, 0}, {
+		numb_case_4_3, tgrp_case_4_3, name_case_4_3, desc_case_4_3, { &test_4_3_conn, &test_4_3_resp, &test_4_3_list }, 0, 0}, {
+		numb_case_4_4, tgrp_case_4_4, name_case_4_4, desc_case_4_4, { &test_4_4_conn, &test_4_4_resp, &test_4_4_list }, 0, 0}, {
+		numb_case_4_5, tgrp_case_4_5, name_case_4_5, desc_case_4_5, { &test_4_5_conn, &test_4_5_resp, &test_4_5_list }, 0, 0}, {
+		numb_case_4_6, tgrp_case_4_6, name_case_4_6, desc_case_4_6, { &test_4_6_conn, &test_4_6_resp, &test_4_6_list }, 0, 0}, {
+		numb_case_4_7, tgrp_case_4_7, name_case_4_7, desc_case_4_7, { &test_4_7_conn, &test_4_7_resp, &test_4_7_list }, 0, 0}, {
 	NULL,}
 };
 
@@ -5029,7 +5482,7 @@ int do_tests(void)
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests() == __RESULT_SUCCESS) {
+	if (begin_tests(0) == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
@@ -5055,7 +5508,7 @@ int do_tests(void)
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests()) != __RESULT_SUCCESS)
+			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
 				goto inconclusive;
 			result = test_run(tests[i].stream);
 			end_tests();
@@ -5499,7 +5952,7 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 	}
-	/* 
+	/*
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)

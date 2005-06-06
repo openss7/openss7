@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 12:03:57 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/16 10:55:14 $ by $Author: brian $
+ Last Modified $Date: 2005/06/06 12:03:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
- Revision 0.9.2.13  2005/05/16 10:55:14  brian
- - updated test program
+ Revision 0.9.2.14  2005/06/06 12:03:57  brian
+ - upgraded test suites
+
+ Revision 0.9.2.9  2005/06/06 12:03:57  brian
+ - upgraded test suites
 
  Revision 0.9.2.8  2005/05/16 10:55:14  brian
  - updated test program
@@ -108,12 +111,20 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 12:03:57 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/16 10:55:14 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/06 12:03:57 $";
 
+#include <sys/types.h>
 #include <stropts.h>
 #include <stdlib.h>
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#elif HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
@@ -126,11 +137,14 @@ static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0
 #include <signal.h>
 #include <sys/uio.h>
 
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
 
-#include <sys/types.h>
 
 /*
  *  -------------------------------------------------------------------------
@@ -154,6 +168,7 @@ static int verbose = 1;
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+static int show_data = 1;
 
 static int last_prim = 0;
 static int last_event = 0;
@@ -166,9 +181,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 10
-#define NORMAL_WAIT 100
-#define LONG_WAIT 500
+#define SHORT_WAIT 100		// 10
+#define NORMAL_WAIT 500		// 100
+#define LONG_WAIT 5000		// 500
+#define LONGER_WAIT 10000	// 5000
+
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -238,7 +255,6 @@ long test_start = 0;
 
 static int state;
 
-#if 0
 /*
  *  Return the current time in milliseconds.
  */
@@ -314,7 +330,6 @@ static int check_time(const char *t, long i, long lo, long hi)
 	else
 		return __RESULT_FAILURE;
 }
-#endif
 
 static int time_event(int event)
 {
@@ -329,7 +344,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                   |  |                    <%d>\n", t, state);
+		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -376,14 +391,11 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
-
-#if 0
 static int start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
-#endif
 
 static int stop_tt(void)
 {
@@ -731,8 +743,10 @@ const char *ioctl_string(int cmd, intptr_t arg)
 		return ("I_FDINSERT");
 	case I_SENDFD:
 		return ("I_SENDFD");
+#if 0
 	case I_E_RECVFD:
 		return ("I_E_RECVFD");
+#endif
 	case I_SWROPT:
 		return ("I_SWROPT");
 	case I_GWROPT:
@@ -757,12 +771,14 @@ const char *ioctl_string(int cmd, intptr_t arg)
 		return ("I_GETCLTIME");
 	case I_CANPUT:
 		return ("I_CANPUT");
+#if 0
 	case I_SERROPT:
 		return ("I_SERROPT");
 	case I_GERROPT:
 		return ("I_GERROPT");
 	case I_ANCHOR:
 		return ("I_ANCHOR");
+#endif
 #if 0
 	case I_S_RECVFD:
 		return ("I_S_RECVFD");
@@ -771,6 +787,7 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	case I_BIGPIPE:
 		return ("I_BIGPIPE");
 #endif
+#if 0
 	case I_GETTP:
 		return ("I_GETTP");
 	case I_AUTOPUSH:
@@ -789,10 +806,12 @@ const char *ioctl_string(int cmd, intptr_t arg)
 		return ("I_FDETACH");
 	case I_PIPE:
 		return ("I_PIPE");
+#endif
 	default:
 		return ("(unexpected)");
 	}
 }
+
 
 void print_less(int child)
 {
@@ -851,6 +870,14 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
+void print_simple_string(int child, const char *msgs[], const char *string)
+{
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
 void print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -865,9 +892,10 @@ void print_pipe(int child)
 void print_open(int child)
 {
 	static const char *msgs[] = {
-		"open()        ----->v                               |  |                    \n",
-		"  open()      ----->v                               |  |                    \n",
-		"    open()    ----->v                               |  |                    \n",
+		"open()        ----->v                                |  |                   \n",
+		"  open()      ----->v                                |  |                   \n",
+		"    open()    ----->v                                |  |                   \n",
+		"                    .                                .  .                   \n",
 	};
 	if (verbose > 3)
 		print_simple(child, msgs);
@@ -876,9 +904,10 @@ void print_open(int child)
 void print_close(int child)
 {
 	static const char *msgs[] = {
-		"close()       ----->X                               |  |                    \n",
-		"  close()     ----->X                               |  |                    \n",
-		"    close()   ----->X                               |  |                    \n",
+		"close()       ----->X                                |  |                   \n",
+		"  close()     ----->X                                |  |                   \n",
+		"    close()   ----->X                                |  |                   \n",
+		"                    .                                .  .                   \n",
 	};
 	if (verbose > 3)
 		print_simple(child, msgs);
@@ -887,35 +916,38 @@ void print_close(int child)
 void print_preamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+------------Preamble-----------+--+                    \n",
-		"  ------------------+------------Preamble-----------+--+                    \n",
-		"    ----------------+------------Preamble-----------+--+                    \n",
+		"--------------------+------------Preamble------------+--+                   \n",
+		"  ------------------+------------Preamble------------+--+                   \n",
+		"    ----------------+------------Preamble------------+--+                   \n",
+		"--------------------+-------------Preamble--------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_inconclusive(int child)
 {
 	static const char *msgs[] = {
-		"???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
-		"  ?????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
-		"    ???????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
+		"  ??????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
+		"    ????????????????|?????????? INCONCLUSIVE ????????|??|                   [%d]\n",
+		"????????????????????|?????????? INCONCLUSIVE ????????|??|???????????????????[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_test(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+--------------Test-------------+--+                    \n",
-		"  ------------------+--------------Test-------------+--+                    \n",
-		"    ----------------+--------------Test-------------+--+                    \n",
+		"--------------------+---------------Test-------------+--+                   \n",
+		"  ------------------+---------------Test-------------+--+                   \n",
+		"    ----------------+---------------Test-------------+--+                   \n",
+		"--------------------+---------------Test-------------+--+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_failed(int child)
 {
@@ -923,102 +955,109 @@ void print_failed(int child)
 		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
 		"  XXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
 		"    XXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXXX[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|########## SCRIPT ERROR #######|##|                    [%d]\n",
-		"  ##################|########## SCRIPT ERROR #######|##|                    [%d]\n",
-		"    ################|########## SCRIPT ERROR #######|##|                    [%d]\n",
+		"####################|########### SCRIPT ERROR ######|##|                    [%d]\n",
+		"  ##################|########### SCRIPT ERROR ######|##|                    [%d]\n",
+		"    ################|########### SCRIPT ERROR ######|##|                    [%d]\n",
+		"####################|########### SCRIPT ERROR ######|##|####################[%d]\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|************ PASSED ***********|**|                    [%d]\n",
-		"  ******************|************ PASSED ***********|**|                    [%d]\n",
-		"    ****************|************ PASSED ***********|**|                    [%d]\n",
+		"********************|************* PASSED ***********|**|                   [%d]\n",
+		"  ******************|************* PASSED ***********|**|                   [%d]\n",
+		"    ****************|************* PASSED ***********|**|                   [%d]\n",
+		"********************|************* PASSED ***********|**|*******************[%d]\n",
 	};
 	if (verbose > 2)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_postamble(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+------------Postamble----------+--+                    \n",
-		"  ------------------+------------Postamble----------+--+                    \n",
-		"    ----------------+------------Postamble----------+--+                    \n",
+		"--------------------+-------------Postamble----------+--+                   \n",
+		"  ------------------+-------------Postamble----------+--+                   \n",
+		"    ----------------+-------------Postamble----------+--+                   \n",
+		"--------------------+-------------Postamble----------+--+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_test_end(int child)
 {
 	static const char *msgs[] = {
-		"--------------------+-------------------------------+--+                    \n",
-		"  ------------------+-------------------------------+--+                    \n",
-		"    ----------------+-------------------------------+--+                    \n",
+		"--------------------+--------------------------------+--+                   \n",
+		"  ------------------+--------------------------------+--+                   \n",
+		"    ----------------+--------------------------------+--+                   \n",
+		"--------------------+--------------------------------+--+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
-};
+}
 
 void print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
-		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
-		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
+		"  @@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
+		"    @@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                   {%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
-};
+}
 
 void print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
-		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
-		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
+		"  &&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
+		"    &&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                   {%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
 	};
 	if (verbose > 0)
 		print_simple_int(child, msgs, signal);
-};
+}
 
 void print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
-		"  ++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
-		"    ++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n",
-		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++[%d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
+		"  ++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
+		"    ++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++{%d}\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++[%d]\n",
 	};
 	if (show_timeout || verbose > 0) {
 		print_simple_int(child, msgs, state);
 		show_timeout--;
 	}
-};
+}
 
 void print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                   [%d]\n",
-		"                    |  |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
-		"                    |- |- - - - - nothing! - - - - - - -|                   [%d]\n",
-		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
+		"  - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
+		"    - - - - - - - - |- - - - - - -nothing!- - - - - -| -|                   [%d]\n",
+		"- - - - - - - - - - |- - - - - - -nothing!- - - - - -| -|- - - - - - - - - -[%d]\n",
 	};
 	if (verbose > 1)
 		print_simple_int(child, msgs, state);
-};
+}
 
 void print_string_state(int child, const char *msgs[], const char *string)
 {
@@ -1031,43 +1070,43 @@ void print_string_state(int child, const char *msgs[], const char *string)
 void print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"  %-14s--->|  |                                |                   [%d]\n",
-		"                    |  |                                |<---%14s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"%-14s<----/|                                |  |                   [%d]\n",
+		"  %-14s<--/|                                |  |                   [%d]\n",
+		"    %-14s</|                                |  |                   [%d]\n",
+		"                    |          %-14s        |  |                   [%d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
-void print_tx_prim(int child, const char *command)
+
+void print_command(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"--%16s->|  |                                |                   [%d]\n",
-		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"%-14s<----/|                                |  |                   [%d]\n",
+		"  %-14s<--/|                                |  |                   [%d]\n",
+		"    %-14s</|                                |  |                   [%d]\n",
+		"                    |          %-14s        |  |                   [%d]\n",
 	};
-	if (verbose > 0)
+	if (verbose > 3)
 		print_string_state(child, msgs, command);
 }
 
-void print_rx_prim(int child, const char *command)
+void print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
-	static const char *msgs[] = {
-		"%-14s<----/|                               |  |                    [%d]\n",
-		"  %-14s<--/|                               |  |                    [%d]\n",
-		"    %-14s</|                               |  |                    [%d]\n",
-	};
-	if (verbose > 0)
-		print_string_state(child, msgs, command);
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, val, state);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"%-14s<----/|                               |  |                    [%d]\n",
-		"  %-14s<--/|                               |  |                    [%d]\n",
-		"    %-14s</|                               |  |                    [%d]\n",
-		"                    |  |       [%14s]        |                    [%d]\n",
+		"%-14s<----/|                                |  |                   [%d]\n",
+		"  %-14s<--/|                                |  |                   [%d]\n",
+		"    %-14s</|                                |  |                   [%d]\n",
+		"                    |          %-14s        |  |                   [%d]\n",
 	};
 	if (verbose > 3)
 		print_string_state(child, msgs, errno_string(error));
@@ -1076,9 +1115,10 @@ void print_errno(int child, long error)
 void print_success(int child)
 {
 	static const char *msgs[] = {
-		"ok            <----/|                               |  |                    [%d]\n",
-		"  ok          <----/|                               |  |                    [%d]\n",
-		"    ok        <----/|                               |  |                    [%d]\n",
+		"ok            <----/|                                |  |                   [%d]\n",
+		"  ok          <----/|                                |  |                   [%d]\n",
+		"    ok        <----/|                                |  |                   [%d]\n",
+		"                    |                ok              |  |                   [%d]\n",
 	};
 	if (verbose > 4)
 		print_simple_int(child, msgs, state);
@@ -1087,30 +1127,85 @@ void print_success(int child)
 void print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"%10d    <----/|                               |  |                    [%d]\n",
-		"  %10d  <----/|                               |  |                    [%d]\n",
-		"    %10d<----/|                               |  |                    [%d]\n",
+		"%10d<--------/|                                |  |                   [%d]\n",
+		"  %10d<------/|                                |  |                   [%d]\n",
+		"    %10d<----/|                                |  |                   [%d]\n",
+		"                    |            [%10d]        |  |                   [%d]\n",
 	};
 	if (verbose)
 		print_double_int(child, msgs, value, state);
 }
 
-void print_ti_ioctl(int child, int cmd, intptr_t arg)
+void print_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
-		"%-14s----->|                               |  |                    [%d]\n",
-		"  %-14s--->|                               |  |                    [%d]\n",
-		"    %-14s->|                               |  |                    [%d]\n",
+		"ioctl(2)----------->|       %16s         |  |                   [%d]\n",
+		"  ioctl(2)--------->|       %16s         |  |                   [%d]\n",
+		"    ioctl(2)------->|       %16s         |  |                   [%d]\n",
+		"                    |       %16s ioctl(2)|  |                   [%d]\n",
 	};
-	if (verbose > 0)
+	if (verbose > 3)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
-void print_ioctl(int child, int cmd, intptr_t arg)
+void print_datcall(int child, const char *command, size_t bytes)
 {
-	if (verbose > 3)
-		print_ti_ioctl(child, cmd, arg);
+	static const char *msgs[] = {
+		"%1$14s- - ->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
+		"  %1$14s- ->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
+		"    %1$14s->|- - %2$4d bytes- - - - - - - - ->|- |                   [%3$d]\n",
+		"                    |< + %2$4d bytes  %1$14s  |  |                   [%3$d]\n",
+	};
+	if ((verbose && show_data) || verbose > 1)
+		print_string_int_state(child, msgs, command, bytes);
 }
+
+void print_expect(int child, int want)
+{
+	static const char *msgs[] = {
+		"(%-14s)    |- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
+		"  (%-14s)  |- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
+		"    (%-14s)|- - - - - -[Expected]- - - - - -|- |                    [%d]\n",
+		"                    |- - -[Expected %-14s] -|- |                    [%d]\n",
+	};
+	if (verbose > 1 && show)
+		print_string_state(child, msgs, event_string(want));
+}
+
+void print_string(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%-16s    |                                |  |                    \n",
+		"  %-16s  |                                |  |                    \n",
+		"    %-16s|                                |  |                    \n",
+		"                    |  |      %-16s       |  |                    \n",
+	};
+	if (verbose > 1 && show)
+		print_simple_string(child, msgs, string);
+}
+
+void print_time_state(int child, const char *msgs[], ulong time)
+{
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, state);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_waiting(int child, ulong time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
+		"  / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
+		"    / / / / / / / / | / / / Waiting %03lu seconds / / /|/ |                   [%d]\n",
+		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / / [%d]\n",
+	};
+	if (verbose > 0 && show)
+		print_time_state(child, msgs, time);
+}
+
+
+
 
 /*
  *  -------------------------------------------------------------------------
@@ -1119,16 +1214,62 @@ void print_ioctl(int child, int cmd, intptr_t arg)
  *
  *  -------------------------------------------------------------------------
  */
+int test_ioctl(int child, int cmd, intptr_t arg)
+{
+	print_ioctl(child, cmd, arg);
+	for (;;) {
+		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		if (verbose > 3)
+			print_success_value(child, last_retval);
+		return (__RESULT_SUCCESS);
+	}
+}
+
+int test_insertfd(int child, int resfd,  int offset, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	struct strfdinsert fdi;
+	if (ctrl) {
+		fdi.ctlbuf.maxlen = ctrl->maxlen;
+		fdi.ctlbuf.len = ctrl->len;
+		fdi.ctlbuf.buf = ctrl->buf;
+	} else {
+		fdi.ctlbuf.maxlen = -1;
+		fdi.ctlbuf.len = 0;
+		fdi.ctlbuf.buf = NULL;
+	}
+	if (data) {
+		fdi.databuf.maxlen = data->maxlen;
+		fdi.databuf.len = data->len;
+		fdi.databuf.buf = data->buf;
+	} else {
+		fdi.databuf.maxlen = -1;
+		fdi.databuf.len = 0;
+		fdi.databuf.buf = NULL;
+	}
+	fdi.flags = flags;
+	fdi.fildes = resfd;
+	fdi.offset = offset;
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
 int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
-	if (band) {
+	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
-		print_syscall(child, "putpmsg(2)----");
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
 				print_errno(child, (last_errno = errno));
@@ -1136,7 +1277,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if (verbose > 3)
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	} else {
@@ -1146,7 +1288,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 			lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
-		print_syscall(child, "putmsg(2)-----");
+		if (ctrl == NULL || data != NULL)
+			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
 				print_errno(child, (last_errno = errno));
@@ -1154,7 +1297,8 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 					continue;
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if (verbose > 3)
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	}
@@ -1248,18 +1392,14 @@ int test_readv(int child, const struct iovec *iov, int count)
 	return (__RESULT_SUCCESS);
 }
 
-int test_ti_ioctl(int child, int cmd, intptr_t arg)
+
+
+int test_nonblock(int child)
 {
-	if (cmd == I_STR && verbose > 3) {
-		struct strioctl *icp = (struct strioctl *) arg;
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	print_ti_ioctl(child, cmd, arg);
+	long flags;
+	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
 			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
@@ -1268,29 +1408,46 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 		print_success_value(child, last_retval);
 		break;
 	}
-	if (cmd == I_STR && verbose > 3) {
-		struct strioctl *icp = (struct strioctl *) arg;
-		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
-		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
-	}
-	return __RESULT_SUCCESS;
-}
-
-int test_ioctl(int child, int cmd, intptr_t arg)
-{
-	print_ioctl(child, cmd, arg);
+	print_syscall(child, "fcntl(2)------");
 	for (;;) {
-		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
 			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
-		return (__RESULT_SUCCESS);
+		break;
 	}
+	return (__RESULT_SUCCESS);
+}
+
+int test_block(int child)
+{
+	long flags;
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	print_syscall(child, "fcntl(2)------");
+	for (;;) {
+		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
 }
 
 int test_pipe(int child)
@@ -1348,14 +1505,73 @@ int test_close(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  Test harness initialization and termination.
+ *  STREAM Initialization
  *
  *  -------------------------------------------------------------------------
  */
 
-static int begin_tests(void)
+static int stream_start(int child, int index)
+{
+	switch (child) {
+	case 1:
+		if (test_pipe(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	case 2:
+		return __RESULT_SUCCESS;
+	case 0:
+#if 0
+		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+#endif
+		return __RESULT_SUCCESS;
+	default:
+		return __RESULT_FAILURE;
+	}
+}
+
+static int stream_stop(int child)
+{
+	switch (child) {
+	case 1:
+		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(1) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		if (test_close(0) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+		return __RESULT_SUCCESS;
+	case 2:
+		return __RESULT_SUCCESS;
+	case 0:
+#if 0
+		if (test_ioctl(0, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
+#endif
+		return __RESULT_SUCCESS;
+	default:
+		return __RESULT_FAILURE;
+	}
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Test initialization and termination.
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+static int begin_tests(int index)
 {
 	state = 0;
+	show_acks = 1;
 	return (__RESULT_SUCCESS);
 }
 
@@ -1406,11 +1622,13 @@ struct test_stream {
 /*
  *  Open and Close 1 stream.
  */
+#define numb_case_1_1 "1.1"
 #define tgrp_case_1_1 test_group_1
 #define name_case_1_1 "Open and close 1 stream."
 #define desc_case_1_1 "\
 Checks that one stream can be opened and closed."
-int test_1_1(int child)
+
+int test_case_1_1(int child)
 {
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -1418,19 +1636,21 @@ int test_1_1(int child)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
-struct test_stream test_case_1_1 = { NULL, &test_1_1, NULL };
-#define test_case_1_1_stream_0 (&test_case_1_1)
+struct test_stream test_1_1 = { NULL, &test_case_1_1, NULL };
+#define test_case_1_1_stream_0 (&test_1_1)
 #define test_case_1_1_stream_1 (NULL)
 #define test_case_1_1_stream_2 (NULL)
 
 /*
  *  Open and Close 3 streams.
  */
+#define numb_case_1_2 "1.2"
 #define tgrp_case_1_2 test_group_1
 #define name_case_1_2 "Open and close 3 streams."
 #define desc_case_1_2 "\
 Checks that three streams can be opened and closed."
-int test_1_2(int child)
+
+int test_case_1_2(int child)
 {
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
@@ -1438,10 +1658,10 @@ int test_1_2(int child)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
-struct test_stream test_case_1_2 = { NULL, &test_1_2, NULL };
-#define test_case_1_2_stream_0 (&test_case_1_2)
-#define test_case_1_2_stream_1 (&test_case_1_2)
-#define test_case_1_2_stream_2 (&test_case_1_2)
+struct test_stream test_1_2 = { NULL, &test_case_1_2, NULL };
+#define test_case_1_2_stream_0 (&test_1_2)
+#define test_case_1_2_stream_1 (&test_1_2)
+#define test_case_1_2_stream_2 (&test_1_2)
 
 #define test_group_2 "Perform IOCTL on one stream"
 
@@ -1454,7 +1674,8 @@ struct test_stream test_case_1_2 = { NULL, &test_1_2, NULL };
 Checks that I_NREAD can be performed on a stream.  Because this test is peformed\n\
 on a freshly opened stream, it should return zero (0) as a return value and\n\
 return zero (0) in the integer pointed to by arg."
-int test_2_1_1(int child)
+
+int test_case_2_1_1(int child)
 {
 	int numb = -1;
 	if (test_ioctl(child, I_NREAD, (intptr_t) & numb) != __RESULT_SUCCESS)
@@ -1468,8 +1689,8 @@ int test_2_1_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_1_1 = { &preamble_0, &test_2_1_1, &postamble_0 };
-#define test_case_2_1_1_stream_0 (&test_case_2_1_1)
+struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
+#define test_case_2_1_1_stream_0 (&test_2_1_1)
 #define test_case_2_1_1_stream_1 (NULL)
 #define test_case_2_1_1_stream_2 (NULL)
 
@@ -1478,14 +1699,15 @@ struct test_stream test_case_2_1_1 = { &preamble_0, &test_2_1_1, &postamble_0 };
 #define desc_case_2_1_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_1_2(int child)
+
+int test_case_2_1_2(int child)
 {
 	if (test_ioctl(child, I_NREAD, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
-#define test_case_2_1_2_stream_0 (&test_case_2_1_2)
+struct test_stream test_2_1_2 = { &preamble_0, &test_case_2_1_2, &postamble_0 };
+#define test_case_2_1_2_stream_0 (&test_2_1_2)
 #define test_case_2_1_2_stream_1 (NULL)
 #define test_case_2_1_2_stream_2 (NULL)
 
@@ -1496,14 +1718,15 @@ struct test_stream test_case_2_1_2 = { &preamble_0, &test_2_1_2, &postamble_0 };
 #define name_case_2_2_1 "Perform streamio I_PUSH."
 #define desc_case_2_2_1 "\
 Checks that I_PUSH can be performed on a stream."
-int test_2_2_1(int child)
+
+int test_case_2_2_1(int child)
 {
 	if (test_ioctl(child, I_PUSH, (intptr_t) "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_2_1 = { &preamble_0, &test_2_2_1, &postamble_0 };
-#define test_case_2_2_1_stream_0 (&test_case_2_2_1)
+struct test_stream test_2_2_1 = { &preamble_0, &test_case_2_2_1, &postamble_0 };
+#define test_case_2_2_1_stream_0 (&test_2_2_1)
 #define test_case_2_2_1_stream_1 (NULL)
 #define test_case_2_2_1_stream_2 (NULL)
 
@@ -1512,14 +1735,15 @@ struct test_stream test_case_2_2_1 = { &preamble_0, &test_2_2_1, &postamble_0 };
 #define desc_case_2_2_2 "\
 Checks that EINVAL is returned when I_PUSH is performed with an invalid module\n\
 name \"nomodule\"."
-int test_2_2_2(int child)
+
+int test_case_2_2_2(int child)
 {
 	if (test_ioctl(child, I_PUSH, (intptr_t) "nomodule") == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_2_2 = { &preamble_0, &test_2_2_2, &postamble_0 };
-#define test_case_2_2_2_stream_0 (&test_case_2_2_2)
+struct test_stream test_2_2_2 = { &preamble_0, &test_case_2_2_2, &postamble_0 };
+#define test_case_2_2_2_stream_0 (&test_2_2_2)
 #define test_case_2_2_2_stream_1 (NULL)
 #define test_case_2_2_2_stream_2 (NULL)
 
@@ -1528,14 +1752,15 @@ struct test_stream test_case_2_2_2 = { &preamble_0, &test_2_2_2, &postamble_0 };
 #define desc_case_2_2_3 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_2_3(int child)
+
+int test_case_2_2_3(int child)
 {
 	if (test_ioctl(child, I_PUSH, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_2_3 = { &preamble_0, &test_2_2_3, &postamble_0 };
-#define test_case_2_2_3_stream_0 (&test_case_2_2_3)
+struct test_stream test_2_2_3 = { &preamble_0, &test_case_2_2_3, &postamble_0 };
+#define test_case_2_2_3_stream_0 (&test_2_2_3)
 #define test_case_2_2_3_stream_1 (NULL)
 #define test_case_2_2_3_stream_2 (NULL)
 
@@ -1546,14 +1771,15 @@ struct test_stream test_case_2_2_3 = { &preamble_0, &test_2_2_3, &postamble_0 };
 #define name_case_2_3 "Perform streamio I_POP."
 #define desc_case_2_3 "\
 Checks that I_POP can be performed on a stream."
-int test_2_3(int child)
+
+int test_case_2_3(int child)
 {
 	if (test_ioctl(child, I_POP, 0) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_3 = { &preamble_0, &test_2_3, &postamble_0 };
-#define test_case_2_3_stream_0 (&test_case_2_3)
+struct test_stream test_2_3 = { &preamble_0, &test_case_2_3, &postamble_0 };
+#define test_case_2_3_stream_0 (&test_2_3)
 #define test_case_2_3_stream_1 (NULL)
 #define test_case_2_3_stream_2 (NULL)
 
@@ -1564,15 +1790,16 @@ struct test_stream test_case_2_3 = { &preamble_0, &test_2_3, &postamble_0 };
 #define name_case_2_4 "Perform streamio I_LOOK."
 #define desc_case_2_4 "\
 Checks that I_LOOK can be performed on a stream."
-int test_2_4(int child)
+
+int test_case_2_4(int child)
 {
 	char buf[FMNAMESZ + 1];
 	if (test_ioctl(child, I_LOOK, (intptr_t) buf) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_4 = { &preamble_0, &test_2_4, &postamble_0 };
-#define test_case_2_4_stream_0 (&test_case_2_4)
+struct test_stream test_2_4 = { &preamble_0, &test_case_2_4, &postamble_0 };
+#define test_case_2_4_stream_0 (&test_2_4)
 #define test_case_2_4_stream_1 (NULL)
 #define test_case_2_4_stream_2 (NULL)
 
@@ -1583,7 +1810,8 @@ struct test_stream test_case_2_4 = { &preamble_0, &test_2_4, &postamble_0 };
 #define name_case_2_5 "Perform streamio I_FLUSH."
 #define desc_case_2_5 "\
 Checks that I_FLUSH can be performed on a stream."
-int test_2_5(int child)
+
+int test_case_2_5(int child)
 {
 #if 1
 	return __RESULT_INCONCLUSIVE;
@@ -1593,8 +1821,8 @@ int test_2_5(int child)
 	return (__RESULT_SUCCESS);
 #endif
 }
-struct test_stream test_case_2_5 = { &preamble_0, &test_2_5, &postamble_0 };
-#define test_case_2_5_stream_0 (&test_case_2_5)
+struct test_stream test_2_5 = { &preamble_0, &test_case_2_5, &postamble_0 };
+#define test_case_2_5_stream_0 (&test_2_5)
 #define test_case_2_5_stream_1 (NULL)
 #define test_case_2_5_stream_2 (NULL)
 
@@ -1606,15 +1834,16 @@ struct test_stream test_case_2_5 = { &preamble_0, &test_2_5, &postamble_0 };
 #define desc_case_2_6_1 "\
 Checks that I_SRDOPT can be performed on a stream.  This case is performed with\n\
 a zero argument and should return EINVAL."
-int test_2_6_1(int child)
+
+int test_case_2_6_1(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, 0) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_1 = { &preamble_0, &test_2_6_1, &postamble_0 };
-#define test_case_2_6_1_stream_0 (&test_case_2_6_1)
+struct test_stream test_2_6_1 = { &preamble_0, &test_case_2_6_1, &postamble_0 };
+#define test_case_2_6_1_stream_0 (&test_2_6_1)
 #define test_case_2_6_1_stream_1 (NULL)
 #define test_case_2_6_1_stream_2 (NULL)
 
@@ -1624,15 +1853,16 @@ struct test_stream test_case_2_6_1 = { &preamble_0, &test_2_6_1, &postamble_0 };
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RNORM | RPROTNORM)."
 
-int test_2_6_2(int child)
+
+int test_case_2_6_2(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_2 = { &preamble_0, &test_2_6_2, &postamble_0 };
-#define test_case_2_6_2_stream_0 (&test_case_2_6_2)
+struct test_stream test_2_6_2 = { &preamble_0, &test_case_2_6_2, &postamble_0 };
+#define test_case_2_6_2_stream_0 (&test_2_6_2)
 #define test_case_2_6_2_stream_1 (NULL)
 #define test_case_2_6_2_stream_2 (NULL)
 
@@ -1641,15 +1871,16 @@ struct test_stream test_case_2_6_2 = { &preamble_0, &test_2_6_2, &postamble_0 };
 #define desc_case_2_6_3 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RNORM | RPROTDAT)."
-int test_2_6_3(int child)
+
+int test_case_2_6_3(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_3 = { &preamble_0, &test_2_6_3, &postamble_0 };
-#define test_case_2_6_3_stream_0 (&test_case_2_6_3)
+struct test_stream test_2_6_3 = { &preamble_0, &test_case_2_6_3, &postamble_0 };
+#define test_case_2_6_3_stream_0 (&test_2_6_3)
 #define test_case_2_6_3_stream_1 (NULL)
 #define test_case_2_6_3_stream_2 (NULL)
 
@@ -1658,15 +1889,16 @@ struct test_stream test_case_2_6_3 = { &preamble_0, &test_2_6_3, &postamble_0 };
 #define desc_case_2_6_4 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RNORM | RPROTDIS)."
-int test_2_6_4(int child)
+
+int test_case_2_6_4(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_4 = { &preamble_0, &test_2_6_4, &postamble_0 };
-#define test_case_2_6_4_stream_0 (&test_case_2_6_4)
+struct test_stream test_2_6_4 = { &preamble_0, &test_case_2_6_4, &postamble_0 };
+#define test_case_2_6_4_stream_0 (&test_2_6_4)
 #define test_case_2_6_4_stream_1 (NULL)
 #define test_case_2_6_4_stream_2 (NULL)
 
@@ -1675,15 +1907,16 @@ struct test_stream test_case_2_6_4 = { &preamble_0, &test_2_6_4, &postamble_0 };
 #define desc_case_2_6_5 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGN | RPROTNORM)."
-int test_2_6_5(int child)
+
+int test_case_2_6_5(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_5 = { &preamble_0, &test_2_6_5, &postamble_0 };
-#define test_case_2_6_5_stream_0 (&test_case_2_6_5)
+struct test_stream test_2_6_5 = { &preamble_0, &test_case_2_6_5, &postamble_0 };
+#define test_case_2_6_5_stream_0 (&test_2_6_5)
 #define test_case_2_6_5_stream_1 (NULL)
 #define test_case_2_6_5_stream_2 (NULL)
 
@@ -1692,15 +1925,16 @@ struct test_stream test_case_2_6_5 = { &preamble_0, &test_2_6_5, &postamble_0 };
 #define desc_case_2_6_6 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGN | RPROTDAT)."
-int test_2_6_6(int child)
+
+int test_case_2_6_6(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_6 = { &preamble_0, &test_2_6_6, &postamble_0 };
-#define test_case_2_6_6_stream_0 (&test_case_2_6_6)
+struct test_stream test_2_6_6 = { &preamble_0, &test_case_2_6_6, &postamble_0 };
+#define test_case_2_6_6_stream_0 (&test_2_6_6)
 #define test_case_2_6_6_stream_1 (NULL)
 #define test_case_2_6_6_stream_2 (NULL)
 
@@ -1709,15 +1943,16 @@ struct test_stream test_case_2_6_6 = { &preamble_0, &test_2_6_6, &postamble_0 };
 #define desc_case_2_6_7 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGN | RPROTDIS)."
-int test_2_6_7(int child)
+
+int test_case_2_6_7(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_7 = { &preamble_0, &test_2_6_7, &postamble_0 };
-#define test_case_2_6_7_stream_0 (&test_case_2_6_7)
+struct test_stream test_2_6_7 = { &preamble_0, &test_case_2_6_7, &postamble_0 };
+#define test_case_2_6_7_stream_0 (&test_2_6_7)
 #define test_case_2_6_7_stream_1 (NULL)
 #define test_case_2_6_7_stream_2 (NULL)
 
@@ -1726,15 +1961,16 @@ struct test_stream test_case_2_6_7 = { &preamble_0, &test_2_6_7, &postamble_0 };
 #define desc_case_2_6_8 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGD | RPROTNORM)."
-int test_2_6_8(int child)
+
+int test_case_2_6_8(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_8 = { &preamble_0, &test_2_6_8, &postamble_0 };
-#define test_case_2_6_8_stream_0 (&test_case_2_6_8)
+struct test_stream test_2_6_8 = { &preamble_0, &test_case_2_6_8, &postamble_0 };
+#define test_case_2_6_8_stream_0 (&test_2_6_8)
 #define test_case_2_6_8_stream_1 (NULL)
 #define test_case_2_6_8_stream_2 (NULL)
 
@@ -1743,15 +1979,16 @@ struct test_stream test_case_2_6_8 = { &preamble_0, &test_2_6_8, &postamble_0 };
 #define desc_case_2_6_9 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGD | RPROTDAT)."
-int test_2_6_9(int child)
+
+int test_case_2_6_9(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_9 = { &preamble_0, &test_2_6_9, &postamble_0 };
-#define test_case_2_6_9_stream_0 (&test_case_2_6_9)
+struct test_stream test_2_6_9 = { &preamble_0, &test_case_2_6_9, &postamble_0 };
+#define test_case_2_6_9_stream_0 (&test_2_6_9)
 #define test_case_2_6_9_stream_1 (NULL)
 #define test_case_2_6_9_stream_2 (NULL)
 
@@ -1760,15 +1997,16 @@ struct test_stream test_case_2_6_9 = { &preamble_0, &test_2_6_9, &postamble_0 };
 #define desc_case_2_6_10 "\
 Checks that I_SRDOPT can be performed on a stream with the values \n\
 (RMSGD | RPROTDIS)."
-int test_2_6_10(int child)
+
+int test_case_2_6_10(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_10 = { &preamble_0, &test_2_6_10, &postamble_0 };
-#define test_case_2_6_10_stream_0 (&test_case_2_6_10)
+struct test_stream test_2_6_10 = { &preamble_0, &test_case_2_6_10, &postamble_0 };
+#define test_case_2_6_10_stream_0 (&test_2_6_10)
 #define test_case_2_6_10_stream_1 (NULL)
 #define test_case_2_6_10_stream_2 (NULL)
 
@@ -1777,15 +2015,16 @@ struct test_stream test_case_2_6_10 = { &preamble_0, &test_2_6_10, &postamble_0 
 #define desc_case_2_6_11 "\
 Checks that EINVAL is returned when I_SRDOPT is called with an invalid\n\
 argument (-1UL)."
-int test_2_6_11(int child)
+
+int test_case_2_6_11(int child)
 {
 	if (test_ioctl(child, I_SRDOPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_6_11 = { &preamble_0, &test_2_6_11, &postamble_0 };
-#define test_case_2_6_11_stream_0 (&test_case_2_6_11)
+struct test_stream test_2_6_11 = { &preamble_0, &test_case_2_6_11, &postamble_0 };
+#define test_case_2_6_11_stream_0 (&test_2_6_11)
 #define test_case_2_6_11_stream_1 (NULL)
 #define test_case_2_6_11_stream_2 (NULL)
 
@@ -1797,7 +2036,8 @@ struct test_stream test_case_2_6_11 = { &preamble_0, &test_2_6_11, &postamble_0 
 #define desc_case_2_7_1 "\
 Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
 read options."
-int test_2_7_1(int child)
+
+int test_case_2_7_1(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
@@ -1808,8 +2048,8 @@ int test_2_7_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_1 = { &preamble_0, &test_2_7_1, &postamble_0 };
-#define test_case_2_7_1_stream_0 (&test_case_2_7_1)
+struct test_stream test_2_7_1 = { &preamble_0, &test_case_2_7_1, &postamble_0 };
+#define test_case_2_7_1_stream_0 (&test_2_7_1)
 #define test_case_2_7_1_stream_1 (NULL)
 #define test_case_2_7_1_stream_2 (NULL)
 
@@ -1818,7 +2058,8 @@ struct test_stream test_case_2_7_1 = { &preamble_0, &test_2_7_1, &postamble_0 };
 #define desc_case_2_7_2 "\
 Checks that I_GRDOPT can be performed on a stream to read the stream default\n\
 options after they have been set with I_SRDOPT."
-int test_2_7_2(int child)
+
+int test_case_2_7_2(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
@@ -1832,8 +2073,8 @@ int test_2_7_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_2 = { &preamble_0, &test_2_7_2, &postamble_0 };
-#define test_case_2_7_2_stream_0 (&test_case_2_7_2)
+struct test_stream test_2_7_2 = { &preamble_0, &test_case_2_7_2, &postamble_0 };
+#define test_case_2_7_2_stream_0 (&test_2_7_2)
 #define test_case_2_7_2_stream_1 (NULL)
 #define test_case_2_7_2_stream_2 (NULL)
 
@@ -1842,7 +2083,8 @@ struct test_stream test_case_2_7_2 = { &preamble_0, &test_2_7_2, &postamble_0 };
 #define desc_case_2_7_3 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RNORM | RPROTDAT) after they have been set with I_SRDOPT."
-int test_2_7_3(int child)
+
+int test_case_2_7_3(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
@@ -1856,8 +2098,8 @@ int test_2_7_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_3 = { &preamble_0, &test_2_7_3, &postamble_0 };
-#define test_case_2_7_3_stream_0 (&test_case_2_7_3)
+struct test_stream test_2_7_3 = { &preamble_0, &test_case_2_7_3, &postamble_0 };
+#define test_case_2_7_3_stream_0 (&test_2_7_3)
 #define test_case_2_7_3_stream_1 (NULL)
 #define test_case_2_7_3_stream_2 (NULL)
 
@@ -1866,7 +2108,8 @@ struct test_stream test_case_2_7_3 = { &preamble_0, &test_2_7_3, &postamble_0 };
 #define desc_case_2_7_4 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RNORM | RPROTDIS) after they have been set with I_SRDOPT."
-int test_2_7_4(int child)
+
+int test_case_2_7_4(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
@@ -1880,8 +2123,8 @@ int test_2_7_4(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_4 = { &preamble_0, &test_2_7_4, &postamble_0 };
-#define test_case_2_7_4_stream_0 (&test_case_2_7_4)
+struct test_stream test_2_7_4 = { &preamble_0, &test_case_2_7_4, &postamble_0 };
+#define test_case_2_7_4_stream_0 (&test_2_7_4)
 #define test_case_2_7_4_stream_1 (NULL)
 #define test_case_2_7_4_stream_2 (NULL)
 
@@ -1890,7 +2133,8 @@ struct test_stream test_case_2_7_4 = { &preamble_0, &test_2_7_4, &postamble_0 };
 #define desc_case_2_7_5 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGD | RPROTNORM) after they have been set with I_SRDOPT."
-int test_2_7_5(int child)
+
+int test_case_2_7_5(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
@@ -1904,8 +2148,8 @@ int test_2_7_5(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_5 = { &preamble_0, &test_2_7_5, &postamble_0 };
-#define test_case_2_7_5_stream_0 (&test_case_2_7_5)
+struct test_stream test_2_7_5 = { &preamble_0, &test_case_2_7_5, &postamble_0 };
+#define test_case_2_7_5_stream_0 (&test_2_7_5)
 #define test_case_2_7_5_stream_1 (NULL)
 #define test_case_2_7_5_stream_2 (NULL)
 
@@ -1914,7 +2158,8 @@ struct test_stream test_case_2_7_5 = { &preamble_0, &test_2_7_5, &postamble_0 };
 #define desc_case_2_7_6 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGD | RPROTDAT) after they have been set with I_SRDOPT."
-int test_2_7_6(int child)
+
+int test_case_2_7_6(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDAT)) != __RESULT_SUCCESS)
@@ -1928,8 +2173,8 @@ int test_2_7_6(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_6 = { &preamble_0, &test_2_7_6, &postamble_0 };
-#define test_case_2_7_6_stream_0 (&test_case_2_7_6)
+struct test_stream test_2_7_6 = { &preamble_0, &test_case_2_7_6, &postamble_0 };
+#define test_case_2_7_6_stream_0 (&test_2_7_6)
 #define test_case_2_7_6_stream_1 (NULL)
 #define test_case_2_7_6_stream_2 (NULL)
 
@@ -1938,7 +2183,8 @@ struct test_stream test_case_2_7_6 = { &preamble_0, &test_2_7_6, &postamble_0 };
 #define desc_case_2_7_7 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGD | RPROTDIS) after they have been set with I_SRDOPT."
-int test_2_7_7(int child)
+
+int test_case_2_7_7(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDIS)) != __RESULT_SUCCESS)
@@ -1952,8 +2198,8 @@ int test_2_7_7(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_7 = { &preamble_0, &test_2_7_7, &postamble_0 };
-#define test_case_2_7_7_stream_0 (&test_case_2_7_7)
+struct test_stream test_2_7_7 = { &preamble_0, &test_case_2_7_7, &postamble_0 };
+#define test_case_2_7_7_stream_0 (&test_2_7_7)
 #define test_case_2_7_7_stream_1 (NULL)
 #define test_case_2_7_7_stream_2 (NULL)
 
@@ -1962,7 +2208,8 @@ struct test_stream test_case_2_7_7 = { &preamble_0, &test_2_7_7, &postamble_0 };
 #define desc_case_2_7_8 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGN | RPROTNORM) after they have been set with I_SRDOPT."
-int test_2_7_8(int child)
+
+int test_case_2_7_8(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
@@ -1976,8 +2223,8 @@ int test_2_7_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_8 = { &preamble_0, &test_2_7_8, &postamble_0 };
-#define test_case_2_7_8_stream_0 (&test_case_2_7_8)
+struct test_stream test_2_7_8 = { &preamble_0, &test_case_2_7_8, &postamble_0 };
+#define test_case_2_7_8_stream_0 (&test_2_7_8)
 #define test_case_2_7_8_stream_1 (NULL)
 #define test_case_2_7_8_stream_2 (NULL)
 
@@ -1986,7 +2233,8 @@ struct test_stream test_case_2_7_8 = { &preamble_0, &test_2_7_8, &postamble_0 };
 #define desc_case_2_7_9 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGN | RPROTDAT) after they have been set with I_SRDOPT."
-int test_2_7_9(int child)
+
+int test_case_2_7_9(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDAT)) != __RESULT_SUCCESS)
@@ -2000,8 +2248,8 @@ int test_2_7_9(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_9 = { &preamble_0, &test_2_7_9, &postamble_0 };
-#define test_case_2_7_9_stream_0 (&test_case_2_7_9)
+struct test_stream test_2_7_9 = { &preamble_0, &test_case_2_7_9, &postamble_0 };
+#define test_case_2_7_9_stream_0 (&test_2_7_9)
 #define test_case_2_7_9_stream_1 (NULL)
 #define test_case_2_7_9_stream_2 (NULL)
 
@@ -2010,7 +2258,8 @@ struct test_stream test_case_2_7_9 = { &preamble_0, &test_2_7_9, &postamble_0 };
 #define desc_case_2_7_10 "\
 Checks that I_GRDOPT can be performed on a stream to read the read options\n\
 (RMSGN | RPROTDIS) after they have been set with I_SRDOPT."
-int test_2_7_10(int child)
+
+int test_case_2_7_10(int child)
 {
 	int rdopts = -1;
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDIS)) != __RESULT_SUCCESS)
@@ -2024,8 +2273,8 @@ int test_2_7_10(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_10 = { &preamble_0, &test_2_7_10, &postamble_0 };
-#define test_case_2_7_10_stream_0 (&test_case_2_7_10)
+struct test_stream test_2_7_10 = { &preamble_0, &test_case_2_7_10, &postamble_0 };
+#define test_case_2_7_10_stream_0 (&test_2_7_10)
 #define test_case_2_7_10_stream_1 (NULL)
 #define test_case_2_7_10_stream_2 (NULL)
 
@@ -2034,15 +2283,16 @@ struct test_stream test_case_2_7_10 = { &preamble_0, &test_2_7_10, &postamble_0 
 #define desc_case_2_7_11 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_7_11(int child)
+
+int test_case_2_7_11(int child)
 {
 	if (test_ioctl(child, I_GRDOPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_7_11 = { &preamble_0, &test_2_7_11, &postamble_0 };
-#define test_case_2_7_11_stream_0 (&test_case_2_7_11)
+struct test_stream test_2_7_11 = { &preamble_0, &test_case_2_7_11, &postamble_0 };
+#define test_case_2_7_11_stream_0 (&test_2_7_11)
 #define test_case_2_7_11_stream_1 (NULL)
 #define test_case_2_7_11_stream_2 (NULL)
 
@@ -2053,12 +2303,13 @@ struct test_stream test_case_2_7_11 = { &preamble_0, &test_2_7_11, &postamble_0 
 #define name_case_2_8 "Perform streamio I_STR."
 #define desc_case_2_8 "\
 Checks that I_STR can be performed on a stream."
-int test_2_8(int child)
+
+int test_case_2_8(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_8 = { &preamble_0, &test_2_8, &postamble_0 };
-#define test_case_2_8_stream_0 (&test_case_2_8)
+struct test_stream test_2_8 = { &preamble_0, &test_case_2_8, &postamble_0 };
+#define test_case_2_8_stream_0 (&test_2_8)
 #define test_case_2_8_stream_1 (NULL)
 #define test_case_2_8_stream_2 (NULL)
 
@@ -2069,14 +2320,15 @@ struct test_stream test_case_2_8 = { &preamble_0, &test_2_8, &postamble_0 };
 #define name_case_2_9 "Perform streamio I_SETSIG."
 #define desc_case_2_9 "\
 Checks that I_SETSIG can be performed on a stream."
-int test_2_9(int child)
+
+int test_case_2_9(int child)
 {
 	if (test_ioctl(child, I_SETSIG, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_9 = { &preamble_0, &test_2_9, &postamble_0 };
-#define test_case_2_9_stream_0 (&test_case_2_9)
+struct test_stream test_2_9 = { &preamble_0, &test_case_2_9, &postamble_0 };
+#define test_case_2_9_stream_0 (&test_2_9)
 #define test_case_2_9_stream_1 (NULL)
 #define test_case_2_9_stream_2 (NULL)
 
@@ -2087,15 +2339,16 @@ struct test_stream test_case_2_9 = { &preamble_0, &test_2_9, &postamble_0 };
 #define name_case_2_10_1 "Perform streamio I_GETSIG."
 #define desc_case_2_10_1 "\
 Checks that I_GETSIG can be performed on a stream."
-int test_2_10_1(int child)
+
+int test_case_2_10_1(int child)
 {
 	int sigs = 0;
 	if (test_ioctl(child, I_GETSIG, (intptr_t) & sigs) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_10_1 = { &preamble_0, &test_2_10_1, &postamble_0 };
-#define test_case_2_10_1_stream_0 (&test_case_2_10_1)
+struct test_stream test_2_10_1 = { &preamble_0, &test_case_2_10_1, &postamble_0 };
+#define test_case_2_10_1_stream_0 (&test_2_10_1)
 #define test_case_2_10_1_stream_1 (NULL)
 #define test_case_2_10_1_stream_2 (NULL)
 
@@ -2104,14 +2357,15 @@ struct test_stream test_case_2_10_1 = { &preamble_0, &test_2_10_1, &postamble_0 
 #define desc_case_2_10_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_10_2(int child)
+
+int test_case_2_10_2(int child)
 {
 	if (test_ioctl(child, I_GETSIG, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_10_2 = { &preamble_0, &test_2_10_2, &postamble_0 };
-#define test_case_2_10_2_stream_0 (&test_case_2_10_2)
+struct test_stream test_2_10_2 = { &preamble_0, &test_case_2_10_2, &postamble_0 };
+#define test_case_2_10_2_stream_0 (&test_2_10_2)
 #define test_case_2_10_2_stream_1 (NULL)
 #define test_case_2_10_2_stream_2 (NULL)
 
@@ -2122,15 +2376,16 @@ struct test_stream test_case_2_10_2 = { &preamble_0, &test_2_10_2, &postamble_0 
 #define name_case_2_11 "Perform streamio I_FIND."
 #define desc_case_2_11 "\
 Checks that I_FIND can be performed on a stream."
-int test_2_11(int child)
+
+int test_case_2_11(int child)
 {
 	char bogus[] = "bogus";
 	if (test_ioctl(child, I_FIND, (intptr_t) bogus) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_11 = { &preamble_0, &test_2_11, &postamble_0 };
-#define test_case_2_11_stream_0 (&test_case_2_11)
+struct test_stream test_2_11 = { &preamble_0, &test_case_2_11, &postamble_0 };
+#define test_case_2_11_stream_0 (&test_2_11)
 #define test_case_2_11_stream_1 (NULL)
 #define test_case_2_11_stream_2 (NULL)
 
@@ -2141,12 +2396,13 @@ struct test_stream test_case_2_11 = { &preamble_0, &test_2_11, &postamble_0 };
 #define name_case_2_12 "Perform streamio I_LINK."
 #define desc_case_2_12 "\
 Checks that I_LINK can be performed on a stream."
-int test_2_12(int child)
+
+int test_case_2_12(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_12 = { &preamble_0, &test_2_12, &postamble_0 };
-#define test_case_2_12_stream_0 (&test_case_2_12)
+struct test_stream test_2_12 = { &preamble_0, &test_case_2_12, &postamble_0 };
+#define test_case_2_12_stream_0 (&test_2_12)
 #define test_case_2_12_stream_1 (NULL)
 #define test_case_2_12_stream_2 (NULL)
 
@@ -2157,12 +2413,13 @@ struct test_stream test_case_2_12 = { &preamble_0, &test_2_12, &postamble_0 };
 #define name_case_2_13 "Perform streamio I_UNLINK."
 #define desc_case_2_13 "\
 Checks that I_UNLINK can be performed on a stream."
-int test_2_13(int child)
+
+int test_case_2_13(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_13 = { &preamble_0, &test_2_13, &postamble_0 };
-#define test_case_2_13_stream_0 (&test_case_2_13)
+struct test_stream test_2_13 = { &preamble_0, &test_case_2_13, &postamble_0 };
+#define test_case_2_13_stream_0 (&test_2_13)
 #define test_case_2_13_stream_1 (NULL)
 #define test_case_2_13_stream_2 (NULL)
 
@@ -2173,15 +2430,16 @@ struct test_stream test_case_2_13 = { &preamble_0, &test_2_13, &postamble_0 };
 #define name_case_2_14 "Perform streamio I_RECVFD."
 #define desc_case_2_14 "\
 Checks that I_RECVFD can be performed on a stream."
-int test_2_14(int child)
+
+int test_case_2_14(int child)
 {
 	struct strrecvfd recvfd;
 	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_14 = { &preamble_0, &test_2_14, &postamble_0 };
-#define test_case_2_14_stream_0 (&test_case_2_14)
+struct test_stream test_2_14 = { &preamble_0, &test_case_2_14, &postamble_0 };
+#define test_case_2_14_stream_0 (&test_2_14)
 #define test_case_2_14_stream_1 (NULL)
 #define test_case_2_14_stream_2 (NULL)
 
@@ -2192,15 +2450,16 @@ struct test_stream test_case_2_14 = { &preamble_0, &test_2_14, &postamble_0 };
 #define name_case_2_15 "Perform streamio I_PEEK."
 #define desc_case_2_15 "\
 Checks that I_PEEK can be performed on a stream."
-int test_2_15(int child)
+
+int test_case_2_15(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_15 = { &preamble_0, &test_2_15, &postamble_0 };
-#define test_case_2_15_stream_0 (&test_case_2_15)
+struct test_stream test_2_15 = { &preamble_0, &test_case_2_15, &postamble_0 };
+#define test_case_2_15_stream_0 (&test_2_15)
 #define test_case_2_15_stream_1 (NULL)
 #define test_case_2_15_stream_2 (NULL)
 
@@ -2211,12 +2470,13 @@ struct test_stream test_case_2_15 = { &preamble_0, &test_2_15, &postamble_0 };
 #define name_case_2_16 "Perform streamio I_FDINSERT."
 #define desc_case_2_16 "\
 Checks that I_FDINSERT can be performed on a stream."
-int test_2_16(int child)
+
+int test_case_2_16(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_16 = { &preamble_0, &test_2_16, &postamble_0 };
-#define test_case_2_16_stream_0 (&test_case_2_16)
+struct test_stream test_2_16 = { &preamble_0, &test_case_2_16, &postamble_0 };
+#define test_case_2_16_stream_0 (&test_2_16)
 #define test_case_2_16_stream_1 (NULL)
 #define test_case_2_16_stream_2 (NULL)
 
@@ -2227,12 +2487,13 @@ struct test_stream test_case_2_16 = { &preamble_0, &test_2_16, &postamble_0 };
 #define name_case_2_17 "Perform streamio I_SENDFD."
 #define desc_case_2_17 "\
 Checks that I_SENDFD can be performed on a stream."
-int test_2_17(int child)
+
+int test_case_2_17(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_17 = { &preamble_0, &test_2_17, &postamble_0 };
-#define test_case_2_17_stream_0 (&test_case_2_17)
+struct test_stream test_2_17 = { &preamble_0, &test_case_2_17, &postamble_0 };
+#define test_case_2_17_stream_0 (&test_2_17)
 #define test_case_2_17_stream_1 (NULL)
 #define test_case_2_17_stream_2 (NULL)
 
@@ -2243,12 +2504,13 @@ struct test_stream test_case_2_17 = { &preamble_0, &test_2_17, &postamble_0 };
 #define name_case_2_18 "Perform streamio I_E_RECVFD."
 #define desc_case_2_18 "\
 Checks that I_E_RECVFD can be performed on a stream."
-int test_2_18(int child)
+
+int test_case_2_18(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_18 = { &preamble_0, &test_2_18, &postamble_0 };
-#define test_case_2_18_stream_0 (&test_case_2_18)
+struct test_stream test_2_18 = { &preamble_0, &test_case_2_18, &postamble_0 };
+#define test_case_2_18_stream_0 (&test_2_18)
 #define test_case_2_18_stream_1 (NULL)
 #define test_case_2_18_stream_2 (NULL)
 
@@ -2259,15 +2521,16 @@ struct test_stream test_case_2_18 = { &preamble_0, &test_2_18, &postamble_0 };
 #define name_case_2_19_1 "Perform streamio I_SWROPT - default."
 #define desc_case_2_19_1 "\
 Checks that I_SWROPT can be performed on a stream."
-int test_2_19_1(int child)
+
+int test_case_2_19_1(int child)
 {
 	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_1 = { &preamble_0, &test_2_19_1, &postamble_0 };
-#define test_case_2_19_1_stream_0 (&test_case_2_19_1)
+struct test_stream test_2_19_1 = { &preamble_0, &test_case_2_19_1, &postamble_0 };
+#define test_case_2_19_1_stream_0 (&test_2_19_1)
 #define test_case_2_19_1_stream_1 (NULL)
 #define test_case_2_19_1_stream_2 (NULL)
 
@@ -2276,15 +2539,16 @@ struct test_stream test_case_2_19_1 = { &preamble_0, &test_2_19_1, &postamble_0 
 #define desc_case_2_19_2 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDZERO)."
-int test_2_19_2(int child)
+
+int test_case_2_19_2(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_2 = { &preamble_0, &test_2_19_2, &postamble_0 };
-#define test_case_2_19_2_stream_0 (&test_case_2_19_2)
+struct test_stream test_2_19_2 = { &preamble_0, &test_case_2_19_2, &postamble_0 };
+#define test_case_2_19_2_stream_0 (&test_2_19_2)
 #define test_case_2_19_2_stream_1 (NULL)
 #define test_case_2_19_2_stream_2 (NULL)
 
@@ -2293,15 +2557,16 @@ struct test_stream test_case_2_19_2 = { &preamble_0, &test_2_19_2, &postamble_0 
 #define desc_case_2_19_3 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDPIPE)."
-int test_2_19_3(int child)
+
+int test_case_2_19_3(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_3 = { &preamble_0, &test_2_19_3, &postamble_0 };
-#define test_case_2_19_3_stream_0 (&test_case_2_19_3)
+struct test_stream test_2_19_3 = { &preamble_0, &test_case_2_19_3, &postamble_0 };
+#define test_case_2_19_3_stream_0 (&test_2_19_3)
 #define test_case_2_19_3_stream_1 (NULL)
 #define test_case_2_19_3_stream_2 (NULL)
 
@@ -2310,15 +2575,16 @@ struct test_stream test_case_2_19_3 = { &preamble_0, &test_2_19_3, &postamble_0 
 #define desc_case_2_19_4 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDHOLD)."
-int test_2_19_4(int child)
+
+int test_case_2_19_4(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_4 = { &preamble_0, &test_2_19_4, &postamble_0 };
-#define test_case_2_19_4_stream_0 (&test_case_2_19_4)
+struct test_stream test_2_19_4 = { &preamble_0, &test_case_2_19_4, &postamble_0 };
+#define test_case_2_19_4_stream_0 (&test_2_19_4)
 #define test_case_2_19_4_stream_1 (NULL)
 #define test_case_2_19_4_stream_2 (NULL)
 
@@ -2327,15 +2593,16 @@ struct test_stream test_case_2_19_4 = { &preamble_0, &test_2_19_4, &postamble_0 
 #define desc_case_2_19_5 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDZERO | SNDPIPE)."
-int test_2_19_5(int child)
+
+int test_case_2_19_5(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_5 = { &preamble_0, &test_2_19_5, &postamble_0 };
-#define test_case_2_19_5_stream_0 (&test_case_2_19_5)
+struct test_stream test_2_19_5 = { &preamble_0, &test_case_2_19_5, &postamble_0 };
+#define test_case_2_19_5_stream_0 (&test_2_19_5)
 #define test_case_2_19_5_stream_1 (NULL)
 #define test_case_2_19_5_stream_2 (NULL)
 
@@ -2344,15 +2611,16 @@ struct test_stream test_case_2_19_5 = { &preamble_0, &test_2_19_5, &postamble_0 
 #define desc_case_2_19_6 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDZERO | SNDHOLD)."
-int test_2_19_6(int child)
+
+int test_case_2_19_6(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_6 = { &preamble_0, &test_2_19_6, &postamble_0 };
-#define test_case_2_19_6_stream_0 (&test_case_2_19_6)
+struct test_stream test_2_19_6 = { &preamble_0, &test_case_2_19_6, &postamble_0 };
+#define test_case_2_19_6_stream_0 (&test_2_19_6)
 #define test_case_2_19_6_stream_1 (NULL)
 #define test_case_2_19_6_stream_2 (NULL)
 
@@ -2361,15 +2629,16 @@ struct test_stream test_case_2_19_6 = { &preamble_0, &test_2_19_6, &postamble_0 
 #define desc_case_2_19_7 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDPIPE | SNDHOLD)."
-int test_2_19_7(int child)
+
+int test_case_2_19_7(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_7 = { &preamble_0, &test_2_19_7, &postamble_0 };
-#define test_case_2_19_7_stream_0 (&test_case_2_19_7)
+struct test_stream test_2_19_7 = { &preamble_0, &test_case_2_19_7, &postamble_0 };
+#define test_case_2_19_7_stream_0 (&test_2_19_7)
 #define test_case_2_19_7_stream_1 (NULL)
 #define test_case_2_19_7_stream_2 (NULL)
 
@@ -2378,15 +2647,16 @@ struct test_stream test_case_2_19_7 = { &preamble_0, &test_2_19_7, &postamble_0 
 #define desc_case_2_19_8 "\
 Checks that I_SWROPT can be performed on a stream with write option values\n\
 (SNDZERO | SNDPIPE | SNDHOLD)."
-int test_2_19_8(int child)
+
+int test_case_2_19_8(int child)
 {
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_8 = { &preamble_0, &test_2_19_8, &postamble_0 };
-#define test_case_2_19_8_stream_0 (&test_case_2_19_8)
+struct test_stream test_2_19_8 = { &preamble_0, &test_case_2_19_8, &postamble_0 };
+#define test_case_2_19_8_stream_0 (&test_2_19_8)
 #define test_case_2_19_8_stream_1 (NULL)
 #define test_case_2_19_8_stream_2 (NULL)
 
@@ -2395,15 +2665,16 @@ struct test_stream test_case_2_19_8 = { &preamble_0, &test_2_19_8, &postamble_0 
 #define desc_case_2_19_9 "\
 Checks that I_SWROPT can be performed on a stream with an invalid argument\n\
 value, resulting in the return of EINVAL."
-int test_2_19_9(int child)
+
+int test_case_2_19_9(int child)
 {
 	if (test_ioctl(child, I_SWROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_19_9 = { &preamble_0, &test_2_19_9, &postamble_0 };
-#define test_case_2_19_9_stream_0 (&test_case_2_19_9)
+struct test_stream test_2_19_9 = { &preamble_0, &test_case_2_19_9, &postamble_0 };
+#define test_case_2_19_9_stream_0 (&test_2_19_9)
 #define test_case_2_19_9_stream_1 (NULL)
 #define test_case_2_19_9_stream_2 (NULL)
 
@@ -2415,7 +2686,8 @@ struct test_stream test_case_2_19_9 = { &preamble_0, &test_2_19_9, &postamble_0 
 #define desc_case_2_20_1 "\
 Checks that I_GWROPT can be performed on a stream to read the stream default\n\
 options after they have been set with I_SWROPT."
-int test_2_20_1(int child)
+
+int test_case_2_20_1(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
@@ -2426,8 +2698,8 @@ int test_2_20_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_1 = { &preamble_0, &test_2_20_1, &postamble_0 };
-#define test_case_2_20_1_stream_0 (&test_case_2_20_1)
+struct test_stream test_2_20_1 = { &preamble_0, &test_case_2_20_1, &postamble_0 };
+#define test_case_2_20_1_stream_0 (&test_2_20_1)
 #define test_case_2_20_1_stream_1 (NULL)
 #define test_case_2_20_1_stream_2 (NULL)
 
@@ -2436,7 +2708,8 @@ struct test_stream test_case_2_20_1 = { &preamble_0, &test_2_20_1, &postamble_0 
 #define desc_case_2_20_2 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (0) after they have been set with I_SWROPT."
-int test_2_20_2(int child)
+
+int test_case_2_20_2(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
@@ -2450,8 +2723,8 @@ int test_2_20_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_2 = { &preamble_0, &test_2_20_2, &postamble_0 };
-#define test_case_2_20_2_stream_0 (&test_case_2_20_2)
+struct test_stream test_2_20_2 = { &preamble_0, &test_case_2_20_2, &postamble_0 };
+#define test_case_2_20_2_stream_0 (&test_2_20_2)
 #define test_case_2_20_2_stream_1 (NULL)
 #define test_case_2_20_2_stream_2 (NULL)
 
@@ -2460,7 +2733,8 @@ struct test_stream test_case_2_20_2 = { &preamble_0, &test_2_20_2, &postamble_0 
 #define desc_case_2_20_3 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDZERO) after they have been set with I_SWROPT."
-int test_2_20_3(int child)
+
+int test_case_2_20_3(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
@@ -2474,8 +2748,8 @@ int test_2_20_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_3 = { &preamble_0, &test_2_20_3, &postamble_0 };
-#define test_case_2_20_3_stream_0 (&test_case_2_20_3)
+struct test_stream test_2_20_3 = { &preamble_0, &test_case_2_20_3, &postamble_0 };
+#define test_case_2_20_3_stream_0 (&test_2_20_3)
 #define test_case_2_20_3_stream_1 (NULL)
 #define test_case_2_20_3_stream_2 (NULL)
 
@@ -2484,7 +2758,8 @@ struct test_stream test_case_2_20_3 = { &preamble_0, &test_2_20_3, &postamble_0 
 #define desc_case_2_20_4 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDPIPE) after they have been set with I_SWROPT."
-int test_2_20_4(int child)
+
+int test_case_2_20_4(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE)) != __RESULT_SUCCESS)
@@ -2498,8 +2773,8 @@ int test_2_20_4(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_4 = { &preamble_0, &test_2_20_4, &postamble_0 };
-#define test_case_2_20_4_stream_0 (&test_case_2_20_4)
+struct test_stream test_2_20_4 = { &preamble_0, &test_case_2_20_4, &postamble_0 };
+#define test_case_2_20_4_stream_0 (&test_2_20_4)
 #define test_case_2_20_4_stream_1 (NULL)
 #define test_case_2_20_4_stream_2 (NULL)
 
@@ -2508,7 +2783,8 @@ struct test_stream test_case_2_20_4 = { &preamble_0, &test_2_20_4, &postamble_0 
 #define desc_case_2_20_5 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDHOLD) after they have been set with I_SWROPT."
-int test_2_20_5(int child)
+
+int test_case_2_20_5(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
@@ -2522,8 +2798,8 @@ int test_2_20_5(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_5 = { &preamble_0, &test_2_20_5, &postamble_0 };
-#define test_case_2_20_5_stream_0 (&test_case_2_20_5)
+struct test_stream test_2_20_5 = { &preamble_0, &test_case_2_20_5, &postamble_0 };
+#define test_case_2_20_5_stream_0 (&test_2_20_5)
 #define test_case_2_20_5_stream_1 (NULL)
 #define test_case_2_20_5_stream_2 (NULL)
 
@@ -2532,7 +2808,8 @@ struct test_stream test_case_2_20_5 = { &preamble_0, &test_2_20_5, &postamble_0 
 #define desc_case_2_20_6 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDZERO | SNDPIPE) after they have been set with I_SWROPT."
-int test_2_20_6(int child)
+
+int test_case_2_20_6(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE)) != __RESULT_SUCCESS)
@@ -2546,8 +2823,8 @@ int test_2_20_6(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_6 = { &preamble_0, &test_2_20_6, &postamble_0 };
-#define test_case_2_20_6_stream_0 (&test_case_2_20_6)
+struct test_stream test_2_20_6 = { &preamble_0, &test_case_2_20_6, &postamble_0 };
+#define test_case_2_20_6_stream_0 (&test_2_20_6)
 #define test_case_2_20_6_stream_1 (NULL)
 #define test_case_2_20_6_stream_2 (NULL)
 
@@ -2556,7 +2833,8 @@ struct test_stream test_case_2_20_6 = { &preamble_0, &test_2_20_6, &postamble_0 
 #define desc_case_2_20_7 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDZERO | SNDHOLD) after they have been set with I_SWROPT."
-int test_2_20_7(int child)
+
+int test_case_2_20_7(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
@@ -2570,8 +2848,8 @@ int test_2_20_7(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_7 = { &preamble_0, &test_2_20_7, &postamble_0 };
-#define test_case_2_20_7_stream_0 (&test_case_2_20_7)
+struct test_stream test_2_20_7 = { &preamble_0, &test_case_2_20_7, &postamble_0 };
+#define test_case_2_20_7_stream_0 (&test_2_20_7)
 #define test_case_2_20_7_stream_1 (NULL)
 #define test_case_2_20_7_stream_2 (NULL)
 
@@ -2580,7 +2858,8 @@ struct test_stream test_case_2_20_7 = { &preamble_0, &test_2_20_7, &postamble_0 
 #define desc_case_2_20_8 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
-int test_2_20_8(int child)
+
+int test_case_2_20_8(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -2594,8 +2873,8 @@ int test_2_20_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_8 = { &preamble_0, &test_2_20_8, &postamble_0 };
-#define test_case_2_20_8_stream_0 (&test_case_2_20_8)
+struct test_stream test_2_20_8 = { &preamble_0, &test_case_2_20_8, &postamble_0 };
+#define test_case_2_20_8_stream_0 (&test_2_20_8)
 #define test_case_2_20_8_stream_1 (NULL)
 #define test_case_2_20_8_stream_2 (NULL)
 
@@ -2604,7 +2883,8 @@ struct test_stream test_case_2_20_8 = { &preamble_0, &test_2_20_8, &postamble_0 
 #define desc_case_2_20_9 "\
 Checks that I_GWROPT can be performed on a stream to read the write options\n\
 (SNDZERO | SNDPIPE | SNDHOLD) after they have been set with I_SWROPT."
-int test_2_20_9(int child)
+
+int test_case_2_20_9(int child)
 {
 	int wropts = -1;
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
@@ -2618,8 +2898,8 @@ int test_2_20_9(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_9 = { &preamble_0, &test_2_20_9, &postamble_0 };
-#define test_case_2_20_9_stream_0 (&test_case_2_20_9)
+struct test_stream test_2_20_9 = { &preamble_0, &test_case_2_20_9, &postamble_0 };
+#define test_case_2_20_9_stream_0 (&test_2_20_9)
 #define test_case_2_20_9_stream_1 (NULL)
 #define test_case_2_20_9_stream_2 (NULL)
 
@@ -2628,15 +2908,16 @@ struct test_stream test_case_2_20_9 = { &preamble_0, &test_2_20_9, &postamble_0 
 #define desc_case_2_20_10 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_20_10(int child)
+
+int test_case_2_20_10(int child)
 {
 	if (test_ioctl(child, I_GWROPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_20_10 = { &preamble_0, &test_2_20_10, &postamble_0 };
-#define test_case_2_20_10_stream_0 (&test_case_2_20_10)
+struct test_stream test_2_20_10 = { &preamble_0, &test_case_2_20_10, &postamble_0 };
+#define test_case_2_20_10_stream_0 (&test_2_20_10)
 #define test_case_2_20_10_stream_1 (NULL)
 #define test_case_2_20_10_stream_2 (NULL)
 
@@ -2647,14 +2928,15 @@ struct test_stream test_case_2_20_10 = { &preamble_0, &test_2_20_10, &postamble_
 #define name_case_2_21 "Perform streamio I_LIST."
 #define desc_case_2_21 "\
 Checks that I_LIST can be performed on a stream."
-int test_2_21(int child)
+
+int test_case_2_21(int child)
 {
 	if (test_ioctl(child, I_LIST, 0) != __RESULT_SUCCESS || (last_retval != 0 && last_retval != 1))
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_21 = { &preamble_0, &test_2_21, &postamble_0 };
-#define test_case_2_21_stream_0 (&test_case_2_21)
+struct test_stream test_2_21 = { &preamble_0, &test_case_2_21, &postamble_0 };
+#define test_case_2_21_stream_0 (&test_2_21)
 #define test_case_2_21_stream_1 (NULL)
 #define test_case_2_21_stream_2 (NULL)
 
@@ -2665,12 +2947,13 @@ struct test_stream test_case_2_21 = { &preamble_0, &test_2_21, &postamble_0 };
 #define name_case_2_22 "Perform streamio I_PUNLINK."
 #define desc_case_2_22 "\
 Checks that I_PUNLINK can be performed on a stream."
-int test_2_22(int child)
+
+int test_case_2_22(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_22 = { &preamble_0, &test_2_22, &postamble_0 };
-#define test_case_2_22_stream_0 (&test_case_2_22)
+struct test_stream test_2_22 = { &preamble_0, &test_case_2_22, &postamble_0 };
+#define test_case_2_22_stream_0 (&test_2_22)
 #define test_case_2_22_stream_1 (NULL)
 #define test_case_2_22_stream_2 (NULL)
 
@@ -2681,7 +2964,8 @@ struct test_stream test_case_2_22 = { &preamble_0, &test_2_22, &postamble_0 };
 #define name_case_2_23 "Perform streamio I_FLUSHBAND."
 #define desc_case_2_23 "\
 Checks that I_FLUSHBAND can be performed on a stream."
-int test_2_23(int child)
+
+int test_case_2_23(int child)
 {
 #if 1
 	return __RESULT_INCONCLUSIVE;
@@ -2692,8 +2976,8 @@ int test_2_23(int child)
 	return (__RESULT_SUCCESS);
 #endif
 }
-struct test_stream test_case_2_23 = { &preamble_0, &test_2_23, &postamble_0 };
-#define test_case_2_23_stream_0 (&test_case_2_23)
+struct test_stream test_2_23 = { &preamble_0, &test_case_2_23, &postamble_0 };
+#define test_case_2_23_stream_0 (&test_2_23)
 #define test_case_2_23_stream_1 (NULL)
 #define test_case_2_23_stream_2 (NULL)
 
@@ -2704,14 +2988,15 @@ struct test_stream test_case_2_23 = { &preamble_0, &test_2_23, &postamble_0 };
 #define name_case_2_24 "Perform streamio I_CKBAND."
 #define desc_case_2_24 "\
 Checks that I_CKBAND can be performed on a stream."
-int test_2_24(int child)
+
+int test_case_2_24(int child)
 {
 	if (test_ioctl(child, I_CKBAND, 2) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_24 = { &preamble_0, &test_2_24, &postamble_0 };
-#define test_case_2_24_stream_0 (&test_case_2_24)
+struct test_stream test_2_24 = { &preamble_0, &test_case_2_24, &postamble_0 };
+#define test_case_2_24_stream_0 (&test_2_24)
 #define test_case_2_24_stream_1 (NULL)
 #define test_case_2_24_stream_2 (NULL)
 
@@ -2722,15 +3007,16 @@ struct test_stream test_case_2_24 = { &preamble_0, &test_2_24, &postamble_0 };
 #define name_case_2_25 "Perform streamio I_GETBAND."
 #define desc_case_2_25 "\
 Checks that I_GETBAND can be performed on a stream."
-int test_2_25(int child)
+
+int test_case_2_25(int child)
 {
 	int band = 0;
 	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != ENODATA)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_25 = { &preamble_0, &test_2_25, &postamble_0 };
-#define test_case_2_25_stream_0 (&test_case_2_25)
+struct test_stream test_2_25 = { &preamble_0, &test_case_2_25, &postamble_0 };
+#define test_case_2_25_stream_0 (&test_2_25)
 #define test_case_2_25_stream_1 (NULL)
 #define test_case_2_25_stream_2 (NULL)
 
@@ -2741,14 +3027,15 @@ struct test_stream test_case_2_25 = { &preamble_0, &test_2_25, &postamble_0 };
 #define name_case_2_26 "Perform streamio I_ATMARK."
 #define desc_case_2_26 "\
 Checks that I_ATMARK can be performed on a stream."
-int test_2_26(int child)
+
+int test_case_2_26(int child)
 {
 	if (test_ioctl(child, I_ATMARK, ANYMARK) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_26 = { &preamble_0, &test_2_26, &postamble_0 };
-#define test_case_2_26_stream_0 (&test_case_2_26)
+struct test_stream test_2_26 = { &preamble_0, &test_case_2_26, &postamble_0 };
+#define test_case_2_26_stream_0 (&test_2_26)
 #define test_case_2_26_stream_1 (NULL)
 #define test_case_2_26_stream_2 (NULL)
 
@@ -2760,15 +3047,16 @@ struct test_stream test_case_2_26 = { &preamble_0, &test_2_26, &postamble_0 };
 #define desc_case_2_27_1 "\
 Checks that I_SETCLTIME can be performed on a stream.\n\
 Checks that the close time can be set to zero."
-int test_2_27_1(int child)
+
+int test_case_2_27_1(int child)
 {
 	int cltime = 0;
 	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_27_1 = { &preamble_0, &test_2_27_1, &postamble_0 };
-#define test_case_2_27_1_stream_0 (&test_case_2_27_1)
+struct test_stream test_2_27_1 = { &preamble_0, &test_case_2_27_1, &postamble_0 };
+#define test_case_2_27_1_stream_0 (&test_2_27_1)
 #define test_case_2_27_1_stream_1 (NULL)
 #define test_case_2_27_1_stream_2 (NULL)
 
@@ -2777,14 +3065,15 @@ struct test_stream test_case_2_27_1 = { &preamble_0, &test_2_27_1, &postamble_0 
 #define desc_case_2_27_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_27_2(int child)
+
+int test_case_2_27_2(int child)
 {
 	if (test_ioctl(child, I_SETCLTIME, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_27_2 = { &preamble_0, &test_2_27_2, &postamble_0 };
-#define test_case_2_27_2_stream_0 (&test_case_2_27_2)
+struct test_stream test_2_27_2 = { &preamble_0, &test_case_2_27_2, &postamble_0 };
+#define test_case_2_27_2_stream_0 (&test_2_27_2)
 #define test_case_2_27_2_stream_1 (NULL)
 #define test_case_2_27_2_stream_2 (NULL)
 
@@ -2796,15 +3085,16 @@ struct test_stream test_case_2_27_2 = { &preamble_0, &test_2_27_2, &postamble_0 
 #define desc_case_2_28_1 "\
 Checks that I_GETCLTIME can be performed on a stream.\n\
 Checks that the default close time is 15000 milliseconds (or 15 seconds)."
-int test_2_28_1(int child)
+
+int test_case_2_28_1(int child)
 {
 	int cltime;
 	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_28_1 = { &preamble_0, &test_2_28_1, &postamble_0 };
-#define test_case_2_28_1_stream_0 (&test_case_2_28_1)
+struct test_stream test_2_28_1 = { &preamble_0, &test_case_2_28_1, &postamble_0 };
+#define test_case_2_28_1_stream_0 (&test_2_28_1)
 #define test_case_2_28_1_stream_1 (NULL)
 #define test_case_2_28_1_stream_2 (NULL)
 
@@ -2813,14 +3103,15 @@ struct test_stream test_case_2_28_1 = { &preamble_0, &test_2_28_1, &postamble_0 
 #define desc_case_2_28_2 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_28_2(int child)
+
+int test_case_2_28_2(int child)
 {
 	if (test_ioctl(child, I_GETCLTIME, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_28_2 = { &preamble_0, &test_2_28_2, &postamble_0 };
-#define test_case_2_28_2_stream_0 (&test_case_2_28_2)
+struct test_stream test_2_28_2 = { &preamble_0, &test_case_2_28_2, &postamble_0 };
+#define test_case_2_28_2_stream_0 (&test_2_28_2)
 #define test_case_2_28_2_stream_1 (NULL)
 #define test_case_2_28_2_stream_2 (NULL)
 
@@ -2831,14 +3122,15 @@ struct test_stream test_case_2_28_2 = { &preamble_0, &test_2_28_2, &postamble_0 
 #define name_case_2_29_1 "Perform streamio I_CANPUT."
 #define desc_case_2_29_1 "\
 Checks that I_CANPUT can be performed on a stream for band 0."
-int test_2_29_1(int child)
+
+int test_case_2_29_1(int child)
 {
 	if (test_ioctl(child, I_CANPUT, 0) != __RESULT_SUCCESS || last_retval != 1)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_29_1 = { &preamble_0, &test_2_29_1, &postamble_0 };
-#define test_case_2_29_1_stream_0 (&test_case_2_29_1)
+struct test_stream test_2_29_1 = { &preamble_0, &test_case_2_29_1, &postamble_0 };
+#define test_case_2_29_1_stream_0 (&test_2_29_1)
 #define test_case_2_29_1_stream_1 (NULL)
 #define test_case_2_29_1_stream_2 (NULL)
 
@@ -2846,14 +3138,15 @@ struct test_stream test_case_2_29_1 = { &preamble_0, &test_2_29_1, &postamble_0 
 #define name_case_2_29_2 "Perform streamio I_CANPUT."
 #define desc_case_2_29_2 "\
 Checks that I_CANPUT can be performed on a stream for band 2."
-int test_2_29_2(int child)
+
+int test_case_2_29_2(int child)
 {
 	if (test_ioctl(child, I_CANPUT, 2) != __RESULT_SUCCESS || last_retval != 1)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_29_2 = { &preamble_0, &test_2_29_2, &postamble_0 };
-#define test_case_2_29_2_stream_0 (&test_case_2_29_2)
+struct test_stream test_2_29_2 = { &preamble_0, &test_case_2_29_2, &postamble_0 };
+#define test_case_2_29_2_stream_0 (&test_2_29_2)
 #define test_case_2_29_2_stream_1 (NULL)
 #define test_case_2_29_2_stream_2 (NULL)
 
@@ -2862,14 +3155,15 @@ struct test_stream test_case_2_29_2 = { &preamble_0, &test_2_29_2, &postamble_0 
 #define desc_case_2_29_3 "\
 Checks that I_CANPUT performed on a stream for an illegal band (256) will result\n\
 in an EINVAL error."
-int test_2_29_3(int child)
+
+int test_case_2_29_3(int child)
 {
 	if (test_ioctl(child, I_CANPUT, 256) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_29_3 = { &preamble_0, &test_2_29_3, &postamble_0 };
-#define test_case_2_29_3_stream_0 (&test_case_2_29_2)
+struct test_stream test_2_29_3 = { &preamble_0, &test_case_2_29_3, &postamble_0 };
+#define test_case_2_29_3_stream_0 (&test_2_29_2)
 #define test_case_2_29_3_stream_1 (NULL)
 #define test_case_2_29_3_stream_2 (NULL)
 
@@ -2879,14 +3173,15 @@ struct test_stream test_case_2_29_3 = { &preamble_0, &test_2_29_3, &postamble_0 
 Checks that I_CANPUT can be performed on a stream for the special band ANYBAND.\n\
 Because there is not any writable non-zero band (no non-zero band exists on a \n\
 newly opened stream), the return value should be zero (0)."
-int test_2_29_4(int child)
+
+int test_case_2_29_4(int child)
 {
 	if (test_ioctl(child, I_CANPUT, (-1UL)) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_29_4 = { &preamble_0, &test_2_29_4, &postamble_0 };
-#define test_case_2_29_4_stream_0 (&test_case_2_29_4)
+struct test_stream test_2_29_4 = { &preamble_0, &test_case_2_29_4, &postamble_0 };
+#define test_case_2_29_4_stream_0 (&test_2_29_4)
 #define test_case_2_29_4_stream_1 (NULL)
 #define test_case_2_29_4_stream_2 (NULL)
 
@@ -2898,14 +3193,15 @@ struct test_stream test_case_2_29_4 = { &preamble_0, &test_2_29_4, &postamble_0 
 #define desc_case_2_30_1 "\
 Checks that I_SERROPT can be performed on a stream with error option values\n\
 (RERRNORM | WRERRNORM)."
-int test_2_30_1(int child)
+
+int test_case_2_30_1(int child)
 {
 	if (test_ioctl(child, I_SERROPT, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30_1 = { &preamble_0, &test_2_30_1, &postamble_0 };
-#define test_case_2_30_1_stream_0 (&test_case_2_30_1)
+struct test_stream test_2_30_1 = { &preamble_0, &test_case_2_30_1, &postamble_0 };
+#define test_case_2_30_1_stream_0 (&test_2_30_1)
 #define test_case_2_30_1_stream_1 (NULL)
 #define test_case_2_30_1_stream_2 (NULL)
 
@@ -2914,14 +3210,15 @@ struct test_stream test_case_2_30_1 = { &preamble_0, &test_2_30_1, &postamble_0 
 #define desc_case_2_30_2 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
 (RERRNONPERSIST | WRERRNORM)."
-int test_2_30_2(int child)
+
+int test_case_2_30_2(int child)
 {
 	if (test_ioctl(child, I_SERROPT, RERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30_2 = { &preamble_0, &test_2_30_2, &postamble_0 };
-#define test_case_2_30_2_stream_0 (&test_case_2_30_2)
+struct test_stream test_2_30_2 = { &preamble_0, &test_case_2_30_2, &postamble_0 };
+#define test_case_2_30_2_stream_0 (&test_2_30_2)
 #define test_case_2_30_2_stream_1 (NULL)
 #define test_case_2_30_2_stream_2 (NULL)
 
@@ -2930,14 +3227,15 @@ struct test_stream test_case_2_30_2 = { &preamble_0, &test_2_30_2, &postamble_0 
 #define desc_case_2_30_3 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
 (RERRNORM | WERRNONPERSIST)."
-int test_2_30_3(int child)
+
+int test_case_2_30_3(int child)
 {
 	if (test_ioctl(child, I_SERROPT, WERRNONPERSIST) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30_3 = { &preamble_0, &test_2_30_3, &postamble_0 };
-#define test_case_2_30_3_stream_0 (&test_case_2_30_3)
+struct test_stream test_2_30_3 = { &preamble_0, &test_case_2_30_3, &postamble_0 };
+#define test_case_2_30_3_stream_0 (&test_2_30_3)
 #define test_case_2_30_3_stream_1 (NULL)
 #define test_case_2_30_3_stream_2 (NULL)
 
@@ -2946,14 +3244,15 @@ struct test_stream test_case_2_30_3 = { &preamble_0, &test_2_30_3, &postamble_0 
 #define desc_case_2_30_4 "\
 Checks that I_SERROPT can be performed on a stream with error options values\n\
 (RERRNONPERSIST | WERRNONPERSIST)."
-int test_2_30_4(int child)
+
+int test_case_2_30_4(int child)
 {
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30_4 = { &preamble_0, &test_2_30_4, &postamble_0 };
-#define test_case_2_30_4_stream_0 (&test_case_2_30_4)
+struct test_stream test_2_30_4 = { &preamble_0, &test_case_2_30_4, &postamble_0 };
+#define test_case_2_30_4_stream_0 (&test_2_30_4)
 #define test_case_2_30_4_stream_1 (NULL)
 #define test_case_2_30_4_stream_2 (NULL)
 
@@ -2962,14 +3261,15 @@ struct test_stream test_case_2_30_4 = { &preamble_0, &test_2_30_4, &postamble_0 
 #define desc_case_2_30_5 "\
 Checks that I_SERROPT can be performed on a stream with an invalid argument\n\
 value, resulting in the return of EINVAL."
-int test_2_30_5(int child)
+
+int test_case_2_30_5(int child)
 {
 	if (test_ioctl(child, I_SERROPT, -1UL) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_30_5 = { &preamble_0, &test_2_30_5, &postamble_0 };
-#define test_case_2_30_5_stream_0 (&test_case_2_30_5)
+struct test_stream test_2_30_5 = { &preamble_0, &test_case_2_30_5, &postamble_0 };
+#define test_case_2_30_5_stream_0 (&test_2_30_5)
 #define test_case_2_30_5_stream_1 (NULL)
 #define test_case_2_30_5_stream_2 (NULL)
 
@@ -2981,7 +3281,8 @@ struct test_stream test_case_2_30_5 = { &preamble_0, &test_2_30_5, &postamble_0 
 #define desc_case_2_31_1 "\
 Checks that I_GERROPT can be performed on a stream to read the stream default\n\
 error options."
-int test_2_31_1(int child)
+
+int test_case_2_31_1(int child)
 {
 	int erropts = -1;
 	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
@@ -2992,8 +3293,8 @@ int test_2_31_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_1 = { &preamble_0, &test_2_31_1, &postamble_0 };
-#define test_case_2_31_1_stream_0 (&test_case_2_31_1)
+struct test_stream test_2_31_1 = { &preamble_0, &test_case_2_31_1, &postamble_0 };
+#define test_case_2_31_1_stream_0 (&test_2_31_1)
 #define test_case_2_31_1_stream_1 (NULL)
 #define test_case_2_31_1_stream_2 (NULL)
 
@@ -3002,7 +3303,8 @@ struct test_stream test_case_2_31_1 = { &preamble_0, &test_2_31_1, &postamble_0 
 #define desc_case_2_31_2 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
 (RERRNORM | WERRNORM) after they have been set with I_SERROPT."
-int test_2_31_2(int child)
+
+int test_case_2_31_2(int child)
 {
 	int erropts = -1;
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNORM)) != __RESULT_SUCCESS)
@@ -3016,8 +3318,8 @@ int test_2_31_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_2 = { &preamble_0, &test_2_31_2, &postamble_0 };
-#define test_case_2_31_2_stream_0 (&test_case_2_31_2)
+struct test_stream test_2_31_2 = { &preamble_0, &test_case_2_31_2, &postamble_0 };
+#define test_case_2_31_2_stream_0 (&test_2_31_2)
 #define test_case_2_31_2_stream_1 (NULL)
 #define test_case_2_31_2_stream_2 (NULL)
 
@@ -3026,7 +3328,8 @@ struct test_stream test_case_2_31_2 = { &preamble_0, &test_2_31_2, &postamble_0 
 #define desc_case_2_31_3 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
 (RERRNONPERSIST | WERRNORM) after they have been set with I_SERROPT."
-int test_2_31_3(int child)
+
+int test_case_2_31_3(int child)
 {
 	int erropts = -1;
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
@@ -3040,8 +3343,8 @@ int test_2_31_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_3 = { &preamble_0, &test_2_31_3, &postamble_0 };
-#define test_case_2_31_3_stream_0 (&test_case_2_31_3)
+struct test_stream test_2_31_3 = { &preamble_0, &test_case_2_31_3, &postamble_0 };
+#define test_case_2_31_3_stream_0 (&test_2_31_3)
 #define test_case_2_31_3_stream_1 (NULL)
 #define test_case_2_31_3_stream_2 (NULL)
 
@@ -3050,7 +3353,8 @@ struct test_stream test_case_2_31_3 = { &preamble_0, &test_2_31_3, &postamble_0 
 #define desc_case_2_31_4 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
 (RERRNORM | WERRNONPERSIST) after they have been set with I_SERROPT."
-int test_2_31_4(int child)
+
+int test_case_2_31_4(int child)
 {
 	int erropts = -1;
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -3064,8 +3368,8 @@ int test_2_31_4(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_4 = { &preamble_0, &test_2_31_4, &postamble_0 };
-#define test_case_2_31_4_stream_0 (&test_case_2_31_4)
+struct test_stream test_2_31_4 = { &preamble_0, &test_case_2_31_4, &postamble_0 };
+#define test_case_2_31_4_stream_0 (&test_2_31_4)
 #define test_case_2_31_4_stream_1 (NULL)
 #define test_case_2_31_4_stream_2 (NULL)
 
@@ -3074,7 +3378,8 @@ struct test_stream test_case_2_31_4 = { &preamble_0, &test_2_31_4, &postamble_0 
 #define desc_case_2_31_5 "\
 Checks that I_GERROPT can be performed on a stream to read the errror options\n\
 (RERRNONPERSIST | WERRNONPERSIST) after they have been set with I_SERROPT."
-int test_2_31_5(int child)
+
+int test_case_2_31_5(int child)
 {
 	int erropts = -1;
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
@@ -3088,8 +3393,8 @@ int test_2_31_5(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_5 = { &preamble_0, &test_2_31_5, &postamble_0 };
-#define test_case_2_31_5_stream_0 (&test_case_2_31_5)
+struct test_stream test_2_31_5 = { &preamble_0, &test_case_2_31_5, &postamble_0 };
+#define test_case_2_31_5_stream_0 (&test_2_31_5)
 #define test_case_2_31_5_stream_1 (NULL)
 #define test_case_2_31_5_stream_2 (NULL)
 
@@ -3098,14 +3403,15 @@ struct test_stream test_case_2_31_5 = { &preamble_0, &test_2_31_5, &postamble_0 
 #define desc_case_2_31_6 "\
 Checks that EFAULT is returned when arg points outside the caller's address \n\
 space."
-int test_2_31_6(int child)
+
+int test_case_2_31_6(int child)
 {
 	if (test_ioctl(child, I_GERROPT, (intptr_t) NULL) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_31_6 = { &preamble_0, &test_2_31_6, &postamble_0 };
-#define test_case_2_31_6_stream_0 (&test_case_2_31_6)
+struct test_stream test_2_31_6 = { &preamble_0, &test_case_2_31_6, &postamble_0 };
+#define test_case_2_31_6_stream_0 (&test_2_31_6)
 #define test_case_2_31_6_stream_1 (NULL)
 #define test_case_2_31_6_stream_2 (NULL)
 
@@ -3116,14 +3422,15 @@ struct test_stream test_case_2_31_6 = { &preamble_0, &test_2_31_6, &postamble_0 
 #define name_case_2_32 "Perform streamio I_ANCHOR."
 #define desc_case_2_32 "\
 Checks that I_ANCHOR can be performed on a stream."
-int test_2_32(int child)
+
+int test_case_2_32(int child)
 {
 	if (test_ioctl(child, I_ANCHOR, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_32 = { &preamble_0, &test_2_32, &postamble_0 };
-#define test_case_2_32_stream_0 (&test_case_2_32)
+struct test_stream test_2_32 = { &preamble_0, &test_case_2_32, &postamble_0 };
+#define test_case_2_32_stream_0 (&test_2_32)
 #define test_case_2_32_stream_1 (NULL)
 #define test_case_2_32_stream_2 (NULL)
 
@@ -3135,15 +3442,16 @@ struct test_stream test_case_2_32 = { &preamble_0, &test_2_32, &postamble_0 };
 #define name_case_2_33 "Perform streamio I_S_RECVFD."
 #define desc_case_2_33 "\
 Checks that I_S_RECVFD can be performed on a stream."
-int test_2_33(int child)
+
+int test_case_2_33(int child)
 {
 	struct strrecvfd recvfd;
 	if (test_ioctl(child, I_S_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
 		return (__RESULT_FAILURE);
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_case_2_33 = { &preamble_0, &test_2_33, &postamble_0 };
-#define test_case_2_33_stream_0 (&test_case_2_33)
+struct test_stream test_2_33 = { &preamble_0, &test_case_2_33, &postamble_0 };
+#define test_case_2_33_stream_0 (&test_2_33)
 #define test_case_2_33_stream_1 (NULL)
 #define test_case_2_33_stream_2 (NULL)
 
@@ -3154,12 +3462,13 @@ struct test_stream test_case_2_33 = { &preamble_0, &test_2_33, &postamble_0 };
 #define name_case_2_34 "Perform streamio I_STATS."
 #define desc_case_2_34 "\
 Checks that I_STATS can be performed on a stream."
-int test_2_34(int child)
+
+int test_case_2_34(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_34 = { &preamble_0, &test_2_34, &postamble_0 };
-#define test_case_2_34_stream_0 (&test_case_2_34)
+struct test_stream test_2_34 = { &preamble_0, &test_case_2_34, &postamble_0 };
+#define test_case_2_34_stream_0 (&test_2_34)
 #define test_case_2_34_stream_1 (NULL)
 #define test_case_2_34_stream_2 (NULL)
 
@@ -3170,12 +3479,13 @@ struct test_stream test_case_2_34 = { &preamble_0, &test_2_34, &postamble_0 };
 #define name_case_2_35 "Perform streamio I_BIGPIPE."
 #define desc_case_2_35 "\
 Checks that I_BIGPIPE can be performed on a stream."
-int test_2_35(int child)
+
+int test_case_2_35(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_35 = { &preamble_0, &test_2_35, &postamble_0 };
-#define test_case_2_35_stream_0 (&test_case_2_35)
+struct test_stream test_2_35 = { &preamble_0, &test_case_2_35, &postamble_0 };
+#define test_case_2_35_stream_0 (&test_2_35)
 #define test_case_2_35_stream_1 (NULL)
 #define test_case_2_35_stream_2 (NULL)
 
@@ -3186,12 +3496,13 @@ struct test_stream test_case_2_35 = { &preamble_0, &test_2_35, &postamble_0 };
 #define name_case_2_36 "Perform streamio I_GETTP."
 #define desc_case_2_36 "\
 Checks that I_GETTP can be performed on a stream."
-int test_2_36(int child)
+
+int test_case_2_36(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_36 = { &preamble_0, &test_2_36, &postamble_0 };
-#define test_case_2_36_stream_0 (&test_case_2_36)
+struct test_stream test_2_36 = { &preamble_0, &test_case_2_36, &postamble_0 };
+#define test_case_2_36_stream_0 (&test_2_36)
 #define test_case_2_36_stream_1 (NULL)
 #define test_case_2_36_stream_2 (NULL)
 
@@ -3202,12 +3513,13 @@ struct test_stream test_case_2_36 = { &preamble_0, &test_2_36, &postamble_0 };
 #define name_case_2_37 "Perform streamio I_AUTOPUSH."
 #define desc_case_2_37 "\
 Checks that I_AUTOPUSH can be performed on a stream."
-int test_2_37(int child)
+
+int test_case_2_37(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_37 = { &preamble_0, &test_2_37, &postamble_0 };
-#define test_case_2_37_stream_0 (&test_case_2_37)
+struct test_stream test_2_37 = { &preamble_0, &test_case_2_37, &postamble_0 };
+#define test_case_2_37_stream_0 (&test_2_37)
 #define test_case_2_37_stream_1 (NULL)
 #define test_case_2_37_stream_2 (NULL)
 
@@ -3218,12 +3530,13 @@ struct test_stream test_case_2_37 = { &preamble_0, &test_2_37, &postamble_0 };
 #define name_case_2_38 "Perform streamio I_HEAP_REPORT."
 #define desc_case_2_38 "\
 Checks that I_HEAP_REPORT can be performed on a stream."
-int test_2_38(int child)
+
+int test_case_2_38(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_38 = { &preamble_0, &test_2_38, &postamble_0 };
-#define test_case_2_38_stream_0 (&test_case_2_38)
+struct test_stream test_2_38 = { &preamble_0, &test_case_2_38, &postamble_0 };
+#define test_case_2_38_stream_0 (&test_2_38)
 #define test_case_2_38_stream_1 (NULL)
 #define test_case_2_38_stream_2 (NULL)
 
@@ -3234,12 +3547,13 @@ struct test_stream test_case_2_38 = { &preamble_0, &test_2_38, &postamble_0 };
 #define name_case_2_39 "Perform streamio I_FIFO."
 #define desc_case_2_39 "\
 Checks that I_FIFO can be performed on a stream."
-int test_2_39(int child)
+
+int test_case_2_39(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_39 = { &preamble_0, &test_2_39, &postamble_0 };
-#define test_case_2_39_stream_0 (&test_case_2_39)
+struct test_stream test_2_39 = { &preamble_0, &test_case_2_39, &postamble_0 };
+#define test_case_2_39_stream_0 (&test_2_39)
 #define test_case_2_39_stream_1 (NULL)
 #define test_case_2_39_stream_2 (NULL)
 
@@ -3250,12 +3564,13 @@ struct test_stream test_case_2_39 = { &preamble_0, &test_2_39, &postamble_0 };
 #define name_case_2_40 "Perform streamio I_PUTPMSG."
 #define desc_case_2_40 "\
 Checks that I_PUTPMSG can be performed on a stream."
-int test_2_40(int child)
+
+int test_case_2_40(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_40 = { &preamble_0, &test_2_40, &postamble_0 };
-#define test_case_2_40_stream_0 (&test_case_2_40)
+struct test_stream test_2_40 = { &preamble_0, &test_case_2_40, &postamble_0 };
+#define test_case_2_40_stream_0 (&test_2_40)
 #define test_case_2_40_stream_1 (NULL)
 #define test_case_2_40_stream_2 (NULL)
 
@@ -3266,12 +3581,13 @@ struct test_stream test_case_2_40 = { &preamble_0, &test_2_40, &postamble_0 };
 #define name_case_2_41 "Perform streamio I_GETPMSG."
 #define desc_case_2_41 "\
 Checks that I_GETPMSG can be performed on a stream."
-int test_2_41(int child)
+
+int test_case_2_41(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_41 = { &preamble_0, &test_2_41, &postamble_0 };
-#define test_case_2_41_stream_0 (&test_case_2_41)
+struct test_stream test_2_41 = { &preamble_0, &test_case_2_41, &postamble_0 };
+#define test_case_2_41_stream_0 (&test_2_41)
 #define test_case_2_41_stream_1 (NULL)
 #define test_case_2_41_stream_2 (NULL)
 
@@ -3282,12 +3598,13 @@ struct test_stream test_case_2_41 = { &preamble_0, &test_2_41, &postamble_0 };
 #define name_case_2_42 "Perform streamio I_FATTACH."
 #define desc_case_2_42 "\
 Checks that I_FATTACH can be performed on a stream."
-int test_2_42(int child)
+
+int test_case_2_42(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_42 = { &preamble_0, &test_2_42, &postamble_0 };
-#define test_case_2_42_stream_0 (&test_case_2_42)
+struct test_stream test_2_42 = { &preamble_0, &test_case_2_42, &postamble_0 };
+#define test_case_2_42_stream_0 (&test_2_42)
 #define test_case_2_42_stream_1 (NULL)
 #define test_case_2_42_stream_2 (NULL)
 
@@ -3298,12 +3615,13 @@ struct test_stream test_case_2_42 = { &preamble_0, &test_2_42, &postamble_0 };
 #define name_case_2_43 "Perform streamio I_FDETACH."
 #define desc_case_2_43 "\
 Checks that I_FDETACH can be performed on a stream."
-int test_2_43(int child)
+
+int test_case_2_43(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_43 = { &preamble_0, &test_2_43, &postamble_0 };
-#define test_case_2_43_stream_0 (&test_case_2_43)
+struct test_stream test_2_43 = { &preamble_0, &test_case_2_43, &postamble_0 };
+#define test_case_2_43_stream_0 (&test_2_43)
 #define test_case_2_43_stream_1 (NULL)
 #define test_case_2_43_stream_2 (NULL)
 
@@ -3314,12 +3632,13 @@ struct test_stream test_case_2_43 = { &preamble_0, &test_2_43, &postamble_0 };
 #define name_case_2_44 "Perform streamio I_PIPE."
 #define desc_case_2_44 "\
 Checks that I_PIPE can be performed on a stream."
-int test_2_44(int child)
+
+int test_case_2_44(int child)
 {
 	return __RESULT_INCONCLUSIVE;
 }
-struct test_stream test_case_2_44 = { &preamble_0, &test_2_44, &postamble_0 };
-#define test_case_2_44_stream_0 (&test_case_2_44)
+struct test_stream test_2_44 = { &preamble_0, &test_case_2_44, &postamble_0 };
+#define test_case_2_44_stream_0 (&test_2_44)
 #define test_case_2_44_stream_1 (NULL)
 #define test_case_2_44_stream_2 (NULL)
 #endif
@@ -3412,7 +3731,7 @@ int test_run(struct test_stream *stream[])
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
-			exit(run_stream(2, stream[2]));	/* execute stream[1] state machine */
+			exit(run_stream(2, stream[2]));	/* execute stream[2] state machine */
 		case -1:	/* error */
 			if (child[0])
 				kill(child[0], SIGKILL);	/* toast stream[0] child */
@@ -3429,16 +3748,31 @@ int test_run(struct test_stream *stream[])
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
-					status[0] = WEXITSTATUS(this_status);
 					child[0] = 0;
+					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[1])
+							kill(child[1], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
 				}
 				if (this_child == child[1]) {
-					status[1] = WEXITSTATUS(this_status);
 					child[1] = 0;
+					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[2])
+							kill(child[2], SIGKILL);
+					}
 				}
 				if (this_child == child[2]) {
-					status[2] = WEXITSTATUS(this_status);
 					child[2] = 0;
+					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+						if (child[0])
+							kill(child[0], SIGKILL);
+						if (child[1])
+							kill(child[1], SIGKILL);
+					}
 				}
 			} else if (WIFSIGNALED(this_status)) {
 				int signal = WTERMSIG(this_status);
@@ -3448,7 +3782,7 @@ int test_run(struct test_stream *stream[])
 						kill(child[1], SIGKILL);
 					if (child[2])
 						kill(child[2], SIGKILL);
-					status[0] = __RESULT_FAILURE;
+					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					child[0] = 0;
 				}
 				if (this_child == child[1]) {
@@ -3457,7 +3791,7 @@ int test_run(struct test_stream *stream[])
 						kill(child[0], SIGKILL);
 					if (child[2])
 						kill(child[2], SIGKILL);
-					status[1] = __RESULT_FAILURE;
+					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					child[1] = 0;
 				}
 				if (this_child == child[2]) {
@@ -3466,13 +3800,15 @@ int test_run(struct test_stream *stream[])
 						kill(child[0], SIGKILL);
 					if (child[1])
 						kill(child[1], SIGKILL);
-					status[2] = __RESULT_FAILURE;
+					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					child[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
 				int signal = WSTOPSIG(this_status);
 				if (this_child == child[0]) {
 					print_stopped(0, signal);
+					if (child[0])
+						kill(child[0], SIGKILL);
 					if (child[1])
 						kill(child[1], SIGKILL);
 					if (child[2])
@@ -3484,6 +3820,8 @@ int test_run(struct test_stream *stream[])
 					print_stopped(1, signal);
 					if (child[0])
 						kill(child[0], SIGKILL);
+					if (child[1])
+						kill(child[1], SIGKILL);
 					if (child[2])
 						kill(child[2], SIGKILL);
 					status[1] = __RESULT_FAILURE;
@@ -3495,6 +3833,8 @@ int test_run(struct test_stream *stream[])
 						kill(child[0], SIGKILL);
 					if (child[1])
 						kill(child[1], SIGKILL);
+					if (child[2])
+						kill(child[2], SIGKILL);
 					status[2] = __RESULT_FAILURE;
 					child[2] = 0;
 				}
@@ -3507,17 +3847,17 @@ int test_run(struct test_stream *stream[])
 			}
 			if (child[0]) {
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_FAILURE;
+				status[0] = __RESULT_INCONCLUSIVE;
 				child[0] = 0;
 			}
 			if (child[1]) {
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_FAILURE;
+				status[1] = __RESULT_INCONCLUSIVE;
 				child[1] = 0;
 			}
 			if (child[2]) {
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_FAILURE;
+				status[2] = __RESULT_INCONCLUSIVE;
 				child[2] = 0;
 			}
 			break;
@@ -3785,20 +4125,20 @@ int do_tests(void)
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests() == __RESULT_SUCCESS) {
+	if (begin_tests(0) == __RESULT_SUCCESS) {
 		end_tests();
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (aborted) {
-				tests[i].result = __RESULT_INCONCLUSIVE;
-				inconclusive++;
-				continue;
-			}
 			if (tests[i].result)
 				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				skipped++;
+				continue;
+			}
+			if (aborted) {
+				tests[i].result = __RESULT_INCONCLUSIVE;
+				inconclusive++;
 				continue;
 			}
 			if (verbose > 0) {
@@ -3811,7 +4151,7 @@ int do_tests(void)
 				fflush(stdout);
 				lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests()) != __RESULT_SUCCESS)
+			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
 				goto inconclusive;
 			result = test_run(tests[i].stream);
 			end_tests();
@@ -3894,10 +4234,12 @@ int do_tests(void)
 		if (verbose > 0) {
 			lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
-			fprintf(stdout, "========= %2d successes   \n", successes);
-			fprintf(stdout, "========= %2d failures    \n", failures);
-			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
-			fprintf(stdout, "========= %2d skipped     \n", skipped);
+			fprintf(stdout, "========= %3d successes   \n", successes);
+			fprintf(stdout, "========= %3d failures    \n", failures);
+			fprintf(stdout, "========= %3d inconclusive\n", inconclusive);
+			fprintf(stdout, "========= %3d skipped     \n", skipped);
+			fprintf(stdout, "==========================\n");
+			fprintf(stdout, "========= %3d total       \n", successes + failures + inconclusive + skipped);
 			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
@@ -4001,7 +4343,7 @@ void version(int argc, char *argv[])
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
 \n\
-    See `%1$s --copying' for copying permissions.\n\
+    See `%1$s --copying' for copying permission.\n\
 \n\
 ", argv[0], ident);
 }
@@ -4059,7 +4401,7 @@ Options:\n\
     -V, --version\n\
         print version and exit\n\
     -C, --copying\n\
-        print copying permissions and exit\n\
+        print copying permission and exit\n\
 \n\
 ", argv[0], devname);
 }
@@ -4247,23 +4589,29 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
+		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
 	}
-	/* 
+	/*
 	 * dont' ignore non-option arguments
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
+	switch (tests_to_run) {
+	case 0:
 		if (verbose > 0) {
 			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
 			fflush(stderr);
 		}
 		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
 	do_tests();
 	exit(0);
 }
