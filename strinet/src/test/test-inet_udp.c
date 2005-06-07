@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/07 00:52:07 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/06 12:11:46 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 00:52:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.12  2005/06/07 00:52:07  brian
+ - upgrading test suites
+
  Revision 0.9.2.11  2005/06/06 12:11:46  brian
  - more upgrades to test suites
 
@@ -144,9 +147,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/07 00:52:07 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/06 12:11:46 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/07 00:52:07 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1422,13 +1425,23 @@ char *status_string(struct t_opthdr *oh)
 	case T_NOTSUPPORT:
 		return ("T_NOTSUPPORT");
 	default:
-		return ("(unknown status)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown status %ld)", (long) oh->status);
+		return buf;
+	}
 	}
 }
+
+#ifndef T_ALLLEVELS
+#define T_ALLLEVELS -1UL
+#endif
 
 char *level_string(struct t_opthdr *oh)
 {
 	switch (oh->level) {
+	case T_ALLLEVELS:
+		return ("T_ALLLEVELS");
 	case XTI_GENERIC:
 		return ("XTI_GENERIC");
 	case T_INET_IP:
@@ -1442,7 +1455,11 @@ char *level_string(struct t_opthdr *oh)
 		return ("T_INET_SCTP");
 #endif
 	default:
-		return ("(unknown level)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown level %ld)", (long) oh->level);
+		return buf;
+	}
 	}
 }
 
@@ -1604,7 +1621,11 @@ char *name_string(struct t_opthdr *oh)
 		break;
 #endif
 	}
-	return ("(unknown name)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown name %ld)", (long) oh->name);
+		return buf;
+	}
 }
 
 char *yesno_string(struct t_opthdr *oh)
@@ -1626,7 +1647,7 @@ char *number_string(struct t_opthdr *oh)
 	return (buf);
 }
 
-char *value_string(struct t_opthdr *oh)
+char *value_string(int child, struct t_opthdr *oh)
 {
 	static char buf[64] = "(invalid)";
 	if (oh->len == sizeof(*oh))
@@ -1722,7 +1743,7 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PPI:
 			return number_string(oh);;
 		case T_SCTP_SID:
-			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh));
 			return number_string(oh);;
 		case T_SCTP_SSN:
 		case T_SCTP_TSN:
@@ -2490,7 +2511,7 @@ void print_opt_status(int child, struct t_opthdr *oh)
 }
 void print_opt_value(int child, struct t_opthdr *oh)
 {
-	char *value = value_string(oh);
+	char *value = value_string(child, oh);
 	if (value)
 		print_string(child, value);
 }
@@ -5957,14 +5978,18 @@ int main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
+	switch (tests_to_run) {
+	case 0:
 		if (verbose > 0) {
 			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
 			fflush(stderr);
 		}
 		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

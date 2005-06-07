@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/06 11:32:40 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 00:52:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.14  2005/06/07 00:52:26  brian
+ - upgrading test suites
+
  Revision 0.9.2.13  2005/06/06 11:32:40  brian
  - more upgrades to test suites
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/06 11:32:40 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -1399,13 +1402,23 @@ char *status_string(struct t_opthdr *oh)
 	case T_NOTSUPPORT:
 		return ("T_NOTSUPPORT");
 	default:
-		return ("(unknown status)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown status %ld)", (long) oh->status);
+		return buf;
+	}
 	}
 }
+
+#ifndef T_ALLLEVELS
+#define T_ALLLEVELS -1UL
+#endif
 
 char *level_string(struct t_opthdr *oh)
 {
 	switch (oh->level) {
+	case T_ALLLEVELS:
+		return ("T_ALLLEVELS");
 	case XTI_GENERIC:
 		return ("XTI_GENERIC");
 #if 0
@@ -1419,7 +1432,11 @@ char *level_string(struct t_opthdr *oh)
 		return ("T_INET_SCTP");
 #endif
 	default:
-		return ("(unknown level)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown level %ld)", (long) oh->level);
+		return buf;
+	}
 	}
 }
 
@@ -1581,7 +1598,11 @@ char *name_string(struct t_opthdr *oh)
 		break;
 #endif
 	}
-	return ("(unknown name)");
+	{
+		static char buf[32];
+		snprintf(buf, sizeof(buf), "(unknown name %ld)", (long) oh->name);
+		return buf;
+	}
 }
 
 char *yesno_string(struct t_opthdr *oh)

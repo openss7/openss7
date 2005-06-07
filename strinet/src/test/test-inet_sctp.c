@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/07 00:52:06 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/07 00:52:06 $
 
  -----------------------------------------------------------------------------
 
@@ -63,8 +63,8 @@
 
  -----------------------------------------------------------------------------
 
- $Log: test-inet_tcp.c,v $
- Revision 0.9.2.11  2005/06/07 00:52:06  brian
+ $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.1  2005/06/07 00:52:06  brian
  - upgrading test suites
 
  Revision 0.9.2.10  2005/06/04 13:38:47  brian
@@ -129,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/07 00:52:06 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/07 00:52:06 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/07 00:52:06 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/07 00:52:06 $";
 
 /*
  *  Simple test program for INET streams.
@@ -187,12 +187,12 @@ static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 
  *  -------------------------------------------------------------------------
  */
 
-static const char *lpkgname = "OpenSS7 INET Driver - TCP";
+static const char *lpkgname = "OpenSS7 INET Driver - SCTP";
 /* static const char *spkgname = "INET"; */
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
-static const char *shortname = "INET/TCP";
-static char devname[256] = "/dev/tcp";
+static const char *shortname = "INET/SCTP";
+static char devname[256] = "/dev/sctp";
 
 static int exit_on_failure = 0;
 
@@ -228,6 +228,13 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONG_WAIT 5000		// 500
 #define LONGER_WAIT 10000	// 5000
 
+ulong seq[10] = { 0, };
+ulong tok[10] = { 0, };
+ulong tsn[10] = { 0, };
+ulong sid[10] = { 0, };
+ulong ssn[10] = { 0, };
+ulong ppi[10] = { 0, };
+ulong exc[10] = { 0, };
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -246,8 +253,6 @@ static struct sockaddr_in *test_addr = NULL;
 static socklen_t test_alen = sizeof(*test_addr);
 static const char *test_data = NULL;
 static int test_resfd = -1;
-static void *test_opts = NULL;
-static int test_olen = 0;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -512,7 +517,7 @@ static int stop_tt(void)
 /*
  *  Addresses
  */
-struct sockaddr_in addrs[4];
+struct sockaddr_in addrs[4][3];
 unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
@@ -524,33 +529,29 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  * data options
  */
 struct {
-#if 0
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
 	struct t_opthdr ttl_hdr __attribute__ ((packed));
 	t_scalar_t ttl_val __attribute__ ((packed));
-#endif
 	struct t_opthdr drt_hdr __attribute__ ((packed));
 	t_scalar_t drt_val __attribute__ ((packed));
 #if 0
 	struct t_opthdr csm_hdr __attribute__ ((packed));
 	t_scalar_t csm_val __attribute__ ((packed));
+#endif
 	struct t_opthdr ppi_hdr __attribute__ ((packed));
 	t_scalar_t ppi_val __attribute__ ((packed));
 	struct t_opthdr sid_hdr __attribute__ ((packed));
 	t_scalar_t sid_val __attribute__ ((packed));
-#endif
 } opt_data = {
-#if 0
 	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
-#endif
-	{ sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 #if 0
 	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+#endif
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
-#endif
 };
 
 /*
@@ -567,29 +568,24 @@ struct {
 	t_scalar_t bca_val __attribute__ ((packed));
 	struct t_opthdr reu_hdr __attribute__ ((packed));
 	t_scalar_t reu_val __attribute__ ((packed));
-#if 0
 	struct t_opthdr ist_hdr __attribute__ ((packed));
 	t_scalar_t ist_val __attribute__ ((packed));
 	struct t_opthdr ost_hdr __attribute__ ((packed));
 	t_scalar_t ost_val __attribute__ ((packed));
-#endif
 } opt_conn = {
 	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
-#if 0
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}, 1
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}, 1
-#endif
 };
 
 /*
  * management options
  */
 struct {
-#if 0
 	struct t_opthdr tos_hdr __attribute__ ((packed));
 	t_scalar_t tos_val __attribute__ ((packed));
 	struct t_opthdr ttl_hdr __attribute__ ((packed));
@@ -600,18 +596,16 @@ struct {
 	t_scalar_t bca_val __attribute__ ((packed));
 	struct t_opthdr reu_hdr __attribute__ ((packed));
 	t_scalar_t reu_val __attribute__ ((packed));
-#endif
+#if 0
 	struct t_opthdr ndl_hdr __attribute__ ((packed));
 	t_scalar_t ndl_val __attribute__ ((packed));
-#if 0
 	struct t_opthdr mxs_hdr __attribute__ ((packed));
 	t_scalar_t mxs_val __attribute__ ((packed));
-#endif
 	struct t_opthdr kpa_hdr __attribute__ ((packed));
 	t_scalar_t kpa_val __attribute__ ((packed));
-#if 0
 	struct t_opthdr csm_hdr __attribute__ ((packed));
 	t_scalar_t csm_val __attribute__ ((packed));
+#endif
 	struct t_opthdr nod_hdr __attribute__ ((packed));
 	t_scalar_t nod_val __attribute__ ((packed));
 	struct t_opthdr crk_hdr __attribute__ ((packed));
@@ -652,43 +646,38 @@ struct {
 	t_scalar_t mac_val __attribute__ ((packed));
 	struct t_opthdr dbg_hdr __attribute__ ((packed));
 	t_scalar_t dbg_val __attribute__ ((packed));
-#endif
 } opt_optm = {
-#if 0
 	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
-#endif
-	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 #if 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
-#endif
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
-#if 0
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}, T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}, 60000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS}, 200
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}, 5
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}, 12
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}, 12
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}, 1000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}, 200
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}, 10
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}, 2000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}, 1
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}, 1
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS}, 1000
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS}, 50
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}, T_SCTP_HMAC_NONE
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}, 0
 #endif
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}, 60000
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_SACK_DELAY, T_SUCCESS}, 200
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, T_SUCCESS}, 5
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, T_SUCCESS}, 12
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, T_SUCCESS}, 12
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, T_SUCCESS}, 1000
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO_INITIAL, T_SUCCESS}, 200
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO_MIN, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_RTO_MAX, T_SUCCESS}, 2000
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_OSTREAMS, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_ISTREAMS, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_COOKIE_INC, T_SUCCESS}, 1000
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_THROTTLE_ITVL, T_SUCCESS}, 50
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_MAC_TYPE, T_SUCCESS}, T_SCTP_HMAC_NONE
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}, 0
 };
 
 #if 0
@@ -1376,28 +1365,61 @@ void print_addrs(int fd, char *add_ptr, size_t add_len)
 void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
-	if (add_len) {
-		if (add_len != sizeof(*a))
-			printf("Aaarrg! add_len = %d, ", add_len);
-		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	size_t anum = add_len / sizeof(*a);
+	lockf(fileno(stdout), F_LOCK, 0);
+	if (add_len > 0) {
+		int i;
+		if (add_len != anum * sizeof(*a))
+			fprintf(stdout, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		fprintf(stdout, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+			fprintf(stdout, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
 	} else
-		printf("(no address)");
-	printf("\n");
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
 }
-
 char *addr_string(char *add_ptr, size_t add_len)
 {
 	static char buf[128];
 	size_t len = 0;
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
-	if (add_len) {
-		if (add_len != sizeof(*a))
-			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, ", add_len);
-		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+	size_t anum = add_len / sizeof(*a);
+	if (add_len > 0) {
+		int i;
+		if (add_len != anum * sizeof(*a))
+			len += snprintf(buf + len, sizeof(buf) - len, "Aaarrg! add_len = %d, anum = %d, ", add_len, anum);
+		len += snprintf(buf + len, sizeof(buf) - len, "[%d]", ntohs(a[0].sin_port));
+		for (i = 0; i < anum; i++) {
+			uint32_t addr = a[i].sin_addr.s_addr;
+			snprintf(buf + len, sizeof(buf) - len, "%s%d.%d.%d.%d.", i ? "," : "", (addr >> 0) & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+		}
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
+}
+void print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *sin;
+	if (verbose < 3)
+		return;
+	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
+		char buf[128];
+		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
+		if (fd == test_fd[0]) {
+			fprintf(stdout, "%-20s|                               |  |                    \n", buf);
+		}
+		if (fd == test_fd[1]) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
+		}
+		if (fd == test_fd[2]) {
+			fprintf(stdout, "                    |                               |  |     %-15s\n", buf);
+		}
+	}
 }
 #endif
 
@@ -1442,10 +1464,8 @@ char *level_string(struct t_opthdr *oh)
 		return ("T_INET_UDP");
 	case T_INET_TCP:
 		return ("T_INET_TCP");
-#if 0
 	case T_INET_SCTP:
 		return ("T_INET_SCTP");
-#endif
 	default:
 	{
 		static char buf[32];
@@ -1530,7 +1550,6 @@ char *name_string(struct t_opthdr *oh)
 			return ("T_TCP_QUICKACK");
 		}
 		break;
-#if 0
 	case T_INET_SCTP:
 		switch (oh->name) {
 		case T_SCTP_NODELAY:
@@ -1611,13 +1630,13 @@ char *name_string(struct t_opthdr *oh)
 			return ("T_SCTP_DEBUG");
 		}
 		break;
-#endif
 	}
 	{
 		static char buf[32];
 		snprintf(buf, sizeof(buf), "(unknown name %ld)", (long) oh->name);
 		return buf;
 	}
+	return ("(unknown name)");
 }
 
 char *yesno_string(struct t_opthdr *oh)
@@ -1725,7 +1744,6 @@ char *value_string(int child, struct t_opthdr *oh)
 			break;
 		}
 		break;
-#if 0
 	case T_INET_SCTP:
 		switch (oh->name) {
 		case T_SCTP_NODELAY:
@@ -1789,12 +1807,10 @@ char *value_string(int child, struct t_opthdr *oh)
 			break;
 		}
 		break;
-#endif
 	}
 	return ("(unknown value)");
 }
 
-#if 0
 void parse_options(int fd, char *opt_ptr, size_t opt_len)
 {
 	struct t_opthdr *oh;
@@ -1820,7 +1836,6 @@ void parse_options(int fd, char *opt_ptr, size_t opt_len)
 		}
 	}
 }
-#endif
 
 char *mgmtflag_string(t_uscalar_t flag)
 {
@@ -2877,16 +2892,21 @@ int test_close(int child)
 static int stream_start(int child, int index)
 {
 	int offset = 3 * index;
-	addrs[3].sin_family = AF_INET;
-	addrs[3].sin_port = htons(ports[3] + offset);
-	inet_aton(addr_strings[3], &addrs[3].sin_addr);
+	int i;
+	for (i = 0; i < 3; i++) {
+		addrs[3][i].sin_family = AF_INET;
+		addrs[3][i].sin_port = htons(ports[3] + offset);
+		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
+	}
 	switch (child) {
 	case 1:
 	case 2:
 	case 0:
-		addrs[child].sin_family = AF_INET;
-		addrs[child].sin_port = htons(ports[child] + offset);
-		inet_aton(addr_strings[child], &addrs[child].sin_addr);
+		for (i = 0; i < 3; i++) {
+			addrs[child][i].sin_family = AF_INET;
+			addrs[child][i].sin_port = htons(ports[child] + offset);
+			inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
+		}
 		if (test_open(child, devname) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
@@ -3016,16 +3036,16 @@ static int do_signal(int child, int action)
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
 		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
-		p->conn_req.OPT_length = test_opts ? test_olen : 0;
-		p->conn_req.OPT_offset = test_opts ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
+		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
+		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		if (test_opt_conn)
+			bcopy(test_opt_conn, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
@@ -3230,16 +3250,16 @@ static int do_signal(int child, int action)
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
 		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
-		p->unitdata_req.OPT_length = test_opts ? test_olen : 0;
-		p->unitdata_req.OPT_offset = test_opts ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
+		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
+		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		if (test_opt_data)
+			bcopy(test_opt_data, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
@@ -3279,13 +3299,13 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTMGMT_REQ:
 		ctrl->len = sizeof(p->optmgmt_req)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
-		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3324,17 +3344,17 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTDATA_REQ:
 		ctrl->len = sizeof(p->optdata_req)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
 		p->optdata_req.PRIM_type = T_OPTDATA_REQ;
 		p->optdata_req.DATA_flag = DATA_flag;
-		p->optdata_req.OPT_length = test_opts ? test_olen : 0;
-		p->optdata_req.OPT_offset = test_opts ? sizeof(p->optdata_req) : 0;
+		p->optdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
+		p->optdata_req.OPT_offset = test_opt_data ? sizeof(p->optdata_req) : 0;
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
 			data = NULL;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		if (test_opt_data)
+			bcopy(test_opt_data, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 		test_pflags = MSG_BAND;
 		test_pband = (DATA_flag & T_ODF_EX) ? 1 : 0;
 		if (p->optdata_req.DATA_flag & T_ODF_EX) {
@@ -3439,13 +3459,13 @@ static int do_signal(int child, int action)
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
-		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
@@ -3468,13 +3488,13 @@ static int do_signal(int child, int action)
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
-		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
@@ -3527,13 +3547,13 @@ static int do_signal(int child, int action)
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opts ? test_olen : 0);
+		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
-		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
+		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opts)
-			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opt_optm)
+			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
@@ -4138,15 +4158,13 @@ static int postamble_0(int child)
 static int preamble_1(int child)
 {
 	test_mgmtflags = T_NEGOTIATE;
-	test_opts = test_opt_optm;
-	test_olen = sizeof(*test_opt_optm);
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[child];
+	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -4185,6 +4203,7 @@ static int postamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 0
 static int postamble_1e(int child)
 {
 	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
@@ -4196,17 +4215,16 @@ static int postamble_1e(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+#endif
 
 static int preamble_2_conn(int child)
 {
 	if (preamble_1s(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[2];
+	test_addr = addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4319,17 +4337,14 @@ static int postamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#if 0
 static int preamble_2b_conn(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_addr = &addrs[1];
+	test_addr = addrs[1];
 	test_alen = sizeof(addrs[1]);
 	test_data = "Hello World";
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4380,9 +4395,7 @@ static int preamble_2b_list(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-#endif
 
-#if 0
 static int postamble_3_conn(int child)
 {
 	int failed = -1;
@@ -4571,7 +4584,6 @@ static int preamble_8_resp(int child)
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
-#endif
 
 /*
  *  =========================================================================
@@ -4588,18 +4600,40 @@ struct test_stream {
 };
 
 /*
- *  Open and Close 3 streams.
+ *  Do options management.
  */
-#define test_group_1 "Opening and closing streams"
+#define test_group_1 "Open, options management, bind, unbind, close"
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
-#define name_case_1_1 "Open and close 3 streams"
+#define name_case_1_1 "Do options management."
 #define desc_case_1_1 "\
-Checks that three streams can be opened and closed."
+Checks that options management can be performed on several streams."
 
 int test_case_1_1(int child)
 {
+	test_mgmtflags = T_NEGOTIATE;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_mgmtflags = T_CURRENT;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define test_case_1_1_conn	test_case_1_1
@@ -4619,30 +4653,48 @@ struct test_stream test_1_1_resp = { &preamble_1_1_resp, &test_case_1_1_resp, &p
 struct test_stream test_1_1_list = { &preamble_1_1_list, &test_case_1_1_list, &postamble_1_1_list };
 
 /*
- *  Request information.
+ *  Bind and unbind three streams.
  */
 #define tgrp_case_1_2 test_group_1
 #define numb_case_1_2 "1.2"
-#define name_case_1_2 "Request information."
+#define name_case_1_2 "Bind and Unbind three streams."
 #define desc_case_1_2 "\
-Checks that information can be requested on each of three streasm."
+Checks that three streams can be bound and unbound with\n\
+one stream as listener."
 
-int test_case_1_2(int child)
+int test_case_1_2(int child, void *add_ptr, size_t add_len, int coninds)
 {
-	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+	test_addr = add_ptr;
+	test_alen = add_len;
+	last_qlen = coninds;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-#define test_case_1_2_conn	test_case_1_2
-#define test_case_1_2_resp	test_case_1_2
-#define test_case_1_2_list	test_case_1_2
+int test_case_1_2_conn(int child)
+{
+	return test_case_1_2(child, addrs[0], sizeof(addrs[0]), 0);
+}
+int test_case_1_2_list(int child)
+{
+	return test_case_1_2(child, addrs[1], sizeof(addrs[1]), 5);
+}
+int test_case_1_2_resp(int child)
+{
+	return test_case_1_2(child, addrs[2], sizeof(addrs[2]), 0);
+}
 
 #define preamble_1_2_conn	preamble_0
 #define preamble_1_2_resp	preamble_0
@@ -4657,129 +4709,64 @@ struct test_stream test_1_2_resp = { &preamble_1_2_resp, &test_case_1_2_resp, &p
 struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &postamble_1_2_list };
 
 /*
- *  Request capabilities.
+ *  Attempt a connection with no listener.
  */
-#define tgrp_case_1_3 test_group_1
-#define numb_case_1_3 "1.3"
-#define name_case_1_3 "Request capabilities."
-#define desc_case_1_3 "\
-Checks that capabilities can be requested on each of three streasm."
-
-int test_case_1_3(int child)
-{
-	if (do_signal(child, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define test_case_1_3_conn	test_case_1_3
-#define test_case_1_3_resp	test_case_1_3
-#define test_case_1_3_list	test_case_1_3
-
-#define preamble_1_3_conn	preamble_0
-#define preamble_1_3_resp	preamble_0
-#define preamble_1_3_list	preamble_0
-
-#define postamble_1_3_conn	postamble_0
-#define postamble_1_3_resp	postamble_0
-#define postamble_1_3_list	postamble_0
-
-struct test_stream test_1_3_conn = { &preamble_1_3_conn, &test_case_1_3_conn, &postamble_1_3_conn };
-struct test_stream test_1_3_resp = { &preamble_1_3_resp, &test_case_1_3_resp, &postamble_1_3_resp };
-struct test_stream test_1_3_list = { &preamble_1_3_list, &test_case_1_3_list, &postamble_1_3_list };
-
-/*
- *  Request addresses.
- */
-#define tgrp_case_1_4 test_group_1
-#define numb_case_1_4 "1.4"
-#define name_case_1_4 "Request addresses."
-#define desc_case_1_4 "\
-Checks that addresses can be requested on each of three streasm."
-
-int test_case_1_4(int child)
-{
-	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define test_case_1_4_conn	test_case_1_4
-#define test_case_1_4_resp	test_case_1_4
-#define test_case_1_4_list	test_case_1_4
-
-#define preamble_1_4_conn	preamble_0
-#define preamble_1_4_resp	preamble_0
-#define preamble_1_4_list	preamble_0
-
-#define postamble_1_4_conn	postamble_0
-#define postamble_1_4_resp	postamble_0
-#define postamble_1_4_list	postamble_0
-
-struct test_stream test_1_4_conn = { &preamble_1_4_conn, &test_case_1_4_conn, &postamble_1_4_conn };
-struct test_stream test_1_4_resp = { &preamble_1_4_resp, &test_case_1_4_resp, &postamble_1_4_resp };
-struct test_stream test_1_4_list = { &preamble_1_4_list, &test_case_1_4_list, &postamble_1_4_list };
-
-/*
- *  Do options management.
- */
-#define test_group_2 "Options management"
+#define test_group_2 "Unsuccessful connections"
 #define tgrp_case_2_1 test_group_2
 #define numb_case_2_1 "2.1"
-#define name_case_2_1 "Perform options management."
+#define name_case_2_1 "Attempt a connection with no listener."
 #define desc_case_2_1 "\
-Checks that options management can be performed on several streams."
+Attempts a connection with no listener.  The connection attempt\n\
+should time out."
 
-int test_case_2_1(int child)
+int test_case_2_1_conn(int child)
 {
-	test_mgmtflags = T_DEFAULT;
-	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_mgmtflags = T_CURRENT;
-	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_mgmtflags = T_CHECK;
-	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
 	test_mgmtflags = T_NEGOTIATE;
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[0];
+	test_alen = sizeof(addrs[0]);
+	last_qlen = 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, (opt_optm.rmx_val + 10) * opt_optm.irt_val, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-#define test_case_2_1_conn	test_case_2_1
-#define test_case_2_1_resp	test_case_2_1
-#define test_case_2_1_list	test_case_2_1
+int test_case_2_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_2_1_resp(int child)
+{
+	return (__RESULT_SUCCESS);
+}
 
 #define preamble_2_1_conn	preamble_0
 #define preamble_2_1_resp	preamble_0
@@ -4793,289 +4780,33 @@ struct test_stream test_2_1_conn = { &preamble_2_1_conn, &test_case_2_1_conn, &p
 struct test_stream test_2_1_resp = { &preamble_2_1_resp, &test_case_2_1_resp, &postamble_2_1_resp };
 struct test_stream test_2_1_list = { &preamble_2_1_list, &test_case_2_1_list, &postamble_2_1_list };
 
-#define tgrp_case_2_1_1 test_group_2
-#define numb_case_2_1_1 "2.1.1"
-#define name_case_2_1_1 "Perform options management -- T_IP_TOS"
-#define desc_case_2_1_1 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_IP option T_IP_TOS."
-
-int test_case_2_1_1(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_1_conn test_case_2_1_1
-#define test_case_2_1_1_resp test_case_2_1_1
-#define test_case_2_1_1_list test_case_2_1_1
-
-struct test_stream test_2_1_1_conn = { &preamble_2_1_conn, &test_case_2_1_1_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_1_resp = { &preamble_2_1_resp, &test_case_2_1_1_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_1_list = { &preamble_2_1_list, &test_case_2_1_1_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_2 test_group_2
-#define numb_case_2_1_2 "2.1.2"
-#define name_case_2_1_2 "Perform options management -- T_IP_TTL"
-#define desc_case_2_1_2 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_IP option T_IP_TTL."
-
-int test_case_2_1_2(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_2_conn test_case_2_1_2
-#define test_case_2_1_2_resp test_case_2_1_2
-#define test_case_2_1_2_list test_case_2_1_2
-
-struct test_stream test_2_1_2_conn = { &preamble_2_1_conn, &test_case_2_1_2_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_2_resp = { &preamble_2_1_resp, &test_case_2_1_2_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_2_list = { &preamble_2_1_list, &test_case_2_1_2_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_3 test_group_2
-#define numb_case_2_1_3 "2.1.3"
-#define name_case_2_1_3 "Perform options management -- T_IP_DONTROUTE"
-#define desc_case_2_1_3 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_IP option T_IP_DONTROUTE."
-
-int test_case_2_1_3(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_3_conn test_case_2_1_3
-#define test_case_2_1_3_resp test_case_2_1_3
-#define test_case_2_1_3_list test_case_2_1_3
-
-struct test_stream test_2_1_3_conn = { &preamble_2_1_conn, &test_case_2_1_3_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_3_resp = { &preamble_2_1_resp, &test_case_2_1_3_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_3_list = { &preamble_2_1_list, &test_case_2_1_3_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_4 test_group_2
-#define numb_case_2_1_4 "2.1.4"
-#define name_case_2_1_4 "Perform options management -- T_IP_BROADCAST"
-#define desc_case_2_1_4 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_IP option T_IP_BROADCAST."
-
-int test_case_2_1_4(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_4_conn test_case_2_1_4
-#define test_case_2_1_4_resp test_case_2_1_4
-#define test_case_2_1_4_list test_case_2_1_4
-
-struct test_stream test_2_1_4_conn = { &preamble_2_1_conn, &test_case_2_1_4_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_4_resp = { &preamble_2_1_resp, &test_case_2_1_4_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_4_list = { &preamble_2_1_list, &test_case_2_1_4_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_5 test_group_2
-#define numb_case_2_1_5 "2.1.5"
-#define name_case_2_1_5 "Perform options management -- T_IP_REUSEADDR"
-#define desc_case_2_1_5 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_IP option T_IP_REUSEADDR."
-
-int test_case_2_1_5(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_5_conn test_case_2_1_5
-#define test_case_2_1_5_resp test_case_2_1_5
-#define test_case_2_1_5_list test_case_2_1_5
-
-struct test_stream test_2_1_5_conn = { &preamble_2_1_conn, &test_case_2_1_5_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_5_resp = { &preamble_2_1_resp, &test_case_2_1_5_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_5_list = { &preamble_2_1_list, &test_case_2_1_5_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_6 test_group_2
-#define numb_case_2_1_6 "2.1.6"
-#define name_case_2_1_6 "Perform options management -- T_TCP_NODELAY"
-#define desc_case_2_1_6 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_TCP option T_TCP_NODELAY."
-
-int test_case_2_1_6(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_6_conn test_case_2_1_6
-#define test_case_2_1_6_resp test_case_2_1_6
-#define test_case_2_1_6_list test_case_2_1_6
-
-struct test_stream test_2_1_6_conn = { &preamble_2_1_conn, &test_case_2_1_6_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_6_resp = { &preamble_2_1_resp, &test_case_2_1_6_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_6_list = { &preamble_2_1_list, &test_case_2_1_6_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_7 test_group_2
-#define numb_case_2_1_7 "2.1.7"
-#define name_case_2_1_7 "Perform options management -- T_TCP_MAXSEG"
-#define desc_case_2_1_7 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_TCP option T_TCP_MAXSEG."
-
-int test_case_2_1_7(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_7_conn test_case_2_1_7
-#define test_case_2_1_7_resp test_case_2_1_7
-#define test_case_2_1_7_list test_case_2_1_7
-
-struct test_stream test_2_1_7_conn = { &preamble_2_1_conn, &test_case_2_1_7_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_7_resp = { &preamble_2_1_resp, &test_case_2_1_7_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_7_list = { &preamble_2_1_list, &test_case_2_1_7_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_8 test_group_2
-#define numb_case_2_1_8 "2.1.8"
-#define name_case_2_1_8 "Perform options management -- T_TCP_KEEPALIVE"
-#define desc_case_2_1_8 "\
-Checks that options management can be performed on several streams\n\
-for T_INET_TCP option T_TCP_KEEPALIVE."
-
-int test_case_2_1_8(int child)
-{
-	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
-	} options = {
-		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
-	};
-	test_opts = &options;
-	test_olen = sizeof(options);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_8_conn test_case_2_1_8
-#define test_case_2_1_8_resp test_case_2_1_8
-#define test_case_2_1_8_list test_case_2_1_8
-
-struct test_stream test_2_1_8_conn = { &preamble_2_1_conn, &test_case_2_1_8_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_8_resp = { &preamble_2_1_resp, &test_case_2_1_8_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_8_list = { &preamble_2_1_list, &test_case_2_1_8_list, &postamble_2_1_list };
-
-
-#define tgrp_case_2_1_9 test_group_2
-#define numb_case_2_1_9 "2.1.9"
-#define name_case_2_1_9 "Perform options management -- all options"
-#define desc_case_2_1_9 "\
-Checks that options management can be performed on several streams\n\
-for all options."
-
-int test_case_2_1_9(int child)
-{
-	test_opts = test_opt_optm;
-	test_olen = sizeof(*test_opt_optm);
-	return test_case_2_1(child);
-}
-
-#define test_case_2_1_9_conn test_case_2_1_9
-#define test_case_2_1_9_resp test_case_2_1_9
-#define test_case_2_1_9_list test_case_2_1_9
-
-struct test_stream test_2_1_9_conn = { &preamble_2_1_conn, &test_case_2_1_9_conn, &postamble_2_1_conn };
-struct test_stream test_2_1_9_resp = { &preamble_2_1_resp, &test_case_2_1_9_resp, &postamble_2_1_resp };
-struct test_stream test_2_1_9_list = { &preamble_2_1_list, &test_case_2_1_9_list, &postamble_2_1_list };
-
 /*
- *  Bind and unbind three streams.
+ *  Attempt and withdraw a connection request.
  */
 #define tgrp_case_2_2 test_group_2
 #define numb_case_2_2 "2.2"
-#define name_case_2_2 "Bind and unbind three streams."
+#define name_case_2_2 "Attempt and withdraw a connection request."
 #define desc_case_2_2 "\
-Checks that three streams can be bound and unbound.  One is bound to\n\
-a normal address, another to a null address, the last to a wildcard\n\
-address."
+Attempts and then withdraws a connection request.  The connection\n\
+should disconnect at both ends."
 
-int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
+int test_case_2_2_conn(int child)
 {
-	test_addr = addr;
-	test_alen = len;
-	last_qlen = 0;
-	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -5085,55 +4816,58 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_2_2_conn(int child)
+int test_case_2_2_list(int child)
 {
-	return test_case_2_2(child, &addrs[0], sizeof(addrs[0]));
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 int test_case_2_2_resp(int child)
 {
-	return test_case_2_2(child, NULL, 0);
-}
-int test_case_2_2_list(int child)
-{
-	addrs[3].sin_addr.s_addr = INADDR_ANY;
-	return test_case_2_2(child, &addrs[3], sizeof(addrs[3]));
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_2_2_conn	preamble_0
-#define preamble_2_2_resp	preamble_0
-#define preamble_2_2_list	preamble_0
+#define preamble_2_2_conn	preamble_1
+#define preamble_2_2_resp	preamble_1
+#define preamble_2_2_list	preamble_1
 
-#define postamble_2_2_conn	postamble_0
-#define postamble_2_2_resp	postamble_0
-#define postamble_2_2_list	postamble_0
+#define postamble_2_2_conn	postamble_1
+#define postamble_2_2_resp	postamble_1
+#define postamble_2_2_list	postamble_1
 
 struct test_stream test_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
 struct test_stream test_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
 struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &postamble_2_2_list };
 
 /*
- *  Attempt a connection with no listener.
+ *  Attempt and refuse a connection request.
  */
-#define test_group_3 "Connection and disconnection"
+#define test_group_3 "Refused and withdrawn connection requets"
 #define tgrp_case_3_1 test_group_3
 #define numb_case_3_1 "3.1"
-#define name_case_3_1 "Attempt a connection with no listener."
+#define name_case_3_1 "Attempt and refuse a connection request."
 #define desc_case_3_1 "\
-Attempts a connection with no listener.  The connection attempt\n\
-should time out."
+Attempts a connection which is refused by the receiving end.\n\
+The connection should disconnect at the attempting end."
 
 int test_case_3_1_conn(int child)
 {
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
 	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
@@ -5143,102 +4877,99 @@ int test_case_3_1_conn(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_3_1_resp(int child)
-{
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_sleep(child, 1);
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
 int test_case_3_1_list(int child)
 {
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	test_data = NULL;
+	last_sequence = seq[child];
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
+int test_case_3_1_resp(int child)
+{
+	return (__RESULT_SUCCESS);
+}
 
-#define preamble_3_1_conn	preamble_1s
-#define preamble_3_1_resp	preamble_1s
-#define preamble_3_1_list	preamble_0
+#define preamble_3_1_conn	preamble_1
+#define preamble_3_1_resp	preamble_1
+#define preamble_3_1_list	preamble_1
 
 #define postamble_3_1_conn	postamble_1
 #define postamble_3_1_resp	postamble_1
-#define postamble_3_1_list	postamble_0
+#define postamble_3_1_list	postamble_1
 
 struct test_stream test_3_1_conn = { &preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
 struct test_stream test_3_1_resp = { &preamble_3_1_resp, &test_case_3_1_resp, &postamble_3_1_resp };
 struct test_stream test_3_1_list = { &preamble_3_1_list, &test_case_3_1_list, &postamble_3_1_list };
 
 /*
- *  Attempt and withdraw a connection request.
+ *  Attempt and delayed refuse a connection request.
  */
 #define tgrp_case_3_2 test_group_3
 #define numb_case_3_2 "3.2"
-#define name_case_3_2 "Attempt and withdraw a connection request."
+#define name_case_3_2 "Attempt and delayed refuse a connection request."
 #define desc_case_3_2 "\
-Attempts and then withdraws a connection request.  The connection\n\
-should disconnect at both ends."
+Attempts a delayed refusal of a connection requrest.  This delayed\n\
+refusal should come after the connector has already timed out."
 
 int test_case_3_2_conn(int child)
 {
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
 	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, (opt_optm.rmx_val + 10) * opt_optm.irt_val, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_3_2_list(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = NULL;
-	last_sequence = 0;
+	last_sequence = seq[child];
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
 int test_case_3_2_resp(int child)
 {
-	test_sleep(child, 1);
-	state++;
 	return (__RESULT_SUCCESS);
 }
 
-int test_case_3_2_list(int child)
-{
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define preamble_3_2_conn	preamble_1s
-#define preamble_3_2_resp	preamble_1s
-#define preamble_3_2_list	preamble_1s
+#define preamble_3_2_conn	preamble_1
+#define preamble_3_2_resp	preamble_1
+#define preamble_3_2_list	preamble_1
 
 #define postamble_3_2_conn	postamble_1
 #define postamble_3_2_resp	postamble_1
@@ -5249,201 +4980,40 @@ struct test_stream test_3_2_resp = { &preamble_3_2_resp, &test_case_3_2_resp, &p
 struct test_stream test_3_2_list = { &preamble_3_2_list, &test_case_3_2_list, &postamble_3_2_list };
 
 /*
- *  Attempt and refuse a connection request.
- */
-#define tgrp_case_3_3 test_group_3
-#define numb_case_3_3 "3.3"
-#define name_case_3_3 "Attempt and refuse a connection request."
-#define desc_case_3_3 "\
-Attempts a connection which is refused by the receiving end.\n\
-The connection should disconnect at the attempting end."
-
-int test_case_3_3_conn(int child)
-{
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
-	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
-	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-int test_case_3_3_resp(int child)
-{
-	test_sleep(child, 1);
-	state++;
-	return (__RESULT_SUCCESS);
-}
-
-int test_case_3_3_list(int child)
-{
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = NULL;
-	last_sequence = last_sequence;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define preamble_3_3_conn	preamble_1s
-#define preamble_3_3_resp	preamble_1s
-#define preamble_3_3_list	preamble_1s
-
-#define postamble_3_3_conn	postamble_1
-#define postamble_3_3_resp	postamble_1
-#define postamble_3_3_list	postamble_1
-
-struct test_stream test_3_3_conn = { &preamble_3_3_conn, &test_case_3_3_conn, &postamble_3_3_conn };
-struct test_stream test_3_3_resp = { &preamble_3_3_resp, &test_case_3_3_resp, &postamble_3_3_resp };
-struct test_stream test_3_3_list = { &preamble_3_3_list, &test_case_3_3_list, &postamble_3_3_list };
-
-/*
- *  Attempt and delayed refuse a connection request.
- */
-#define tgrp_case_3_4 test_group_3
-#define numb_case_3_4 "3.4"
-#define name_case_3_4 "Attempt and delayed refuse a connection request."
-#define desc_case_3_4 "\
-Attempts a delayed refusal of a connection requrest.  This delayed\n\
-refusal should come after the connector has already timed out."
-
-int test_case_3_4_conn(int child)
-{
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
-	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
-	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_sleep(child, 5);
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-int test_case_3_4_resp(int child)
-{
-	test_sleep(child, 6);
-	state++;
-	return (__RESULT_SUCCESS);
-}
-
-int test_case_3_4_list(int child)
-{
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_sleep(child, 5);
-	state++;
-	last_sequence = last_sequence;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define preamble_3_4_conn	preamble_1s
-#define preamble_3_4_resp	preamble_1s
-#define preamble_3_4_list	preamble_1s
-
-#define postamble_3_4_conn	postamble_1
-#define postamble_3_4_resp	postamble_1
-#define postamble_3_4_list	postamble_1
-
-struct test_stream test_3_4_conn = { &preamble_3_4_conn, &test_case_3_4_conn, &postamble_3_4_conn };
-struct test_stream test_3_4_resp = { &preamble_3_4_resp, &test_case_3_4_resp, &postamble_3_4_resp };
-struct test_stream test_3_4_list = { &preamble_3_4_list, &test_case_3_4_list, &postamble_3_4_list };
-
-/*
  *  Accept a connection.
  */
-#define test_group_4 "Connection and disconnection"
+#define test_group_4 "Successful connections"
 #define tgrp_case_4_1 test_group_4
 #define numb_case_4_1 "4.1"
 #define name_case_4_1 "Accept a connection."
 #define desc_case_4_1 "\
-Attempt and accept a connection.  This should be successful."
+Accept a connection and then disconnect.  This connection attempt\n\
+should be successful."
 
 int test_case_4_1_conn(int child)
 {
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
 	test_data = NULL;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_4_1_resp(int child)
-{
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_sleep(child, 1);
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
 int test_case_4_1_list(int child)
 {
 	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -5454,81 +5024,130 @@ int test_case_4_1_list(int child)
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_4_1_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_4_1_conn	preamble_1s
-#define preamble_4_1_resp	preamble_1s
-#define preamble_4_1_list	preamble_1s
+#define preamble_4_1_conn	preamble_1
+#define preamble_4_1_resp	preamble_1
+#define preamble_4_1_list	preamble_1
 
-#define postamble_4_1_conn	postamble_2_conn
-#define postamble_4_1_resp	postamble_2_resp
-#define postamble_4_1_list	postamble_2_list
+#define postamble_4_1_conn	postamble_1
+#define postamble_4_1_resp	postamble_1
+#define postamble_4_1_list	postamble_1
 
 struct test_stream test_4_1_conn = { &preamble_4_1_conn, &test_case_4_1_conn, &postamble_4_1_conn };
 struct test_stream test_4_1_resp = { &preamble_4_1_resp, &test_case_4_1_resp, &postamble_4_1_resp };
 struct test_stream test_4_1_list = { &preamble_4_1_list, &test_case_4_1_list, &postamble_4_1_list };
 
 /*
- *  Connect with data.
+ *  Attempt and delayed accept a connection request.
  */
 #define tgrp_case_4_2 test_group_4
 #define numb_case_4_2 "4.2"
-#define name_case_4_2 "Connect with data."
+#define name_case_4_2 "Attempt and delayed accept a connection request."
 #define desc_case_4_2 "\
-Attempt and accept a connection where data is also passed in the\n\
-connection request and the connection response.  This cannot be\n\
-accomplished in TCP protocol, and should generate an error."
+Test Case 4(b):\n\
+Attempt a connection and delay the acceptance of the connection request.\n\
+This should result in a disconnection indication after the connection is\n\
+accepted.  "
 
 int test_case_4_2_conn(int child)
 {
-	static char dat[] = "Connection Data!";
-	test_addr = &addrs[2];
-	test_alen = sizeof(addrs[2]);
-	test_data = dat;
-	test_opts = test_opt_conn;
-	test_olen = sizeof(*test_opt_conn);
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TBADDATA)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, (opt_optm.rmx_val + 10) * opt_optm.irt_val, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_4_2_resp(int child)
-{
-	test_sleep(child, 1);
-	state++;
-	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
-		return (__RESULT_FAILURE);
-	state++;
-	return (__RESULT_SUCCESS);
-}
-
 int test_case_4_2_list(int child)
 {
-	test_sleep(child, 1);
+	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
-		return (__RESULT_FAILURE);
+	if (expect(child, (opt_optm.rmx_val + 10) * opt_optm.irt_val + NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_4_2_resp(int child)
+{
+	switch (wait_event(child, (opt_optm.rmx_val + 10) * opt_optm.irt_val + LONG_WAIT)) {
+	case __TEST_DISCON_IND:
+		goto success;
+	case __EVENT_NO_MSG:
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_data = "Hello!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+      success:
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_4_2_conn	preamble_1s
-#define preamble_4_2_resp	preamble_1s
-#define preamble_4_2_list	preamble_1s
+#define preamble_4_2_conn	preamble_1
+#define preamble_4_2_resp	preamble_1
+#define preamble_4_2_list	preamble_1
 
 #define postamble_4_2_conn	postamble_1
 #define postamble_4_2_resp	postamble_1
@@ -5539,133 +5158,75 @@ struct test_stream test_4_2_resp = { &preamble_4_2_resp, &test_case_4_2_resp, &p
 struct test_stream test_4_2_list = { &preamble_4_2_list, &test_case_4_2_list, &postamble_4_2_list };
 
 /*
- *  Connect with transfer data and orderly release.
+ *  Accept a connection.
  */
-#define test_group_5 "Data transfer"
+#define test_group_5 "Connections with different HMAC algorithms"
 #define tgrp_case_5_1 test_group_5
 #define numb_case_5_1 "5.1"
-#define name_case_5_1 "Connect with transfer data and orderly release."
+#define name_case_5_1 "Accept a connection."
 #define desc_case_5_1 "\
-Connect, transfer data and perform orderly release."
+Attempt and accept a connection.  This should be successful.  The\n\
+accepting stream uses the T_SCTP_HMAC_NONE signature on its cookie."
 
 int test_case_5_1_conn(int child)
 {
-	static char dat[] = "Orderly release data connecting.";
-	int data_seen = 0, data_sent;
-	for (data_sent = 0; data_sent < 4; data_sent++) {
-		test_data = dat;
-		MORE_flag = 0;
-		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-			goto failure;
-		state++;
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
-			data_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	while (data_seen < 4) {
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
-			data_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_5_1_resp(int child)
-{
-	static char dat[] = "Orderly release data responding.";
-	int data_seen = 0, data_sent, ordrel_seen = 0;
-	for (data_sent = 0; data_sent < 4; data_sent++) {
-		test_data = dat;
-		MORE_flag = 1;
-		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-			goto failure;
-		state++;
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
-			data_seen++;
-			break;
-		case __TEST_ORDREL_IND:
-			if (ordrel_seen >= 1)
-				goto failure;
-			ordrel_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	while (data_seen < 4 || ordrel_seen < 1) {
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_DATA_IND:
-			if (data_seen >= 4)
-				goto failure;
-			data_seen++;
-			break;
-		case __TEST_ORDREL_IND:
-			if (ordrel_seen >= 1)
-				goto failure;
-			ordrel_seen++;
-			break;
-		default:
-			goto failure;
-		}
-		state++;
-	}
-	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
 int test_case_5_1_list(int child)
 {
-	test_sleep(child, 1);
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (wait_event(child, SHORT_WAIT) != __EVENT_NO_MSG)
-		return (__RESULT_FAILURE);
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_5_1_resp(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_5_1_conn	preamble_2_conn
-#define preamble_5_1_resp	preamble_2_resp
-#define preamble_5_1_list	preamble_2_list
+#define preamble_5_1_conn	preamble_1
+#define preamble_5_1_resp	preamble_1
+#define preamble_5_1_list	preamble_1
 
 #define postamble_5_1_conn	postamble_1
 #define postamble_5_1_resp	postamble_1
@@ -5676,98 +5237,74 @@ struct test_stream test_5_1_resp = { &preamble_5_1_resp, &test_case_5_1_resp, &p
 struct test_stream test_5_1_list = { &preamble_5_1_list, &test_case_5_1_list, &postamble_5_1_list };
 
 /*
- *  Connect with orderly release and late data transfer.
+ *  Accept a connection (MD5 hashed cookie)
  */
 #define tgrp_case_5_2 test_group_5
 #define numb_case_5_2 "5.2"
-#define name_case_5_2 "Connect with orderly release and late data transfer."
+#define name_case_5_2 "Accept a connection (MD5 hashed cookie)."
 #define desc_case_5_2 "\
-Connect, transfer data and perform orderly release but transfer\n\
-data after release has been initiated"
+Attempt and accept a connection.  This should be successful.  The\n\
+accepting stream uses the T_SCTP_HMAC_MD5 signature on its cookie."
 
 int test_case_5_2_conn(int child)
 {
-	static char dat[] = "Orderly release data connecting.";
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-      more:
-	switch (wait_event(child, LONG_WAIT)) {
-	case __TEST_DATA_IND:
-		state++;
-		goto more;
-	case __TEST_ORDREL_IND:
-		break;
-	default:
-		goto failure;
-	}
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-int test_case_5_2_resp(int child)
-{
-	static char dat[] = "Orderly release data responding.";
-	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
 int test_case_5_2_list(int child)
 {
-	test_sleep(child, 1);
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_5_2_resp(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_5_2_conn	preamble_2_conn
-#define preamble_5_2_resp	preamble_2_resp
-#define preamble_5_2_list	preamble_2_list
+#define preamble_5_2_conn	preamble_8_conn
+#define preamble_5_2_resp	preamble_8_resp
+#define preamble_5_2_list	preamble_8_list
 
 #define postamble_5_2_conn	postamble_1
 #define postamble_5_2_resp	postamble_1
@@ -5778,108 +5315,74 @@ struct test_stream test_5_2_resp = { &preamble_5_2_resp, &test_case_5_2_resp, &p
 struct test_stream test_5_2_list = { &preamble_5_2_list, &test_case_5_2_list, &postamble_5_2_list };
 
 /*
- *  Connect with attempted simultaneous orderly release.
+ *  Accept a connection (SHA1 hashed cookie)
  */
 #define tgrp_case_5_3 test_group_5
 #define numb_case_5_3 "5.3"
-#define name_case_5_3 "Connect with attempted simultaneous orderly release."
+#define name_case_5_3 "Accept a connection (SHA1 hashed cookie)"
 #define desc_case_5_3 "\
-Connect, transfer data and perform orderly release but attempt\n\
-to perform a simultaneous release from both sides.  (This might\n\
-or might not result in a simultaneous release attempt.)"
+Attempt and accept a connection.  This should be successful.  The\n\
+accepting stream uses the T_SCTP_HMAC_SHA1 signature on its cookie."
 
 int test_case_5_3_conn(int child)
 {
-	static char dat[] = "Orderly release data connecting.";
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+	test_addr = addrs[1];
+	test_alen = sizeof(addrs[1]);
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	for (;;) {
-		switch (wait_event(child, SHORT_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_ORDREL_IND:
-			break;
-		case __TEST_DATA_IND:
-			state++;
-			continue;
-		default:
-			goto failure;
-		}
-		break;
-	}
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
-
-int test_case_5_3_resp(int child)
-{
-	static char dat[] = "Orderly release data responding.";
-	test_data = dat;
-	MORE_flag = 1;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = NULL;
-	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	for (;;) {
-		switch (wait_event(child, SHORT_WAIT)) {
-		case __EVENT_NO_MSG:
-			break;
-		case __TEST_ORDREL_IND:
-			break;
-		case __TEST_DATA_IND:
-			state++;
-			continue;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
 int test_case_5_3_list(int child)
 {
-	test_sleep(child, 1);
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_5_3_resp(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_5_3_conn	preamble_2_conn
-#define preamble_5_3_resp	preamble_2_resp
-#define preamble_5_3_list	preamble_2_list
+#define preamble_5_3_conn	preamble_7_conn
+#define preamble_5_3_resp	preamble_7_resp
+#define preamble_5_3_list	preamble_7_list
 
 #define postamble_5_3_conn	postamble_1
 #define postamble_5_3_resp	postamble_1
@@ -5890,159 +5393,1665 @@ struct test_stream test_5_3_resp = { &preamble_5_3_resp, &test_case_5_3_resp, &p
 struct test_stream test_5_3_list = { &preamble_5_3_list, &test_case_5_3_list, &postamble_5_3_list };
 
 /*
- *  Connect with data transfer and abortive release.
+ *  Connect with data.
  */
-#define tgrp_case_5_4 test_group_5
-#define numb_case_5_4 "5.4"
-#define name_case_5_4 "Connection with data transfer and abortive release."
-#define desc_case_5_4 "\
-Connect, transfer data and perform abort."
-
-
-int test_case_5_4_conn(int child)
-{
-	static char dat[] = "Abortive release data connecting.";
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = NULL;
-	last_sequence = 0;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	for (;;) {
-		switch (wait_event(child, SHORT_WAIT)) {
-		case __EVENT_NO_MSG:
-		case __TEST_DISCON_IND:
-			break;
-		case __TEST_OK_ACK:
-		case __TEST_ERROR_ACK:
-			continue;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-int test_case_5_4_resp(int child)
-{
-	static char dat[] = "Abortive release data responding.";
-	test_data = dat;
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = NULL;
-	last_sequence = 0;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	for (;;) {
-		switch (wait_event(child, SHORT_WAIT)) {
-		case __EVENT_NO_MSG:
-		case __TEST_DISCON_IND:
-			break;
-		case __TEST_OK_ACK:
-		case __TEST_ERROR_ACK:
-			continue;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-int test_case_5_4_list(int child)
-{
-	test_sleep(child, 1);
-	state++;
-	return (__RESULT_SUCCESS);
-}
-
-#define preamble_5_4_conn	preamble_2_conn
-#define preamble_5_4_resp	preamble_2_resp
-#define preamble_5_4_list	preamble_2_list
-
-#define postamble_5_4_conn	postamble_1
-#define postamble_5_4_resp	postamble_1
-#define postamble_5_4_list	postamble_1
-
-struct test_stream test_5_4_conn = { &preamble_5_4_conn, &test_case_5_4_conn, &postamble_5_4_conn };
-struct test_stream test_5_4_resp = { &preamble_5_4_resp, &test_case_5_4_resp, &postamble_5_4_resp };
-struct test_stream test_5_4_list = { &preamble_5_4_list, &test_case_5_4_list, &postamble_5_4_list };
-
-/*
- *  Negative test cases on connectionless primitives.
- */
-#define test_group_6 "Unsupported primitives"
+#define test_group_6 "Connections with data"
 #define tgrp_case_6_1 test_group_6
 #define numb_case_6_1 "6.1"
-#define name_case_6_1 "Unsupported T_UNITDATA_REQ."
+#define name_case_6_1 "Connect with data."
 #define desc_case_6_1 "\
-Attempts to invoke connectionless primitives.\n\
-- T_UNITDATA_REQ."
+Attempt and accept a connection where data is also passed in the\n\
+connection request and the connection response.  This should result\n\
+in DATA chunks being bundled with the COOKIE-ECHO and COOKIE-ACK\n\
+chunks in the SCTP messages."
 
-int test_case_6_1(int child)
+int test_case_6_1_conn(int child)
 {
-	static char dat[] = "Dummy message.";
-	test_addr = &addrs[0];
-	test_alen = sizeof(addrs[0]);
-	test_data = dat;
-	test_opts = test_opt_data;
-	test_olen = sizeof(*test_opt_data);
-	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+	int i;
+	test_data = "Hello Again!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
+	test_data = "Hello Again!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_data = "Hello Again!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 21; i++)
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_6_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_6_1_resp(int child)
+{
+	int i;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 21; i++) {
+		test_data = "Hello Too!";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_6_1_conn	test_case_6_1
-#define test_case_6_1_resp	test_case_6_1
-#define test_case_6_1_list	test_case_6_1
+#define preamble_6_1_conn	preamble_2b_conn
+#define preamble_6_1_resp	preamble_2b_resp
+#define preamble_6_1_list	preamble_2b_list
 
-#define preamble_6_1_conn	preamble_1s
-#define preamble_6_1_resp	preamble_1s
-#define preamble_6_1_list	preamble_1s
-
-#define postamble_6_1_conn	postamble_1e
-#define postamble_6_1_resp	postamble_1e
-#define postamble_6_1_list	postamble_1e
+#define postamble_6_1_conn	postamble_3_conn
+#define postamble_6_1_resp	postamble_3_resp
+#define postamble_6_1_list	postamble_3_list
 
 struct test_stream test_6_1_conn = { &preamble_6_1_conn, &test_case_6_1_conn, &postamble_6_1_conn };
 struct test_stream test_6_1_resp = { &preamble_6_1_resp, &test_case_6_1_resp, &postamble_6_1_resp };
 struct test_stream test_6_1_list = { &preamble_6_1_list, &test_case_6_1_list, &postamble_6_1_list };
+
+/*
+ *  Connect and send partial data.
+ */
+#define tgrp_case_6_2 test_group_6
+#define numb_case_6_2 "6.2"
+#define name_case_6_2 "Connect and send partial data."
+#define desc_case_6_2 "\
+Connect and send partial data (i.e., data with more flag set)."
+
+int test_case_6_2_conn(int child)
+{
+	test_data = "Hello There.";
+	MORE_flag = T_MORE;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello There.";
+	MORE_flag = T_MORE;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello There.";
+	MORE_flag = T_MORE;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello There.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_6_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_6_2_resp(int child)
+{
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_6_2_conn	preamble_2_conn
+#define preamble_6_2_resp	preamble_2_resp
+#define preamble_6_2_list	preamble_2_list
+
+#define postamble_6_2_conn	postamble_3_conn
+#define postamble_6_2_resp	postamble_3_resp
+#define postamble_6_2_list	postamble_3_list
+
+struct test_stream test_6_2_conn = { &preamble_6_2_conn, &test_case_6_2_conn, &postamble_6_2_conn };
+struct test_stream test_6_2_resp = { &preamble_6_2_resp, &test_case_6_2_resp, &postamble_6_2_resp };
+struct test_stream test_6_2_list = { &preamble_6_2_list, &test_case_6_2_list, &postamble_6_2_list };
+
+/*
+ *  Connect and send partial data.
+ */
+#define tgrp_case_6_3 test_group_6
+#define numb_case_6_3 "6.3"
+#define name_case_6_3 "Connect and send partial data."
+#define desc_case_6_3 "\
+Connect and send partial data and expedited data on multiple streams.\n\
+Expedited data should be delivered between ordered data fragments on\n\
+the same stream and delivered to the user first."
+
+int test_case_6_3_conn(int child)
+{
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 1;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 2;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 3;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 1;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 2;
+	test_data = "Hello There.";
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 3;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 1;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 2;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 3;
+	test_data = "Hello There.";
+	DATA_flag = T_MORE;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 0;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 1;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 2;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 3;
+	test_data = "Hello There.";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_6_3_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_6_3_resp(int child)
+{
+	int i;
+	if (expect(child, NORMAL_WAIT, __TEST_EXP_OPTDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 16; i++) {
+		if (expect(child, NORMAL_WAIT, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_6_3_conn	preamble_3b_conn
+#define preamble_6_3_resp	preamble_3b_resp
+#define preamble_6_3_list	preamble_3b_list
+
+#define postamble_6_3_conn	postamble_3_conn
+#define postamble_6_3_resp	postamble_3_resp
+#define postamble_6_3_list	postamble_3_list
+
+struct test_stream test_6_3_conn = { &preamble_6_3_conn, &test_case_6_3_conn, &postamble_6_3_conn };
+struct test_stream test_6_3_resp = { &preamble_6_3_resp, &test_case_6_3_resp, &postamble_6_3_resp };
+struct test_stream test_6_3_list = { &preamble_6_3_list, &test_case_6_3_list, &postamble_6_3_list };
+
+/*
+ *  Test fragmentation by sending very large packets.
+ */
+#define test_group_7 "Segmentation and reassembly"
+#define tgrp_case_7_1 test_group_7
+#define numb_case_7_1 "7.1"
+#define name_case_7_1 "Test fragmentation by sending very large packets."
+#define desc_case_7_1 "\
+Connect and send very large packets to test fragmentation."
+
+int test_case_7_1_conn(int child)
+{
+	unsigned char lbuf[100000];
+	const char nrm[] = "Hello.";
+	const char urg[] = "Urgent.";
+	int i;
+	for (i = 0; i < 100000; i++)
+		lbuf[i] = 'A';
+	lbuf[99999] = '\0';
+	bzero(lbuf, sizeof(lbuf));
+	for (i = 0; i < 4; i++) {
+		test_data = (char *)lbuf;
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(child, 1);
+			test_data = (char *)lbuf;
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		state++;
+		test_data = urg;
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(child, 1);
+			test_data = urg;
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		state++;
+		test_data = nrm;
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+			state++;
+			test_sleep(child, 1);
+			test_data = nrm;
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_7_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_7_1_resp(int child)
+{
+	size_t len = 0;
+	while (len < 4 * 100000 + 4 * 8 + 4 * 7) {
+		switch (wait_event(child, LONGER_WAIT)) {
+		case __TEST_EXDATA_IND:
+		case __TEST_DATA_IND:
+			len += data.len;
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
+	fprintf(stdout, "Received %u bytes, expecting %u\n", len, 4 * 100000 + 4 * 8 + 4 * 7);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_7_1_conn	preamble_2_conn
+#define preamble_7_1_resp	preamble_2_resp
+#define preamble_7_1_list	preamble_2_list
+
+#define postamble_7_1_conn	postamble_3_conn
+#define postamble_7_1_resp	postamble_3_resp
+#define postamble_7_1_list	postamble_3_list
+
+struct test_stream test_7_1_conn = { &preamble_7_1_conn, &test_case_7_1_conn, &postamble_7_1_conn };
+struct test_stream test_7_1_resp = { &preamble_7_1_resp, &test_case_7_1_resp, &postamble_7_1_resp };
+struct test_stream test_7_1_list = { &preamble_7_1_list, &test_case_7_1_list, &postamble_7_1_list };
+
+/*
+ *  Test coallescing packets by sending many small fragmented pieces.
+ */
+#define tgrp_case_7_2 test_group_7
+#define numb_case_7_2 "7.2"
+#define name_case_7_2 "Test coallescing by sending small fragmented pieces."
+#define desc_case_7_2 "\
+Connect and send many small packets to test coallescing of packets."
+
+int test_case_7_2_conn(int child)
+{
+	int s = 0;
+	size_t snd_bytes = 0;
+	while (s < 100000) {
+		test_data = "Hi Threre.";
+		MORE_flag = T_MORE;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
+			state++;
+			print_more();
+			test_sleep(child, 1);
+			test_data = "Hi Threre.";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+		}
+		snd_bytes += 10;
+		s++;
+		state++;
+		if (s > 3)
+			print_less(child);
+	}
+	state++;
+	test_data = "Hi Threre.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	snd_bytes += 10;
+	s++;
+	state++;
+	print_more();
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "Sent %3d messages making %6u bytes.\n", s, snd_bytes);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+int test_case_7_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_7_2_resp(int child)
+{
+	int r = 0;
+	size_t rcv_bytes = 0;
+	int joined = 0;
+	while (r < 4) {
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		if (data.len > 10)
+			joined = 1;
+		rcv_bytes += data.len;
+		r++;
+		state++;
+	}
+	print_less(child);
+	while (rcv_bytes < 1000010) {
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		if (data.len > 10)
+			joined = 1;
+		rcv_bytes += data.len;
+		r++;
+		state++;
+	}
+	if (!joined)
+		goto failure;
+	state++;
+	print_more();
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	print_more();
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_7_2_conn	preamble_2_conn
+#define preamble_7_2_resp	preamble_2_resp
+#define preamble_7_2_list	preamble_2_list
+
+#define postamble_7_2_conn	postamble_3_conn
+#define postamble_7_2_resp	postamble_3_resp
+#define postamble_7_2_list	postamble_3_list
+
+struct test_stream test_7_2_conn = { &preamble_7_2_conn, &test_case_7_2_conn, &postamble_7_2_conn };
+struct test_stream test_7_2_resp = { &preamble_7_2_resp, &test_case_7_2_resp, &postamble_7_2_resp };
+struct test_stream test_7_2_list = { &preamble_7_2_list, &test_case_7_2_list, &postamble_7_2_list };
+
+/*
+ *  Connect with transfer data and orderly release.
+ */
+#define test_group_8 "Orderly release"
+#define tgrp_case_8_1 test_group_8
+#define numb_case_8_1 "8.1"
+#define name_case_8_1 "Connect with transfer data and orderly release."
+#define desc_case_8_1 "\
+Connect, transfer data and perform orderly release."
+
+int test_case_8_1_conn(int child)
+{
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_8_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_8_1_resp(int child)
+{
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_1_conn	preamble_2_conn
+#define preamble_8_1_resp	preamble_2_resp
+#define preamble_8_1_list	preamble_2_list
+
+#define postamble_8_1_conn	postamble_1
+#define postamble_8_1_resp	postamble_1
+#define postamble_8_1_list	postamble_1
+
+struct test_stream test_8_1_conn = { &preamble_8_1_conn, &test_case_8_1_conn, &postamble_8_1_conn };
+struct test_stream test_8_1_resp = { &preamble_8_1_resp, &test_case_8_1_resp, &postamble_8_1_resp };
+struct test_stream test_8_1_list = { &preamble_8_1_list, &test_case_8_1_list, &postamble_8_1_list };
+
+/*
+ *  Connect with orderly release and late data transfer.
+ */
+#define tgrp_case_8_2 test_group_8
+#define numb_case_8_2 "8.2"
+#define name_case_8_2 "Connect with orderly release and late data transfer."
+#define desc_case_8_2 "\
+Connect, transfer data and perform orderly release but transfer\n\
+data after release has been initiated"
+
+int test_case_8_2_conn(int child)
+{
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_8_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_8_2_resp(int child)
+{
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_2_conn	preamble_2_conn
+#define preamble_8_2_resp	preamble_2_resp
+#define preamble_8_2_list	preamble_2_list
+
+#define postamble_8_2_conn	postamble_1
+#define postamble_8_2_resp	postamble_1
+#define postamble_8_2_list	postamble_1
+
+struct test_stream test_8_2_conn = { &preamble_8_2_conn, &test_case_8_2_conn, &postamble_8_2_conn };
+struct test_stream test_8_2_resp = { &preamble_8_2_resp, &test_case_8_2_resp, &postamble_8_2_resp };
+struct test_stream test_8_2_list = { &preamble_8_2_list, &test_case_8_2_list, &postamble_8_2_list };
+
+/*
+ *  Connect with attempted simultaneous orderly release.
+ */
+#define tgrp_case_8_3 test_group_8
+#define numb_case_8_3 "8.3"
+#define name_case_8_3 "Connect with attempted simultaneous orderly release."
+#define desc_case_8_3 "\
+Connect, transfer data and perform orderly release but attempt\n\
+to perform a simultaneous release from both sides.  (This might\n\
+or might not result in a simultaneous release attempt.)"
+
+int test_case_8_3_conn(int child)
+{
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_8_3_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_8_3_resp(int child)
+{
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_3_conn	preamble_2_conn
+#define preamble_8_3_resp	preamble_2_resp
+#define preamble_8_3_list	preamble_2_list
+
+#define postamble_8_3_conn	postamble_1
+#define postamble_8_3_resp	postamble_1
+#define postamble_8_3_list	postamble_1
+
+struct test_stream test_8_3_conn = { &preamble_8_3_conn, &test_case_8_3_conn, &postamble_8_3_conn };
+struct test_stream test_8_3_resp = { &preamble_8_3_resp, &test_case_8_3_resp, &postamble_8_3_resp };
+struct test_stream test_8_3_list = { &preamble_8_3_list, &test_case_8_3_list, &postamble_8_3_list };
+
+/*
+ *  Connect with orderly release under noise.
+ */
+#define tgrp_case_8_4 test_group_8
+#define numb_case_8_4 "8.4"
+#define name_case_8_4 "Connect with orderly release under noise."
+#define desc_case_8_4 "\
+Connect, transfer data and perform orderly release under noise."
+
+int test_case_8_4_conn(int child)
+{
+	int i;
+	test_data = "Hello World!";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 20; i++) {
+		test_data = "Hello World!";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+	}
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 20; i++) {
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_8_4_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_8_4_resp(int child)
+{
+	int i;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 20; i++) {
+		test_data = "Hello World!";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+	}
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (i = 0; i < 20; i++) {
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_8_4_conn	preamble_4b_conn
+#define preamble_8_4_resp	preamble_4b_resp
+#define preamble_8_4_list	preamble_4b_list
+
+#define postamble_8_4_conn	postamble_1
+#define postamble_8_4_resp	postamble_1
+#define postamble_8_4_list	postamble_1
+
+struct test_stream test_8_4_conn = { &preamble_8_4_conn, &test_case_8_4_conn, &postamble_8_4_conn };
+struct test_stream test_8_4_resp = { &preamble_8_4_resp, &test_case_8_4_resp, &postamble_8_4_resp };
+struct test_stream test_8_4_list = { &preamble_8_4_list, &test_case_8_4_list, &postamble_8_4_list };
+
+/*
+ *  Delivering ordered data under noise.
+ */
+#define test_group_9 "Data transfer under noise"
+#define tgrp_case_9_1 test_group_9
+#define numb_case_9_1 "9.1"
+#define name_case_9_1 "Delivering ordered data under noise."
+#define desc_case_9_1 "\
+Delivery of ordered data under noise with acknowledgement."
+#define TEST_PACKETS 300
+int test_case_9_1_conn(int child)
+{
+	int i = 0, j = 0;
+	test_data = "Pattern-1";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	while (i < TEST_PACKETS) {
+		test_data = "Pattern-1";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
+		state++;
+	}
+	while (j < TEST_PACKETS) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_DATA_IND:
+			j++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", child, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+int test_case_9_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_9_1_resp(int child)
+{
+	int i = 0, j = 0;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	while (i < TEST_PACKETS) {
+		test_data = "Pattern-3";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
+		state++;
+	}
+	while (j < TEST_PACKETS) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_DATA_IND:
+			j++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", child, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_1_conn	preamble_4_conn
+#define preamble_9_1_resp	preamble_4_resp
+#define preamble_9_1_list	preamble_4_list
+
+#define postamble_9_1_conn	postamble_3_conn
+#define postamble_9_1_resp	postamble_3_resp
+#define postamble_9_1_list	postamble_3_list
+
+struct test_stream test_9_1_conn = { &preamble_9_1_conn, &test_case_9_1_conn, &postamble_9_1_conn };
+struct test_stream test_9_1_resp = { &preamble_9_1_resp, &test_case_9_1_resp, &postamble_9_1_resp };
+struct test_stream test_9_1_list = { &preamble_9_1_list, &test_case_9_1_list, &postamble_9_1_list };
+
+/*
+ *  Delivering out-of-order data under noise.
+ */
+#define tgrp_case_9_2 test_group_9
+#define numb_case_9_2 "9.2"
+#define name_case_9_2 "Delivering out-of-order data under noise."
+#define desc_case_9_2 "\
+Delivery of un-ordered data under noise."
+int test_case_9_2_conn(int child)
+{
+	int i = 0, j = 0;
+	test_data = "Pattern-1";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	while (i < TEST_PACKETS) {
+		test_data = "Pattern-1";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
+		state++;
+	}
+	while (j < TEST_PACKETS) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_EXDATA_IND:
+			j++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", child, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+int test_case_9_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_9_2_resp(int child)
+{
+	int i = 0, j = 0;
+	if (expect(child, LONG_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Pattern-3";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	while (i < TEST_PACKETS) {
+		test_data = "Pattern-3";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		i++;
+		state++;
+	}
+	while (j < TEST_PACKETS) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_EXDATA_IND:
+			j++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, "%d sent %d inds %d\n", child, i, j);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_2_conn	preamble_4_conn
+#define preamble_9_2_resp	preamble_4_resp
+#define preamble_9_2_list	preamble_4_list
+
+#define postamble_9_2_conn	postamble_3_conn
+#define postamble_9_2_resp	postamble_3_resp
+#define postamble_9_2_list	postamble_3_list
+
+struct test_stream test_9_2_conn = { &preamble_9_2_conn, &test_case_9_2_conn, &postamble_9_2_conn };
+struct test_stream test_9_2_resp = { &preamble_9_2_resp, &test_case_9_2_resp, &postamble_9_2_resp };
+struct test_stream test_9_2_list = { &preamble_9_2_list, &test_case_9_2_list, &postamble_9_2_list };
+
+#undef TEST_PACKETS
+
+#define TEST_PACKETS  5
+#define TEST_STREAMS 32
+#define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
+/*
+ *  Delivering ordered data in multiple streams under noise.
+ */
+#define tgrp_case_9_3 test_group_9
+#define numb_case_9_3 "9.3"
+#define name_case_9_3 "Delivering ordered data in multiple streams under noise."
+#define desc_case_9_3 "\
+Delivery of ordered data in multiple streams under noise."
+int test_case_9_3_conn(int child)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0;
+	test_data = "Pattern-1";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-1";
+			DATA_flag = 0;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			i[s]++;
+			I++;
+			state++;
+		}
+	}
+	while (J < TEST_TOTAL) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_NRM_OPTDATA_IND:
+			j[sid[child]]++;
+			J++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS)
+			goto failure;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, i[s], j[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+int test_case_9_3_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_9_3_resp(int child)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0;
+	if (expect(child, LONG_WAIT, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Pattern-3";
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-3";
+			DATA_flag = 0;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			i[s]++;
+			I++;
+			state++;
+		}
+	}
+	while (J < TEST_TOTAL) {
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_NRM_OPTDATA_IND:
+			j[sid[child]]++;
+			J++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS)
+			goto failure;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, i[s], j[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_3_conn	preamble_6_conn
+#define preamble_9_3_resp	preamble_6_resp
+#define preamble_9_3_list	preamble_6_list
+
+#define postamble_9_3_conn	postamble_3_conn
+#define postamble_9_3_resp	postamble_3_resp
+#define postamble_9_3_list	postamble_3_list
+
+struct test_stream test_9_3_conn = { &preamble_9_3_conn, &test_case_9_3_conn, &postamble_9_3_conn };
+struct test_stream test_9_3_resp = { &preamble_9_3_resp, &test_case_9_3_resp, &postamble_9_3_resp };
+struct test_stream test_9_3_list = { &preamble_9_3_list, &test_case_9_3_list, &postamble_9_3_list };
+
+/*
+ *  Delivering ordered and unordered data in multiple streams under noise.
+ */
+#define tgrp_case_9_4 test_group_9
+#define numb_case_9_4 "9.4"
+#define name_case_9_4 "Delivering data in multiple streams under noise."
+#define desc_case_9_4 "\
+Delivery of ordered and un-ordered data in multiple streams under noise."
+int test_case_9_4_conn(int child)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int o[TEST_STREAMS] = { 0, };
+	int p[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0, O = 0, P = 0;
+	opt_data.sid_val = 1;
+	test_data = "Pattern-1";
+	DATA_flag = T_ODF_EX;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-1";
+			DATA_flag = 0;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			i[s]++;
+			I++;
+			state++;
+		}
+		while (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-1";
+			DATA_flag = T_ODF_EX;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			o[s]++;
+			O++;
+			state++;
+		}
+	}
+	while (J < TEST_TOTAL || P < TEST_TOTAL) {
+		switch (wait_event(child, LONGER_WAIT)) {
+		case __TEST_NRM_OPTDATA_IND:
+			if (!exc[child]) {
+				j[sid[child]]++;
+				J++;
+			} else {
+				p[sid[child]]++;
+				P++;
+			}
+			break;
+		case __TEST_DATA_IND:
+			j[sid[child]]++;
+			J++;
+			break;
+		case __TEST_EXDATA_IND:
+			p[sid[child]]++;
+			P++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, i[s], j[s]);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, o[s], p[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+int test_case_9_4_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_9_4_resp(int child)
+{
+	int s;
+	int i[TEST_STREAMS] = { 0, };
+	int j[TEST_STREAMS] = { 0, };
+	int o[TEST_STREAMS] = { 0, };
+	int p[TEST_STREAMS] = { 0, };
+	int I = 0, J = 0, O = 0, P = 0;
+	if (expect(child, LONG_WAIT, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	opt_data.sid_val = 3;
+	test_data = "Pattern-3";
+	DATA_flag = T_ODF_EX;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (s = 0; s < TEST_STREAMS; s++) {
+		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-3";
+			DATA_flag = 0;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			i[s]++;
+			I++;
+			state++;
+		}
+		while (O < TEST_TOTAL && o[s] < TEST_PACKETS) {
+			opt_data.sid_val = s;
+			test_data = "Pattern-3";
+			DATA_flag = T_ODF_EX;
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			o[s]++;
+			O++;
+			state++;
+		}
+	}
+	while (J < TEST_TOTAL || P < TEST_TOTAL) {
+		switch (wait_event(child, LONGER_WAIT)) {
+		case __TEST_NRM_OPTDATA_IND:
+			if (!exc[child]) {
+				j[sid[child]]++;
+				J++;
+			} else {
+				p[sid[child]]++;
+				P++;
+			}
+			break;
+		case __TEST_DATA_IND:
+			j[sid[child]]++;
+			J++;
+			break;
+		case __TEST_EXDATA_IND:
+			p[sid[child]]++;
+			P++;
+			break;
+		case __EVENT_NO_MSG:
+			continue;
+		default:
+			goto failure;
+		}
+		state++;
+	}
+	for (s = 0; s < TEST_STREAMS; s++) {
+		if (j[s] != TEST_PACKETS || p[s] != TEST_PACKETS)
+			goto failure;
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, i[s], j[s]);
+	for (s = 0; s < TEST_STREAMS; s++)
+		fprintf(stdout, "%d send %d inds %d\n", child, o[s], p[s]);
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_9_4_conn	preamble_6_conn
+#define preamble_9_4_resp	preamble_6_resp
+#define preamble_9_4_list	preamble_6_list
+
+#define postamble_9_4_conn	postamble_3_conn
+#define postamble_9_4_resp	postamble_3_resp
+#define postamble_9_4_list	postamble_3_list
+
+struct test_stream test_9_4_conn = { &preamble_9_4_conn, &test_case_9_4_conn, &postamble_9_4_conn };
+struct test_stream test_9_4_resp = { &preamble_9_4_resp, &test_case_9_4_resp, &postamble_9_4_resp };
+struct test_stream test_9_4_list = { &preamble_9_4_list, &test_case_9_4_list, &postamble_9_4_list };
+
+/*
+ *  Data for destination failure testing.
+ */
+#define test_group_10 "Data transfer undder destination failure"
+#define tgrp_case_10_1 test_group_10
+#define numb_case_10_1 "10.1"
+#define name_case_10_1 "Data for destination failure testing."
+#define desc_case_10_1 "\
+Delivery of ordered data with destination failure."
+int test_case_10_1_conn(int child)
+{
+	int i, j;
+	test_data = "Test Pattern-1";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (j = 0; j < 20; j++) {
+		for (i = 0; i < 20;) {
+			test_data = "Test Pattern-1";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			i++;
+			state++;
+		}
+		for (i = 0; i < 20;) {
+			switch (wait_event(child, LONGER_WAIT)) {
+			case __TEST_DATA_IND:
+				i++;
+				break;
+			case __EVENT_NO_MSG:
+				continue;
+			default:
+				goto failure;
+			}
+			state++;
+		}
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int test_case_10_1_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_10_1_resp(int child)
+{
+	int i, j;
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Test Pattern-3";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	for (j = 0; j < 20; j++) {
+		for (i = 0; i < 20;) {
+			test_data = "Test Pattern-3";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			i++;
+			state++;
+		}
+		for (i = 0; i < 20;) {
+			switch (wait_event(child, LONGER_WAIT)) {
+			case __TEST_DATA_IND:
+				i++;
+				break;
+			case __EVENT_NO_MSG:
+				continue;
+			default:
+				goto failure;
+			}
+			state++;
+		}
+	}
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_10_1_conn	preamble_5_conn
+#define preamble_10_1_resp	preamble_5_resp
+#define preamble_10_1_list	preamble_5_list
+
+#define postamble_10_1_conn	postamble_3_conn
+#define postamble_10_1_resp	postamble_3_resp
+#define postamble_10_1_list	postamble_3_list
+
+struct test_stream test_10_1_conn = { &preamble_10_1_conn, &test_case_10_1_conn, &postamble_10_1_conn };
+struct test_stream test_10_1_resp = { &preamble_10_1_resp, &test_case_10_1_resp, &postamble_10_1_resp };
+struct test_stream test_10_1_list = { &preamble_10_1_list, &test_case_10_1_list, &postamble_10_1_list };
+
+/*
+ *  Data for destination failure testing.
+ */
+long time_sub(struct timeval *t1, struct timeval *t2)
+{
+	return ((t1->tv_sec - t2->tv_sec) * 1000000 + (t1->tv_usec - t2->tv_usec));
+}
+
+#define tgrp_case_10_2 test_group_10
+#define numb_case_10_2 "10.2"
+#define name_case_10_2 "Data for destination failure testing."
+#define desc_case_10_2 "\
+Delivery of ordered data with destination failure."
+int test_case_10_2_conn(int child)
+{
+	int i, j, n = 0;
+	struct result {
+		uint req_idx;
+		struct timeval req;
+	};
+#define SETS 1000
+#define REPS 1
+	struct result times[SETS * REPS];
+	bzero(times, sizeof(times));
+	show = 0;
+	for (j = 0; j < SETS;) {
+		for (i = 0; i < REPS; i++, state++) {
+			test_data = "Test Pattern-1";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				continue;
+			times[j * REPS + i].req = when;
+			times[j * REPS + i].req_idx = n++;
+			j++;
+			state++;
+		}
+	}
+	show = 1;
+	lockf(fileno(stdout), F_LOCK, 0);
+	for (j = 0, n = 0; n < 3 * SETS * REPS; n++) {
+		for (i = 0; i < SETS * REPS; i++) {
+			if (times[i].req_idx == n) {
+				fprintf(stdout, "T_DATA_REQ    ----->| - - - - - - ->\\               |  |                    \n");
+				fprintf(stdout, "                    |               \\ - - - - - - - +->|---> T_DATA_IND     \n");
+				break;
+			}
+		}
+	}
+	fflush(stdout);
+	lockf(fileno(stdout), F_ULOCK, 0);
+	show = 1;
+	return (__RESULT_SUCCESS);
+	goto failure;
+      failure:
+	show = 1;
+	return (__RESULT_FAILURE);
+}
+int test_case_10_2_list(int child)
+{
+	return (__RESULT_SUCCESS);
+}
+int test_case_10_2_resp(int child)
+{
+	int i, j;
+	show = 0;
+	for (j = 0; j < SETS; j++)
+		for (i = 0; i < REPS;) {
+			switch (wait_event(child, LONG_WAIT)) {
+			case __TEST_DATA_IND:
+				i++;
+				break;
+			case __EVENT_NO_MSG:
+				continue;
+			default:
+				goto failure;
+			}
+			state++;
+		}
+	show = 1;
+	return (__RESULT_SUCCESS);
+      failure:
+	show = 1;
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_10_2_conn	preamble_5_conn
+#define preamble_10_2_resp	preamble_5_resp
+#define preamble_10_2_list	preamble_5_list
+
+#define postamble_10_2_conn	postamble_3_conn
+#define postamble_10_2_resp	postamble_3_resp
+#define postamble_10_2_list	postamble_3_list
+
+struct test_stream test_10_2_conn = { &preamble_10_2_conn, &test_case_10_2_conn, &postamble_10_2_conn };
+struct test_stream test_10_2_resp = { &preamble_10_2_resp, &test_case_10_2_resp, &postamble_10_2_resp };
+struct test_stream test_10_2_list = { &preamble_10_2_list, &test_case_10_2_list, &postamble_10_2_list };
 
 /*
  *  -------------------------------------------------------------------------
@@ -6294,29 +7303,30 @@ struct test_case {
 	{
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
-		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
-		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, { &test_1_4_conn, &test_1_4_resp, &test_1_4_list }, 0, 0}, {
-		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, { &test_2_1_1_conn, &test_2_1_1_resp, &test_2_1_1_list }, 0, 0}, {
-		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, { &test_2_1_2_conn, &test_2_1_2_resp, &test_2_1_2_list }, 0, 0}, {
-		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, { &test_2_1_3_conn, &test_2_1_3_resp, &test_2_1_3_list }, 0, 0}, {
-		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, { &test_2_1_4_conn, &test_2_1_4_resp, &test_2_1_4_list }, 0, 0}, {
-		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, { &test_2_1_5_conn, &test_2_1_5_resp, &test_2_1_5_list }, 0, 0}, {
-		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, { &test_2_1_6_conn, &test_2_1_6_resp, &test_2_1_6_list }, 0, 0}, {
-		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, { &test_2_1_7_conn, &test_2_1_7_resp, &test_2_1_7_list }, 0, 0}, {
-		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, { &test_2_1_8_conn, &test_2_1_8_resp, &test_2_1_8_list }, 0, 0}, {
-		numb_case_2_1_9, tgrp_case_2_1_9, name_case_2_1_9, desc_case_2_1_9, { &test_2_1_9_conn, &test_2_1_9_resp, &test_2_1_9_list }, 0, 0}, {
+		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, { &test_2_1_conn, &test_2_1_resp, &test_2_1_list }, 0, 0}, {
 		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, { &test_2_2_conn, &test_2_2_resp, &test_2_2_list }, 0, 0}, {
 		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, { &test_3_2_conn, &test_3_2_resp, &test_3_2_list }, 0, 0}, {
-		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, { &test_3_3_conn, &test_3_3_resp, &test_3_3_list }, 0, 0}, {
-		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, { &test_3_4_conn, &test_3_4_resp, &test_3_4_list }, 0, 0}, {
 		numb_case_4_1, tgrp_case_4_1, name_case_4_1, desc_case_4_1, { &test_4_1_conn, &test_4_1_resp, &test_4_1_list }, 0, 0}, {
 		numb_case_4_2, tgrp_case_4_2, name_case_4_2, desc_case_4_2, { &test_4_2_conn, &test_4_2_resp, &test_4_2_list }, 0, 0}, {
 		numb_case_5_1, tgrp_case_5_1, name_case_5_1, desc_case_5_1, { &test_5_1_conn, &test_5_1_resp, &test_5_1_list }, 0, 0}, {
 		numb_case_5_2, tgrp_case_5_2, name_case_5_2, desc_case_5_2, { &test_5_2_conn, &test_5_2_resp, &test_5_2_list }, 0, 0}, {
 		numb_case_5_3, tgrp_case_5_3, name_case_5_3, desc_case_5_3, { &test_5_3_conn, &test_5_3_resp, &test_5_3_list }, 0, 0}, {
-		numb_case_5_4, tgrp_case_5_4, name_case_5_4, desc_case_5_4, { &test_5_4_conn, &test_5_4_resp, &test_5_4_list }, 0, 0}, {
 		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, { &test_6_1_conn, &test_6_1_resp, &test_6_1_list }, 0, 0}, {
+		numb_case_6_2, tgrp_case_6_2, name_case_6_2, desc_case_6_2, { &test_6_2_conn, &test_6_2_resp, &test_6_2_list }, 0, 0}, {
+		numb_case_6_3, tgrp_case_6_3, name_case_6_3, desc_case_6_3, { &test_6_3_conn, &test_6_3_resp, &test_6_3_list }, 0, 0}, {
+		numb_case_7_1, tgrp_case_7_1, name_case_7_1, desc_case_7_1, { &test_7_1_conn, &test_7_1_resp, &test_7_1_list }, 0, 0}, {
+		numb_case_7_2, tgrp_case_7_2, name_case_7_2, desc_case_7_2, { &test_7_2_conn, &test_7_2_resp, &test_7_2_list }, 0, 0}, {
+		numb_case_8_1, tgrp_case_8_1, name_case_8_1, desc_case_8_1, { &test_8_1_conn, &test_8_1_resp, &test_8_1_list }, 0, 0}, {
+		numb_case_8_2, tgrp_case_8_2, name_case_8_2, desc_case_8_2, { &test_8_2_conn, &test_8_2_resp, &test_8_2_list }, 0, 0}, {
+		numb_case_8_3, tgrp_case_8_3, name_case_8_3, desc_case_8_3, { &test_8_3_conn, &test_8_3_resp, &test_8_3_list }, 0, 0}, {
+		numb_case_8_4, tgrp_case_8_4, name_case_8_4, desc_case_8_4, { &test_8_4_conn, &test_8_4_resp, &test_8_4_list }, 0, 0}, {
+		numb_case_9_1, tgrp_case_9_1, name_case_9_1, desc_case_9_1, { &test_9_1_conn, &test_9_1_resp, &test_9_1_list }, 0, 0}, {
+		numb_case_9_2, tgrp_case_9_2, name_case_9_2, desc_case_9_2, { &test_9_2_conn, &test_9_2_resp, &test_9_2_list }, 0, 0}, {
+		numb_case_9_3, tgrp_case_9_3, name_case_9_3, desc_case_9_3, { &test_9_3_conn, &test_9_3_resp, &test_9_3_list }, 0, 0}, {
+		numb_case_9_4, tgrp_case_9_4, name_case_9_4, desc_case_9_4, { &test_9_4_conn, &test_9_4_resp, &test_9_4_list }, 0, 0}, {
+		numb_case_10_1, tgrp_case_10_1, name_case_10_1, desc_case_10_1, { &test_10_1_conn, &test_10_1_resp, &test_10_1_list }, 0, 0}, {
+		numb_case_10_2, tgrp_case_10_2, name_case_10_2, desc_case_10_2, { &test_10_2_conn, &test_10_2_resp, &test_10_2_list }, 0, 0}, {
 	NULL,}
 };
 

@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_tcp.at,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/04 13:40:02 $
+dnl @(#) $RCSfile: testsuite-inet_tcp.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/07 00:52:14 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/04 13:40:02 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/07 00:52:14 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_tcp.at,v $
+dnl Revision 0.9.2.3  2005/06/07 00:52:14  brian
+dnl - upgrading test suites
+dnl
 dnl Revision 0.9.2.2  2005/06/04 13:40:02  brian
 dnl - exit early to get proper return code
 dnl
@@ -80,7 +83,7 @@ AT_BANNER([INET TCP module tests])
 AT_SETUP([tcp test 1.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -91,7 +94,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 1.2])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -102,7 +105,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 1.3])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -113,7 +116,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 1.4])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -121,21 +124,120 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([tcp test 2.1])
+dnl AT_SETUP([tcp test 2.1])
+dnl AT_KEYWORDS([tcp])
+dnl AT_CHECK([
+dnl     if test $at_verbose = echo ; then options='--verbose=5' ; fi
+dnl     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+dnl     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+dnl     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+dnl     test-inet_tcp $options -e -o 2.1
+dnl     ], [], [ignore], [], [], [])
+dnl AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_tcp $options -e -o 2.1
+    test-inet_tcp $options -e -o 2.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.2])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.3])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.4])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.5])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.6])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.7])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.8])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([tcp test 2.1.9])
+AT_KEYWORDS([tcp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_tcp $options -e -o 2.1.9
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
 AT_SETUP([tcp test 2.2])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -146,7 +248,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 3.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -157,7 +259,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 3.2])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -168,7 +270,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 3.3])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -179,7 +281,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 3.4])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -190,7 +292,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 4.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -201,7 +303,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 4.2])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -212,7 +314,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 5.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -223,7 +325,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 5.2])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -234,7 +336,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 5.3])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -245,7 +347,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 5.4])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
@@ -256,7 +358,7 @@ AT_CLEANUP
 AT_SETUP([tcp test 6.1])
 AT_KEYWORDS([tcp])
 AT_CHECK([
-    if test $at_verbose = echo ; then options='-vvv' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi

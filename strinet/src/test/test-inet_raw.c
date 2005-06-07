@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/06 12:11:45 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/06 12:11:45 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 00:52:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.13  2005/06/07 00:52:05  brian
+ - upgrading test suites
+
  Revision 0.9.2.12  2005/06/06 12:11:45  brian
  - more upgrades to test suites
 
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/06 12:11:45 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/06 12:11:45 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1631,7 +1634,7 @@ char *number_string(struct t_opthdr *oh)
 	return (buf);
 }
 
-char *value_string(struct t_opthdr *oh)
+char *value_string(int child, struct t_opthdr *oh)
 {
 	static char buf[64] = "(invalid)";
 	if (oh->len == sizeof(*oh))
@@ -1727,7 +1730,7 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PPI:
 			return number_string(oh);;
 		case T_SCTP_SID:
-			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh));
 			return number_string(oh);;
 		case T_SCTP_SSN:
 		case T_SCTP_TSN:
@@ -2495,7 +2498,7 @@ void print_opt_status(int child, struct t_opthdr *oh)
 }
 void print_opt_value(int child, struct t_opthdr *oh)
 {
-	char *value = value_string(oh);
+	char *value = value_string(child, oh);
 	if (value)
 		print_string(child, value);
 }
@@ -5990,14 +5993,18 @@ int main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	if (!tests_to_run) {
+	switch (tests_to_run) {
+	case 0:
 		if (verbose > 0) {
 			fprintf(stderr, "%s: error: no tests to run\n", argv[0]);
 			fflush(stderr);
 		}
 		exit(2);
+	case 1:
+		break;
+	default:
+		copying(argc, argv);
 	}
-	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

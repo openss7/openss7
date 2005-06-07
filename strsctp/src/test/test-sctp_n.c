@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/04 16:43:18 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/06/07 00:52:19 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/04/04 16:43:18 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -231,7 +231,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                   |  |                    <%d>\n", t, state);
+		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
 		fflush(stdout);
 		lockf(fileno(stdout), F_ULOCK, 0);
 	}
