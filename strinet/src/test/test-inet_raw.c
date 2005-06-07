@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 11:17:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/07 00:52:05 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 11:17:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.15  2005/06/07 11:17:31  brian
+ - more test case workup
+
+ Revision 0.9.2.14  2005/06/07 08:10:45  brian
+ - working up option handling tests
+
  Revision 0.9.2.13  2005/06/07 00:52:05  brian
  - upgrading test suites
 
@@ -138,9 +144,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 11:17:31 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 00:52:05 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 11:17:31 $";
 
 /*
  *  Simple test program for INET streams.
@@ -232,10 +238,10 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 100		// 10
-#define NORMAL_WAIT 500		// 100
-#define LONG_WAIT 5000		// 500
-#define LONGER_WAIT 10000	// 5000
+#define SHORT_WAIT	  20	// 100		// 10
+#define NORMAL_WAIT	 100	// 500		// 100
+#define LONG_WAIT	 500	// 5000		// 500
+#define LONGER_WAIT	1000	// 10000	// 5000
 
 
 char cbuf[BUFSIZE];
@@ -255,6 +261,8 @@ static struct sockaddr_in *test_addr = NULL;
 static socklen_t test_alen = sizeof(*test_addr);
 static const char *test_data = NULL;
 static int test_resfd = -1;
+static void *test_opts = NULL;
+static int test_olen = 0;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -531,12 +539,12 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  * data options
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr;
+	unsigned char tos_val;
+	struct t_opthdr ttl_hdr;
+	unsigned char ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
 #if 0
 	struct t_opthdr csm_hdr __attribute__ ((packed));
 	t_scalar_t csm_val __attribute__ ((packed));
@@ -2496,6 +2504,15 @@ void print_opt_status(int child, struct t_opthdr *oh)
 	if (status)
 		print_string(child, status);
 }
+void print_opt_length(int child, struct t_opthdr *oh)
+{
+	int len = oh->len - sizeof(*oh);
+	if (len) {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "(len=%d)", len);
+		print_string(child, buf);
+	}
+}
 void print_opt_value(int child, struct t_opthdr *oh)
 {
 	char *value = value_string(child, oh);
@@ -2514,6 +2531,7 @@ void print_options(int child, char *opt_ptr, size_t opt_len)
 		print_opt_level(child, oh);
 		print_opt_name(child, oh);
 		print_opt_status(child, oh);
+		print_opt_length(child, oh);
 		print_opt_value(child, oh);
 	}
 }
@@ -3010,16 +3028,16 @@ static int do_signal(int child, int action)
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
 		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
-		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
-		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
+		p->conn_req.OPT_length = test_opts ? test_olen : 0;
+		p->conn_req.OPT_offset = test_opts ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
-		if (test_opt_conn)
-			bcopy(test_opt_conn, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
@@ -3224,16 +3242,16 @@ static int do_signal(int child, int action)
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
 		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
-		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
-		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
+		p->unitdata_req.OPT_length = test_opts ? test_olen : 0;
+		p->unitdata_req.OPT_offset = test_opts ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
-		if (test_opt_data)
-			bcopy(test_opt_data, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
@@ -3273,13 +3291,13 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTMGMT_REQ:
 		ctrl->len = sizeof(p->optmgmt_req)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
@@ -3318,17 +3336,17 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTDATA_REQ:
 		ctrl->len = sizeof(p->optdata_req)
-		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optdata_req.PRIM_type = T_OPTDATA_REQ;
 		p->optdata_req.DATA_flag = DATA_flag;
-		p->optdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
-		p->optdata_req.OPT_offset = test_opt_data ? sizeof(p->optdata_req) : 0;
+		p->optdata_req.OPT_length = test_opts ? test_olen : 0;
+		p->optdata_req.OPT_offset = test_opts ? sizeof(p->optdata_req) : 0;
 		if (test_data)
 			data->len = sprintf(dbuf, test_data);
 		else
 			data = NULL;
-		if (test_opt_data)
-			bcopy(test_opt_data, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 		test_pflags = MSG_BAND;
 		test_pband = (DATA_flag & T_ODF_EX) ? 1 : 0;
 		if (p->optdata_req.DATA_flag & T_ODF_EX) {
@@ -3433,13 +3451,13 @@ static int do_signal(int child, int action)
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
@@ -3462,13 +3480,13 @@ static int do_signal(int child, int action)
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
@@ -3521,13 +3539,13 @@ static int do_signal(int child, int action)
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
@@ -4103,7 +4121,7 @@ void test_sleep(int child, unsigned long t)
  */
 static int preamble_0(int child)
 {
-	start_tt(1000);
+	start_tt(LONGER_WAIT);
 	return (__RESULT_SUCCESS);
 }
 
@@ -4111,7 +4129,7 @@ static int postamble_0(int child)
 {
 	stop_tt();
 	state++;
-	start_tt(1000);
+	start_tt(LONGER_WAIT);
 	for (;;) {
 		state++;
 		switch (wait_event(child, 0)) {
@@ -4132,6 +4150,8 @@ static int postamble_0(int child)
 static int preamble_1(int child)
 {
 	test_mgmtflags = T_NEGOTIATE;
+	test_opts = test_opt_optm;
+	test_olen = sizeof(*test_opt_optm);
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4198,6 +4218,8 @@ static int preamble_2_conn(int child)
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
+	test_opts = test_opt_conn;
+	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4257,7 +4279,7 @@ static int postamble_2_conn(int child)
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
@@ -4275,14 +4297,6 @@ static int postamble_2_resp(int child)
 {
 	int failed = -1;
 	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		failed = (failed == -1) ? state : failed;
-	state++;
-	test_data = NULL;
-	last_sequence = 0;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
-		failed = (failed == -1) ? state : failed;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
@@ -4319,6 +4333,8 @@ static int preamble_2b_conn(int child)
 	test_addr = &addrs[1];
 	test_alen = sizeof(addrs[1]);
 	test_data = "Hello World";
+	test_opts = test_opt_conn;
+	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4783,6 +4799,463 @@ struct test_stream test_2_1_conn = { &preamble_2_1_conn, &test_case_2_1_conn, &p
 struct test_stream test_2_1_resp = { &preamble_2_1_resp, &test_case_2_1_resp, &postamble_2_1_resp };
 struct test_stream test_2_1_list = { &preamble_2_1_list, &test_case_2_1_list, &postamble_2_1_list };
 
+#define tgrp_case_2_1_1 test_group_2
+#define numb_case_2_1_1 "2.1.1"
+#define name_case_2_1_1 "Perform options management -- T_IP_TOS"
+#define desc_case_2_1_1 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_IP option T_IP_TOS."
+
+int test_case_2_1_1(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_1_conn test_case_2_1_1
+#define test_case_2_1_1_resp test_case_2_1_1
+#define test_case_2_1_1_list test_case_2_1_1
+
+struct test_stream test_2_1_1_conn = { &preamble_2_1_conn, &test_case_2_1_1_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_1_resp = { &preamble_2_1_resp, &test_case_2_1_1_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_1_list = { &preamble_2_1_list, &test_case_2_1_1_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_2 test_group_2
+#define numb_case_2_1_2 "2.1.2"
+#define name_case_2_1_2 "Perform options management -- T_IP_TTL"
+#define desc_case_2_1_2 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_IP option T_IP_TTL."
+
+int test_case_2_1_2(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_2_conn test_case_2_1_2
+#define test_case_2_1_2_resp test_case_2_1_2
+#define test_case_2_1_2_list test_case_2_1_2
+
+struct test_stream test_2_1_2_conn = { &preamble_2_1_conn, &test_case_2_1_2_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_2_resp = { &preamble_2_1_resp, &test_case_2_1_2_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_2_list = { &preamble_2_1_list, &test_case_2_1_2_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_3 test_group_2
+#define numb_case_2_1_3 "2.1.3"
+#define name_case_2_1_3 "Perform options management -- T_IP_DONTROUTE"
+#define desc_case_2_1_3 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_IP option T_IP_DONTROUTE."
+
+int test_case_2_1_3(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_3_conn test_case_2_1_3
+#define test_case_2_1_3_resp test_case_2_1_3
+#define test_case_2_1_3_list test_case_2_1_3
+
+struct test_stream test_2_1_3_conn = { &preamble_2_1_conn, &test_case_2_1_3_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_3_resp = { &preamble_2_1_resp, &test_case_2_1_3_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_3_list = { &preamble_2_1_list, &test_case_2_1_3_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_4 test_group_2
+#define numb_case_2_1_4 "2.1.4"
+#define name_case_2_1_4 "Perform options management -- T_IP_BROADCAST"
+#define desc_case_2_1_4 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_IP option T_IP_BROADCAST."
+
+int test_case_2_1_4(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_4_conn test_case_2_1_4
+#define test_case_2_1_4_resp test_case_2_1_4
+#define test_case_2_1_4_list test_case_2_1_4
+
+struct test_stream test_2_1_4_conn = { &preamble_2_1_conn, &test_case_2_1_4_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_4_resp = { &preamble_2_1_resp, &test_case_2_1_4_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_4_list = { &preamble_2_1_list, &test_case_2_1_4_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_5 test_group_2
+#define numb_case_2_1_5 "2.1.5"
+#define name_case_2_1_5 "Perform options management -- T_IP_REUSEADDR"
+#define desc_case_2_1_5 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_IP option T_IP_REUSEADDR."
+
+int test_case_2_1_5(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_5_conn test_case_2_1_5
+#define test_case_2_1_5_resp test_case_2_1_5
+#define test_case_2_1_5_list test_case_2_1_5
+
+struct test_stream test_2_1_5_conn = { &preamble_2_1_conn, &test_case_2_1_5_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_5_resp = { &preamble_2_1_resp, &test_case_2_1_5_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_5_list = { &preamble_2_1_list, &test_case_2_1_5_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_6 test_group_2
+#define numb_case_2_1_6 "2.1.6"
+#define name_case_2_1_6 "Perform options management -- T_UDP_CHECKSUM"
+#define desc_case_2_1_6 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_UDP option T_UDP_CHECKSUM."
+
+int test_case_2_1_6(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_6_conn test_case_2_1_6
+#define test_case_2_1_6_resp test_case_2_1_6
+#define test_case_2_1_6_list test_case_2_1_6
+
+struct test_stream test_2_1_6_conn = { &preamble_2_1_conn, &test_case_2_1_6_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_6_resp = { &preamble_2_1_resp, &test_case_2_1_6_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_6_list = { &preamble_2_1_list, &test_case_2_1_6_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_7 test_group_2
+#define numb_case_2_1_7 "2.1.7"
+#define name_case_2_1_7 "Perform options management -- T_TCP_NODELAY"
+#define desc_case_2_1_7 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_TCP option T_TCP_NODELAY."
+
+int test_case_2_1_7(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_7_conn test_case_2_1_7
+#define test_case_2_1_7_resp test_case_2_1_7
+#define test_case_2_1_7_list test_case_2_1_7
+
+struct test_stream test_2_1_7_conn = { &preamble_2_1_conn, &test_case_2_1_7_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_7_resp = { &preamble_2_1_resp, &test_case_2_1_7_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_7_list = { &preamble_2_1_list, &test_case_2_1_7_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_8 test_group_2
+#define numb_case_2_1_8 "2.1.8"
+#define name_case_2_1_8 "Perform options management -- T_TCP_MAXSEG"
+#define desc_case_2_1_8 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_TCP option T_TCP_MAXSEG."
+
+int test_case_2_1_8(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_scalar_t opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_8_conn test_case_2_1_8
+#define test_case_2_1_8_resp test_case_2_1_8
+#define test_case_2_1_8_list test_case_2_1_8
+
+struct test_stream test_2_1_8_conn = { &preamble_2_1_conn, &test_case_2_1_8_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_8_resp = { &preamble_2_1_resp, &test_case_2_1_8_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_8_list = { &preamble_2_1_list, &test_case_2_1_8_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_9 test_group_2
+#define numb_case_2_1_9 "2.1.9"
+#define name_case_2_1_9 "Perform options management -- T_TCP_KEEPALIVE"
+#define desc_case_2_1_9 "\
+Checks that options management can be performed on several streams\n\
+for T_INET_TCP option T_TCP_KEEPALIVE."
+
+int test_case_2_1_9(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_kpalive opt_val __attribute__ ((packed));
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_9_conn test_case_2_1_9
+#define test_case_2_1_9_resp test_case_2_1_9
+#define test_case_2_1_9_list test_case_2_1_9
+
+struct test_stream test_2_1_9_conn = { &preamble_2_1_conn, &test_case_2_1_9_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_9_resp = { &preamble_2_1_resp, &test_case_2_1_9_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_9_list = { &preamble_2_1_list, &test_case_2_1_9_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_10 test_group_2
+#define numb_case_2_1_10 "2.1.10"
+#define name_case_2_1_10 "Perform options management -- all options"
+#define desc_case_2_1_10 "\
+Checks that options management can be performed on several streams\n\
+for all options."
+
+int test_case_2_1_10(int child)
+{
+	test_opts = test_opt_optm;
+	test_olen = sizeof(*test_opt_optm);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_10_conn test_case_2_1_10
+#define test_case_2_1_10_resp test_case_2_1_10
+#define test_case_2_1_10_list test_case_2_1_10
+
+struct test_stream test_2_1_10_conn = { &preamble_2_1_conn, &test_case_2_1_10_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_10_resp = { &preamble_2_1_resp, &test_case_2_1_10_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_10_list = { &preamble_2_1_list, &test_case_2_1_10_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_11 test_group_2
+#define numb_case_2_1_11 "2.1.11"
+#define name_case_2_1_11 "Perform options management -- XTI_DEBUG"
+#define desc_case_2_1_11 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_DEBUG."
+
+int test_case_2_1_11(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_11_conn test_case_2_1_11
+#define test_case_2_1_11_resp test_case_2_1_11
+#define test_case_2_1_11_list test_case_2_1_11
+
+struct test_stream test_2_1_11_conn = { &preamble_2_1_conn, &test_case_2_1_11_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_11_resp = { &preamble_2_1_resp, &test_case_2_1_11_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_11_list = { &preamble_2_1_list, &test_case_2_1_11_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_12 test_group_2
+#define numb_case_2_1_12 "2.1.12"
+#define name_case_2_1_12 "Perform options management -- XTI_LINGER"
+#define desc_case_2_1_12 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_LINGER."
+
+int test_case_2_1_12(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_linger opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_12_conn test_case_2_1_12
+#define test_case_2_1_12_resp test_case_2_1_12
+#define test_case_2_1_12_list test_case_2_1_12
+
+struct test_stream test_2_1_12_conn = { &preamble_2_1_conn, &test_case_2_1_12_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_12_resp = { &preamble_2_1_resp, &test_case_2_1_12_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_12_list = { &preamble_2_1_list, &test_case_2_1_12_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_13 test_group_2
+#define numb_case_2_1_13 "2.1.13"
+#define name_case_2_1_13 "Perform options management -- XTI_RCVBUF"
+#define desc_case_2_1_13 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_RCVBUF."
+
+int test_case_2_1_13(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_13_conn test_case_2_1_13
+#define test_case_2_1_13_resp test_case_2_1_13
+#define test_case_2_1_13_list test_case_2_1_13
+
+struct test_stream test_2_1_13_conn = { &preamble_2_1_conn, &test_case_2_1_13_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_13_resp = { &preamble_2_1_resp, &test_case_2_1_13_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_13_list = { &preamble_2_1_list, &test_case_2_1_13_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_14 test_group_2
+#define numb_case_2_1_14 "2.1.14"
+#define name_case_2_1_14 "Perform options management -- XTI_RCVLOWAT"
+#define desc_case_2_1_14 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_RCVLOWAT."
+
+int test_case_2_1_14(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_14_conn test_case_2_1_14
+#define test_case_2_1_14_resp test_case_2_1_14
+#define test_case_2_1_14_list test_case_2_1_14
+
+struct test_stream test_2_1_14_conn = { &preamble_2_1_conn, &test_case_2_1_14_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_14_resp = { &preamble_2_1_resp, &test_case_2_1_14_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_14_list = { &preamble_2_1_list, &test_case_2_1_14_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_15 test_group_2
+#define numb_case_2_1_15 "2.1.15"
+#define name_case_2_1_15 "Perform options management -- XTI_SNDBUF"
+#define desc_case_2_1_15 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_SNDBUF."
+
+int test_case_2_1_15(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_15_conn test_case_2_1_15
+#define test_case_2_1_15_resp test_case_2_1_15
+#define test_case_2_1_15_list test_case_2_1_15
+
+struct test_stream test_2_1_15_conn = { &preamble_2_1_conn, &test_case_2_1_15_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_15_resp = { &preamble_2_1_resp, &test_case_2_1_15_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_15_list = { &preamble_2_1_list, &test_case_2_1_15_list, &postamble_2_1_list };
+
+
+#define tgrp_case_2_1_16 test_group_2
+#define numb_case_2_1_16 "2.1.16"
+#define name_case_2_1_16 "Perform options management -- XTI_SNDLOWAT"
+#define desc_case_2_1_16 "\
+Checks that options management can be performed on several streams\n\
+for XTI_GENERIC option XTI_SNDLOWAT."
+
+int test_case_2_1_16(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr __attribute__ ((packed));
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_2_1(child);
+}
+
+#define test_case_2_1_16_conn test_case_2_1_16
+#define test_case_2_1_16_resp test_case_2_1_16
+#define test_case_2_1_16_list test_case_2_1_16
+
+struct test_stream test_2_1_16_conn = { &preamble_2_1_conn, &test_case_2_1_16_conn, &postamble_2_1_conn };
+struct test_stream test_2_1_16_resp = { &preamble_2_1_resp, &test_case_2_1_16_resp, &postamble_2_1_resp };
+struct test_stream test_2_1_16_list = { &preamble_2_1_list, &test_case_2_1_16_list, &postamble_2_1_list };
+
 /*
  *  Bind and unbind three streams.
  */
@@ -4830,6 +5303,7 @@ int test_case_2_2_resp(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
 	test_addr = NULL;
+	test_alen = 0;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -4893,6 +5367,8 @@ int test_case_3_1(int child, struct sockaddr_in *addr, socklen_t len)
 	test_addr = addr;
 	test_alen = len;
 	test_data = msg;
+	test_opts = test_opt_data;
+	test_olen = sizeof(*test_opt_data);
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4946,6 +5422,8 @@ int test_case_4_1(int child)
 	test_addr = &addrs[0];
 	test_alen = sizeof(addrs[0]);
 	test_data = dat;
+	test_opts = test_opt_conn;
+	test_olen = sizeof(*test_opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5156,6 +5634,8 @@ int test_case_4_6(int child)
 	static char dat[] = "Option data.";
 	test_data = dat;
 	DATA_flag = 0;
+	test_opts = test_opt_data;
+	test_olen = sizeof(*test_opt_data);
 	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5476,7 +5956,22 @@ struct test_case {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
 		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
 		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, { &test_1_4_conn, &test_1_4_resp, &test_1_4_list }, 0, 0}, {
-		numb_case_2_1, tgrp_case_2_1, name_case_2_1, desc_case_2_1, { &test_2_1_conn, &test_2_1_resp, &test_2_1_list }, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, { &test_2_1_1_conn, &test_2_1_1_resp, &test_2_1_1_list }, 0, 0}, {
+		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, { &test_2_1_2_conn, &test_2_1_2_resp, &test_2_1_2_list }, 0, 0}, {
+		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, { &test_2_1_3_conn, &test_2_1_3_resp, &test_2_1_3_list }, 0, 0}, {
+		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, { &test_2_1_4_conn, &test_2_1_4_resp, &test_2_1_4_list }, 0, 0}, {
+		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, { &test_2_1_5_conn, &test_2_1_5_resp, &test_2_1_5_list }, 0, 0}, {
+		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, { &test_2_1_6_conn, &test_2_1_6_resp, &test_2_1_6_list }, 0, __RESULT_INCONCLUSIVE}, {
+		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, { &test_2_1_7_conn, &test_2_1_7_resp, &test_2_1_7_list }, 0, __RESULT_INCONCLUSIVE}, {
+		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, { &test_2_1_8_conn, &test_2_1_8_resp, &test_2_1_8_list }, 0, __RESULT_INCONCLUSIVE}, {
+		numb_case_2_1_9, tgrp_case_2_1_9, name_case_2_1_9, desc_case_2_1_9, { &test_2_1_9_conn, &test_2_1_9_resp, &test_2_1_9_list }, 0, __RESULT_INCONCLUSIVE}, {
+		numb_case_2_1_10, tgrp_case_2_1_10, name_case_2_1_10, desc_case_2_1_10, { &test_2_1_10_conn, &test_2_1_10_resp, &test_2_1_10_list }, 0, 0}, {
+		numb_case_2_1_11, tgrp_case_2_1_11, name_case_2_1_11, desc_case_2_1_11, { &test_2_1_11_conn, &test_2_1_11_resp, &test_2_1_11_list }, 0, 0}, {
+		numb_case_2_1_12, tgrp_case_2_1_12, name_case_2_1_12, desc_case_2_1_12, { &test_2_1_12_conn, &test_2_1_12_resp, &test_2_1_12_list }, 0, 0}, {
+		numb_case_2_1_13, tgrp_case_2_1_13, name_case_2_1_13, desc_case_2_1_13, { &test_2_1_13_conn, &test_2_1_13_resp, &test_2_1_13_list }, 0, 0}, {
+		numb_case_2_1_14, tgrp_case_2_1_14, name_case_2_1_14, desc_case_2_1_14, { &test_2_1_14_conn, &test_2_1_14_resp, &test_2_1_14_list }, 0, 0}, {
+		numb_case_2_1_15, tgrp_case_2_1_15, name_case_2_1_15, desc_case_2_1_15, { &test_2_1_15_conn, &test_2_1_15_resp, &test_2_1_15_list }, 0, 0}, {
+		numb_case_2_1_16, tgrp_case_2_1_16, name_case_2_1_16, desc_case_2_1_16, { &test_2_1_16_conn, &test_2_1_16_resp, &test_2_1_16_list }, 0, 0}, {
 		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, { &test_2_2_conn, &test_2_2_resp, &test_2_2_list }, 0, 0}, {
 		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
 		numb_case_4_1, tgrp_case_4_1, name_case_4_1, desc_case_4_1, { &test_4_1_conn, &test_4_1_resp, &test_4_1_list }, 0, 0}, {

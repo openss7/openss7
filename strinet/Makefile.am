@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/05/28 04:42:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/07 08:16:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:42:59 $ by $Author: brian $
+# Last Modified $Date: 2005/06/07 08:16:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -296,7 +296,7 @@ include am/strconf.am
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
-dist_noinst_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
+sbin_SCRIPTS = $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 if RPM_BUILD_KERNEL
@@ -345,20 +345,24 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				src/util/init/strinet.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				src/util/init/strinet
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= \
+				src/util/sysconfig/strinet.conf
 
-dist_config_DATA		=
+dist_config_DATA		= \
+				src/util/sysconfig/strinet
 
 ## INSTALL_INITSCRIPTS
 endif

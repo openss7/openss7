@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2005/05/31 05:10:40 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2005/06/07 08:16:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/31 05:10:40 $ by $Author: brian $
+# Last Modified $Date: 2005/06/07 08:16:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,7 +92,7 @@
 %global libraries   inet
 %global tools       strinet_mknod test-inet_raw test-inet_udp test-inet_tcp
 %global infofiles   %{name}
-#global initfiles
+%global initfiles   strinet
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -1461,7 +1461,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{_sysconfdir}/%{name}.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %{_modutildir}/*
@@ -1471,7 +1471,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{_sysconfdir}/%{name}.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1493,6 +1493,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.79  2005/06/07 08:16:08  brian
+# - added initscripts for creating strinet devices
+#
 # Revision 0.9.2.78  2005/05/31 05:10:40  brian
 # - correct case on modutildir filename
 #
