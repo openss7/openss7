@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 11:17:33 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 22:35:52 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/07 11:17:33 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 22:35:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.15  2005/06/07 22:35:52  brian
+ - working up options
+
  Revision 0.9.2.14  2005/06/07 11:17:33  brian
  - more test case workup
 
@@ -153,9 +156,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 11:17:33 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 22:35:52 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 11:17:33 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/07 22:35:52 $";
 
 /*
  *  Simple test program for INET streams.
@@ -247,10 +250,10 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 100		// 10
-#define NORMAL_WAIT 500		// 100
-#define LONG_WAIT 5000		// 500
-#define LONGER_WAIT 10000	// 5000
+#define SHORT_WAIT	  20	// 100		// 10
+#define NORMAL_WAIT	 100	// 500		// 100
+#define LONG_WAIT	 500	// 5000		// 500
+#define LONGER_WAIT	1000	// 10000	// 5000
 
 
 char cbuf[BUFSIZE];
@@ -548,19 +551,19 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  * data options
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr;
+	unsigned char tos_val;
+	struct t_opthdr ttl_hdr;
+	unsigned char ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
+	struct t_opthdr csm_hdr;
+	t_scalar_t csm_val;
 #if 0
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr ppi_hdr;
+	t_scalar_t ppi_val;
+	struct t_opthdr sid_hdr;
+	t_scalar_t sid_val;
 #endif
 } opt_data = {
 	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
@@ -577,24 +580,42 @@ struct {
  * connect options
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
+	struct t_opthdr dbg_hdr;
+	t_uscalar_t dbg_val;
+	struct t_opthdr lin_hdr;
+	struct t_linger lin_val;
+	struct t_opthdr rbf_hdr;
+	t_uscalar_t rbf_val;
+	struct t_opthdr rlw_hdr;
+	t_uscalar_t rlw_val;
+	struct t_opthdr sbf_hdr;
+	t_uscalar_t sbf_val;
+	struct t_opthdr slw_hdr;
+	t_uscalar_t slw_val;
+	struct t_opthdr tos_hdr;
+	t_scalar_t tos_val;
+	struct t_opthdr ttl_hdr;
+	t_scalar_t ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
+	struct t_opthdr bca_hdr;
+	t_scalar_t bca_val;
+	struct t_opthdr reu_hdr;
+	t_scalar_t reu_val;
 #if 0
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr;
+	t_scalar_t ist_val;
+	struct t_opthdr ost_hdr;
+	t_scalar_t ost_val;
 #endif
 } opt_conn = {
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
@@ -609,81 +630,95 @@ struct {
  * management options
  */
 struct {
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
+	struct t_opthdr dbg_hdr;
+	t_uscalar_t dbg_val;
+	struct t_opthdr lin_hdr;
+	struct t_linger lin_val;
+	struct t_opthdr rbf_hdr;
+	t_uscalar_t rbf_val;
+	struct t_opthdr rlw_hdr;
+	t_uscalar_t rlw_val;
+	struct t_opthdr sbf_hdr;
+	t_uscalar_t sbf_val;
+	struct t_opthdr slw_hdr;
+	t_uscalar_t slw_val;
+	struct t_opthdr tos_hdr;
+	t_scalar_t tos_val;
+	struct t_opthdr ttl_hdr;
+	t_scalar_t ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
+	struct t_opthdr bca_hdr;
+	t_scalar_t bca_val;
+	struct t_opthdr reu_hdr;
+	t_scalar_t reu_val;
+	struct t_opthdr csm_hdr;
+	t_scalar_t csm_val;
 #if 0
-	struct t_opthdr ndl_hdr __attribute__ ((packed));
-	t_scalar_t ndl_val __attribute__ ((packed));
-	struct t_opthdr mxs_hdr __attribute__ ((packed));
-	t_scalar_t mxs_val __attribute__ ((packed));
-	struct t_opthdr kpa_hdr __attribute__ ((packed));
-	t_scalar_t kpa_val __attribute__ ((packed));
-#endif
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
-#if 0
-	struct t_opthdr nod_hdr __attribute__ ((packed));
-	t_scalar_t nod_val __attribute__ ((packed));
-	struct t_opthdr crk_hdr __attribute__ ((packed));
-	t_scalar_t crk_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr rcv_hdr __attribute__ ((packed));
-	t_scalar_t rcv_val __attribute__ ((packed));
-	struct t_opthdr ckl_hdr __attribute__ ((packed));
-	t_scalar_t ckl_val __attribute__ ((packed));
-	struct t_opthdr skd_hdr __attribute__ ((packed));
-	t_scalar_t skd_val __attribute__ ((packed));
-	struct t_opthdr prt_hdr __attribute__ ((packed));
-	t_scalar_t prt_val __attribute__ ((packed));
-	struct t_opthdr art_hdr __attribute__ ((packed));
-	t_scalar_t art_val __attribute__ ((packed));
-	struct t_opthdr irt_hdr __attribute__ ((packed));
-	t_scalar_t irt_val __attribute__ ((packed));
-	struct t_opthdr hbi_hdr __attribute__ ((packed));
-	t_scalar_t hbi_val __attribute__ ((packed));
-	struct t_opthdr rin_hdr __attribute__ ((packed));
-	t_scalar_t rin_val __attribute__ ((packed));
-	struct t_opthdr rmn_hdr __attribute__ ((packed));
-	t_scalar_t rmn_val __attribute__ ((packed));
-	struct t_opthdr rmx_hdr __attribute__ ((packed));
-	t_scalar_t rmx_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
-	struct t_opthdr cin_hdr __attribute__ ((packed));
-	t_scalar_t cin_val __attribute__ ((packed));
-	struct t_opthdr tin_hdr __attribute__ ((packed));
-	t_scalar_t tin_val __attribute__ ((packed));
-	struct t_opthdr mac_hdr __attribute__ ((packed));
-	t_scalar_t mac_val __attribute__ ((packed));
-	struct t_opthdr dbg_hdr __attribute__ ((packed));
-	t_scalar_t dbg_val __attribute__ ((packed));
+	struct t_opthdr ndl_hdr;
+	t_scalar_t ndl_val;
+	struct t_opthdr mxs_hdr;
+	t_scalar_t mxs_val;
+	struct t_opthdr kpa_hdr;
+	struct t_kpalive kpa_val;
+	struct t_opthdr nod_hdr;
+	t_scalar_t nod_val;
+	struct t_opthdr crk_hdr;
+	t_scalar_t crk_val;
+	struct t_opthdr ppi_hdr;
+	t_scalar_t ppi_val;
+	struct t_opthdr sid_hdr;
+	t_scalar_t sid_val;
+	struct t_opthdr rcv_hdr;
+	t_scalar_t rcv_val;
+	struct t_opthdr ckl_hdr;
+	t_scalar_t ckl_val;
+	struct t_opthdr skd_hdr;
+	t_scalar_t skd_val;
+	struct t_opthdr prt_hdr;
+	t_scalar_t prt_val;
+	struct t_opthdr art_hdr;
+	t_scalar_t art_val;
+	struct t_opthdr irt_hdr;
+	t_scalar_t irt_val;
+	struct t_opthdr hbi_hdr;
+	t_scalar_t hbi_val;
+	struct t_opthdr rin_hdr;
+	t_scalar_t rin_val;
+	struct t_opthdr rmn_hdr;
+	t_scalar_t rmn_val;
+	struct t_opthdr rmx_hdr;
+	t_scalar_t rmx_val;
+	struct t_opthdr ist_hdr;
+	t_scalar_t ist_val;
+	struct t_opthdr ost_hdr;
+	t_scalar_t ost_val;
+	struct t_opthdr cin_hdr;
+	t_scalar_t cin_val;
+	struct t_opthdr tin_hdr;
+	t_scalar_t tin_val;
+	struct t_opthdr mac_hdr;
+	t_scalar_t mac_val;
+	struct t_opthdr dbg_hdr;
+	t_scalar_t dbg_val;
 #endif
 } opt_optm = {
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 #if 0
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
-#endif
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
-#if 0
+	, { sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
@@ -1718,7 +1753,7 @@ char *value_string(int child, struct t_opthdr *oh)
 				snprintf(buf, sizeof(buf), "%lu", (ulong) *((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
-			return yesno_string(oh);
+			break;
 		case T_TCP_CORK:
 			return yesno_string(oh);
 		case T_TCP_KEEPIDLE:
@@ -4823,7 +4858,7 @@ for T_INET_IP option T_IP_TOS."
 int test_case_2_1_1(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
@@ -4852,7 +4887,7 @@ for T_INET_IP option T_IP_TTL."
 int test_case_2_1_2(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
@@ -4881,8 +4916,8 @@ for T_INET_IP option T_IP_DONTROUTE."
 int test_case_2_1_3(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	};
@@ -4910,8 +4945,8 @@ for T_INET_IP option T_IP_BROADCAST."
 int test_case_2_1_4(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	};
@@ -4939,8 +4974,8 @@ for T_INET_IP option T_IP_REUSEADDR."
 int test_case_2_1_5(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 	};
@@ -4968,8 +5003,8 @@ for T_INET_UDP option T_UDP_CHECKSUM."
 int test_case_2_1_6(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 	};
@@ -4997,8 +5032,8 @@ for T_INET_TCP option T_TCP_NODELAY."
 int test_case_2_1_7(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	};
@@ -5026,8 +5061,8 @@ for T_INET_TCP option T_TCP_MAXSEG."
 int test_case_2_1_8(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
 	};
@@ -5055,8 +5090,8 @@ for T_INET_TCP option T_TCP_KEEPALIVE."
 int test_case_2_1_9(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		struct t_kpalive opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		struct t_kpalive opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	};
@@ -5107,7 +5142,7 @@ for XTI_GENERIC option XTI_DEBUG."
 int test_case_2_1_11(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
@@ -5136,7 +5171,7 @@ for XTI_GENERIC option XTI_LINGER."
 int test_case_2_1_12(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		struct t_linger opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
@@ -5165,7 +5200,7 @@ for XTI_GENERIC option XTI_RCVBUF."
 int test_case_2_1_13(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
@@ -5194,7 +5229,7 @@ for XTI_GENERIC option XTI_RCVLOWAT."
 int test_case_2_1_14(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
@@ -5223,7 +5258,7 @@ for XTI_GENERIC option XTI_SNDBUF."
 int test_case_2_1_15(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
@@ -5252,7 +5287,7 @@ for XTI_GENERIC option XTI_SNDLOWAT."
 int test_case_2_1_16(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
@@ -5388,6 +5423,623 @@ int test_case_3_1_list(int child)
 struct test_stream test_3_1_conn = { &preamble_3_1_conn, &test_case_3_1_conn, &postamble_3_1_conn };
 struct test_stream test_3_1_resp = { &preamble_3_1_resp, &test_case_3_1_resp, &postamble_3_1_resp };
 struct test_stream test_3_1_list = { &preamble_3_1_list, &test_case_3_1_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- XTI_DEBUG
+ */
+#define tgrp_case_3_1_1 test_group_3
+#define numb_case_3_1_1 "3.1.1"
+#define name_case_3_1_1 "Transfer connectionless data with options -- XTI_DEBUG"
+#define desc_case_3_1_1 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_DEBUG."
+
+int test_case_3_1_1_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_1_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_1_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_1_conn = { &preamble_3_1_conn, &test_case_3_1_1_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_1_resp = { &preamble_3_1_resp, &test_case_3_1_1_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_1_list = { &preamble_3_1_list, &test_case_3_1_1_list, &postamble_3_1_list };
+
+
+/*
+ *  Transfer connectionless data with options -- XTI_LINGER
+ */
+#define tgrp_case_3_1_2 test_group_3
+#define numb_case_3_1_2 "3.1.2"
+#define name_case_3_1_2 "Transfer connectionless data with options -- XTI_LINGER"
+#define desc_case_3_1_2 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_LINGER."
+
+int test_case_3_1_2_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		struct t_linger opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_2_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		struct t_linger opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_2_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		struct t_linger opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_2_conn = { &preamble_3_1_conn, &test_case_3_1_2_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_2_resp = { &preamble_3_1_resp, &test_case_3_1_2_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_2_list = { &preamble_3_1_list, &test_case_3_1_2_list, &postamble_3_1_list };
+
+
+/*
+ *  Transfer connectionless data with options -- XTI_RCVBUF
+ */
+#define tgrp_case_3_1_3 test_group_3
+#define numb_case_3_1_3 "3.1.3"
+#define name_case_3_1_3 "Transfer connectionless data with options -- XTI_RCVBUF"
+#define desc_case_3_1_3 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_RCVBUF."
+
+int test_case_3_1_3_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_3_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_3_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_3_conn = { &preamble_3_1_conn, &test_case_3_1_3_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_3_resp = { &preamble_3_1_resp, &test_case_3_1_3_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_3_list = { &preamble_3_1_list, &test_case_3_1_3_list, &postamble_3_1_list };
+
+
+/*
+ *  Transfer connectionless data with options -- XTI_RCVLOWAT
+ */
+#define tgrp_case_3_1_4 test_group_3
+#define numb_case_3_1_4 "3.1.4"
+#define name_case_3_1_4 "Transfer connectionless data with options -- XTI_RCVLOWAT"
+#define desc_case_3_1_4 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_RCVLOWAT."
+
+int test_case_3_1_4_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_4_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_4_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_4_conn = { &preamble_3_1_conn, &test_case_3_1_4_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_4_resp = { &preamble_3_1_resp, &test_case_3_1_4_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_4_list = { &preamble_3_1_list, &test_case_3_1_4_list, &postamble_3_1_list };
+
+
+/*
+ *  Transfer connectionless data with options -- XTI_SNDBUF
+ */
+#define tgrp_case_3_1_5 test_group_3
+#define numb_case_3_1_5 "3.1.5"
+#define name_case_3_1_5 "Transfer connectionless data with options -- XTI_SNDBUF"
+#define desc_case_3_1_5 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_SNDBUF."
+
+int test_case_3_1_5_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_5_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_5_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_5_conn = { &preamble_3_1_conn, &test_case_3_1_5_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_5_resp = { &preamble_3_1_resp, &test_case_3_1_5_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_5_list = { &preamble_3_1_list, &test_case_3_1_5_list, &postamble_3_1_list };
+
+
+/*
+ *  Transfer connectionless data with options -- XTI_SNDLOWAT
+ */
+#define tgrp_case_3_1_6 test_group_3
+#define numb_case_3_1_6 "3.1.6"
+#define name_case_3_1_6 "Transfer connectionless data with options -- XTI_SNDLOWAT"
+#define desc_case_3_1_6 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is XTI_SNDLOWAT."
+
+int test_case_3_1_6_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_6_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_6_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_uscalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_6_conn = { &preamble_3_1_conn, &test_case_3_1_6_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_6_resp = { &preamble_3_1_resp, &test_case_3_1_6_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_6_list = { &preamble_3_1_list, &test_case_3_1_6_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_IP_TOS
+ */
+#define tgrp_case_3_1_7 test_group_3
+#define numb_case_3_1_7 "3.1.7"
+#define name_case_3_1_7 "Transfer connectionless data with options -- T_IP_TOS"
+#define desc_case_3_1_7 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_IP_TOS."
+
+int test_case_3_1_7_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_7_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_7_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_7_conn = { &preamble_3_1_conn, &test_case_3_1_7_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_7_resp = { &preamble_3_1_resp, &test_case_3_1_7_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_7_list = { &preamble_3_1_list, &test_case_3_1_7_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_IP_TTL
+ */
+#define tgrp_case_3_1_8 test_group_3
+#define numb_case_3_1_8 "3.1.8"
+#define name_case_3_1_8 "Transfer connectionless data with options -- T_IP_TTL"
+#define desc_case_3_1_8 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_IP_TTL."
+
+int test_case_3_1_8_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_8_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_8_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		unsigned char opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_8_conn = { &preamble_3_1_conn, &test_case_3_1_8_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_8_resp = { &preamble_3_1_resp, &test_case_3_1_8_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_8_list = { &preamble_3_1_list, &test_case_3_1_8_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_IP_DONTROUTE
+ */
+#define tgrp_case_3_1_9 test_group_3
+#define numb_case_3_1_9 "3.1.9"
+#define name_case_3_1_9 "Transfer connectionless data with options -- T_IP_DONTROUTE"
+#define desc_case_3_1_9 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_IP_DONTROUTE."
+
+int test_case_3_1_9_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_9_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_9_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_9_conn = { &preamble_3_1_conn, &test_case_3_1_9_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_9_resp = { &preamble_3_1_resp, &test_case_3_1_9_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_9_list = { &preamble_3_1_list, &test_case_3_1_9_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_IP_BROADCAST
+ */
+#define tgrp_case_3_1_10 test_group_3
+#define numb_case_3_1_10 "3.1.10"
+#define name_case_3_1_10 "Transfer connectionless data with options -- T_IP_BROADCAST"
+#define desc_case_3_1_10 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_IP_BROADCAST."
+
+int test_case_3_1_10_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_10_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_10_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_10_conn = { &preamble_3_1_conn, &test_case_3_1_10_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_10_resp = { &preamble_3_1_resp, &test_case_3_1_10_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_10_list = { &preamble_3_1_list, &test_case_3_1_10_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_IP_REUSEADDR
+ */
+#define tgrp_case_3_1_11 test_group_3
+#define numb_case_3_1_11 "3.1.11"
+#define name_case_3_1_11 "Transfer connectionless data with options -- T_IP_REUSEADDR"
+#define desc_case_3_1_11 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_IP_REUSEADDR."
+
+int test_case_3_1_11_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_11_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_11_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_11_conn = { &preamble_3_1_conn, &test_case_3_1_11_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_11_resp = { &preamble_3_1_resp, &test_case_3_1_11_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_11_list = { &preamble_3_1_list, &test_case_3_1_11_list, &postamble_3_1_list };
+
+/*
+ *  Transfer connectionless data with options -- T_UDP_CHECKSUM
+ */
+#define tgrp_case_3_1_12 test_group_3
+#define numb_case_3_1_12 "3.1.12"
+#define name_case_3_1_12 "Transfer connectionless data with options -- T_UDP_CHECKSUM"
+#define desc_case_3_1_12 "\
+Transfer connectionless data with options.  The specific option used by this\n\
+case is T_UDP_CHECKSUM."
+
+int test_case_3_1_12_conn(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_conn(child);
+}
+int test_case_3_1_12_resp(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_resp(child);
+}
+int test_case_3_1_12_list(int child)
+{
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	return test_case_3_1_list(child);
+}
+
+struct test_stream test_3_1_12_conn = { &preamble_3_1_conn, &test_case_3_1_12_conn, &postamble_3_1_conn };
+struct test_stream test_3_1_12_resp = { &preamble_3_1_resp, &test_case_3_1_12_resp, &postamble_3_1_resp };
+struct test_stream test_3_1_12_list = { &preamble_3_1_list, &test_case_3_1_12_list, &postamble_3_1_list };
 
 /*
  *  Negative test cases on connection oriented primitives.
@@ -5957,7 +6609,18 @@ struct test_case {
 		numb_case_2_1_15, tgrp_case_2_1_15, name_case_2_1_15, desc_case_2_1_15, { &test_2_1_15_conn, &test_2_1_15_resp, &test_2_1_15_list }, 0, 0}, {
 		numb_case_2_1_16, tgrp_case_2_1_16, name_case_2_1_16, desc_case_2_1_16, { &test_2_1_16_conn, &test_2_1_16_resp, &test_2_1_16_list }, 0, 0}, {
 		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, { &test_2_2_conn, &test_2_2_resp, &test_2_2_list }, 0, 0}, {
-		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, { &test_3_1_1_conn, &test_3_1_1_resp, &test_3_1_1_list }, 0, 0}, {
+		numb_case_3_1_2, tgrp_case_3_1_2, name_case_3_1_2, desc_case_3_1_2, { &test_3_1_2_conn, &test_3_1_2_resp, &test_3_1_2_list }, 0, 0}, {
+		numb_case_3_1_3, tgrp_case_3_1_3, name_case_3_1_3, desc_case_3_1_3, { &test_3_1_3_conn, &test_3_1_3_resp, &test_3_1_3_list }, 0, 0}, {
+		numb_case_3_1_4, tgrp_case_3_1_4, name_case_3_1_4, desc_case_3_1_4, { &test_3_1_4_conn, &test_3_1_4_resp, &test_3_1_4_list }, 0, 0}, {
+		numb_case_3_1_5, tgrp_case_3_1_5, name_case_3_1_5, desc_case_3_1_5, { &test_3_1_5_conn, &test_3_1_5_resp, &test_3_1_5_list }, 0, 0}, {
+		numb_case_3_1_6, tgrp_case_3_1_6, name_case_3_1_6, desc_case_3_1_6, { &test_3_1_6_conn, &test_3_1_6_resp, &test_3_1_6_list }, 0, 0}, {
+		numb_case_3_1_7, tgrp_case_3_1_7, name_case_3_1_7, desc_case_3_1_7, { &test_3_1_7_conn, &test_3_1_7_resp, &test_3_1_7_list }, 0, 0}, {
+		numb_case_3_1_8, tgrp_case_3_1_8, name_case_3_1_8, desc_case_3_1_8, { &test_3_1_8_conn, &test_3_1_8_resp, &test_3_1_8_list }, 0, 0}, {
+		numb_case_3_1_9, tgrp_case_3_1_9, name_case_3_1_9, desc_case_3_1_9, { &test_3_1_9_conn, &test_3_1_9_resp, &test_3_1_9_list }, 0, 0}, {
+		numb_case_3_1_10, tgrp_case_3_1_10, name_case_3_1_10, desc_case_3_1_10, { &test_3_1_10_conn, &test_3_1_10_resp, &test_3_1_10_list }, 0, 0}, {
+		numb_case_3_1_11, tgrp_case_3_1_11, name_case_3_1_11, desc_case_3_1_11, { &test_3_1_11_conn, &test_3_1_11_resp, &test_3_1_11_list }, 0, 0}, {
+		numb_case_3_1_12, tgrp_case_3_1_12, name_case_3_1_12, desc_case_3_1_12, { &test_3_1_12_conn, &test_3_1_12_resp, &test_3_1_12_list }, 0, 0}, {
 		numb_case_4_1, tgrp_case_4_1, name_case_4_1, desc_case_4_1, { &test_4_1_conn, &test_4_1_resp, &test_4_1_list }, 0, 0}, {
 		numb_case_4_2, tgrp_case_4_2, name_case_4_2, desc_case_4_2, { &test_4_2_conn, &test_4_2_resp, &test_4_2_list }, 0, 0}, {
 		numb_case_4_3, tgrp_case_4_3, name_case_4_3, desc_case_4_3, { &test_4_3_conn, &test_4_3_resp, &test_4_3_list }, 0, 0}, {

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/07 08:16:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/07 22:35:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/07 08:16:08 $ by $Author: brian $
+# Last Modified $Date: 2005/06/07 22:35:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -297,6 +297,7 @@ INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
 sbin_SCRIPTS = $(INET_MKDEV) $(INET_RMDEV)
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 
 if RPM_BUILD_KERNEL

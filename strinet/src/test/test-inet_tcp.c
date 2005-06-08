@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 11:17:32 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 22:35:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/07 11:17:32 $ by $Author: brian $
+ Last Modified $Date: 2005/06/07 22:35:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.14  2005/06/07 22:35:51  brian
+ - working up options
+
  Revision 0.9.2.13  2005/06/07 11:17:32  brian
  - more test case workup
 
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 11:17:32 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 22:35:51 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/07 11:17:32 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 22:35:51 $";
 
 /*
  *  Simple test program for INET streams.
@@ -531,20 +534,20 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
  */
 struct {
 #if 0
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr tos_hdr;
+	unsigned char tos_val;
+	struct t_opthdr ttl_hdr;
+	unsigned char ttl_val;
 #endif
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
 #if 0
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr;
+	t_scalar_t csm_val;
+	struct t_opthdr ppi_hdr;
+	t_scalar_t ppi_val;
+	struct t_opthdr sid_hdr;
+	t_scalar_t sid_val;
 #endif
 } opt_data = {
 #if 0
@@ -563,30 +566,44 @@ struct {
  * connect options
  */
 struct {
+	struct t_opthdr dbg_hdr;
+	t_uscalar_t dbg_val;
+	struct t_opthdr lin_hdr;
+	struct t_linger lin_val;
+	struct t_opthdr rbf_hdr;
+	t_uscalar_t rbf_val;
+	struct t_opthdr rlw_hdr;
+	t_uscalar_t rlw_val;
+	struct t_opthdr sbf_hdr;
+	t_uscalar_t sbf_val;
+	struct t_opthdr slw_hdr;
+	t_uscalar_t slw_val;
+	struct t_opthdr tos_hdr;
+	unsigned char tos_val;
+	struct t_opthdr ttl_hdr;
+	unsigned char ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
+	struct t_opthdr bca_hdr;
+	t_scalar_t bca_val;
+	struct t_opthdr reu_hdr;
+	t_scalar_t reu_val;
 #if 0
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
-#endif
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
-#if 0
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
+	struct t_opthdr ist_hdr;
+	t_scalar_t ist_val;
+	struct t_opthdr ost_hdr;
+	t_scalar_t ost_val;
 #endif
 } opt_conn = {
-#if 0
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
-#endif
-	{ sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 #if 0
@@ -599,81 +616,103 @@ struct {
  * management options
  */
 struct {
+	struct t_opthdr dbg_hdr;
+	t_uscalar_t dbg_val;
+	struct t_opthdr lin_hdr;
+	struct t_linger lin_val;
+	struct t_opthdr rbf_hdr;
+	t_uscalar_t rbf_val;
+	struct t_opthdr rlw_hdr;
+	t_uscalar_t rlw_val;
+	struct t_opthdr sbf_hdr;
+	t_uscalar_t sbf_val;
+	struct t_opthdr slw_hdr;
+	t_uscalar_t slw_val;
+	struct t_opthdr tos_hdr;
+	unsigned char tos_val;
+	struct t_opthdr ttl_hdr;
+	unsigned char ttl_val;
+	struct t_opthdr drt_hdr;
+	t_scalar_t drt_val;
+	struct t_opthdr bca_hdr;
+	t_scalar_t bca_val;
+	struct t_opthdr reu_hdr;
+	t_scalar_t reu_val;
 #if 0
-	struct t_opthdr tos_hdr __attribute__ ((packed));
-	t_scalar_t tos_val __attribute__ ((packed));
-	struct t_opthdr ttl_hdr __attribute__ ((packed));
-	t_scalar_t ttl_val __attribute__ ((packed));
+	struct t_opthdr csm_hdr;
+	t_scalar_t csm_val;
 #endif
-	struct t_opthdr drt_hdr __attribute__ ((packed));
-	t_scalar_t drt_val __attribute__ ((packed));
-	struct t_opthdr bca_hdr __attribute__ ((packed));
-	t_scalar_t bca_val __attribute__ ((packed));
-	struct t_opthdr reu_hdr __attribute__ ((packed));
-	t_scalar_t reu_val __attribute__ ((packed));
-	struct t_opthdr ndl_hdr __attribute__ ((packed));
-	t_scalar_t ndl_val __attribute__ ((packed));
-	struct t_opthdr mxs_hdr __attribute__ ((packed));
-	t_scalar_t mxs_val __attribute__ ((packed));
+	struct t_opthdr ndl_hdr;
+	t_scalar_t ndl_val;
+	struct t_opthdr mxs_hdr;
+	t_scalar_t mxs_val;
 #if 0
-	struct t_opthdr kpa_hdr __attribute__ ((packed));
-	t_scalar_t kpa_val __attribute__ ((packed));
-	struct t_opthdr csm_hdr __attribute__ ((packed));
-	t_scalar_t csm_val __attribute__ ((packed));
-	struct t_opthdr nod_hdr __attribute__ ((packed));
-	t_scalar_t nod_val __attribute__ ((packed));
-	struct t_opthdr crk_hdr __attribute__ ((packed));
-	t_scalar_t crk_val __attribute__ ((packed));
-	struct t_opthdr ppi_hdr __attribute__ ((packed));
-	t_scalar_t ppi_val __attribute__ ((packed));
-	struct t_opthdr sid_hdr __attribute__ ((packed));
-	t_scalar_t sid_val __attribute__ ((packed));
-	struct t_opthdr rcv_hdr __attribute__ ((packed));
-	t_scalar_t rcv_val __attribute__ ((packed));
-	struct t_opthdr ckl_hdr __attribute__ ((packed));
-	t_scalar_t ckl_val __attribute__ ((packed));
-	struct t_opthdr skd_hdr __attribute__ ((packed));
-	t_scalar_t skd_val __attribute__ ((packed));
-	struct t_opthdr prt_hdr __attribute__ ((packed));
-	t_scalar_t prt_val __attribute__ ((packed));
-	struct t_opthdr art_hdr __attribute__ ((packed));
-	t_scalar_t art_val __attribute__ ((packed));
-	struct t_opthdr irt_hdr __attribute__ ((packed));
-	t_scalar_t irt_val __attribute__ ((packed));
-	struct t_opthdr hbi_hdr __attribute__ ((packed));
-	t_scalar_t hbi_val __attribute__ ((packed));
-	struct t_opthdr rin_hdr __attribute__ ((packed));
-	t_scalar_t rin_val __attribute__ ((packed));
-	struct t_opthdr rmn_hdr __attribute__ ((packed));
-	t_scalar_t rmn_val __attribute__ ((packed));
-	struct t_opthdr rmx_hdr __attribute__ ((packed));
-	t_scalar_t rmx_val __attribute__ ((packed));
-	struct t_opthdr ist_hdr __attribute__ ((packed));
-	t_scalar_t ist_val __attribute__ ((packed));
-	struct t_opthdr ost_hdr __attribute__ ((packed));
-	t_scalar_t ost_val __attribute__ ((packed));
-	struct t_opthdr cin_hdr __attribute__ ((packed));
-	t_scalar_t cin_val __attribute__ ((packed));
-	struct t_opthdr tin_hdr __attribute__ ((packed));
-	t_scalar_t tin_val __attribute__ ((packed));
-	struct t_opthdr mac_hdr __attribute__ ((packed));
-	t_scalar_t mac_val __attribute__ ((packed));
-	struct t_opthdr dbg_hdr __attribute__ ((packed));
-	t_scalar_t dbg_val __attribute__ ((packed));
+	struct t_opthdr kpa_hdr;
+	struct t_kpalive kpa_val;
+#endif
+#if 0
+	struct t_opthdr nod_hdr;
+	t_scalar_t nod_val;
+	struct t_opthdr crk_hdr;
+	t_scalar_t crk_val;
+	struct t_opthdr ppi_hdr;
+	t_scalar_t ppi_val;
+	struct t_opthdr sid_hdr;
+	t_scalar_t sid_val;
+	struct t_opthdr rcv_hdr;
+	t_scalar_t rcv_val;
+	struct t_opthdr ckl_hdr;
+	t_scalar_t ckl_val;
+	struct t_opthdr skd_hdr;
+	t_scalar_t skd_val;
+	struct t_opthdr prt_hdr;
+	t_scalar_t prt_val;
+	struct t_opthdr art_hdr;
+	t_scalar_t art_val;
+	struct t_opthdr irt_hdr;
+	t_scalar_t irt_val;
+	struct t_opthdr hbi_hdr;
+	t_scalar_t hbi_val;
+	struct t_opthdr rin_hdr;
+	t_scalar_t rin_val;
+	struct t_opthdr rmn_hdr;
+	t_scalar_t rmn_val;
+	struct t_opthdr rmx_hdr;
+	t_scalar_t rmx_val;
+	struct t_opthdr ist_hdr;
+	t_scalar_t ist_val;
+	struct t_opthdr ost_hdr;
+	t_scalar_t ost_val;
+	struct t_opthdr cin_hdr;
+	t_scalar_t cin_val;
+	struct t_opthdr tin_hdr;
+	t_scalar_t tin_val;
+	struct t_opthdr mac_hdr;
+	t_scalar_t mac_val;
+	struct t_opthdr dbg_hdr;
+	t_scalar_t dbg_val;
 #endif
 } opt_optm = {
-#if 0
-	{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
+	{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
+	, { sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
+	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
 	, { sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
-#endif
-	{ sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(unsigned int), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
+#if 0
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+#endif
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
 #if 0
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, T_NO
-	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
+	, { sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
+#endif
+#if 0
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
@@ -1708,7 +1747,7 @@ char *value_string(int child, struct t_opthdr *oh)
 				snprintf(buf, sizeof(buf), "%lu", (ulong) *((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
-			return yesno_string(oh);
+			break;
 		case T_TCP_CORK:
 			return yesno_string(oh);
 		case T_TCP_KEEPIDLE:
@@ -4818,7 +4857,7 @@ for T_INET_IP option T_IP_TOS."
 int test_case_2_1_1(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
@@ -4847,7 +4886,7 @@ for T_INET_IP option T_IP_TTL."
 int test_case_2_1_2(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
@@ -4876,8 +4915,8 @@ for T_INET_IP option T_IP_DONTROUTE."
 int test_case_2_1_3(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	};
@@ -4905,8 +4944,8 @@ for T_INET_IP option T_IP_BROADCAST."
 int test_case_2_1_4(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	};
@@ -4934,8 +4973,8 @@ for T_INET_IP option T_IP_REUSEADDR."
 int test_case_2_1_5(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 	};
@@ -4963,8 +5002,8 @@ for T_INET_UDP option T_UDP_CHECKSUM."
 int test_case_2_1_6(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 	};
@@ -4992,8 +5031,8 @@ for T_INET_TCP option T_TCP_NODELAY."
 int test_case_2_1_7(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	};
@@ -5021,8 +5060,8 @@ for T_INET_TCP option T_TCP_MAXSEG."
 int test_case_2_1_8(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
 	};
@@ -5050,8 +5089,8 @@ for T_INET_TCP option T_TCP_KEEPALIVE."
 int test_case_2_1_9(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		struct t_kpalive opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		struct t_kpalive opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	};
@@ -5102,7 +5141,7 @@ for XTI_GENERIC option XTI_DEBUG."
 int test_case_2_1_11(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
@@ -5131,7 +5170,7 @@ for XTI_GENERIC option XTI_LINGER."
 int test_case_2_1_12(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		struct t_linger opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
@@ -5160,7 +5199,7 @@ for XTI_GENERIC option XTI_RCVBUF."
 int test_case_2_1_13(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
@@ -5189,7 +5228,7 @@ for XTI_GENERIC option XTI_RCVLOWAT."
 int test_case_2_1_14(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
@@ -5218,7 +5257,7 @@ for XTI_GENERIC option XTI_SNDBUF."
 int test_case_2_1_15(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
@@ -5247,7 +5286,7 @@ for XTI_GENERIC option XTI_SNDLOWAT."
 int test_case_2_1_16(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
@@ -5854,7 +5893,7 @@ tests the XTI_DEBUG option."
 int test_case_4_3_1_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
@@ -5870,7 +5909,7 @@ int test_case_4_3_1_resp(int child)
 int test_case_4_3_1_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}, 0x0
@@ -5898,7 +5937,7 @@ tests the XTI_LINGER option."
 int test_case_4_3_2_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		struct t_linger opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
@@ -5914,7 +5953,7 @@ int test_case_4_3_2_resp(int child)
 int test_case_4_3_2_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		struct t_linger opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, { T_NO, T_UNSPEC }
@@ -5942,7 +5981,7 @@ tests the XTI_RCVBUF option."
 int test_case_4_3_3_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
@@ -5958,7 +5997,7 @@ int test_case_4_3_3_resp(int child)
 int test_case_4_3_3_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVBUF, T_SUCCESS}, 32767
@@ -5986,7 +6025,7 @@ tests the XTI_RCVLOWAT option."
 int test_case_4_3_4_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
@@ -6002,7 +6041,7 @@ int test_case_4_3_4_resp(int child)
 int test_case_4_3_4_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_RCVLOWAT, T_SUCCESS}, 1
@@ -6030,7 +6069,7 @@ tests the XTI_SNDBUF option."
 int test_case_4_3_5_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
@@ -6046,7 +6085,7 @@ int test_case_4_3_5_resp(int child)
 int test_case_4_3_5_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS}, 32767
@@ -6074,7 +6113,7 @@ tests the XTI_SNDLOWAT option."
 int test_case_4_3_6_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
@@ -6090,7 +6129,7 @@ int test_case_4_3_6_resp(int child)
 int test_case_4_3_6_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		t_uscalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_SNDLOWAT, T_SUCCESS}, 1
@@ -6118,7 +6157,7 @@ tests the T_IP_TOS option."
 int test_case_4_3_7_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
@@ -6134,7 +6173,7 @@ int test_case_4_3_7_resp(int child)
 int test_case_4_3_7_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TOS, T_SUCCESS}, 0x0
@@ -6162,7 +6201,7 @@ tests the T_IP_TTL option."
 int test_case_4_3_8_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
@@ -6178,7 +6217,7 @@ int test_case_4_3_8_resp(int child)
 int test_case_4_3_8_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
 		unsigned char opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(unsigned char), T_INET_IP, T_IP_TTL, T_SUCCESS}, 64
@@ -6206,8 +6245,8 @@ tests the T_IP_REUSEADDR option."
 int test_case_4_3_9_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 	};
@@ -6222,8 +6261,8 @@ int test_case_4_3_9_resp(int child)
 int test_case_4_3_9_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_NO
 	};
@@ -6250,8 +6289,8 @@ tests the T_IP_DONTROUTE option."
 int test_case_4_3_10_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	};
@@ -6266,8 +6305,8 @@ int test_case_4_3_10_resp(int child)
 int test_case_4_3_10_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_DONTROUTE, T_SUCCESS}, T_NO
 	};
@@ -6294,8 +6333,8 @@ tests the T_IP_BROADCAST option."
 int test_case_4_3_11_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	};
@@ -6310,8 +6349,8 @@ int test_case_4_3_11_resp(int child)
 int test_case_4_3_11_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_BROADCAST, T_SUCCESS}, T_NO
 	};
@@ -6338,8 +6377,8 @@ tests the T_UDP_CHECKSUM option."
 int test_case_4_3_12_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 	};
@@ -6354,8 +6393,8 @@ int test_case_4_3_12_resp(int child)
 int test_case_4_3_12_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_UDP, T_UDP_CHECKSUM, T_SUCCESS}, T_NO
 	};
@@ -6382,8 +6421,8 @@ tests the T_TCP_NODELAY option."
 int test_case_4_3_13_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	};
@@ -6398,8 +6437,8 @@ int test_case_4_3_13_resp(int child)
 int test_case_4_3_13_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_NODELAY, T_SUCCESS}, T_NO
 	};
@@ -6426,8 +6465,8 @@ tests the T_TCP_MAXSEG option."
 int test_case_4_3_14_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
 	};
@@ -6442,8 +6481,8 @@ int test_case_4_3_14_resp(int child)
 int test_case_4_3_14_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		t_scalar_t opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_TCP, T_TCP_MAXSEG, T_SUCCESS}, 576
 	};
@@ -6470,8 +6509,8 @@ tests the T_TCP_KEEPALIVE option."
 int test_case_4_3_15_conn(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		struct t_kpalive opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		struct t_kpalive opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	};
@@ -6486,8 +6525,8 @@ int test_case_4_3_15_resp(int child)
 int test_case_4_3_15_list(int child)
 {
 	struct {
-		struct t_opthdr opt_hdr __attribute__ ((packed));
-		struct t_kpalive opt_val __attribute__ ((packed));
+		struct t_opthdr opt_hdr;
+		struct t_kpalive opt_val;
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	};
