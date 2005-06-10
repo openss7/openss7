@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_udp.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/08 09:01:20 $
+dnl @(#) $RCSfile: testsuite-inet_udp.at,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/09 23:19:48 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/08 09:01:20 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/09 23:19:48 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_udp.at,v $
+dnl Revision 0.9.2.9  2005/06/09 23:19:48  brian
+dnl - improved options processing
+dnl
 dnl Revision 0.9.2.8  2005/06/08 09:01:20  brian
 dnl - corrected options processing
 dnl
@@ -832,146 +835,2921 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 1.6])
+
+AT_SETUP([udp test 1.6.1.1])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 1.6
+    test-inet_udp $options -e -o 1.6.1.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.1])
+AT_SETUP([udp test 1.6.1.2])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.1
+    test-inet_udp $options -e -o 1.6.1.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.2])
+AT_SETUP([udp test 1.6.1.3])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.2
+    test-inet_udp $options -e -o 1.6.1.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.3])
+AT_SETUP([udp test 1.6.1.4])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.3
+    test-inet_udp $options -e -o 1.6.1.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.4])
+AT_SETUP([udp test 1.6.1.5])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.4
+    test-inet_udp $options -e -o 1.6.1.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.5])
+AT_SETUP([udp test 1.6.1.6])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.5
+    test-inet_udp $options -e -o 1.6.1.6
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.6])
+AT_SETUP([udp test 1.6.1.7])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.6
+    test-inet_udp $options -e -o 1.6.1.7
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.7])
+AT_SETUP([udp test 1.6.2.1])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.7
+    test-inet_udp $options -e -o 1.6.2.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.8])
+AT_SETUP([udp test 1.6.2.2])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.8
+    test-inet_udp $options -e -o 1.6.2.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.9])
+AT_SETUP([udp test 1.6.2.3])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.9
+    test-inet_udp $options -e -o 1.6.2.3
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.10])
+AT_SETUP([udp test 1.6.2.4])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.10
+    test-inet_udp $options -e -o 1.6.2.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.11])
+AT_SETUP([udp test 1.6.2.5])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.11
+    test-inet_udp $options -e -o 1.6.2.5
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([udp test 3.1.12])
+AT_SETUP([udp test 1.6.3.1])
 AT_KEYWORDS([udp])
 AT_CHECK([
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_udp $options -e -o 3.1.12
+    test-inet_udp $options -e -o 1.6.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.4.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.4.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.14])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.14
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.15])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.15
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.16])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.16
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.17])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.17
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.18])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.18
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.19])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.19
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.20])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.20
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.21])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.21
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.22])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.22
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.23])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.23
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.24])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.24
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.25])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.25
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.26])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.26
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.27])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.27
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.28])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.28
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.29])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.29
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.30])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.30
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.31])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.31
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.32])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.32
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.33])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.33
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.34])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.34
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.35])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.35
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.37])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.37
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.6.5.38])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.6.5.38
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+
+AT_SETUP([udp test 1.7.1.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.1.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.1.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.2.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.2.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.2.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.2.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.2.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.2.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.2.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.3.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.4.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.4.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.14])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.14
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.15])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.15
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.16])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.16
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.17])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.17
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.18])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.18
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.19])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.19
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.20])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.20
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.21])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.21
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.22])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.22
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.23])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.23
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.24])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.24
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.25])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.25
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.26])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.26
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.27])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.27
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.28])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.28
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.29])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.29
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.30])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.30
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.31])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.31
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.32])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.32
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.33])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.33
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.34])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.34
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.35])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.35
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.37])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.37
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.7.5.38])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.7.5.38
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+
+AT_SETUP([udp test 1.8.1.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.1.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.1.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.2.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.2.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.2.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.2.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.2.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.2.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.2.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.3.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.4.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.4.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.14])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.14
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.15])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.15
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.16])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.16
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.17])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.17
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.18])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.18
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.19])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.19
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.20])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.20
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.21])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.21
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.22])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.22
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.23])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.23
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.24])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.24
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.25])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.25
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.26])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.26
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.27])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.27
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.28])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.28
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.29])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.29
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.30])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.30
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.31])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.31
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.32])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.32
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.33])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.33
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.34])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.34
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.35])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.35
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.37])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.37
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.8.5.38])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.8.5.38
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 1.10.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 1.10.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.1.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.1.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.2.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.2.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.2.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.2.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.2.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.2.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.2.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.3.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.4.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.4.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.5])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.6])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.7])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.8])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.9])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.10])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.11])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.12])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.13])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.14])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.14
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.15])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.15
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.16])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.16
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.17])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.17
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.18])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.18
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.19])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.19
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.20])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.20
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.21])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.21
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.22])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.22
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.23])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.23
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.24])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.24
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.25])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.25
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.26])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.26
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.27])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.27
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.28])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.28
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.29])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.29
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.30])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.30
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.31])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.31
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.32])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.32
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.33])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.33
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.34])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.34
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.35])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.35
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.36])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.36
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.37])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.37
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 2.2.5.38])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 2.2.5.38
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 3.1])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 3.2])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 3.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 3.3])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 3.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([udp test 3.4])
+AT_KEYWORDS([udp])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_udp $options -e -o 3.4
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
