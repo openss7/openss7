@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/08 09:01:19 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/06/10 04:03:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/08 09:01:19 $ by $Author: brian $
+ Last Modified $Date: 2005/06/10 04:03:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.4  2005/06/10 04:03:12  brian
+ - more options corrections
+
  Revision 0.9.2.3  2005/06/08 09:01:19  brian
  - corrected options processing
 
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/08 09:01:19 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/06/10 04:03:12 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/08 09:01:19 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/06/10 04:03:12 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2356,9 +2359,9 @@ void print_rx_prim(int child, const char *command)
 void print_ack_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s-/|<- - - - - - - - - - - - - - - -| -|                   [%d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|  |\\%16s->[%d]\n",
-		"                    |- - - - - - - - - - - - - - - ->|\\-+-%16s->[%d]\n",
+		"<-%16s-/|                                |  |                   [%d]\n",
+		"                    |                                |  |\\%16s->[%d]\n",
+		"                    |                                |\\-+-%16s->[%d]\n",
 		"                    |         <%16s>     |  |                   [%d]\n",
 	};
 	if (verbose > 0)
