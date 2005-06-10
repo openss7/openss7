@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/06/10 04:03:11 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/10 04:03:11 $ by $Author: brian $
+ Last Modified $Date: 2005/06/10 12:21:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/06/10 04:03:11 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $"
 
-static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/06/10 04:03:11 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -306,7 +305,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/06/10 04:03:11 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1434,8 +1433,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_RCVBUF;
 		oh->status = T_SUCCESS;
 		if (ss->options.xti.rcvbuf != sk->sk_rcvbuf / 2) {
-			if (ss->options.xti.rcvbuf != T_UNSPEC
-			    && ss->options.xti.rcvbuf < sk->sk_rcvbuf / 2)
+			if (ss->options.xti.rcvbuf != T_UNSPEC && ss->options.xti.rcvbuf < sk->sk_rcvbuf / 2)
 				oh->status = T_PARTSUCCESS;
 			ss->options.xti.rcvbuf = sk->sk_rcvbuf / 2;
 		}
@@ -1448,8 +1446,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_RCVLOWAT;
 		oh->status = T_SUCCESS;
 		if (ss->options.xti.rcvlowat != sk->sk_rcvlowat) {
-			if (ss->options.xti.rcvlowat != T_UNSPEC
-			    && ss->options.xti.rcvlowat < sk->sk_rcvlowat)
+			if (ss->options.xti.rcvlowat != T_UNSPEC && ss->options.xti.rcvlowat < sk->sk_rcvlowat)
 				oh->status = T_PARTSUCCESS;
 			ss->options.xti.rcvlowat = sk->sk_rcvlowat;
 		}
@@ -1462,8 +1459,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 		oh->name = XTI_SNDBUF;
 		oh->status = T_SUCCESS;
 		if (ss->options.xti.sndbuf != sk->sk_sndbuf / 2) {
-			if (ss->options.xti.sndbuf != T_UNSPEC
-			    && ss->options.xti.sndbuf < sk->sk_sndbuf / 2)
+			if (ss->options.xti.sndbuf != T_UNSPEC && ss->options.xti.sndbuf < sk->sk_sndbuf / 2)
 				oh->status = T_PARTSUCCESS;
 			ss->options.xti.sndbuf = sk->sk_sndbuf / 2;
 		}
@@ -1610,20 +1606,16 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_KEEPALIVE;
 				oh->status = T_SUCCESS;
-				if ((ss->options.tcp.keepalive.kp_onoff != T_NO) !=
-				    (sock_tst_keepopen(sk) != 0)) {
-					ss->options.tcp.keepalive.kp_onoff =
-					    sock_tst_keepopen(sk) ? T_YES : T_NO;
+				if ((ss->options.tcp.keepalive.kp_onoff != T_NO) != (sock_tst_keepopen(sk) != 0)) {
+					ss->options.tcp.keepalive.kp_onoff = sock_tst_keepopen(sk) ? T_YES : T_NO;
 				}
 				if (ss->options.tcp.keepalive.kp_onoff == T_YES) {
-					if (ss->options.tcp.keepalive.kp_timeout !=
-					    tp->keepalive_time / 60 / HZ) {
+					if (ss->options.tcp.keepalive.kp_timeout != tp->keepalive_time / 60 / HZ) {
 						if (ss->options.tcp.keepalive.kp_timeout != T_UNSPEC
 						    && ss->options.tcp.keepalive.kp_timeout >
 						    tp->keepalive_time / 60 / HZ)
 							oh->status = T_PARTSUCCESS;
-						ss->options.tcp.keepalive.kp_timeout =
-						    tp->keepalive_time / 60 / HZ;
+						ss->options.tcp.keepalive.kp_timeout = tp->keepalive_time / 60 / HZ;
 					}
 				} else
 					ss->options.tcp.keepalive.kp_timeout = T_UNSPEC;
@@ -1718,13 +1710,10 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_TCP_DEFER_ACCEPT;
 				oh->status = T_SUCCESS;
 				if (ss->options.tcp.defer_accept == T_UNSPEC)
-					ss->options.tcp.defer_accept =
-					    (TCP_TIMEOUT_INIT / HZ) << tp->defer_accept;
-				else if (ss->options.tcp.defer_accept !=
-					 ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept)) {
+					ss->options.tcp.defer_accept = (TCP_TIMEOUT_INIT / HZ) << tp->defer_accept;
+				else if (ss->options.tcp.defer_accept != ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept)) {
 					oh->status = T_PARTSUCCESS;
-					ss->options.tcp.defer_accept =
-					    ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
+					ss->options.tcp.defer_accept = ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
 				}
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.defer_accept;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1858,8 +1847,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_PATH_MAX_RETRANS;
 				oh->status = T_SUCCESS;
 				/* absolute requirement */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) =
-				    ss->options.sctp.path_max_retrans;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.path_max_retrans;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_ASSOC_MAX_RETRANS, ss->options.flags)) {
@@ -1868,8 +1856,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 				oh->status = T_SUCCESS;
 				/* absolute requirement */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) =
-				    ss->options.sctp.assoc_max_retrans;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.assoc_max_retrans;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_MAX_INIT_RETRIES, ss->options.flags)) {
@@ -1878,8 +1865,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_MAX_INIT_RETRIES;
 				oh->status = T_SUCCESS;
 				/* absolute requirement */
-				*((t_uscalar_t *) T_OPT_DATA(oh)) =
-				    ss->options.sctp.max_init_retries;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.max_init_retries;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_HEARTBEAT_ITVL, ss->options.flags)) {
@@ -1888,8 +1874,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_HEARTBEAT_ITVL;
 				oh->status = T_SUCCESS;
 				if (ss->options.sctp.heartbeat_itvl != sp->hb_itvl / HZ * 1000) {
-					if (ss->options.sctp.heartbeat_itvl <
-					    sp->hb_itvl / HZ * 1000)
+					if (ss->options.sctp.heartbeat_itvl < sp->hb_itvl / HZ * 1000)
 						oh->status = T_PARTSUCCESS;
 					ss->options.sctp.heartbeat_itvl = sp->hb_itvl / HZ * 1000;
 				}
@@ -1986,8 +1971,7 @@ ss_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->name = T_SCTP_THROTTLE_ITVL;
 				oh->status = T_SUCCESS;
 				if (ss->options.sctp.throttle_itvl != sp->throttle / HZ * 1000) {
-					if (ss->options.sctp.throttle_itvl <
-					    sp->throttle / HZ * 1000)
+					if (ss->options.sctp.throttle_itvl < sp->throttle / HZ * 1000)
 						oh->status = T_PARTSUCCESS;
 					ss->options.sctp.throttle_itvl = sp->throttle / HZ * 1000;
 				}
@@ -2275,8 +2259,7 @@ ss_set_options(ss_t * ss)
 		case T_INET_UDP:
 			if (ss_tst_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.udp.checksum;
-				sk->sk_no_check =
-				    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+				sk->sk_no_check = (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 			}
 			break;
 		case T_INET_TCP:
@@ -2300,8 +2283,7 @@ ss_set_options(ss_t * ss)
 					valp->kp_timeout = T_UNSPEC;
 				else {
 					if (valp->kp_timeout == T_UNSPEC)
-						valp->kp_timeout =
-						    ss_defaults.tcp.keepalive.kp_timeout;
+						valp->kp_timeout = ss_defaults.tcp.keepalive.kp_timeout;
 					if (valp->kp_timeout < 1)
 						valp->kp_timeout = 1;
 					if (valp->kp_timeout > MAX_SCHEDULE_TIMEOUT / 60 / HZ)
@@ -2400,12 +2382,12 @@ ss_set_options(ss_t * ss)
 				t_uscalar_t *valp = &ss->options.sctp.recvopt;
 				if (*valp == T_YES)
 					sp->cmsg_flags |=
-					    (SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI |
-					     SCTP_CMSGF_RECVSSN | SCTP_CMSGF_RECVTSN);
+					    (SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
+					     SCTP_CMSGF_RECVTSN);
 				else
 					sp->cmsg_flags &=
-					    ~(SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI |
-					      SCTP_CMSGF_RECVSSN | SCTP_CMSGF_RECVTSN);
+					    ~(SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
+					      SCTP_CMSGF_RECVTSN);
 			}
 			if (ss_tst_bit(_T_BIT_SCTP_COOKIE_LIFE, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.cookie_life;
@@ -2740,8 +2722,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					goto einval;
 				if (valp->l_onoff != T_NO && valp->l_onoff != T_YES)
 					goto einval;
-				if (valp->l_linger != T_INFINITE && valp->l_linger != T_UNSPEC
-				    && valp->l_linger < 0)
+				if (valp->l_linger != T_INFINITE && valp->l_linger != T_UNSPEC && valp->l_linger < 0)
 					goto einval;
 				ss->options.xti.linger = *valp;
 				ss_set_bit(_T_BIT_XTI_LINGER, ss->options.flags);
@@ -2946,8 +2927,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					ss_set_bit(_T_BIT_UDP_CHECKSUM, ss->options.flags);
 					if (!request)
 						continue;
-					sk->sk_no_check =
-					    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+					sk->sk_no_check = (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 					continue;
 				}
 				}
@@ -2989,14 +2969,13 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_TCP_KEEPALIVE:
 				{
-					struct t_kpalive *valp =
-					    (struct t_kpalive *) T_OPT_DATA(ih);
+					struct t_kpalive *valp = (struct t_kpalive *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->kp_onoff != T_YES && valp->kp_onoff != T_NO)
 						goto einval;
-					if (valp->kp_timeout != T_INFINITE
-					    && valp->kp_timeout != T_UNSPEC && valp->kp_timeout < 0)
+					if (valp->kp_timeout != T_INFINITE && valp->kp_timeout != T_UNSPEC
+					    && valp->kp_timeout < 0)
 						goto einval;
 					ss->options.tcp.keepalive = *valp;
 					ss_set_bit(_T_BIT_TCP_KEEPALIVE, ss->options.flags);
@@ -3006,14 +2985,11 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						valp->kp_timeout = T_UNSPEC;
 					else {
 						if (valp->kp_timeout == T_UNSPEC)
-							valp->kp_timeout =
-							    ss_defaults.tcp.keepalive.kp_timeout;
+							valp->kp_timeout = ss_defaults.tcp.keepalive.kp_timeout;
 						if (valp->kp_timeout < 1)
 							valp->kp_timeout = 1;
-						if (valp->kp_timeout >
-						    MAX_SCHEDULE_TIMEOUT / 60 / HZ)
-							valp->kp_timeout =
-							    MAX_SCHEDULE_TIMEOUT / 60 / HZ;
+						if (valp->kp_timeout > MAX_SCHEDULE_TIMEOUT / 60 / HZ)
+							valp->kp_timeout = MAX_SCHEDULE_TIMEOUT / 60 / HZ;
 					}
 					if (valp->kp_onoff == T_YES)
 						tp->keepalive_time = valp->kp_timeout * 60 * HZ;
@@ -3139,8 +3115,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					else {
 						for (tp->defer_accept = 0;
 						     tp->defer_accept < 32
-						     && *valp >
-						     ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
+						     && *valp > ((TCP_TIMEOUT_INIT / HZ) << tp->defer_accept);
 						     tp->defer_accept++) ;
 						tp->defer_accept++;
 					}
@@ -3271,12 +3246,12 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 						continue;
 					if (*valp == T_YES)
 						sp->cmsg_flags |=
-						    (SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI |
-						     SCTP_CMSGF_RECVSSN | SCTP_CMSGF_RECVTSN);
+						    (SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
+						     SCTP_CMSGF_RECVTSN);
 					else
 						sp->cmsg_flags &=
-						    ~(SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI |
-						      SCTP_CMSGF_RECVSSN | SCTP_CMSGF_RECVTSN);
+						    ~(SCTP_CMSGF_RECVSID | SCTP_CMSGF_RECVPPI | SCTP_CMSGF_RECVSSN |
+						      SCTP_CMSGF_RECVTSN);
 					continue;
 				}
 				case T_SCTP_COOKIE_LIFE:
@@ -3329,8 +3304,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					ss->options.sctp.assoc_max_retrans = *valp;
-					ss_set_bit(_T_BIT_SCTP_ASSOC_MAX_RETRANS,
-						   ss->options.flags);
+					ss_set_bit(_T_BIT_SCTP_ASSOC_MAX_RETRANS, ss->options.flags);
 					if (!request)
 						continue;
 					sp->max_retrans = *valp;
@@ -3530,8 +3504,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_SCTP_HB:
 				{
-					struct t_sctp_hb *valp =
-					    (struct t_sctp_hb *) T_OPT_DATA(ih);
+					struct t_sctp_hb *valp = (struct t_sctp_hb *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->hb_onoff != T_YES && valp->hb_onoff != T_NO)
@@ -3556,12 +3529,10 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_SCTP_RTO:
 				{
-					struct t_sctp_rto *valp =
-					    (struct t_sctp_rto *) T_OPT_DATA(ih);
+					struct t_sctp_rto *valp = (struct t_sctp_rto *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
-					if (valp->rto_initial != T_INFINITE
-					    && valp->rto_initial != T_UNSPEC
+					if (valp->rto_initial != T_INFINITE && valp->rto_initial != T_UNSPEC
 					    && valp->rto_initial < 0)
 						goto einval;
 					if (valp->rto_min != T_INFINITE && valp->rto_min != T_UNSPEC
@@ -3570,12 +3541,10 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					if (valp->rto_max != T_INFINITE && valp->rto_max != T_UNSPEC
 					    && valp->rto_max < 0)
 						goto einval;
-					if (valp->max_retrans != T_INFINITE
-					    && valp->max_retrans != T_UNSPEC
+					if (valp->max_retrans != T_INFINITE && valp->max_retrans != T_UNSPEC
 					    && valp->max_retrans < 0)
 						goto einval;
-					if (valp->rto_initial < valp->rto_min
-					    || valp->rto_max < valp->rto_min
+					if (valp->rto_initial < valp->rto_min || valp->rto_max < valp->rto_min
 					    || valp->rto_max < valp->rto_initial)
 						goto einval;
 					ss->options.sctp.rto = *valp;
@@ -3583,11 +3552,9 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					if (!request)
 						continue;
 					if (valp->rto_initial == T_INFINITE)
-						valp->rto_initial =
-						    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+						valp->rto_initial = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 					if (valp->rto_initial / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
-						valp->rto_initial =
-						    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+						valp->rto_initial = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 					if (valp->rto_min == T_INFINITE)
 						valp->rto_min = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
 					if (valp->rto_min / HZ > MAX_SCHEDULE_TIMEOUT / 1000)
@@ -3696,8 +3663,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					   request or on connection response. */
 				case T_SCTP_ADD_IP:
 				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
+					struct sockaddr_in *valp = (struct sockaddr_in *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -3713,8 +3679,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_SCTP_DEL_IP:
 				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
+					struct sockaddr_in *valp = (struct sockaddr_in *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -3730,8 +3695,7 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 				}
 				case T_SCTP_SET_IP:
 				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
+					struct sockaddr_in *valp = (struct sockaddr_in *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
 					if (valp->sin_family != AF_INET)
@@ -3788,10 +3752,8 @@ ss_parse_conn_opts(ss_t * ss, unsigned char *ip, size_t ilen, int request)
 					t_uscalar_t *valp = (t_uscalar_t *) T_OPT_DATA(ih);
 					if (ih->len - sizeof(*ih) != sizeof(*valp))
 						goto einval;
-					if (*valp != T_SCTP_DISPOSITION_NONE
-					    && *valp != T_SCTP_DISPOSITION_UNSENT
-					    && *valp != T_SCTP_DISPOSITION_SENT
-					    && *valp != T_SCTP_DISPOSITION_GAP_ACKED
+					if (*valp != T_SCTP_DISPOSITION_NONE && *valp != T_SCTP_DISPOSITION_UNSENT
+					    && *valp != T_SCTP_DISPOSITION_SENT && *valp != T_SCTP_DISPOSITION_GAP_ACKED
 					    && *valp != T_SCTP_DISPOSITION_ACKED)
 						goto einval;
 					ss->options.sctp.disposition = *valp;
@@ -3939,8 +3901,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 				switch (ih->name) {
 				case T_IP_OPTIONS:
 				{
-					size_t len =
-					    ih->len - sizeof(*ih) < 40 ? ih->len - sizeof(*ih) : 40;
+					size_t len = ih->len - sizeof(*ih) < 40 ? ih->len - sizeof(*ih) : 40;
 					ch->cmsg_len = CMSG_LEN(len);
 					ch->cmsg_level = SOL_IP;
 					ch->cmsg_type = IP_OPTIONS;
@@ -3955,19 +3916,18 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 					case T_INET_IP:
 					case T_INET_UDP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
-							np->tos =
-							    *((unsigned char *) T_OPT_DATA(ih));
+							np->tos = *((unsigned char *)
+								    T_OPT_DATA(ih));
 						}
 						continue;
 #if defined HAVE_OPENSS7_SCTP
 					case T_INET_SCTP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
-							ch->cmsg_len =
-							    CMSG_LEN(ih->len - sizeof(*ih));
+							ch->cmsg_len = CMSG_LEN(ih->len - sizeof(*ih));
 							ch->cmsg_level = SOL_IP;
 							ch->cmsg_type = IP_TOS;
-							*((unsigned char *) CMSG_DATA(ch)) =
-							    *((unsigned char *) T_OPT_DATA(ih));
+							*((unsigned char *) CMSG_DATA(ch)) = *((unsigned char *)
+											       T_OPT_DATA(ih));
 							ch = CMSG_NXTHDR(msg, ch);
 						}
 						continue;
@@ -3982,23 +3942,22 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 					case T_INET_UDP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
 #if defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
-							np->ttl =
-							    *((unsigned char *) T_OPT_DATA(ih));
+							np->ttl = *((unsigned char *)
+								    T_OPT_DATA(ih));
 #elif defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
-							np->uc_ttl =
-							    *((unsigned char *) T_OPT_DATA(ih));
+							np->uc_ttl = *((unsigned char *)
+								       T_OPT_DATA(ih));
 #endif				/* defined HAVE_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
 						}
 						continue;
 #if defined HAVE_OPENSS7_SCTP
 					case T_INET_SCTP:
 						if (ih->len == sizeof(*ih) + sizeof(unsigned char)) {
-							ch->cmsg_len =
-							    CMSG_LEN(ih->len - sizeof(*ih));
+							ch->cmsg_len = CMSG_LEN(ih->len - sizeof(*ih));
 							ch->cmsg_level = SOL_IP;
 							ch->cmsg_type = IP_TTL;
-							*((unsigned char *) CMSG_DATA(ch)) =
-							    *((unsigned char *) T_OPT_DATA(ih));
+							*((unsigned char *) CMSG_DATA(ch)) = *((unsigned char *)
+											       T_OPT_DATA(ih));
 							ch = CMSG_NXTHDR(msg, ch);
 						}
 						continue;
@@ -4008,8 +3967,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 				case T_IP_DONTROUTE:
 					if (ih->len == sizeof(*ih) + sizeof(unsigned int)) {
 						if (ss->p.prot.protocol == T_INET_UDP)
-							msg->msg_flags |=
-							    *((unsigned int *) T_OPT_DATA(ih))
+							msg->msg_flags |= *((unsigned int *) T_OPT_DATA(ih))
 							    == T_NO ? 0 : MSG_DONTROUTE;
 					}
 					continue;
@@ -4018,8 +3976,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 						ch->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
 						ch->cmsg_level = SOL_IP;
 						ch->cmsg_type = IP_PKTINFO;
-						*((struct in_pktinfo *) CMSG_DATA(ch)) =
-						    (struct in_pktinfo) {
+						*((struct in_pktinfo *) CMSG_DATA(ch)) = (struct in_pktinfo) {
 							0, {
 							*((uint32_t *) T_OPT_DATA(ih))}, {
 						0}};
@@ -4051,8 +4008,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 						ch->cmsg_len = CMSG_LEN(sizeof(unsigned int));
 						ch->cmsg_level = SOL_SCTP;
 						ch->cmsg_type = SCTP_SID;
-						*((unsigned int *) CMSG_DATA(ch)) =
-						    *((t_uscalar_t *) T_OPT_DATA(ih));
+						*((unsigned int *) CMSG_DATA(ch)) = *((t_uscalar_t *) T_OPT_DATA(ih));
 						ch = CMSG_NXTHDR(msg, ch);
 					}
 					continue;
@@ -4061,8 +4017,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 						ch->cmsg_len = CMSG_LEN(sizeof(unsigned int));
 						ch->cmsg_level = SOL_SCTP;
 						ch->cmsg_type = SCTP_PPI;
-						*((unsigned int *) CMSG_DATA(ch)) =
-						    *((t_uscalar_t *) T_OPT_DATA(ih));
+						*((unsigned int *) CMSG_DATA(ch)) = *((t_uscalar_t *) T_OPT_DATA(ih));
 						ch = CMSG_NXTHDR(msg, ch);
 					}
 					continue;
@@ -4072,8 +4027,7 @@ ss_cmsg_build(ss_t * ss, unsigned char *ip, size_t ilen, struct msghdr *msg)
 						ch->cmsg_len = CMSG_LEN(sizeof(unsigned int));
 						ch->cmsg_level = SOL_SCTP;
 						ch->cmsg_type = SCTP_LIFETIME;
-						*((unsigned int *) CMSG_DATA(ch)) =
-						    *((t_uscalar_t *) T_OPT_DATA(ih));
+						*((unsigned int *) CMSG_DATA(ch)) = *((t_uscalar_t *) T_OPT_DATA(ih));
 						ch = CMSG_NXTHDR(msg, ch);
 					}
 					continue;
@@ -4122,8 +4076,7 @@ ss_opts_size(ss_t * ss, struct msghdr *msg)
 			continue;
 		case SOL_IP:
 			if (ss->p.prot.family == PF_INET
-			    && (ss->p.prot.protocol == T_INET_UDP
-				|| ss->p.prot.protocol == T_INET_IP)) {
+			    && (ss->p.prot.protocol == T_INET_UDP || ss->p.prot.protocol == T_INET_IP)) {
 				switch (cmsg->cmsg_type) {
 				case IP_PKTINFO:
 					size += _T_SPACE_SIZEOF(uint32_t);
@@ -4135,8 +4088,7 @@ ss_opts_size(ss_t * ss, struct msghdr *msg)
 					size += _T_SPACE_SIZEOF(unsigned char);
 					continue;
 				case IP_RECVOPTS:
-					size +=
-					    T_SPACE((cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40));
+					size += T_SPACE((cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40));
 					continue;
 				}
 			}
@@ -4189,10 +4141,8 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 				case IP_RECVOPTS:
 				{
 					size_t len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
-					printd(("%s: %p: processing option IP_RECVOPTS\n", DRV_NAME,
-						ss));
-					printd(("%s: %p: building option T_IP_OPTIONS\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option IP_RECVOPTS\n", DRV_NAME, ss));
+					printd(("%s: %p: building option T_IP_OPTIONS\n", DRV_NAME, ss));
 					oh->len = T_LENGTH(len);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -4202,42 +4152,33 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 					continue;
 				}
 				case IP_TOS:
-					printd(("%s: %p: processing option IP_TOS\n", DRV_NAME,
-						ss));
-					printd(("%s: %p: building option T_IP_TOS\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option IP_TOS\n", DRV_NAME, ss));
+					printd(("%s: %p: building option T_IP_TOS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(unsigned char);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
 					oh->status = T_SUCCESS;
-					*((unsigned char *) T_OPT_DATA(oh)) =
-					    *((unsigned char *) CMSG_DATA(cmsg));
+					*((unsigned char *) T_OPT_DATA(oh)) = *((unsigned char *) CMSG_DATA(cmsg));
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_TTL:
-					printd(("%s: %p: processing option IP_TTL\n", DRV_NAME,
-						ss));
-					printd(("%s: %p: building option T_IP_TTL\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option IP_TTL\n", DRV_NAME, ss));
+					printd(("%s: %p: building option T_IP_TTL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(unsigned char);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
 					oh->status = T_SUCCESS;
-					*((unsigned char *) T_OPT_DATA(oh)) =
-					    *((unsigned char *) CMSG_DATA(cmsg));
+					*((unsigned char *) T_OPT_DATA(oh)) = *((unsigned char *) CMSG_DATA(cmsg));
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_PKTINFO:
-					printd(("%s: %p: processing option IP_PKTINFO\n", DRV_NAME,
-						ss));
-					printd(("%s: %p: building option T_IP_ADDR\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option IP_PKTINFO\n", DRV_NAME, ss));
+					printd(("%s: %p: building option T_IP_ADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(uint32_t);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
 					*((uint32_t *) T_OPT_DATA(oh)) =
-					    ((struct in_pktinfo *) CMSG_DATA(cmsg))->ipi_addr.
-					    s_addr;
+					    ((struct in_pktinfo *) CMSG_DATA(cmsg))->ipi_addr.s_addr;
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				}
@@ -4261,21 +4202,17 @@ ss_opts_build(ss_t * ss, struct msghdr *msg, unsigned char *op, size_t olen)
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_PPI;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) =
-				    *((unsigned int *) CMSG_DATA(cmsg));
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = *((unsigned int *) CMSG_DATA(cmsg));
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			case SCTP_DISPOSITION:
-				printd(("%s: %p: processing option SCTP_DISPOSITION\n", DRV_NAME,
-					ss));
-				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing option SCTP_DISPOSITION\n", DRV_NAME, ss));
+				printd(("%s: %p: building option T_SCTP_DISPOSITION\n", DRV_NAME, ss));
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 				oh->level = T_INET_SCTP;
 				oh->name = T_SCTP_DISPOSITION;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) =
-				    *((unsigned int *) CMSG_DATA(cmsg));
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = *((unsigned int *) CMSG_DATA(cmsg));
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			}
@@ -4325,27 +4262,27 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 				continue;
 			case T_ALLOPT:
 			case XTI_DEBUG:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.debug)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.debug)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.linger)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.linger)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.rcvbuf)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.rcvbuf)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.rcvlowat)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.rcvlowat)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.sndbuf)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.sndbuf)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.xti.sndlowat)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.xti.sndlowat)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -4359,31 +4296,31 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.options)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.options)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.tos)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.tos)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.ttl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.ttl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.reuseaddr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.reuseaddr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.dontroute)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.dontroute)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.broadcast)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.broadcast)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.ip.addr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.ip.addr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4401,7 +4338,7 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.udp.checksum)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.udp.checksum)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4419,56 +4356,56 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_TCP_NODELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.nodelay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.nodelay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_MAXSEG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.maxseg)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.maxseg)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPALIVE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.keepalive)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.keepalive)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_CORK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.cork)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.cork)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPIDLE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.keepidle)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.keepidle)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPINTVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.keepitvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.keepitvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPCNT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.keepcnt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.keepcnt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_SYNCNT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.syncnt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.syncnt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_LINGER2:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.linger2)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.linger2)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_DEFER_ACCEPT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.defer_accept)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.defer_accept)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_WINDOW_CLAMP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.window_clamp)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.window_clamp)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_INFO:
 					/* read only, can't get default */
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.info)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.info)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_QUICKACK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.tcp.quickack)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.tcp.quickack)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4487,170 +4424,170 @@ ss_size_default_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_SCTP_NODELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.nodelay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.nodelay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CORK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.cork)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.cork)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PPI:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.ppi)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.ppi)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SID:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.sid)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.sid)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SSN:
 					/* read only, can't get default */
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.ssn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.ssn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_TSN:
 					/* read only, can't get default */
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.tsn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.tsn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RECVOPT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.recvopt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.recvopt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_LIFE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.cookie_life)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.cookie_life)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SACK_DELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.sack_delay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.sack_delay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PATH_MAX_RETRANS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.path_max_retrans)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.path_max_retrans)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.assoc_max_retrans)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.assoc_max_retrans)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_INIT_RETRIES:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.max_init_retries)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.max_init_retries)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HEARTBEAT_ITVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.heartbeat_itvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.heartbeat_itvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_INITIAL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.rto_initial)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.rto_initial)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MIN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.rto_min)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.rto_min)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MAX:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.rto_max)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.rto_max)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_OSTREAMS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.ostreams)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.ostreams)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ISTREAMS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.istreams)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.istreams)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_INC:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.cookie_inc)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.cookie_inc)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_THROTTLE_ITVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.throttle_itvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.throttle_itvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAC_TYPE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.mac_type)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.mac_type)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CKSUM_TYPE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.cksum_type)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.cksum_type)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
 				case T_SCTP_ECN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.ecn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.ecn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 				case T_SCTP_ALI:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.ali)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.ali)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
 				case T_SCTP_ADD:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.add)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.add)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.set)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.set)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ADD_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.add_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.add_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEL_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.del_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.del_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.set_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.set_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_PR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.pr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.pr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_LIFETIME:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.lifetime)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.lifetime)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 				case T_SCTP_DISPOSITION:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.disposition)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.disposition)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_BURST:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.max_burst)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.max_burst)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HB:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.hb)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.hb)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.rto)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.rto)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAXSEG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.maxseg)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.maxseg)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_STATUS:
 					/* read-only, no default */
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.status)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.status)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEBUG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss_defaults.sctp.debug)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss_defaults.sctp.debug)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4702,27 +4639,27 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 				continue;
 			case T_ALLOPT:
 			case XTI_DEBUG:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.debug)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.debug)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.linger)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.linger)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.rcvbuf)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.rcvbuf)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.rcvlowat)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.rcvlowat)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.sndbuf)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.sndbuf)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				olen += T_SPACE(max(optlen, (int)sizeof(ss->options.xti.sndlowat)));
+				olen += T_SPACE(max(optlen, (int) sizeof(ss->options.xti.sndlowat)));
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -4736,31 +4673,31 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.options)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.options)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.tos)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.tos)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.ttl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.ttl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.reuseaddr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.reuseaddr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.dontroute)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.dontroute)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.broadcast)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.broadcast)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.ip.addr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.ip.addr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4778,7 +4715,7 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.udp.checksum)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.udp.checksum)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4796,55 +4733,55 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_TCP_NODELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.nodelay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.nodelay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_MAXSEG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.maxseg)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.maxseg)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPALIVE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.keepalive)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.keepalive)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_CORK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.cork)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.cork)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPIDLE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.keepidle)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.keepidle)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPINTVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.keepitvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.keepitvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPCNT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.keepcnt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.keepcnt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_SYNCNT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.syncnt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.syncnt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_LINGER2:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.linger2)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.linger2)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_DEFER_ACCEPT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.defer_accept)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.defer_accept)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_WINDOW_CLAMP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.window_clamp)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.window_clamp)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_INFO:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.info)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.info)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_QUICKACK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.tcp.quickack)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.tcp.quickack)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -4863,167 +4800,167 @@ ss_size_current_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_SCTP_NODELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.nodelay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.nodelay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CORK:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.cork)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.cork)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PPI:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.ppi)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.ppi)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SID:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.sid)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.sid)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SSN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.ssn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.ssn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_TSN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.tsn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.tsn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RECVOPT:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.recvopt)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.recvopt)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_LIFE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.cookie_life)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.cookie_life)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SACK_DELAY:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.sack_delay)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.sack_delay)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PATH_MAX_RETRANS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.path_max_retrans)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.path_max_retrans)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.assoc_max_retrans)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.assoc_max_retrans)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_INIT_RETRIES:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.max_init_retries)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.max_init_retries)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HEARTBEAT_ITVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.heartbeat_itvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.heartbeat_itvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_INITIAL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.rto_initial)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.rto_initial)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MIN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.rto_min)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.rto_min)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MAX:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.rto_max)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.rto_max)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_OSTREAMS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.ostreams)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.ostreams)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ISTREAMS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.istreams)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.istreams)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_INC:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.cookie_inc)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.cookie_inc)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_THROTTLE_ITVL:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.throttle_itvl)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.throttle_itvl)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAC_TYPE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.mac_type)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.mac_type)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CKSUM_TYPE:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.cksum_type)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.cksum_type)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
 				case T_SCTP_ECN:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.ecn)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.ecn)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 				case T_SCTP_ALI:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.ali)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.ali)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP || defined
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
 				case T_SCTP_ADD:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.add)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.add)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.set)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.set)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ADD_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.add_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.add_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEL_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.del_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.del_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET_IP:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.set_ip)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.set_ip)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_PR:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.pr)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.pr)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_LIFETIME:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.lifetime)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.lifetime)));
 					if (ih->name != T_ALLOPT)
 						continue;
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 				case T_SCTP_DISPOSITION:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.disposition)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.disposition)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_BURST:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.max_burst)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.max_burst)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HB:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.hb)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.hb)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.rto)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.rto)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAXSEG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.maxseg)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.maxseg)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_STATUS:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.status)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.status)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEBUG:
-					olen += T_SPACE(max(optlen, (int)sizeof(ss->options.sctp.debug)));
+					olen += T_SPACE(max(optlen, (int) sizeof(ss->options.sctp.debug)));
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -5076,8 +5013,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 			case T_ALLOPT:
 			case XTI_DEBUG:
 				/* can be any non-zero array of t_uscalar_t */
-				if (optlen && ((optlen % sizeof(t_uscalar_t)) != 0
-					|| optlen > 4 * sizeof(t_uscalar_t)))
+				if (optlen && ((optlen % sizeof(t_uscalar_t)) != 0 || optlen > 4 * sizeof(t_uscalar_t)))
 					goto einval;
 				olen += T_SPACE(optlen);
 				if (ih->name != T_ALLOPT)
@@ -5253,15 +5189,13 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_DEFER_ACCEPT:
-					if (optlen
-					    && optlen != sizeof(ss->options.tcp.defer_accept))
+					if (optlen && optlen != sizeof(ss->options.tcp.defer_accept))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_WINDOW_CLAMP:
-					if (optlen
-					    && optlen != sizeof(ss->options.tcp.window_clamp))
+					if (optlen && optlen != sizeof(ss->options.tcp.window_clamp))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5336,8 +5270,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_LIFE:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.cookie_life))
+					if (optlen && optlen != sizeof(ss->options.sctp.cookie_life))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5349,36 +5282,31 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PATH_MAX_RETRANS:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.path_max_retrans))
+					if (optlen && optlen != sizeof(ss->options.sctp.path_max_retrans))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ASSOC_MAX_RETRANS:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.assoc_max_retrans))
+					if (optlen && optlen != sizeof(ss->options.sctp.assoc_max_retrans))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_INIT_RETRIES:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.max_init_retries))
+					if (optlen && optlen != sizeof(ss->options.sctp.max_init_retries))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HEARTBEAT_ITVL:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.heartbeat_itvl))
+					if (optlen && optlen != sizeof(ss->options.sctp.heartbeat_itvl))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_INITIAL:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.rto_initial))
+					if (optlen && optlen != sizeof(ss->options.sctp.rto_initial))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5414,8 +5342,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_THROTTLE_ITVL:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.throttle_itvl))
+					if (optlen && optlen != sizeof(ss->options.sctp.throttle_itvl))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5499,8 +5426,7 @@ ss_size_check_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 				case T_SCTP_DISPOSITION:
-					if (optlen
-					    && optlen != sizeof(ss->options.sctp.disposition))
+					if (optlen && optlen != sizeof(ss->options.sctp.disposition))
 						goto einval;
 					olen += T_SPACE(optlen);
 					if (ih->name != T_ALLOPT)
@@ -5590,43 +5516,37 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 			case T_ALLOPT:
 			case XTI_DEBUG:
 				if (ih->name != T_ALLOPT
-				    && ((optlen % sizeof(t_uscalar_t)) != 0
-					|| optlen > 4 * sizeof(t_uscalar_t)))
+				    && ((optlen % sizeof(t_uscalar_t)) != 0 || optlen > 4 * sizeof(t_uscalar_t)))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.debug);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_LINGER:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(ss->options.xti.linger))
+				if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.xti.linger))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.linger);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVBUF:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(ss->options.xti.rcvbuf))
+				if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.xti.rcvbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.rcvbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_RCVLOWAT:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(ss->options.xti.rcvlowat))
+				if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.xti.rcvlowat))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.rcvlowat);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDBUF:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(ss->options.xti.sndbuf))
+				if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.xti.sndbuf))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.sndbuf);
 				if (ih->name != T_ALLOPT)
 					continue;
 			case XTI_SNDLOWAT:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(ss->options.xti.sndlowat))
+				if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.xti.sndlowat))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(ss->options.xti.sndlowat);
 				if (ih->name != T_ALLOPT)
@@ -5642,50 +5562,43 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_IP_OPTIONS:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.options))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.options))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.options);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TOS:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.tos))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.tos))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.tos);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_TTL:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.ttl))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.ttl))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.ttl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_REUSEADDR:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.reuseaddr))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.reuseaddr))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.reuseaddr);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_DONTROUTE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.dontroute))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.dontroute))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.dontroute);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_BROADCAST:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.broadcast))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.broadcast))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.broadcast);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_IP_ADDR:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.ip.addr))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.ip.addr))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.ip.addr);
 					if (ih->name != T_ALLOPT)
@@ -5705,8 +5618,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_UDP_CHECKSUM:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.udp.checksum))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.udp.checksum))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.udp.checksum);
 					if (ih->name != T_ALLOPT)
@@ -5726,78 +5638,67 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_TCP_NODELAY:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.nodelay))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.nodelay))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_MAXSEG:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.maxseg))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.maxseg))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.maxseg);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPALIVE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.keepalive))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.keepalive))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.keepalive);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_CORK:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.cork))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.cork))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPIDLE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.keepidle))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.keepidle))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.keepidle);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPINTVL:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.keepitvl))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.keepitvl))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.keepitvl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPCNT:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.keepcnt))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.keepcnt))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.keepcnt);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_SYNCNT:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.syncnt))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.syncnt))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.syncnt);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_LINGER2:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.linger2))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.linger2))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.linger2);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_DEFER_ACCEPT:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.defer_accept))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.defer_accept))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.defer_accept);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_WINDOW_CLAMP:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.window_clamp))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.window_clamp))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.window_clamp);
 					if (ih->name != T_ALLOPT)
@@ -5810,8 +5711,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_QUICKACK:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.tcp.quickack))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.tcp.quickack))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.tcp.quickack);
 					if (ih->name != T_ALLOPT)
@@ -5832,71 +5732,61 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					continue;
 				case T_ALLOPT:
 				case T_SCTP_NODELAY:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.nodelay))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.nodelay))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.nodelay);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CORK:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.cork))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.cork))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.cork);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PPI:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.ppi))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.ppi))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.ppi);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SID:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.sid))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.sid))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.sid);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SSN:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.ssn))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.ssn))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.ssn);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_TSN:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.tsn))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.tsn))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.tsn);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RECVOPT:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.recvopt))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.recvopt))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.recvopt);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_LIFE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.cookie_life))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.cookie_life))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.cookie_life);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SACK_DELAY:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.sack_delay))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.sack_delay))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.sack_delay);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_PATH_MAX_RETRANS:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.path_max_retrans))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.path_max_retrans))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.path_max_retrans);
 					if (ih->name != T_ALLOPT)
@@ -5909,86 +5799,74 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_INIT_RETRIES:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.max_init_retries))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.max_init_retries))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.max_init_retries);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HEARTBEAT_ITVL:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.heartbeat_itvl))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.heartbeat_itvl))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.heartbeat_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_INITIAL:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.rto_initial))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.rto_initial))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.rto_initial);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MIN:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.rto_min))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.rto_min))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.rto_min);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO_MAX:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.rto_max))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.rto_max))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.rto_max);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_OSTREAMS:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.ostreams))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.ostreams))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.ostreams);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ISTREAMS:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.istreams))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.istreams))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.istreams);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_COOKIE_INC:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.cookie_inc))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.cookie_inc))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.cookie_inc);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_THROTTLE_ITVL:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.throttle_itvl))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.throttle_itvl))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.throttle_itvl);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAC_TYPE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.mac_type))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.mac_type))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.mac_type);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_CKSUM_TYPE:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.cksum_type))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.cksum_type))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.cksum_type);
 					if (ih->name != T_ALLOPT)
 						continue;
 #if defined CONFIG_SCTP_ECN
 				case T_SCTP_ECN:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.ecn))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.ecn))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.ecn);
 					if (ih->name != T_ALLOPT)
@@ -5996,8 +5874,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ECN */
 #if defined CONFIG_SCTP_ADD_IP || defined CONFIG_SCTP_ADAPTATION_LAYER_INFO
 				case T_SCTP_ALI:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.ali))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.ali))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.ali);
 					if (ih->name != T_ALLOPT)
@@ -6006,36 +5883,31 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 				   CONFIG_SCTP_ADAPTATION_LAYER_INFO */
 #if defined CONFIG_SCTP_ADD_IP
 				case T_SCTP_ADD:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.add))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.add))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.add);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.set))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.set))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.set);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_ADD_IP:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.add_ip))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.add_ip))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.add_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEL_IP:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.del_ip))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.del_ip))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.del_ip);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_SET_IP:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.set_ip))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.set_ip))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.set_ip);
 					if (ih->name != T_ALLOPT)
@@ -6043,8 +5915,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_PR:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.pr))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.pr))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.pr);
 					if (ih->name != T_ALLOPT)
@@ -6052,8 +5923,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_PARTIAL_RELIABILITY */
 #if defined CONFIG_SCTP_LIFETIMES || defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_LIFETIME:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.lifetime))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.lifetime))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.lifetime);
 					if (ih->name != T_ALLOPT)
@@ -6061,36 +5931,31 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 #endif				/* defined CONFIG_SCTP_LIFETIMES || defined
 				   CONFIG_SCTP_PARTIAL_RELIABILITY */
 				case T_SCTP_DISPOSITION:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.disposition))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.disposition))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.disposition);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAX_BURST:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.max_burst))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.max_burst))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.max_burst);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_HB:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.hb))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.hb))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.hb);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_RTO:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.rto))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.rto))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.rto);
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_MAXSEG:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.maxseg))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.maxseg))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.maxseg);
 					if (ih->name != T_ALLOPT)
@@ -6101,8 +5966,7 @@ ss_size_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen)
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_SCTP_DEBUG:
-					if (ih->name != T_ALLOPT
-					    && optlen != sizeof(ss->options.sctp.debug))
+					if (ih->name != T_ALLOPT && optlen != sizeof(ss->options.sctp.debug))
 						goto einval;
 					olen += _T_SPACE_SIZEOF(ss->options.sctp.debug);
 					if (ih->name != T_ALLOPT)
@@ -6150,9 +6014,7 @@ ss_overall_result(ulong *overall, ulong result)
 			*overall = T_PARTSUCCESS;
 		break;
 	case T_SUCCESS:
-		if (!
-		    (*overall &
-		     (T_NOTSUPPORT | T_READONLY | T_FAILURE | T_PARTSUCCESS | T_SUCCESS)))
+		if (!(*overall & (T_NOTSUPPORT | T_READONLY | T_FAILURE | T_PARTSUCCESS | T_SUCCESS)))
 			*overall = T_SUCCESS;
 		break;
 	}
@@ -6180,8 +6042,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		ip = (unsigned char *) &all;
 		ilen = sizeof(all);
 	}
-	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0);
-	     ih && oh;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0); ih && oh;
 	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0), oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)) {
 		/* don't need to do this, it was done when we sized options */
 		if (ih->len < sizeof(*ih))
@@ -6198,24 +6059,21 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME, ss));
 				oh->len = sizeof(*oh);
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME, ss));
 			case XTI_DEBUG:
 				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->len = _T_LENGTH_SIZEOF(ss_defaults.xti.debug);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->status = T_SUCCESS;
-				bcopy(ss_defaults.xti.debug, T_OPT_DATA(oh),
-				      sizeof(ss_defaults.xti.debug));
+				bcopy(ss_defaults.xti.debug, T_OPT_DATA(oh), sizeof(ss_defaults.xti.debug));
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6284,20 +6142,17 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) np;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_IP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_IP options\n", DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
-					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_OPTIONS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.options);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -6310,8 +6165,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				}
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.tos);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -6322,8 +6176,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.ttl);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -6334,47 +6187,40 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_REUSEADDR:
-					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_REUSEADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.reuseaddr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss_defaults.ip.reuseaddr;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss_defaults.ip.reuseaddr;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_DONTROUTE:
-					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_DONTROUTE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.dontroute);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss_defaults.ip.dontroute;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss_defaults.ip.dontroute;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_BROADCAST:
-					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_BROADCAST\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.broadcast);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->status = T_SUCCESS;
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss_defaults.ip.broadcast;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss_defaults.ip.broadcast;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.ip.addr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
@@ -6395,25 +6241,21 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_UDP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_UDP options\n", DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
-					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_UDP_CHECKSUM\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.udp.checksum);
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.udp.checksum;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.udp.checksum;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -6431,16 +6273,14 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) tp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_TCP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_TCP options\n", DRV_NAME, ss));
 				case T_TCP_NODELAY:
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.tcp.nodelay);
 					oh->level = T_INET_TCP;
@@ -6466,8 +6306,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPALIVE;
 					oh->status = T_SUCCESS;
-					*((struct t_kpalive *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.keepalive;
+					*((struct t_kpalive *) T_OPT_DATA(oh)) = ss_defaults.tcp.keepalive;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_CORK:
@@ -6485,8 +6324,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPIDLE;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.keepidle;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.tcp.keepidle;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6496,8 +6334,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPINTVL;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.keepitvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.tcp.keepitvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6537,8 +6374,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_DEFER_ACCEPT;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.defer_accept;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.tcp.defer_accept;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6548,8 +6384,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_WINDOW_CLAMP;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.window_clamp;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.tcp.window_clamp;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6569,8 +6404,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_QUICKACK;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.tcp.quickack;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.tcp.quickack;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6591,32 +6425,27 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) sp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_SCTP options\n", DRV_NAME, ss));
 				case T_SCTP_NODELAY:
-					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_NODELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.nodelay);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.nodelay;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.nodelay;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAXSEG:
-					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.maxseg);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
@@ -6627,8 +6456,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cork);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
@@ -6639,8 +6467,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.ppi);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
@@ -6651,8 +6478,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.sid);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
@@ -6663,8 +6489,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
@@ -6674,8 +6499,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
@@ -6685,40 +6509,34 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RECVOPT:
-					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.recvopt);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.recvopt;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.recvopt;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cookie_life);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.cookie_life;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.cookie_life;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SACK_DELAY:
-					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.sack_delay);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.sack_delay;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.sack_delay;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6729,8 +6547,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.path_max_retrans;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.path_max_retrans;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6741,8 +6558,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.assoc_max_retrans;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.assoc_max_retrans;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -6753,171 +6569,145 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.max_init_retries;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.max_init_retries;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
-					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.heartbeat_itvl);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.heartbeat_itvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.heartbeat_itvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
-					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_initial);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.rto_initial;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.rto_initial;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MIN:
-					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_min);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.rto_min;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.rto_min;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MAX:
-					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto_max);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.rto_max;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.rto_max;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_OSTREAMS:
-					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.ostreams);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.ostreams;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.ostreams;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ISTREAMS:
-					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.istreams);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.istreams;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.istreams;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_INC:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cookie_inc);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.cookie_inc;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.cookie_inc;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
-					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.throttle_itvl);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.throttle_itvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.throttle_itvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAC_TYPE:
-					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.mac_type);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.mac_type;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.mac_type;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CKSUM_TYPE:
-					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.cksum_type);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CKSUM_TYPE;
 					oh->status = T_SUCCESS;
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.cksum_type;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss_defaults.sctp.cksum_type;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.hb);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->status = T_SUCCESS;
-					*((struct t_sctp_hb *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.hb;
+					*((struct t_sctp_hb *) T_OPT_DATA(oh)) = ss_defaults.sctp.hb;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.rto);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->status = T_SUCCESS;
-					*((struct t_sctp_rto *) T_OPT_DATA(oh)) =
-					    ss_defaults.sctp.rto;
+					*((struct t_sctp_rto *) T_OPT_DATA(oh)) = ss_defaults.sctp.rto;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_STATUS:
-					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_STATUS\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
@@ -6927,8 +6717,7 @@ ss_build_default_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_DEBUG:
-					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_DEBUG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss_defaults.sctp.debug);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
@@ -6980,8 +6769,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		ip = (unsigned char *) &all;
 		ilen = sizeof(all);
 	}
-	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0);
-	     ih && oh;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0); ih && oh;
 	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0), oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)) {
 		/* don't need to do this, it was done when we sized options */
 		if (ih->len < sizeof(*ih))
@@ -6998,24 +6786,21 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME, ss));
 				oh->len = sizeof(*oh);
 				oh->level = ih->level;
 				oh->name = ih->name;
 				oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME, ss));
 			case XTI_DEBUG:
 				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->len = _T_LENGTH_SIZEOF(ss->options.xti.debug);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_DEBUG;
 				oh->status = T_SUCCESS;
-				bcopy(ss->options.xti.debug, T_OPT_DATA(oh),
-				      4 * sizeof(t_uscalar_t));
+				bcopy(ss->options.xti.debug, T_OPT_DATA(oh), 4 * sizeof(t_uscalar_t));
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -7089,20 +6874,17 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) np;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_IP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_IP options\n", DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
-					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_OPTIONS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.options);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -7115,8 +6897,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 						goto efault;
 				}
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.tos);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -7128,8 +6909,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.ttl);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -7141,50 +6921,43 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_REUSEADDR:
-					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_REUSEADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.reuseaddr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss->options.ip.reuseaddr;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.reuseaddr;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_DONTROUTE:
-					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_DONTROUTE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.dontroute);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss->options.ip.dontroute;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.dontroute;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_BROADCAST:
-					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_BROADCAST\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.broadcast);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((unsigned int *) T_OPT_DATA(oh)) =
-					    ss->options.ip.broadcast;
+					*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.broadcast;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.ip.addr);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
@@ -7206,26 +6979,22 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_UDP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_UDP options\n", DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
-					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_UDP_CHECKSUM\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.udp.checksum);
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.udp.checksum;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.udp.checksum;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -7243,8 +7012,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) tp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -7279,8 +7047,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPALIVE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((struct t_kpalive *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.keepalive;
+					*((struct t_kpalive *) T_OPT_DATA(oh)) = ss->options.tcp.keepalive;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_CORK:
@@ -7298,8 +7065,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPIDLE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.keepidle;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.keepidle;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPINTVL:
@@ -7308,8 +7074,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_KEEPINTVL;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.keepitvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.keepitvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_KEEPCNT:
@@ -7345,8 +7110,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_DEFER_ACCEPT;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.defer_accept;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.defer_accept;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_WINDOW_CLAMP:
@@ -7355,8 +7119,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_WINDOW_CLAMP;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.window_clamp;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.window_clamp;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_INFO:
@@ -7365,8 +7128,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_INFO;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((struct t_tcp_info *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.info;
+					*((struct t_tcp_info *) T_OPT_DATA(oh)) = ss->options.tcp.info;
 					if (ih->name != T_ALLOPT)
 						continue;
 				case T_TCP_QUICKACK:
@@ -7375,8 +7137,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_TCP_QUICKACK;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.tcp.quickack;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.quickack;
 					if (ih->name != T_ALLOPT)
 						continue;
 				}
@@ -7395,33 +7156,28 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 				(void) sp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh);
 					oh->level = ih->level;
 					oh->name = ih->name;
 					oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_SCTP options\n", DRV_NAME, ss));
 				case T_SCTP_NODELAY:
-					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_NODELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.nodelay);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.nodelay;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.nodelay;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAXSEG:
-					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.maxseg);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
@@ -7433,8 +7189,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cork);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
@@ -7446,8 +7201,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ppi);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
@@ -7459,8 +7213,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sid);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
@@ -7472,8 +7225,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ssn);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
@@ -7485,8 +7237,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.tsn);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
@@ -7498,43 +7249,37 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RECVOPT:
-					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.recvopt);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.recvopt;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.recvopt;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_life);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.cookie_life;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.cookie_life;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SACK_DELAY:
-					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.sack_delay);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.sack_delay;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.sack_delay;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -7546,8 +7291,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.path_max_retrans;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.path_max_retrans;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -7559,8 +7303,7 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.assoc_max_retrans;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.assoc_max_retrans;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -7572,198 +7315,170 @@ ss_build_current_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned cha
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.max_init_retries;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.max_init_retries;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
-					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.heartbeat_itvl);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.heartbeat_itvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.heartbeat_itvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
-					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_initial);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.rto_initial;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.rto_initial;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MIN:
-					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_min);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.rto_min;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.rto_min;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MAX:
-					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto_max);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.rto_max;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.rto_max;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_OSTREAMS:
-					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.ostreams);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.ostreams;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.ostreams;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ISTREAMS:
-					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.istreams);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.istreams;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.istreams;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_INC:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cookie_inc);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.cookie_inc;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.cookie_inc;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
-					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.throttle_itvl);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.throttle_itvl;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.throttle_itvl;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAC_TYPE:
-					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.mac_type);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.mac_type;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.mac_type;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CKSUM_TYPE:
-					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.cksum_type);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CKSUM_TYPE;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((t_uscalar_t *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.cksum_type;
+					*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.cksum_type;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.hb);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((struct t_sctp_hb *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.hb;
+					*((struct t_sctp_hb *) T_OPT_DATA(oh)) = ss->options.sctp.hb;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.rto);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
-					*((struct t_sctp_rto *) T_OPT_DATA(oh)) =
-					    ss->options.sctp.rto;
+					*((struct t_sctp_rto *) T_OPT_DATA(oh)) = ss->options.sctp.rto;
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_STATUS:
-					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_STATUS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.status);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
 					oh->status = T_SUCCESS;
 					/* refresh current value */
 					bcopy(&ss->options.sctp.status, T_OPT_DATA(oh),
-					      sizeof(struct t_sctp_status) +
-					      sizeof(struct t_sctp_dest_status));
+					      sizeof(struct t_sctp_status) + sizeof(struct t_sctp_dest_status));
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_DEBUG:
-					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_DEBUG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(ss->options.sctp.debug);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
@@ -7816,8 +7531,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 		ip = (unsigned char *) &all;
 		ilen = sizeof(all);
 	}
-	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0);
-	     ih && oh;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0); ih && oh;
 	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0), oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)) {
 		/* don't need to do this, it was done when we sized options */
 		if (ih->len < sizeof(*ih))
@@ -7834,8 +7548,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME, ss));
 				oh->len = ih->len;
 				oh->level = ih->level;
 				oh->name = ih->name;
@@ -7843,8 +7556,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME, ss));
 			case XTI_DEBUG:
 				printd(("%s: %p: processing option XTI_DEBUG\n", DRV_NAME, ss));
 				oh->len = ih->len;
@@ -7874,23 +7586,20 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (optlen != sizeof(*valp))
 						goto einval;
 					if ((valp->l_onoff != T_NO && valp->l_onoff != T_YES)
-					    || (valp->l_linger == T_UNSPEC
-						&& valp->l_onoff != T_NO))
+					    || (valp->l_linger == T_UNSPEC && valp->l_onoff != T_NO))
 						goto einval;
 					if (valp->l_linger == T_UNSPEC) {
 						valp->l_linger = ss_defaults.xti.linger.l_linger;
 					}
 					if (valp->l_linger == T_INFINITE) {
 						valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 					if (valp->l_linger < 0)
 						goto einval;
 					if (valp->l_linger > MAX_SCHEDULE_TIMEOUT / HZ) {
 						valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
 				if (ih->name != T_ALLOPT)
@@ -7910,12 +7619,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto einval;
 					if (*valp > sysctl_rmem_max) {
 						*valp = sysctl_rmem_max;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_RCVBUF / 2) {
 						*valp = SOCK_MIN_RCVBUF / 2;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
 				if (ih->name != T_ALLOPT)
@@ -7935,12 +7642,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto einval;
 					if (*valp > INT_MAX) {
 						*valp = INT_MAX;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp <= 0) {
 						*valp = 1;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 				}
 				if (ih->name != T_ALLOPT)
@@ -7960,12 +7665,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto einval;
 					if (*valp > sysctl_rmem_max) {
 						*valp = sysctl_rmem_max;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp < SOCK_MIN_SNDBUF / 2) {
 						*valp = SOCK_MIN_SNDBUF / 2;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 					break;
 				}
@@ -7986,12 +7689,10 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						goto einval;
 					if (*valp > 1) {
 						*valp = 1;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					} else if (*valp <= 0) {
 						*valp = 1;
-						oh->status =
-						    ss_overall_result(&overall, T_PARTSUCCESS);
+						oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 					}
 					break;
 				}
@@ -8008,8 +7709,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				(void) np;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -8017,11 +7717,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_IP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_IP options\n", DRV_NAME, ss));
 				case T_IP_OPTIONS:
-					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_OPTIONS\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -8033,8 +7731,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TOS:
-					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -8050,17 +7747,14 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						if (*valp != SET_TOS(prec, type))
 							goto einval;
 						if (prec >= T_CRITIC_ECP && !capable(CAP_NET_ADMIN))
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_NOTSUPPORT);
+							oh->status = ss_overall_result(&overall, T_NOTSUPPORT);
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_TTL:
-					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -8072,22 +7766,16 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp == 0) {
 							*valp = sysctl_ip_default_ttl;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 #if 0
 						if (*valp > 255) {
 							*valp = 255;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 #endif
 					}
@@ -8096,8 +7784,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_REUSEADDR:
-					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_REUSEADDR\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
@@ -8115,8 +7802,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_DONTROUTE:
-					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_DONTROUTE\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
@@ -8134,8 +7820,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_BROADCAST:
-					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_BROADCAST\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
@@ -8153,8 +7838,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_IP_ADDR:
-					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
@@ -8175,8 +7859,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -8184,11 +7867,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_UDP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_UDP options\n", DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
-					printd(("%s: %p: processing option T_UDP_CHECKSUM\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_UDP_CHECKSUM\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
@@ -8218,8 +7899,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				(void) tp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -8227,8 +7907,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_TCP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_TCP options\n", DRV_NAME, ss));
 				case T_TCP_NODELAY:
 					oh->len = ih->len;
 					oh->level = T_INET_TCP;
@@ -8258,15 +7937,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 8) {
 							*valp = 8;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_WINDOW) {
 							*valp = MAX_TCP_WINDOW;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8280,31 +7955,22 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						struct t_kpalive *valp =
-						    (typeof(valp)) T_OPT_DATA(oh);
+						struct t_kpalive *valp = (typeof(valp)) T_OPT_DATA(oh);
 						if (optlen != sizeof(*valp))
 							goto einval;
-						if (valp->kp_onoff != T_YES
-						    && valp->kp_onoff != T_NO)
+						if (valp->kp_onoff != T_YES && valp->kp_onoff != T_NO)
 							goto einval;
 						if (valp->kp_timeout == T_UNSPEC)
-							valp->kp_timeout =
-							    ss_defaults.tcp.keepalive.kp_timeout;
+							valp->kp_timeout = ss_defaults.tcp.keepalive.kp_timeout;
 						if (valp->kp_timeout < 0)
 							goto einval;
-						if (valp->kp_timeout >
-						    MAX_SCHEDULE_TIMEOUT / 60 / HZ) {
-							valp->kp_timeout =
-							    MAX_SCHEDULE_TIMEOUT / 60 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+						if (valp->kp_timeout > MAX_SCHEDULE_TIMEOUT / 60 / HZ) {
+							valp->kp_timeout = MAX_SCHEDULE_TIMEOUT / 60 / HZ;
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (valp->kp_onoff == T_YES && valp->kp_timeout < 1) {
 							valp->kp_timeout = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8336,15 +8002,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_KEEPIDLE) {
 							*valp = MAX_TCP_KEEPIDLE;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8361,15 +8023,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_KEEPINTVL) {
 							*valp = MAX_TCP_KEEPINTVL;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8386,15 +8044,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_KEEPCNT) {
 							*valp = MAX_TCP_KEEPCNT;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8411,15 +8065,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_SYNCNT) {
 							*valp = MAX_TCP_SYNCNT;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8451,25 +8101,17 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 						t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 						if (optlen != sizeof(*valp))
 							goto einval;
-						if (*valp == T_INFINITE
-						    || *valp > ((TCP_TIMEOUT_INIT / HZ) << 31)) {
+						if (*valp == T_INFINITE || *valp > ((TCP_TIMEOUT_INIT / HZ) << 31)) {
 							*valp = (TCP_TIMEOUT_INIT / HZ) << 31;
 						} else if (*valp != 0) {
 							int count;
 							for (count = 0;
-							     count < 32
-							     && *valp >
-							     ((TCP_TIMEOUT_INIT / HZ) << count);
+							     count < 32 && *valp > ((TCP_TIMEOUT_INIT / HZ) << count);
 							     count++) ;
 							count++;
-							if (*valp !=
-							    ((TCP_TIMEOUT_INIT / HZ) << count)) {
-								*valp =
-								    (TCP_TIMEOUT_INIT /
-								     HZ) << count;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+							if (*valp != ((TCP_TIMEOUT_INIT / HZ) << count)) {
+								*valp = (TCP_TIMEOUT_INIT / HZ) << count;
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 						}
 					}
@@ -8487,9 +8129,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < SOCK_MIN_RCVBUF / 2) {
 							*valp = SOCK_MIN_RCVBUF / 2;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8534,8 +8174,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 				(void) sp;
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -8543,11 +8182,9 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_SCTP options\n", DRV_NAME, ss));
 				case T_SCTP_NODELAY:
-					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_NODELAY\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
@@ -8565,8 +8202,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAXSEG:
-					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
@@ -8578,15 +8214,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > MAX_TCP_WINDOW) {
 							*valp = MAX_TCP_WINDOW;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8594,8 +8226,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CORK:
-					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
@@ -8613,8 +8244,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_PPI:
-					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
@@ -8630,8 +8260,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SID:
-					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
@@ -8649,8 +8278,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SSN:
-					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
@@ -8661,8 +8289,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_TSN:
-					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
@@ -8673,8 +8300,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RECVOPT:
-					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
@@ -8692,8 +8318,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_LIFE:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
@@ -8705,21 +8330,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8727,8 +8346,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_SACK_DELAY:
-					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
@@ -8740,21 +8358,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > 500) {
 							*valp = 500;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8810,8 +8422,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HEARTBEAT_ITVL:
-					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
@@ -8827,8 +8438,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_INITIAL:
-					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
@@ -8840,21 +8450,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8862,8 +8466,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MIN:
-					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
@@ -8875,21 +8478,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8897,8 +8494,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO_MAX:
-					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
@@ -8910,21 +8506,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8932,8 +8522,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_OSTREAMS:
-					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
@@ -8945,15 +8534,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > 0x00010000) {
 							*valp = 0x00010000;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8961,8 +8546,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_ISTREAMS:
-					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
@@ -8974,15 +8558,11 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp > 0x00010000) {
 							*valp = 0x00010000;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -8990,8 +8570,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_COOKIE_INC:
-					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
@@ -9003,21 +8582,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -9025,8 +8598,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_THROTTLE_ITVL:
-					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
@@ -9038,21 +8610,15 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (*valp < 1000 / HZ) {
 							*valp = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp < 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (*valp / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
 							*valp = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -9060,8 +8626,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_MAC_TYPE:
-					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
@@ -9077,8 +8642,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_CKSUM_TYPE:
-					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CKSUM_TYPE;
@@ -9094,38 +8658,29 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_HB:
-					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						struct t_sctp_hb *valp =
-						    (typeof(valp)) T_OPT_DATA(oh);
+						struct t_sctp_hb *valp = (typeof(valp)) T_OPT_DATA(oh);
 						if (optlen != sizeof(*valp))
 							goto einval;
-						if (valp->hb_onoff != T_YES
-						    && valp->hb_onoff != T_NO)
+						if (valp->hb_onoff != T_YES && valp->hb_onoff != T_NO)
 							goto einval;
 						if (valp->hb_itvl == T_UNSPEC)
 							valp->hb_itvl = ss_defaults.sctp.hb.hb_itvl;
 						if (valp->hb_itvl < 0)
 							goto einval;
-						if (valp->hb_itvl / HZ >
-						    MAX_SCHEDULE_TIMEOUT / 1000) {
-							valp->hb_itvl =
-							    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+						if (valp->hb_itvl / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
+							valp->hb_itvl = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (valp->hb_onoff == T_YES && valp->hb_itvl < 1) {
 							valp->hb_itvl = 1;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -9133,16 +8688,14 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_RTO:
-					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
-						ss));
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
 					oh->status = T_SUCCESS;
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					if (optlen) {
-						struct t_sctp_rto *valp =
-						    (typeof(valp)) T_OPT_DATA(oh);
+						struct t_sctp_rto *valp = (typeof(valp)) T_OPT_DATA(oh);
 						if (optlen != sizeof(*valp))
 							goto einval;
 						if (valp->rto_initial < valp->rto_min
@@ -9150,45 +8703,27 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 							goto einval;
 						if (valp->rto_initial < 1000 / HZ) {
 							valp->rto_initial = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (valp->rto_min < 1000 / HZ) {
 							valp->rto_min = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (valp->rto_max < 1000 / HZ) {
 							valp->rto_max = 1000 / HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
-						if (valp->rto_initial / HZ >
-						    MAX_SCHEDULE_TIMEOUT / 1000) {
-							valp->rto_initial =
-							    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+						if (valp->rto_initial / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
+							valp->rto_initial = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
-						if (valp->rto_min / HZ >
-						    MAX_SCHEDULE_TIMEOUT / 1000) {
-							valp->rto_min =
-							    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+						if (valp->rto_min / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
+							valp->rto_min = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
-						if (valp->rto_max / HZ >
-						    MAX_SCHEDULE_TIMEOUT / 1000) {
-							valp->rto_max =
-							    MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
-							oh->status =
-							    ss_overall_result(&overall,
-									      T_PARTSUCCESS);
+						if (valp->rto_max / HZ > MAX_SCHEDULE_TIMEOUT / 1000) {
+							valp->rto_max = MAX_SCHEDULE_TIMEOUT / 1000 * HZ;
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					if (ih->name != T_ALLOPT)
@@ -9196,8 +8731,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_STATUS:
-					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_STATUS\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
@@ -9208,8 +8742,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
 					if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
 						goto efault;
 				case T_SCTP_DEBUG:
-					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_SCTP_DEBUG\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
@@ -9251,8 +8784,7 @@ ss_build_check_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char 
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
 STATIC long
-ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char *op,
-			   size_t *olen)
+ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen)
 {
 	long overall = T_SUCCESS;
 	struct t_opthdr *ih, *oh, all;
@@ -9267,8 +8799,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 		ip = (unsigned char *) &all;
 		ilen = sizeof(all);
 	}
-	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0);
-	     ih && oh;
+	for (ih = _T_OPT_FIRSTHDR_OFS(ip, ilen, 0), oh = _T_OPT_FIRSTHDR_OFS(op, *olen, 0); ih && oh;
 	     ih = _T_OPT_NEXTHDR_OFS(ip, ilen, ih, 0), oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)) {
 		/* don't need to do this, it was done when we sized options */
 		if (ih->len < sizeof(*ih))
@@ -9285,8 +8816,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 		case XTI_GENERIC:
 			switch (ih->name) {
 			default:
-				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing option UNKNOWN XTI_GENERIC\n", DRV_NAME, ss));
 				oh->len = ih->len;
 				oh->level = ih->level;
 				oh->name = ih->name;
@@ -9294,8 +8824,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				continue;
 			case T_ALLOPT:
-				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME,
-					ss));
+				printd(("%s: %p: processing all XTI_GENERIC options\n", DRV_NAME, ss));
 			case XTI_DEBUG:
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
@@ -9331,8 +8860,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			{
 				struct t_linger *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option XTI_LINGER\n", DRV_NAME, ss));
-				if (optlen != sizeof(*valp))
-					goto einval;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_LINGER;
@@ -9346,23 +8873,20 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if ((valp->l_onoff != T_NO && valp->l_onoff != T_YES)
-						    || (valp->l_linger == T_UNSPEC
-							&& valp->l_onoff != T_NO))
+						    || (valp->l_linger == T_UNSPEC && valp->l_onoff != T_NO))
 							goto einval;
 						if (valp->l_linger == T_UNSPEC) {
 							valp->l_linger = ss_defaults.xti.linger.l_linger;
 						}
 						if (valp->l_linger == T_INFINITE) {
 							valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 						if (valp->l_linger < 0)
 							goto einval;
 						if (valp->l_linger > MAX_SCHEDULE_TIMEOUT / HZ) {
 							valp->l_linger = MAX_SCHEDULE_TIMEOUT / HZ;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					ss->options.xti.linger = *valp;
@@ -9382,8 +8906,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option XTI_RECVBUF\n", DRV_NAME, ss));
-				if (optlen != sizeof(*valp))
-					goto einval;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
@@ -9398,12 +8920,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > sysctl_rmem_max) {
 							*valp = sysctl_rmem_max;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						} else if (*valp < SOCK_MIN_RCVBUF / 2) {
 							*valp = SOCK_MIN_RCVBUF / 2;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					ss->options.xti.rcvbuf = *valp;
@@ -9418,8 +8938,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option XTI_RCVLOWAT\n", DRV_NAME, ss));
-				if (optlen != sizeof(*valp))
-					goto einval;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVLOWAT;
@@ -9434,12 +8952,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > INT_MAX) {
 							*valp = INT_MAX;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						} else if (*valp <= 0) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					ss->options.xti.rcvlowat = *valp;
@@ -9454,8 +8970,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option XTI_SNDBUF\n", DRV_NAME, ss));
-				if (optlen != sizeof(*valp))
-					goto einval;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
@@ -9470,12 +8984,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > sysctl_rmem_max) {
 							*valp = sysctl_rmem_max;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						} else if (*valp < SOCK_MIN_SNDBUF / 2) {
 							*valp = SOCK_MIN_SNDBUF / 2;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					ss->options.xti.sndbuf = *valp;
@@ -9490,8 +9002,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			{
 				t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 				printd(("%s: %p: processing option XTI_SNDLOWAT\n", DRV_NAME, ss));
-				if (optlen != sizeof(*valp))
-					goto einval;
 				oh->len = _T_LENGTH_SIZEOF(*valp);
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
@@ -9506,12 +9016,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > 1) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						} else if (*valp <= 0) {
 							*valp = 1;
-							oh->status =
-							    ss_overall_result(&overall, T_PARTSUCCESS);
+							oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 						}
 					}
 					ss->options.xti.sndlowat = *valp;
@@ -9529,8 +9037,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				struct inet_opt *np = inet_sk(sk);
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_IP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -9538,12 +9045,10 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_IP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_IP options\n", DRV_NAME, ss));
 				case T_IP_OPTIONS:
 				{
-					printd(("%s: %p: processing option T_IP_OPTIONS\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option T_IP_OPTIONS\n", DRV_NAME, ss));
 					oh->len = sizeof(*oh) + 40;
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -9559,8 +9064,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_IP_TOS\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TOS;
@@ -9576,15 +9079,12 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							{
 								unsigned char prec = (*valp >> 5) & 0x7;
 								unsigned char type =
-								    *valp & (T_LDELAY | T_HITHRPT | T_HIREL
-									     | T_LOCOST);
+								    *valp & (T_LDELAY | T_HITHRPT | T_HIREL | T_LOCOST);
 								if (*valp != SET_TOS(prec, type))
 									goto einval;
-								if (prec >= T_CRITIC_ECP
-								    && !capable(CAP_NET_ADMIN)) {
+								if (prec >= T_CRITIC_ECP && !capable(CAP_NET_ADMIN)) {
 									oh->status =
-									    ss_overall_result(&overall,
-											      T_NOTSUPPORT);
+									    ss_overall_result(&overall, T_NOTSUPPORT);
 									break;
 								}
 							}
@@ -9604,10 +9104,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_TTL:
 				{
 					unsigned char *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_IP_TTL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_TTL;
@@ -9622,22 +9119,16 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							*valp = *((typeof(valp)) T_OPT_DATA(ih));
 							if (*valp == 0) {
 								*valp = sysctl_ip_default_ttl;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 							if (*valp < 1) {
 								*valp = 1;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 #if 0
 							if (*valp > 255) {
 								*valp = 255;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 #endif
 						}
@@ -9656,10 +9147,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_REUSEADDR:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_REUSEADDR\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_IP_REUSEADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_REUSEADDR;
@@ -9686,10 +9174,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_DONTROUTE:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_DONTROUTE\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_IP_DONTROUTE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_DONTROUTE;
@@ -9716,10 +9201,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_BROADCAST:
 				{
 					unsigned int *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_BROADCAST\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_IP_BROADCAST\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_BROADCAST;
@@ -9749,10 +9231,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_IP_ADDR:
 				{
 					uint32_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_IP_ADDR\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_ADDR;
@@ -9785,8 +9264,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 			if (ss->p.prot.family == PF_INET && ss->p.prot.protocol == T_INET_UDP) {
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_UDP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -9794,14 +9272,11 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_UDP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_UDP options\n", DRV_NAME, ss));
 				case T_UDP_CHECKSUM:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_UDP_CHECKSUM\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_UDP;
 					oh->name = T_UDP_CHECKSUM;
@@ -9818,8 +9293,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 								goto einval;
 						}
 						ss->options.udp.checksum = *valp;
-						sk->sk_no_check =
-						    (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
+						sk->sk_no_check = (*valp == T_YES) ? UDP_CSUM_DEFAULT : UDP_CSUM_NOXMIT;
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9838,8 +9312,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				struct tcp_opt *tp = tcp_sk(sk);
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_TCP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -9851,8 +9324,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_NODELAY\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_NODELAY;
@@ -9881,8 +9352,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_MAXSEG\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_MAXSEG;
@@ -9897,15 +9366,11 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							*valp = *((typeof(valp)) T_OPT_DATA(ih));
 							if (*valp < 8) {
 								*valp = 8;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 							if (*valp > MAX_TCP_WINDOW) {
 								*valp = MAX_TCP_WINDOW;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 						}
 						ss->options.tcp.maxseg = *valp;
@@ -9920,8 +9385,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					struct t_kpalive *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_KEEPALIVE\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPALIVE;
@@ -9934,28 +9397,20 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 							*valp = ss_defaults.tcp.keepalive;
 						} else {
 							*valp = *((typeof(valp)) T_OPT_DATA(ih));
-							if (valp->kp_onoff != T_YES
-							    && valp->kp_onoff != T_NO)
+							if (valp->kp_onoff != T_YES && valp->kp_onoff != T_NO)
 								goto einval;
 							if (valp->kp_timeout == T_UNSPEC) {
-								valp->kp_timeout =
-								    ss_defaults.tcp.keepalive.kp_timeout;
+								valp->kp_timeout = ss_defaults.tcp.keepalive.kp_timeout;
 							}
 							if (valp->kp_timeout < 0)
 								goto einval;
-							if (valp->kp_timeout >
-							    MAX_SCHEDULE_TIMEOUT / 60 / HZ) {
-								valp->kp_timeout =
-								    MAX_SCHEDULE_TIMEOUT / 60 / HZ;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+							if (valp->kp_timeout > MAX_SCHEDULE_TIMEOUT / 60 / HZ) {
+								valp->kp_timeout = MAX_SCHEDULE_TIMEOUT / 60 / HZ;
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 							if (valp->kp_onoff == T_YES && valp->kp_timeout < 1) {
 								valp->kp_timeout = 1;
-								oh->status =
-								    ss_overall_result(&overall,
-										      T_PARTSUCCESS);
+								oh->status = ss_overall_result(&overall, T_PARTSUCCESS);
 							}
 						}
 						ss->options.tcp.keepalive = *valp;
@@ -9978,8 +9433,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_CORK\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_CORK;
@@ -10006,8 +9459,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_KEEPIDLE\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPIDLE;
@@ -10034,8 +9485,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_KEEPINTVL\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPINTVL;
@@ -10062,8 +9511,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_KEEPCNT\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_KEEPCNT;
@@ -10090,8 +9537,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_SYNCNT\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_SYNCNT;
@@ -10118,8 +9563,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_LINGER2\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_LINGER2;
@@ -10146,8 +9589,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_DEFER_ACCEPT\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_DEFER_ACCEPT;
@@ -10174,8 +9615,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_WINDOW_CLAMP\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_WINDOW_CLAMP;
@@ -10202,8 +9641,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					struct t_tcp_info *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_INFO\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_INFO;
@@ -10219,8 +9656,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_TCP_QUICKACK\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_TCP;
 					oh->name = T_TCP_QUICKACK;
@@ -10258,8 +9693,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				struct sctp_opt *sp = sctp_sk(sk);
 				switch (ih->name) {
 				default:
-					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing option UNKNOWN T_INET_SCTP\n", DRV_NAME, ss));
 					oh->len = ih->len;
 					oh->level = ih->level;
 					oh->name = ih->name;
@@ -10267,15 +9701,11 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 					bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 					continue;
 				case T_ALLOPT:
-					printd(("%s: %p: processing all T_INET_SCTP options\n",
-						DRV_NAME, ss));
+					printd(("%s: %p: processing all T_INET_SCTP options\n", DRV_NAME, ss));
 				case T_SCTP_NODELAY:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_NODELAY\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_NODELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_NODELAY;
@@ -10302,10 +9732,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_MAXSEG:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_MAXSEG\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_MAXSEG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAXSEG;
@@ -10331,10 +9758,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_CORK:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_CORK\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CORK;
@@ -10360,10 +9784,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_PPI:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_PPI\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PPI;
@@ -10389,10 +9810,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_SID:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_SID\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SID;
@@ -10418,10 +9836,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_SSN:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_SSN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SSN;
@@ -10436,10 +9851,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_TSN:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_TSN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_TSN;
@@ -10454,10 +9866,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RECVOPT:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RECVOPT\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_RECVOPT\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RECVOPT;
@@ -10483,10 +9892,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_COOKIE_LIFE:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_COOKIE_LIFE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_LIFE;
@@ -10512,10 +9918,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_SACK_DELAY:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_SACK_DELAY\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_SACK_DELAY;
@@ -10542,8 +9945,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_PATH_MAX_RETRANS\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_PATH_MAX_RETRANS;
@@ -10570,8 +9971,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_ASSOC_MAX_RETRANS\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ASSOC_MAX_RETRANS;
@@ -10598,8 +9997,6 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
 					printd(("%s: %p: processing option T_SCTP_MAX_INIT_RETRIES\n", DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAX_INIT_RETRIES;
@@ -10625,10 +10022,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_HEARTBEAT_ITVL:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_HEARTBEAT_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HEARTBEAT_ITVL;
@@ -10654,10 +10048,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RTO_INITIAL:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_RTO_INITIAL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_INITIAL;
@@ -10683,10 +10074,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RTO_MIN:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_RTO_MIN\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MIN;
@@ -10712,10 +10100,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RTO_MAX:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_RTO_MAX\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO_MAX;
@@ -10741,10 +10126,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_OSTREAMS:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_OSTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_OSTREAMS;
@@ -10770,10 +10152,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_ISTREAMS:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_ISTREAMS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_ISTREAMS;
@@ -10799,10 +10178,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_COOKIE_INC:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_COOKIE_INC\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_COOKIE_INC;
@@ -10828,10 +10204,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_THROTTLE_ITVL:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_THROTTLE_ITVL\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_THROTTLE_ITVL;
@@ -10857,10 +10230,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_MAC_TYPE:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_MAC_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_MAC_TYPE;
@@ -10886,10 +10256,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_CKSUM_TYPE:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_CKSUM_TYPE\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_CKSUM_TYPE;
@@ -10915,10 +10282,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_HB:
 				{
 					struct t_sctp_hb *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_HB\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_HB;
@@ -10944,10 +10308,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_RTO:
 				{
 					struct t_sctp_rto *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME,
-						ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_RTO\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_RTO;
@@ -10972,11 +10333,11 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				}
 				case T_SCTP_STATUS:
 				{
-					struct { struct t_sctp_status status; struct t_sctp_dest_status dest_status; } *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_STATUS\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					struct {
+						struct t_sctp_status status;
+						struct t_sctp_dest_status dest_status;
+					} *valp = (typeof(valp)) T_OPT_DATA(oh);
+					printd(("%s: %p: processing option T_SCTP_STATUS\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_STATUS;
@@ -10991,10 +10352,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
 				case T_SCTP_DEBUG:
 				{
 					t_uscalar_t *valp = (typeof(valp)) T_OPT_DATA(oh);
-					printd(("%s: %p: processing option T_SCTP_DEBUG\n",
-						DRV_NAME, ss));
-					if (optlen != sizeof(*valp))
-						goto einval;
+					printd(("%s: %p: processing option T_SCTP_DEBUG\n", DRV_NAME, ss));
 					oh->len = _T_LENGTH_SIZEOF(*valp);
 					oh->level = T_INET_SCTP;
 					oh->name = T_SCTP_DEBUG;
@@ -11044,8 +10402,7 @@ ss_build_negotiate_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned c
  *  T_NEGOTIARE, placing the output in the provided buffer.
  */
 STATIC long
-ss_build_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
-		 long flag)
+ss_build_options(ss_t * ss, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen, long flag)
 {
 	switch (flag) {
 	case T_DEFAULT:
@@ -11141,8 +10498,7 @@ state_name(long state)
 STATIC void
 ss_set_state(ss_t * ss, long state)
 {
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state),
-		state_name(ss->p.info.CURRENT_state)));
+	printd(("%s: %p: %s <- %s\n", DRV_NAME, ss, state_name(state), state_name(ss->p.info.CURRENT_state)));
 	ss->p.info.CURRENT_state = state;
 }
 STATIC long
@@ -11432,8 +10788,7 @@ ss_connect(ss_t * ss, struct sockaddr *dst)
 	ensure(ss->sock->sk, return (-EFAULT));
 	ensure(ss->sock->ops, return (-EFAULT));
 	ensure(ss->sock->ops->connect, return (-EFAULT));
-	if ((err = ss->sock->ops->connect(ss->sock, dst, sizeof(*dst), O_NONBLOCK)) == 0
-	    || err == -EINPROGRESS) {
+	if ((err = ss->sock->ops->connect(ss->sock, dst, sizeof(*dst), O_NONBLOCK)) == 0 || err == -EINPROGRESS) {
 		return (0);
 	}
 	printd(("%s: %p: ERROR: from sock->ops->connect %d\n", DRV_NAME, ss, err));
@@ -11659,13 +11014,11 @@ t_conn_ind(queue_t *q, struct sockaddr *src, mblk_t *cp)
 					mp->b_wptr += src_len;
 				}
 				if (opt_len) {
-					if ((err =
-					     ss_build_conn_opts(ss, mp->b_wptr, opt_len)) >= 0)
+					if ((err = ss_build_conn_opts(ss, mp->b_wptr, opt_len)) >= 0)
 						mp->b_wptr += opt_len;
 					else {
 						freemsg(mp);
-						ptrace(("%s: ERROR: option build fault\n",
-							DRV_NAME));
+						ptrace(("%s: ERROR: option build fault\n", DRV_NAME));
 						return (-EFAULT);
 					}
 				}
@@ -11747,8 +11100,7 @@ t_seq_find(ss_t * ss, mblk_t *rp)
 		struct sock *sk = ((ss_event_t *) rp->b_rptr)->sk;
 		spin_lock_bh(&ss->conq.q_lock);
 		{
-			for (mp = bufq_head(&ss->conq); mp && ((ss_event_t *) mp->b_rptr)->sk != sk;
-			     mp = mp->b_next) ;
+			for (mp = bufq_head(&ss->conq); mp && ((ss_event_t *) mp->b_rptr)->sk != sk; mp = mp->b_next) ;
 		}
 		spin_unlock_bh(&ss->conq.q_lock);
 	}
@@ -12296,9 +11648,7 @@ t_optdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_OPTDATA_IND;
 		p->DATA_flag =
-		    ((msg->msg_flags & MSG_EOR) ? 0 : T_ODF_MORE) | ((msg->
-								      msg_flags & MSG_OOB) ?
-								     T_ODF_EX : 0);
+		    ((msg->msg_flags & MSG_EOR) ? 0 : T_ODF_MORE) | ((msg->msg_flags & MSG_OOB) ? T_ODF_EX : 0);
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
 		mp->b_wptr += sizeof(*p);
@@ -12612,16 +11962,12 @@ ss_sock_recvmsg(queue_t *q, int flags)
 		}
 		if (msg.msg_control != (void *) cbuf) {
 			printd(("%s: %p: control message pointer moved!\n", DRV_NAME, ss));
-			printd(("%s: %p: initial control buffer %p\n", DRV_NAME, ss,
-				msg.msg_control));
-			printd(("%s: %p: initial control length %d\n", DRV_NAME, ss,
-				msg.msg_controllen));
+			printd(("%s: %p: initial control buffer %p\n", DRV_NAME, ss, msg.msg_control));
+			printd(("%s: %p: initial control length %d\n", DRV_NAME, ss, msg.msg_controllen));
 			msg.msg_control = cbuf;
 			msg.msg_controllen = sizeof(cbuf) - msg.msg_controllen;
-			printd(("%s: %p: final control buffer %p\n", DRV_NAME, ss,
-				msg.msg_control));
-			printd(("%s: %p: final control length %d\n", DRV_NAME, ss,
-				msg.msg_controllen));
+			printd(("%s: %p: final control buffer %p\n", DRV_NAME, ss, msg.msg_control));
+			printd(("%s: %p: final control length %d\n", DRV_NAME, ss, msg.msg_controllen));
 		} else if (msg.msg_controllen == sizeof(cbuf) && cbuf[0] == 0xdeadbeef) {
 			printd(("%s: %p: control message unchanged!\n", DRV_NAME, ss));
 			msg.msg_control = NULL;
@@ -12863,8 +12209,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		default:
 			goto badaddr;
 		}
-		if ((err =
-		     ss_parse_conn_opts(ss, mp->b_rptr + p->OPT_offset, p->OPT_length, 1)) < 0) {
+		if ((err = ss_parse_conn_opts(ss, mp->b_rptr + p->OPT_offset, p->OPT_length, 1)) < 0) {
 			switch (-err) {
 			case EINVAL:
 				goto badopt;
@@ -12878,8 +12223,9 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		if (mp->b_cont) {
 			long mlen, mmax;
 			mlen = msgdsize(mp->b_cont);
-			if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-			    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+			if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax)
+			    || mmax == T_INVALID || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax)
+			    || mmax == T_INVALID)
 				goto baddata;
 			/* FIXME need to generate connect with data */
 		}
@@ -12975,8 +12321,8 @@ t_conn_res(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		long mlen, mmax;
 		mlen = msgdsize(mp->b_cont);
-		if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+		if (((mmax = ss->p.info.CDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 			goto baddata;
 		/* FIXME need to generate connect with data */
 	}
@@ -13062,8 +12408,8 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		long mlen, mmax;
 		mlen = msgdsize(mp->b_cont);
-		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 			goto baddata;
 		/* FIXME need to generate disconnect with data */
 	}
@@ -13129,8 +12475,8 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
+	    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -13174,8 +12520,8 @@ t_data_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
+	    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
@@ -13222,15 +12568,14 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
-	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
+	    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
 	msg.msg_name = NULL;
 	msg.msg_namelen = 0;
 	msg.msg_control = NULL;
 	msg.msg_controllen = 0;
-	msg.msg_flags =
-	    MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0);
+	msg.msg_flags = MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0);
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
 	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
@@ -13283,8 +12628,8 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	if (ss->p.info.SERV_type == T_CLTS && p->CONIND_number)
 		goto notsupport;
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, ss,
-			p->ADDR_offset, p->ADDR_length));
+		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, ss, p->ADDR_offset,
+			p->ADDR_length));
 		goto badaddr;
 	}
 	switch (ss->p.prot.family) {
@@ -13299,13 +12644,25 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_INET;
 		} else {
 			if (add_len < sizeof(struct sockaddr_in)) {
-				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n",
-					DRV_NAME, ss, add_len, sizeof(struct sockaddr_in)));
+				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_in)(%u)\n", DRV_NAME, ss, add_len,
+					sizeof(struct sockaddr_in)));
 				goto badaddr;
 			}
+			if (ss->p.prot.protocol != T_INET_SCTP) {
+				if (add_len > sizeof(struct sockaddr_in)) {
+					ptrace(("%s: %p: add_len(%u) > sizeof(struct sockaddr_in)(%u)\n", DRV_NAME, ss, add_len,
+						sizeof(struct sockaddr_in)));
+					goto badaddr;
+				}
+			} else {
+				if ((add_len % sizeof(struct sockaddr_in)) != 0) {
+					ptrace(("%s: %p: add_len(%u) %% sizeof(struct sockaddr_in)(%u)\n", DRV_NAME, ss, add_len,
+						sizeof(struct sockaddr_in)));
+					goto badaddr;
+				}
+			}
 			if (add->sa_family != AF_INET && add->sa_family != 0) {
-				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss,
-					add->sa_family));
+				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss, add->sa_family));
 				goto badaddr;
 			}
 			add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
@@ -13325,13 +12682,12 @@ t_bind_req(queue_t *q, mblk_t *mp)
 			add->sa_family = AF_UNIX;
 		} else {
 			if (add_len < sizeof(struct sockaddr_un)) {
-				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_un)(%u)\n",
-					DRV_NAME, ss, add_len, sizeof(struct sockaddr_un)));
+				ptrace(("%s: %p: add_len(%u) < sizeof(struct sockaddr_un)(%u)\n", DRV_NAME, ss, add_len,
+					sizeof(struct sockaddr_un)));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_UNIX && add->sa_family != 0) {
-				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss,
-					add->sa_family));
+				ptrace(("%s: %p: sa_family incorrect (%u)\n", DRV_NAME, ss, add->sa_family));
 				goto badaddr;
 			}
 			add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
@@ -13347,8 +12703,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	if ((err = ss_bind(ss, add, add_len)))
 		goto error_close;
 	ss->conind = 0;
-	if (p->CONIND_number
-	    && (ss->p.prot.type == SOCK_STREAM || ss->p.prot.type == SOCK_SEQPACKET))
+	if (p->CONIND_number && (ss->p.prot.type == SOCK_STREAM || ss->p.prot.type == SOCK_SEQPACKET))
 		if ((err = ss_listen(ss, p->CONIND_number)))
 			goto error_close;
 	if (ss_getsockname(ss) <= 0)
@@ -13416,8 +12771,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (dlen == 0 && !(ss->p.info.PROVIDER_flag & T_SNDZERO))
 		goto baddata;
-	if (((mmax = ss->p.info.TSDU_size) > 0 && dlen > mmax) || mmax == T_INVALID ||
-	    ((mmax = ss->p.info.TIDU_size) > 0 && dlen > mmax) || mmax == T_INVALID)
+	if (((mmax = ss->p.info.TSDU_size) > 0 && dlen > mmax) || mmax == T_INVALID
+	    || ((mmax = ss->p.info.TIDU_size) > 0 && dlen > mmax) || mmax == T_INVALID)
 		goto baddata;
 	if (ss_get_state(ss) != TS_IDLE)
 		goto outstate;
@@ -13425,8 +12780,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->DEST_length < sizeof(ss->dst.sa_family))
-	    || (p->DEST_length <
-		ss_addr_size(ss, (struct sockaddr *) (mp->b_rptr + p->DEST_length))))
+	    || (p->DEST_length < ss_addr_size(ss, (struct sockaddr *) (mp->b_rptr + p->DEST_length))))
 		goto badadd;
 	if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0)
 		goto acces;
@@ -13528,8 +12882,7 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 		}
 	}
 	/* add 32 bytes slop */
-	if ((err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset,
-				 p->OPT_length, opt_len + 32)) < 0) {
+	if ((err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len + 32)) < 0) {
 		switch (-err) {
 		case EINVAL:
 			goto badopt;
@@ -13583,8 +12936,8 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		long mlen, mmax;
 		mlen = msgdsize(mp->b_cont);
-		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID ||
-		    ((mmax = ss->p.info.TIDU_size)  > 0 && mlen > mmax) || mmax == T_INVALID)
+		if (((mmax = ss->p.info.DDATA_size) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 			goto baddata;
 		/* FIXME need to generate orderly release with data */
 	}
@@ -13973,8 +13326,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 					ss->tcp_state = TCP_LISTEN;
 					/* look for the child */
 					if ((cp = t_seq_find(ss, mp)))
-						return (t_discon_ind
-							(q, NULL, T_PROVIDER, 0, cp, NULL));
+						return (t_discon_ind(q, NULL, T_PROVIDER, 0, cp, NULL));
 					return (QR_DONE);
 				}
 				}
@@ -13990,14 +13342,14 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 			}
 			break;
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	default:
 		printd(("%s: SWERR: unsupported socket type\n", DRV_NAME));
@@ -14055,8 +13407,8 @@ ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_WREQ_ORDREL:	/* TCP bug I believe */
 			return ss_sock_recvmsg(q, 0);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
 	case SOCK_RAW:
@@ -14065,8 +13417,8 @@ ss_r_read(queue_t *q, mblk_t *mp)
 		case TS_IDLE:
 			return ss_sock_recvmsg(q, 0);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
 	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
@@ -14114,8 +13466,8 @@ ss_w_read(queue_t *q, mblk_t *mp)
 			qenable(ss->wq);
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
 	case SOCK_RAW:
@@ -14125,8 +13477,8 @@ ss_w_read(queue_t *q, mblk_t *mp)
 			qenable(ss->wq);
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
 	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
@@ -14181,8 +13533,8 @@ ss_r_error(queue_t *q, mblk_t *mp)
 			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	case SOCK_DGRAM:
 	case SOCK_RAW:
@@ -14193,8 +13545,8 @@ ss_r_error(queue_t *q, mblk_t *mp)
 			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
 			return (QR_DONE);
 		}
-		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss,
-			tcp_state_name(p->state), state_name(ss_get_state(ss))));
+		printd(("%s: %p: SWERR: socket state %s in TPI state %s\n", DRV_NAME, ss, tcp_state_name(p->state),
+			state_name(ss_get_state(ss))));
 		return (-EFAULT);
 	}
 	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
@@ -14463,8 +13815,7 @@ ss_init_caches(void)
 {
 	if (!ss_priv_cachep
 	    && !(ss_priv_cachep =
-		 kmem_cache_create("ss_priv_cachep", sizeof(ss_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_cache_create("ss_priv_cachep", sizeof(ss_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate ss_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else
@@ -14484,8 +13835,7 @@ ss_term_caches(void)
 	return (0);
 }
 STATIC ss_t *
-ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *crp,
-	      const ss_profile_t * prof)
+ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *crp, const ss_profile_t * prof)
 {
 	ss_t *ss;
 	if ((ss = kmem_cache_alloc(ss_priv_cachep, SLAB_ATOMIC))) {
@@ -14516,8 +13866,7 @@ ss_alloc_priv(queue_t *q, ss_t ** slp, major_t cmajor, minor_t cminor, cred_t *c
 		*slp = ss;
 		ss->refcnt++;
 #if 0
-		printd(("%s: linked private structure, reference count %d\n", DRV_NAME,
-			ss->refcnt));
+		printd(("%s: linked private structure, reference count %d\n", DRV_NAME, ss->refcnt));
 #endif
 	} else
 		ptrace(("%s: ERROR: Could not allocate module private structure\n", DRV_NAME));
@@ -14671,8 +14020,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 				break;
 			if (cminor == (*ipp)->cminor) {
 				if (++cminor >= NMINORS) {
-					if (++mindex >= SS__CMAJORS
-					    || !(cmajor = ss_majors[mindex]))
+					if (++mindex >= SS__CMAJORS || !(cmajor = ss_majors[mindex]))
 						break;
 					cminor = 0;
 				}
@@ -14725,8 +14073,7 @@ ss_close(queue_t *q, int flag, cred_t *crp)
 		goto quit;
 	}
 	if (q->q_next == NULL) {
-		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
-			DRV_NAME, __FUNCTION__);
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer", DRV_NAME, __FUNCTION__);
 		goto skip_pop;
 	}
 #endif				/* defined LIS */
@@ -14836,8 +14183,7 @@ ss_terminate(void)
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (ss_majors[mindex]) {
 			if ((err = ss_unregister_strdev(ss_majors[mindex])))
-				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME,
-					ss_majors[mindex]);
+				cmn_err(CE_PANIC, "%s: cannot unregister major %d", DRV_NAME, ss_majors[mindex]);
 			if (mindex)
 				ss_majors[mindex] = 0;
 		}
@@ -14860,12 +14206,10 @@ ss_init(void)
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
 		if ((err = ss_register_strdev(ss_majors[mindex])) < 0) {
 			if (mindex) {
-				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME,
-					ss_majors[mindex]);
+				cmn_err(CE_WARN, "%s: could not register major %d", DRV_NAME, ss_majors[mindex]);
 				continue;
 			} else {
-				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
-					DRV_NAME, err);
+				cmn_err(CE_WARN, "%s: could not register driver, err = %d", DRV_NAME, err);
 				ss_terminate();
 				return (err);
 			}

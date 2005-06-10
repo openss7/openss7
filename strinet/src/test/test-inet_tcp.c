@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/10 04:03:12 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/10 12:21:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/10 04:03:12 $ by $Author: brian $
+ Last Modified $Date: 2005/06/10 12:21:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.19  2005/06/10 12:21:13  brian
+ - some final option tweaking
+
  Revision 0.9.2.18  2005/06/10 04:03:12  brian
  - more options corrections
 
@@ -150,9 +153,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/10 04:03:12 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/10 12:21:13 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/10 04:03:12 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/06/10 12:21:13 $";
 
 /*
  *  Simple test program for INET streams.
@@ -4930,7 +4933,7 @@ struct test_stream test_1_4_list = { &preamble_1_4_list, &test_case_1_4_list, &p
 /*
  *  Do options management.
  */
-#define test_group_1_5 "Options management"
+#define test_group_1_5 "Options management - T_DEFAULT"
 #define tgrp_case_1_5 test_group_1_5
 #define numb_case_1_5 "1.5"
 #define name_case_1_5 "Perform options management."
@@ -13538,6 +13541,520 @@ struct test_stream test_1_8_5_38_conn = { &preamble_1_8_conn, &test_case_1_8_5_3
 struct test_stream test_1_8_5_38_resp = { &preamble_1_8_resp, &test_case_1_8_5_38_resp, &postamble_1_8_resp };
 struct test_stream test_1_8_5_38_list = { &preamble_1_8_list, &test_case_1_8_5_38_list, &postamble_1_8_list };
 
+#define test_group_1_9_1 "Options management -- no options specified"
+
+int test_case_1_9_1(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	test_opts = NULL;
+	test_olen = 0;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.MGMT_flags == T_FAILURE)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.OPT_length == 0)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define tgrp_case_1_9_1_1 test_group_1_9_1
+#define numb_case_1_9_1_1 "1.9.1.1"
+#define name_case_1_9_1_1 "Perform options management -- T_DEFAULT (none)"
+#define sref_case_1_9_1_1 "OpenSS7 Extension"
+#define desc_case_1_9_1_1 "\
+Checks that all default options are returned when no options are specified in\n\
+the T_OPTMGMT_REQ.  The specifications do not indicate what action is taken when\n\
+T_DEFAULT is given and the OPT_length is zero.  This OpenSS7 extension returns\n\
+all of the known default options as though each had been specified with no\n\
+option value."
+
+int test_case_1_9_1_1(int child)
+{
+	test_mgmtflags = T_DEFAULT;
+	return test_case_1_9_1(child);
+}
+
+#define test_case_1_9_1_1_conn	test_case_1_9_1_1
+#define test_case_1_9_1_1_resp	test_case_1_9_1_1
+#define test_case_1_9_1_1_list	test_case_1_9_1_1
+
+#define preamble_1_9_1_1_conn	preamble_0
+#define preamble_1_9_1_1_resp	preamble_0
+#define preamble_1_9_1_1_list	preamble_0
+
+#define postamble_1_9_1_1_conn	postamble_0
+#define postamble_1_9_1_1_resp	postamble_0
+#define postamble_1_9_1_1_list	postamble_0
+
+struct test_stream test_1_9_1_1_conn = { &preamble_1_9_1_1_conn, &test_case_1_9_1_1_conn, &postamble_1_9_1_1_conn };
+struct test_stream test_1_9_1_1_resp = { &preamble_1_9_1_1_resp, &test_case_1_9_1_1_resp, &postamble_1_9_1_1_resp };
+struct test_stream test_1_9_1_1_list = { &preamble_1_9_1_1_list, &test_case_1_9_1_1_list, &postamble_1_9_1_1_list };
+
+
+#define tgrp_case_1_9_1_2 test_group_1_9_1
+#define numb_case_1_9_1_2 "1.9.1.2"
+#define name_case_1_9_1_2 "Perform options management -- T_CURRENT (none)"
+#define sref_case_1_9_1_2 "OpenSS7 Extension"
+#define desc_case_1_9_1_2 "\
+Checks that all current options are returned when no options are specified in\n\
+the T_OPTMGMT_REQ.  The specifications do not indicate what action is taken\n\
+when T_CURRENT is given and the OPT_length is zero.  This OpenSS7 extension\n\
+returns all of the known current options as though each had been specified with\n\
+no option value."
+
+int test_case_1_9_1_2(int child)
+{
+	test_mgmtflags = T_CURRENT;
+	return test_case_1_9_1(child);
+}
+
+#define test_case_1_9_1_2_conn	test_case_1_9_1_2
+#define test_case_1_9_1_2_resp	test_case_1_9_1_2
+#define test_case_1_9_1_2_list	test_case_1_9_1_2
+
+#define preamble_1_9_1_2_conn	preamble_0
+#define preamble_1_9_1_2_resp	preamble_0
+#define preamble_1_9_1_2_list	preamble_0
+
+#define postamble_1_9_1_2_conn	postamble_0
+#define postamble_1_9_1_2_resp	postamble_0
+#define postamble_1_9_1_2_list	postamble_0
+
+struct test_stream test_1_9_1_2_conn = { &preamble_1_9_1_2_conn, &test_case_1_9_1_2_conn, &postamble_1_9_1_2_conn };
+struct test_stream test_1_9_1_2_resp = { &preamble_1_9_1_2_resp, &test_case_1_9_1_2_resp, &postamble_1_9_1_2_resp };
+struct test_stream test_1_9_1_2_list = { &preamble_1_9_1_2_list, &test_case_1_9_1_2_list, &postamble_1_9_1_2_list };
+
+
+#define tgrp_case_1_9_1_3 test_group_1_9_1
+#define numb_case_1_9_1_3 "1.9.1.3"
+#define name_case_1_9_1_3 "Perform options management -- T_CHECK (none)"
+#define sref_case_1_9_1_3 "OpenSS7 Extension"
+#define desc_case_1_9_1_3 "\
+Checks that all checked options are returned when no options are specified in\n\
+the T_OPTMGMT_REQ.  The specification does not indicate what action is taken\n\
+when T_CHECK is given and the OPT_length is zero.  This OpenSS7 extension\n\
+returns all of the known checkable options as though each had been specified\n\
+with no option value."
+
+
+int test_case_1_9_1_3(int child)
+{
+	test_mgmtflags = T_CHECK;
+	return test_case_1_9_1(child);
+}
+
+#define test_case_1_9_1_3_conn	test_case_1_9_1_3
+#define test_case_1_9_1_3_resp	test_case_1_9_1_3
+#define test_case_1_9_1_3_list	test_case_1_9_1_3
+
+#define preamble_1_9_1_3_conn	preamble_0
+#define preamble_1_9_1_3_resp	preamble_0
+#define preamble_1_9_1_3_list	preamble_0
+
+#define postamble_1_9_1_3_conn	postamble_0
+#define postamble_1_9_1_3_resp	postamble_0
+#define postamble_1_9_1_3_list	postamble_0
+
+struct test_stream test_1_9_1_3_conn = { &preamble_1_9_1_3_conn, &test_case_1_9_1_3_conn, &postamble_1_9_1_3_conn };
+struct test_stream test_1_9_1_3_resp = { &preamble_1_9_1_3_resp, &test_case_1_9_1_3_resp, &postamble_1_9_1_3_resp };
+struct test_stream test_1_9_1_3_list = { &preamble_1_9_1_3_list, &test_case_1_9_1_3_list, &postamble_1_9_1_3_list };
+
+
+#define tgrp_case_1_9_1_4 test_group_1_9_1
+#define numb_case_1_9_1_4 "1.9.1.4"
+#define name_case_1_9_1_4 "Perform options management -- T_NEGOTIATE (none)"
+#define sref_case_1_9_1_4 "TPI Version 2 Draft 2 -- T_OPTMGMT_ACK"
+#define desc_case_1_9_1_4 "\
+Checks that all negotiated options are returned when no options are specified in\n\
+the T_OPTMGMT_REQ.  The specifications say than when T_NEGOTIATE is given and\n\
+the OPT_length is zero, that the transport provider is to negotiate and return\n\
+the default values for all options."
+
+int test_case_1_9_1_4(int child)
+{
+	test_mgmtflags = T_NEGOTIATE;
+	return test_case_1_9_1(child);
+}
+
+#define test_case_1_9_1_4_conn	test_case_1_9_1_4
+#define test_case_1_9_1_4_resp	test_case_1_9_1_4
+#define test_case_1_9_1_4_list	test_case_1_9_1_4
+
+#define preamble_1_9_1_4_conn	preamble_0
+#define preamble_1_9_1_4_resp	preamble_0
+#define preamble_1_9_1_4_list	preamble_0
+
+#define postamble_1_9_1_4_conn	postamble_0
+#define postamble_1_9_1_4_resp	postamble_0
+#define postamble_1_9_1_4_list	postamble_0
+
+struct test_stream test_1_9_1_4_conn = { &preamble_1_9_1_4_conn, &test_case_1_9_1_4_conn, &postamble_1_9_1_4_conn };
+struct test_stream test_1_9_1_4_resp = { &preamble_1_9_1_4_resp, &test_case_1_9_1_4_resp, &postamble_1_9_1_4_resp };
+struct test_stream test_1_9_1_4_list = { &preamble_1_9_1_4_list, &test_case_1_9_1_4_list, &postamble_1_9_1_4_list };
+
+
+#define test_group_1_9_2 "Options management -- T_ALLOPT"
+#define sref_case_1_9_2 "XNS 5.2 -- Chapter 7 -- Section t_optmgmt"
+
+int test_case_1_9_2(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	struct {
+		struct t_opthdr opt_hdr1;
+		struct t_opthdr opt_hdr2;
+#if 0
+		struct t_opthdr opt_hdr3;
+#endif
+		struct t_opthdr opt_hdr4;
+#if 0
+		struct t_opthdr opt_hdr5;
+#endif
+	} options = {
+		{
+		sizeof(struct t_opthdr), XTI_GENERIC, T_ALLOPT, T_SUCCESS}
+		, {
+		sizeof(struct t_opthdr), T_INET_IP, T_ALLOPT, T_SUCCESS}
+#if 0
+		, {
+		sizeof(struct t_opthdr), T_INET_UDP, T_ALLOPT, T_SUCCESS}
+#endif
+		, {
+		sizeof(struct t_opthdr), T_INET_TCP, T_ALLOPT, T_SUCCESS}
+#if 0
+		, {
+		sizeof(struct t_opthdr), T_INET_SCTP, T_ALLOPT, T_SUCCESS}
+#endif
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.MGMT_flags == T_FAILURE)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define tgrp_case_1_9_2_1 test_group_1_9_2
+#define numb_case_1_9_2_1 "1.9.2.1"
+#define name_case_1_9_2_1 "Perform options management -- T_DEFAULT T_ALLOPT"
+#define sref_case_1_9_2_1 sref_case_1_9_2
+#define desc_case_1_9_2_1 "\
+Checks that all default options under a level are returned when the option name\n\
+T_ALLOPT is used.  The specification indicates that when T_ALLOPT is specified\n\
+as an option name for a supported level, that the action corresponds to all\n\
+known option at that level.  This test should return all known option defaults\n\
+at the specified levels."
+
+int test_case_1_9_2_1(int child)
+{
+	test_mgmtflags = T_DEFAULT;
+	return test_case_1_9_2(child);
+}
+
+#define test_case_1_9_2_1_conn	test_case_1_9_2_1
+#define test_case_1_9_2_1_resp	test_case_1_9_2_1
+#define test_case_1_9_2_1_list	test_case_1_9_2_1
+
+#define preamble_1_9_2_1_conn	preamble_0
+#define preamble_1_9_2_1_resp	preamble_0
+#define preamble_1_9_2_1_list	preamble_0
+
+#define postamble_1_9_2_1_conn	postamble_0
+#define postamble_1_9_2_1_resp	postamble_0
+#define postamble_1_9_2_1_list	postamble_0
+
+struct test_stream test_1_9_2_1_conn = { &preamble_1_9_2_1_conn, &test_case_1_9_2_1_conn, &postamble_1_9_2_1_conn };
+struct test_stream test_1_9_2_1_resp = { &preamble_1_9_2_1_resp, &test_case_1_9_2_1_resp, &postamble_1_9_2_1_resp };
+struct test_stream test_1_9_2_1_list = { &preamble_1_9_2_1_list, &test_case_1_9_2_1_list, &postamble_1_9_2_1_list };
+
+
+#define tgrp_case_1_9_2_2 test_group_1_9_2
+#define numb_case_1_9_2_2 "1.9.2.2"
+#define name_case_1_9_2_2 "Perform options management -- T_CURRENT T_ALLOPT"
+#define sref_case_1_9_2_2 sref_case_1_9_2
+#define desc_case_1_9_2_2 "\
+Checks that all current options under a level are returned when the option name\n\
+T_ALLOPT is used.  The specification indicates that when T_ALLOPT is specified\n\
+as an option name for a supported level, that the action corresponds to all\n\
+known option at that level.  This test should return all known option current\n\
+at the specified levels."
+
+int test_case_1_9_2_2(int child)
+{
+	test_mgmtflags = T_CURRENT;
+	return test_case_1_9_2(child);
+}
+
+#define test_case_1_9_2_2_conn	test_case_1_9_2_2
+#define test_case_1_9_2_2_resp	test_case_1_9_2_2
+#define test_case_1_9_2_2_list	test_case_1_9_2_2
+
+#define preamble_1_9_2_2_conn	preamble_0
+#define preamble_1_9_2_2_resp	preamble_0
+#define preamble_1_9_2_2_list	preamble_0
+
+#define postamble_1_9_2_2_conn	postamble_0
+#define postamble_1_9_2_2_resp	postamble_0
+#define postamble_1_9_2_2_list	postamble_0
+
+struct test_stream test_1_9_2_2_conn = { &preamble_1_9_2_2_conn, &test_case_1_9_2_2_conn, &postamble_1_9_2_2_conn };
+struct test_stream test_1_9_2_2_resp = { &preamble_1_9_2_2_resp, &test_case_1_9_2_2_resp, &postamble_1_9_2_2_resp };
+struct test_stream test_1_9_2_2_list = { &preamble_1_9_2_2_list, &test_case_1_9_2_2_list, &postamble_1_9_2_2_list };
+
+
+#define tgrp_case_1_9_2_3 test_group_1_9_2
+#define numb_case_1_9_2_3 "1.9.2.3"
+#define name_case_1_9_2_3 "Perform options management -- T_CHECK T_ALLOPT"
+#define sref_case_1_9_2_3 sref_case_1_9_2
+#define desc_case_1_9_2_3 "\
+Checks that all checked options under a level are returned when the option name\n\
+T_ALLOPT is used.  The specification indicates that whenever T_ALLOPT is\n\
+specified with management flags T_CHECK that the response should be a\n\
+T_ERROR_ACK primitive with error TBADOPT.  This implementation returns all of\n\
+the checkable options at the specified level as though each were specified\n\
+without a value in the T_OPTMGMT_REQ.  This is not standard behavior and should\n\
+not be used by portable programs."
+
+int test_case_1_9_2_3(int child)
+{
+	test_mgmtflags = T_CHECK;
+	return test_case_1_9_2(child);
+}
+
+#define test_case_1_9_2_3_conn	test_case_1_9_2_3
+#define test_case_1_9_2_3_resp	test_case_1_9_2_3
+#define test_case_1_9_2_3_list	test_case_1_9_2_3
+
+#define preamble_1_9_2_3_conn	preamble_0
+#define preamble_1_9_2_3_resp	preamble_0
+#define preamble_1_9_2_3_list	preamble_0
+
+#define postamble_1_9_2_3_conn	postamble_0
+#define postamble_1_9_2_3_resp	postamble_0
+#define postamble_1_9_2_3_list	postamble_0
+
+struct test_stream test_1_9_2_3_conn = { &preamble_1_9_2_3_conn, &test_case_1_9_2_3_conn, &postamble_1_9_2_3_conn };
+struct test_stream test_1_9_2_3_resp = { &preamble_1_9_2_3_resp, &test_case_1_9_2_3_resp, &postamble_1_9_2_3_resp };
+struct test_stream test_1_9_2_3_list = { &preamble_1_9_2_3_list, &test_case_1_9_2_3_list, &postamble_1_9_2_3_list };
+
+
+#define tgrp_case_1_9_2_4 test_group_1_9_2
+#define numb_case_1_9_2_4 "1.9.2.4"
+#define name_case_1_9_2_4 "Perform options management -- T_NEGOTIATE T_ALLOPT"
+#define sref_case_1_9_2_4 sref_case_1_9_2
+#define desc_case_1_9_2_4 "\
+Checks that all negotiated options under a level are returned when the option name\n\
+T_ALLOPT is used.  The specification indicates that when T_ALLOPT is specified\n\
+as an option name for a supported level, that the action corresponds to all\n\
+known option at that level.  This test should return all known option negotiated\n\
+to the default values at the specified levels."
+
+int test_case_1_9_2_4(int child)
+{
+	test_mgmtflags = T_NEGOTIATE;
+	return test_case_1_9_2(child);
+}
+
+#define test_case_1_9_2_4_conn	test_case_1_9_2_4
+#define test_case_1_9_2_4_resp	test_case_1_9_2_4
+#define test_case_1_9_2_4_list	test_case_1_9_2_4
+
+#define preamble_1_9_2_4_conn	preamble_0
+#define preamble_1_9_2_4_resp	preamble_0
+#define preamble_1_9_2_4_list	preamble_0
+
+#define postamble_1_9_2_4_conn	postamble_0
+#define postamble_1_9_2_4_resp	postamble_0
+#define postamble_1_9_2_4_list	postamble_0
+
+struct test_stream test_1_9_2_4_conn = { &preamble_1_9_2_4_conn, &test_case_1_9_2_4_conn, &postamble_1_9_2_4_conn };
+struct test_stream test_1_9_2_4_resp = { &preamble_1_9_2_4_resp, &test_case_1_9_2_4_resp, &postamble_1_9_2_4_resp };
+struct test_stream test_1_9_2_4_list = { &preamble_1_9_2_4_list, &test_case_1_9_2_4_list, &postamble_1_9_2_4_list };
+
+
+#define test_group_1_9_3 "Options management -- illegal options"
+#define sref_case_1_9_3 "TPI 2.2 T_OPTMGMT_ACK, XNS 5.2 t_optmgmt"
+
+int test_case_1_9_3(int child)
+{
+	struct t_opthdr opt_hdr =
+	    { sizeof(struct t_opthdr) + 100, XTI_GENERIC, XTI_DEBUG, T_SUCCESS };
+	test_opts = &opt_hdr;
+	test_olen = sizeof(opt_hdr);
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TBADOPT)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define tgrp_case_1_9_3_1 test_group_1_9_3
+#define numb_case_1_9_3_1 "1.9.3.1"
+#define name_case_1_9_3_1 "Perform options management -- T_DEFAULT (illegal)"
+#define sref_case_1_9_3_1 sref_case_1_9_3
+#define desc_case_1_9_3_1 "\
+Checks that T_DEFAULT given with an illegal option results in failure.\n\
+According to the specification, when an illegal option is given in\n\
+T_OPTMGMT_REQ, the result is a T_ERROR_ACK with an error of TBADOPT.\n\
+The tests are separated by management flag because the implementation\n\
+follows different code paths for each management flag."
+
+int test_case_1_9_3_1(int child)
+{
+	test_mgmtflags = T_DEFAULT;
+	return test_case_1_9_3(child);
+}
+
+#define test_case_1_9_3_1_conn	test_case_1_9_3_1
+#define test_case_1_9_3_1_resp	test_case_1_9_3_1
+#define test_case_1_9_3_1_list	test_case_1_9_3_1
+
+#define preamble_1_9_3_1_conn	preamble_0
+#define preamble_1_9_3_1_resp	preamble_0
+#define preamble_1_9_3_1_list	preamble_0
+
+#define postamble_1_9_3_1_conn	postamble_0
+#define postamble_1_9_3_1_resp	postamble_0
+#define postamble_1_9_3_1_list	postamble_0
+
+struct test_stream test_1_9_3_1_conn = { &preamble_1_9_3_1_conn, &test_case_1_9_3_1_conn, &postamble_1_9_3_1_conn };
+struct test_stream test_1_9_3_1_resp = { &preamble_1_9_3_1_resp, &test_case_1_9_3_1_resp, &postamble_1_9_3_1_resp };
+struct test_stream test_1_9_3_1_list = { &preamble_1_9_3_1_list, &test_case_1_9_3_1_list, &postamble_1_9_3_1_list };
+
+
+#define test_group_1_9_3 "Options management -- illegal options"
+#define tgrp_case_1_9_3_2 test_group_1_9_3
+#define numb_case_1_9_3_2 "1.9.3.2"
+#define name_case_1_9_3_2 "Perform options management -- T_CURRENT (illegal)"
+#define sref_case_1_9_3_2 sref_case_1_9_3
+#define desc_case_1_9_3_2 "\
+Checks that T_CURRENT given with an illegal option results in failure.\n\
+According to the specification, when an illegal option is given in\n\
+T_OPTMGMT_REQ, the result is a T_ERROR_ACK with an error of TBADOPT.\n\
+The tests are separated by management flag because the implementation\n\
+follows different code paths for each management flag."
+
+int test_case_1_9_3_2(int child)
+{
+	test_mgmtflags = T_CURRENT;
+	return test_case_1_9_3(child);
+}
+
+#define test_case_1_9_3_2_conn	test_case_1_9_3_2
+#define test_case_1_9_3_2_resp	test_case_1_9_3_2
+#define test_case_1_9_3_2_list	test_case_1_9_3_2
+
+#define preamble_1_9_3_2_conn	preamble_0
+#define preamble_1_9_3_2_resp	preamble_0
+#define preamble_1_9_3_2_list	preamble_0
+
+#define postamble_1_9_3_2_conn	postamble_0
+#define postamble_1_9_3_2_resp	postamble_0
+#define postamble_1_9_3_2_list	postamble_0
+
+struct test_stream test_1_9_3_2_conn = { &preamble_1_9_3_2_conn, &test_case_1_9_3_2_conn, &postamble_1_9_3_2_conn };
+struct test_stream test_1_9_3_2_resp = { &preamble_1_9_3_2_resp, &test_case_1_9_3_2_resp, &postamble_1_9_3_2_resp };
+struct test_stream test_1_9_3_2_list = { &preamble_1_9_3_2_list, &test_case_1_9_3_2_list, &postamble_1_9_3_2_list };
+
+
+#define test_group_1_9_3 "Options management -- illegal options"
+#define tgrp_case_1_9_3_3 test_group_1_9_3
+#define numb_case_1_9_3_3 "1.9.3.3"
+#define name_case_1_9_3_3 "Perform options management -- T_CHECK (illegal)"
+#define sref_case_1_9_3_3 sref_case_1_9_3
+#define desc_case_1_9_3_3 "\
+Checks that T_CHECK given with an illegal option results in failure.\n\
+According to the specification, when an illegal option is given in\n\
+T_OPTMGMT_REQ, the result is a T_ERROR_ACK with an error of TBADOPT.\n\
+The tests are separated by management flag because the implementation\n\
+follows different code paths for each management flag."
+
+int test_case_1_9_3_3(int child)
+{
+	test_mgmtflags = T_CHECK;
+	return test_case_1_9_3(child);
+}
+
+#define test_case_1_9_3_3_conn	test_case_1_9_3_3
+#define test_case_1_9_3_3_resp	test_case_1_9_3_3
+#define test_case_1_9_3_3_list	test_case_1_9_3_3
+
+#define preamble_1_9_3_3_conn	preamble_0
+#define preamble_1_9_3_3_resp	preamble_0
+#define preamble_1_9_3_3_list	preamble_0
+
+#define postamble_1_9_3_3_conn	postamble_0
+#define postamble_1_9_3_3_resp	postamble_0
+#define postamble_1_9_3_3_list	postamble_0
+
+struct test_stream test_1_9_3_3_conn = { &preamble_1_9_3_3_conn, &test_case_1_9_3_3_conn, &postamble_1_9_3_3_conn };
+struct test_stream test_1_9_3_3_resp = { &preamble_1_9_3_3_resp, &test_case_1_9_3_3_resp, &postamble_1_9_3_3_resp };
+struct test_stream test_1_9_3_3_list = { &preamble_1_9_3_3_list, &test_case_1_9_3_3_list, &postamble_1_9_3_3_list };
+
+
+#define test_group_1_9_3 "Options management -- illegal options"
+#define tgrp_case_1_9_3_4 test_group_1_9_3
+#define numb_case_1_9_3_4 "1.9.3.4"
+#define name_case_1_9_3_4 "Perform options management -- T_NEGOTIATE (illegal)"
+#define sref_case_1_9_3_4 sref_case_1_9_3
+#define desc_case_1_9_3_4 "\
+Checks that T_NEGOTIATE given with an illegal option results in failure.\n\
+According to the specification, when an illegal option is given in\n\
+T_OPTMGMT_REQ, the result is a T_ERROR_ACK with an error of TBADOPT.\n\
+The tests are separated by management flag because the implementation\n\
+follows different code paths for each management flag."
+
+int test_case_1_9_3_4(int child)
+{
+	test_mgmtflags = T_NEGOTIATE;
+	return test_case_1_9_3(child);
+}
+
+#define test_case_1_9_3_4_conn	test_case_1_9_3_4
+#define test_case_1_9_3_4_resp	test_case_1_9_3_4
+#define test_case_1_9_3_4_list	test_case_1_9_3_4
+
+#define preamble_1_9_3_4_conn	preamble_0
+#define preamble_1_9_3_4_resp	preamble_0
+#define preamble_1_9_3_4_list	preamble_0
+
+#define postamble_1_9_3_4_conn	postamble_0
+#define postamble_1_9_3_4_resp	postamble_0
+#define postamble_1_9_3_4_list	postamble_0
+
+struct test_stream test_1_9_3_4_conn = { &preamble_1_9_3_4_conn, &test_case_1_9_3_4_conn, &postamble_1_9_3_4_conn };
+struct test_stream test_1_9_3_4_resp = { &preamble_1_9_3_4_resp, &test_case_1_9_3_4_resp, &postamble_1_9_3_4_resp };
+struct test_stream test_1_9_3_4_list = { &preamble_1_9_3_4_list, &test_case_1_9_3_4_list, &postamble_1_9_3_4_list };
+
+
 
 /*
  *  Bind and unbind three streams.
@@ -14012,6 +14529,7 @@ int test_case_1_10_9(int child)
 {
 	test_addr = &addrs[child];
 	test_alen = sizeof(addrs[child]) + 1;
+	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14047,7 +14565,7 @@ struct test_stream test_1_10_9_list = { &preamble_1_10_9_list, &test_case_1_10_9
 #define tgrp_case_2_2 test_group_2
 #define numb_case_2_2 "2.2"
 #define name_case_2_2 "Transfer connectionless data."
-#define sref_case_2_2 "(none)"
+#define sref_case_2_2 "XNS 5.2 -- Chapter 6 -- The Use of Options in XTI"
 #define desc_case_2_2 "\
 Attempts to transfer connectionless data."
 
@@ -14057,8 +14575,6 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	test_addr = addr;
 	test_alen = len;
 	test_data = msg;
-	test_opts = &opt_data;
-	test_olen = sizeof(opt_data);
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	start_tt(20000);
@@ -14067,12 +14583,8 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 			continue;
-		case __RESULT_FAILURE:
-			if (last_errno == EPROTO)
-				break;
-			goto failure;
 		case __TEST_UNITDATA_IND:
-			goto failure;
+			break;
 		default:
 			goto failure;
 		}
@@ -14101,13 +14613,69 @@ int test_case_2_2_list(int child)
 #define preamble_2_2_resp	preamble_1s
 #define preamble_2_2_list	preamble_1s
 
-#define postamble_2_2_conn	postamble_0
-#define postamble_2_2_resp	postamble_0
-#define postamble_2_2_list	postamble_0
+#define postamble_2_2_conn	postamble_1
+#define postamble_2_2_resp	postamble_1
+#define postamble_2_2_list	postamble_1
 
 struct test_stream test_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
 struct test_stream test_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
 struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &postamble_2_2_list };
+
+int test_case_2_2_xfail(int child, struct sockaddr_in *addr, socklen_t len)
+{
+	const char msg[] = "Unit test data.";
+	test_addr = addr;
+	test_alen = len;
+	test_data = msg;
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	start_tt(20000);
+	for (;;) {
+		state++;
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __EVENT_NO_MSG:
+			continue;
+		case __TEST_UNITDATA_IND:
+			goto failure;
+		case __RESULT_FAILURE:
+			if (last_errno == EPROTO)
+				break;
+			goto failure;
+		default:
+			goto failure;
+		}
+		break;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_2_2_xfail_conn(int child)
+{
+	return test_case_2_2_xfail(child, &addrs[1], sizeof(addrs[1]));
+}
+int test_case_2_2_xfail_resp(int child)
+{
+	return test_case_2_2_xfail(child, &addrs[2], sizeof(addrs[2]));
+}
+int test_case_2_2_xfail_list(int child)
+{
+	return test_case_2_2_xfail(child, &addrs[0], sizeof(addrs[0]));
+}
+
+#define preamble_2_2_xfail_conn	preamble_1s
+#define preamble_2_2_xfail_resp	preamble_1s
+#define preamble_2_2_xfail_list	preamble_1s
+
+#define postamble_2_2_xfail_conn	postamble_0
+#define postamble_2_2_xfail_resp	postamble_0
+#define postamble_2_2_xfail_list	postamble_0
+
+struct test_stream test_2_2_xfail_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_xfail_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_xfail_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_xfail_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_xfail_list = { &preamble_2_2_xfail_list, &test_case_2_2_xfail_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- XTI_DEBUG
@@ -14116,10 +14684,11 @@ struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &p
 #define tgrp_case_2_2_1_1 test_group_2_2_1
 #define numb_case_2_2_1_1 "2.2.1.1"
 #define name_case_2_2_1_1 "Transfer connectionless data with options -- XTI_DEBUG"
-#define sref_case_2_2_1_1 "(none)"
+#define sref_case_2_2_1_1 sref_case_2_2
 #define desc_case_2_2_1_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_DEBUG."
+case is XTI_DEBUG.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_1_conn(int child)
 {
@@ -14131,7 +14700,7 @@ int test_case_2_2_1_1_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_1_resp(int child)
 {
@@ -14143,7 +14712,7 @@ int test_case_2_2_1_1_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_1_list(int child)
 {
@@ -14155,12 +14724,12 @@ int test_case_2_2_1_1_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_1_conn = { &preamble_2_2_conn, &test_case_2_2_1_1_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_1_resp = { &preamble_2_2_resp, &test_case_2_2_1_1_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_1_list = { &preamble_2_2_list, &test_case_2_2_1_1_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_1_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_1_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_1_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_1_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_1_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_1_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14169,10 +14738,11 @@ struct test_stream test_2_2_1_1_list = { &preamble_2_2_list, &test_case_2_2_1_1_
 #define tgrp_case_2_2_1_2 test_group_2_2_1
 #define numb_case_2_2_1_2 "2.2.1.2"
 #define name_case_2_2_1_2 "Transfer connectionless data with options -- XTI_LINGER"
-#define sref_case_2_2_1_2 "(none)"
+#define sref_case_2_2_1_2 sref_case_2_2
 #define desc_case_2_2_1_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_LINGER."
+case is XTI_LINGER.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_2_conn(int child)
 {
@@ -14184,7 +14754,7 @@ int test_case_2_2_1_2_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_2_resp(int child)
 {
@@ -14196,7 +14766,7 @@ int test_case_2_2_1_2_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_2_list(int child)
 {
@@ -14208,12 +14778,12 @@ int test_case_2_2_1_2_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_2_conn = { &preamble_2_2_conn, &test_case_2_2_1_2_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_2_resp = { &preamble_2_2_resp, &test_case_2_2_1_2_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_2_list = { &preamble_2_2_list, &test_case_2_2_1_2_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_2_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_2_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_2_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_2_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_2_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_2_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14222,10 +14792,11 @@ struct test_stream test_2_2_1_2_list = { &preamble_2_2_list, &test_case_2_2_1_2_
 #define tgrp_case_2_2_1_3 test_group_2_2_1
 #define numb_case_2_2_1_3 "2.2.1.3"
 #define name_case_2_2_1_3 "Transfer connectionless data with options -- XTI_RCVBUF"
-#define sref_case_2_2_1_3 "(none)"
+#define sref_case_2_2_1_3 sref_case_2_2
 #define desc_case_2_2_1_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_RCVBUF."
+case is XTI_RCVBUF.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_3_conn(int child)
 {
@@ -14237,7 +14808,7 @@ int test_case_2_2_1_3_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_3_resp(int child)
 {
@@ -14249,7 +14820,7 @@ int test_case_2_2_1_3_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_3_list(int child)
 {
@@ -14261,12 +14832,12 @@ int test_case_2_2_1_3_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_3_conn = { &preamble_2_2_conn, &test_case_2_2_1_3_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_3_resp = { &preamble_2_2_resp, &test_case_2_2_1_3_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_3_list = { &preamble_2_2_list, &test_case_2_2_1_3_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_3_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_3_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_3_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_3_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_3_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_3_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14275,10 +14846,11 @@ struct test_stream test_2_2_1_3_list = { &preamble_2_2_list, &test_case_2_2_1_3_
 #define tgrp_case_2_2_1_4 test_group_2_2_1
 #define numb_case_2_2_1_4 "2.2.1.4"
 #define name_case_2_2_1_4 "Transfer connectionless data with options -- XTI_RCVLOWAT"
-#define sref_case_2_2_1_4 "(none)"
+#define sref_case_2_2_1_4 sref_case_2_2
 #define desc_case_2_2_1_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_RCVLOWAT."
+case is XTI_RCVLOWAT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_4_conn(int child)
 {
@@ -14290,7 +14862,7 @@ int test_case_2_2_1_4_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_4_resp(int child)
 {
@@ -14302,7 +14874,7 @@ int test_case_2_2_1_4_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_4_list(int child)
 {
@@ -14314,12 +14886,12 @@ int test_case_2_2_1_4_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_4_conn = { &preamble_2_2_conn, &test_case_2_2_1_4_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_4_resp = { &preamble_2_2_resp, &test_case_2_2_1_4_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_4_list = { &preamble_2_2_list, &test_case_2_2_1_4_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_4_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_4_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_4_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_4_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_4_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_4_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14328,10 +14900,11 @@ struct test_stream test_2_2_1_4_list = { &preamble_2_2_list, &test_case_2_2_1_4_
 #define tgrp_case_2_2_1_5 test_group_2_2_1
 #define numb_case_2_2_1_5 "2.2.1.5"
 #define name_case_2_2_1_5 "Transfer connectionless data with options -- XTI_SNDBUF"
-#define sref_case_2_2_1_5 "(none)"
+#define sref_case_2_2_1_5 sref_case_2_2
 #define desc_case_2_2_1_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_SNDBUF."
+case is XTI_SNDBUF.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_5_conn(int child)
 {
@@ -14343,7 +14916,7 @@ int test_case_2_2_1_5_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_5_resp(int child)
 {
@@ -14355,7 +14928,7 @@ int test_case_2_2_1_5_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_5_list(int child)
 {
@@ -14367,12 +14940,12 @@ int test_case_2_2_1_5_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_5_conn = { &preamble_2_2_conn, &test_case_2_2_1_5_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_5_resp = { &preamble_2_2_resp, &test_case_2_2_1_5_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_5_list = { &preamble_2_2_list, &test_case_2_2_1_5_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_5_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_5_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_5_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_5_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_5_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_5_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14381,10 +14954,11 @@ struct test_stream test_2_2_1_5_list = { &preamble_2_2_list, &test_case_2_2_1_5_
 #define tgrp_case_2_2_1_6 test_group_2_2_1
 #define numb_case_2_2_1_6 "2.2.1.6"
 #define name_case_2_2_1_6 "Transfer connectionless data with options -- XTI_SNDLOWAT"
-#define sref_case_2_2_1_6 "(none)"
+#define sref_case_2_2_1_6 sref_case_2_2
 #define desc_case_2_2_1_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is XTI_SNDLOWAT."
+case is XTI_SNDLOWAT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_1_6_conn(int child)
 {
@@ -14396,7 +14970,7 @@ int test_case_2_2_1_6_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_1_6_resp(int child)
 {
@@ -14408,7 +14982,7 @@ int test_case_2_2_1_6_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_1_6_list(int child)
 {
@@ -14420,12 +14994,12 @@ int test_case_2_2_1_6_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_1_6_conn = { &preamble_2_2_conn, &test_case_2_2_1_6_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_1_6_resp = { &preamble_2_2_resp, &test_case_2_2_1_6_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_1_6_list = { &preamble_2_2_list, &test_case_2_2_1_6_list, &postamble_2_2_list };
+struct test_stream test_2_2_1_6_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_1_6_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_1_6_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_1_6_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_1_6_list = { &preamble_2_2_xfail_list, &test_case_2_2_1_6_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_IP_TOS
@@ -14434,10 +15008,11 @@ struct test_stream test_2_2_1_6_list = { &preamble_2_2_list, &test_case_2_2_1_6_
 #define tgrp_case_2_2_2_1 test_group_2_2_2
 #define numb_case_2_2_2_1 "2.2.2.1"
 #define name_case_2_2_2_1 "Transfer connectionless data with options -- T_IP_TOS"
-#define sref_case_2_2_2_1 "(none)"
+#define sref_case_2_2_2_1 sref_case_2_2
 #define desc_case_2_2_2_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_IP_TOS."
+case is T_IP_TOS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_2_1_conn(int child)
 {
@@ -14449,7 +15024,7 @@ int test_case_2_2_2_1_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_2_1_resp(int child)
 {
@@ -14461,7 +15036,7 @@ int test_case_2_2_2_1_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_2_1_list(int child)
 {
@@ -14473,12 +15048,12 @@ int test_case_2_2_2_1_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_2_1_conn = { &preamble_2_2_conn, &test_case_2_2_2_1_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_2_1_resp = { &preamble_2_2_resp, &test_case_2_2_2_1_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_2_1_list = { &preamble_2_2_list, &test_case_2_2_2_1_list, &postamble_2_2_list };
+struct test_stream test_2_2_2_1_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_2_1_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_2_1_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_2_1_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_2_1_list = { &preamble_2_2_xfail_list, &test_case_2_2_2_1_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_IP_TTL
@@ -14486,10 +15061,11 @@ struct test_stream test_2_2_2_1_list = { &preamble_2_2_list, &test_case_2_2_2_1_
 #define tgrp_case_2_2_2_2 test_group_2_2_2
 #define numb_case_2_2_2_2 "2.2.2.2"
 #define name_case_2_2_2_2 "Transfer connectionless data with options -- T_IP_TTL"
-#define sref_case_2_2_2_2 "(none)"
+#define sref_case_2_2_2_2 sref_case_2_2
 #define desc_case_2_2_2_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_IP_TTL."
+case is T_IP_TTL.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_2_2_conn(int child)
 {
@@ -14501,7 +15077,7 @@ int test_case_2_2_2_2_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_2_2_resp(int child)
 {
@@ -14513,7 +15089,7 @@ int test_case_2_2_2_2_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_2_2_list(int child)
 {
@@ -14525,12 +15101,12 @@ int test_case_2_2_2_2_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_2_2_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_2_2_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_2_2_list = { &preamble_2_2_list, &test_case_2_2_2_2_list, &postamble_2_2_list };
+struct test_stream test_2_2_2_2_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_2_2_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_2_2_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_2_2_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_2_2_list = { &preamble_2_2_xfail_list, &test_case_2_2_2_2_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_IP_DONTROUTE
@@ -14538,10 +15114,11 @@ struct test_stream test_2_2_2_2_list = { &preamble_2_2_list, &test_case_2_2_2_2_
 #define tgrp_case_2_2_2_3 test_group_2_2_2
 #define numb_case_2_2_2_3 "2.2.2.3"
 #define name_case_2_2_2_3 "Transfer connectionless data with options -- T_IP_DONTROUTE"
-#define sref_case_2_2_2_3 "(none)"
+#define sref_case_2_2_2_3 sref_case_2_2
 #define desc_case_2_2_2_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_IP_DONTROUTE."
+case is T_IP_DONTROUTE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_2_3_conn(int child)
 {
@@ -14553,7 +15130,7 @@ int test_case_2_2_2_3_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_2_3_resp(int child)
 {
@@ -14565,7 +15142,7 @@ int test_case_2_2_2_3_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_2_3_list(int child)
 {
@@ -14577,12 +15154,12 @@ int test_case_2_2_2_3_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_2_3_conn = { &preamble_2_2_conn, &test_case_2_2_2_3_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_2_3_resp = { &preamble_2_2_resp, &test_case_2_2_2_3_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_2_3_list = { &preamble_2_2_list, &test_case_2_2_2_3_list, &postamble_2_2_list };
+struct test_stream test_2_2_2_3_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_2_3_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_2_3_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_2_3_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_2_3_list = { &preamble_2_2_xfail_list, &test_case_2_2_2_3_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_IP_BROADCAST
@@ -14590,10 +15167,11 @@ struct test_stream test_2_2_2_3_list = { &preamble_2_2_list, &test_case_2_2_2_3_
 #define tgrp_case_2_2_2_4 test_group_2_2_2
 #define numb_case_2_2_2_4 "2.2.2.4"
 #define name_case_2_2_2_4 "Transfer connectionless data with options -- T_IP_BROADCAST"
-#define sref_case_2_2_2_4 "(none)"
+#define sref_case_2_2_2_4 sref_case_2_2
 #define desc_case_2_2_2_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_IP_BROADCAST."
+case is T_IP_BROADCAST.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_2_4_conn(int child)
 {
@@ -14605,7 +15183,7 @@ int test_case_2_2_2_4_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_2_4_resp(int child)
 {
@@ -14617,7 +15195,7 @@ int test_case_2_2_2_4_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_2_4_list(int child)
 {
@@ -14629,12 +15207,12 @@ int test_case_2_2_2_4_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_2_4_conn = { &preamble_2_2_conn, &test_case_2_2_2_4_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_2_4_resp = { &preamble_2_2_resp, &test_case_2_2_2_4_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_2_4_list = { &preamble_2_2_list, &test_case_2_2_2_4_list, &postamble_2_2_list };
+struct test_stream test_2_2_2_4_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_2_4_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_2_4_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_2_4_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_2_4_list = { &preamble_2_2_xfail_list, &test_case_2_2_2_4_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_IP_REUSEADDR
@@ -14642,10 +15220,11 @@ struct test_stream test_2_2_2_4_list = { &preamble_2_2_list, &test_case_2_2_2_4_
 #define tgrp_case_2_2_2_5 test_group_2_2_2
 #define numb_case_2_2_2_5 "2.2.2.5"
 #define name_case_2_2_2_5 "Transfer connectionless data with options -- T_IP_REUSEADDR"
-#define sref_case_2_2_2_5 "(none)"
+#define sref_case_2_2_2_5 sref_case_2_2
 #define desc_case_2_2_2_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_IP_REUSEADDR."
+case is T_IP_REUSEADDR.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_2_5_conn(int child)
 {
@@ -14657,7 +15236,7 @@ int test_case_2_2_2_5_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_2_5_resp(int child)
 {
@@ -14669,7 +15248,7 @@ int test_case_2_2_2_5_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_2_5_list(int child)
 {
@@ -14681,12 +15260,12 @@ int test_case_2_2_2_5_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_2_5_conn = { &preamble_2_2_conn, &test_case_2_2_2_5_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_2_5_resp = { &preamble_2_2_resp, &test_case_2_2_2_5_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_2_5_list = { &preamble_2_2_list, &test_case_2_2_2_5_list, &postamble_2_2_list };
+struct test_stream test_2_2_2_5_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_2_5_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_2_5_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_2_5_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_2_5_list = { &preamble_2_2_xfail_list, &test_case_2_2_2_5_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- T_UDP_CHECKSUM
@@ -14695,10 +15274,11 @@ struct test_stream test_2_2_2_5_list = { &preamble_2_2_list, &test_case_2_2_2_5_
 #define tgrp_case_2_2_3_1 test_group_2_2_3
 #define numb_case_2_2_3_1 "2.2.3.1"
 #define name_case_2_2_3_1 "Transfer connectionless data with options -- T_UDP_CHECKSUM"
-#define sref_case_2_2_3_1 "(none)"
+#define sref_case_2_2_3_1 sref_case_2_2
 #define desc_case_2_2_3_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_UDP_CHECKSUM."
+case is T_UDP_CHECKSUM.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_3_1_conn(int child)
 {
@@ -14710,7 +15290,7 @@ int test_case_2_2_3_1_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_3_1_resp(int child)
 {
@@ -14722,7 +15302,7 @@ int test_case_2_2_3_1_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_3_1_list(int child)
 {
@@ -14734,12 +15314,12 @@ int test_case_2_2_3_1_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_3_1_conn = { &preamble_2_2_conn, &test_case_2_2_3_1_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_3_1_resp = { &preamble_2_2_resp, &test_case_2_2_3_1_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_3_1_list = { &preamble_2_2_list, &test_case_2_2_3_1_list, &postamble_2_2_list };
+struct test_stream test_2_2_3_1_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_3_1_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_3_1_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_3_1_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_3_1_list = { &preamble_2_2_xfail_list, &test_case_2_2_3_1_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14749,10 +15329,11 @@ struct test_stream test_2_2_3_1_list = { &preamble_2_2_list, &test_case_2_2_3_1_
 #define tgrp_case_2_2_4_1 test_group_2_2_4
 #define numb_case_2_2_4_1 "2.2.4.1"
 #define name_case_2_2_4_1 "Transfer connectionless data with options -- T_TCP_NODELAY"
-#define sref_case_2_2_4_1 "(none)"
+#define sref_case_2_2_4_1 sref_case_2_2
 #define desc_case_2_2_4_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_NODELAY."
+case is T_TCP_NODELAY.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_1_conn(int child)
 {
@@ -14764,7 +15345,7 @@ int test_case_2_2_4_1_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_1_resp(int child)
 {
@@ -14776,7 +15357,7 @@ int test_case_2_2_4_1_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_1_list(int child)
 {
@@ -14788,12 +15369,12 @@ int test_case_2_2_4_1_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_1_conn = { &preamble_2_2_conn, &test_case_2_2_4_1_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_1_resp = { &preamble_2_2_resp, &test_case_2_2_4_1_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_1_list = { &preamble_2_2_list, &test_case_2_2_4_1_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_1_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_1_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_1_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_1_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_1_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_1_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14803,10 +15384,11 @@ struct test_stream test_2_2_4_1_list = { &preamble_2_2_list, &test_case_2_2_4_1_
 #define tgrp_case_2_2_4_2 test_group_2_2_4
 #define numb_case_2_2_4_2 "2.2.4.2"
 #define name_case_2_2_4_2 "Transfer connectionless data with options -- T_TCP_MAXSEG"
-#define sref_case_2_2_4_2 "(none)"
+#define sref_case_2_2_4_2 sref_case_2_2
 #define desc_case_2_2_4_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_MAXSEG."
+case is T_TCP_MAXSEG.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_2_conn(int child)
 {
@@ -14818,7 +15400,7 @@ int test_case_2_2_4_2_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_2_resp(int child)
 {
@@ -14830,7 +15412,7 @@ int test_case_2_2_4_2_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_2_list(int child)
 {
@@ -14842,12 +15424,12 @@ int test_case_2_2_4_2_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_2_conn = { &preamble_2_2_conn, &test_case_2_2_4_2_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_2_resp = { &preamble_2_2_resp, &test_case_2_2_4_2_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_2_list = { &preamble_2_2_list, &test_case_2_2_4_2_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_2_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_2_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_2_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_2_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_2_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_2_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14857,10 +15439,11 @@ struct test_stream test_2_2_4_2_list = { &preamble_2_2_list, &test_case_2_2_4_2_
 #define tgrp_case_2_2_4_3 test_group_2_2_4
 #define numb_case_2_2_4_3 "2.2.4.3"
 #define name_case_2_2_4_3 "Transfer connectionless data with options -- T_TCP_KEEPALIVE"
-#define sref_case_2_2_4_3 "(none)"
+#define sref_case_2_2_4_3 sref_case_2_2
 #define desc_case_2_2_4_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPALIVE."
+case is T_TCP_KEEPALIVE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_3_conn(int child)
 {
@@ -14872,7 +15455,7 @@ int test_case_2_2_4_3_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_3_resp(int child)
 {
@@ -14884,7 +15467,7 @@ int test_case_2_2_4_3_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_3_list(int child)
 {
@@ -14896,12 +15479,12 @@ int test_case_2_2_4_3_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_3_conn = { &preamble_2_2_conn, &test_case_2_2_4_3_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_3_resp = { &preamble_2_2_resp, &test_case_2_2_4_3_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_3_list = { &preamble_2_2_list, &test_case_2_2_4_3_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_3_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_3_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_3_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_3_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_3_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_3_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14911,10 +15494,11 @@ struct test_stream test_2_2_4_3_list = { &preamble_2_2_list, &test_case_2_2_4_3_
 #define tgrp_case_2_2_4_4 test_group_2_2_4
 #define numb_case_2_2_4_4 "2.2.4.4"
 #define name_case_2_2_4_4 "Transfer connectionless data with options -- T_TCP_CORK"
-#define sref_case_2_2_4_4 "(none)"
+#define sref_case_2_2_4_4 sref_case_2_2
 #define desc_case_2_2_4_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_CORK."
+case is T_TCP_CORK.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_4_conn(int child)
 {
@@ -14926,7 +15510,7 @@ int test_case_2_2_4_4_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_4_resp(int child)
 {
@@ -14938,7 +15522,7 @@ int test_case_2_2_4_4_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_4_list(int child)
 {
@@ -14950,12 +15534,12 @@ int test_case_2_2_4_4_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_4_conn = { &preamble_2_2_conn, &test_case_2_2_4_4_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_4_resp = { &preamble_2_2_resp, &test_case_2_2_4_4_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_4_list = { &preamble_2_2_list, &test_case_2_2_4_4_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_4_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_4_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_4_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_4_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_4_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_4_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -14965,10 +15549,11 @@ struct test_stream test_2_2_4_4_list = { &preamble_2_2_list, &test_case_2_2_4_4_
 #define tgrp_case_2_2_4_5 test_group_2_2_4
 #define numb_case_2_2_4_5 "2.2.4.5"
 #define name_case_2_2_4_5 "Transfer connectionless data with options -- T_TCP_KEEPIDLE"
-#define sref_case_2_2_4_5 "(none)"
+#define sref_case_2_2_4_5 sref_case_2_2
 #define desc_case_2_2_4_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPIDLE."
+case is T_TCP_KEEPIDLE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_5_conn(int child)
 {
@@ -14980,7 +15565,7 @@ int test_case_2_2_4_5_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_5_resp(int child)
 {
@@ -14992,7 +15577,7 @@ int test_case_2_2_4_5_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_5_list(int child)
 {
@@ -15004,12 +15589,12 @@ int test_case_2_2_4_5_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_5_conn = { &preamble_2_2_conn, &test_case_2_2_4_5_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_5_resp = { &preamble_2_2_resp, &test_case_2_2_4_5_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_5_list = { &preamble_2_2_list, &test_case_2_2_4_5_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_5_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_5_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_5_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_5_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_5_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_5_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15019,10 +15604,11 @@ struct test_stream test_2_2_4_5_list = { &preamble_2_2_list, &test_case_2_2_4_5_
 #define tgrp_case_2_2_4_6 test_group_2_2_4
 #define numb_case_2_2_4_6 "2.2.4.6"
 #define name_case_2_2_4_6 "Transfer connectionless data with options -- T_TCP_KEEPINTVL"
-#define sref_case_2_2_4_6 "(none)"
+#define sref_case_2_2_4_6 sref_case_2_2
 #define desc_case_2_2_4_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPINTVL."
+case is T_TCP_KEEPINTVL.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_6_conn(int child)
 {
@@ -15034,7 +15620,7 @@ int test_case_2_2_4_6_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_6_resp(int child)
 {
@@ -15046,7 +15632,7 @@ int test_case_2_2_4_6_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_6_list(int child)
 {
@@ -15058,12 +15644,12 @@ int test_case_2_2_4_6_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_6_conn = { &preamble_2_2_conn, &test_case_2_2_4_6_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_6_resp = { &preamble_2_2_resp, &test_case_2_2_4_6_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_6_list = { &preamble_2_2_list, &test_case_2_2_4_6_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_6_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_6_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_6_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_6_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_6_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_6_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15073,10 +15659,11 @@ struct test_stream test_2_2_4_6_list = { &preamble_2_2_list, &test_case_2_2_4_6_
 #define tgrp_case_2_2_4_7 test_group_2_2_4
 #define numb_case_2_2_4_7 "2.2.4.7"
 #define name_case_2_2_4_7 "Transfer connectionless data with options -- T_TCP_KEEPCNT"
-#define sref_case_2_2_4_7 "(none)"
+#define sref_case_2_2_4_7 sref_case_2_2
 #define desc_case_2_2_4_7 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPCNT."
+case is T_TCP_KEEPCNT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_7_conn(int child)
 {
@@ -15088,7 +15675,7 @@ int test_case_2_2_4_7_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_7_resp(int child)
 {
@@ -15100,7 +15687,7 @@ int test_case_2_2_4_7_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_7_list(int child)
 {
@@ -15112,12 +15699,12 @@ int test_case_2_2_4_7_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_7_conn = { &preamble_2_2_conn, &test_case_2_2_4_7_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_7_resp = { &preamble_2_2_resp, &test_case_2_2_4_7_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_7_list = { &preamble_2_2_list, &test_case_2_2_4_7_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_7_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_7_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_7_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_7_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_7_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_7_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15127,10 +15714,11 @@ struct test_stream test_2_2_4_7_list = { &preamble_2_2_list, &test_case_2_2_4_7_
 #define tgrp_case_2_2_4_8 test_group_2_2_4
 #define numb_case_2_2_4_8 "2.2.4.8"
 #define name_case_2_2_4_8 "Transfer connectionless data with options -- T_TCP_SYNCNT"
-#define sref_case_2_2_4_8 "(none)"
+#define sref_case_2_2_4_8 sref_case_2_2
 #define desc_case_2_2_4_8 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_SYNCNT."
+case is T_TCP_SYNCNT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_8_conn(int child)
 {
@@ -15142,7 +15730,7 @@ int test_case_2_2_4_8_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_8_resp(int child)
 {
@@ -15154,7 +15742,7 @@ int test_case_2_2_4_8_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_8_list(int child)
 {
@@ -15166,12 +15754,12 @@ int test_case_2_2_4_8_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_8_conn = { &preamble_2_2_conn, &test_case_2_2_4_8_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_8_resp = { &preamble_2_2_resp, &test_case_2_2_4_8_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_8_list = { &preamble_2_2_list, &test_case_2_2_4_8_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_8_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_8_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_8_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_8_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_8_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_8_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15181,10 +15769,11 @@ struct test_stream test_2_2_4_8_list = { &preamble_2_2_list, &test_case_2_2_4_8_
 #define tgrp_case_2_2_4_9 test_group_2_2_4
 #define numb_case_2_2_4_9 "2.2.4.9"
 #define name_case_2_2_4_9 "Transfer connectionless data with options -- T_TCP_LINGER2"
-#define sref_case_2_2_4_9 "(none)"
+#define sref_case_2_2_4_9 sref_case_2_2
 #define desc_case_2_2_4_9 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_LINGER2."
+case is T_TCP_LINGER2.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_9_conn(int child)
 {
@@ -15196,7 +15785,7 @@ int test_case_2_2_4_9_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_9_resp(int child)
 {
@@ -15208,7 +15797,7 @@ int test_case_2_2_4_9_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_9_list(int child)
 {
@@ -15220,12 +15809,12 @@ int test_case_2_2_4_9_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_9_conn = { &preamble_2_2_conn, &test_case_2_2_4_9_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_9_resp = { &preamble_2_2_resp, &test_case_2_2_4_9_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_9_list = { &preamble_2_2_list, &test_case_2_2_4_9_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_9_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_9_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_9_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_9_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_9_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_9_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15235,10 +15824,11 @@ struct test_stream test_2_2_4_9_list = { &preamble_2_2_list, &test_case_2_2_4_9_
 #define tgrp_case_2_2_4_10 test_group_2_2_4
 #define numb_case_2_2_4_10 "2.2.4.10"
 #define name_case_2_2_4_10 "Transfer connectionless data with options -- T_TCP_DEFER_ACCEPT"
-#define sref_case_2_2_4_10 "(none)"
+#define sref_case_2_2_4_10 sref_case_2_2
 #define desc_case_2_2_4_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_DEFER_ACCEPT."
+case is T_TCP_DEFER_ACCEPT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_10_conn(int child)
 {
@@ -15250,7 +15840,7 @@ int test_case_2_2_4_10_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_10_resp(int child)
 {
@@ -15262,7 +15852,7 @@ int test_case_2_2_4_10_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_10_list(int child)
 {
@@ -15274,12 +15864,12 @@ int test_case_2_2_4_10_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_10_conn = { &preamble_2_2_conn, &test_case_2_2_4_10_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_10_resp = { &preamble_2_2_resp, &test_case_2_2_4_10_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_10_list = { &preamble_2_2_list, &test_case_2_2_4_10_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_10_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_10_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_10_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_10_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_10_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_10_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15289,10 +15879,11 @@ struct test_stream test_2_2_4_10_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define tgrp_case_2_2_4_11 test_group_2_2_4
 #define numb_case_2_2_4_11 "2.2.4.11"
 #define name_case_2_2_4_11 "Transfer connectionless data with options -- T_TCP_WINDOW_CLAMP"
-#define sref_case_2_2_4_11 "(none)"
+#define sref_case_2_2_4_11 sref_case_2_2
 #define desc_case_2_2_4_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_WINDOW_CLAMP."
+case is T_TCP_WINDOW_CLAMP.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_11_conn(int child)
 {
@@ -15304,7 +15895,7 @@ int test_case_2_2_4_11_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_11_resp(int child)
 {
@@ -15316,7 +15907,7 @@ int test_case_2_2_4_11_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_11_list(int child)
 {
@@ -15328,12 +15919,12 @@ int test_case_2_2_4_11_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_11_conn = { &preamble_2_2_conn, &test_case_2_2_4_11_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_11_resp = { &preamble_2_2_resp, &test_case_2_2_4_11_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_11_list = { &preamble_2_2_list, &test_case_2_2_4_11_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_11_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_11_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_11_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_11_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_11_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_11_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15343,10 +15934,11 @@ struct test_stream test_2_2_4_11_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define tgrp_case_2_2_4_12 test_group_2_2_4
 #define numb_case_2_2_4_12 "2.2.4.12"
 #define name_case_2_2_4_12 "Transfer connectionless data with options -- T_TCP_INFO"
-#define sref_case_2_2_4_12 "(none)"
+#define sref_case_2_2_4_12 sref_case_2_2
 #define desc_case_2_2_4_12 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_INFO."
+case is T_TCP_INFO.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_12_conn(int child)
 {
@@ -15358,7 +15950,7 @@ int test_case_2_2_4_12_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_12_resp(int child)
 {
@@ -15370,7 +15962,7 @@ int test_case_2_2_4_12_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_12_list(int child)
 {
@@ -15382,12 +15974,12 @@ int test_case_2_2_4_12_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_12_conn = { &preamble_2_2_conn, &test_case_2_2_4_12_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_12_resp = { &preamble_2_2_resp, &test_case_2_2_4_12_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_12_list = { &preamble_2_2_list, &test_case_2_2_4_12_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_12_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_12_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_12_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_12_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_12_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_12_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15397,10 +15989,11 @@ struct test_stream test_2_2_4_12_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define tgrp_case_2_2_4_13 test_group_2_2_4
 #define numb_case_2_2_4_13 "2.2.4.13"
 #define name_case_2_2_4_13 "Transfer connectionless data with options -- T_TCP_QUICKACK"
-#define sref_case_2_2_4_13 "(none)"
+#define sref_case_2_2_4_13 sref_case_2_2
 #define desc_case_2_2_4_13 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_QUICKACK."
+case is T_TCP_QUICKACK.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_4_13_conn(int child)
 {
@@ -15412,7 +16005,7 @@ int test_case_2_2_4_13_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_4_13_resp(int child)
 {
@@ -15424,7 +16017,7 @@ int test_case_2_2_4_13_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_4_13_list(int child)
 {
@@ -15436,12 +16029,12 @@ int test_case_2_2_4_13_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_4_13_conn = { &preamble_2_2_conn, &test_case_2_2_4_13_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_4_13_resp = { &preamble_2_2_resp, &test_case_2_2_4_13_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_4_13_list = { &preamble_2_2_list, &test_case_2_2_4_13_list, &postamble_2_2_list };
+struct test_stream test_2_2_4_13_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_4_13_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_4_13_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_4_13_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_4_13_list = { &preamble_2_2_xfail_list, &test_case_2_2_4_13_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15451,10 +16044,11 @@ struct test_stream test_2_2_4_13_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define tgrp_case_2_2_5_1 test_group_2_2_5
 #define numb_case_2_2_5_1 "2.2.5.1"
 #define name_case_2_2_5_1 "Transfer connectionless data with options -- T_SCTP_NODELAY"
-#define sref_case_2_2_5_1 "(none)"
+#define sref_case_2_2_5_1 sref_case_2_2
 #define desc_case_2_2_5_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_NODELAY."
+case is T_SCTP_NODELAY.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_1_conn(int child)
 {
@@ -15466,7 +16060,7 @@ int test_case_2_2_5_1_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_1_resp(int child)
 {
@@ -15478,7 +16072,7 @@ int test_case_2_2_5_1_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_1_list(int child)
 {
@@ -15490,12 +16084,12 @@ int test_case_2_2_5_1_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_1_conn = { &preamble_2_2_conn, &test_case_2_2_5_1_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_1_resp = { &preamble_2_2_resp, &test_case_2_2_5_1_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_1_list = { &preamble_2_2_list, &test_case_2_2_5_1_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_1_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_1_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_1_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_1_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_1_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_1_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15505,10 +16099,11 @@ struct test_stream test_2_2_5_1_list = { &preamble_2_2_list, &test_case_2_2_5_1_
 #define tgrp_case_2_2_5_2 test_group_2_2_5
 #define numb_case_2_2_5_2 "2.2.5.2"
 #define name_case_2_2_5_2 "Transfer connectionless data with options -- T_SCTP_CORK"
-#define sref_case_2_2_5_2 "(none)"
+#define sref_case_2_2_5_2 sref_case_2_2
 #define desc_case_2_2_5_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_CORK."
+case is T_SCTP_CORK.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_2_conn(int child)
 {
@@ -15520,7 +16115,7 @@ int test_case_2_2_5_2_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_2_resp(int child)
 {
@@ -15532,7 +16127,7 @@ int test_case_2_2_5_2_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_2_list(int child)
 {
@@ -15544,12 +16139,12 @@ int test_case_2_2_5_2_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_2_conn = { &preamble_2_2_conn, &test_case_2_2_5_2_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_2_resp = { &preamble_2_2_resp, &test_case_2_2_5_2_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_2_list = { &preamble_2_2_list, &test_case_2_2_5_2_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_2_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_2_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_2_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_2_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_2_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_2_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15559,10 +16154,11 @@ struct test_stream test_2_2_5_2_list = { &preamble_2_2_list, &test_case_2_2_5_2_
 #define tgrp_case_2_2_5_3 test_group_2_2_5
 #define numb_case_2_2_5_3 "2.2.5.3"
 #define name_case_2_2_5_3 "Transfer connectionless data with options -- T_SCTP_PPI"
-#define sref_case_2_2_5_3 "(none)"
+#define sref_case_2_2_5_3 sref_case_2_2
 #define desc_case_2_2_5_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_PPI."
+case is T_SCTP_PPI.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_3_conn(int child)
 {
@@ -15574,7 +16170,7 @@ int test_case_2_2_5_3_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_3_resp(int child)
 {
@@ -15586,7 +16182,7 @@ int test_case_2_2_5_3_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_3_list(int child)
 {
@@ -15598,12 +16194,12 @@ int test_case_2_2_5_3_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_3_conn = { &preamble_2_2_conn, &test_case_2_2_5_3_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_3_resp = { &preamble_2_2_resp, &test_case_2_2_5_3_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_3_list = { &preamble_2_2_list, &test_case_2_2_5_3_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_3_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_3_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_3_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_3_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_3_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_3_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15613,10 +16209,11 @@ struct test_stream test_2_2_5_3_list = { &preamble_2_2_list, &test_case_2_2_5_3_
 #define tgrp_case_2_2_5_4 test_group_2_2_5
 #define numb_case_2_2_5_4 "2.2.5.4"
 #define name_case_2_2_5_4 "Transfer connectionless data with options -- T_SCTP_SID"
-#define sref_case_2_2_5_4 "(none)"
+#define sref_case_2_2_5_4 sref_case_2_2
 #define desc_case_2_2_5_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SID."
+case is T_SCTP_SID.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_4_conn(int child)
 {
@@ -15628,7 +16225,7 @@ int test_case_2_2_5_4_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_4_resp(int child)
 {
@@ -15640,7 +16237,7 @@ int test_case_2_2_5_4_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_4_list(int child)
 {
@@ -15652,12 +16249,12 @@ int test_case_2_2_5_4_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_4_conn = { &preamble_2_2_conn, &test_case_2_2_5_4_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_4_resp = { &preamble_2_2_resp, &test_case_2_2_5_4_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_4_list = { &preamble_2_2_list, &test_case_2_2_5_4_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_4_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_4_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_4_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_4_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_4_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_4_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15667,10 +16264,11 @@ struct test_stream test_2_2_5_4_list = { &preamble_2_2_list, &test_case_2_2_5_4_
 #define tgrp_case_2_2_5_5 test_group_2_2_5
 #define numb_case_2_2_5_5 "2.2.5.5"
 #define name_case_2_2_5_5 "Transfer connectionless data with options -- T_SCTP_SSN"
-#define sref_case_2_2_5_5 "(none)"
+#define sref_case_2_2_5_5 sref_case_2_2
 #define desc_case_2_2_5_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SSN."
+case is T_SCTP_SSN.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_5_conn(int child)
 {
@@ -15682,7 +16280,7 @@ int test_case_2_2_5_5_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_5_resp(int child)
 {
@@ -15694,7 +16292,7 @@ int test_case_2_2_5_5_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_5_list(int child)
 {
@@ -15706,12 +16304,12 @@ int test_case_2_2_5_5_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_5_conn = { &preamble_2_2_conn, &test_case_2_2_5_5_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_5_resp = { &preamble_2_2_resp, &test_case_2_2_5_5_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_5_list = { &preamble_2_2_list, &test_case_2_2_5_5_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_5_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_5_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_5_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_5_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_5_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_5_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15721,10 +16319,11 @@ struct test_stream test_2_2_5_5_list = { &preamble_2_2_list, &test_case_2_2_5_5_
 #define tgrp_case_2_2_5_6 test_group_2_2_5
 #define numb_case_2_2_5_6 "2.2.5.6"
 #define name_case_2_2_5_6 "Transfer connectionless data with options -- T_SCTP_TSN"
-#define sref_case_2_2_5_6 "(none)"
+#define sref_case_2_2_5_6 sref_case_2_2
 #define desc_case_2_2_5_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_TSN."
+case is T_SCTP_TSN.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_6_conn(int child)
 {
@@ -15736,7 +16335,7 @@ int test_case_2_2_5_6_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_6_resp(int child)
 {
@@ -15748,7 +16347,7 @@ int test_case_2_2_5_6_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_6_list(int child)
 {
@@ -15760,12 +16359,12 @@ int test_case_2_2_5_6_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_6_conn = { &preamble_2_2_conn, &test_case_2_2_5_6_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_6_resp = { &preamble_2_2_resp, &test_case_2_2_5_6_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_6_list = { &preamble_2_2_list, &test_case_2_2_5_6_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_6_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_6_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_6_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_6_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_6_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_6_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15775,10 +16374,11 @@ struct test_stream test_2_2_5_6_list = { &preamble_2_2_list, &test_case_2_2_5_6_
 #define tgrp_case_2_2_5_7 test_group_2_2_5
 #define numb_case_2_2_5_7 "2.2.5.7"
 #define name_case_2_2_5_7 "Transfer connectionless data with options -- T_SCTP_RECVOPT"
-#define sref_case_2_2_5_7 "(none)"
+#define sref_case_2_2_5_7 sref_case_2_2
 #define desc_case_2_2_5_7 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RECVOPT."
+case is T_SCTP_RECVOPT.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_7_conn(int child)
 {
@@ -15790,7 +16390,7 @@ int test_case_2_2_5_7_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_7_resp(int child)
 {
@@ -15802,7 +16402,7 @@ int test_case_2_2_5_7_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_7_list(int child)
 {
@@ -15814,12 +16414,12 @@ int test_case_2_2_5_7_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_7_conn = { &preamble_2_2_conn, &test_case_2_2_5_7_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_7_resp = { &preamble_2_2_resp, &test_case_2_2_5_7_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_7_list = { &preamble_2_2_list, &test_case_2_2_5_7_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_7_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_7_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_7_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_7_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_7_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_7_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15829,10 +16429,11 @@ struct test_stream test_2_2_5_7_list = { &preamble_2_2_list, &test_case_2_2_5_7_
 #define tgrp_case_2_2_5_8 test_group_2_2_5
 #define numb_case_2_2_5_8 "2.2.5.8"
 #define name_case_2_2_5_8 "Transfer connectionless data with options -- T_SCTP_COOKIE_LIFE"
-#define sref_case_2_2_5_8 "(none)"
+#define sref_case_2_2_5_8 sref_case_2_2
 #define desc_case_2_2_5_8 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_COOKIE_LIFE."
+case is T_SCTP_COOKIE_LIFE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_8_conn(int child)
 {
@@ -15844,7 +16445,7 @@ int test_case_2_2_5_8_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_8_resp(int child)
 {
@@ -15856,7 +16457,7 @@ int test_case_2_2_5_8_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_8_list(int child)
 {
@@ -15868,12 +16469,12 @@ int test_case_2_2_5_8_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_8_conn = { &preamble_2_2_conn, &test_case_2_2_5_8_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_8_resp = { &preamble_2_2_resp, &test_case_2_2_5_8_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_8_list = { &preamble_2_2_list, &test_case_2_2_5_8_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_8_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_8_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_8_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_8_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_8_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_8_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15883,10 +16484,11 @@ struct test_stream test_2_2_5_8_list = { &preamble_2_2_list, &test_case_2_2_5_8_
 #define tgrp_case_2_2_5_9 test_group_2_2_5
 #define numb_case_2_2_5_9 "2.2.5.9"
 #define name_case_2_2_5_9 "Transfer connectionless data with options -- T_SCTP_SACK_DELAY"
-#define sref_case_2_2_5_9 "(none)"
+#define sref_case_2_2_5_9 sref_case_2_2
 #define desc_case_2_2_5_9 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SACK_DELAY."
+case is T_SCTP_SACK_DELAY.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_9_conn(int child)
 {
@@ -15898,7 +16500,7 @@ int test_case_2_2_5_9_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_9_resp(int child)
 {
@@ -15910,7 +16512,7 @@ int test_case_2_2_5_9_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_9_list(int child)
 {
@@ -15922,12 +16524,12 @@ int test_case_2_2_5_9_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_9_conn = { &preamble_2_2_conn, &test_case_2_2_5_9_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_9_resp = { &preamble_2_2_resp, &test_case_2_2_5_9_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_9_list = { &preamble_2_2_list, &test_case_2_2_5_9_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_9_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_9_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_9_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_9_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_9_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_9_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15937,10 +16539,11 @@ struct test_stream test_2_2_5_9_list = { &preamble_2_2_list, &test_case_2_2_5_9_
 #define tgrp_case_2_2_5_10 test_group_2_2_5
 #define numb_case_2_2_5_10 "2.2.5.10"
 #define name_case_2_2_5_10 "Transfer connectionless data with options -- T_SCTP_PATH_MAX_RETRANS"
-#define sref_case_2_2_5_10 "(none)"
+#define sref_case_2_2_5_10 sref_case_2_2
 #define desc_case_2_2_5_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_PATH_MAX_RETRANS."
+case is T_SCTP_PATH_MAX_RETRANS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_10_conn(int child)
 {
@@ -15952,7 +16555,7 @@ int test_case_2_2_5_10_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_10_resp(int child)
 {
@@ -15964,7 +16567,7 @@ int test_case_2_2_5_10_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_10_list(int child)
 {
@@ -15976,12 +16579,12 @@ int test_case_2_2_5_10_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_10_conn = { &preamble_2_2_conn, &test_case_2_2_5_10_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_10_resp = { &preamble_2_2_resp, &test_case_2_2_5_10_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_10_list = { &preamble_2_2_list, &test_case_2_2_5_10_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_10_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_10_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_10_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_10_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_10_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_10_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -15991,10 +16594,11 @@ struct test_stream test_2_2_5_10_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_11 test_group_2_2_5
 #define numb_case_2_2_5_11 "2.2.5.11"
 #define name_case_2_2_5_11 "Transfer connectionless data with options -- T_SCTP_ASSOC_MAX_RETRANS"
-#define sref_case_2_2_5_11 "(none)"
+#define sref_case_2_2_5_11 sref_case_2_2
 #define desc_case_2_2_5_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ASSOC_MAX_RETRANS."
+case is T_SCTP_ASSOC_MAX_RETRANS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_11_conn(int child)
 {
@@ -16006,7 +16610,7 @@ int test_case_2_2_5_11_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_11_resp(int child)
 {
@@ -16018,7 +16622,7 @@ int test_case_2_2_5_11_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_11_list(int child)
 {
@@ -16030,12 +16634,12 @@ int test_case_2_2_5_11_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_11_conn = { &preamble_2_2_conn, &test_case_2_2_5_11_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_11_resp = { &preamble_2_2_resp, &test_case_2_2_5_11_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_11_list = { &preamble_2_2_list, &test_case_2_2_5_11_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_11_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_11_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_11_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_11_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_11_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_11_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16045,10 +16649,11 @@ struct test_stream test_2_2_5_11_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_12 test_group_2_2_5
 #define numb_case_2_2_5_12 "2.2.5.12"
 #define name_case_2_2_5_12 "Transfer connectionless data with options -- T_SCTP_MAX_INIT_RETRIES"
-#define sref_case_2_2_5_12 "(none)"
+#define sref_case_2_2_5_12 sref_case_2_2
 #define desc_case_2_2_5_12 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAX_INIT_RETRIES."
+case is T_SCTP_MAX_INIT_RETRIES.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_12_conn(int child)
 {
@@ -16060,7 +16665,7 @@ int test_case_2_2_5_12_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_12_resp(int child)
 {
@@ -16072,7 +16677,7 @@ int test_case_2_2_5_12_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_12_list(int child)
 {
@@ -16084,12 +16689,12 @@ int test_case_2_2_5_12_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_12_conn = { &preamble_2_2_conn, &test_case_2_2_5_12_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_12_resp = { &preamble_2_2_resp, &test_case_2_2_5_12_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_12_list = { &preamble_2_2_list, &test_case_2_2_5_12_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_12_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_12_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_12_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_12_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_12_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_12_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16099,10 +16704,11 @@ struct test_stream test_2_2_5_12_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_13 test_group_2_2_5
 #define numb_case_2_2_5_13 "2.2.5.13"
 #define name_case_2_2_5_13 "Transfer connectionless data with options -- T_SCTP_HEARTBEAT_ITVL"
-#define sref_case_2_2_5_13 "(none)"
+#define sref_case_2_2_5_13 sref_case_2_2
 #define desc_case_2_2_5_13 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_HEARTBEAT_ITVL."
+case is T_SCTP_HEARTBEAT_ITVL.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_13_conn(int child)
 {
@@ -16114,7 +16720,7 @@ int test_case_2_2_5_13_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_13_resp(int child)
 {
@@ -16126,7 +16732,7 @@ int test_case_2_2_5_13_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_13_list(int child)
 {
@@ -16138,12 +16744,12 @@ int test_case_2_2_5_13_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_13_conn = { &preamble_2_2_conn, &test_case_2_2_5_13_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_13_resp = { &preamble_2_2_resp, &test_case_2_2_5_13_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_13_list = { &preamble_2_2_list, &test_case_2_2_5_13_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_13_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_13_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_13_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_13_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_13_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_13_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16153,10 +16759,11 @@ struct test_stream test_2_2_5_13_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_14 test_group_2_2_5
 #define numb_case_2_2_5_14 "2.2.5.14"
 #define name_case_2_2_5_14 "Transfer connectionless data with options -- T_SCTP_RTO_INITIAL"
-#define sref_case_2_2_5_14 "(none)"
+#define sref_case_2_2_5_14 sref_case_2_2
 #define desc_case_2_2_5_14 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RTO_INITIAL."
+case is T_SCTP_RTO_INITIAL.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_14_conn(int child)
 {
@@ -16168,7 +16775,7 @@ int test_case_2_2_5_14_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_14_resp(int child)
 {
@@ -16180,7 +16787,7 @@ int test_case_2_2_5_14_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_14_list(int child)
 {
@@ -16192,12 +16799,12 @@ int test_case_2_2_5_14_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_14_conn = { &preamble_2_2_conn, &test_case_2_2_5_14_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_14_resp = { &preamble_2_2_resp, &test_case_2_2_5_14_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_14_list = { &preamble_2_2_list, &test_case_2_2_5_14_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_14_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_14_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_14_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_14_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_14_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_14_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16207,10 +16814,11 @@ struct test_stream test_2_2_5_14_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_15 test_group_2_2_5
 #define numb_case_2_2_5_15 "2.2.5.15"
 #define name_case_2_2_5_15 "Transfer connectionless data with options -- T_SCTP_RTO_MIN"
-#define sref_case_2_2_5_15 "(none)"
+#define sref_case_2_2_5_15 sref_case_2_2
 #define desc_case_2_2_5_15 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RTO_MIN."
+case is T_SCTP_RTO_MIN.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_15_conn(int child)
 {
@@ -16222,7 +16830,7 @@ int test_case_2_2_5_15_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_15_resp(int child)
 {
@@ -16234,7 +16842,7 @@ int test_case_2_2_5_15_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_15_list(int child)
 {
@@ -16246,12 +16854,12 @@ int test_case_2_2_5_15_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_15_conn = { &preamble_2_2_conn, &test_case_2_2_5_15_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_15_resp = { &preamble_2_2_resp, &test_case_2_2_5_15_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_15_list = { &preamble_2_2_list, &test_case_2_2_5_15_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_15_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_15_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_15_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_15_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_15_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_15_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16261,10 +16869,11 @@ struct test_stream test_2_2_5_15_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_16 test_group_2_2_5
 #define numb_case_2_2_5_16 "2.2.5.16"
 #define name_case_2_2_5_16 "Transfer connectionless data with options -- T_SCTP_RTO_MAX"
-#define sref_case_2_2_5_16 "(none)"
+#define sref_case_2_2_5_16 sref_case_2_2
 #define desc_case_2_2_5_16 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RTO_MAX."
+case is T_SCTP_RTO_MAX.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_16_conn(int child)
 {
@@ -16276,7 +16885,7 @@ int test_case_2_2_5_16_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_16_resp(int child)
 {
@@ -16288,7 +16897,7 @@ int test_case_2_2_5_16_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_16_list(int child)
 {
@@ -16300,12 +16909,12 @@ int test_case_2_2_5_16_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_16_conn = { &preamble_2_2_conn, &test_case_2_2_5_16_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_16_resp = { &preamble_2_2_resp, &test_case_2_2_5_16_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_16_list = { &preamble_2_2_list, &test_case_2_2_5_16_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_16_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_16_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_16_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_16_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_16_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_16_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16315,10 +16924,11 @@ struct test_stream test_2_2_5_16_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_17 test_group_2_2_5
 #define numb_case_2_2_5_17 "2.2.5.17"
 #define name_case_2_2_5_17 "Transfer connectionless data with options -- T_SCTP_OSTREAMS"
-#define sref_case_2_2_5_17 "(none)"
+#define sref_case_2_2_5_17 sref_case_2_2
 #define desc_case_2_2_5_17 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_OSTREAMS."
+case is T_SCTP_OSTREAMS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_17_conn(int child)
 {
@@ -16330,7 +16940,7 @@ int test_case_2_2_5_17_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_17_resp(int child)
 {
@@ -16342,7 +16952,7 @@ int test_case_2_2_5_17_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_17_list(int child)
 {
@@ -16354,12 +16964,12 @@ int test_case_2_2_5_17_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_17_conn = { &preamble_2_2_conn, &test_case_2_2_5_17_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_17_resp = { &preamble_2_2_resp, &test_case_2_2_5_17_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_17_list = { &preamble_2_2_list, &test_case_2_2_5_17_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_17_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_17_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_17_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_17_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_17_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_17_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16369,10 +16979,11 @@ struct test_stream test_2_2_5_17_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_18 test_group_2_2_5
 #define numb_case_2_2_5_18 "2.2.5.18"
 #define name_case_2_2_5_18 "Transfer connectionless data with options -- T_SCTP_ISTREAMS"
-#define sref_case_2_2_5_18 "(none)"
+#define sref_case_2_2_5_18 sref_case_2_2
 #define desc_case_2_2_5_18 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ISTREAMS."
+case is T_SCTP_ISTREAMS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_18_conn(int child)
 {
@@ -16384,7 +16995,7 @@ int test_case_2_2_5_18_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_18_resp(int child)
 {
@@ -16396,7 +17007,7 @@ int test_case_2_2_5_18_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_18_list(int child)
 {
@@ -16408,12 +17019,12 @@ int test_case_2_2_5_18_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_18_conn = { &preamble_2_2_conn, &test_case_2_2_5_18_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_18_resp = { &preamble_2_2_resp, &test_case_2_2_5_18_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_18_list = { &preamble_2_2_list, &test_case_2_2_5_18_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_18_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_18_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_18_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_18_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_18_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_18_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16423,10 +17034,11 @@ struct test_stream test_2_2_5_18_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_19 test_group_2_2_5
 #define numb_case_2_2_5_19 "2.2.5.19"
 #define name_case_2_2_5_19 "Transfer connectionless data with options -- T_SCTP_COOKIE_INC"
-#define sref_case_2_2_5_19 "(none)"
+#define sref_case_2_2_5_19 sref_case_2_2
 #define desc_case_2_2_5_19 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_COOKIE_INC."
+case is T_SCTP_COOKIE_INC.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_19_conn(int child)
 {
@@ -16438,7 +17050,7 @@ int test_case_2_2_5_19_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_19_resp(int child)
 {
@@ -16450,7 +17062,7 @@ int test_case_2_2_5_19_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_19_list(int child)
 {
@@ -16462,12 +17074,12 @@ int test_case_2_2_5_19_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_19_conn = { &preamble_2_2_conn, &test_case_2_2_5_19_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_19_resp = { &preamble_2_2_resp, &test_case_2_2_5_19_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_19_list = { &preamble_2_2_list, &test_case_2_2_5_19_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_19_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_19_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_19_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_19_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_19_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_19_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16477,10 +17089,11 @@ struct test_stream test_2_2_5_19_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define tgrp_case_2_2_5_20 test_group_2_2_5
 #define numb_case_2_2_5_20 "2.2.5.20"
 #define name_case_2_2_5_20 "Transfer connectionless data with options -- T_SCTP_THROTTLE_ITVL"
-#define sref_case_2_2_5_20 "(none)"
+#define sref_case_2_2_5_20 sref_case_2_2
 #define desc_case_2_2_5_20 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_THROTTLE_ITVL."
+case is T_SCTP_THROTTLE_ITVL.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_20_conn(int child)
 {
@@ -16492,7 +17105,7 @@ int test_case_2_2_5_20_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_20_resp(int child)
 {
@@ -16504,7 +17117,7 @@ int test_case_2_2_5_20_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_20_list(int child)
 {
@@ -16516,12 +17129,12 @@ int test_case_2_2_5_20_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_20_conn = { &preamble_2_2_conn, &test_case_2_2_5_20_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_20_resp = { &preamble_2_2_resp, &test_case_2_2_5_20_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_20_list = { &preamble_2_2_list, &test_case_2_2_5_20_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_20_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_20_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_20_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_20_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_20_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_20_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16531,10 +17144,11 @@ struct test_stream test_2_2_5_20_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_21 test_group_2_2_5
 #define numb_case_2_2_5_21 "2.2.5.21"
 #define name_case_2_2_5_21 "Transfer connectionless data with options -- T_SCTP_MAC_TYPE"
-#define sref_case_2_2_5_21 "(none)"
+#define sref_case_2_2_5_21 sref_case_2_2
 #define desc_case_2_2_5_21 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAC_TYPE."
+case is T_SCTP_MAC_TYPE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_21_conn(int child)
 {
@@ -16546,7 +17160,7 @@ int test_case_2_2_5_21_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_21_resp(int child)
 {
@@ -16558,7 +17172,7 @@ int test_case_2_2_5_21_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_21_list(int child)
 {
@@ -16570,12 +17184,12 @@ int test_case_2_2_5_21_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_21_conn = { &preamble_2_2_conn, &test_case_2_2_5_21_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_21_resp = { &preamble_2_2_resp, &test_case_2_2_5_21_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_21_list = { &preamble_2_2_list, &test_case_2_2_5_21_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_21_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_21_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_21_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_21_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_21_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_21_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16585,10 +17199,11 @@ struct test_stream test_2_2_5_21_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_22 test_group_2_2_5
 #define numb_case_2_2_5_22 "2.2.5.22"
 #define name_case_2_2_5_22 "Transfer connectionless data with options -- T_SCTP_CKSUM_TYPE"
-#define sref_case_2_2_5_22 "(none)"
+#define sref_case_2_2_5_22 sref_case_2_2
 #define desc_case_2_2_5_22 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_CKSUM_TYPE."
+case is T_SCTP_CKSUM_TYPE.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_22_conn(int child)
 {
@@ -16600,7 +17215,7 @@ int test_case_2_2_5_22_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_22_resp(int child)
 {
@@ -16612,7 +17227,7 @@ int test_case_2_2_5_22_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_22_list(int child)
 {
@@ -16624,12 +17239,12 @@ int test_case_2_2_5_22_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_22_conn = { &preamble_2_2_conn, &test_case_2_2_5_22_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_22_resp = { &preamble_2_2_resp, &test_case_2_2_5_22_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_22_list = { &preamble_2_2_list, &test_case_2_2_5_22_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_22_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_22_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_22_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_22_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_22_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_22_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16639,10 +17254,11 @@ struct test_stream test_2_2_5_22_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_23 test_group_2_2_5
 #define numb_case_2_2_5_23 "2.2.5.23"
 #define name_case_2_2_5_23 "Transfer connectionless data with options -- T_SCTP_ECN"
-#define sref_case_2_2_5_23 "(none)"
+#define sref_case_2_2_5_23 sref_case_2_2
 #define desc_case_2_2_5_23 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ECN."
+case is T_SCTP_ECN.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_23_conn(int child)
 {
@@ -16654,7 +17270,7 @@ int test_case_2_2_5_23_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_23_resp(int child)
 {
@@ -16666,7 +17282,7 @@ int test_case_2_2_5_23_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_23_list(int child)
 {
@@ -16678,12 +17294,12 @@ int test_case_2_2_5_23_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_23_conn = { &preamble_2_2_conn, &test_case_2_2_5_23_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_23_resp = { &preamble_2_2_resp, &test_case_2_2_5_23_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_23_list = { &preamble_2_2_list, &test_case_2_2_5_23_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_23_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_23_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_23_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_23_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_23_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_23_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16693,10 +17309,11 @@ struct test_stream test_2_2_5_23_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_24 test_group_2_2_5
 #define numb_case_2_2_5_24 "2.2.5.24"
 #define name_case_2_2_5_24 "Transfer connectionless data with options -- T_SCTP_ALI"
-#define sref_case_2_2_5_24 "(none)"
+#define sref_case_2_2_5_24 sref_case_2_2
 #define desc_case_2_2_5_24 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ALI."
+case is T_SCTP_ALI.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_24_conn(int child)
 {
@@ -16708,7 +17325,7 @@ int test_case_2_2_5_24_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_24_resp(int child)
 {
@@ -16720,7 +17337,7 @@ int test_case_2_2_5_24_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_24_list(int child)
 {
@@ -16732,12 +17349,12 @@ int test_case_2_2_5_24_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_24_conn = { &preamble_2_2_conn, &test_case_2_2_5_24_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_24_resp = { &preamble_2_2_resp, &test_case_2_2_5_24_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_24_list = { &preamble_2_2_list, &test_case_2_2_5_24_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_24_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_24_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_24_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_24_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_24_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_24_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16747,10 +17364,11 @@ struct test_stream test_2_2_5_24_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_25 test_group_2_2_5
 #define numb_case_2_2_5_25 "2.2.5.25"
 #define name_case_2_2_5_25 "Transfer connectionless data with options -- T_SCTP_ADD"
-#define sref_case_2_2_5_25 "(none)"
+#define sref_case_2_2_5_25 sref_case_2_2
 #define desc_case_2_2_5_25 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ADD."
+case is T_SCTP_ADD.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_25_conn(int child)
 {
@@ -16762,7 +17380,7 @@ int test_case_2_2_5_25_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_25_resp(int child)
 {
@@ -16774,7 +17392,7 @@ int test_case_2_2_5_25_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_25_list(int child)
 {
@@ -16786,12 +17404,12 @@ int test_case_2_2_5_25_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_25_conn = { &preamble_2_2_conn, &test_case_2_2_5_25_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_25_resp = { &preamble_2_2_resp, &test_case_2_2_5_25_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_25_list = { &preamble_2_2_list, &test_case_2_2_5_25_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_25_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_25_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_25_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_25_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_25_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_25_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16801,10 +17419,11 @@ struct test_stream test_2_2_5_25_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_26 test_group_2_2_5
 #define numb_case_2_2_5_26 "2.2.5.26"
 #define name_case_2_2_5_26 "Transfer connectionless data with options -- T_SCTP_SET"
-#define sref_case_2_2_5_26 "(none)"
+#define sref_case_2_2_5_26 sref_case_2_2
 #define desc_case_2_2_5_26 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SET."
+case is T_SCTP_SET.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_26_conn(int child)
 {
@@ -16816,7 +17435,7 @@ int test_case_2_2_5_26_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_26_resp(int child)
 {
@@ -16828,7 +17447,7 @@ int test_case_2_2_5_26_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_26_list(int child)
 {
@@ -16840,12 +17459,12 @@ int test_case_2_2_5_26_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_26_conn = { &preamble_2_2_conn, &test_case_2_2_5_26_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_26_resp = { &preamble_2_2_resp, &test_case_2_2_5_26_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_26_list = { &preamble_2_2_list, &test_case_2_2_5_26_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_26_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_26_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_26_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_26_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_26_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_26_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16855,10 +17474,11 @@ struct test_stream test_2_2_5_26_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_27 test_group_2_2_5
 #define numb_case_2_2_5_27 "2.2.5.27"
 #define name_case_2_2_5_27 "Transfer connectionless data with options -- T_SCTP_ADD_IP"
-#define sref_case_2_2_5_27 "(none)"
+#define sref_case_2_2_5_27 sref_case_2_2
 #define desc_case_2_2_5_27 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ADD_IP."
+case is T_SCTP_ADD_IP.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_27_conn(int child)
 {
@@ -16870,7 +17490,7 @@ int test_case_2_2_5_27_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_27_resp(int child)
 {
@@ -16882,7 +17502,7 @@ int test_case_2_2_5_27_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_27_list(int child)
 {
@@ -16894,12 +17514,12 @@ int test_case_2_2_5_27_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_27_conn = { &preamble_2_2_conn, &test_case_2_2_5_27_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_27_resp = { &preamble_2_2_resp, &test_case_2_2_5_27_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_27_list = { &preamble_2_2_list, &test_case_2_2_5_27_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_27_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_27_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_27_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_27_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_27_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_27_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16909,10 +17529,11 @@ struct test_stream test_2_2_5_27_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_28 test_group_2_2_5
 #define numb_case_2_2_5_28 "2.2.5.28"
 #define name_case_2_2_5_28 "Transfer connectionless data with options -- T_SCTP_DEL_IP"
-#define sref_case_2_2_5_28 "(none)"
+#define sref_case_2_2_5_28 sref_case_2_2
 #define desc_case_2_2_5_28 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_DEL_IP."
+case is T_SCTP_DEL_IP.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_28_conn(int child)
 {
@@ -16924,7 +17545,7 @@ int test_case_2_2_5_28_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_28_resp(int child)
 {
@@ -16936,7 +17557,7 @@ int test_case_2_2_5_28_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_28_list(int child)
 {
@@ -16948,12 +17569,12 @@ int test_case_2_2_5_28_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_28_conn = { &preamble_2_2_conn, &test_case_2_2_5_28_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_28_resp = { &preamble_2_2_resp, &test_case_2_2_5_28_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_28_list = { &preamble_2_2_list, &test_case_2_2_5_28_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_28_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_28_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_28_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_28_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_28_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_28_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -16963,10 +17584,11 @@ struct test_stream test_2_2_5_28_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_29 test_group_2_2_5
 #define numb_case_2_2_5_29 "2.2.5.29"
 #define name_case_2_2_5_29 "Transfer connectionless data with options -- T_SCTP_SET_IP"
-#define sref_case_2_2_5_29 "(none)"
+#define sref_case_2_2_5_29 sref_case_2_2
 #define desc_case_2_2_5_29 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SET_IP."
+case is T_SCTP_SET_IP.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_29_conn(int child)
 {
@@ -16978,7 +17600,7 @@ int test_case_2_2_5_29_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_29_resp(int child)
 {
@@ -16990,7 +17612,7 @@ int test_case_2_2_5_29_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_29_list(int child)
 {
@@ -17002,12 +17624,12 @@ int test_case_2_2_5_29_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_29_conn = { &preamble_2_2_conn, &test_case_2_2_5_29_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_29_resp = { &preamble_2_2_resp, &test_case_2_2_5_29_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_29_list = { &preamble_2_2_list, &test_case_2_2_5_29_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_29_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_29_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_29_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_29_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_29_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_29_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17017,10 +17639,11 @@ struct test_stream test_2_2_5_29_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define tgrp_case_2_2_5_30 test_group_2_2_5
 #define numb_case_2_2_5_30 "2.2.5.30"
 #define name_case_2_2_5_30 "Transfer connectionless data with options -- T_SCTP_PR"
-#define sref_case_2_2_5_30 "(none)"
+#define sref_case_2_2_5_30 sref_case_2_2
 #define desc_case_2_2_5_30 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_PR."
+case is T_SCTP_PR.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_30_conn(int child)
 {
@@ -17032,7 +17655,7 @@ int test_case_2_2_5_30_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_30_resp(int child)
 {
@@ -17044,7 +17667,7 @@ int test_case_2_2_5_30_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_30_list(int child)
 {
@@ -17056,12 +17679,12 @@ int test_case_2_2_5_30_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_30_conn = { &preamble_2_2_conn, &test_case_2_2_5_30_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_30_resp = { &preamble_2_2_resp, &test_case_2_2_5_30_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_30_list = { &preamble_2_2_list, &test_case_2_2_5_30_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_30_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_30_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_30_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_30_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_30_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_30_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17071,10 +17694,11 @@ struct test_stream test_2_2_5_30_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_31 test_group_2_2_5
 #define numb_case_2_2_5_31 "2.2.5.31"
 #define name_case_2_2_5_31 "Transfer connectionless data with options -- T_SCTP_LIFETIME"
-#define sref_case_2_2_5_31 "(none)"
+#define sref_case_2_2_5_31 sref_case_2_2
 #define desc_case_2_2_5_31 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_LIFETIME."
+case is T_SCTP_LIFETIME.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_31_conn(int child)
 {
@@ -17086,7 +17710,7 @@ int test_case_2_2_5_31_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_31_resp(int child)
 {
@@ -17098,7 +17722,7 @@ int test_case_2_2_5_31_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_31_list(int child)
 {
@@ -17110,12 +17734,12 @@ int test_case_2_2_5_31_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_31_conn = { &preamble_2_2_conn, &test_case_2_2_5_31_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_31_resp = { &preamble_2_2_resp, &test_case_2_2_5_31_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_31_list = { &preamble_2_2_list, &test_case_2_2_5_31_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_31_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_31_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_31_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_31_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_31_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_31_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17125,10 +17749,11 @@ struct test_stream test_2_2_5_31_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_32 test_group_2_2_5
 #define numb_case_2_2_5_32 "2.2.5.32"
 #define name_case_2_2_5_32 "Transfer connectionless data with options -- T_SCTP_DISPOSITION"
-#define sref_case_2_2_5_32 "(none)"
+#define sref_case_2_2_5_32 sref_case_2_2
 #define desc_case_2_2_5_32 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_DISPOSITION."
+case is T_SCTP_DISPOSITION.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_32_conn(int child)
 {
@@ -17140,7 +17765,7 @@ int test_case_2_2_5_32_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_32_resp(int child)
 {
@@ -17152,7 +17777,7 @@ int test_case_2_2_5_32_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_32_list(int child)
 {
@@ -17164,12 +17789,12 @@ int test_case_2_2_5_32_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_32_conn = { &preamble_2_2_conn, &test_case_2_2_5_32_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_32_resp = { &preamble_2_2_resp, &test_case_2_2_5_32_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_32_list = { &preamble_2_2_list, &test_case_2_2_5_32_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_32_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_32_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_32_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_32_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_32_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_32_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17179,10 +17804,11 @@ struct test_stream test_2_2_5_32_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_33 test_group_2_2_5
 #define numb_case_2_2_5_33 "2.2.5.33"
 #define name_case_2_2_5_33 "Transfer connectionless data with options -- T_SCTP_MAX_BURST"
-#define sref_case_2_2_5_33 "(none)"
+#define sref_case_2_2_5_33 sref_case_2_2
 #define desc_case_2_2_5_33 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAX_BURST."
+case is T_SCTP_MAX_BURST.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_33_conn(int child)
 {
@@ -17194,7 +17820,7 @@ int test_case_2_2_5_33_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_33_resp(int child)
 {
@@ -17206,7 +17832,7 @@ int test_case_2_2_5_33_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_33_list(int child)
 {
@@ -17218,12 +17844,12 @@ int test_case_2_2_5_33_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_33_conn = { &preamble_2_2_conn, &test_case_2_2_5_33_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_33_resp = { &preamble_2_2_resp, &test_case_2_2_5_33_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_33_list = { &preamble_2_2_list, &test_case_2_2_5_33_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_33_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_33_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_33_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_33_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_33_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_33_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17233,10 +17859,11 @@ struct test_stream test_2_2_5_33_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_34 test_group_2_2_5
 #define numb_case_2_2_5_34 "2.2.5.34"
 #define name_case_2_2_5_34 "Transfer connectionless data with options -- T_SCTP_HB"
-#define sref_case_2_2_5_34 "(none)"
+#define sref_case_2_2_5_34 sref_case_2_2
 #define desc_case_2_2_5_34 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_HB."
+case is T_SCTP_HB.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_34_conn(int child)
 {
@@ -17248,7 +17875,7 @@ int test_case_2_2_5_34_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_34_resp(int child)
 {
@@ -17260,7 +17887,7 @@ int test_case_2_2_5_34_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_34_list(int child)
 {
@@ -17272,12 +17899,12 @@ int test_case_2_2_5_34_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_34_conn = { &preamble_2_2_conn, &test_case_2_2_5_34_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_34_resp = { &preamble_2_2_resp, &test_case_2_2_5_34_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_34_list = { &preamble_2_2_list, &test_case_2_2_5_34_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_34_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_34_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_34_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_34_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_34_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_34_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17287,10 +17914,11 @@ struct test_stream test_2_2_5_34_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_35 test_group_2_2_5
 #define numb_case_2_2_5_35 "2.2.5.35"
 #define name_case_2_2_5_35 "Transfer connectionless data with options -- T_SCTP_RTO"
-#define sref_case_2_2_5_35 "(none)"
+#define sref_case_2_2_5_35 sref_case_2_2
 #define desc_case_2_2_5_35 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RTO."
+case is T_SCTP_RTO.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_35_conn(int child)
 {
@@ -17302,7 +17930,7 @@ int test_case_2_2_5_35_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_35_resp(int child)
 {
@@ -17314,7 +17942,7 @@ int test_case_2_2_5_35_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_35_list(int child)
 {
@@ -17326,12 +17954,12 @@ int test_case_2_2_5_35_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_35_conn = { &preamble_2_2_conn, &test_case_2_2_5_35_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_35_resp = { &preamble_2_2_resp, &test_case_2_2_5_35_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_35_list = { &preamble_2_2_list, &test_case_2_2_5_35_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_35_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_35_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_35_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_35_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_35_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_35_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17341,10 +17969,11 @@ struct test_stream test_2_2_5_35_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_36 test_group_2_2_5
 #define numb_case_2_2_5_36 "2.2.5.36"
 #define name_case_2_2_5_36 "Transfer connectionless data with options -- T_SCTP_MAXSEG"
-#define sref_case_2_2_5_36 "(none)"
+#define sref_case_2_2_5_36 sref_case_2_2
 #define desc_case_2_2_5_36 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAXSEG."
+case is T_SCTP_MAXSEG.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_36_conn(int child)
 {
@@ -17356,7 +17985,7 @@ int test_case_2_2_5_36_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_36_resp(int child)
 {
@@ -17368,7 +17997,7 @@ int test_case_2_2_5_36_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_36_list(int child)
 {
@@ -17380,12 +18009,12 @@ int test_case_2_2_5_36_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_36_conn = { &preamble_2_2_conn, &test_case_2_2_5_36_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_36_resp = { &preamble_2_2_resp, &test_case_2_2_5_36_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_36_list = { &preamble_2_2_list, &test_case_2_2_5_36_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_36_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_36_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_36_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_36_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_36_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_36_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17395,10 +18024,11 @@ struct test_stream test_2_2_5_36_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_37 test_group_2_2_5
 #define numb_case_2_2_5_37 "2.2.5.37"
 #define name_case_2_2_5_37 "Transfer connectionless data with options -- T_SCTP_STATUS"
-#define sref_case_2_2_5_37 "(none)"
+#define sref_case_2_2_5_37 sref_case_2_2
 #define desc_case_2_2_5_37 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_STATUS."
+case is T_SCTP_STATUS.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_37_conn(int child)
 {
@@ -17410,7 +18040,7 @@ int test_case_2_2_5_37_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_37_resp(int child)
 {
@@ -17422,7 +18052,7 @@ int test_case_2_2_5_37_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_37_list(int child)
 {
@@ -17434,12 +18064,12 @@ int test_case_2_2_5_37_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_37_conn = { &preamble_2_2_conn, &test_case_2_2_5_37_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_37_resp = { &preamble_2_2_resp, &test_case_2_2_5_37_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_37_list = { &preamble_2_2_list, &test_case_2_2_5_37_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_37_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_37_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_37_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_37_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_37_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_37_list, &postamble_2_2_xfail_list };
 
 
 /*
@@ -17449,10 +18079,11 @@ struct test_stream test_2_2_5_37_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define tgrp_case_2_2_5_38 test_group_2_2_5
 #define numb_case_2_2_5_38 "2.2.5.38"
 #define name_case_2_2_5_38 "Transfer connectionless data with options -- T_SCTP_DEBUG"
-#define sref_case_2_2_5_38 "(none)"
+#define sref_case_2_2_5_38 sref_case_2_2
 #define desc_case_2_2_5_38 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_DEBUG."
+case is T_SCTP_DEBUG.  T_COTS_ORD transport providers are always expected to\n\
+fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_5_38_conn(int child)
 {
@@ -17464,7 +18095,7 @@ int test_case_2_2_5_38_conn(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_conn(child);
+	return test_case_2_2_xfail_conn(child);
 }
 int test_case_2_2_5_38_resp(int child)
 {
@@ -17476,7 +18107,7 @@ int test_case_2_2_5_38_resp(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_resp(child);
+	return test_case_2_2_xfail_resp(child);
 }
 int test_case_2_2_5_38_list(int child)
 {
@@ -17488,12 +18119,90 @@ int test_case_2_2_5_38_list(int child)
 	};
 	test_opts = &options;
 	test_olen = sizeof(options);
-	return test_case_2_2_list(child);
+	return test_case_2_2_xfail_list(child);
 }
 
-struct test_stream test_2_2_5_38_conn = { &preamble_2_2_conn, &test_case_2_2_5_38_conn, &postamble_2_2_conn };
-struct test_stream test_2_2_5_38_resp = { &preamble_2_2_resp, &test_case_2_2_5_38_resp, &postamble_2_2_resp };
-struct test_stream test_2_2_5_38_list = { &preamble_2_2_list, &test_case_2_2_5_38_list, &postamble_2_2_list };
+struct test_stream test_2_2_5_38_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_5_38_conn, &postamble_2_2_xfail_conn };
+struct test_stream test_2_2_5_38_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_5_38_resp, &postamble_2_2_xfail_resp };
+struct test_stream test_2_2_5_38_list = { &preamble_2_2_xfail_list, &test_case_2_2_5_38_list, &postamble_2_2_xfail_list };
+
+
+/*
+ *  Transfer connectionless data with options -- illegal option
+ */
+#define test_group_2_2_6 "Connectionless data transfer -- illegal option"
+#define tgrp_case_2_2_6 test_group_2_2_6
+#define numb_case_2_2_6 "2.2.6"
+#define name_case_2_2_6 "Transfer connectionless data with options -- illegal option"
+#define sref_case_2_2_6 sref_case_2_2
+#define desc_case_2_2_6 "\
+Transfer connectionless data with options.  This specific test case uses\n\
+an illegal option.  The specification says that when t_sndudata(3) is\n\
+given an illegal option, the transport provider must fail with TBADOPT or\n\
+issue a T_UDERROR_IND primitive.  We rely on the XTI library to check for\n\
+illegal options and return [TBADOPT].  If the transport provider is given\n\
+an illegal option we treat it as a fatal error.  This is not well described\n\
+in the TPI 2.2 specification.  T_COTS_ORD transport providers are always\n\
+expected to fail when issued a T_UNITDATA_REQ primitive."
+
+int test_case_2_2_6(int child, struct sockaddr_in *addr, socklen_t len)
+{
+	const char msg[] = "Unit test data.";
+	struct t_opthdr opt_hdr =
+	    { sizeof(struct t_opthdr) + 100, XTI_GENERIC, XTI_DEBUG, T_SUCCESS };
+	test_addr = addr;
+	test_alen = len;
+	test_data = msg;
+	test_opts = &opt_hdr;
+	test_olen = sizeof(opt_hdr);
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, LONG_WAIT)) {
+	case __RESULT_FAILURE:
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		state++;
+		break;
+	case __TEST_ERROR_ACK:
+		goto failure;
+	case __TEST_UDERROR_IND:
+		goto failure;
+	default:
+		goto failure;
+	}
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_2_2_6_conn(int child)
+{
+	return test_case_2_2_6(child, &addrs[1], sizeof(addrs[1]));
+}
+int test_case_2_2_6_resp(int child)
+{
+	return test_case_2_2_6(child, &addrs[2], sizeof(addrs[2]));
+}
+int test_case_2_2_6_list(int child)
+{
+	return test_case_2_2_6(child, &addrs[0], sizeof(addrs[0]));
+}
+
+#define preamble_2_2_6_conn	preamble_1
+#define preamble_2_2_6_resp	preamble_1
+#define preamble_2_2_6_list	preamble_1
+
+#define postamble_2_2_6_conn	postamble_0
+#define postamble_2_2_6_resp	postamble_0
+#define postamble_2_2_6_list	postamble_0
+
+struct test_stream test_2_2_6_conn = { &preamble_2_2_6_conn, &test_case_2_2_6_conn, &postamble_2_2_6_conn };
+struct test_stream test_2_2_6_resp = { &preamble_2_2_6_resp, &test_case_2_2_6_resp, &postamble_2_2_6_resp };
+struct test_stream test_2_2_6_list = { &preamble_2_2_6_list, &test_case_2_2_6_list, &postamble_2_2_6_list };
 
 
 /*
@@ -19710,6 +20419,18 @@ struct test_case {
 		numb_case_1_8_5_36, tgrp_case_1_8_5_36, name_case_1_8_5_36, desc_case_1_8_5_36, sref_case_1_8_5_36, { &test_1_8_5_36_conn, &test_1_8_5_36_resp, &test_1_8_5_36_list }, 0, 0}, {
 		numb_case_1_8_5_37, tgrp_case_1_8_5_37, name_case_1_8_5_37, desc_case_1_8_5_37, sref_case_1_8_5_37, { &test_1_8_5_37_conn, &test_1_8_5_37_resp, &test_1_8_5_37_list }, 0, 0}, {
 		numb_case_1_8_5_38, tgrp_case_1_8_5_38, name_case_1_8_5_38, desc_case_1_8_5_38, sref_case_1_8_5_38, { &test_1_8_5_38_conn, &test_1_8_5_38_resp, &test_1_8_5_38_list }, 0, 0}, {
+		numb_case_1_9_1_1, tgrp_case_1_9_1_1, name_case_1_9_1_1, desc_case_1_9_1_1, sref_case_1_9_1_1, { &test_1_9_1_1_conn, &test_1_9_1_1_resp, &test_1_9_1_1_list }, 0, 0}, {
+		numb_case_1_9_1_2, tgrp_case_1_9_1_2, name_case_1_9_1_2, desc_case_1_9_1_2, sref_case_1_9_1_2, { &test_1_9_1_2_conn, &test_1_9_1_2_resp, &test_1_9_1_2_list }, 0, 0}, {
+		numb_case_1_9_1_3, tgrp_case_1_9_1_3, name_case_1_9_1_3, desc_case_1_9_1_3, sref_case_1_9_1_3, { &test_1_9_1_3_conn, &test_1_9_1_3_resp, &test_1_9_1_3_list }, 0, 0}, {
+		numb_case_1_9_1_4, tgrp_case_1_9_1_4, name_case_1_9_1_4, desc_case_1_9_1_4, sref_case_1_9_1_4, { &test_1_9_1_4_conn, &test_1_9_1_4_resp, &test_1_9_1_4_list }, 0, 0}, {
+		numb_case_1_9_2_1, tgrp_case_1_9_2_1, name_case_1_9_2_1, desc_case_1_9_2_1, sref_case_1_9_2_1, { &test_1_9_2_1_conn, &test_1_9_2_1_resp, &test_1_9_2_1_list }, 0, 0}, {
+		numb_case_1_9_2_2, tgrp_case_1_9_2_2, name_case_1_9_2_2, desc_case_1_9_2_2, sref_case_1_9_2_2, { &test_1_9_2_2_conn, &test_1_9_2_2_resp, &test_1_9_2_2_list }, 0, 0}, {
+		numb_case_1_9_2_3, tgrp_case_1_9_2_3, name_case_1_9_2_3, desc_case_1_9_2_3, sref_case_1_9_2_3, { &test_1_9_2_3_conn, &test_1_9_2_3_resp, &test_1_9_2_3_list }, 0, 0}, {
+		numb_case_1_9_2_4, tgrp_case_1_9_2_4, name_case_1_9_2_4, desc_case_1_9_2_4, sref_case_1_9_2_4, { &test_1_9_2_4_conn, &test_1_9_2_4_resp, &test_1_9_2_4_list }, 0, 0}, {
+		numb_case_1_9_3_1, tgrp_case_1_9_3_1, name_case_1_9_3_1, desc_case_1_9_3_1, sref_case_1_9_3_1, { &test_1_9_3_1_conn, &test_1_9_3_1_resp, &test_1_9_3_1_list }, 0, 0}, {
+		numb_case_1_9_3_2, tgrp_case_1_9_3_2, name_case_1_9_3_2, desc_case_1_9_3_2, sref_case_1_9_3_2, { &test_1_9_3_2_conn, &test_1_9_3_2_resp, &test_1_9_3_2_list }, 0, 0}, {
+		numb_case_1_9_3_3, tgrp_case_1_9_3_3, name_case_1_9_3_3, desc_case_1_9_3_3, sref_case_1_9_3_3, { &test_1_9_3_3_conn, &test_1_9_3_3_resp, &test_1_9_3_3_list }, 0, 0}, {
+		numb_case_1_9_3_4, tgrp_case_1_9_3_4, name_case_1_9_3_4, desc_case_1_9_3_4, sref_case_1_9_3_4, { &test_1_9_3_4_conn, &test_1_9_3_4_resp, &test_1_9_3_4_list }, 0, 0}, {
 		numb_case_1_10_1, tgrp_case_1_10_1, name_case_1_10_1, desc_case_1_10_1, sref_case_1_10_1, { &test_1_10_1_conn, &test_1_10_1_resp, &test_1_10_1_list }, 0, 0}, {
 		numb_case_1_10_2, tgrp_case_1_10_2, name_case_1_10_2, desc_case_1_10_2, sref_case_1_10_2, { &test_1_10_2_conn, &test_1_10_2_resp, &test_1_10_2_list }, 0, 0}, {
 		numb_case_1_10_3, tgrp_case_1_10_3, name_case_1_10_3, desc_case_1_10_3, sref_case_1_10_3, { &test_1_10_3_conn, &test_1_10_3_resp, &test_1_10_3_list }, 0, 0}, {
@@ -19782,6 +20503,7 @@ struct test_case {
 		numb_case_2_2_5_36, tgrp_case_2_2_5_36, name_case_2_2_5_36, desc_case_2_2_5_36, sref_case_2_2_5_36, { &test_2_2_5_36_conn, &test_2_2_5_36_resp, &test_2_2_5_36_list }, 0, 0}, {
 		numb_case_2_2_5_37, tgrp_case_2_2_5_37, name_case_2_2_5_37, desc_case_2_2_5_37, sref_case_2_2_5_37, { &test_2_2_5_37_conn, &test_2_2_5_37_resp, &test_2_2_5_37_list }, 0, 0}, {
 		numb_case_2_2_5_38, tgrp_case_2_2_5_38, name_case_2_2_5_38, desc_case_2_2_5_38, sref_case_2_2_5_38, { &test_2_2_5_38_conn, &test_2_2_5_38_resp, &test_2_2_5_38_list }, 0, 0}, {
+		numb_case_2_2_6, tgrp_case_2_2_6, name_case_2_2_6, desc_case_2_2_6, sref_case_2_2_6, { &test_2_2_6_conn, &test_2_2_6_resp, &test_2_2_6_list }, 0, 0}, {
 		numb_case_3_1, tgrp_case_3_1, name_case_3_1, desc_case_3_1, sref_case_3_1, { &test_3_1_conn, &test_3_1_resp, &test_3_1_list }, 0, 0}, {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, { &test_3_2_conn, &test_3_2_resp, &test_3_2_list }, 0, 0}, {
 		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, { &test_3_3_conn, &test_3_3_resp, &test_3_3_list }, 0, 0}, {
