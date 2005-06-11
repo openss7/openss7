@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_raw.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/10 12:21:17 $
+dnl @(#) $RCSfile: testsuite-inet_raw.at,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/11 02:21:22 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,17 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/10 12:21:17 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/11 02:21:22 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_raw.at,v $
+dnl Revision 0.9.2.12  2005/06/11 02:21:22  brian
+dnl - added more test cases
+dnl
+dnl Revision 0.9.2.11  2005/06/10 23:55:11  brian
+dnl - new additions to binding tests
+dnl
 dnl Revision 0.9.2.10  2005/06/10 12:21:17  brian
 dnl - some final option tweaking
 dnl
@@ -101,10 +107,11 @@ dnl ==========================================================================
 AT_TESTED([test-inet_raw])
 AT_BANNER([INET RAWIP module tests])
 
+dnl AT_XFAIL_IF([test `id -u` -ne 0])
+
 AT_SETUP([raw test 1.1])
 AT_KEYWORDS([raw])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -116,7 +123,6 @@ AT_CLEANUP
 AT_SETUP([raw test 1.2])
 AT_KEYWORDS([raw])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -128,7 +134,6 @@ AT_CLEANUP
 AT_SETUP([raw test 1.3])
 AT_KEYWORDS([raw])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -137,15 +142,25 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-AT_SETUP([raw test 1.4])
+AT_SETUP([raw test 1.4.1])
 AT_KEYWORDS([raw])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    test-inet_raw $options -e -o 1.4
+    test-inet_raw $options -e -o 1.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([raw test 1.4.2])
+AT_KEYWORDS([raw])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_raw $options -e -o 1.4.2
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
@@ -1537,7 +1552,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.7.1.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -1548,7 +1565,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.7.1.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2230,7 +2249,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2241,7 +2262,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2252,7 +2275,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2263,7 +2288,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2274,7 +2301,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2285,7 +2314,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2296,7 +2327,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.1.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2307,7 +2340,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.2.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2318,7 +2353,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.2.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2329,7 +2366,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.2.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2340,7 +2379,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.2.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2351,7 +2392,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.2.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2362,7 +2405,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.3.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2373,7 +2418,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2384,7 +2431,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2395,7 +2444,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2406,7 +2457,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2417,7 +2470,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2428,7 +2483,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2439,7 +2496,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2450,7 +2509,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.8])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2461,7 +2522,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.9])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2472,7 +2535,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.10])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2483,7 +2548,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.11])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2494,7 +2561,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.12])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2505,7 +2574,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.4.13])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2516,7 +2587,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2527,7 +2600,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2538,7 +2613,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2549,7 +2626,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2560,7 +2639,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2571,7 +2652,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2582,7 +2665,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2593,7 +2678,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.8])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2604,7 +2691,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.9])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2615,7 +2704,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.10])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2626,7 +2717,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.11])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2637,7 +2730,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.12])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2648,7 +2743,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.13])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2659,7 +2756,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.14])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2670,7 +2769,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.15])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2681,7 +2782,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.16])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2692,7 +2795,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.17])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2703,7 +2808,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.18])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2714,7 +2821,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.19])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2725,7 +2834,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.20])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2736,7 +2847,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.21])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2747,7 +2860,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.22])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2758,7 +2873,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.23])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2769,7 +2886,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.24])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2780,7 +2899,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.25])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2791,7 +2912,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.26])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2802,7 +2925,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.27])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2813,7 +2938,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.28])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2824,7 +2951,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.29])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2835,7 +2964,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.30])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2846,7 +2977,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.31])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2857,7 +2990,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.32])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2868,7 +3003,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.33])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2879,7 +3016,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.34])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2890,7 +3029,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.35])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2901,7 +3042,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.37])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -2912,7 +3055,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.8.5.38])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3055,7 +3200,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3066,7 +3213,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3077,7 +3226,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3088,7 +3239,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3099,7 +3252,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3111,6 +3266,7 @@ AT_CLEANUP
 AT_SETUP([raw test 1.10.6])
 AT_KEYWORDS([raw])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3121,7 +3277,9 @@ AT_CLEANUP
 
 AT_SETUP([raw test 1.10.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3133,6 +3291,7 @@ AT_CLEANUP
 AT_SETUP([raw test 1.10.8])
 AT_KEYWORDS([raw])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3144,6 +3303,7 @@ AT_CLEANUP
 AT_SETUP([raw test 1.10.9])
 AT_KEYWORDS([raw])
 AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -3152,8 +3312,35 @@ AT_CHECK([
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
+AT_SETUP([raw test 1.10.10])
+AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_raw $options -e -o 1.10.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([raw test 1.10.11])
+AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
+AT_CHECK([
+    if test `id -u` -ne 0 ; then exit 77 ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_raw $options -e -o 1.10.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
 AT_SETUP([raw test 2.2.1.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3166,6 +3353,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.1.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3178,6 +3366,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.1.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3190,6 +3379,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.1.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3202,6 +3392,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.1.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3214,6 +3405,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.1.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3226,6 +3418,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.2.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3238,6 +3431,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.2.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3250,6 +3444,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.2.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3262,6 +3457,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.2.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3274,6 +3470,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.2.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3286,6 +3483,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.3.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3298,6 +3496,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3310,6 +3509,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3322,6 +3522,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3334,6 +3535,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3346,6 +3548,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3358,6 +3561,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3370,6 +3574,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3382,6 +3587,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.8])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3394,6 +3600,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.9])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3406,6 +3613,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.10])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3418,6 +3626,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.11])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3430,6 +3639,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.12])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3442,6 +3652,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.4.13])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3454,6 +3665,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3466,6 +3678,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3478,6 +3691,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3490,6 +3704,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3502,6 +3717,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3514,6 +3730,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3526,6 +3743,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3538,6 +3756,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.8])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3550,6 +3769,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.9])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3562,6 +3782,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.10])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3574,6 +3795,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.11])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3586,6 +3808,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.12])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3598,6 +3821,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.13])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3610,6 +3834,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.14])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3622,6 +3847,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.15])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3634,6 +3860,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.16])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3646,6 +3873,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.17])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3658,6 +3886,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.18])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3670,6 +3899,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.19])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3682,6 +3912,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.20])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3694,6 +3925,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.21])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3706,6 +3938,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.22])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3718,6 +3951,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.23])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3730,6 +3964,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.24])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3742,6 +3977,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.25])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3754,6 +3990,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.26])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3766,6 +4003,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.27])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3778,6 +4016,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.28])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3790,6 +4029,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.29])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3802,6 +4042,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.30])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3814,6 +4055,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.31])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3826,6 +4068,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.32])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3838,6 +4081,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.33])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3850,6 +4094,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.34])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3862,6 +4107,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.35])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3874,6 +4120,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.36])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3886,6 +4133,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.37])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3898,6 +4146,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.5.38])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3910,6 +4159,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 2.2.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3922,6 +4172,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 3.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3934,6 +4185,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 3.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3946,6 +4198,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 3.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3958,6 +4211,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 3.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3970,6 +4224,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.1])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3982,6 +4237,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.2])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -3994,6 +4250,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.3])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -4006,6 +4263,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.4])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -4018,6 +4276,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.5])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -4030,6 +4289,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.6])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
@@ -4042,6 +4302,7 @@ AT_CLEANUP
 
 AT_SETUP([raw test 4.7])
 AT_KEYWORDS([raw])
+AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi

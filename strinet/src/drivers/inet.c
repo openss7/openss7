@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/11 02:20:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/10 12:21:11 $ by $Author: brian $
+ Last Modified $Date: 2005/06/11 02:20:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/11 02:20:59 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/11 02:20:59 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -305,7 +305,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/10 12:21:11 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/11 02:20:59 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12625,8 +12625,11 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	ss_set_state(ss, TS_WACK_BREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+#if 0
+	/* we are supposed to ignore CONIND_number for T_CLTS according to XTI */
 	if (ss->p.info.SERV_type == T_CLTS && p->CONIND_number)
 		goto notsupport;
+#endif
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
 		ptrace(("%s: %p: ADDR_offset(%u) or ADDR_length(%u) are incorrect\n", DRV_NAME, ss, p->ADDR_offset,
 			p->ADDR_length));
@@ -12671,6 +12674,9 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0)
 			goto acces;
 		ss->port = ntohs(add_in->sin_port);
+		/* raw sockets really do not like being fed zero protocol numbers */
+		if (ss->p.prot.type == SOCK_RAW && ss->port == 0)
+			goto noaddr;
 		break;
 	}
 	case AF_UNIX:
@@ -12729,10 +12735,12 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
+#if 0
       notsupport:
 	err = TNOTSUPPORT;
 	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
+#endif
       error_close:
 	ss_socket_put(xchg(&ss->sock, NULL));
       error:

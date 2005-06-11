@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/10 12:21:12 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/10 12:21:12 $ by $Author: brian $
+ Last Modified $Date: 2005/06/11 02:21:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.23  2005/06/11 02:21:19  brian
+ - added more test cases
+
+ Revision 0.9.2.22  2005/06/10 23:55:08  brian
+ - new additions to binding tests
+
  Revision 0.9.2.21  2005/06/10 12:21:12  brian
  - some final option tweaking
 
@@ -162,9 +168,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/10 12:21:12 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/10 12:21:12 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $";
 
 /*
  *  Simple test program for INET streams.
@@ -727,7 +733,7 @@ struct {
 	, { sizeof(struct t_opthdr) + sizeof(struct t_kpalive), T_INET_TCP, T_TCP_KEEPALIVE, T_SUCCESS}, { T_NO, 0 }
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_NODELAY, T_SUCCESS}, T_YES
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_CORK, T_SUCCESS}, T_YES
-	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
+	, { sizeof(struct t_opthdr) + sizeof(t_uscalar_t), T_INET_SCTP, T_SCTP_PPI, T_SUCCESS}, 10
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_SID, T_SUCCESS}, 0
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_RECVOPT, T_SUCCESS}, T_NO
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_COOKIE_LIFE, T_SUCCESS}, 60000
@@ -4245,7 +4251,7 @@ static int preamble_1(int child)
 #endif
 	test_addr = &addrs[child];
 	test_alen = sizeof(addrs[child]);
-	last_qlen = 0;
+	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4880,16 +4886,15 @@ struct test_stream test_1_3_list = { &preamble_1_3_list, &test_case_1_3_list, &p
 /*
  *  Request addresses.
  */
-#define tgrp_case_1_4 test_group_1
-#define numb_case_1_4 "1.4"
-#define name_case_1_4 "Request addresses."
-#define sref_case_1_4 "TPI Rev 1.5 Sections 2.1.1.5, 2.1.2.6"
-#define desc_case_1_4 "\
-Checks that addresses can be requested on each of three streams.\n\
-Because we are in the unbound state, neither local nor remote\n\
-address should be returned."
+#define tgrp_case_1_4_1 test_group_1
+#define numb_case_1_4_1 "1.4.1"
+#define name_case_1_4_1 "Request addresses -- unbound state."
+#define sref_case_1_4_1 "TPI Rev 1.5 Sections 2.1.1.5, 2.1.2.6"
+#define desc_case_1_4_1 "\
+Checks that addresses can be requested on each of three streams.  Because we are\n\
+in the unbound state, neither local nor remote address should be returned."
 
-int test_case_1_4(int child)
+int test_case_1_4_1(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
 	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
@@ -4912,21 +4917,142 @@ int test_case_1_4(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_4_conn	test_case_1_4
-#define test_case_1_4_resp	test_case_1_4
-#define test_case_1_4_list	test_case_1_4
+#define test_case_1_4_1_conn	test_case_1_4_1
+#define test_case_1_4_1_resp	test_case_1_4_1
+#define test_case_1_4_1_list	test_case_1_4_1
 
-#define preamble_1_4_conn	preamble_0
-#define preamble_1_4_resp	preamble_0
-#define preamble_1_4_list	preamble_0
+#define preamble_1_4_1_conn	preamble_0
+#define preamble_1_4_1_resp	preamble_0
+#define preamble_1_4_1_list	preamble_0
 
-#define postamble_1_4_conn	postamble_0
-#define postamble_1_4_resp	postamble_0
-#define postamble_1_4_list	postamble_0
+#define postamble_1_4_1_conn	postamble_0
+#define postamble_1_4_1_resp	postamble_0
+#define postamble_1_4_1_list	postamble_0
 
-struct test_stream test_1_4_conn = { &preamble_1_4_conn, &test_case_1_4_conn, &postamble_1_4_conn };
-struct test_stream test_1_4_resp = { &preamble_1_4_resp, &test_case_1_4_resp, &postamble_1_4_resp };
-struct test_stream test_1_4_list = { &preamble_1_4_list, &test_case_1_4_list, &postamble_1_4_list };
+struct test_stream test_1_4_1_conn = { &preamble_1_4_1_conn, &test_case_1_4_1_conn, &postamble_1_4_1_conn };
+struct test_stream test_1_4_1_resp = { &preamble_1_4_1_resp, &test_case_1_4_1_resp, &postamble_1_4_1_resp };
+struct test_stream test_1_4_1_list = { &preamble_1_4_1_list, &test_case_1_4_1_list, &postamble_1_4_1_list };
+
+
+#define tgrp_case_1_4_2 test_group_1
+#define numb_case_1_4_2 "1.4.2"
+#define name_case_1_4_2 "Request addresses -- bound state."
+#define sref_case_1_4_2 "TPI Rev 1.5 Sections 2.1.1.5, 2.1.2.6"
+#define desc_case_1_4_2 "\
+Checks that addresses can be requested on each of three streams.  Because we are\n\
+in the bound state, local but not remote addresses should be returned."
+
+int test_case_1_4_2(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
+		goto failure;
+	state++;
+	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
+		goto failure;
+	state++;
+	if (p->addr_ack.REMADDR_length != 0)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_2_conn	test_case_1_4_2
+#define test_case_1_4_2_resp	test_case_1_4_2
+#define test_case_1_4_2_list	test_case_1_4_2
+
+#define preamble_1_4_2_conn	preamble_1
+#define preamble_1_4_2_resp	preamble_1
+#define preamble_1_4_2_list	preamble_1
+
+#define postamble_1_4_2_conn	postamble_1
+#define postamble_1_4_2_resp	postamble_1
+#define postamble_1_4_2_list	postamble_1
+
+struct test_stream test_1_4_2_conn = { &preamble_1_4_2_conn, &test_case_1_4_2_conn, &postamble_1_4_2_conn };
+struct test_stream test_1_4_2_resp = { &preamble_1_4_2_resp, &test_case_1_4_2_resp, &postamble_1_4_2_resp };
+struct test_stream test_1_4_2_list = { &preamble_1_4_2_list, &test_case_1_4_2_list, &postamble_1_4_2_list };
+
+
+#define tgrp_case_1_4_3 test_group_1
+#define numb_case_1_4_3 "1.4.3"
+#define name_case_1_4_3 "Request addresses -- connected state."
+#define sref_case_1_4_3 "TPI Rev 1.5 Sections 2.1.1.5, 2.1.2.6"
+#define desc_case_1_4_3 "\
+Checks that addresses can be requested on each of three streams.  Because we are\n\
+in the connected state, local and remote addresses should be returned."
+
+int test_case_1_4_3(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
+		goto failure;
+	state++;
+	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
+		goto failure;
+	state++;
+	if (p->addr_ack.REMADDR_length != sizeof(struct sockaddr_in))
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_1_4_3_list(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->addr_ack.PRIM_type != T_ADDR_ACK)
+		goto failure;
+	state++;
+	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
+		goto failure;
+	state++;
+	if (p->addr_ack.REMADDR_length != 0)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_4_3_conn	test_case_1_4_3
+#define test_case_1_4_3_resp	test_case_1_4_3
+
+#define preamble_1_4_3_conn	preamble_2_conn
+#define preamble_1_4_3_resp	preamble_2_resp
+#define preamble_1_4_3_list	preamble_2_list
+
+#define postamble_1_4_3_conn	postamble_2_conn
+#define postamble_1_4_3_resp	postamble_2_resp
+#define postamble_1_4_3_list	postamble_2_list
+
+//struct test_stream test_1_4_3_conn = { &preamble_1_4_3_conn, &test_case_1_4_3_conn, &postamble_1_4_3_conn };
+//struct test_stream test_1_4_3_resp = { &preamble_1_4_3_resp, &test_case_1_4_3_resp, &postamble_1_4_3_resp };
+//struct test_stream test_1_4_3_list = { &preamble_1_4_3_list, &test_case_1_4_3_list, &postamble_1_4_3_list };
+
 
 /*
  *  Do options management.
@@ -14334,10 +14460,10 @@ struct test_stream test_1_10_3_list = { &preamble_1_10_3_list, &test_case_1_10_3
 #define tgrp_case_1_10_4 test_group_1_10
 #define numb_case_1_10_4 "1.10.4"
 #define name_case_1_10_4 "Double bind on three streams."
-#define sref_case_1_10_4 sref_case_1_10
+#define sref_case_1_10_4 "TPI Version 2 Draft 2 T_BIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_4 "\
-Check that an attempt to bind three streams twice to each address\n\
-results in failure."
+Check that an attempt to bind three streams twice to each address results in\n\
+failure.  This is a simple test of a common interface state violation."
 
 int test_case_1_10_4(int child)
 {
@@ -14422,10 +14548,11 @@ struct test_stream test_1_10_5_list = { &preamble_1_10_5_list, &test_case_1_10_5
 #define tgrp_case_1_10_6 test_group_1_10
 #define numb_case_1_10_6 "1.10.6"
 #define name_case_1_10_6 "Unbind from unbound on three streams."
-#define sref_case_1_10_6 sref_case_1_10
+#define sref_case_1_10_6 "TPI Version 2 Draft 2 T_UNBIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_6 "\
-Check that an attempt to and unbind three streams, already in the\n\
-unbound state, results in failure."
+Check that an attempt to and unbind three streams, already in the unbound\n\
+state, results in failure.  This is a simple tests of a common interface\n\
+state violation."
 
 int test_case_1_10_6(int child)
 {
@@ -14504,10 +14631,13 @@ struct test_stream test_1_10_7_list = { &preamble_1_10_7_list, &test_case_1_10_7
 #define tgrp_case_1_10_8 test_group_1_10
 #define numb_case_1_10_8 "1.10.8"
 #define name_case_1_10_8 "Bind streams with a bad address -- too short"
-#define sref_case_1_10_8 sref_case_1_10
+#define sref_case_1_10_8 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_8 "\
-Checks that an attempt to bind a stream with an address that is too\n\
-short will result in error TBADADDR."
+Checks that an attempt to bind a stream with an address that is too short will\n\
+result in error TBADADDR.  The specification states that an address that is\n\
+illegally formatted (e.g. too long or too short) will result in error TBADADDR.\n\
+This test case is for too short.  We do not use a multiple of the socket address\n\
+size because that is acceptable to SCTP."
 
 int test_case_1_10_8(int child)
 {
@@ -14545,10 +14675,13 @@ struct test_stream test_1_10_8_list = { &preamble_1_10_8_list, &test_case_1_10_8
 #define tgrp_case_1_10_9 test_group_1_10
 #define numb_case_1_10_9 "1.10.9"
 #define name_case_1_10_9 "Bind streams with a bad address -- too long"
-#define sref_case_1_10_9 sref_case_1_10
+#define sref_case_1_10_9 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_9 "\
-Checks that an attempt to bind a stream with an address that is too\n\
-long will result in error TBADADDR."
+Checks that an attempt to bind a stream with an address that is too long will\n\
+result in error TBADADDR.  The specification states that an address that is\n\
+illegally formatted (e.g. too long or too short) will result in error TBADADDR.\n\
+This test case is for too long.  We do not use a multiple of the socket address\n\
+size because that is acceptable to SCTP."
 
 int test_case_1_10_9(int child)
 {
@@ -14581,6 +14714,112 @@ int test_case_1_10_9(int child)
 struct test_stream test_1_10_9_conn = { &preamble_1_10_9_conn, &test_case_1_10_9_conn, &postamble_1_10_9_conn };
 struct test_stream test_1_10_9_resp = { &preamble_1_10_9_resp, &test_case_1_10_9_resp, &postamble_1_10_9_resp };
 struct test_stream test_1_10_9_list = { &preamble_1_10_9_list, &test_case_1_10_9_list, &postamble_1_10_9_list };
+
+
+#define tgrp_case_1_10_10 test_group_1_10
+#define numb_case_1_10_10 "1.10.10"
+#define name_case_1_10_10 "Bind streams to unassignable address -- TNOADDR"
+#define sref_case_1_10_10 "TPI Version 2 Draft 2 T_BIND_REQ [TNOADDR]"
+#define desc_case_1_10_10 "\
+Checks that an attempt to bind to an unassignable address results in failure\n\
+with error TNOADDR.  There are two ways of specifying an unassignable address\n\
+for RAWIP: on is to provide an ADDR_length of zero; the other is to use a\n\
+wildcard socket address as an address.  Both versions are tested.  For UDP and\n\
+TCP there is no way to specify an unassignable address so the test is reversed\n\
+for UDP and TCP."
+
+int test_case_1_10_10(int child)
+{
+	struct sockaddr_in addr = { AF_INET, 0, {0} };
+	test_addr = NULL;
+	test_alen = 0;
+	last_qlen = 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TNOADDR)
+		goto failure;
+	state++;
+	test_addr = &addr;
+	test_alen = sizeof(addr);
+	last_qlen = 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TNOADDR)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_10_10_conn	test_case_1_10_10
+#define test_case_1_10_10_resp	test_case_1_10_10
+#define test_case_1_10_10_list	test_case_1_10_10
+
+#define preamble_1_10_10_conn	preamble_0
+#define preamble_1_10_10_resp	preamble_0
+#define preamble_1_10_10_list	preamble_0
+
+#define postamble_1_10_10_conn	postamble_0
+#define postamble_1_10_10_resp	postamble_0
+#define postamble_1_10_10_list	postamble_0
+
+struct test_stream test_1_10_10_conn = { &preamble_1_10_10_conn, &test_case_1_10_10_conn, &postamble_1_10_10_conn };
+struct test_stream test_1_10_10_resp = { &preamble_1_10_10_resp, &test_case_1_10_10_resp, &postamble_1_10_10_resp };
+struct test_stream test_1_10_10_list = { &preamble_1_10_10_list, &test_case_1_10_10_list, &postamble_1_10_10_list };
+
+
+#define tgrp_case_1_10_11 test_group_1_10
+#define numb_case_1_10_11 "1.10.11"
+#define name_case_1_10_11 "Bind streams with non-zero CONNIND_number"
+#define sref_case_1_10_11 "TPI Version 2 Draft 2 T_BIND_REQ [CONNIND_number]"
+#define desc_case_1_10_11 "\
+Checks that an attempt to bind to wildcard and non-wildcard addresses and with a\n\
+non-zero CONNINND_number results in failure for T_COTS or T_COTS_ORD service,\n\
+while it is successful for T_CLTS service."
+
+int test_case_1_10_11(int child)
+{
+	struct sockaddr_in addr = { AF_INET, addrs[child].sin_port, {child == 0 ? 0 : addrs[child].sin_addr.s_addr} };
+	test_addr = &addr;
+	test_alen = sizeof(addr);
+	last_qlen = 5;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_sleep(child, 1);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_10_11_conn	test_case_1_10_10
+#define test_case_1_10_11_resp	test_case_1_10_10
+#define test_case_1_10_11_list	test_case_1_10_10
+
+#define preamble_1_10_11_conn	preamble_0
+#define preamble_1_10_11_resp	preamble_0
+#define preamble_1_10_11_list	preamble_0
+
+#define postamble_1_10_11_conn	postamble_0
+#define postamble_1_10_11_resp	postamble_0
+#define postamble_1_10_11_list	postamble_0
+
+struct test_stream test_1_10_11_conn = { &preamble_1_10_11_conn, &test_case_1_10_11_conn, &postamble_1_10_11_conn };
+struct test_stream test_1_10_11_resp = { &preamble_1_10_11_resp, &test_case_1_10_11_resp, &postamble_1_10_11_resp };
+struct test_stream test_1_10_11_list = { &preamble_1_10_11_list, &test_case_1_10_11_list, &postamble_1_10_11_list };
 
 
 /*
@@ -19068,7 +19307,11 @@ struct test_case {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
 		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
-		numb_case_1_4, tgrp_case_1_4, name_case_1_4, desc_case_1_4, sref_case_1_4, { &test_1_4_conn, &test_1_4_resp, &test_1_4_list }, 0, 0}, {
+		numb_case_1_4_1, tgrp_case_1_4_1, name_case_1_4_1, desc_case_1_4_1, sref_case_1_4_1, { &test_1_4_1_conn, &test_1_4_1_resp, &test_1_4_1_list }, 0, 0}, {
+		numb_case_1_4_2, tgrp_case_1_4_2, name_case_1_4_2, desc_case_1_4_2, sref_case_1_4_2, { &test_1_4_2_conn, &test_1_4_2_resp, &test_1_4_2_list }, 0, 0}, {
+#if 0
+		numb_case_1_4_3, tgrp_case_1_4_3, name_case_1_4_3, desc_case_1_4_3, sref_case_1_4_3, { &test_1_4_3_conn, &test_1_4_3_resp, &test_1_4_3_list }, 0, 0}, {
+#endif
 		numb_case_1_5_1_1, tgrp_case_1_5_1_1, name_case_1_5_1_1, desc_case_1_5_1_1, sref_case_1_5_1_1, { &test_1_5_1_1_conn, &test_1_5_1_1_resp, &test_1_5_1_1_list }, 0, 0}, {
 		numb_case_1_5_1_2, tgrp_case_1_5_1_2, name_case_1_5_1_2, desc_case_1_5_1_2, sref_case_1_5_1_2, { &test_1_5_1_2_conn, &test_1_5_1_2_resp, &test_1_5_1_2_list }, 0, 0}, {
 		numb_case_1_5_1_3, tgrp_case_1_5_1_3, name_case_1_5_1_3, desc_case_1_5_1_3, sref_case_1_5_1_3, { &test_1_5_1_3_conn, &test_1_5_1_3_resp, &test_1_5_1_3_list }, 0, 0}, {
@@ -19346,6 +19589,8 @@ struct test_case {
 		numb_case_1_10_7, tgrp_case_1_10_7, name_case_1_10_7, desc_case_1_10_7, sref_case_1_10_7, { &test_1_10_7_conn, &test_1_10_7_resp, &test_1_10_7_list }, 0, 0}, {
 		numb_case_1_10_8, tgrp_case_1_10_8, name_case_1_10_8, desc_case_1_10_8, sref_case_1_10_8, { &test_1_10_8_conn, &test_1_10_8_resp, &test_1_10_8_list }, 0, 0}, {
 		numb_case_1_10_9, tgrp_case_1_10_9, name_case_1_10_9, desc_case_1_10_9, sref_case_1_10_9, { &test_1_10_9_conn, &test_1_10_9_resp, &test_1_10_9_list }, 0, 0}, {
+		numb_case_1_10_10, tgrp_case_1_10_10, name_case_1_10_10, desc_case_1_10_10, sref_case_1_10_10, { &test_1_10_10_conn, &test_1_10_10_resp, &test_1_10_10_list }, 0, 0}, {
+		numb_case_1_10_11, tgrp_case_1_10_11, name_case_1_10_11, desc_case_1_10_11, sref_case_1_10_11, { &test_1_10_11_conn, &test_1_10_11_resp, &test_1_10_11_list }, 0, 0}, {
 		numb_case_2_2_1_1, tgrp_case_2_2_1_1, name_case_2_2_1_1, desc_case_2_2_1_1, sref_case_2_2_1_1, { &test_2_2_1_1_conn, &test_2_2_1_1_resp, &test_2_2_1_1_list }, 0, 0}, {
 		numb_case_2_2_1_2, tgrp_case_2_2_1_2, name_case_2_2_1_2, desc_case_2_2_1_2, sref_case_2_2_1_2, { &test_2_2_1_2_conn, &test_2_2_1_2_resp, &test_2_2_1_2_list }, 0, 0}, {
 		numb_case_2_2_1_3, tgrp_case_2_2_1_3, name_case_2_2_1_3, desc_case_2_2_1_3, sref_case_2_2_1_3, { &test_2_2_1_3_conn, &test_2_2_1_3_resp, &test_2_2_1_3_list }, 0, 0}, {
