@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/11 02:21:19 $ by $Author: brian $
+ Last Modified $Date: 2005/06/11 08:04:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.24  2005/06/11 08:04:40  brian
+ - corrected some T_ALLOPT behavior
+
  Revision 0.9.2.23  2005/06/11 02:21:19  brian
  - added more test cases
 
@@ -168,9 +171,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/11 02:21:19 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $";
 
 /*
  *  Simple test program for INET streams.
@@ -753,6 +756,25 @@ struct {
 	, { sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_SCTP, T_SCTP_DEBUG, T_SUCCESS}, 0
 #endif
 };
+
+struct t_opthdr *find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+{
+	const char *opt_ptr = cmd_buf + opt_ofs;
+	struct t_opthdr *oh = NULL;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		int len = oh->len - sizeof(*oh);
+		if (len < 0) {
+			oh = NULL;
+			break;
+		}
+		if (oh->level != level)
+			continue;
+		if (oh->name != name)
+			continue;
+		break;
+	}
+	return (oh);
+}
 
 /*
  *  -------------------------------------------------------------------------
@@ -13670,6 +13692,7 @@ struct test_stream test_1_8_5_38_list = { &preamble_1_8_list, &test_case_1_8_5_3
 int test_case_1_9_1(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
+	struct t_opthdr *oh;
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
@@ -13682,6 +13705,83 @@ int test_case_1_9_1(int child)
 		goto failure;
 	state++;
 	if (p->optmgmt_ack.OPT_length == 0)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_DEBUG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_LINGER, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_RCVBUF, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_RCVLOWAT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_SNDBUF, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_SNDLOWAT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	if (!(oh = find_option(T_INET_IP, T_IP_OPTIONS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_TOS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_TTL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_REUSEADDR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_DONTROUTE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_BROADCAST, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_ADDR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
 		goto failure;
 	state++;
 	test_sleep(child, 1);
@@ -13814,13 +13914,13 @@ int test_case_1_9_1_4(int child)
 #define test_case_1_9_1_4_resp	test_case_1_9_1_4
 #define test_case_1_9_1_4_list	test_case_1_9_1_4
 
-#define preamble_1_9_1_4_conn	preamble_0
-#define preamble_1_9_1_4_resp	preamble_0
-#define preamble_1_9_1_4_list	preamble_0
+#define preamble_1_9_1_4_conn	preamble_1
+#define preamble_1_9_1_4_resp	preamble_1
+#define preamble_1_9_1_4_list	preamble_1
 
-#define postamble_1_9_1_4_conn	postamble_0
-#define postamble_1_9_1_4_resp	postamble_0
-#define postamble_1_9_1_4_list	postamble_0
+#define postamble_1_9_1_4_conn	postamble_1
+#define postamble_1_9_1_4_resp	postamble_1
+#define postamble_1_9_1_4_list	postamble_1
 
 struct test_stream test_1_9_1_4_conn = { &preamble_1_9_1_4_conn, &test_case_1_9_1_4_conn, &postamble_1_9_1_4_conn };
 struct test_stream test_1_9_1_4_resp = { &preamble_1_9_1_4_resp, &test_case_1_9_1_4_resp, &postamble_1_9_1_4_resp };
@@ -13833,6 +13933,7 @@ struct test_stream test_1_9_1_4_list = { &preamble_1_9_1_4_list, &test_case_1_9_
 int test_case_1_9_2(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
+	struct t_opthdr *oh;
 	struct {
 		struct t_opthdr opt_hdr1;
 		struct t_opthdr opt_hdr2;
@@ -13864,6 +13965,86 @@ int test_case_1_9_2(int child)
 		goto failure;
 	state++;
 	if (p->optmgmt_ack.MGMT_flags == T_FAILURE)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.OPT_length == 0)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_DEBUG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_LINGER, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_RCVBUF, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_RCVLOWAT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_SNDBUF, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(XTI_GENERIC, XTI_SNDLOWAT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	if (!(oh = find_option(T_INET_IP, T_IP_OPTIONS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_TOS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_TTL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_REUSEADDR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_DONTROUTE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_BROADCAST, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
+		goto failure;
+	state++;
+	if (!(oh = find_option(T_INET_IP, T_IP_ADDR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+		goto failure;
+	state++;
+	if (oh->status == T_FAILURE)
 		goto failure;
 	state++;
 	test_sleep(child, 1);
@@ -13998,13 +14179,13 @@ int test_case_1_9_2_4(int child)
 #define test_case_1_9_2_4_resp	test_case_1_9_2_4
 #define test_case_1_9_2_4_list	test_case_1_9_2_4
 
-#define preamble_1_9_2_4_conn	preamble_0
-#define preamble_1_9_2_4_resp	preamble_0
-#define preamble_1_9_2_4_list	preamble_0
+#define preamble_1_9_2_4_conn	preamble_1
+#define preamble_1_9_2_4_resp	preamble_1
+#define preamble_1_9_2_4_list	preamble_1
 
-#define postamble_1_9_2_4_conn	postamble_0
-#define postamble_1_9_2_4_resp	postamble_0
-#define postamble_1_9_2_4_list	postamble_0
+#define postamble_1_9_2_4_conn	postamble_1
+#define postamble_1_9_2_4_resp	postamble_1
+#define postamble_1_9_2_4_list	postamble_1
 
 struct test_stream test_1_9_2_4_conn = { &preamble_1_9_2_4_conn, &test_case_1_9_2_4_conn, &postamble_1_9_2_4_conn };
 struct test_stream test_1_9_2_4_resp = { &preamble_1_9_2_4_resp, &test_case_1_9_2_4_resp, &postamble_1_9_2_4_resp };
