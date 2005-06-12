@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/11 08:04:28 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/11 08:04:28 $ by $Author: brian $
+ Last Modified $Date: 2005/06/12 12:52:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/11 08:04:28 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/11 08:04:28 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -305,7 +305,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/11 08:04:28 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13148,10 +13148,11 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	const struct T_conn_req *p = (typeof(p)) mp->b_rptr;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto einval;
 	if (ss_get_state(ss) != TS_IDLE)
 		goto outstate;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
-	    || (p->DEST_length && mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
+	if ((p->DEST_length && mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length))
 		goto einval;
 	else {
@@ -13265,11 +13266,11 @@ t_conn_res(queue_t *q, mblk_t *mp)
 	unsigned char *opt;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto inval;
 	if (ss_get_state(ss) != TS_WRES_CIND)
 		goto outstate;
 	ss_set_state(ss, TS_WACK_CRES);
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto inval;
 	if ((cp = t_seq_check(ss, p->SEQ_number)) == NULL)
 		goto badseq;
 	if (((as = t_tok_check(p->ACCEPTOR_id)) == NULL)
@@ -13367,10 +13368,10 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	struct T_discon_req *p = (typeof(p)) mp->b_rptr;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
-	if ((1 << ss_get_state(ss)) & ~TSM_CONNECTED)
-		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if ((1 << ss_get_state(ss)) & ~TSM_CONNECTED)
+		goto outstate;
 	if (mp->b_cont) {
 		long mlen, mmax;
 		mlen = msgdsize(mp->b_cont);
@@ -13479,10 +13480,10 @@ t_data_req(queue_t *q, mblk_t *mp)
 	struct msghdr msg;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
-	if (ss_get_state(ss) == TS_IDLE)
-		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (ss_get_state(ss) == TS_IDLE)
+		goto discard;
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
@@ -13527,10 +13528,10 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	struct msghdr msg;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
-	if (ss_get_state(ss) == TS_IDLE)
-		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (ss_get_state(ss) == TS_IDLE)
+		goto discard;
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	mlen = msgdsize(mp);
@@ -13586,11 +13587,11 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	int err, add_len;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
 	struct sockaddr *add = &ss->src;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto einval;
 	if (ss_get_state(ss) != TS_UNBND)
 		goto outstate;
 	ss_set_state(ss, TS_WACK_BREQ);
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
 #if 0
 	/* we are supposed to ignore CONIND_number for T_CLTS according to XTI */
 	if (ss->p.info.SERV_type == T_CLTS && p->CONIND_number)
@@ -13743,6 +13744,8 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 	if (ss->p.info.SERV_type != T_CLTS)
 		goto notsupport;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto einval;
 	if (dlen == 0 && !(ss->p.info.PROVIDER_flag & T_SNDZERO))
 		goto baddata;
 	if (((mmax = ss->p.info.TSDU_size) > 0 && dlen > mmax) || mmax == T_INVALID
@@ -13750,8 +13753,6 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 		goto baddata;
 	if (ss_get_state(ss) != TS_IDLE)
 		goto outstate;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
 	if ((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 	    || (p->DEST_length < sizeof(ss->dst.sa_family))
 	    || (p->DEST_length < ss_addr_size(ss, (struct sockaddr *) (mp->b_rptr + p->DEST_length))))
@@ -13821,12 +13822,12 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	ss_t *ss = PRIV(q);
 	int err, opt_len;
 	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto einval;
 #ifdef TS_WACK_OPTREQ
 	if (ss_get_state(ss) == TS_IDLE)
 		ss_set_state(ss, TS_WACK_OPTREQ);
 #endif
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
 	if (p->OPT_length && mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto badopt;
 	switch (p->MGMT_flags) {
@@ -13949,10 +13950,10 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
-	if (ss_get_state(ss) == TS_IDLE)
-		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (ss_get_state(ss) == TS_IDLE)
+		goto discard;
 	if ((1 << ss_get_state(ss)) & ~TSM_OUTDATA)
 		goto outstate;
 	else {
@@ -14043,10 +14044,20 @@ t_addr_req(queue_t *q, mblk_t *mp)
 STATIC int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
+	int err = -EFAULT;
 	ss_t *ss = PRIV(q);
 	struct T_capability_req *p = (typeof(p)) mp->b_rptr;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto einval;
 	(void) ss;
 	return t_capability_ack(q, p->CAP_bits1);
+      einval:
+	err = -EINVAL;
+	ptrace(("%s: ERROR: invalid message format\n", DRV_NAME));
+	goto error;
+      error:
+	return t_error_ack(q, T_CAPABILITY_REQ, err);
+
 }
 #endif
 /*
@@ -14082,6 +14093,8 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	ss_t *ss = PRIV(q);
 	ulong oldstate = ss_get_state(ss);
+	if (mp->b_wptr < mp->b_rptr + sizeof(ulong))
+		goto eproto;
 	switch ((prim = *((ulong *) mp->b_rptr))) {
 	case T_CONN_REQ:
 		printd(("%s: %p: -> T_CONN_REQ\n", DRV_NAME, ss));
@@ -14143,6 +14156,27 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 		rtn = t_capability_req(q, mp);
 		break;
 #endif
+	case T_CONN_IND:
+	case T_CONN_CON:
+	case T_DISCON_IND:
+	case T_DATA_IND:
+	case T_EXDATA_IND:
+	case T_INFO_ACK:
+	case T_BIND_ACK:
+	case T_ERROR_ACK:
+	case T_OK_ACK:
+	case T_UNITDATA_IND:
+	case T_UDERROR_IND:
+	case T_OPTMGMT_ACK:
+	case T_ORDREL_IND:
+	case T_OPTDATA_IND:
+	case T_ADDR_ACK:
+#ifdef T_CAPABILITY_ACK
+	case T_CAPABILITY_ACK:
+#endif
+	      eproto:
+		rtn = m_error(q, EPROTO);
+		break;
 	default:
 		rtn = t_other_req(q, mp);
 		break;

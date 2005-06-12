@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/12 12:52:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/11 08:04:40 $ by $Author: brian $
+ Last Modified $Date: 2005/06/12 12:52:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.25  2005/06/12 12:52:54  brian
+ - added more tests, bad primitive corrections
+
  Revision 0.9.2.24  2005/06/11 08:04:40  brian
  - corrected some T_ALLOPT behavior
 
@@ -171,9 +174,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/12 12:52:54 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/11 08:04:40 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/12 12:52:54 $";
 
 /*
  *  Simple test program for INET streams.
@@ -236,6 +239,8 @@ static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/RAW";
 static char devname[256] = "/dev/rawip";
 
+static const int test_level = T_INET_IP;
+
 static int exit_on_failure = 0;
 
 static int verbose = 1;
@@ -255,6 +260,7 @@ static int last_sequence = 1;
 static int last_servtype = T_COTS_ORD;
 static int last_provflag = T_SENDZERO | T_ORDRELDATA | T_XPG4_1;
 static int last_tstate = TS_UNBND;
+struct T_info_ack last_info = { 0, };
 
 static int MORE_flag = 0;
 static int DATA_flag = T_ODF_EX | T_ODF_MORE;
@@ -351,6 +357,7 @@ enum {
 	__TEST_TI_SETMYNAME_DATA, __TEST_TI_SETPEERNAME_DATA,
 	__TEST_TI_SETMYNAME_DISC, __TEST_TI_SETPEERNAME_DISC,
 	__TEST_TI_SETMYNAME_DISC_DATA, __TEST_TI_SETPEERNAME_DISC_DATA,
+	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
 };
 
 /*
@@ -3548,6 +3555,22 @@ static int do_signal(int child, int action)
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PRIM_TOO_SHORT:
+		ctrl->len = sizeof(p->type);
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PRIM_WAY_TOO_SHORT:
+		ctrl->len = sizeof(p->type) >> 1;
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_O_TI_GETINFO:
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
@@ -3890,6 +3913,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_INFO_ACK:
 			event = __TEST_INFO_ACK;
+			last_info = p->info_ack;
 			print_ack_prim(child, prim_string(p->type));
 			break;
 		case T_BIND_ACK:
@@ -3953,6 +3977,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_CAPABILITY_ACK:
 			event = __TEST_CAPABILITY_ACK;
+			last_info = p->capability_ack.INFO_ack;
 			print_ack_prim(child, prim_string(p->type));
 			break;
 		default:
@@ -4232,26 +4257,31 @@ static int preamble_0(int child)
 
 static int postamble_0(int child)
 {
-	stop_tt();
-	state++;
-	start_tt(20000);
-	for (;;) {
-		state++;
-		switch (wait_event(child, 0)) {
+	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			break;
 		case __EVENT_TIMEOUT:
 			break;
 		case __RESULT_FAILURE:
 			break;
 		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
 			continue;
 		}
 		break;
 	}
 	state++;
 	stop_tt();
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
 }
 
 static int preamble_1(int child)
@@ -4299,33 +4329,80 @@ static int preamble_1s(int child)
 
 static int postamble_1(int child)
 {
+	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
+	stop_tt();
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
 static int postamble_1e(int child)
 {
-	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
-		expect(child, SHORT_WAIT, __TEST_OK_ACK);
-		goto failure;
+	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
 	}
 	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	stop_tt();
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
-#if 0
 static int preamble_2_conn(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[2];
@@ -4342,6 +4419,9 @@ static int preamble_2_conn(int child)
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	//if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	//	goto failure;
+	//state++;
 	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4351,9 +4431,12 @@ static int preamble_2_conn(int child)
 
 static int preamble_2_resp(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	//if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	//	goto failure;
+	//state++;
 	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4363,10 +4446,10 @@ static int preamble_2_resp(int child)
 
 static int preamble_2_list(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -4379,6 +4462,9 @@ static int preamble_2_list(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	//if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	//	goto failure;
+	//state++;
 	test_sleep(child, 1);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4389,6 +4475,23 @@ static int preamble_2_list(int child)
 static int postamble_2_conn(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	test_data = NULL;
 	last_sequence = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
@@ -4399,6 +4502,8 @@ static int postamble_2_conn(int child)
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4411,11 +4516,30 @@ static int postamble_2_conn(int child)
 static int postamble_2_resp(int child)
 {
 	int failed = -1;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4428,8 +4552,27 @@ static int postamble_2_resp(int child)
 static int postamble_2_list(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4443,6 +4586,9 @@ static int postamble_2_list(int child)
 static int preamble_2b_conn(int child)
 {
 	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[1];
@@ -4472,7 +4618,7 @@ static int preamble_2b_resp(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4485,7 +4631,7 @@ static int preamble_2b_list(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -4502,11 +4648,27 @@ static int preamble_2b_list(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-#endif
 
 static int postamble_3_conn(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
@@ -4523,6 +4685,8 @@ static int postamble_3_conn(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
+	stop_tt();
+	state++;
 	if (failed != -1)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -4534,6 +4698,23 @@ static int postamble_3_conn(int child)
 static int postamble_3_resp(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, LONG_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
@@ -4553,6 +4734,8 @@ static int postamble_3_resp(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
+	stop_tt();
+	state++;
 	if (failed != -1)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -4565,9 +4748,7 @@ static int postamble_3_list(int child)
 {
 	return postamble_2_list(child);
 }
-#endif
 
-#if 0
 static int preamble_3b_conn(int child)
 {
 	opt_optm.rcv_val = T_YES;
@@ -4755,45 +4936,143 @@ and that the returned information is appropriate for each stream."
 
 int test_case_1_2(int child)
 {
-	union T_primitives *p = (typeof(p)) cbuf;
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->info_ack.PRIM_type != T_INFO_ACK)
+	if (last_info.PRIM_type != T_INFO_ACK)
 		goto failure;
 	state++;
-	if (p->info_ack.TSDU_size != 65535)
+	switch (test_level) {
+	case T_INET_IP:
+		if (last_info.TSDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_UDP:
+		if (last_info.TSDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_TCP:
+		if (last_info.TSDU_size != 0)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != 1)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_COTS_ORD)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_SCTP:
+		if (last_info.TSDU_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != 536)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_COTS_ORD)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	default:
 		goto failure;
-	state++;
-	if (p->info_ack.ETSDU_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->info_ack.CDATA_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->info_ack.DDATA_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->info_ack.ADDR_size != sizeof(struct sockaddr_in))
-		goto failure;
-	state++;
-	if (p->info_ack.OPT_size != T_INFINITE)
-		goto failure;
-	state++;
-	if (p->info_ack.TIDU_size != 65535)
-		goto failure;
-	state++;
-	if (p->info_ack.SERV_type != T_CLTS)
-		goto failure;
-	state++;
-	if (p->info_ack.CURRENT_state != TS_UNBND)
-		goto failure;
-	state++;
-	if (p->info_ack.PROVIDER_flag != T_XPG4_1)
-		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4819,15 +5098,15 @@ struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &p
 /*
  *  Request capabilities.
  */
-#define tgrp_case_1_3 test_group_1
-#define numb_case_1_3 "1.3"
-#define name_case_1_3 "Request capabilities."
-#define sref_case_1_3 "TPI Rev 2.0"
-#define desc_case_1_3 "\
+#define tgrp_case_1_3_1 test_group_1
+#define numb_case_1_3_1 "1.3.1"
+#define name_case_1_3_1 "Request capabilities."
+#define sref_case_1_3_1 "TPI Version 2 Draft 2 T_CAPABILITY_REQ"
+#define desc_case_1_3_1 "\
 Checks that capabilities can be requested on each of three streams,\n\
 and that the returned information is appropriate for each stream."
 
-int test_case_1_3(int child)
+int test_case_1_3_1(int child)
 {
 	union T_primitives *p = (typeof(p)) cbuf;
 	if (do_signal(child, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
@@ -4848,38 +5127,137 @@ int test_case_1_3(int child)
 	if (p->capability_ack.CAP_bits1 & TCI_CAP_BITS2)
 		goto failure;
 	state++;
-	if (p->capability_ack.INFO_ack.PRIM_type != T_INFO_ACK)
+	if (last_info.PRIM_type != T_INFO_ACK)
 		goto failure;
 	state++;
-	if (p->capability_ack.INFO_ack.TSDU_size != 65535)
+	switch (test_level) {
+	case T_INET_IP:
+		if (last_info.TSDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_UDP:
+		if (last_info.TSDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_TCP:
+		if (last_info.TSDU_size != 0)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != 1)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_COTS_ORD)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	case T_INET_SCTP:
+		if (last_info.TSDU_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.ETSDU_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.CDATA_size != 536)
+			goto failure;
+		state++;
+		if (last_info.DDATA_size != T_INVALID)
+			goto failure;
+		state++;
+		if (last_info.ADDR_size != 8 * sizeof(struct sockaddr_in))
+			goto failure;
+		state++;
+		if (last_info.OPT_size != T_INFINITE)
+			goto failure;
+		state++;
+		if (last_info.TIDU_size != 65535)
+			goto failure;
+		state++;
+		if (last_info.SERV_type != T_COTS_ORD)
+			goto failure;
+		state++;
+		if (last_info.CURRENT_state != TS_UNBND)
+			goto failure;
+		state++;
+		if (last_info.PROVIDER_flag != T_XPG4_1)
+			goto failure;
+		break;
+	default:
 		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.ETSDU_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.CDATA_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.DDATA_size != T_INVALID)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.ADDR_size != sizeof(struct sockaddr_in))
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.OPT_size != T_INFINITE)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.TIDU_size != 65535)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.SERV_type != T_CLTS)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.CURRENT_state != TS_UNBND)
-		goto failure;
-	state++;
-	if (p->capability_ack.INFO_ack.PROVIDER_flag != T_XPG4_1)
-		goto failure;
+	}
 	state++;
 	if (p->capability_ack.ACCEPTOR_id == 0)
 		goto failure;
@@ -4889,21 +5267,73 @@ int test_case_1_3(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_3_conn	test_case_1_3
-#define test_case_1_3_resp	test_case_1_3
-#define test_case_1_3_list	test_case_1_3
+#define test_case_1_3_1_conn	test_case_1_3_1
+#define test_case_1_3_1_resp	test_case_1_3_1
+#define test_case_1_3_1_list	test_case_1_3_1
 
-#define preamble_1_3_conn	preamble_0
-#define preamble_1_3_resp	preamble_0
-#define preamble_1_3_list	preamble_0
+#define preamble_1_3_1_conn	preamble_0
+#define preamble_1_3_1_resp	preamble_0
+#define preamble_1_3_1_list	preamble_0
 
-#define postamble_1_3_conn	postamble_0
-#define postamble_1_3_resp	postamble_0
-#define postamble_1_3_list	postamble_0
+#define postamble_1_3_1_conn	postamble_0
+#define postamble_1_3_1_resp	postamble_0
+#define postamble_1_3_1_list	postamble_0
 
-struct test_stream test_1_3_conn = { &preamble_1_3_conn, &test_case_1_3_conn, &postamble_1_3_conn };
-struct test_stream test_1_3_resp = { &preamble_1_3_resp, &test_case_1_3_resp, &postamble_1_3_resp };
-struct test_stream test_1_3_list = { &preamble_1_3_list, &test_case_1_3_list, &postamble_1_3_list };
+struct test_stream test_1_3_1_conn = { &preamble_1_3_1_conn, &test_case_1_3_1_conn, &postamble_1_3_1_conn };
+struct test_stream test_1_3_1_resp = { &preamble_1_3_1_resp, &test_case_1_3_1_resp, &postamble_1_3_1_resp };
+struct test_stream test_1_3_1_list = { &preamble_1_3_1_list, &test_case_1_3_1_list, &postamble_1_3_1_list };
+
+
+#define tgrp_case_1_3_2 test_group_1
+#define numb_case_1_3_2 "1.3.2"
+#define name_case_1_3_2 "Request capabilities -- primitive in error."
+#define sref_case_1_3_2 "TPI Version 2 Draft 2 T_CAPABILITY_REQ"
+#define desc_case_1_3_2 "\
+Checks that a T_CAPABILITY_REQ primitive in error (too short) results in\n\
+failure.  The specifications do not state what to do in the event that a\n\
+primitive that is too short is received."
+
+int test_case_1_3_2(int child)
+{
+	last_prim = T_CAPABILITY_REQ;
+	if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (wait_event(child, NORMAL_WAIT)) {
+	case __TEST_ERROR_ACK:
+		state++;
+		if (last_t_errno != TSYSERR || last_errno != EINVAL)
+			goto failure;
+		break;
+	case __RESULT_FAILURE:
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define test_case_1_3_2_conn	test_case_1_3_2
+#define test_case_1_3_2_resp	test_case_1_3_2
+#define test_case_1_3_2_list	test_case_1_3_2
+
+#define preamble_1_3_2_conn	preamble_0
+#define preamble_1_3_2_resp	preamble_0
+#define preamble_1_3_2_list	preamble_0
+
+#define postamble_1_3_2_conn	postamble_0
+#define postamble_1_3_2_resp	postamble_0
+#define postamble_1_3_2_list	postamble_0
+
+struct test_stream test_1_3_2_conn = { &preamble_1_3_2_conn, &test_case_1_3_2_conn, &postamble_1_3_2_conn };
+struct test_stream test_1_3_2_resp = { &preamble_1_3_2_resp, &test_case_1_3_2_resp, &postamble_1_3_2_resp };
+struct test_stream test_1_3_2_list = { &preamble_1_3_2_list, &test_case_1_3_2_list, &postamble_1_3_1_list };
 
 /*
  *  Request addresses.
@@ -5027,11 +5457,22 @@ int test_case_1_4_3(int child)
 	if (p->addr_ack.LOCADDR_length != sizeof(struct sockaddr_in))
 		goto failure;
 	state++;
-	if (p->addr_ack.REMADDR_length != sizeof(struct sockaddr_in))
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (p->addr_ack.REMADDR_length != 0)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (p->addr_ack.REMADDR_length != sizeof(struct sockaddr_in))
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -5060,20 +5501,74 @@ int test_case_1_4_3_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+int preamble_1_4_3_conn(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type == T_CLTS)
+		return preamble_1(child);
+	return preamble_2_conn(child);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int preamble_1_4_3_resp(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type == T_CLTS)
+		return preamble_1(child);
+	return preamble_2_resp(child);
+      failure:
+	return (__RESULT_FAILURE);
+}
+int preamble_1_4_3_list(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.SERV_type == T_CLTS)
+		return preamble_1(child);
+	return preamble_2_list(child);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int postamble_1_4_3_conn(int child)
+{
+	if (last_info.SERV_type == T_CLTS)
+		return postamble_1(child);
+	return postamble_2_conn(child);
+}
+int postamble_1_4_3_resp(int child)
+{
+	if (last_info.SERV_type == T_CLTS)
+		return postamble_1(child);
+	return postamble_2_resp(child);
+}
+int postamble_1_4_3_list(int child)
+{
+	if (last_info.SERV_type == T_CLTS)
+		return postamble_1(child);
+	return postamble_2_list(child);
+}
+
 #define test_case_1_4_3_conn	test_case_1_4_3
 #define test_case_1_4_3_resp	test_case_1_4_3
 
-#define preamble_1_4_3_conn	preamble_2_conn
-#define preamble_1_4_3_resp	preamble_2_resp
-#define preamble_1_4_3_list	preamble_2_list
-
-#define postamble_1_4_3_conn	postamble_2_conn
-#define postamble_1_4_3_resp	postamble_2_resp
-#define postamble_1_4_3_list	postamble_2_list
-
-//struct test_stream test_1_4_3_conn = { &preamble_1_4_3_conn, &test_case_1_4_3_conn, &postamble_1_4_3_conn };
-//struct test_stream test_1_4_3_resp = { &preamble_1_4_3_resp, &test_case_1_4_3_resp, &postamble_1_4_3_resp };
-//struct test_stream test_1_4_3_list = { &preamble_1_4_3_list, &test_case_1_4_3_list, &postamble_1_4_3_list };
+struct test_stream test_1_4_3_conn = { &preamble_1_4_3_conn, &test_case_1_4_3_conn, &postamble_1_4_3_conn };
+struct test_stream test_1_4_3_resp = { &preamble_1_4_3_resp, &test_case_1_4_3_resp, &postamble_1_4_3_resp };
+struct test_stream test_1_4_3_list = { &preamble_1_4_3_list, &test_case_1_4_3_list, &postamble_1_4_3_list };
 
 
 /*
@@ -5117,9 +5612,64 @@ int test_case_1_5_xfail(int child, int terror, int error)
 	return (__RESULT_FAILURE);
 }
 
-#define test_case_1_5_conn	test_case_1_5
-#define test_case_1_5_resp	test_case_1_5
-#define test_case_1_5_list	test_case_1_5
+int test_case_1_5_xti(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_5(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_5_ip(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_5(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_5_udp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_UDP:
+		return test_case_1_5(child, result);
+	case T_INET_IP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_5_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_5_tcp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_TCP:
+		return test_case_1_5(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_SCTP:
+		return test_case_1_5_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_5_sctp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_SCTP:
+		return test_case_1_5(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		return test_case_1_5_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
 
 #define preamble_1_5_conn	preamble_0
 #define preamble_1_5_resp	preamble_0
@@ -5128,10 +5678,6 @@ int test_case_1_5_xfail(int child, int terror, int error)
 #define postamble_1_5_conn	postamble_0
 #define postamble_1_5_resp	postamble_0
 #define postamble_1_5_list	postamble_0
-
-//struct test_stream test_1_5_conn = { &preamble_1_5_conn, &test_case_1_5_conn, &postamble_1_5_conn };
-//struct test_stream test_1_5_resp = { &preamble_1_5_resp, &test_case_1_5_resp, &postamble_1_5_resp };
-//struct test_stream test_1_5_list = { &preamble_1_5_list, &test_case_1_5_list, &postamble_1_5_list };
 
 #define test_group_1_5_1 "Local management -- XTI options management"
 #define tgrp_case_1_5_1_1 test_group_1_5_1
@@ -5178,7 +5724,7 @@ int test_case_1_5_1_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_2_conn test_case_1_5_1_2
@@ -5209,7 +5755,7 @@ int test_case_1_5_1_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_3_conn test_case_1_5_1_3
@@ -5240,7 +5786,7 @@ int test_case_1_5_1_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_4_conn test_case_1_5_1_4
@@ -5271,7 +5817,7 @@ int test_case_1_5_1_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_5_conn test_case_1_5_1_5
@@ -5302,7 +5848,7 @@ int test_case_1_5_1_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_6_conn test_case_1_5_1_6
@@ -5333,7 +5879,7 @@ int test_case_1_5_1_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_1_7_conn test_case_1_5_1_7
@@ -5364,7 +5910,7 @@ int test_case_1_5_2_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_2_1_conn test_case_1_5_2_1
@@ -5395,7 +5941,7 @@ int test_case_1_5_2_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_2_2_conn test_case_1_5_2_2
@@ -5426,7 +5972,7 @@ int test_case_1_5_2_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_2_3_conn test_case_1_5_2_3
@@ -5457,7 +6003,7 @@ int test_case_1_5_2_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_2_4_conn test_case_1_5_2_4
@@ -5488,7 +6034,7 @@ int test_case_1_5_2_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5(child, T_SUCCESS);
+	return test_case_1_5_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_2_5_conn test_case_1_5_2_5
@@ -5520,7 +6066,7 @@ int test_case_1_5_3_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_udp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_3_1_conn test_case_1_5_3_1
@@ -5552,7 +6098,7 @@ int test_case_1_5_4_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_1_conn test_case_1_5_4_1
@@ -5583,7 +6129,7 @@ int test_case_1_5_4_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_2_conn test_case_1_5_4_2
@@ -5614,7 +6160,7 @@ int test_case_1_5_4_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_3_conn test_case_1_5_4_3
@@ -5645,7 +6191,7 @@ int test_case_1_5_4_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_4_conn test_case_1_5_4_4
@@ -5676,7 +6222,7 @@ int test_case_1_5_4_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_5_conn test_case_1_5_4_5
@@ -5707,7 +6253,7 @@ int test_case_1_5_4_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_6_conn test_case_1_5_4_6
@@ -5738,7 +6284,7 @@ int test_case_1_5_4_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_7_conn test_case_1_5_4_7
@@ -5769,7 +6315,7 @@ int test_case_1_5_4_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_8_conn test_case_1_5_4_8
@@ -5800,7 +6346,7 @@ int test_case_1_5_4_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_9_conn test_case_1_5_4_9
@@ -5831,7 +6377,7 @@ int test_case_1_5_4_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_10_conn test_case_1_5_4_10
@@ -5862,7 +6408,7 @@ int test_case_1_5_4_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_11_conn test_case_1_5_4_11
@@ -5893,7 +6439,7 @@ int test_case_1_5_4_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_12_conn test_case_1_5_4_12
@@ -5924,7 +6470,7 @@ int test_case_1_5_4_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_4_13_conn test_case_1_5_4_13
@@ -5959,7 +6505,7 @@ int test_case_1_5_5_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_1_conn test_case_1_5_5_1
@@ -5993,7 +6539,7 @@ int test_case_1_5_5_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_2_conn test_case_1_5_5_2
@@ -6027,7 +6573,7 @@ int test_case_1_5_5_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_3_conn test_case_1_5_5_3
@@ -6061,7 +6607,7 @@ int test_case_1_5_5_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_4_conn test_case_1_5_5_4
@@ -6095,7 +6641,7 @@ int test_case_1_5_5_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_5_conn test_case_1_5_5_5
@@ -6129,7 +6675,7 @@ int test_case_1_5_5_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_6_conn test_case_1_5_5_6
@@ -6163,7 +6709,7 @@ int test_case_1_5_5_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_7_conn test_case_1_5_5_7
@@ -6197,7 +6743,7 @@ int test_case_1_5_5_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_8_conn test_case_1_5_5_8
@@ -6231,7 +6777,7 @@ int test_case_1_5_5_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_9_conn test_case_1_5_5_9
@@ -6265,7 +6811,7 @@ int test_case_1_5_5_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_10_conn test_case_1_5_5_10
@@ -6299,7 +6845,7 @@ int test_case_1_5_5_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_11_conn test_case_1_5_5_11
@@ -6333,7 +6879,7 @@ int test_case_1_5_5_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_12_conn test_case_1_5_5_12
@@ -6367,7 +6913,7 @@ int test_case_1_5_5_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_13_conn test_case_1_5_5_13
@@ -6401,7 +6947,7 @@ int test_case_1_5_5_14(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_14_conn test_case_1_5_5_14
@@ -6435,7 +6981,7 @@ int test_case_1_5_5_15(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_15_conn test_case_1_5_5_15
@@ -6469,7 +7015,7 @@ int test_case_1_5_5_16(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_16_conn test_case_1_5_5_16
@@ -6503,7 +7049,7 @@ int test_case_1_5_5_17(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_17_conn test_case_1_5_5_17
@@ -6537,7 +7083,7 @@ int test_case_1_5_5_18(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_18_conn test_case_1_5_5_18
@@ -6571,7 +7117,7 @@ int test_case_1_5_5_19(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_19_conn test_case_1_5_5_19
@@ -6605,7 +7151,7 @@ int test_case_1_5_5_20(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_20_conn test_case_1_5_5_20
@@ -6639,7 +7185,7 @@ int test_case_1_5_5_21(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_21_conn test_case_1_5_5_21
@@ -6673,7 +7219,7 @@ int test_case_1_5_5_22(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_22_conn test_case_1_5_5_22
@@ -6707,7 +7253,7 @@ int test_case_1_5_5_23(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_23_conn test_case_1_5_5_23
@@ -6741,7 +7287,7 @@ int test_case_1_5_5_24(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_24_conn test_case_1_5_5_24
@@ -6775,7 +7321,7 @@ int test_case_1_5_5_25(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_25_conn test_case_1_5_5_25
@@ -6809,7 +7355,7 @@ int test_case_1_5_5_26(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_26_conn test_case_1_5_5_26
@@ -6843,7 +7389,7 @@ int test_case_1_5_5_27(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_27_conn test_case_1_5_5_27
@@ -6877,7 +7423,7 @@ int test_case_1_5_5_28(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_28_conn test_case_1_5_5_28
@@ -6911,7 +7457,7 @@ int test_case_1_5_5_29(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_29_conn test_case_1_5_5_29
@@ -6945,7 +7491,7 @@ int test_case_1_5_5_30(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_30_conn test_case_1_5_5_30
@@ -6979,7 +7525,7 @@ int test_case_1_5_5_31(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_31_conn test_case_1_5_5_31
@@ -7013,7 +7559,7 @@ int test_case_1_5_5_32(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_32_conn test_case_1_5_5_32
@@ -7047,7 +7593,7 @@ int test_case_1_5_5_33(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_33_conn test_case_1_5_5_33
@@ -7081,7 +7627,7 @@ int test_case_1_5_5_34(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_34_conn test_case_1_5_5_34
@@ -7115,7 +7661,7 @@ int test_case_1_5_5_35(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_35_conn test_case_1_5_5_35
@@ -7149,7 +7695,7 @@ int test_case_1_5_5_36(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_36_conn test_case_1_5_5_36
@@ -7183,7 +7729,7 @@ int test_case_1_5_5_37(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_37_conn test_case_1_5_5_37
@@ -7217,7 +7763,7 @@ int test_case_1_5_5_38(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_DEFAULT;
-	return test_case_1_5_xfail(child, TBADOPT, 0);
+	return test_case_1_5_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_5_5_38_conn test_case_1_5_5_38
@@ -7270,6 +7816,65 @@ int test_case_1_6_xfail(int child, int terror, int error)
 	return (__RESULT_FAILURE);
 }
 
+int test_case_1_6_xti(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_6(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_6_ip(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_6(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_6_udp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_UDP:
+		return test_case_1_6(child, result);
+	case T_INET_IP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_6_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_6_tcp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_TCP:
+		return test_case_1_6(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_SCTP:
+		return test_case_1_6_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_6_sctp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_SCTP:
+		return test_case_1_6(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		return test_case_1_6_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+
 #define test_case_1_6_conn	test_case_1_6
 #define test_case_1_6_resp	test_case_1_6
 #define test_case_1_6_list	test_case_1_6
@@ -7300,7 +7905,7 @@ int test_case_1_6_1_1(int child)
 	test_opts = &opt_optm;
 	test_olen = sizeof(opt_optm);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_1_conn test_case_1_6_1_1
@@ -7331,7 +7936,7 @@ int test_case_1_6_1_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_2_conn test_case_1_6_1_2
@@ -7362,7 +7967,7 @@ int test_case_1_6_1_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_3_conn test_case_1_6_1_3
@@ -7393,7 +7998,7 @@ int test_case_1_6_1_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_4_conn test_case_1_6_1_4
@@ -7424,7 +8029,7 @@ int test_case_1_6_1_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_5_conn test_case_1_6_1_5
@@ -7455,7 +8060,7 @@ int test_case_1_6_1_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_6_conn test_case_1_6_1_6
@@ -7486,7 +8091,7 @@ int test_case_1_6_1_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_1_7_conn test_case_1_6_1_7
@@ -7517,7 +8122,7 @@ int test_case_1_6_2_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_2_1_conn test_case_1_6_2_1
@@ -7548,7 +8153,7 @@ int test_case_1_6_2_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_2_2_conn test_case_1_6_2_2
@@ -7579,7 +8184,7 @@ int test_case_1_6_2_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_2_3_conn test_case_1_6_2_3
@@ -7610,7 +8215,7 @@ int test_case_1_6_2_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_2_4_conn test_case_1_6_2_4
@@ -7641,7 +8246,7 @@ int test_case_1_6_2_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6(child, T_SUCCESS);
+	return test_case_1_6_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_2_5_conn test_case_1_6_2_5
@@ -7673,7 +8278,7 @@ int test_case_1_6_3_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_udp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_3_1_conn test_case_1_6_3_1
@@ -7705,7 +8310,7 @@ int test_case_1_6_4_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_1_conn test_case_1_6_4_1
@@ -7736,7 +8341,7 @@ int test_case_1_6_4_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_2_conn test_case_1_6_4_2
@@ -7767,7 +8372,7 @@ int test_case_1_6_4_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_3_conn test_case_1_6_4_3
@@ -7798,7 +8403,7 @@ int test_case_1_6_4_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_4_conn test_case_1_6_4_4
@@ -7829,7 +8434,7 @@ int test_case_1_6_4_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_5_conn test_case_1_6_4_5
@@ -7860,7 +8465,7 @@ int test_case_1_6_4_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_6_conn test_case_1_6_4_6
@@ -7891,7 +8496,7 @@ int test_case_1_6_4_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_7_conn test_case_1_6_4_7
@@ -7922,7 +8527,7 @@ int test_case_1_6_4_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_8_conn test_case_1_6_4_8
@@ -7953,7 +8558,7 @@ int test_case_1_6_4_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_9_conn test_case_1_6_4_9
@@ -7984,7 +8589,7 @@ int test_case_1_6_4_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_10_conn test_case_1_6_4_10
@@ -8015,7 +8620,7 @@ int test_case_1_6_4_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_11_conn test_case_1_6_4_11
@@ -8046,7 +8651,7 @@ int test_case_1_6_4_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_12_conn test_case_1_6_4_12
@@ -8077,7 +8682,7 @@ int test_case_1_6_4_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_4_13_conn test_case_1_6_4_13
@@ -8112,7 +8717,7 @@ int test_case_1_6_5_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_1_conn test_case_1_6_5_1
@@ -8146,7 +8751,7 @@ int test_case_1_6_5_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_2_conn test_case_1_6_5_2
@@ -8180,7 +8785,7 @@ int test_case_1_6_5_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_3_conn test_case_1_6_5_3
@@ -8214,7 +8819,7 @@ int test_case_1_6_5_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_4_conn test_case_1_6_5_4
@@ -8248,7 +8853,7 @@ int test_case_1_6_5_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_5_conn test_case_1_6_5_5
@@ -8282,7 +8887,7 @@ int test_case_1_6_5_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_6_conn test_case_1_6_5_6
@@ -8316,7 +8921,7 @@ int test_case_1_6_5_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_7_conn test_case_1_6_5_7
@@ -8350,7 +8955,7 @@ int test_case_1_6_5_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_8_conn test_case_1_6_5_8
@@ -8384,7 +8989,7 @@ int test_case_1_6_5_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_9_conn test_case_1_6_5_9
@@ -8418,7 +9023,7 @@ int test_case_1_6_5_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_10_conn test_case_1_6_5_10
@@ -8452,7 +9057,7 @@ int test_case_1_6_5_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_11_conn test_case_1_6_5_11
@@ -8486,7 +9091,7 @@ int test_case_1_6_5_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_12_conn test_case_1_6_5_12
@@ -8520,7 +9125,7 @@ int test_case_1_6_5_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_13_conn test_case_1_6_5_13
@@ -8554,7 +9159,7 @@ int test_case_1_6_5_14(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_14_conn test_case_1_6_5_14
@@ -8588,7 +9193,7 @@ int test_case_1_6_5_15(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_15_conn test_case_1_6_5_15
@@ -8622,7 +9227,7 @@ int test_case_1_6_5_16(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_16_conn test_case_1_6_5_16
@@ -8656,7 +9261,7 @@ int test_case_1_6_5_17(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_17_conn test_case_1_6_5_17
@@ -8690,7 +9295,7 @@ int test_case_1_6_5_18(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_18_conn test_case_1_6_5_18
@@ -8724,7 +9329,7 @@ int test_case_1_6_5_19(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_19_conn test_case_1_6_5_19
@@ -8758,7 +9363,7 @@ int test_case_1_6_5_20(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_20_conn test_case_1_6_5_20
@@ -8792,7 +9397,7 @@ int test_case_1_6_5_21(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_21_conn test_case_1_6_5_21
@@ -8826,7 +9431,7 @@ int test_case_1_6_5_22(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_22_conn test_case_1_6_5_22
@@ -8860,7 +9465,7 @@ int test_case_1_6_5_23(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_23_conn test_case_1_6_5_23
@@ -8894,7 +9499,7 @@ int test_case_1_6_5_24(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_24_conn test_case_1_6_5_24
@@ -8928,7 +9533,7 @@ int test_case_1_6_5_25(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_25_conn test_case_1_6_5_25
@@ -8962,7 +9567,7 @@ int test_case_1_6_5_26(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_26_conn test_case_1_6_5_26
@@ -8996,7 +9601,7 @@ int test_case_1_6_5_27(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_27_conn test_case_1_6_5_27
@@ -9030,7 +9635,7 @@ int test_case_1_6_5_28(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_28_conn test_case_1_6_5_28
@@ -9064,7 +9669,7 @@ int test_case_1_6_5_29(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_29_conn test_case_1_6_5_29
@@ -9098,7 +9703,7 @@ int test_case_1_6_5_30(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_30_conn test_case_1_6_5_30
@@ -9132,7 +9737,7 @@ int test_case_1_6_5_31(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_31_conn test_case_1_6_5_31
@@ -9166,7 +9771,7 @@ int test_case_1_6_5_32(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_32_conn test_case_1_6_5_32
@@ -9200,7 +9805,7 @@ int test_case_1_6_5_33(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_33_conn test_case_1_6_5_33
@@ -9234,7 +9839,7 @@ int test_case_1_6_5_34(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_34_conn test_case_1_6_5_34
@@ -9268,7 +9873,7 @@ int test_case_1_6_5_35(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_35_conn test_case_1_6_5_35
@@ -9302,7 +9907,7 @@ int test_case_1_6_5_36(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_36_conn test_case_1_6_5_36
@@ -9336,7 +9941,7 @@ int test_case_1_6_5_37(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_37_conn test_case_1_6_5_37
@@ -9370,7 +9975,7 @@ int test_case_1_6_5_38(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CURRENT;
-	return test_case_1_6_xfail(child, TBADOPT, 0);
+	return test_case_1_6_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_6_5_38_conn test_case_1_6_5_38
@@ -9423,6 +10028,65 @@ int test_case_1_7_xfail(int child, int terror, int error)
 	return (__RESULT_FAILURE);
 }
 
+int test_case_1_7_xti(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_7(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_7_ip(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_7(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_7_udp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_UDP:
+		return test_case_1_7(child, result);
+	case T_INET_IP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_7_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_7_tcp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_TCP:
+		return test_case_1_7(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_SCTP:
+		return test_case_1_7_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_7_sctp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_SCTP:
+		return test_case_1_7(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		return test_case_1_7_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+
 #define test_case_1_7_conn	test_case_1_7
 #define test_case_1_7_resp	test_case_1_7
 #define test_case_1_7_list	test_case_1_7
@@ -9453,7 +10117,7 @@ int test_case_1_7_1_1(int child)
 	test_opts = &opt_optm;
 	test_olen = sizeof(opt_optm);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_1_conn test_case_1_7_1_1
@@ -9484,7 +10148,7 @@ int test_case_1_7_1_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_2_conn test_case_1_7_1_2
@@ -9515,7 +10179,7 @@ int test_case_1_7_1_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_3_conn test_case_1_7_1_3
@@ -9546,7 +10210,7 @@ int test_case_1_7_1_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_4_conn test_case_1_7_1_4
@@ -9577,7 +10241,7 @@ int test_case_1_7_1_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_5_conn test_case_1_7_1_5
@@ -9608,7 +10272,7 @@ int test_case_1_7_1_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_6_conn test_case_1_7_1_6
@@ -9639,7 +10303,7 @@ int test_case_1_7_1_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_1_7_conn test_case_1_7_1_7
@@ -9670,7 +10334,7 @@ int test_case_1_7_2_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_2_1_conn test_case_1_7_2_1
@@ -9701,7 +10365,7 @@ int test_case_1_7_2_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_2_2_conn test_case_1_7_2_2
@@ -9732,7 +10396,7 @@ int test_case_1_7_2_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_2_3_conn test_case_1_7_2_3
@@ -9763,7 +10427,7 @@ int test_case_1_7_2_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_2_4_conn test_case_1_7_2_4
@@ -9794,7 +10458,7 @@ int test_case_1_7_2_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7(child, T_SUCCESS);
+	return test_case_1_7_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_2_5_conn test_case_1_7_2_5
@@ -9826,7 +10490,7 @@ int test_case_1_7_3_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_udp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_3_1_conn test_case_1_7_3_1
@@ -9858,7 +10522,7 @@ int test_case_1_7_4_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_1_conn test_case_1_7_4_1
@@ -9889,7 +10553,7 @@ int test_case_1_7_4_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_2_conn test_case_1_7_4_2
@@ -9920,7 +10584,7 @@ int test_case_1_7_4_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_3_conn test_case_1_7_4_3
@@ -9951,7 +10615,7 @@ int test_case_1_7_4_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_4_conn test_case_1_7_4_4
@@ -9982,7 +10646,7 @@ int test_case_1_7_4_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_PARTSUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_5_conn test_case_1_7_4_5
@@ -10013,7 +10677,7 @@ int test_case_1_7_4_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_PARTSUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_6_conn test_case_1_7_4_6
@@ -10044,7 +10708,7 @@ int test_case_1_7_4_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_PARTSUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_7_conn test_case_1_7_4_7
@@ -10075,7 +10739,7 @@ int test_case_1_7_4_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_PARTSUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_8_conn test_case_1_7_4_8
@@ -10106,7 +10770,7 @@ int test_case_1_7_4_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_9_conn test_case_1_7_4_9
@@ -10137,7 +10801,7 @@ int test_case_1_7_4_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_10_conn test_case_1_7_4_10
@@ -10168,7 +10832,7 @@ int test_case_1_7_4_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_PARTSUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_11_conn test_case_1_7_4_11
@@ -10199,7 +10863,7 @@ int test_case_1_7_4_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_12_conn test_case_1_7_4_12
@@ -10230,7 +10894,7 @@ int test_case_1_7_4_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_4_13_conn test_case_1_7_4_13
@@ -10265,7 +10929,7 @@ int test_case_1_7_5_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_1_conn test_case_1_7_5_1
@@ -10299,7 +10963,7 @@ int test_case_1_7_5_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_2_conn test_case_1_7_5_2
@@ -10333,7 +10997,7 @@ int test_case_1_7_5_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_3_conn test_case_1_7_5_3
@@ -10367,7 +11031,7 @@ int test_case_1_7_5_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_4_conn test_case_1_7_5_4
@@ -10401,7 +11065,7 @@ int test_case_1_7_5_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_5_conn test_case_1_7_5_5
@@ -10435,7 +11099,7 @@ int test_case_1_7_5_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_6_conn test_case_1_7_5_6
@@ -10469,7 +11133,7 @@ int test_case_1_7_5_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_7_conn test_case_1_7_5_7
@@ -10503,7 +11167,7 @@ int test_case_1_7_5_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_8_conn test_case_1_7_5_8
@@ -10537,7 +11201,7 @@ int test_case_1_7_5_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_9_conn test_case_1_7_5_9
@@ -10571,7 +11235,7 @@ int test_case_1_7_5_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_10_conn test_case_1_7_5_10
@@ -10605,7 +11269,7 @@ int test_case_1_7_5_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_11_conn test_case_1_7_5_11
@@ -10639,7 +11303,7 @@ int test_case_1_7_5_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_12_conn test_case_1_7_5_12
@@ -10673,7 +11337,7 @@ int test_case_1_7_5_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_13_conn test_case_1_7_5_13
@@ -10707,7 +11371,7 @@ int test_case_1_7_5_14(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_14_conn test_case_1_7_5_14
@@ -10741,7 +11405,7 @@ int test_case_1_7_5_15(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_15_conn test_case_1_7_5_15
@@ -10775,7 +11439,7 @@ int test_case_1_7_5_16(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_16_conn test_case_1_7_5_16
@@ -10809,7 +11473,7 @@ int test_case_1_7_5_17(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_17_conn test_case_1_7_5_17
@@ -10843,7 +11507,7 @@ int test_case_1_7_5_18(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_18_conn test_case_1_7_5_18
@@ -10877,7 +11541,7 @@ int test_case_1_7_5_19(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_19_conn test_case_1_7_5_19
@@ -10911,7 +11575,7 @@ int test_case_1_7_5_20(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_20_conn test_case_1_7_5_20
@@ -10945,7 +11609,7 @@ int test_case_1_7_5_21(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_21_conn test_case_1_7_5_21
@@ -10979,7 +11643,7 @@ int test_case_1_7_5_22(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_22_conn test_case_1_7_5_22
@@ -11013,7 +11677,7 @@ int test_case_1_7_5_23(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_23_conn test_case_1_7_5_23
@@ -11047,7 +11711,7 @@ int test_case_1_7_5_24(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_24_conn test_case_1_7_5_24
@@ -11081,7 +11745,7 @@ int test_case_1_7_5_25(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_25_conn test_case_1_7_5_25
@@ -11115,7 +11779,7 @@ int test_case_1_7_5_26(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_26_conn test_case_1_7_5_26
@@ -11149,7 +11813,7 @@ int test_case_1_7_5_27(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_27_conn test_case_1_7_5_27
@@ -11183,7 +11847,7 @@ int test_case_1_7_5_28(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_28_conn test_case_1_7_5_28
@@ -11217,7 +11881,7 @@ int test_case_1_7_5_29(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_29_conn test_case_1_7_5_29
@@ -11251,7 +11915,7 @@ int test_case_1_7_5_30(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_30_conn test_case_1_7_5_30
@@ -11285,7 +11949,7 @@ int test_case_1_7_5_31(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_31_conn test_case_1_7_5_31
@@ -11319,7 +11983,7 @@ int test_case_1_7_5_32(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_32_conn test_case_1_7_5_32
@@ -11353,7 +12017,7 @@ int test_case_1_7_5_33(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_33_conn test_case_1_7_5_33
@@ -11387,7 +12051,7 @@ int test_case_1_7_5_34(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_34_conn test_case_1_7_5_34
@@ -11421,7 +12085,7 @@ int test_case_1_7_5_35(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_35_conn test_case_1_7_5_35
@@ -11455,7 +12119,7 @@ int test_case_1_7_5_36(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_36_conn test_case_1_7_5_36
@@ -11489,7 +12153,7 @@ int test_case_1_7_5_37(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_37_conn test_case_1_7_5_37
@@ -11523,7 +12187,7 @@ int test_case_1_7_5_38(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_CHECK;
-	return test_case_1_7_xfail(child, TBADOPT, 0);
+	return test_case_1_7_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_7_5_38_conn test_case_1_7_5_38
@@ -11576,6 +12240,65 @@ int test_case_1_8_xfail(int child, int terror, int error)
 	return (__RESULT_FAILURE);
 }
 
+int test_case_1_8_xti(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_8(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_8_ip(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_8(child, result);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_8_udp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_UDP:
+		return test_case_1_8(child, result);
+	case T_INET_IP:
+	case T_INET_TCP:
+	case T_INET_SCTP:
+		return test_case_1_8_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_8_tcp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_TCP:
+		return test_case_1_8(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_SCTP:
+		return test_case_1_8_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+int test_case_1_8_sctp(int child, ulong result, int terror, int error)
+{
+	switch (test_level) {
+	case T_INET_SCTP:
+		return test_case_1_8(child, result);
+	case T_INET_IP:
+	case T_INET_UDP:
+	case T_INET_TCP:
+		return test_case_1_8_xfail(child, terror, error);
+	}
+	return (__RESULT_FAILURE);
+}
+
 #define test_case_1_8_conn	test_case_1_8
 #define test_case_1_8_resp	test_case_1_8
 #define test_case_1_8_list	test_case_1_8
@@ -11606,7 +12329,7 @@ int test_case_1_8_1_1(int child)
 	test_opts = &opt_optm;
 	test_olen = sizeof(opt_optm);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_1_conn test_case_1_8_1_1
@@ -11637,7 +12360,7 @@ int test_case_1_8_1_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_2_conn test_case_1_8_1_2
@@ -11668,7 +12391,7 @@ int test_case_1_8_1_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_3_conn test_case_1_8_1_3
@@ -11699,7 +12422,7 @@ int test_case_1_8_1_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_4_conn test_case_1_8_1_4
@@ -11730,7 +12453,7 @@ int test_case_1_8_1_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_5_conn test_case_1_8_1_5
@@ -11761,7 +12484,7 @@ int test_case_1_8_1_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_6_conn test_case_1_8_1_6
@@ -11792,7 +12515,7 @@ int test_case_1_8_1_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_xti(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_1_7_conn test_case_1_8_1_7
@@ -11823,7 +12546,7 @@ int test_case_1_8_2_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_2_1_conn test_case_1_8_2_1
@@ -11854,7 +12577,7 @@ int test_case_1_8_2_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_2_2_conn test_case_1_8_2_2
@@ -11885,7 +12608,7 @@ int test_case_1_8_2_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_2_3_conn test_case_1_8_2_3
@@ -11916,7 +12639,7 @@ int test_case_1_8_2_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_2_4_conn test_case_1_8_2_4
@@ -11947,7 +12670,7 @@ int test_case_1_8_2_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8(child, T_SUCCESS);
+	return test_case_1_8_ip(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_2_5_conn test_case_1_8_2_5
@@ -11979,7 +12702,7 @@ int test_case_1_8_3_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_udp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_3_1_conn test_case_1_8_3_1
@@ -12011,7 +12734,7 @@ int test_case_1_8_4_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_1_conn test_case_1_8_4_1
@@ -12042,7 +12765,7 @@ int test_case_1_8_4_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_2_conn test_case_1_8_4_2
@@ -12073,7 +12796,7 @@ int test_case_1_8_4_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_3_conn test_case_1_8_4_3
@@ -12104,7 +12827,7 @@ int test_case_1_8_4_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_4_conn test_case_1_8_4_4
@@ -12135,7 +12858,7 @@ int test_case_1_8_4_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_5_conn test_case_1_8_4_5
@@ -12166,7 +12889,7 @@ int test_case_1_8_4_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_6_conn test_case_1_8_4_6
@@ -12197,7 +12920,7 @@ int test_case_1_8_4_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_7_conn test_case_1_8_4_7
@@ -12228,7 +12951,7 @@ int test_case_1_8_4_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_8_conn test_case_1_8_4_8
@@ -12259,7 +12982,7 @@ int test_case_1_8_4_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_9_conn test_case_1_8_4_9
@@ -12290,7 +13013,7 @@ int test_case_1_8_4_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_10_conn test_case_1_8_4_10
@@ -12321,7 +13044,7 @@ int test_case_1_8_4_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_11_conn test_case_1_8_4_11
@@ -12352,7 +13075,7 @@ int test_case_1_8_4_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_READONLY, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_12_conn test_case_1_8_4_12
@@ -12383,7 +13106,7 @@ int test_case_1_8_4_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_tcp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_4_13_conn test_case_1_8_4_13
@@ -12418,7 +13141,7 @@ int test_case_1_8_5_1(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_1_conn test_case_1_8_5_1
@@ -12452,7 +13175,7 @@ int test_case_1_8_5_2(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_2_conn test_case_1_8_5_2
@@ -12486,7 +13209,7 @@ int test_case_1_8_5_3(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_3_conn test_case_1_8_5_3
@@ -12520,7 +13243,7 @@ int test_case_1_8_5_4(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_4_conn test_case_1_8_5_4
@@ -12554,7 +13277,7 @@ int test_case_1_8_5_5(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_5_conn test_case_1_8_5_5
@@ -12588,7 +13311,7 @@ int test_case_1_8_5_6(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_6_conn test_case_1_8_5_6
@@ -12622,7 +13345,7 @@ int test_case_1_8_5_7(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_7_conn test_case_1_8_5_7
@@ -12656,7 +13379,7 @@ int test_case_1_8_5_8(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_8_conn test_case_1_8_5_8
@@ -12690,7 +13413,7 @@ int test_case_1_8_5_9(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_9_conn test_case_1_8_5_9
@@ -12724,7 +13447,7 @@ int test_case_1_8_5_10(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_10_conn test_case_1_8_5_10
@@ -12758,7 +13481,7 @@ int test_case_1_8_5_11(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_11_conn test_case_1_8_5_11
@@ -12792,7 +13515,7 @@ int test_case_1_8_5_12(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_12_conn test_case_1_8_5_12
@@ -12826,7 +13549,7 @@ int test_case_1_8_5_13(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_13_conn test_case_1_8_5_13
@@ -12860,7 +13583,7 @@ int test_case_1_8_5_14(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_14_conn test_case_1_8_5_14
@@ -12894,7 +13617,7 @@ int test_case_1_8_5_15(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_15_conn test_case_1_8_5_15
@@ -12928,7 +13651,7 @@ int test_case_1_8_5_16(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_16_conn test_case_1_8_5_16
@@ -12962,7 +13685,7 @@ int test_case_1_8_5_17(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_17_conn test_case_1_8_5_17
@@ -12996,7 +13719,7 @@ int test_case_1_8_5_18(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_18_conn test_case_1_8_5_18
@@ -13030,7 +13753,7 @@ int test_case_1_8_5_19(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_19_conn test_case_1_8_5_19
@@ -13064,7 +13787,7 @@ int test_case_1_8_5_20(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_20_conn test_case_1_8_5_20
@@ -13098,7 +13821,7 @@ int test_case_1_8_5_21(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_21_conn test_case_1_8_5_21
@@ -13132,7 +13855,7 @@ int test_case_1_8_5_22(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_22_conn test_case_1_8_5_22
@@ -13166,7 +13889,7 @@ int test_case_1_8_5_23(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_23_conn test_case_1_8_5_23
@@ -13200,7 +13923,7 @@ int test_case_1_8_5_24(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_24_conn test_case_1_8_5_24
@@ -13234,7 +13957,7 @@ int test_case_1_8_5_25(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_25_conn test_case_1_8_5_25
@@ -13268,7 +13991,7 @@ int test_case_1_8_5_26(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_26_conn test_case_1_8_5_26
@@ -13302,7 +14025,7 @@ int test_case_1_8_5_27(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_27_conn test_case_1_8_5_27
@@ -13336,7 +14059,7 @@ int test_case_1_8_5_28(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_28_conn test_case_1_8_5_28
@@ -13370,7 +14093,7 @@ int test_case_1_8_5_29(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_29_conn test_case_1_8_5_29
@@ -13404,7 +14127,7 @@ int test_case_1_8_5_30(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_30_conn test_case_1_8_5_30
@@ -13438,7 +14161,7 @@ int test_case_1_8_5_31(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_31_conn test_case_1_8_5_31
@@ -13472,7 +14195,7 @@ int test_case_1_8_5_32(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_32_conn test_case_1_8_5_32
@@ -13506,7 +14229,7 @@ int test_case_1_8_5_33(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_33_conn test_case_1_8_5_33
@@ -13540,7 +14263,7 @@ int test_case_1_8_5_34(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_34_conn test_case_1_8_5_34
@@ -13574,7 +14297,7 @@ int test_case_1_8_5_35(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_35_conn test_case_1_8_5_35
@@ -13608,7 +14331,7 @@ int test_case_1_8_5_36(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_36_conn test_case_1_8_5_36
@@ -13642,7 +14365,7 @@ int test_case_1_8_5_37(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_37_conn test_case_1_8_5_37
@@ -13676,7 +14399,7 @@ int test_case_1_8_5_38(int child)
 	test_opts = &options;
 	test_olen = sizeof(options);
 	test_mgmtflags = T_NEGOTIATE;
-	return test_case_1_8_xfail(child, TBADOPT, 0);
+	return test_case_1_8_sctp(child, T_SUCCESS, TBADOPT, 0);
 }
 
 #define test_case_1_8_5_38_conn test_case_1_8_5_38
@@ -13784,8 +14507,326 @@ int test_case_1_9_1(int child)
 	if (oh->status == T_FAILURE)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	if (test_level == T_INET_UDP) {
+		if (!(oh = find_option(T_INET_UDP, T_UDP_CHECKSUM, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	if (test_level == T_INET_TCP) {
+		if (!(oh = find_option(T_INET_TCP, T_TCP_NODELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_MAXSEG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPALIVE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_CORK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPIDLE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPINTVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPCNT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_SYNCNT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_LINGER2, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_DEFER_ACCEPT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_WINDOW_CLAMP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_INFO, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_QUICKACK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	if (test_level == T_INET_SCTP) {
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_NODELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_CORK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PPI, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SID, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SSN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_TSN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RECVOPT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_COOKIE_LIFE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SACK_DELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_INITIAL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_MIN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_MAX, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_OSTREAMS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ISTREAMS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_COOKIE_INC, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_THROTTLE_ITVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAC_TYPE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_CKSUM_TYPE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ECN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ALI, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ADD, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SET, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ADD_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DEL_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SET_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_LIFETIME, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DISPOSITION, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAX_BURST, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_HB, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAXSEG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_STATUS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DEBUG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -13914,13 +14955,24 @@ int test_case_1_9_1_4(int child)
 #define test_case_1_9_1_4_resp	test_case_1_9_1_4
 #define test_case_1_9_1_4_list	test_case_1_9_1_4
 
-#define preamble_1_9_1_4_conn	preamble_1
-#define preamble_1_9_1_4_resp	preamble_1
-#define preamble_1_9_1_4_list	preamble_1
+int preamble_1_9_1_4(int child) {
+	if (test_level == T_INET_IP)
+		return preamble_1(child);
+	return preamble_0(child);
+}
+int postamble_1_9_1_4(int child) {
+	if (test_level == T_INET_IP)
+		return postamble_1(child);
+	return postamble_0(child);
+}
 
-#define postamble_1_9_1_4_conn	postamble_1
-#define postamble_1_9_1_4_resp	postamble_1
-#define postamble_1_9_1_4_list	postamble_1
+#define preamble_1_9_1_4_conn	preamble_1_9_1_4
+#define preamble_1_9_1_4_resp	preamble_1_9_1_4
+#define preamble_1_9_1_4_list	preamble_1_9_1_4
+
+#define postamble_1_9_1_4_conn	postamble_1_9_1_4
+#define postamble_1_9_1_4_resp	postamble_1_9_1_4
+#define postamble_1_9_1_4_list	postamble_1_9_1_4
 
 struct test_stream test_1_9_1_4_conn = { &preamble_1_9_1_4_conn, &test_case_1_9_1_4_conn, &postamble_1_9_1_4_conn };
 struct test_stream test_1_9_1_4_resp = { &preamble_1_9_1_4_resp, &test_case_1_9_1_4_resp, &postamble_1_9_1_4_resp };
@@ -14047,8 +15099,326 @@ int test_case_1_9_2(int child)
 	if (oh->status == T_FAILURE)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	if (test_level == T_INET_UDP) {
+		if (!(oh = find_option(T_INET_UDP, T_UDP_CHECKSUM, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	if (test_level == T_INET_TCP) {
+		if (!(oh = find_option(T_INET_TCP, T_TCP_NODELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_MAXSEG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPALIVE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_CORK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPIDLE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPINTVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_KEEPCNT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_SYNCNT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_LINGER2, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_DEFER_ACCEPT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_WINDOW_CLAMP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_INFO, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_TCP, T_TCP_QUICKACK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	if (test_level == T_INET_SCTP) {
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_NODELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_CORK, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PPI, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SID, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SSN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_TSN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RECVOPT, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_COOKIE_LIFE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SACK_DELAY, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PATH_MAX_RETRANS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ASSOC_MAX_RETRANS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAX_INIT_RETRIES, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_HEARTBEAT_ITVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_INITIAL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_MIN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO_MAX, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_OSTREAMS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ISTREAMS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_COOKIE_INC, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_THROTTLE_ITVL, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAC_TYPE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_CKSUM_TYPE, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ECN, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ALI, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ADD, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SET, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_ADD_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DEL_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_SET_IP, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_PR, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_LIFETIME, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DISPOSITION, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAX_BURST, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_HB, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_RTO, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_MAXSEG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_STATUS, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+		if (!(oh = find_option(T_INET_SCTP, T_SCTP_DEBUG, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length)))
+			goto failure;
+		state++;
+		if (oh->status == T_FAILURE)
+			goto failure;
+		state++;
+	}
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14179,13 +15549,24 @@ int test_case_1_9_2_4(int child)
 #define test_case_1_9_2_4_resp	test_case_1_9_2_4
 #define test_case_1_9_2_4_list	test_case_1_9_2_4
 
-#define preamble_1_9_2_4_conn	preamble_1
-#define preamble_1_9_2_4_resp	preamble_1
-#define preamble_1_9_2_4_list	preamble_1
+int preamble_1_9_2_4(int child) {
+	if (test_level == T_INET_IP)
+		return preamble_1(child);
+	return preamble_0(child);
+}
+int postamble_1_9_2_4(int child) {
+	if (test_level == T_INET_IP)
+		return postamble_1(child);
+	return postamble_0(child);
+}
 
-#define postamble_1_9_2_4_conn	postamble_1
-#define postamble_1_9_2_4_resp	postamble_1
-#define postamble_1_9_2_4_list	postamble_1
+#define preamble_1_9_2_4_conn	preamble_1_9_2_4
+#define preamble_1_9_2_4_resp	preamble_1_9_2_4
+#define preamble_1_9_2_4_list	preamble_1_9_2_4
+
+#define postamble_1_9_2_4_conn	postamble_1_9_2_4
+#define postamble_1_9_2_4_resp	postamble_1_9_2_4
+#define postamble_1_9_2_4_list	postamble_1_9_2_4
 
 struct test_stream test_1_9_2_4_conn = { &preamble_1_9_2_4_conn, &test_case_1_9_2_4_conn, &postamble_1_9_2_4_conn };
 struct test_stream test_1_9_2_4_resp = { &preamble_1_9_2_4_resp, &test_case_1_9_2_4_resp, &postamble_1_9_2_4_resp };
@@ -14210,8 +15591,8 @@ int test_case_1_9_3(int child)
 	if (last_t_errno != TBADOPT)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14405,37 +15786,41 @@ int test_case_1_10_1_conn(int child)
 }
 int test_case_1_10_1_resp(int child)
 {
-	union T_primitives *p = (typeof(p)) cbuf;
-	test_addr = NULL;
-	test_alen = 0;
-	last_qlen = 0;
-	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (p->error_ack.TLI_error != TNOADDR)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (p->error_ack.TLI_error != TOUTSTATE)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
+	if (test_level != T_INET_IP)
+		return test_case_1_10_1(child, NULL, 0);
+	else {
+		union T_primitives *p = (typeof(p)) cbuf;
+		test_addr = NULL;
+		test_alen = 0;
+		last_qlen = 0;
+		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (p->error_ack.TLI_error != TNOADDR)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (p->error_ack.TLI_error != TOUTSTATE)
+			goto failure;
+		state++;
+		return (__RESULT_SUCCESS);
+	      failure:
+		return (__RESULT_FAILURE);
+	}
 }
 int test_case_1_10_1_list(int child)
 {
@@ -14482,7 +15867,9 @@ int test_case_1_10_2_conn(int child)
 	if (expect(child, SHORT_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	//test_sleep(child, 1);
 	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -14505,8 +15892,13 @@ int test_case_1_10_2_resp(int child)
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		goto failure;
+	if (test_level == T_INET_IP) {
+		if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	} else {
+		if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	state++;
 	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -14529,8 +15921,13 @@ int test_case_1_10_2_list(int child)
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		goto failure;
+	if (test_level == T_INET_IP) {
+		if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	} else {
+		if (expect(child, SHORT_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	state++;
 	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -14572,15 +15969,17 @@ int test_case_1_10_3(int child)
 	} options = {
 		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS}, T_YES
 	};
-	test_addr = &addrs[0];
-	test_alen = sizeof(addrs[0]);
-	last_qlen = 0;
-	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+	if (test_level == T_INET_IP) {
+		test_addr = &addrs[0];
+		test_alen = sizeof(addrs[0]);
+		last_qlen = 0;
+		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
 	test_opts = &options;
 	test_olen = sizeof(options);
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
@@ -14592,6 +15991,17 @@ int test_case_1_10_3(int child)
 	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
 		goto failure;
 	state++;
+	if (test_level != T_INET_IP) {
+		test_addr = &addrs[0];
+		test_alen = sizeof(addrs[0]);
+		last_qlen = 0;
+		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	}
 	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14604,10 +16014,12 @@ int test_case_1_10_3(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (p->info_ack.CURRENT_state != TS_IDLE)
+	if (last_info.CURRENT_state != TS_IDLE)
 		goto failure;
 	state++;
-	test_sleep(child, 2);
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	//test_sleep(child, 2);
 	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -14615,8 +16027,8 @@ int test_case_1_10_3(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14650,7 +16062,7 @@ int test_case_1_10_4(int child)
 {
 	test_addr = &addrs[child];
 	test_alen = sizeof(addrs[child]);
-	last_qlen = 0;
+	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14918,11 +16330,22 @@ int test_case_1_10_10(int child)
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (last_t_errno != TNOADDR)
-		goto failure;
+	if (test_level == T_INET_IP) {
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (last_t_errno != TNOADDR)
+			goto failure;
+	} else {
+		if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	state++;
 	test_addr = &addr;
 	test_alen = sizeof(addr);
@@ -14930,11 +16353,22 @@ int test_case_1_10_10(int child)
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (last_t_errno != TNOADDR)
-		goto failure;
+	if (test_level == T_INET_IP) {
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (last_t_errno != TNOADDR)
+			goto failure;
+	} else {
+		if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14979,8 +16413,8 @@ int test_case_1_10_11(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15017,6 +16451,12 @@ Attempts to transfer connectionless data."
 int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 {
 	const char msg[] = "Unit test data.";
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = addr;
 	test_alen = len;
 	test_data = msg;
@@ -15029,6 +16469,15 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 		case __EVENT_NO_MSG:
 			continue;
 		case __TEST_UNITDATA_IND:
+			if (last_info.SERV_type != T_CLTS)
+				goto failure;
+			break;
+		case __RESULT_FAILURE:
+			if (last_info.SERV_type == T_CLTS)
+				goto failure;
+			state++;
+			if (last_errno != EPROTO)
+				goto failure;
 			break;
 		default:
 			goto failure;
@@ -15054,73 +16503,25 @@ int test_case_2_2_list(int child)
 	return test_case_2_2(child, &addrs[0], sizeof(addrs[0]));
 }
 
+int postamble_2_2(int child)
+{
+	if (last_info.SERV_type == T_CLTS)
+		return postamble_1(child);
+	else
+		return postamble_0(child);
+}
+
 #define preamble_2_2_conn	preamble_1s
 #define preamble_2_2_resp	preamble_1s
 #define preamble_2_2_list	preamble_1s
 
-#define postamble_2_2_conn	postamble_1
-#define postamble_2_2_resp	postamble_1
-#define postamble_2_2_list	postamble_1
+#define postamble_2_2_conn	postamble_2_2
+#define postamble_2_2_resp	postamble_2_2
+#define postamble_2_2_list	postamble_2_2
 
 struct test_stream test_2_2_conn = { &preamble_2_2_conn, &test_case_2_2_conn, &postamble_2_2_conn };
 struct test_stream test_2_2_resp = { &preamble_2_2_resp, &test_case_2_2_resp, &postamble_2_2_resp };
 struct test_stream test_2_2_list = { &preamble_2_2_list, &test_case_2_2_list, &postamble_2_2_list };
-
-int test_case_2_2_xfail(int child, struct sockaddr_in *addr, socklen_t len)
-{
-	const char msg[] = "Unit test data.";
-	test_addr = addr;
-	test_alen = len;
-	test_data = msg;
-	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	start_tt(20000);
-	for (;;) {
-		state++;
-		switch (wait_event(child, NORMAL_WAIT)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __TEST_UNITDATA_IND:
-			goto failure;
-		case __RESULT_FAILURE:
-			if (last_errno == EPROTO)
-				break;
-			goto failure;
-		default:
-			goto failure;
-		}
-		break;
-	}
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-int test_case_2_2_xfail_conn(int child)
-{
-	return test_case_2_2_xfail(child, &addrs[1], sizeof(addrs[1]));
-}
-int test_case_2_2_xfail_resp(int child)
-{
-	return test_case_2_2_xfail(child, &addrs[2], sizeof(addrs[2]));
-}
-int test_case_2_2_xfail_list(int child)
-{
-	return test_case_2_2_xfail(child, &addrs[0], sizeof(addrs[0]));
-}
-
-#define preamble_2_2_xfail_conn	preamble_1s
-#define preamble_2_2_xfail_resp	preamble_1s
-#define preamble_2_2_xfail_list	preamble_1s
-
-#define postamble_2_2_xfail_conn	postamble_0
-#define postamble_2_2_xfail_resp	postamble_0
-#define postamble_2_2_xfail_list	postamble_0
-
-struct test_stream test_2_2_xfail_conn = { &preamble_2_2_xfail_conn, &test_case_2_2_xfail_conn, &postamble_2_2_xfail_conn };
-struct test_stream test_2_2_xfail_resp = { &preamble_2_2_xfail_resp, &test_case_2_2_xfail_resp, &postamble_2_2_xfail_resp };
-struct test_stream test_2_2_xfail_list = { &preamble_2_2_xfail_list, &test_case_2_2_xfail_list, &postamble_2_2_xfail_list };
 
 /*
  *  Transfer connectionless data with options -- XTI_DEBUG
@@ -15133,7 +16534,9 @@ struct test_stream test_2_2_xfail_list = { &preamble_2_2_xfail_list, &test_case_
 #define desc_case_2_2_1_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_DEBUG.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_1_conn(int child)
 {
@@ -15187,7 +16590,9 @@ struct test_stream test_2_2_1_1_list = { &preamble_2_2_list, &test_case_2_2_1_1_
 #define desc_case_2_2_1_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_LINGER.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_2_conn(int child)
 {
@@ -15241,7 +16646,9 @@ struct test_stream test_2_2_1_2_list = { &preamble_2_2_list, &test_case_2_2_1_2_
 #define desc_case_2_2_1_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_RCVBUF.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_3_conn(int child)
 {
@@ -15295,7 +16702,9 @@ struct test_stream test_2_2_1_3_list = { &preamble_2_2_list, &test_case_2_2_1_3_
 #define desc_case_2_2_1_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_RCVLOWAT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_4_conn(int child)
 {
@@ -15349,7 +16758,9 @@ struct test_stream test_2_2_1_4_list = { &preamble_2_2_list, &test_case_2_2_1_4_
 #define desc_case_2_2_1_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_SNDBUF.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_5_conn(int child)
 {
@@ -15403,7 +16814,9 @@ struct test_stream test_2_2_1_5_list = { &preamble_2_2_list, &test_case_2_2_1_5_
 #define desc_case_2_2_1_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is XTI_SNDLOWAT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_1_6_conn(int child)
 {
@@ -15457,7 +16870,9 @@ struct test_stream test_2_2_1_6_list = { &preamble_2_2_list, &test_case_2_2_1_6_
 #define desc_case_2_2_2_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_IP_TOS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_2_1_conn(int child)
 {
@@ -15510,7 +16925,9 @@ struct test_stream test_2_2_2_1_list = { &preamble_2_2_list, &test_case_2_2_2_1_
 #define desc_case_2_2_2_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_IP_TTL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_2_2_conn(int child)
 {
@@ -15563,7 +16980,9 @@ struct test_stream test_2_2_2_2_list = { &preamble_2_2_list, &test_case_2_2_2_2_
 #define desc_case_2_2_2_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_IP_DONTROUTE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_2_3_conn(int child)
 {
@@ -15616,7 +17035,9 @@ struct test_stream test_2_2_2_3_list = { &preamble_2_2_list, &test_case_2_2_2_3_
 #define desc_case_2_2_2_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_IP_BROADCAST.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_2_4_conn(int child)
 {
@@ -15669,7 +17090,9 @@ struct test_stream test_2_2_2_4_list = { &preamble_2_2_list, &test_case_2_2_2_4_
 #define desc_case_2_2_2_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_IP_REUSEADDR.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_2_5_conn(int child)
 {
@@ -15723,7 +17146,9 @@ struct test_stream test_2_2_2_5_list = { &preamble_2_2_list, &test_case_2_2_2_5_
 #define desc_case_2_2_3_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_UDP_CHECKSUM.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_3_1_conn(int child)
 {
@@ -15778,7 +17203,9 @@ struct test_stream test_2_2_3_1_list = { &preamble_2_2_list, &test_case_2_2_3_1_
 #define desc_case_2_2_4_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_NODELAY.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_1_conn(int child)
 {
@@ -15833,7 +17260,9 @@ struct test_stream test_2_2_4_1_list = { &preamble_2_2_list, &test_case_2_2_4_1_
 #define desc_case_2_2_4_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_MAXSEG.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_2_conn(int child)
 {
@@ -15888,7 +17317,9 @@ struct test_stream test_2_2_4_2_list = { &preamble_2_2_list, &test_case_2_2_4_2_
 #define desc_case_2_2_4_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_KEEPALIVE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_3_conn(int child)
 {
@@ -15943,7 +17374,9 @@ struct test_stream test_2_2_4_3_list = { &preamble_2_2_list, &test_case_2_2_4_3_
 #define desc_case_2_2_4_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_CORK.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_4_conn(int child)
 {
@@ -15998,7 +17431,9 @@ struct test_stream test_2_2_4_4_list = { &preamble_2_2_list, &test_case_2_2_4_4_
 #define desc_case_2_2_4_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_KEEPIDLE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_5_conn(int child)
 {
@@ -16053,7 +17488,9 @@ struct test_stream test_2_2_4_5_list = { &preamble_2_2_list, &test_case_2_2_4_5_
 #define desc_case_2_2_4_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_KEEPINTVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_6_conn(int child)
 {
@@ -16108,7 +17545,9 @@ struct test_stream test_2_2_4_6_list = { &preamble_2_2_list, &test_case_2_2_4_6_
 #define desc_case_2_2_4_7 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_KEEPCNT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_7_conn(int child)
 {
@@ -16163,7 +17602,9 @@ struct test_stream test_2_2_4_7_list = { &preamble_2_2_list, &test_case_2_2_4_7_
 #define desc_case_2_2_4_8 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_SYNCNT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_8_conn(int child)
 {
@@ -16218,7 +17659,9 @@ struct test_stream test_2_2_4_8_list = { &preamble_2_2_list, &test_case_2_2_4_8_
 #define desc_case_2_2_4_9 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_LINGER2.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_9_conn(int child)
 {
@@ -16273,7 +17716,9 @@ struct test_stream test_2_2_4_9_list = { &preamble_2_2_list, &test_case_2_2_4_9_
 #define desc_case_2_2_4_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_DEFER_ACCEPT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_10_conn(int child)
 {
@@ -16328,7 +17773,9 @@ struct test_stream test_2_2_4_10_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define desc_case_2_2_4_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_WINDOW_CLAMP.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_11_conn(int child)
 {
@@ -16383,7 +17830,9 @@ struct test_stream test_2_2_4_11_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define desc_case_2_2_4_12 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_INFO.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_12_conn(int child)
 {
@@ -16438,7 +17887,9 @@ struct test_stream test_2_2_4_12_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define desc_case_2_2_4_13 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_TCP_QUICKACK.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_4_13_conn(int child)
 {
@@ -16493,7 +17944,9 @@ struct test_stream test_2_2_4_13_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define desc_case_2_2_5_1 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_NODELAY.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_1_conn(int child)
 {
@@ -16548,7 +18001,9 @@ struct test_stream test_2_2_5_1_list = { &preamble_2_2_list, &test_case_2_2_5_1_
 #define desc_case_2_2_5_2 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_CORK.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_2_conn(int child)
 {
@@ -16603,7 +18058,9 @@ struct test_stream test_2_2_5_2_list = { &preamble_2_2_list, &test_case_2_2_5_2_
 #define desc_case_2_2_5_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_PPI.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_3_conn(int child)
 {
@@ -16658,7 +18115,9 @@ struct test_stream test_2_2_5_3_list = { &preamble_2_2_list, &test_case_2_2_5_3_
 #define desc_case_2_2_5_4 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_SID.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_4_conn(int child)
 {
@@ -16713,7 +18172,9 @@ struct test_stream test_2_2_5_4_list = { &preamble_2_2_list, &test_case_2_2_5_4_
 #define desc_case_2_2_5_5 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_SSN.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_5_conn(int child)
 {
@@ -16768,7 +18229,9 @@ struct test_stream test_2_2_5_5_list = { &preamble_2_2_list, &test_case_2_2_5_5_
 #define desc_case_2_2_5_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_TSN.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_6_conn(int child)
 {
@@ -16823,7 +18286,9 @@ struct test_stream test_2_2_5_6_list = { &preamble_2_2_list, &test_case_2_2_5_6_
 #define desc_case_2_2_5_7 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_RECVOPT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_7_conn(int child)
 {
@@ -16878,7 +18343,9 @@ struct test_stream test_2_2_5_7_list = { &preamble_2_2_list, &test_case_2_2_5_7_
 #define desc_case_2_2_5_8 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_COOKIE_LIFE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_8_conn(int child)
 {
@@ -16933,7 +18400,9 @@ struct test_stream test_2_2_5_8_list = { &preamble_2_2_list, &test_case_2_2_5_8_
 #define desc_case_2_2_5_9 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_SACK_DELAY.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_9_conn(int child)
 {
@@ -16988,7 +18457,9 @@ struct test_stream test_2_2_5_9_list = { &preamble_2_2_list, &test_case_2_2_5_9_
 #define desc_case_2_2_5_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_PATH_MAX_RETRANS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_10_conn(int child)
 {
@@ -17043,7 +18514,9 @@ struct test_stream test_2_2_5_10_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ASSOC_MAX_RETRANS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_11_conn(int child)
 {
@@ -17098,7 +18571,9 @@ struct test_stream test_2_2_5_11_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_12 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_MAX_INIT_RETRIES.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_12_conn(int child)
 {
@@ -17153,7 +18628,9 @@ struct test_stream test_2_2_5_12_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_13 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_HEARTBEAT_ITVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_13_conn(int child)
 {
@@ -17208,7 +18685,9 @@ struct test_stream test_2_2_5_13_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_14 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_RTO_INITIAL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_14_conn(int child)
 {
@@ -17263,7 +18742,9 @@ struct test_stream test_2_2_5_14_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_15 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_RTO_MIN.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_15_conn(int child)
 {
@@ -17318,7 +18799,9 @@ struct test_stream test_2_2_5_15_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_16 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_RTO_MAX.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_16_conn(int child)
 {
@@ -17373,7 +18856,9 @@ struct test_stream test_2_2_5_16_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_17 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_OSTREAMS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_17_conn(int child)
 {
@@ -17428,7 +18913,9 @@ struct test_stream test_2_2_5_17_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_18 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ISTREAMS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_18_conn(int child)
 {
@@ -17538,7 +19025,9 @@ struct test_stream test_2_2_5_19_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define desc_case_2_2_5_20 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_THROTTLE_ITVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_20_conn(int child)
 {
@@ -17593,7 +19082,9 @@ struct test_stream test_2_2_5_20_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_21 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_MAC_TYPE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_21_conn(int child)
 {
@@ -17648,7 +19139,9 @@ struct test_stream test_2_2_5_21_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_22 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_CKSUM_TYPE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_22_conn(int child)
 {
@@ -17703,7 +19196,9 @@ struct test_stream test_2_2_5_22_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_23 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ECN.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_23_conn(int child)
 {
@@ -17758,7 +19253,9 @@ struct test_stream test_2_2_5_23_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_24 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ALI.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_24_conn(int child)
 {
@@ -17813,7 +19310,9 @@ struct test_stream test_2_2_5_24_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_25 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ADD.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_25_conn(int child)
 {
@@ -17868,7 +19367,9 @@ struct test_stream test_2_2_5_25_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_26 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_SET.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_26_conn(int child)
 {
@@ -17923,7 +19424,9 @@ struct test_stream test_2_2_5_26_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_27 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_ADD_IP.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_27_conn(int child)
 {
@@ -17978,7 +19481,9 @@ struct test_stream test_2_2_5_27_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_28 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_DEL_IP.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_28_conn(int child)
 {
@@ -18033,7 +19538,9 @@ struct test_stream test_2_2_5_28_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_29 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_SET_IP.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_29_conn(int child)
 {
@@ -18088,7 +19595,9 @@ struct test_stream test_2_2_5_29_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define desc_case_2_2_5_30 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_PR.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_30_conn(int child)
 {
@@ -18143,7 +19652,9 @@ struct test_stream test_2_2_5_30_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_31 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_LIFETIME.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_31_conn(int child)
 {
@@ -18198,7 +19709,9 @@ struct test_stream test_2_2_5_31_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_32 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_DISPOSITION.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_32_conn(int child)
 {
@@ -18253,7 +19766,9 @@ struct test_stream test_2_2_5_32_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_33 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_MAX_BURST.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_33_conn(int child)
 {
@@ -18308,7 +19823,9 @@ struct test_stream test_2_2_5_33_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_34 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_HB.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_34_conn(int child)
 {
@@ -18363,7 +19880,9 @@ struct test_stream test_2_2_5_34_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_35 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_RTO.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_35_conn(int child)
 {
@@ -18418,7 +19937,9 @@ struct test_stream test_2_2_5_35_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_36 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_MAXSEG.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_36_conn(int child)
 {
@@ -18473,7 +19994,9 @@ struct test_stream test_2_2_5_36_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_37 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_STATUS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_37_conn(int child)
 {
@@ -18528,7 +20051,9 @@ struct test_stream test_2_2_5_37_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define desc_case_2_2_5_38 "\
 Transfer connectionless data with options.  The specific option used by this\n\
 case is T_SCTP_DEBUG.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
+transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
+primitive."
 
 int test_case_2_2_5_38_conn(int child)
 {
@@ -18587,13 +20112,20 @@ given an illegal option, the transport provider must fail with TBADOPT or\n\
 issue a T_UDERROR_IND primitive.  We rely on the XTI library to check for\n\
 illegal options and return [TBADOPT].  If the transport provider is given\n\
 an illegal option we treat it as a fatal error.  This is not well described\n\
-in the TPI 2.2 specification."
+in the TPI 2.2 specification.  T_COTS_ORD transport providers are always\n\
+expected to fail when issued a T_UNITDATA_REQ primitive."
 
 int test_case_2_2_6(int child, struct sockaddr_in *addr, socklen_t len)
 {
 	const char msg[] = "Unit test data.";
 	struct t_opthdr opt_hdr =
 	    { sizeof(struct t_opthdr) + 100, XTI_GENERIC, XTI_DEBUG, T_SUCCESS };
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = addr;
 	test_alen = len;
 	test_data = msg;
@@ -18602,26 +20134,34 @@ int test_case_2_2_6(int child, struct sockaddr_in *addr, socklen_t len)
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+      wait_again:
 	switch (wait_event(child, LONG_WAIT)) {
+	case __EVENT_NO_MSG:
+		goto wait_again;
 	case __RESULT_FAILURE:
 		state++;
 		if (last_errno != EPROTO)
 			goto failure;
-		state++;
 		break;
 	case __TEST_ERROR_ACK:
+		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
 		state++;
 		if (last_t_errno != TBADOPT)
 			goto failure;
 		break;
 	case __TEST_UDERROR_IND:
 		state++;
+		if (last_info.SERV_type != T_CLTS)
+			goto failure;
 		break;
 	default:
 		goto failure;
 	}
-	test_sleep(child, 1);
 	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -18656,7 +20196,7 @@ struct test_stream test_2_2_6_list = { &preamble_2_2_6_list, &test_case_2_2_6_li
 /*
  *  Attempt a connection with no listener.
  */
-#define test_group_3 "Connection and disconnection"
+#define test_group_3 "Connection and disconnection -- unsuccessful"
 #define tgrp_case_3_1 test_group_3
 #define numb_case_3_1 "3.1"
 #define name_case_3_1 "Attempt a connection with no listener."
@@ -18667,6 +20207,15 @@ should time out."
 
 int test_case_3_1_conn(int child)
 {
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
@@ -18675,8 +20224,22 @@ int test_case_3_1_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18688,8 +20251,8 @@ int test_case_3_1_resp(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -18700,8 +20263,8 @@ int test_case_3_1_list(int child)
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -18732,6 +20295,18 @@ should disconnect at both ends."
 
 int test_case_3_2_conn(int child)
 {
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
@@ -18740,16 +20315,38 @@ int test_case_3_2_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	test_data = NULL;
 	last_sequence = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18758,18 +20355,38 @@ int test_case_3_2_conn(int child)
 
 int test_case_3_2_resp(int child)
 {
-	test_sleep(child, 1);
-	state++;
+	//test_sleep(child, 1);
+	//state++;
 	return (__RESULT_SUCCESS);
 }
 
 int test_case_3_2_list(int child)
 {
-	if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18801,6 +20418,18 @@ The connection should disconnect at the attempting end."
 
 int test_case_3_3_conn(int child)
 {
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
@@ -18809,8 +20438,39 @@ int test_case_3_3_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		switch (wait_event(child, NORMAL_WAIT)) {
+		case __TEST_OK_ACK:
+			state++;
+			switch (wait_event(child, LONG_WAIT)) {
+			case __TEST_CONN_CON:
+				state++;
+				if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+					goto failure;
+				break;
+			case __TEST_DISCON_IND:
+				/* the T_CONN_CON was flushed by the T_DISCON_IND */
+				break;
+			default:
+				goto failure;
+			}
+			break;
+		case __TEST_DISCON_IND:
+			/* both the T_OK_ACK and T_CONN_CON were flushed by the T_DISCON_IND */
+			break;
+		default:
+			goto failure;
+		}
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18819,23 +20479,49 @@ int test_case_3_3_conn(int child)
 
 int test_case_3_3_resp(int child)
 {
-	test_sleep(child, 1);
-	state++;
 	return (__RESULT_SUCCESS);
 }
 
 int test_case_3_3_list(int child)
 {
-	if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
 	state++;
 	test_data = NULL;
 	last_sequence = last_sequence;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18867,6 +20553,18 @@ refusal should come after the connector has already timed out."
 
 int test_case_3_4_conn(int child)
 {
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
@@ -18875,16 +20573,29 @@ int test_case_3_4_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
-	state++;
-	test_sleep(child, 5);
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_CONN_CON) == __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
-		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18893,24 +20604,53 @@ int test_case_3_4_conn(int child)
 
 int test_case_3_4_resp(int child)
 {
-	test_sleep(child, 6);
-	state++;
+	//test_sleep(child, 6);
+	//state++;
 	return (__RESULT_SUCCESS);
 }
 
 int test_case_3_4_list(int child)
 {
-	if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
 	state++;
 	test_sleep(child, 5);
 	state++;
+	test_data = NULL;
 	last_sequence = last_sequence;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -18945,6 +20685,9 @@ Attempts to invoke connection oriented primitives.\n\
 int test_case_4_1(int child)
 {
 	static char dat[] = "Dummy message.";
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[0];
 	test_alen = sizeof(addrs[0]);
 	test_data = dat;
@@ -19236,6 +20979,1598 @@ struct test_stream test_4_7_conn = { &preamble_4_7_conn, &test_case_4_7_conn, &p
 struct test_stream test_4_7_resp = { &preamble_4_7_resp, &test_case_4_7_resp, &postamble_4_7_resp };
 struct test_stream test_4_7_list = { &preamble_4_7_list, &test_case_4_7_list, &postamble_4_7_list };
 
+
+#define test_group_11_1 "Primitives in error -- too short"
+
+int test_case_11_1(int child, int prim)
+{
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	last_prim = prim;
+	switch (prim) {
+	case T_ADDR_REQ:
+	case T_INFO_REQ:
+	case T_ORDREL_REQ:
+	case T_UNBIND_REQ:
+		if (do_signal(child, __TEST_PRIM_WAY_TOO_SHORT) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	}
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		switch (prim) {
+		case T_ADDR_REQ:
+			goto expect_error;
+		case T_BIND_REQ:
+			goto expect_ack;
+		case T_CAPABILITY_REQ:
+			goto expect_ack;
+		case T_CONN_REQ:
+			goto expect_nosupport_ack;
+		case T_CONN_RES:
+			goto expect_nosupport_ack;
+		case T_DATA_REQ:
+			goto expect_error;
+		case T_DISCON_REQ:
+			goto expect_nosupport_ack;
+		case T_EXDATA_REQ:
+			goto expect_error;
+		case T_INFO_REQ:
+			goto expect_error;
+		case T_OPTDATA_REQ:
+			goto expect_error;
+		case T_ORDREL_REQ:
+			goto expect_error;
+		case T_UNBIND_REQ:
+			goto expect_error;
+		case T_UNITDATA_REQ:
+			goto expect_error;
+		case -1UL:
+			goto expect_nosupport_ack;
+		default:
+			goto expect_error;
+		}
+	case T_COTS:
+		switch (prim) {
+		case T_ADDR_REQ:
+			goto expect_error;
+		case T_BIND_REQ:
+			goto expect_ack;
+		case T_CAPABILITY_REQ:
+			goto expect_ack;
+		case T_CONN_REQ:
+			goto expect_ack;
+		case T_CONN_RES:
+			goto expect_ack;
+		case T_DATA_REQ:
+			goto expect_error;
+		case T_DISCON_REQ:
+			goto expect_ack;
+		case T_EXDATA_REQ:
+			goto expect_error;
+		case T_INFO_REQ:
+			goto expect_error;
+		case T_OPTDATA_REQ:
+			goto expect_error;
+		case T_ORDREL_REQ:
+			goto expect_error;
+		case T_UNBIND_REQ:
+			goto expect_error;
+		case T_UNITDATA_REQ:
+			goto expect_error;
+		case -1UL:
+			goto expect_nosupport_ack;
+		default:
+			goto expect_error;
+		}
+	case T_COTS_ORD:
+		switch (prim) {
+		case T_ADDR_REQ:
+			goto expect_error;
+		case T_BIND_REQ:
+			goto expect_ack;
+		case T_CAPABILITY_REQ:
+			goto expect_ack;
+		case T_CONN_REQ:
+			goto expect_ack;
+		case T_CONN_RES:
+			goto expect_ack;
+		case T_DATA_REQ:
+			goto expect_error;
+		case T_DISCON_REQ:
+			goto expect_ack;
+		case T_EXDATA_REQ:
+			goto expect_error;
+		case T_INFO_REQ:
+			goto expect_error;
+		case T_OPTDATA_REQ:
+			goto expect_error;
+		case T_ORDREL_REQ:
+			goto expect_error;
+		case T_UNBIND_REQ:
+			goto expect_error;
+		case T_UNITDATA_REQ:
+			goto expect_error;
+		case -1UL:
+			goto expect_nosupport_ack;
+		default:
+			goto expect_error;
+		}
+	default:
+		goto failure;
+	}
+      expect_ack:
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TSYSERR)
+		goto failure;
+	state++;
+	if (last_errno != EINVAL)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      expect_nosupport_ack:
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TNOTSUPPORT)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      expect_error:
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_errno != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define tgrp_case_11_1_1 test_group_11_1
+#define numb_case_11_1_1 "11.1.1"
+#define sref_case_11_1_1 "(none)"
+#define name_case_11_1_1 "Primitives in error -- too short -- T_ADDR_REQ"
+#define desc_case_11_1_1 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_ADDR_REQ primitive that is too short."
+
+int test_case_11_1_1(int child)
+{
+	return test_case_11_1(child, T_ADDR_REQ);
+}
+
+#define preamble_11_1_1_conn	preamble_0
+#define preamble_11_1_1_resp	preamble_0
+#define preamble_11_1_1_list	preamble_0
+
+#define postamble_11_1_1_conn	postamble_0
+#define postamble_11_1_1_resp	postamble_0
+#define postamble_11_1_1_list	postamble_0
+
+struct test_stream test_11_1_1_conn = { &preamble_11_1_1_conn, &test_case_11_1_1, &postamble_11_1_1_conn };
+struct test_stream test_11_1_1_resp = { &preamble_11_1_1_resp, &test_case_11_1_1, &postamble_11_1_1_resp };
+struct test_stream test_11_1_1_list = { &preamble_11_1_1_list, &test_case_11_1_1, &postamble_11_1_1_list };
+
+
+#define tgrp_case_11_1_2 test_group_11_1
+#define numb_case_11_1_2 "11.1.2"
+#define sref_case_11_1_2 "(none)"
+#define name_case_11_1_2 "Primitives in error -- too short -- T_BIND_REQ"
+#define desc_case_11_1_2 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_BIND_REQ primitive that is too short."
+
+int test_case_11_1_2(int child)
+{
+	return test_case_11_1(child, T_BIND_REQ);
+}
+
+#define preamble_11_1_2_conn	preamble_0
+#define preamble_11_1_2_resp	preamble_0
+#define preamble_11_1_2_list	preamble_0
+
+#define postamble_11_1_2_conn	postamble_0
+#define postamble_11_1_2_resp	postamble_0
+#define postamble_11_1_2_list	postamble_0
+
+struct test_stream test_11_1_2_conn = { &preamble_11_1_2_conn, &test_case_11_1_2, &postamble_11_1_2_conn };
+struct test_stream test_11_1_2_resp = { &preamble_11_1_2_resp, &test_case_11_1_2, &postamble_11_1_2_resp };
+struct test_stream test_11_1_2_list = { &preamble_11_1_2_list, &test_case_11_1_2, &postamble_11_1_2_list };
+
+
+#define tgrp_case_11_1_3 test_group_11_1
+#define numb_case_11_1_3 "11.1.3"
+#define sref_case_11_1_3 "(none)"
+#define name_case_11_1_3 "Primitives in error -- too short -- T_CAPABILITY_REQ"
+#define desc_case_11_1_3 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_CAPABILITY_REQ primitive that is too short."
+
+int test_case_11_1_3(int child)
+{
+	return test_case_11_1(child, T_CAPABILITY_REQ);
+}
+
+#define preamble_11_1_3_conn	preamble_0
+#define preamble_11_1_3_resp	preamble_0
+#define preamble_11_1_3_list	preamble_0
+
+#define postamble_11_1_3_conn	postamble_0
+#define postamble_11_1_3_resp	postamble_0
+#define postamble_11_1_3_list	postamble_0
+
+struct test_stream test_11_1_3_conn = { &preamble_11_1_3_conn, &test_case_11_1_3, &postamble_11_1_3_conn };
+struct test_stream test_11_1_3_resp = { &preamble_11_1_3_resp, &test_case_11_1_3, &postamble_11_1_3_resp };
+struct test_stream test_11_1_3_list = { &preamble_11_1_3_list, &test_case_11_1_3, &postamble_11_1_3_list };
+
+
+#define tgrp_case_11_1_4 test_group_11_1
+#define numb_case_11_1_4 "11.1.4"
+#define sref_case_11_1_4 "(none)"
+#define name_case_11_1_4 "Primitives in error -- too short -- T_CONN_REQ"
+#define desc_case_11_1_4 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_CONN_REQ primitive that is too short."
+
+int test_case_11_1_4(int child)
+{
+	return test_case_11_1(child, T_CONN_REQ);
+}
+
+#define preamble_11_1_4_conn	preamble_0
+#define preamble_11_1_4_resp	preamble_0
+#define preamble_11_1_4_list	preamble_0
+
+#define postamble_11_1_4_conn	postamble_0
+#define postamble_11_1_4_resp	postamble_0
+#define postamble_11_1_4_list	postamble_0
+
+struct test_stream test_11_1_4_conn = { &preamble_11_1_4_conn, &test_case_11_1_4, &postamble_11_1_4_conn };
+struct test_stream test_11_1_4_resp = { &preamble_11_1_4_resp, &test_case_11_1_4, &postamble_11_1_4_resp };
+struct test_stream test_11_1_4_list = { &preamble_11_1_4_list, &test_case_11_1_4, &postamble_11_1_4_list };
+
+#define tgrp_case_11_1_5 test_group_11_1
+#define numb_case_11_1_5 "11.1.5"
+#define sref_case_11_1_5 "(none)"
+#define name_case_11_1_5 "Primitives in error -- too short -- T_CONN_RES"
+#define desc_case_11_1_5 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_CONN_RES primitive that is too short."
+
+int test_case_11_1_5(int child)
+{
+	return test_case_11_1(child, T_CONN_RES);
+}
+
+#define preamble_11_1_5_conn	preamble_0
+#define preamble_11_1_5_resp	preamble_0
+#define preamble_11_1_5_list	preamble_0
+
+#define postamble_11_1_5_conn	postamble_0
+#define postamble_11_1_5_resp	postamble_0
+#define postamble_11_1_5_list	postamble_0
+
+struct test_stream test_11_1_5_conn = { &preamble_11_1_5_conn, &test_case_11_1_5, &postamble_11_1_5_conn };
+struct test_stream test_11_1_5_resp = { &preamble_11_1_5_resp, &test_case_11_1_5, &postamble_11_1_5_resp };
+struct test_stream test_11_1_5_list = { &preamble_11_1_5_list, &test_case_11_1_5, &postamble_11_1_5_list };
+
+
+#define tgrp_case_11_1_6 test_group_11_1
+#define numb_case_11_1_6 "11.1.6"
+#define sref_case_11_1_6 "(none)"
+#define name_case_11_1_6 "Primitives in error -- too short -- T_DATA_REQ"
+#define desc_case_11_1_6 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_DATA_REQ primitive that is too short."
+
+int test_case_11_1_6(int child)
+{
+	return test_case_11_1(child, T_DATA_REQ);
+}
+
+#define preamble_11_1_6_conn	preamble_0
+#define preamble_11_1_6_resp	preamble_0
+#define preamble_11_1_6_list	preamble_0
+
+#define postamble_11_1_6_conn	postamble_0
+#define postamble_11_1_6_resp	postamble_0
+#define postamble_11_1_6_list	postamble_0
+
+struct test_stream test_11_1_6_conn = { &preamble_11_1_6_conn, &test_case_11_1_6, &postamble_11_1_6_conn };
+struct test_stream test_11_1_6_resp = { &preamble_11_1_6_resp, &test_case_11_1_6, &postamble_11_1_6_resp };
+struct test_stream test_11_1_6_list = { &preamble_11_1_6_list, &test_case_11_1_6, &postamble_11_1_6_list };
+
+
+#define tgrp_case_11_1_7 test_group_11_1
+#define numb_case_11_1_7 "11.1.7"
+#define sref_case_11_1_7 "(none)"
+#define name_case_11_1_7 "Primitives in error -- too short -- T_DISCON_REQ"
+#define desc_case_11_1_7 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_DISCON_REQ primitive that is too short."
+
+int test_case_11_1_7(int child)
+{
+	return test_case_11_1(child, T_DISCON_REQ);
+}
+
+#define preamble_11_1_7_conn	preamble_0
+#define preamble_11_1_7_resp	preamble_0
+#define preamble_11_1_7_list	preamble_0
+
+#define postamble_11_1_7_conn	postamble_0
+#define postamble_11_1_7_resp	postamble_0
+#define postamble_11_1_7_list	postamble_0
+
+struct test_stream test_11_1_7_conn = { &preamble_11_1_7_conn, &test_case_11_1_7, &postamble_11_1_7_conn };
+struct test_stream test_11_1_7_resp = { &preamble_11_1_7_resp, &test_case_11_1_7, &postamble_11_1_7_resp };
+struct test_stream test_11_1_7_list = { &preamble_11_1_7_list, &test_case_11_1_7, &postamble_11_1_7_list };
+
+
+#define tgrp_case_11_1_8 test_group_11_1
+#define numb_case_11_1_8 "11.1.8"
+#define sref_case_11_1_8 "(none)"
+#define name_case_11_1_8 "Primitives in error -- too short -- T_EXDATA_REQ"
+#define desc_case_11_1_8 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_EXDATA_REQ primitive that is too short."
+
+int test_case_11_1_8(int child)
+{
+	return test_case_11_1(child, T_EXDATA_REQ);
+}
+
+#define preamble_11_1_8_conn	preamble_0
+#define preamble_11_1_8_resp	preamble_0
+#define preamble_11_1_8_list	preamble_0
+
+#define postamble_11_1_8_conn	postamble_0
+#define postamble_11_1_8_resp	postamble_0
+#define postamble_11_1_8_list	postamble_0
+
+struct test_stream test_11_1_8_conn = { &preamble_11_1_8_conn, &test_case_11_1_8, &postamble_11_1_8_conn };
+struct test_stream test_11_1_8_resp = { &preamble_11_1_8_resp, &test_case_11_1_8, &postamble_11_1_8_resp };
+struct test_stream test_11_1_8_list = { &preamble_11_1_8_list, &test_case_11_1_8, &postamble_11_1_8_list };
+
+
+#define tgrp_case_11_1_9 test_group_11_1
+#define numb_case_11_1_9 "11.1.9"
+#define sref_case_11_1_9 "(none)"
+#define name_case_11_1_9 "Primitives in error -- too short -- T_INFO_REQ"
+#define desc_case_11_1_9 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_INFO_REQ primitive that is too short."
+
+int test_case_11_1_9(int child)
+{
+	return test_case_11_1(child, T_INFO_REQ);
+}
+
+#define preamble_11_1_9_conn	preamble_0
+#define preamble_11_1_9_resp	preamble_0
+#define preamble_11_1_9_list	preamble_0
+
+#define postamble_11_1_9_conn	postamble_0
+#define postamble_11_1_9_resp	postamble_0
+#define postamble_11_1_9_list	postamble_0
+
+struct test_stream test_11_1_9_conn = { &preamble_11_1_9_conn, &test_case_11_1_9, &postamble_11_1_9_conn };
+struct test_stream test_11_1_9_resp = { &preamble_11_1_9_resp, &test_case_11_1_9, &postamble_11_1_9_resp };
+struct test_stream test_11_1_9_list = { &preamble_11_1_9_list, &test_case_11_1_9, &postamble_11_1_9_list };
+
+
+#define tgrp_case_11_1_10 test_group_11_1
+#define numb_case_11_1_10 "11.1.10"
+#define sref_case_11_1_10 "(none)"
+#define name_case_11_1_10 "Primitives in error -- too short -- T_OPTDATA_REQ"
+#define desc_case_11_1_10 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_OPTDATA_REQ primitive that is too short."
+
+int test_case_11_1_10(int child)
+{
+	return test_case_11_1(child, T_OPTDATA_REQ);
+}
+
+#define preamble_11_1_10_conn	preamble_0
+#define preamble_11_1_10_resp	preamble_0
+#define preamble_11_1_10_list	preamble_0
+
+#define postamble_11_1_10_conn	postamble_0
+#define postamble_11_1_10_resp	postamble_0
+#define postamble_11_1_10_list	postamble_0
+
+struct test_stream test_11_1_10_conn = { &preamble_11_1_10_conn, &test_case_11_1_10, &postamble_11_1_10_conn };
+struct test_stream test_11_1_10_resp = { &preamble_11_1_10_resp, &test_case_11_1_10, &postamble_11_1_10_resp };
+struct test_stream test_11_1_10_list = { &preamble_11_1_10_list, &test_case_11_1_10, &postamble_11_1_10_list };
+
+
+#define tgrp_case_11_1_11 test_group_11_1
+#define numb_case_11_1_11 "11.1.11"
+#define sref_case_11_1_11 "(none)"
+#define name_case_11_1_11 "Primitives in error -- too short -- T_ORDREL_REQ"
+#define desc_case_11_1_11 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_ORDREL_REQ primitive that is too short."
+
+int test_case_11_1_11(int child)
+{
+	return test_case_11_1(child, T_ORDREL_REQ);
+}
+
+#define preamble_11_1_11_conn	preamble_0
+#define preamble_11_1_11_resp	preamble_0
+#define preamble_11_1_11_list	preamble_0
+
+#define postamble_11_1_11_conn	postamble_0
+#define postamble_11_1_11_resp	postamble_0
+#define postamble_11_1_11_list	postamble_0
+
+struct test_stream test_11_1_11_conn = { &preamble_11_1_11_conn, &test_case_11_1_11, &postamble_11_1_11_conn };
+struct test_stream test_11_1_11_resp = { &preamble_11_1_11_resp, &test_case_11_1_11, &postamble_11_1_11_resp };
+struct test_stream test_11_1_11_list = { &preamble_11_1_11_list, &test_case_11_1_11, &postamble_11_1_11_list };
+
+
+#define tgrp_case_11_1_12 test_group_11_1
+#define numb_case_11_1_12 "11.1.12"
+#define sref_case_11_1_12 "(none)"
+#define name_case_11_1_12 "Primitives in error -- too short -- T_UNBIND_REQ"
+#define desc_case_11_1_12 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_UNBIND_REQ primitive that is too short."
+
+int test_case_11_1_12(int child)
+{
+	return test_case_11_1(child, T_UNBIND_REQ);
+}
+
+#define preamble_11_1_12_conn	preamble_0
+#define preamble_11_1_12_resp	preamble_0
+#define preamble_11_1_12_list	preamble_0
+
+#define postamble_11_1_12_conn	postamble_0
+#define postamble_11_1_12_resp	postamble_0
+#define postamble_11_1_12_list	postamble_0
+
+struct test_stream test_11_1_12_conn = { &preamble_11_1_12_conn, &test_case_11_1_12, &postamble_11_1_12_conn };
+struct test_stream test_11_1_12_resp = { &preamble_11_1_12_resp, &test_case_11_1_12, &postamble_11_1_12_resp };
+struct test_stream test_11_1_12_list = { &preamble_11_1_12_list, &test_case_11_1_12, &postamble_11_1_12_list };
+
+
+#define tgrp_case_11_1_13 test_group_11_1
+#define numb_case_11_1_13 "11.1.13"
+#define sref_case_11_1_13 "(none)"
+#define name_case_11_1_13 "Primitives in error -- too short -- T_UNITDATA_REQ"
+#define desc_case_11_1_13 "\
+Checks that a primitive that is too short results in an error.  Neither the TPI\n\
+nor the XTI specification indicates what action is taken when a primitive is\n\
+received that is to short.  For primitives that require an acknowledgeement we\n\
+return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
+not require an acknowledgement we issue an M_ERROR with an error number of\n\
+EPROTO.  This test case is for a T_UNITDATA_REQ primitive that is too short."
+
+int test_case_11_1_13(int child)
+{
+	return test_case_11_1(child, T_UNITDATA_REQ);
+}
+
+#define preamble_11_1_13_conn	preamble_0
+#define preamble_11_1_13_resp	preamble_0
+#define preamble_11_1_13_list	preamble_0
+
+#define postamble_11_1_13_conn	postamble_0
+#define postamble_11_1_13_resp	postamble_0
+#define postamble_11_1_13_list	postamble_0
+
+struct test_stream test_11_1_13_conn = { &preamble_11_1_13_conn, &test_case_11_1_13, &postamble_11_1_13_conn };
+struct test_stream test_11_1_13_resp = { &preamble_11_1_13_resp, &test_case_11_1_13, &postamble_11_1_13_resp };
+struct test_stream test_11_1_13_list = { &preamble_11_1_13_list, &test_case_11_1_13, &postamble_11_1_13_list };
+
+#define test_group_11_2 "Primitives in error -- wrong primitive type"
+
+#define tgrp_case_11_2_1 test_group_11_2
+#define numb_case_11_2_1 "11.2.1"
+#define sref_case_11_2_1 "(none)"
+#define name_case_11_2_1 "Primitivie in error -- wrong primitive type -- T_ADDR_ACK"
+#define desc_case_11_2_1 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_ADDR_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_1(int child)
+{
+	return test_case_11_1(child, T_ADDR_ACK);
+}
+
+#define preamble_11_2_1_conn	preamble_0
+#define preamble_11_2_1_resp	preamble_0
+#define preamble_11_2_1_list	preamble_0
+
+#define postamble_11_2_1_conn	postamble_0
+#define postamble_11_2_1_resp	postamble_0
+#define postamble_11_2_1_list	postamble_0
+
+struct test_stream test_11_2_1_conn = { &preamble_11_2_1_conn, &test_case_11_2_1, &postamble_11_2_1_conn };
+struct test_stream test_11_2_1_resp = { &preamble_11_2_1_resp, &test_case_11_2_1, &postamble_11_2_1_resp };
+struct test_stream test_11_2_1_list = { &preamble_11_2_1_list, &test_case_11_2_1, &postamble_11_2_1_list };
+
+
+#define tgrp_case_11_2_2 test_group_11_2
+#define numb_case_11_2_2 "11.2.2"
+#define sref_case_11_2_2 "(none)"
+#define name_case_11_2_2 "Primitivie in error -- wrong primitive type -- T_BIND_ACK"
+#define desc_case_11_2_2 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_BIND_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_2(int child)
+{
+	return test_case_11_1(child, T_BIND_ACK);
+}
+
+#define preamble_11_2_2_conn	preamble_0
+#define preamble_11_2_2_resp	preamble_0
+#define preamble_11_2_2_list	preamble_0
+
+#define postamble_11_2_2_conn	postamble_0
+#define postamble_11_2_2_resp	postamble_0
+#define postamble_11_2_2_list	postamble_0
+
+struct test_stream test_11_2_2_conn = { &preamble_11_2_2_conn, &test_case_11_2_2, &postamble_11_2_2_conn };
+struct test_stream test_11_2_2_resp = { &preamble_11_2_2_resp, &test_case_11_2_2, &postamble_11_2_2_resp };
+struct test_stream test_11_2_2_list = { &preamble_11_2_2_list, &test_case_11_2_2, &postamble_11_2_2_list };
+
+
+#define tgrp_case_11_2_3 test_group_11_2
+#define numb_case_11_2_3 "11.2.3"
+#define sref_case_11_2_3 "(none)"
+#define name_case_11_2_3 "Primitivie in error -- wrong primitive type -- T_CAPABILITY_ACK"
+#define desc_case_11_2_3 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_CAPABILITY_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_3(int child)
+{
+	return test_case_11_1(child, T_CAPABILITY_ACK);
+}
+
+#define preamble_11_2_3_conn	preamble_0
+#define preamble_11_2_3_resp	preamble_0
+#define preamble_11_2_3_list	preamble_0
+
+#define postamble_11_2_3_conn	postamble_0
+#define postamble_11_2_3_resp	postamble_0
+#define postamble_11_2_3_list	postamble_0
+
+struct test_stream test_11_2_3_conn = { &preamble_11_2_3_conn, &test_case_11_2_3, &postamble_11_2_3_conn };
+struct test_stream test_11_2_3_resp = { &preamble_11_2_3_resp, &test_case_11_2_3, &postamble_11_2_3_resp };
+struct test_stream test_11_2_3_list = { &preamble_11_2_3_list, &test_case_11_2_3, &postamble_11_2_3_list };
+
+
+#define tgrp_case_11_2_4 test_group_11_2
+#define numb_case_11_2_4 "11.2.4"
+#define sref_case_11_2_4 "(none)"
+#define name_case_11_2_4 "Primitivie in error -- wrong primitive type -- T_CONN_CON"
+#define desc_case_11_2_4 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_CONN_CON primitive sent in the wrong direction."
+
+int test_case_11_2_4(int child)
+{
+	return test_case_11_1(child, T_CONN_CON);
+}
+
+#define preamble_11_2_4_conn	preamble_0
+#define preamble_11_2_4_resp	preamble_0
+#define preamble_11_2_4_list	preamble_0
+
+#define postamble_11_2_4_conn	postamble_0
+#define postamble_11_2_4_resp	postamble_0
+#define postamble_11_2_4_list	postamble_0
+
+struct test_stream test_11_2_4_conn = { &preamble_11_2_4_conn, &test_case_11_2_4, &postamble_11_2_4_conn };
+struct test_stream test_11_2_4_resp = { &preamble_11_2_4_resp, &test_case_11_2_4, &postamble_11_2_4_resp };
+struct test_stream test_11_2_4_list = { &preamble_11_2_4_list, &test_case_11_2_4, &postamble_11_2_4_list };
+
+
+#define tgrp_case_11_2_5 test_group_11_2
+#define numb_case_11_2_5 "11.2.5"
+#define sref_case_11_2_5 "(none)"
+#define name_case_11_2_5 "Primitivie in error -- wrong primitive type -- T_CONN_IND"
+#define desc_case_11_2_5 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_CONN_IND primitive sent in the wrong direction."
+
+int test_case_11_2_5(int child)
+{
+	return test_case_11_1(child, T_CONN_IND);
+}
+
+#define preamble_11_2_5_conn	preamble_0
+#define preamble_11_2_5_resp	preamble_0
+#define preamble_11_2_5_list	preamble_0
+
+#define postamble_11_2_5_conn	postamble_0
+#define postamble_11_2_5_resp	postamble_0
+#define postamble_11_2_5_list	postamble_0
+
+struct test_stream test_11_2_5_conn = { &preamble_11_2_5_conn, &test_case_11_2_5, &postamble_11_2_5_conn };
+struct test_stream test_11_2_5_resp = { &preamble_11_2_5_resp, &test_case_11_2_5, &postamble_11_2_5_resp };
+struct test_stream test_11_2_5_list = { &preamble_11_2_5_list, &test_case_11_2_5, &postamble_11_2_5_list };
+
+
+#define tgrp_case_11_2_6 test_group_11_2
+#define numb_case_11_2_6 "11.2.6"
+#define sref_case_11_2_6 "(none)"
+#define name_case_11_2_6 "Primitivie in error -- wrong primitive type -- T_DATA_IND"
+#define desc_case_11_2_6 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_DATA_IND primitive sent in the wrong direction."
+
+int test_case_11_2_6(int child)
+{
+	return test_case_11_1(child, T_DATA_IND);
+}
+
+#define preamble_11_2_6_conn	preamble_0
+#define preamble_11_2_6_resp	preamble_0
+#define preamble_11_2_6_list	preamble_0
+
+#define postamble_11_2_6_conn	postamble_0
+#define postamble_11_2_6_resp	postamble_0
+#define postamble_11_2_6_list	postamble_0
+
+struct test_stream test_11_2_6_conn = { &preamble_11_2_6_conn, &test_case_11_2_6, &postamble_11_2_6_conn };
+struct test_stream test_11_2_6_resp = { &preamble_11_2_6_resp, &test_case_11_2_6, &postamble_11_2_6_resp };
+struct test_stream test_11_2_6_list = { &preamble_11_2_6_list, &test_case_11_2_6, &postamble_11_2_6_list };
+
+
+#define tgrp_case_11_2_7 test_group_11_2
+#define numb_case_11_2_7 "11.2.7"
+#define sref_case_11_2_7 "(none)"
+#define name_case_11_2_7 "Primitivie in error -- wrong primitive type -- T_DISCON_IND"
+#define desc_case_11_2_7 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_DISCON_IND primitive sent in the wrong direction."
+
+int test_case_11_2_7(int child)
+{
+	return test_case_11_1(child, T_DISCON_IND);
+}
+
+#define preamble_11_2_7_conn	preamble_0
+#define preamble_11_2_7_resp	preamble_0
+#define preamble_11_2_7_list	preamble_0
+
+#define postamble_11_2_7_conn	postamble_0
+#define postamble_11_2_7_resp	postamble_0
+#define postamble_11_2_7_list	postamble_0
+
+struct test_stream test_11_2_7_conn = { &preamble_11_2_7_conn, &test_case_11_2_7, &postamble_11_2_7_conn };
+struct test_stream test_11_2_7_resp = { &preamble_11_2_7_resp, &test_case_11_2_7, &postamble_11_2_7_resp };
+struct test_stream test_11_2_7_list = { &preamble_11_2_7_list, &test_case_11_2_7, &postamble_11_2_7_list };
+
+
+#define tgrp_case_11_2_8 test_group_11_2
+#define numb_case_11_2_8 "11.2.8"
+#define sref_case_11_2_8 "(none)"
+#define name_case_11_2_8 "Primitivie in error -- wrong primitive type -- T_ERROR_ACK"
+#define desc_case_11_2_8 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_ERROR_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_8(int child)
+{
+	return test_case_11_1(child, T_ERROR_ACK);
+}
+
+#define preamble_11_2_8_conn	preamble_0
+#define preamble_11_2_8_resp	preamble_0
+#define preamble_11_2_8_list	preamble_0
+
+#define postamble_11_2_8_conn	postamble_0
+#define postamble_11_2_8_resp	postamble_0
+#define postamble_11_2_8_list	postamble_0
+
+struct test_stream test_11_2_8_conn = { &preamble_11_2_8_conn, &test_case_11_2_8, &postamble_11_2_8_conn };
+struct test_stream test_11_2_8_resp = { &preamble_11_2_8_resp, &test_case_11_2_8, &postamble_11_2_8_resp };
+struct test_stream test_11_2_8_list = { &preamble_11_2_8_list, &test_case_11_2_8, &postamble_11_2_8_list };
+
+
+#define tgrp_case_11_2_9 test_group_11_2
+#define numb_case_11_2_9 "11.2.9"
+#define sref_case_11_2_9 "(none)"
+#define name_case_11_2_9 "Primitivie in error -- wrong primitive type -- T_EXDATA_IND"
+#define desc_case_11_2_9 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_EXDATA_IND primitive sent in the wrong direction."
+
+int test_case_11_2_9(int child)
+{
+	return test_case_11_1(child, T_EXDATA_IND);
+}
+
+#define preamble_11_2_9_conn	preamble_0
+#define preamble_11_2_9_resp	preamble_0
+#define preamble_11_2_9_list	preamble_0
+
+#define postamble_11_2_9_conn	postamble_0
+#define postamble_11_2_9_resp	postamble_0
+#define postamble_11_2_9_list	postamble_0
+
+struct test_stream test_11_2_9_conn = { &preamble_11_2_9_conn, &test_case_11_2_9, &postamble_11_2_9_conn };
+struct test_stream test_11_2_9_resp = { &preamble_11_2_9_resp, &test_case_11_2_9, &postamble_11_2_9_resp };
+struct test_stream test_11_2_9_list = { &preamble_11_2_9_list, &test_case_11_2_9, &postamble_11_2_9_list };
+
+
+#define tgrp_case_11_2_10 test_group_11_2
+#define numb_case_11_2_10 "11.2.10"
+#define sref_case_11_2_10 "(none)"
+#define name_case_11_2_10 "Primitivie in error -- wrong primitive type -- T_INFO_ACK"
+#define desc_case_11_2_10 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_INFO_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_10(int child)
+{
+	return test_case_11_1(child, T_INFO_ACK);
+}
+
+#define preamble_11_2_10_conn	preamble_0
+#define preamble_11_2_10_resp	preamble_0
+#define preamble_11_2_10_list	preamble_0
+
+#define postamble_11_2_10_conn	postamble_0
+#define postamble_11_2_10_resp	postamble_0
+#define postamble_11_2_10_list	postamble_0
+
+struct test_stream test_11_2_10_conn = { &preamble_11_2_10_conn, &test_case_11_2_10, &postamble_11_2_10_conn };
+struct test_stream test_11_2_10_resp = { &preamble_11_2_10_resp, &test_case_11_2_10, &postamble_11_2_10_resp };
+struct test_stream test_11_2_10_list = { &preamble_11_2_10_list, &test_case_11_2_10, &postamble_11_2_10_list };
+
+
+#define tgrp_case_11_2_11 test_group_11_2
+#define numb_case_11_2_11 "11.2.11"
+#define sref_case_11_2_11 "(none)"
+#define name_case_11_2_11 "Primitivie in error -- wrong primitive type -- T_OK_ACK"
+#define desc_case_11_2_11 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_OK_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_11(int child)
+{
+	return test_case_11_1(child, T_OK_ACK);
+}
+
+#define preamble_11_2_11_conn	preamble_0
+#define preamble_11_2_11_resp	preamble_0
+#define preamble_11_2_11_list	preamble_0
+
+#define postamble_11_2_11_conn	postamble_0
+#define postamble_11_2_11_resp	postamble_0
+#define postamble_11_2_11_list	postamble_0
+
+struct test_stream test_11_2_11_conn = { &preamble_11_2_11_conn, &test_case_11_2_11, &postamble_11_2_11_conn };
+struct test_stream test_11_2_11_resp = { &preamble_11_2_11_resp, &test_case_11_2_11, &postamble_11_2_11_resp };
+struct test_stream test_11_2_11_list = { &preamble_11_2_11_list, &test_case_11_2_11, &postamble_11_2_11_list };
+
+
+#define tgrp_case_11_2_12 test_group_11_2
+#define numb_case_11_2_12 "11.2.12"
+#define sref_case_11_2_12 "(none)"
+#define name_case_11_2_12 "Primitivie in error -- wrong primitive type -- T_OPTDATA_IND"
+#define desc_case_11_2_12 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_OPTDATA_IND primitive sent in the wrong direction."
+
+int test_case_11_2_12(int child)
+{
+	return test_case_11_1(child, T_OPTDATA_IND);
+}
+
+#define preamble_11_2_12_conn	preamble_0
+#define preamble_11_2_12_resp	preamble_0
+#define preamble_11_2_12_list	preamble_0
+
+#define postamble_11_2_12_conn	postamble_0
+#define postamble_11_2_12_resp	postamble_0
+#define postamble_11_2_12_list	postamble_0
+
+struct test_stream test_11_2_12_conn = { &preamble_11_2_12_conn, &test_case_11_2_12, &postamble_11_2_12_conn };
+struct test_stream test_11_2_12_resp = { &preamble_11_2_12_resp, &test_case_11_2_12, &postamble_11_2_12_resp };
+struct test_stream test_11_2_12_list = { &preamble_11_2_12_list, &test_case_11_2_12, &postamble_11_2_12_list };
+
+
+#define tgrp_case_11_2_13 test_group_11_2
+#define numb_case_11_2_13 "11.2.13"
+#define sref_case_11_2_13 "(none)"
+#define name_case_11_2_13 "Primitivie in error -- wrong primitive type -- T_OPTMGMT_ACK"
+#define desc_case_11_2_13 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_OPTMGMT_ACK primitive sent in the wrong direction."
+
+int test_case_11_2_13(int child)
+{
+	return test_case_11_1(child, T_OPTMGMT_ACK);
+}
+
+#define preamble_11_2_13_conn	preamble_0
+#define preamble_11_2_13_resp	preamble_0
+#define preamble_11_2_13_list	preamble_0
+
+#define postamble_11_2_13_conn	postamble_0
+#define postamble_11_2_13_resp	postamble_0
+#define postamble_11_2_13_list	postamble_0
+
+struct test_stream test_11_2_13_conn = { &preamble_11_2_13_conn, &test_case_11_2_13, &postamble_11_2_13_conn };
+struct test_stream test_11_2_13_resp = { &preamble_11_2_13_resp, &test_case_11_2_13, &postamble_11_2_13_resp };
+struct test_stream test_11_2_13_list = { &preamble_11_2_13_list, &test_case_11_2_13, &postamble_11_2_13_list };
+
+
+#define tgrp_case_11_2_14 test_group_11_2
+#define numb_case_11_2_14 "11.2.14"
+#define sref_case_11_2_14 "(none)"
+#define name_case_11_2_14 "Primitivie in error -- wrong primitive type -- T_ORDREL_IND"
+#define desc_case_11_2_14 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_ORDREL_IND primitive sent in the wrong direction."
+
+int test_case_11_2_14(int child)
+{
+	return test_case_11_1(child, T_ORDREL_IND);
+}
+
+#define preamble_11_2_14_conn	preamble_0
+#define preamble_11_2_14_resp	preamble_0
+#define preamble_11_2_14_list	preamble_0
+
+#define postamble_11_2_14_conn	postamble_0
+#define postamble_11_2_14_resp	postamble_0
+#define postamble_11_2_14_list	postamble_0
+
+struct test_stream test_11_2_14_conn = { &preamble_11_2_14_conn, &test_case_11_2_14, &postamble_11_2_14_conn };
+struct test_stream test_11_2_14_resp = { &preamble_11_2_14_resp, &test_case_11_2_14, &postamble_11_2_14_resp };
+struct test_stream test_11_2_14_list = { &preamble_11_2_14_list, &test_case_11_2_14, &postamble_11_2_14_list };
+
+
+#define tgrp_case_11_2_15 test_group_11_2
+#define numb_case_11_2_15 "11.2.15"
+#define sref_case_11_2_15 "(none)"
+#define name_case_11_2_15 "Primitivie in error -- wrong primitive type -- T_UDERROR_IND"
+#define desc_case_11_2_15 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_UDERROR_IND primitive sent in the wrong direction."
+
+int test_case_11_2_15(int child)
+{
+	return test_case_11_1(child, T_UDERROR_IND);
+}
+
+#define preamble_11_2_15_conn	preamble_0
+#define preamble_11_2_15_resp	preamble_0
+#define preamble_11_2_15_list	preamble_0
+
+#define postamble_11_2_15_conn	postamble_0
+#define postamble_11_2_15_resp	postamble_0
+#define postamble_11_2_15_list	postamble_0
+
+struct test_stream test_11_2_15_conn = { &preamble_11_2_15_conn, &test_case_11_2_15, &postamble_11_2_15_conn };
+struct test_stream test_11_2_15_resp = { &preamble_11_2_15_resp, &test_case_11_2_15, &postamble_11_2_15_resp };
+struct test_stream test_11_2_15_list = { &preamble_11_2_15_list, &test_case_11_2_15, &postamble_11_2_15_list };
+
+
+#define tgrp_case_11_2_16 test_group_11_2
+#define numb_case_11_2_16 "11.2.16"
+#define sref_case_11_2_16 "(none)"
+#define name_case_11_2_16 "Primitivie in error -- wrong primitive type -- T_UNITDATA_IND"
+#define desc_case_11_2_16 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a T_UNITDATA_IND primitive sent in the wrong direction."
+
+int test_case_11_2_16(int child)
+{
+	return test_case_11_1(child, T_UNITDATA_IND);
+}
+
+#define preamble_11_2_16_conn	preamble_0
+#define preamble_11_2_16_resp	preamble_0
+#define preamble_11_2_16_list	preamble_0
+
+#define postamble_11_2_16_conn	postamble_0
+#define postamble_11_2_16_resp	postamble_0
+#define postamble_11_2_16_list	postamble_0
+
+struct test_stream test_11_2_16_conn = { &preamble_11_2_16_conn, &test_case_11_2_16, &postamble_11_2_16_conn };
+struct test_stream test_11_2_16_resp = { &preamble_11_2_16_resp, &test_case_11_2_16, &postamble_11_2_16_resp };
+struct test_stream test_11_2_16_list = { &preamble_11_2_16_list, &test_case_11_2_16, &postamble_11_2_16_list };
+
+
+#define tgrp_case_11_2_17 test_group_11_2
+#define numb_case_11_2_17 "11.2.17"
+#define sref_case_11_2_17 "(none)"
+#define name_case_11_2_17 "Primitivie in error -- wrong primitive type -- UNKNOWN"
+#define desc_case_11_2_17 "\
+Checks that a primitive of a known but incorrect primitive type results in an\n\
+error.  Neither the TPI nor the XTI specification indicates what action is taken\n\
+when a primitive of the a known wrong type is received.  For known primitives we\n\
+issue an M_ERROR with an error number of EPROTO.  For unknown primitives, we\n\
+return a T_ERROR_ACK with a UNIX error number of TNOTSUPPORT.  This test case is\n\
+for a UNKNOWN primitive sent in the wrong direction."
+
+int test_case_11_2_17(int child)
+{
+	return test_case_11_1(child, -1UL);
+}
+
+#define preamble_11_2_17_conn	preamble_0
+#define preamble_11_2_17_resp	preamble_0
+#define preamble_11_2_17_list	preamble_0
+
+#define postamble_11_2_17_conn	postamble_0
+#define postamble_11_2_17_resp	postamble_0
+#define postamble_11_2_17_list	postamble_0
+
+struct test_stream test_11_2_17_conn = { &preamble_11_2_17_conn, &test_case_11_2_17, &postamble_11_2_17_conn };
+struct test_stream test_11_2_17_resp = { &preamble_11_2_17_resp, &test_case_11_2_17, &postamble_11_2_17_resp };
+struct test_stream test_11_2_17_list = { &preamble_11_2_17_list, &test_case_11_2_17, &postamble_11_2_17_list };
+
+
+#define test_group_11_3 "Primitives in error -- unsupported primitive type"
+
+int test_case_11_3(int child, long prim)
+{
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		switch (prim) {
+		case T_ADDR_REQ:
+			break;
+		case T_BIND_REQ:
+			break;
+		case T_CAPABILITY_REQ:
+			break;
+		case T_CONN_REQ:
+			test_addr = &addrs[2];
+			test_alen = sizeof(addrs[2]);
+			test_data = "Hello World";
+			test_opts = &opt_conn;
+			test_olen = sizeof(opt_conn);
+			if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		case T_CONN_RES:
+			test_resfd = test_fd[1];
+			test_data = "Hello There!";
+			test_opts = &opt_conn;
+			test_olen = sizeof(opt_conn);
+			if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		case T_DATA_REQ:
+			test_data = "Normal test message.";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case T_DISCON_REQ:
+			test_data = NULL;
+			last_sequence = 0;
+			if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		case T_EXDATA_REQ:
+			test_data = "Expedited test message.";
+			MORE_flag = 0;
+			if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case T_INFO_REQ:
+			break;
+		case T_OPTDATA_REQ:
+			test_data = "Option data.";
+			DATA_flag = 0;
+			test_opts = &opt_data;
+			test_olen = sizeof(opt_data);
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case T_ORDREL_REQ:
+			test_data = NULL;
+			if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case T_UNBIND_REQ:
+			break;
+		case T_UNITDATA_REQ:
+			break;
+		case -1UL:
+		default:
+			last_prim = prim;
+			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		}
+		break;
+	case T_COTS:
+		switch (prim) {
+		case T_ADDR_REQ:
+			break;
+		case T_BIND_REQ:
+			break;
+		case T_CAPABILITY_REQ:
+			break;
+		case T_CONN_REQ:
+			break;
+		case T_CONN_RES:
+			break;
+		case T_DATA_REQ:
+			break;
+		case T_DISCON_REQ:
+			break;
+		case T_EXDATA_REQ:
+			break;
+		case T_INFO_REQ:
+			break;
+		case T_OPTDATA_REQ:
+			break;
+		case T_ORDREL_REQ:
+			test_data = NULL;
+			if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case T_UNBIND_REQ:
+			break;
+		case T_UNITDATA_REQ:
+			test_addr = &addrs[(child + 1) % 3];
+			test_alen = sizeof(addrs[(child + 1) % 3]);
+			test_data = "Unit test data.";
+			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case -1UL:
+		default:
+			last_prim = prim;
+			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		}
+		break;
+	case T_COTS_ORD:
+		switch (prim) {
+		case T_ADDR_REQ:
+			break;
+		case T_BIND_REQ:
+			break;
+		case T_CAPABILITY_REQ:
+			break;
+		case T_CONN_REQ:
+			break;
+		case T_CONN_RES:
+			break;
+		case T_DATA_REQ:
+			break;
+		case T_DISCON_REQ:
+			break;
+		case T_EXDATA_REQ:
+			break;
+		case T_INFO_REQ:
+			break;
+		case T_OPTDATA_REQ:
+			break;
+		case T_ORDREL_REQ:
+			break;
+		case T_UNBIND_REQ:
+			break;
+		case T_UNITDATA_REQ:
+			test_addr = &addrs[(child + 1) % 3];
+			test_alen = sizeof(addrs[(child + 1) % 3]);
+			test_data = "Unit test data.";
+			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_error;
+		case -1UL:
+		default:
+			last_prim = prim;
+			if (do_signal(child, __TEST_PRIM_TOO_SHORT) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+			goto expect_nosupport_ack;
+		}
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      expect_nosupport_ack:
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TNOTSUPPORT)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      expect_error:
+	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_errno != EPROTO)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define tgrp_case_11_3_1 test_group_11_3
+#define numb_case_11_3_1 "11.3.1"
+#define sref_case_11_3_1 "(none)"
+#define name_case_11_3_1 "Primitive in error -- unsupported primitive type -- T_ADDR_REQ"
+#define desc_case_11_3_1 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_ADDR_REQ primitive."
+
+int test_case_11_3_1(int child)
+{
+	return test_case_11_3(child, T_ADDR_REQ);
+}
+
+struct test_stream test_11_3_1_conn = { &preamble_0, &test_case_11_3_1, &postamble_0 };
+struct test_stream test_11_3_1_resp = { &preamble_0, &test_case_11_3_1, &postamble_0 };
+struct test_stream test_11_3_1_list = { &preamble_0, &test_case_11_3_1, &postamble_0 };
+
+
+#define tgrp_case_11_3_2 test_group_11_3
+#define numb_case_11_3_2 "11.3.2"
+#define sref_case_11_3_2 "(none)"
+#define name_case_11_3_2 "Primitive in error -- unsupported primitive type -- T_BIND_REQ"
+#define desc_case_11_3_2 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_BIND_REQ primitive."
+
+int test_case_11_3_2(int child)
+{
+	return test_case_11_3(child, T_BIND_REQ);
+}
+
+struct test_stream test_11_3_2_conn = { &preamble_0, &test_case_11_3_2, &postamble_0 };
+struct test_stream test_11_3_2_resp = { &preamble_0, &test_case_11_3_2, &postamble_0 };
+struct test_stream test_11_3_2_list = { &preamble_0, &test_case_11_3_2, &postamble_0 };
+
+
+#define tgrp_case_11_3_3 test_group_11_3
+#define numb_case_11_3_3 "11.3.3"
+#define sref_case_11_3_3 "(none)"
+#define name_case_11_3_3 "Primitive in error -- unsupported primitive type -- T_CAPABILITY_REQ"
+#define desc_case_11_3_3 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_CAPABILITY_REQ primitive."
+
+int test_case_11_3_3(int child)
+{
+	return test_case_11_3(child, T_CAPABILITY_REQ);
+}
+
+struct test_stream test_11_3_3_conn = { &preamble_0, &test_case_11_3_3, &postamble_0 };
+struct test_stream test_11_3_3_resp = { &preamble_0, &test_case_11_3_3, &postamble_0 };
+struct test_stream test_11_3_3_list = { &preamble_0, &test_case_11_3_3, &postamble_0 };
+
+
+#define tgrp_case_11_3_4 test_group_11_3
+#define numb_case_11_3_4 "11.3.4"
+#define sref_case_11_3_4 "(none)"
+#define name_case_11_3_4 "Primitive in error -- unsupported primitive type -- T_CONN_REQ"
+#define desc_case_11_3_4 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_CONN_REQ primitive."
+
+int test_case_11_3_4(int child)
+{
+	return test_case_11_3(child, T_CONN_REQ);
+}
+
+struct test_stream test_11_3_4_conn = { &preamble_0, &test_case_11_3_4, &postamble_0 };
+struct test_stream test_11_3_4_resp = { &preamble_0, &test_case_11_3_4, &postamble_0 };
+struct test_stream test_11_3_4_list = { &preamble_0, &test_case_11_3_4, &postamble_0 };
+
+
+#define tgrp_case_11_3_5 test_group_11_3
+#define numb_case_11_3_5 "11.3.5"
+#define sref_case_11_3_5 "(none)"
+#define name_case_11_3_5 "Primitive in error -- unsupported primitive type -- T_CONN_RES"
+#define desc_case_11_3_5 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_CONN_RES primitive."
+
+int test_case_11_3_5(int child)
+{
+	return test_case_11_3(child, T_CONN_RES);
+}
+
+struct test_stream test_11_3_5_conn = { &preamble_0, &test_case_11_3_5, &postamble_0 };
+struct test_stream test_11_3_5_resp = { &preamble_0, &test_case_11_3_5, &postamble_0 };
+struct test_stream test_11_3_5_list = { &preamble_0, &test_case_11_3_5, &postamble_0 };
+
+
+#define tgrp_case_11_3_6 test_group_11_3
+#define numb_case_11_3_6 "11.3.6"
+#define sref_case_11_3_6 "(none)"
+#define name_case_11_3_6 "Primitive in error -- unsupported primitive type -- T_DATA_REQ"
+#define desc_case_11_3_6 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_DATA_REQ primitive."
+
+int test_case_11_3_6(int child)
+{
+	return test_case_11_3(child, T_DATA_REQ);
+}
+
+struct test_stream test_11_3_6_conn = { &preamble_0, &test_case_11_3_6, &postamble_0 };
+struct test_stream test_11_3_6_resp = { &preamble_0, &test_case_11_3_6, &postamble_0 };
+struct test_stream test_11_3_6_list = { &preamble_0, &test_case_11_3_6, &postamble_0 };
+
+
+#define tgrp_case_11_3_7 test_group_11_3
+#define numb_case_11_3_7 "11.3.7"
+#define sref_case_11_3_7 "(none)"
+#define name_case_11_3_7 "Primitive in error -- unsupported primitive type -- T_DISCON_REQ"
+#define desc_case_11_3_7 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_DISCON_REQ primitive."
+
+int test_case_11_3_7(int child)
+{
+	return test_case_11_3(child, T_DISCON_REQ);
+}
+
+struct test_stream test_11_3_7_conn = { &preamble_0, &test_case_11_3_7, &postamble_0 };
+struct test_stream test_11_3_7_resp = { &preamble_0, &test_case_11_3_7, &postamble_0 };
+struct test_stream test_11_3_7_list = { &preamble_0, &test_case_11_3_7, &postamble_0 };
+
+
+#define tgrp_case_11_3_8 test_group_11_3
+#define numb_case_11_3_8 "11.3.8"
+#define sref_case_11_3_8 "(none)"
+#define name_case_11_3_8 "Primitive in error -- unsupported primitive type -- T_EXDATA_REQ"
+#define desc_case_11_3_8 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_EXDATA_REQ primitive."
+
+int test_case_11_3_8(int child)
+{
+	return test_case_11_3(child, T_EXDATA_REQ);
+}
+
+struct test_stream test_11_3_8_conn = { &preamble_0, &test_case_11_3_8, &postamble_0 };
+struct test_stream test_11_3_8_resp = { &preamble_0, &test_case_11_3_8, &postamble_0 };
+struct test_stream test_11_3_8_list = { &preamble_0, &test_case_11_3_8, &postamble_0 };
+
+
+#define tgrp_case_11_3_9 test_group_11_3
+#define numb_case_11_3_9 "11.3.9"
+#define sref_case_11_3_9 "(none)"
+#define name_case_11_3_9 "Primitive in error -- unsupported primitive type -- T_INFO_REQ"
+#define desc_case_11_3_9 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_INFO_REQ primitive."
+
+int test_case_11_3_9(int child)
+{
+	return test_case_11_3(child, T_INFO_REQ);
+}
+
+struct test_stream test_11_3_9_conn = { &preamble_0, &test_case_11_3_9, &postamble_0 };
+struct test_stream test_11_3_9_resp = { &preamble_0, &test_case_11_3_9, &postamble_0 };
+struct test_stream test_11_3_9_list = { &preamble_0, &test_case_11_3_9, &postamble_0 };
+
+
+#define tgrp_case_11_3_10 test_group_11_3
+#define numb_case_11_3_10 "11.3.10"
+#define sref_case_11_3_10 "(none)"
+#define name_case_11_3_10 "Primitive in error -- unsupported primitive type -- T_OPTDATA_REQ"
+#define desc_case_11_3_10 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_OPTDATA_REQ primitive."
+
+int test_case_11_3_10(int child)
+{
+	return test_case_11_3(child, T_OPTDATA_REQ);
+}
+
+struct test_stream test_11_3_10_conn = { &preamble_0, &test_case_11_3_10, &postamble_0 };
+struct test_stream test_11_3_10_resp = { &preamble_0, &test_case_11_3_10, &postamble_0 };
+struct test_stream test_11_3_10_list = { &preamble_0, &test_case_11_3_10, &postamble_0 };
+
+
+#define tgrp_case_11_3_11 test_group_11_3
+#define numb_case_11_3_11 "11.3.11"
+#define sref_case_11_3_11 "(none)"
+#define name_case_11_3_11 "Primitive in error -- unsupported primitive type -- T_ORDREL_REQ"
+#define desc_case_11_3_11 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_ORDREL_REQ primitive."
+
+int test_case_11_3_11(int child)
+{
+	return test_case_11_3(child, T_ORDREL_REQ);
+}
+
+struct test_stream test_11_3_11_conn = { &preamble_0, &test_case_11_3_11, &postamble_0 };
+struct test_stream test_11_3_11_resp = { &preamble_0, &test_case_11_3_11, &postamble_0 };
+struct test_stream test_11_3_11_list = { &preamble_0, &test_case_11_3_11, &postamble_0 };
+
+
+#define tgrp_case_11_3_12 test_group_11_3
+#define numb_case_11_3_12 "11.3.12"
+#define sref_case_11_3_12 "(none)"
+#define name_case_11_3_12 "Primitive in error -- unsupported primitive type -- T_UNBIND_REQ"
+#define desc_case_11_3_12 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_UNBIND_REQ primitive."
+
+int test_case_11_3_12(int child)
+{
+	return test_case_11_3(child, T_UNBIND_REQ);
+}
+
+struct test_stream test_11_3_12_conn = { &preamble_0, &test_case_11_3_12, &postamble_0 };
+struct test_stream test_11_3_12_resp = { &preamble_0, &test_case_11_3_12, &postamble_0 };
+struct test_stream test_11_3_12_list = { &preamble_0, &test_case_11_3_12, &postamble_0 };
+
+
+#define tgrp_case_11_3_13 test_group_11_3
+#define numb_case_11_3_13 "11.3.13"
+#define sref_case_11_3_13 "(none)"
+#define name_case_11_3_13 "Primitive in error -- unsupported primitive type -- T_UNITDATA_REQ"
+#define desc_case_11_3_13 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a T_UNITDATA_REQ primitive."
+
+int test_case_11_3_13(int child)
+{
+	return test_case_11_3(child, T_UNITDATA_REQ);
+}
+
+struct test_stream test_11_3_13_conn = { &preamble_0, &test_case_11_3_13, &postamble_0 };
+struct test_stream test_11_3_13_resp = { &preamble_0, &test_case_11_3_13, &postamble_0 };
+struct test_stream test_11_3_13_list = { &preamble_0, &test_case_11_3_13, &postamble_0 };
+
+
+#define tgrp_case_11_3_14 test_group_11_3
+#define numb_case_11_3_14 "11.3.14"
+#define sref_case_11_3_14 "(none)"
+#define name_case_11_3_14 "Primitive in error -- unsupported primitive type -- UNKNOWN"
+#define desc_case_11_3_14 "\
+Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
+XTI specification indicates what action to take when an unsupported primitive\n\
+type is received.  For known primitives beloning to the wrong service class that\n\
+expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
+the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
+class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
+error number of EPROTO.  This test case is for a UNKNOWN primitive."
+
+int test_case_11_3_14(int child)
+{
+	return test_case_11_3(child, -1UL);
+}
+
+struct test_stream test_11_3_14_conn = { &preamble_0, &test_case_11_3_14, &postamble_0 };
+struct test_stream test_11_3_14_resp = { &preamble_0, &test_case_11_3_14, &postamble_0 };
+struct test_stream test_11_3_14_list = { &preamble_0, &test_case_11_3_14, &postamble_0 };
+
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -19297,32 +22632,6 @@ int test_run(struct test_stream *stream[])
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 	start_tt(5000);
-	if (stream[0]) {
-		switch ((child[0] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
-		case -1:	/* error */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[0] = __RESULT_SUCCESS;
-	if (stream[1]) {
-		switch ((child[1] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[1] = __RESULT_SUCCESS;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -19339,6 +22648,32 @@ int test_run(struct test_stream *stream[])
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
+	if (stream[1]) {
+		switch ((child[1] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[1] = __RESULT_SUCCESS;
+	if (stream[0]) {
+		switch ((child[0] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
@@ -19487,12 +22822,11 @@ struct test_case {
 	{
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, 0, 0}, {
-		numb_case_1_3, tgrp_case_1_3, name_case_1_3, desc_case_1_3, sref_case_1_3, { &test_1_3_conn, &test_1_3_resp, &test_1_3_list }, 0, 0}, {
+		numb_case_1_3_1, tgrp_case_1_3_1, name_case_1_3_1, desc_case_1_3_1, sref_case_1_3_1, { &test_1_3_1_conn, &test_1_3_1_resp, &test_1_3_1_list }, 0, 0}, {
+		numb_case_1_3_2, tgrp_case_1_3_2, name_case_1_3_2, desc_case_1_3_2, sref_case_1_3_2, { &test_1_3_2_conn, &test_1_3_2_resp, &test_1_3_2_list }, 0, 0}, {
 		numb_case_1_4_1, tgrp_case_1_4_1, name_case_1_4_1, desc_case_1_4_1, sref_case_1_4_1, { &test_1_4_1_conn, &test_1_4_1_resp, &test_1_4_1_list }, 0, 0}, {
 		numb_case_1_4_2, tgrp_case_1_4_2, name_case_1_4_2, desc_case_1_4_2, sref_case_1_4_2, { &test_1_4_2_conn, &test_1_4_2_resp, &test_1_4_2_list }, 0, 0}, {
-#if 0
 		numb_case_1_4_3, tgrp_case_1_4_3, name_case_1_4_3, desc_case_1_4_3, sref_case_1_4_3, { &test_1_4_3_conn, &test_1_4_3_resp, &test_1_4_3_list }, 0, 0}, {
-#endif
 		numb_case_1_5_1_1, tgrp_case_1_5_1_1, name_case_1_5_1_1, desc_case_1_5_1_1, sref_case_1_5_1_1, { &test_1_5_1_1_conn, &test_1_5_1_1_resp, &test_1_5_1_1_list }, 0, 0}, {
 		numb_case_1_5_1_2, tgrp_case_1_5_1_2, name_case_1_5_1_2, desc_case_1_5_1_2, sref_case_1_5_1_2, { &test_1_5_1_2_conn, &test_1_5_1_2_resp, &test_1_5_1_2_list }, 0, 0}, {
 		numb_case_1_5_1_3, tgrp_case_1_5_1_3, name_case_1_5_1_3, desc_case_1_5_1_3, sref_case_1_5_1_3, { &test_1_5_1_3_conn, &test_1_5_1_3_resp, &test_1_5_1_3_list }, 0, 0}, {
@@ -19847,6 +23181,50 @@ struct test_case {
 		numb_case_4_5, tgrp_case_4_5, name_case_4_5, desc_case_4_5, sref_case_4_5, { &test_4_5_conn, &test_4_5_resp, &test_4_5_list }, 0, 0}, {
 		numb_case_4_6, tgrp_case_4_6, name_case_4_6, desc_case_4_6, sref_case_4_6, { &test_4_6_conn, &test_4_6_resp, &test_4_6_list }, 0, 0}, {
 		numb_case_4_7, tgrp_case_4_7, name_case_4_7, desc_case_4_7, sref_case_4_7, { &test_4_7_conn, &test_4_7_resp, &test_4_7_list }, 0, 0}, {
+		numb_case_11_1_1, tgrp_case_11_1_1, name_case_11_1_1, desc_case_11_1_1, sref_case_11_1_1, { &test_11_1_1_conn, &test_11_1_1_resp, &test_11_1_1_list }, 0, 0}, {
+		numb_case_11_1_2, tgrp_case_11_1_2, name_case_11_1_2, desc_case_11_1_2, sref_case_11_1_2, { &test_11_1_2_conn, &test_11_1_2_resp, &test_11_1_2_list }, 0, 0}, {
+		numb_case_11_1_3, tgrp_case_11_1_3, name_case_11_1_3, desc_case_11_1_3, sref_case_11_1_3, { &test_11_1_3_conn, &test_11_1_3_resp, &test_11_1_3_list }, 0, 0}, {
+		numb_case_11_1_4, tgrp_case_11_1_4, name_case_11_1_4, desc_case_11_1_4, sref_case_11_1_4, { &test_11_1_4_conn, &test_11_1_4_resp, &test_11_1_4_list }, 0, 0}, {
+		numb_case_11_1_5, tgrp_case_11_1_5, name_case_11_1_5, desc_case_11_1_5, sref_case_11_1_5, { &test_11_1_5_conn, &test_11_1_5_resp, &test_11_1_5_list }, 0, 0}, {
+		numb_case_11_1_6, tgrp_case_11_1_6, name_case_11_1_6, desc_case_11_1_6, sref_case_11_1_6, { &test_11_1_6_conn, &test_11_1_6_resp, &test_11_1_6_list }, 0, 0}, {
+		numb_case_11_1_7, tgrp_case_11_1_7, name_case_11_1_7, desc_case_11_1_7, sref_case_11_1_7, { &test_11_1_7_conn, &test_11_1_7_resp, &test_11_1_7_list }, 0, 0}, {
+		numb_case_11_1_8, tgrp_case_11_1_8, name_case_11_1_8, desc_case_11_1_8, sref_case_11_1_8, { &test_11_1_8_conn, &test_11_1_8_resp, &test_11_1_8_list }, 0, 0}, {
+		numb_case_11_1_9, tgrp_case_11_1_9, name_case_11_1_9, desc_case_11_1_9, sref_case_11_1_9, { &test_11_1_9_conn, &test_11_1_9_resp, &test_11_1_9_list }, 0, 0}, {
+		numb_case_11_1_10, tgrp_case_11_1_10, name_case_11_1_10, desc_case_11_1_10, sref_case_11_1_10, { &test_11_1_10_conn, &test_11_1_10_resp, &test_11_1_10_list }, 0, 0}, {
+		numb_case_11_1_11, tgrp_case_11_1_11, name_case_11_1_11, desc_case_11_1_11, sref_case_11_1_11, { &test_11_1_11_conn, &test_11_1_11_resp, &test_11_1_11_list }, 0, 0}, {
+		numb_case_11_1_12, tgrp_case_11_1_12, name_case_11_1_12, desc_case_11_1_12, sref_case_11_1_12, { &test_11_1_12_conn, &test_11_1_12_resp, &test_11_1_12_list }, 0, 0}, {
+		numb_case_11_1_13, tgrp_case_11_1_13, name_case_11_1_13, desc_case_11_1_13, sref_case_11_1_13, { &test_11_1_13_conn, &test_11_1_13_resp, &test_11_1_13_list }, 0, 0}, {
+		numb_case_11_2_1, tgrp_case_11_2_1, name_case_11_2_1, desc_case_11_2_1, sref_case_11_2_1, { &test_11_2_1_conn, &test_11_2_1_resp, &test_11_2_1_list }, 0, 0}, {
+		numb_case_11_2_2, tgrp_case_11_2_2, name_case_11_2_2, desc_case_11_2_2, sref_case_11_2_2, { &test_11_2_2_conn, &test_11_2_2_resp, &test_11_2_2_list }, 0, 0}, {
+		numb_case_11_2_3, tgrp_case_11_2_3, name_case_11_2_3, desc_case_11_2_3, sref_case_11_2_3, { &test_11_2_3_conn, &test_11_2_3_resp, &test_11_2_3_list }, 0, 0}, {
+		numb_case_11_2_4, tgrp_case_11_2_4, name_case_11_2_4, desc_case_11_2_4, sref_case_11_2_4, { &test_11_2_4_conn, &test_11_2_4_resp, &test_11_2_4_list }, 0, 0}, {
+		numb_case_11_2_5, tgrp_case_11_2_5, name_case_11_2_5, desc_case_11_2_5, sref_case_11_2_5, { &test_11_2_5_conn, &test_11_2_5_resp, &test_11_2_5_list }, 0, 0}, {
+		numb_case_11_2_6, tgrp_case_11_2_6, name_case_11_2_6, desc_case_11_2_6, sref_case_11_2_6, { &test_11_2_6_conn, &test_11_2_6_resp, &test_11_2_6_list }, 0, 0}, {
+		numb_case_11_2_7, tgrp_case_11_2_7, name_case_11_2_7, desc_case_11_2_7, sref_case_11_2_7, { &test_11_2_7_conn, &test_11_2_7_resp, &test_11_2_7_list }, 0, 0}, {
+		numb_case_11_2_8, tgrp_case_11_2_8, name_case_11_2_8, desc_case_11_2_8, sref_case_11_2_8, { &test_11_2_8_conn, &test_11_2_8_resp, &test_11_2_8_list }, 0, 0}, {
+		numb_case_11_2_9, tgrp_case_11_2_9, name_case_11_2_9, desc_case_11_2_9, sref_case_11_2_9, { &test_11_2_9_conn, &test_11_2_9_resp, &test_11_2_9_list }, 0, 0}, {
+		numb_case_11_2_10, tgrp_case_11_2_10, name_case_11_2_10, desc_case_11_2_10, sref_case_11_2_10, { &test_11_2_10_conn, &test_11_2_10_resp, &test_11_2_10_list }, 0, 0}, {
+		numb_case_11_2_11, tgrp_case_11_2_11, name_case_11_2_11, desc_case_11_2_11, sref_case_11_2_11, { &test_11_2_11_conn, &test_11_2_11_resp, &test_11_2_11_list }, 0, 0}, {
+		numb_case_11_2_12, tgrp_case_11_2_12, name_case_11_2_12, desc_case_11_2_12, sref_case_11_2_12, { &test_11_2_12_conn, &test_11_2_12_resp, &test_11_2_12_list }, 0, 0}, {
+		numb_case_11_2_13, tgrp_case_11_2_13, name_case_11_2_13, desc_case_11_2_13, sref_case_11_2_13, { &test_11_2_13_conn, &test_11_2_13_resp, &test_11_2_13_list }, 0, 0}, {
+		numb_case_11_2_14, tgrp_case_11_2_14, name_case_11_2_14, desc_case_11_2_14, sref_case_11_2_14, { &test_11_2_14_conn, &test_11_2_14_resp, &test_11_2_14_list }, 0, 0}, {
+		numb_case_11_2_15, tgrp_case_11_2_15, name_case_11_2_15, desc_case_11_2_15, sref_case_11_2_15, { &test_11_2_15_conn, &test_11_2_15_resp, &test_11_2_15_list }, 0, 0}, {
+		numb_case_11_2_16, tgrp_case_11_2_16, name_case_11_2_16, desc_case_11_2_16, sref_case_11_2_16, { &test_11_2_16_conn, &test_11_2_16_resp, &test_11_2_16_list }, 0, 0}, {
+		numb_case_11_2_17, tgrp_case_11_2_17, name_case_11_2_17, desc_case_11_2_17, sref_case_11_2_17, { &test_11_2_17_conn, &test_11_2_17_resp, &test_11_2_17_list }, 0, 0}, {
+		numb_case_11_3_1, tgrp_case_11_3_1, name_case_11_3_1, desc_case_11_3_1, sref_case_11_3_1, { &test_11_3_1_conn, &test_11_3_1_resp, &test_11_3_1_list }, 0, 0}, {
+		numb_case_11_3_2, tgrp_case_11_3_2, name_case_11_3_2, desc_case_11_3_2, sref_case_11_3_2, { &test_11_3_2_conn, &test_11_3_2_resp, &test_11_3_2_list }, 0, 0}, {
+		numb_case_11_3_3, tgrp_case_11_3_3, name_case_11_3_3, desc_case_11_3_3, sref_case_11_3_3, { &test_11_3_3_conn, &test_11_3_3_resp, &test_11_3_3_list }, 0, 0}, {
+		numb_case_11_3_4, tgrp_case_11_3_4, name_case_11_3_4, desc_case_11_3_4, sref_case_11_3_4, { &test_11_3_4_conn, &test_11_3_4_resp, &test_11_3_4_list }, 0, 0}, {
+		numb_case_11_3_5, tgrp_case_11_3_5, name_case_11_3_5, desc_case_11_3_5, sref_case_11_3_5, { &test_11_3_5_conn, &test_11_3_5_resp, &test_11_3_5_list }, 0, 0}, {
+		numb_case_11_3_6, tgrp_case_11_3_6, name_case_11_3_6, desc_case_11_3_6, sref_case_11_3_6, { &test_11_3_6_conn, &test_11_3_6_resp, &test_11_3_6_list }, 0, 0}, {
+		numb_case_11_3_7, tgrp_case_11_3_7, name_case_11_3_7, desc_case_11_3_7, sref_case_11_3_7, { &test_11_3_7_conn, &test_11_3_7_resp, &test_11_3_7_list }, 0, 0}, {
+		numb_case_11_3_8, tgrp_case_11_3_8, name_case_11_3_8, desc_case_11_3_8, sref_case_11_3_8, { &test_11_3_8_conn, &test_11_3_8_resp, &test_11_3_8_list }, 0, 0}, {
+		numb_case_11_3_9, tgrp_case_11_3_9, name_case_11_3_9, desc_case_11_3_9, sref_case_11_3_9, { &test_11_3_9_conn, &test_11_3_9_resp, &test_11_3_9_list }, 0, 0}, {
+		numb_case_11_3_10, tgrp_case_11_3_10, name_case_11_3_10, desc_case_11_3_10, sref_case_11_3_10, { &test_11_3_10_conn, &test_11_3_10_resp, &test_11_3_10_list }, 0, 0}, {
+		numb_case_11_3_11, tgrp_case_11_3_11, name_case_11_3_11, desc_case_11_3_11, sref_case_11_3_11, { &test_11_3_11_conn, &test_11_3_11_resp, &test_11_3_11_list }, 0, 0}, {
+		numb_case_11_3_12, tgrp_case_11_3_12, name_case_11_3_12, desc_case_11_3_12, sref_case_11_3_12, { &test_11_3_12_conn, &test_11_3_12_resp, &test_11_3_12_list }, 0, 0}, {
+		numb_case_11_3_13, tgrp_case_11_3_13, name_case_11_3_13, desc_case_11_3_13, sref_case_11_3_13, { &test_11_3_13_conn, &test_11_3_13_resp, &test_11_3_13_list }, 0, 0}, {
+		numb_case_11_3_14, tgrp_case_11_3_14, name_case_11_3_14, desc_case_11_3_14, sref_case_11_3_14, { &test_11_3_14_conn, &test_11_3_14_resp, &test_11_3_14_list }, 0, 0}, {
 	NULL,}
 };
 
