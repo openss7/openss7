@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/12 12:52:53 $ by $Author: brian $
+ Last Modified $Date: 2005/06/13 09:50:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -305,7 +305,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/12 12:52:53 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13027,7 +13027,7 @@ _ss_sock_state_change(long data)
 		read_lock(&sk->sk_callback_lock);
 		if (sk->sk_state_change == &ss_state_change) {
 			if ((ss = SOCK_PRIV(sk))) {
-				ss_putctl(ss, ss->rq, M_PCRSE, &_ss_sock_state_change, sk);
+				ss_putctl(ss, ss->rq, M_RSE, &_ss_sock_state_change, sk);
 			} else
 				assure(ss);
 		} else
