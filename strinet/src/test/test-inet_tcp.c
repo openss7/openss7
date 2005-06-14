@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 21:25:29 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:03 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/13 21:25:29 $ by $Author: brian $
+ Last Modified $Date: 2005/06/14 06:30:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.27  2005/06/14 06:30:03  brian
+ - a few more test cases
+
  Revision 0.9.2.26  2005/06/13 21:25:29  brian
  - added some connection acceptance tests
 
@@ -174,9 +177,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 21:25:29 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:03 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 21:25:29 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:03 $";
 
 /*
  *  Simple test program for INET streams.
@@ -4412,6 +4415,7 @@ static int postamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 0
 static int postamble_1e(int child)
 {
 	int failed = -1;
@@ -4445,6 +4449,7 @@ static int postamble_1e(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+#endif
 
 static int preamble_2_conn(int child)
 {
@@ -5527,14 +5532,14 @@ int test_case_1_4_3(int child)
 int test_case_1_4_3_conn(int child)
 {
 	if (last_info.SERV_type != T_CLTS) {
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = "Synchornization test data.";
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		test_data = "Synchornization test data.";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 	}
 	if (test_case_1_4_3(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -5547,9 +5552,9 @@ int test_case_1_4_3_conn(int child)
 int test_case_1_4_3_resp(int child)
 {
 	if (last_info.SERV_type != T_CLTS) {
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 	}
 	if (test_case_1_4_3(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -16067,7 +16072,7 @@ int test_case_1_10_3(int child)
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
@@ -20622,6 +20627,7 @@ struct test_stream test_3_3_conn = { &preamble_3_3_conn, &test_case_3_3_conn, &p
 struct test_stream test_3_3_resp = { &preamble_3_3_resp, &test_case_3_3_resp, &postamble_3_3_resp };
 struct test_stream test_3_3_list = { &preamble_3_3_list, &test_case_3_3_list, &postamble_3_3_list };
 
+
 /*
  *  Attempt and delayed refuse a connection request.
  */
@@ -20670,9 +20676,21 @@ int test_case_3_4_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 		test_sleep(child, 5);
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -20750,6 +20768,334 @@ int test_case_3_4_list(int child)
 struct test_stream test_3_4_conn = { &preamble_3_4_conn, &test_case_3_4_conn, &postamble_3_4_conn };
 struct test_stream test_3_4_resp = { &preamble_3_4_resp, &test_case_3_4_resp, &postamble_3_4_resp };
 struct test_stream test_3_4_list = { &preamble_3_4_list, &test_case_3_4_list, &postamble_3_4_list };
+
+
+#define tgrp_case_3_5 test_group_3
+#define numb_case_3_5 "3.5"
+#define name_case_3_5 "Double attempt a connection request."
+#define sref_case_3_5 "(none)"
+#define desc_case_3_5 "\
+Attempts a connection request twice to the same address.  The second request is\n\
+made either in the awaiting confirmation of connection request state.  This is\n\
+to check that the second connection request is refused with a TOUTSTATE error."
+
+int test_case_3_5_conn(int child)
+{
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		test_msleep(child, SHORT_WAIT);
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+			goto failure;
+		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_3_5_resp(int child)
+{
+	test_sleep(child, 6);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int test_case_3_5_list(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_sleep(child, 5);
+	state++;
+	test_data = NULL;
+	last_sequence = last_sequence;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_3_5_conn	preamble_1s
+#define preamble_3_5_resp	preamble_1s
+#define preamble_3_5_list	preamble_1s
+
+#define postamble_3_5_conn	postamble_1
+#define postamble_3_5_resp	postamble_1
+#define postamble_3_5_list	postamble_1
+
+struct test_stream test_3_5_conn = { &preamble_3_5_conn, &test_case_3_5_conn, &postamble_3_5_conn };
+struct test_stream test_3_5_resp = { &preamble_3_5_resp, &test_case_3_5_resp, &postamble_3_5_resp };
+struct test_stream test_3_5_list = { &preamble_3_5_list, &test_case_3_5_list, &postamble_3_5_list };
+
+
+#define tgrp_case_3_6 test_group_3
+#define numb_case_3_6 "3.6"
+#define name_case_3_6 "Attempt a connection request from the unbound state."
+#define sref_case_3_6 "(none)"
+#define desc_case_3_6 "\
+Attempts a connection request from the unbound state.  This is to check that\n\
+the connection request is refused with a TOUTSTATE error.  The test then\n\
+properly completes a connection to ensure that the state machine continues to\n\
+work correctly."
+
+int test_case_3_6_conn(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_3_6_resp(int child)
+{
+	test_sleep(child, 6);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int test_case_3_6_list(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_sleep(child, 5);
+	state++;
+	test_data = NULL;
+	last_sequence = last_sequence;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_3_6_conn	preamble_0
+#define preamble_3_6_resp	preamble_1s
+#define preamble_3_6_list	preamble_1s
+
+#define postamble_3_6_conn	postamble_1
+#define postamble_3_6_resp	postamble_1
+#define postamble_3_6_list	postamble_1
+
+struct test_stream test_3_6_conn = { &preamble_3_6_conn, &test_case_3_6_conn, &postamble_3_6_conn };
+struct test_stream test_3_6_resp = { &preamble_3_6_resp, &test_case_3_6_resp, &postamble_3_6_resp };
+struct test_stream test_3_6_list = { &preamble_3_6_list, &test_case_3_6_list, &postamble_3_6_list };
 
 
 #define test_group_4 "Connection and disconnection -- successful"
@@ -21213,6 +21559,782 @@ int test_case_4_1_4_list(int child)
 struct test_stream test_4_1_4_conn = { &preamble_4_1_4_conn, &test_case_4_1_4_conn, &postamble_4_1_4_conn };
 struct test_stream test_4_1_4_resp = { &preamble_4_1_4_resp, &test_case_4_1_4_resp, &postamble_4_1_4_resp };
 struct test_stream test_4_1_4_list = { &preamble_4_1_4_list, &test_case_4_1_4_list, &postamble_4_1_4_list };
+
+
+
+/*
+ *  Attempt to connect in the data transfer state.
+ */
+#define tgrp_case_4_1_5 test_group_4
+#define numb_case_4_1_5 "4.1.5"
+#define name_case_4_1_5 "Attempt a connection in the data transfer state."
+#define sref_case_4_1_5 sref_case_4_1
+#define desc_case_4_1_5 "\
+Attempt and accept a connection.  Next attempt another connection in the data\n\
+transfer state.  This second attempt should fail with error TOUTSTATE.  The\n\
+complete and disconnection of the connection to ensure that the state machine\n\
+continues to function correctly."
+
+int test_case_4_1_5_conn(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_5_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_5_list(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_5_conn	preamble_1
+#define preamble_4_1_5_resp	preamble_1
+#define preamble_4_1_5_list	preamble_1
+
+#define postamble_4_1_5_conn	postamble_2_conn
+#define postamble_4_1_5_resp	postamble_2_resp
+#define postamble_4_1_5_list	postamble_2_list
+
+struct test_stream test_4_1_5_conn = { &preamble_4_1_5_conn, &test_case_4_1_5_conn, &postamble_4_1_5_conn };
+struct test_stream test_4_1_5_resp = { &preamble_4_1_5_resp, &test_case_4_1_5_resp, &postamble_4_1_5_resp };
+struct test_stream test_4_1_5_list = { &preamble_4_1_5_list, &test_case_4_1_5_list, &postamble_4_1_5_list };
+
+
+/*
+ *  Connect and disconnect two connections in sequence.
+ */
+#define tgrp_case_4_1_6 test_group_4
+#define numb_case_4_1_6 "4.1.6"
+#define name_case_4_1_6 "Attempt a two consecutive connections, no unbind."
+#define sref_case_4_1_6 sref_case_4_1
+#define desc_case_4_1_6 "\
+Attempt and accept a connection, disconnect, and then attempt and disconnect\n\
+again without unbinding.  This checks that the state machine works correctly\n\
+after completing a connection cycle."
+
+int test_case_4_1_6_conn(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Synchronizing test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	/* ---- */
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Synchronizing test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_6_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Synchronizing test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	/* ---- */
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Synchronizing test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_6_list(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	/* ---- */
+	/* ---- */
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_6_conn	preamble_1
+#define preamble_4_1_6_resp	preamble_1
+#define preamble_4_1_6_list	preamble_1
+
+#define postamble_4_1_6_conn	postamble_2_conn
+#define postamble_4_1_6_resp	postamble_2_resp
+#define postamble_4_1_6_list	postamble_2_list
+
+struct test_stream test_4_1_6_conn = { &preamble_4_1_6_conn, &test_case_4_1_6_conn, &postamble_4_1_6_conn };
+struct test_stream test_4_1_6_resp = { &preamble_4_1_6_resp, &test_case_4_1_6_resp, &postamble_4_1_6_resp };
+struct test_stream test_4_1_6_list = { &preamble_4_1_6_list, &test_case_4_1_6_list, &postamble_4_1_6_list };
+
+
+/*
+ *  Connect and disconnect two connections in sequence.
+ */
+#define tgrp_case_4_1_7 test_group_4
+#define numb_case_4_1_7 "4.1.7"
+#define name_case_4_1_7 "Attempt a two consecutive connections, with unbind."
+#define sref_case_4_1_7 sref_case_4_1
+#define desc_case_4_1_7 "\
+Attempt and accept a connection, disconnect, and then attempt and disconnect\n\
+again with unbinding.  This checks that the state machine works correctly\n\
+after completing a connection cycle."
+
+int preamble_4_1_7(int child)
+{
+	union T_primitives *p = (typeof(p)) cbuf;
+	struct {
+		struct t_opthdr opt_hdr;
+		t_scalar_t opt_val;
+	} options = {
+		{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), T_INET_IP, T_IP_REUSEADDR, T_SUCCESS }, T_YES
+	};
+	test_opts = &options;
+	test_olen = sizeof(options);
+	test_mgmtflags = T_NEGOTIATE;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_7_conn	preamble_4_1_7
+#define preamble_4_1_7_resp	preamble_4_1_7
+#define preamble_4_1_7_list	preamble_4_1_7
+
+int midamble_4_1_7_conn(int child)
+{
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int midamble_4_1_7_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int midamble_4_1_7_list(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_conn_part(int child)
+{
+	test_msleep(child, LONG_WAIT);
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	test_data = "Synchronization test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT << 1, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_resp_part(int child)
+{
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (expect(child, LONGER_WAIT << 3, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	test_data = "Synchronization test data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_list_part(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, SHORT_WAIT);
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_conn(int child)
+{
+	if (test_case_4_1_7_conn_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_conn(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (preamble_4_1_7(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (test_case_4_1_7_conn_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_conn(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_resp(int child)
+{
+	if (test_case_4_1_7_resp_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_resp(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (preamble_4_1_7(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (test_case_4_1_7_resp_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_resp(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_7_list(int child)
+{
+	if (test_case_4_1_7_list_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_list(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (preamble_4_1_7(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (test_case_4_1_7_list_part(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* ---- */
+	if (midamble_4_1_7_list(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define postamble_4_1_7_conn	postamble_0
+#define postamble_4_1_7_resp	postamble_0
+#define postamble_4_1_7_list	postamble_0
+
+struct test_stream test_4_1_7_conn = { &preamble_4_1_7_conn, &test_case_4_1_7_conn, &postamble_4_1_7_conn };
+struct test_stream test_4_1_7_resp = { &preamble_4_1_7_resp, &test_case_4_1_7_resp, &postamble_4_1_7_resp };
+struct test_stream test_4_1_7_list = { &preamble_4_1_7_list, &test_case_4_1_7_list, &postamble_4_1_7_list };
+
+
+/*
+ *  Double connection response.
+ */
+#define tgrp_case_4_1_8 test_group_4
+#define numb_case_4_1_8 "4.1.8"
+#define name_case_4_1_8 "Connect with double connection response attempt, different stream."
+#define sref_case_4_1_8 sref_case_4_1
+#define desc_case_4_1_8 "\
+Attempt a connection and accept on a separate stream twice.  The second\n\
+connection respose is issued in the TS_IDLE state for the listening stream and\n\
+should fail with error TOUTSTATE.  The connection transfers data and disconnects\n\
+to ensure that the state machine remains correct."
+
+int test_case_4_1_8_conn(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_8_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_8_list(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_8_conn	preamble_1
+#define preamble_4_1_8_resp	preamble_1
+#define preamble_4_1_8_list	preamble_1
+
+#define postamble_4_1_8_conn	postamble_2_conn
+#define postamble_4_1_8_resp	postamble_2_resp
+#define postamble_4_1_8_list	postamble_2_list
+
+struct test_stream test_4_1_8_conn = { &preamble_4_1_8_conn, &test_case_4_1_8_conn, &postamble_4_1_8_conn };
+struct test_stream test_4_1_8_resp = { &preamble_4_1_8_resp, &test_case_4_1_8_resp, &postamble_4_1_8_resp };
+struct test_stream test_4_1_8_list = { &preamble_4_1_8_list, &test_case_4_1_8_list, &postamble_4_1_8_list };
+
+
+/*
+ *  Double connection response.
+ */
+#define tgrp_case_4_1_9 test_group_4
+#define numb_case_4_1_9 "4.1.9"
+#define name_case_4_1_9 "Connect with double connection response attempt, same stream."
+#define sref_case_4_1_9 sref_case_4_1
+#define desc_case_4_1_9 "\
+Attempt a connection and accept on the same stream twice.  The second connection\n\
+respose is issued in the TS_DATA_XFER state for the listening stream and should\n\
+fail with error TOUTSTATE.  The connection transfers data and disconnects to\n\
+ensure that the state machine remains correct."
+
+int test_case_4_1_9_conn(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_9_resp(int child)
+{
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_4_1_9_list(int child)
+{
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[2];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_resfd = test_fd[2];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_4_1_9_conn	preamble_1
+#define preamble_4_1_9_resp	preamble_1
+#define preamble_4_1_9_list	preamble_1
+
+#define postamble_4_1_9_conn	postamble_2_conn
+#define postamble_4_1_9_resp	postamble_2_list
+#define postamble_4_1_9_list	postamble_2_resp
+
+struct test_stream test_4_1_9_conn = { &preamble_4_1_9_conn, &test_case_4_1_9_conn, &postamble_4_1_9_conn };
+struct test_stream test_4_1_9_resp = { &preamble_4_1_9_resp, &test_case_4_1_9_resp, &postamble_4_1_9_resp };
+struct test_stream test_4_1_9_list = { &preamble_4_1_9_list, &test_case_4_1_9_list, &postamble_4_1_9_list };
 
 
 /*
@@ -24916,52 +26038,6 @@ struct test_stream test_5_4_conn = { &preamble_5_4_conn, &test_case_5_4_conn, &p
 struct test_stream test_5_4_resp = { &preamble_5_4_resp, &test_case_5_4_resp, &postamble_5_4_resp };
 struct test_stream test_5_4_list = { &preamble_5_4_list, &test_case_5_4_list, &postamble_5_4_list };
 
-/*
- *  Negative test cases on connectionless primitives.
- */
-#define test_group_6 "Unsupported primitives"
-#define tgrp_case_6_1 test_group_6
-#define numb_case_6_1 "6.1"
-#define name_case_6_1 "Unsupported T_UNITDATA_REQ."
-#define sref_case_6_1 "(none)"
-#define desc_case_6_1 "\
-Attempts to invoke connectionless primitives.\n\
-- T_UNITDATA_REQ."
-
-int test_case_6_1(int child)
-{
-	static char dat[] = "Dummy message.";
-	test_addr = &addrs[0];
-	test_alen = sizeof(addrs[0]);
-	test_data = dat;
-	test_opts = &opt_data;
-	test_olen = sizeof(opt_data);
-	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS || last_errno != EPROTO)
-		goto failure;
-	state++;
-	return (__RESULT_SUCCESS);
-      failure:
-	return (__RESULT_FAILURE);
-}
-
-#define test_case_6_1_conn	test_case_6_1
-#define test_case_6_1_resp	test_case_6_1
-#define test_case_6_1_list	test_case_6_1
-
-#define preamble_6_1_conn	preamble_1s
-#define preamble_6_1_resp	preamble_1s
-#define preamble_6_1_list	preamble_1s
-
-#define postamble_6_1_conn	postamble_1e
-#define postamble_6_1_resp	postamble_1e
-#define postamble_6_1_list	postamble_1e
-
-struct test_stream test_6_1_conn = { &preamble_6_1_conn, &test_case_6_1_conn, &postamble_6_1_conn };
-struct test_stream test_6_1_resp = { &preamble_6_1_resp, &test_case_6_1_resp, &postamble_6_1_resp };
-struct test_stream test_6_1_list = { &preamble_6_1_list, &test_case_6_1_list, &postamble_6_1_list };
 
 #define test_group_11_1 "Primitives in error -- too short"
 
@@ -27157,10 +28233,17 @@ struct test_case {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, { &test_3_2_conn, &test_3_2_resp, &test_3_2_list }, 0, 0}, {
 		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, { &test_3_3_conn, &test_3_3_resp, &test_3_3_list }, 0, 0}, {
 		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, { &test_3_4_conn, &test_3_4_resp, &test_3_4_list }, 0, 0}, {
+		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, { &test_3_5_conn, &test_3_5_resp, &test_3_5_list }, 0, 0}, {
+		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, { &test_3_6_conn, &test_3_6_resp, &test_3_6_list }, 0, 0}, {
 		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, { &test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list }, 0, 0}, {
 		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, { &test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list }, 0, 0}, {
 		numb_case_4_1_3, tgrp_case_4_1_3, name_case_4_1_3, desc_case_4_1_3, sref_case_4_1_3, { &test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list }, 0, 0}, {
 		numb_case_4_1_4, tgrp_case_4_1_4, name_case_4_1_4, desc_case_4_1_4, sref_case_4_1_4, { &test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list }, 0, 0}, {
+		numb_case_4_1_5, tgrp_case_4_1_5, name_case_4_1_5, desc_case_4_1_5, sref_case_4_1_5, { &test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list }, 0, 0}, {
+		numb_case_4_1_6, tgrp_case_4_1_6, name_case_4_1_6, desc_case_4_1_6, sref_case_4_1_6, { &test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list }, 0, 0}, {
+		numb_case_4_1_7, tgrp_case_4_1_7, name_case_4_1_7, desc_case_4_1_7, sref_case_4_1_7, { &test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list }, 0, 0}, {
+		numb_case_4_1_8, tgrp_case_4_1_8, name_case_4_1_8, desc_case_4_1_8, sref_case_4_1_8, { &test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list }, 0, 0}, {
+		numb_case_4_1_9, tgrp_case_4_1_9, name_case_4_1_9, desc_case_4_1_9, sref_case_4_1_9, { &test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list }, 0, 0}, {
 		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, { &test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list }, 0, 0}, {
 		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, { &test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list }, 0, 0}, {
 		numb_case_4_3_1_1, tgrp_case_4_3_1_1, name_case_4_3_1_1, desc_case_4_3_1_1, sref_case_4_3_1_1, { &test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list }, 0, 0}, {
@@ -27230,7 +28313,6 @@ struct test_case {
 		numb_case_5_2, tgrp_case_5_2, name_case_5_2, desc_case_5_2, sref_case_5_2, { &test_5_2_conn, &test_5_2_resp, &test_5_2_list }, 0, 0}, {
 		numb_case_5_3, tgrp_case_5_3, name_case_5_3, desc_case_5_3, sref_case_5_3, { &test_5_3_conn, &test_5_3_resp, &test_5_3_list }, 0, 0}, {
 		numb_case_5_4, tgrp_case_5_4, name_case_5_4, desc_case_5_4, sref_case_5_4, { &test_5_4_conn, &test_5_4_resp, &test_5_4_list }, 0, 0}, {
-		numb_case_6_1, tgrp_case_6_1, name_case_6_1, desc_case_6_1, sref_case_6_1, { &test_6_1_conn, &test_6_1_resp, &test_6_1_list }, 0, 0}, {
 		numb_case_11_1_1, tgrp_case_11_1_1, name_case_11_1_1, desc_case_11_1_1, sref_case_11_1_1, { &test_11_1_1_conn, &test_11_1_1_resp, &test_11_1_1_list }, 0, 0}, {
 		numb_case_11_1_2, tgrp_case_11_1_2, name_case_11_1_2, desc_case_11_1_2, sref_case_11_1_2, { &test_11_1_2_conn, &test_11_1_2_resp, &test_11_1_2_list }, 0, 0}, {
 		numb_case_11_1_3, tgrp_case_11_1_3, name_case_11_1_3, desc_case_11_1_3, sref_case_11_1_3, { &test_11_1_3_conn, &test_11_1_3_resp, &test_11_1_3_list }, 0, 0}, {

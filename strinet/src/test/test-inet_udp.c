@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 11:20:54 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:05 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/13 11:20:54 $ by $Author: brian $
+ Last Modified $Date: 2005/06/14 06:30:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.27  2005/06/14 06:30:05  brian
+ - a few more test cases
+
  Revision 0.9.2.26  2005/06/13 11:20:54  brian
  - added bug test case, a few timing corrections
 
@@ -189,9 +192,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 11:20:54 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:05 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/13 11:20:54 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/14 06:30:05 $";
 
 /*
  *  Simple test program for INET streams.
@@ -5532,14 +5535,14 @@ int test_case_1_4_3(int child)
 int test_case_1_4_3_conn(int child)
 {
 	if (last_info.SERV_type != T_CLTS) {
-	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	test_data = "Synchornization test data.";
-	MORE_flag = 0;
-	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		test_data = "Synchornization test data.";
+		MORE_flag = 0;
+		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 	}
 	if (test_case_1_4_3(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -5552,9 +5555,9 @@ int test_case_1_4_3_conn(int child)
 int test_case_1_4_3_resp(int child)
 {
 	if (last_info.SERV_type != T_CLTS) {
-	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
+		if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
 	}
 	if (test_case_1_4_3(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -16068,7 +16071,7 @@ int test_case_1_10_3(int child)
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
@@ -20623,6 +20626,7 @@ struct test_stream test_3_3_conn = { &preamble_3_3_conn, &test_case_3_3_conn, &p
 struct test_stream test_3_3_resp = { &preamble_3_3_resp, &test_case_3_3_resp, &postamble_3_3_resp };
 struct test_stream test_3_3_list = { &preamble_3_3_list, &test_case_3_3_list, &postamble_3_3_list };
 
+
 /*
  *  Attempt and delayed refuse a connection request.
  */
@@ -20671,9 +20675,21 @@ int test_case_3_4_conn(int child)
 		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
 		test_sleep(child, 5);
 		state++;
-		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	default:
@@ -20687,8 +20703,8 @@ int test_case_3_4_conn(int child)
 
 int test_case_3_4_resp(int child)
 {
-	//test_sleep(child, 6);
-	//state++;
+	test_sleep(child, 6);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 
@@ -20753,7 +20769,335 @@ struct test_stream test_3_4_resp = { &preamble_3_4_resp, &test_case_3_4_resp, &p
 struct test_stream test_3_4_list = { &preamble_3_4_list, &test_case_3_4_list, &postamble_3_4_list };
 
 
-#define test_group_4 "Connection and disconnection."
+#define tgrp_case_3_5 test_group_3
+#define numb_case_3_5 "3.5"
+#define name_case_3_5 "Double attempt a connection request."
+#define sref_case_3_5 "(none)"
+#define desc_case_3_5 "\
+Attempts a connection request twice to the same address.  The second request is\n\
+made either in the awaiting confirmation of connection request state.  This is\n\
+to check that the second connection request is refused with a TOUTSTATE error."
+
+int test_case_3_5_conn(int child)
+{
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		test_msleep(child, SHORT_WAIT);
+		state++;
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+			goto failure;
+		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_3_5_resp(int child)
+{
+	test_sleep(child, 6);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int test_case_3_5_list(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_sleep(child, 5);
+	state++;
+	test_data = NULL;
+	last_sequence = last_sequence;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_3_5_conn	preamble_1s
+#define preamble_3_5_resp	preamble_1s
+#define preamble_3_5_list	preamble_1s
+
+#define postamble_3_5_conn	postamble_1
+#define postamble_3_5_resp	postamble_1
+#define postamble_3_5_list	postamble_1
+
+struct test_stream test_3_5_conn = { &preamble_3_5_conn, &test_case_3_5_conn, &postamble_3_5_conn };
+struct test_stream test_3_5_resp = { &preamble_3_5_resp, &test_case_3_5_resp, &postamble_3_5_resp };
+struct test_stream test_3_5_list = { &preamble_3_5_list, &test_case_3_5_list, &postamble_3_5_list };
+
+
+#define tgrp_case_3_6 test_group_3
+#define numb_case_3_6 "3.6"
+#define name_case_3_6 "Attempt a connection request from the unbound state."
+#define sref_case_3_6 "(none)"
+#define desc_case_3_6 "\
+Attempts a connection request from the unbound state.  This is to check that\n\
+the connection request is refused with a TOUTSTATE error.  The test then\n\
+properly completes a connection to ensure that the state machine continues to\n\
+work correctly."
+
+int test_case_3_6_conn(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+		expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __TEST_CONN_CON:
+			if (test_level == T_INET_TCP)
+				break;
+			goto failure;
+		case __EVENT_NO_MSG:
+			break;
+		default:
+			goto failure;
+		}
+		state++;
+		test_sleep(child, 5);
+		state++;
+		if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_3_6_resp(int child)
+{
+	test_sleep(child, 6);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int test_case_3_6_list(int child)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	test_sleep(child, 5);
+	state++;
+	test_data = NULL;
+	last_sequence = last_sequence;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	switch (last_info.SERV_type) {
+	case T_CLTS:
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TNOTSUPPORT)
+			goto failure;
+		break;
+	case T_COTS:
+	case T_COTS_ORD:
+		if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+#define preamble_3_6_conn	preamble_0
+#define preamble_3_6_resp	preamble_1s
+#define preamble_3_6_list	preamble_1s
+
+#define postamble_3_6_conn	postamble_1
+#define postamble_3_6_resp	postamble_1
+#define postamble_3_6_list	postamble_1
+
+struct test_stream test_3_6_conn = { &preamble_3_6_conn, &test_case_3_6_conn, &postamble_3_6_conn };
+struct test_stream test_3_6_resp = { &preamble_3_6_resp, &test_case_3_6_resp, &postamble_3_6_resp };
+struct test_stream test_3_6_list = { &preamble_3_6_list, &test_case_3_6_list, &postamble_3_6_list };
+
+
+#define test_group_4 "Connection and disconnection -- successful"
 
 /*
  *  Connect with options.
@@ -25988,6 +26332,8 @@ struct test_case {
 		numb_case_3_2, tgrp_case_3_2, name_case_3_2, desc_case_3_2, sref_case_3_2, { &test_3_2_conn, &test_3_2_resp, &test_3_2_list }, 0, 0}, {
 		numb_case_3_3, tgrp_case_3_3, name_case_3_3, desc_case_3_3, sref_case_3_3, { &test_3_3_conn, &test_3_3_resp, &test_3_3_list }, 0, 0}, {
 		numb_case_3_4, tgrp_case_3_4, name_case_3_4, desc_case_3_4, sref_case_3_4, { &test_3_4_conn, &test_3_4_resp, &test_3_4_list }, 0, 0}, {
+		numb_case_3_5, tgrp_case_3_5, name_case_3_5, desc_case_3_5, sref_case_3_5, { &test_3_5_conn, &test_3_5_resp, &test_3_5_list }, 0, 0}, {
+		numb_case_3_6, tgrp_case_3_6, name_case_3_6, desc_case_3_6, sref_case_3_6, { &test_3_6_conn, &test_3_6_resp, &test_3_6_list }, 0, 0}, {
 		numb_case_4_3_1_1, tgrp_case_4_3_1_1, name_case_4_3_1_1, desc_case_4_3_1_1, sref_case_4_3_1_1, { &test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list }, 0, 0}, {
 		numb_case_4_3_1_2, tgrp_case_4_3_1_2, name_case_4_3_1_2, desc_case_4_3_1_2, sref_case_4_3_1_2, { &test_4_3_1_2_conn, &test_4_3_1_2_resp, &test_4_3_1_2_list }, 0, 0}, {
 		numb_case_4_3_1_3, tgrp_case_4_3_1_3, name_case_4_3_1_3, desc_case_4_3_1_3, sref_case_4_3_1_3, { &test_4_3_1_3_conn, &test_4_3_1_3_resp, &test_4_3_1_3_list }, 0, 0}, {
