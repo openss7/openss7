@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-inet_sctp.at,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/06/14 23:02:33 $
+dnl @(#) $RCSfile: testsuite-inet_sctp.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/06/15 13:11:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,17 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/14 23:02:33 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/15 13:11:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-inet_sctp.at,v $
+dnl Revision 0.9.2.5  2005/06/15 13:11:46  brian
+dnl - a few corrections
+dnl
+dnl Revision 0.9.2.4  2005/06/15 12:36:41  brian
+dnl - added negative test cases
+dnl
 dnl Revision 0.9.2.3  2005/06/14 23:02:33  brian
 dnl - additional test cases for flushing and capabilities request
 dnl
@@ -4704,9 +4710,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.1])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4717,9 +4721,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.2])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4730,9 +4732,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.3])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4743,9 +4743,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.4])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4756,9 +4754,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.5])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4769,9 +4765,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.6])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4782,9 +4776,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.7])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4795,9 +4787,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.8])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4808,9 +4798,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.9])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4821,9 +4809,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.10])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4834,9 +4820,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.11])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4847,9 +4831,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.12])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4860,9 +4842,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.1.13])
 AT_KEYWORDS([sctp tooshort])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4873,9 +4853,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.1])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4886,9 +4864,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.2])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4899,9 +4875,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.3])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4912,9 +4886,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.4])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4925,9 +4897,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.5])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4938,9 +4908,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.6])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4951,9 +4919,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.7])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4964,9 +4930,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.8])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4977,9 +4941,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.9])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -4990,9 +4952,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.10])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5003,9 +4963,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.11])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5016,9 +4974,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.12])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5029,9 +4985,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.13])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5042,9 +4996,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.14])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5055,9 +5007,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.15])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5068,9 +5018,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.16])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5081,9 +5029,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.2.17])
 AT_KEYWORDS([sctp badprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5094,9 +5040,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.1])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5107,9 +5051,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.2])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5120,9 +5062,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.3])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5133,9 +5073,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.4])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5146,9 +5084,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.5])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5159,9 +5095,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.6])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5172,9 +5106,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.7])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5185,9 +5117,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.8])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5198,9 +5128,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.9])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5211,9 +5139,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.10])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5224,9 +5150,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.11])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5237,9 +5161,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.12])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5250,9 +5172,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.13])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5263,9 +5183,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 11.3.14])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5276,9 +5194,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.1])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5289,9 +5205,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.1])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5302,9 +5216,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.2])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5315,9 +5227,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.2.3])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5328,9 +5238,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.1])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5341,9 +5249,7 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.2])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -5354,14 +5260,1579 @@ AT_CLEANUP
 
 AT_SETUP([sctp test 12.3.3])
 AT_KEYWORDS([sctp unsupprim])
-AT_XFAIL_IF([test `id -u` -ne 0])
 AT_CHECK([
-    if test `id -u` -ne 0 ; then exit 77 ; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; fi
     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     test-inet_sctp $options -e -o 12.3.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.6.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.6.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.2.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.2.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.3.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.3.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.3.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_XFAIL_IF([true])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.8.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.8.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.4.9])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.4.9
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.8])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.8
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.9.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.9.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.10])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.10
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.11])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.11
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.12])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.12
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.5.13])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.5.13
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.1.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_XFAIL_IF([true])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.1.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.1.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.6.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.6.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.5.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.5.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.5.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.7.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.7.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.1.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_XFAIL_IF([true])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.1.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.1.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.8.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.8.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.9.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.9.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.9.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.9.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.10.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.10.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.10.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.10.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.10.1.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_XFAIL_IF([true])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.10.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.10.1.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.10.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.10.1.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.10.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.11.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.11.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.12.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.12.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.12.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.12.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.12.1.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.12.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.12.1.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.12.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.12.1.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.12.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_XFAIL_IF([true])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.2.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.2.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.13.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.13.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.14.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.14.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 13.14.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 13.14.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.1.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.1.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.2.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.2.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.3.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.3.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.4.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.4.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.5.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.5.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.6.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.6.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.6.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.6.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.7.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.7.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.7.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.7.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.7.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.7.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.7.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.7.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.7.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.7.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.8.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.8.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.8.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.8.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.9.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.9.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.10.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.10.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.10.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.10.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.3])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.3
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.4])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.4
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.5])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.5
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.6])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.6
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.11.7])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.11.7
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.12.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.12.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.12.2])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.12.2
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.13.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.13.1
+    ], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([sctp test 14.14.1])
+AT_KEYWORDS([sctp unsupprim])
+AT_CHECK([
+    if test $at_verbose = echo ; then options='--verbose=5' ; fi
+    if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+    test-inet_sctp $options -e -o 14.14.1
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
