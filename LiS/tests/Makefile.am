@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.8 $) $Date: 2005/05/30 14:25:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.4.9 $) $Date: 2005/06/15 00:46:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
+# Last Modified $Date: 2005/06/15 00:46:04 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.4.9  2005/06/15 00:46:04  brian
+# - corrected a couple targets
+#
 # Revision 1.1.4.8  2005/05/30 14:25:54  brian
 # - packaged standalong test suites
 #
@@ -131,7 +134,7 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITE)
+all-testsuite: $(TESTSUITE) atconfig atlocal
 
 if PERFORM_TESTING
 ## PERFORM_TESTING
@@ -169,9 +172,11 @@ clean-testsuite:
 	done
 
 CLEANFILES		+= \
-			atconfig \
-			atlocal \
 			package.m4
+
+DISTCLEANFILES		+= \
+			atconfig \
+			atlocal
 
 ALL_LOCAL += all-testsuite
 
