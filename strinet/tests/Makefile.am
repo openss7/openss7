@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/30 14:25:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/14 23:02:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/30 14:25:56 $ by $Author: brian $
+# Last Modified $Date: 2005/06/14 23:02:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2005/06/14 23:02:33  brian
+# - additional test cases for flushing and capabilities request
+#
 # Revision 0.9.2.7  2005/05/30 14:25:56  brian
 # - packaged standalong test suites
 #
@@ -105,6 +108,10 @@ package.m4: $(top_srcdir)/configure
 # my rule
 TESTSUITE_DEPS		= \
 			kernel.at \
+			$(TESTSUITE)-inet_raw.at \
+			$(TESTSUITE)-inet_udp.at \
+			$(TESTSUITE)-inet_tcp.at \
+			$(TESTSUITE)-inet_sctp.at \
 			$(TESTSUITE).at \
 			local.at \
 			package.m4
@@ -123,7 +130,7 @@ atconfig: $(top_builddir)/config.status
 #	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
 
 # my rule
-all-testsuite: $(TESTSUITE)
+all-testsuite: $(TESTSUITE) atconfig atlocal
 
 if PERFORM_TESTING
 ## PERFORM_TESTING
@@ -161,9 +168,11 @@ clean-testsuite:
 	done
 
 CLEANFILES		+= \
-			atconfig \
-			atlocal \
 			package.m4
+
+DISTCLEANFILES		+= \
+			atconfig \
+			atlocal
 
 ALL_LOCAL += all-testsuite
 
