@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/06/14 23:01:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/13 09:50:42 $ by $Author: brian $
+ Last Modified $Date: 2005/06/14 23:01:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/06/14 23:01:48 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/06/14 23:01:48 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -305,7 +305,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/13 09:50:42 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/06/14 23:01:48 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12674,15 +12674,19 @@ t_addr_ack(queue_t *q, struct sockaddr *loc, struct sockaddr *rem)
 /*
  *  T_CAPABILITY_ACK    ?? - Protocol Capability Ack
  *  -------------------------------------------------------------------------
+ *  Note that TPI Version 2 Draft 2 says that if the T_CAPABILITY_REQ is sent as
+ *  a M_PCPROTO then the the T_CAPABILITY_ACK must be sent as an M_PCPROTO and
+ *  that if the T_CAPABILITY_REQ was sent as a M_PROTO, then the
+ *  T_CAPABILITY_ACK must also be sent as a M_PROTO.
  */
 STATIC int
-t_capability_ack(queue_t *q, ulong caps)
+t_capability_ack(queue_t *q, ulong caps, int type)
 {
 	ss_t *ss = PRIV(q);
 	mblk_t *mp;
 	struct T_capability_ack *p;
 	if ((mp = ss_allocb(q, sizeof(*p), BPRI_MED))) {
-		mp->b_datap->db_type = M_PCPROTO;
+		mp->b_datap->db_type = type;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps & (TC1_INFO | TC1_ACCEPTOR_ID);
@@ -14050,7 +14054,7 @@ t_capability_req(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	(void) ss;
-	return t_capability_ack(q, p->CAP_bits1);
+	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
       einval:
 	err = -EINVAL;
 	ptrace(("%s: ERROR: invalid message format\n", DRV_NAME));
@@ -14532,12 +14536,24 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	case SOCK_STREAM:
 	case SOCK_SEQPACKET:
 		switch (ss_get_state(ss)) {
-		default:
+		case TS_WCON_CREQ:
+		case TS_DATA_XFER:
+		case TS_WIND_ORDREL:
+		case TS_WREQ_ORDREL:
+			switch (-err) {
+			case ECONNREFUSED:
+			case EPIPE:
+			case ECONNRESET:
+				return (t_discon_ind(q, NULL, T_PROVIDER, 0, NULL, NULL));
+			default:
+				return (QR_DONE);
+			}
 #if 0
 			fixme(("%s: %p: FIXME: save errors for later\n", DRV_NAME, ss));
 #endif
-			return (QR_DONE);
+		default:
 		case TS_IDLE:
+		case TS_WRES_CIND:
 			printd(("%s: %p: INFO: ignoring error event %d\n", DRV_NAME, ss, err));
 			return (QR_DONE);
 		}
