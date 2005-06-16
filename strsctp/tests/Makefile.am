@@ -1,7 +1,7 @@
 # vim: ft=automake
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/15 00:46:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 04:34:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/15 00:46:05 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 04:34:05 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2005/06/16 04:34:05  brian
+# - modifications to test-sctp_t
+#
 # Revision 0.9.2.8  2005/06/15 00:46:05  brian
 # - corrected a couple targets
 #
@@ -108,6 +111,7 @@ package.m4: $(top_srcdir)/configure
 # my rule
 TESTSUITE_DEPS		= \
 			kernel.at \
+			$(TESTSUITE)-sctp_t.at \
 			$(TESTSUITE).at \
 			local.at \
 			package.m4

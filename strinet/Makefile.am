@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/07 22:35:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/16 04:33:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/07 22:35:05 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 04:33:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,13 +68,15 @@ if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
+				  test-inet_udp \
 				  test-inet_tcp \
-				  test-inet_udp
+				  test-inet_sctp
 
 libexec_PROGRAMS		= \
 				  test-inet_raw \
+				  test-inet_udp \
 				  test-inet_tcp \
-				  test-inet_udp
+				  test-inet_sctp
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -90,15 +92,20 @@ test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
+test_inet_udp_SOURCES		= src/test/test-inet_udp.c
+test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CFLAGS		= $(USER_CFLAGS)
+
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
-test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS)
+test_inet_sctp_SOURCES		= src/test/test-inet_sctp.c
+test_inet_sctp_LDFLAGS		= $(STREAMS_LDADD)
+test_inet_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_sctp_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif
@@ -147,13 +154,15 @@ if RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
 				  test-inet_raw \
+				  test-inet_udp \
 				  test-inet_tcp \
-				  test-inet_udp
+				  test-inet_sctp
 
 libexec_PROGRAMS		= \
 				  test-inet_raw \
+				  test-inet_udp \
 				  test-inet_tcp \
-				  test-inet_udp
+				  test-inet_sctp
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -169,15 +178,20 @@ test_inet_raw_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS)
 
+test_inet_udp_SOURCES		= src/test/test-inet_udp.c
+test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CFLAGS		= $(USER_CFLAGS)
+
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDADD)
 test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS)
 
-test_inet_udp_SOURCES		= src/test/test-inet_udp.c
-test_inet_udp_LDFLAGS		= $(STREAMS_LDADD)
-test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_inet_udp_CFLAGS		= $(USER_CFLAGS)
+test_inet_sctp_SOURCES		= src/test/test-inet_sctp.c
+test_inet_sctp_LDFLAGS		= $(STREAMS_LDADD)
+test_inet_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_sctp_CFLAGS		= $(USER_CFLAGS)
 
 ## RPM_BUILD_USER
 endif

@@ -1,7 +1,7 @@
-dnl vim: ft=config
+dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/16 04:33:35 $
+dnl @(#) $RCSfile: testsuite-sctp_n.at,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 04:34:05 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,36 +61,30 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/06/16 04:33:35 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/16 04:34:05 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl $Log: testsuite.at,v $
-dnl Revision 0.9.2.6  2005/06/16 04:33:35  brian
-dnl - modifications for test-inet_sctp
-dnl
-dnl Revision 0.9.2.5  2005/06/04 07:07:24  brian
-dnl - improving test suites
-dnl
-dnl Revision 0.9.2.4  2005/05/30 14:25:56  brian
-dnl - packaged standalong test suites
-dnl
-dnl Revision 0.9.2.3  2005/05/27 07:48:44  brian
-dnl - updated test suites to match LFS package
+dnl $Log: testsuite-sctp_n.at,v $
+dnl Revision 0.9.2.1  2005/06/16 04:34:05  brian
+dnl - modifications to test-sctp_t
 dnl
 dnl ==========================================================================
 
-dnl AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option]))
-dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg]))
+AT_TESTED([test-sctp_n])
+AT_BANNER([STREAMS SCTP NPI module tests])
 
-m4_include([kernel.at])
+dnl AT_XFAIL_IF([test `id -u` -ne 0])
 
-m4_include([testsuite-inet_raw.at])
-m4_include([testsuite-inet_udp.at])
-m4_include([testsuite-inet_tcp.at])
+dnl AT_SETUP([sctp test 1.1])
+dnl AT_KEYWORDS([npi sctp])
+dnl AT_CHECK([
+dnl     if test $at_verbose = echo ; then options='--verbose=5' ; fi
+dnl     if test $at_arg_given_fast = : ; then optiones="$options --fast $at_arg_fast" ; fi
+dnl     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+dnl     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+dnl     test-sctp_n $options -e -o 1.1
+dnl     ], [], [ignore], [], [], [])
+dnl AT_CLEANUP
 
-#m4_include([dummy1.m4])
-#m4_include([dummy2.m4])
-#m4_include([dummy3.m4])
-#m4_include([dummy4.m4])
 
