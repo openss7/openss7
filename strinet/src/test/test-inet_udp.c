@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/15 12:36:39 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/06/15 23:00:23 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/15 12:36:39 $ by $Author: brian $
+ Last Modified $Date: 2005/06/15 23:00:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.32  2005/06/15 23:00:23  brian
+ - final allowed state test cases
+
  Revision 0.9.2.31  2005/06/15 12:36:39  brian
  - added negative test cases
 
@@ -204,9 +207,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/15 12:36:39 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/06/15 23:00:23 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/15 12:36:39 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/06/15 23:00:23 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1399,6 +1402,20 @@ const char *ioctl_string(int cmd, intptr_t arg)
 #endif
 	default:
 		return ("(unexpected)");
+	}
+}
+
+const char *service_type(ulong type)
+{
+	switch (type) {
+	case T_CLTS:
+		return ("T_CLTS");
+	case T_COTS:
+		return ("T_COTS");
+	case T_COTS_ORD:
+		return ("T_COTS_ORD");
+	default:
+		return ("(unknown)");
 	}
 }
 
@@ -2737,6 +2754,32 @@ void print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_le
 	}
 }
 
+void print_info(int child, struct T_info_ack *info) {
+	char buf[64];
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "TSDU  = %ld", (long) info->TSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ETSDU = %ld", (long) info->ETSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "CDATA = %ld", (long) info->CDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "DDATA = %ld", (long) info->DDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ADDR  = %ld", (long) info->ADDR_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "OPT   = %ld", (long) info->OPT_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "TIDU  = %ld", (long) info->TIDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "PROV  = %ld", (long) info->PROVIDER_flag);
+	print_string(child, buf);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -3388,6 +3431,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_info(child, &p->info_ack);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
 		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
@@ -4008,6 +4052,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_INFO_ACK;
 			last_info = p->info_ack;
 			print_ack_prim(child, prim_string(p->type));
+			print_info(child, &p->info_ack);
 			break;
 		case T_BIND_ACK:
 			event = __TEST_BIND_ACK;
@@ -26524,7 +26569,7 @@ struct test_stream test_12_3_3_list = { &preamble_12_3_3_list, &test_case_12_3_3
 #define test_group_13 "Fatal and non-fatal errors."
 #define sref_case_13 "TPI Version 2 Draft 2 -- Chapter 2"
 
-int preamble_13_ts_unbnd_cots(int child)
+int preamble_ts_unbnd_cots(int child)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -26542,15 +26587,15 @@ int preamble_13_ts_unbnd_cots(int child)
 	return (__RESULT_NOTAPPL);
 }
 
-#define preamble_13_ts_unbnd_cots_conn	preamble_13_ts_unbnd_cots
-#define preamble_13_ts_unbnd_cots_resp	preamble_13_ts_unbnd_cots
-#define preamble_13_ts_unbnd_cots_list	preamble_13_ts_unbnd_cots
+#define preamble_ts_unbnd_cots_conn	preamble_ts_unbnd_cots
+#define preamble_ts_unbnd_cots_resp	preamble_ts_unbnd_cots
+#define preamble_ts_unbnd_cots_list	preamble_ts_unbnd_cots
 
-#define postamble_13_ts_unbnd_cots_conn	postamble_0
-#define postamble_13_ts_unbnd_cots_resp	postamble_0
-#define postamble_13_ts_unbnd_cots_list	postamble_0
+#define postamble_ts_unbnd_cots_conn	postamble_0
+#define postamble_ts_unbnd_cots_resp	postamble_0
+#define postamble_ts_unbnd_cots_list	postamble_0
 
-int preamble_13_ts_unbnd_clts(int child)
+int preamble_ts_unbnd_clts(int child)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -26568,23 +26613,23 @@ int preamble_13_ts_unbnd_clts(int child)
 	return (__RESULT_NOTAPPL);
 }
 
-#define preamble_13_ts_unbnd_clts_conn	preamble_13_ts_unbnd_clts
-#define preamble_13_ts_unbnd_clts_resp	preamble_13_ts_unbnd_clts
-#define preamble_13_ts_unbnd_clts_list	preamble_13_ts_unbnd_clts
+#define preamble_ts_unbnd_clts_conn	preamble_ts_unbnd_clts
+#define preamble_ts_unbnd_clts_resp	preamble_ts_unbnd_clts
+#define preamble_ts_unbnd_clts_list	preamble_ts_unbnd_clts
 
-#define postamble_13_ts_unbnd_clts_conn	postamble_0
-#define postamble_13_ts_unbnd_clts_resp	postamble_0
-#define postamble_13_ts_unbnd_clts_list	postamble_0
+#define postamble_ts_unbnd_clts_conn	postamble_0
+#define postamble_ts_unbnd_clts_resp	postamble_0
+#define postamble_ts_unbnd_clts_list	postamble_0
 
-#define preamble_13_ts_unbnd_conn	preamble_0
-#define preamble_13_ts_unbnd_resp	preamble_0
-#define preamble_13_ts_unbnd_list	preamble_0
+#define preamble_ts_unbnd_conn	preamble_0
+#define preamble_ts_unbnd_resp	preamble_0
+#define preamble_ts_unbnd_list	preamble_0
 
-#define postamble_13_ts_unbnd_conn	postamble_0
-#define postamble_13_ts_unbnd_resp	postamble_0
-#define postamble_13_ts_unbnd_list	postamble_0
+#define postamble_ts_unbnd_conn	postamble_0
+#define postamble_ts_unbnd_resp	postamble_0
+#define postamble_ts_unbnd_list	postamble_0
 
-int preamble_13_ts_idle_cots(int child)
+int preamble_ts_idle_cots(int child)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -26602,15 +26647,15 @@ int preamble_13_ts_idle_cots(int child)
 	return (__RESULT_NOTAPPL);
 }
 
-#define preamble_13_ts_idle_cots_conn	preamble_13_ts_idle_cots
-#define preamble_13_ts_idle_cots_resp	preamble_13_ts_idle_cots
-#define preamble_13_ts_idle_cots_list	preamble_13_ts_idle_cots
+#define preamble_ts_idle_cots_conn	preamble_ts_idle_cots
+#define preamble_ts_idle_cots_resp	preamble_ts_idle_cots
+#define preamble_ts_idle_cots_list	preamble_ts_idle_cots
 
-#define postamble_13_ts_idle_cots_conn	postamble_1
-#define postamble_13_ts_idle_cots_resp	postamble_1
-#define postamble_13_ts_idle_cots_list	postamble_1
+#define postamble_ts_idle_cots_conn	postamble_1
+#define postamble_ts_idle_cots_resp	postamble_1
+#define postamble_ts_idle_cots_list	postamble_1
 
-int preamble_13_ts_idle_clts(int child)
+int preamble_ts_idle_clts(int child)
 {
 	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -26628,21 +26673,21 @@ int preamble_13_ts_idle_clts(int child)
 	return (__RESULT_NOTAPPL);
 }
 
-#define preamble_13_ts_idle_clts_conn	preamble_13_ts_idle_clts
-#define preamble_13_ts_idle_clts_resp	preamble_13_ts_idle_clts
-#define preamble_13_ts_idle_clts_list	preamble_13_ts_idle_clts
+#define preamble_ts_idle_clts_conn	preamble_ts_idle_clts
+#define preamble_ts_idle_clts_resp	preamble_ts_idle_clts
+#define preamble_ts_idle_clts_list	preamble_ts_idle_clts
 
-#define postamble_13_ts_idle_clts_conn	postamble_1
-#define postamble_13_ts_idle_clts_resp	postamble_1
-#define postamble_13_ts_idle_clts_list	postamble_1
+#define postamble_ts_idle_clts_conn	postamble_1
+#define postamble_ts_idle_clts_resp	postamble_1
+#define postamble_ts_idle_clts_list	postamble_1
 
-#define preamble_13_ts_idle_conn	preamble_1s
-#define preamble_13_ts_idle_resp	preamble_1s
-#define preamble_13_ts_idle_list	preamble_1s
+#define preamble_ts_idle_conn	preamble_1s
+#define preamble_ts_idle_resp	preamble_1s
+#define preamble_ts_idle_list	preamble_1s
 
-#define postamble_13_ts_idle_conn	postamble_1
-#define postamble_13_ts_idle_resp	postamble_1
-#define postamble_13_ts_idle_list	postamble_1
+#define postamble_ts_idle_conn	postamble_1
+#define postamble_ts_idle_resp	postamble_1
+#define postamble_ts_idle_list	postamble_1
 
 int preamble_13_connection(int child)
 {
@@ -26670,10 +26715,10 @@ int preamble_13_connection(int child)
 	return (__RESULT_NOTAPPL);
 }
 
-int preamble_13_ts_wcon_creq_conn(int child)
+int preamble_ts_wcon_creq_conn(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
-	if ((result = preamble_13_ts_idle_cots(child)) != __RESULT_SUCCESS)
+	if ((result = preamble_ts_idle_cots(child)) != __RESULT_SUCCESS)
 		goto abort;
 	state++;
 	test_data = NULL;
@@ -26695,10 +26740,10 @@ int preamble_13_ts_wcon_creq_conn(int child)
 }
  /* we do not actually listen on the address in the hope that the connection request will have to
     time out before we leave the TS_WCON_CREQ state. */
-#define preamble_13_ts_wcon_creq_resp	preamble_0
-#define preamble_13_ts_wcon_creq_list	preamble_0
+#define preamble_ts_wcon_creq_resp	preamble_0
+#define preamble_ts_wcon_creq_list	preamble_0
 
-int postamble_13_ts_wcon_creq_conn(int child)
+int postamble_ts_wcon_creq_conn(int child)
 {
 	int failed = -1;
 	while (1) {
@@ -26742,16 +26787,16 @@ int postamble_13_ts_wcon_creq_conn(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define postamble_13_ts_wcon_creq_resp	postamble_0
-#define postamble_13_ts_wcon_creq_list	postamble_0
+#define postamble_ts_wcon_creq_resp	postamble_0
+#define postamble_ts_wcon_creq_list	postamble_0
 
-#define preamble_13_ts_wres_cind_conn	preamble_13_connection
-#define preamble_13_ts_wres_cind_resp	preamble_0
+#define preamble_ts_wres_cind_conn	preamble_13_connection
+#define preamble_ts_wres_cind_resp	preamble_0
 
-int preamble_13_ts_wres_cind_list(int child)
+int preamble_ts_wres_cind_list(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
-	if ((result = preamble_13_ts_idle_cots(child)) != __RESULT_SUCCESS)
+	if ((result = preamble_ts_idle_cots(child)) != __RESULT_SUCCESS)
 		goto abort;
 	state++;
 	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -26766,11 +26811,11 @@ int preamble_13_ts_wres_cind_list(int child)
 	return (result);
 }
 
-#define postamble_13_ts_wres_cind_conn	postamble_2_conn
-#define postamble_13_ts_wres_cind_resp	postamble_0
-#define postamble_13_ts_wres_cind_list	postamble_2_resp
+#define postamble_ts_wres_cind_conn	postamble_2_conn
+#define postamble_ts_wres_cind_resp	postamble_0
+#define postamble_ts_wres_cind_list	postamble_2_resp
 
-int preamble_13_ts_data_xfer_conn(int child)
+int preamble_ts_data_xfer_conn(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = preamble_13_connection(child)) != __RESULT_SUCCESS)
@@ -26790,7 +26835,7 @@ int preamble_13_ts_data_xfer_conn(int child)
       abort:
 	return (result);
 }
-int preamble_13_ts_data_xfer_resp(int child)
+int preamble_ts_data_xfer_resp(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = preamble_13_connection(child)) != __RESULT_SUCCESS)
@@ -26810,16 +26855,16 @@ int preamble_13_ts_data_xfer_resp(int child)
       abort:
 	return (result);
 }
-int preamble_13_ts_data_xfer_list(int child)
+int preamble_ts_data_xfer_list(int child)
 {
 	return preamble_13_connection(child);
 }
 
-#define postamble_13_ts_data_xfer_conn	postamble_2_conn
-#define postamble_13_ts_data_xfer_resp	postamble_2_resp
-#define postamble_13_ts_data_xfer_list	postamble_2_list
+#define postamble_ts_data_xfer_conn	postamble_2_conn
+#define postamble_ts_data_xfer_resp	postamble_2_resp
+#define postamble_ts_data_xfer_list	postamble_2_list
 
-int preamble_13_ts_wind_ordrel_conn(int child)
+int preamble_ts_wind_ordrel_conn(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = preamble_13_connection(child)) != __RESULT_SUCCESS)
@@ -26835,7 +26880,7 @@ int preamble_13_ts_wind_ordrel_conn(int child)
       abort:
 	return (result);
 }
-int preamble_13_ts_wind_ordrel_resp(int child)
+int preamble_ts_wind_ordrel_resp(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = preamble_13_connection(child)) != __RESULT_SUCCESS)
@@ -26852,7 +26897,7 @@ int preamble_13_ts_wind_ordrel_resp(int child)
       abort:
 	return (result);
 }
-int preamble_13_ts_wind_ordrel_list(int child)
+int preamble_ts_wind_ordrel_list(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = preamble_13_connection(child)) != __RESULT_SUCCESS)
@@ -26863,7 +26908,7 @@ int preamble_13_ts_wind_ordrel_list(int child)
 	return (result);
 }
 
-int postamble_13_ts_wind_ordrel_conn(int child)
+int postamble_ts_wind_ordrel_conn(int child)
 {
 	int failed = -1;
 	int result = __RESULT_SCRIPT_ERROR;
@@ -26884,7 +26929,7 @@ int postamble_13_ts_wind_ordrel_conn(int child)
 		state = failed;
 	return (result);
 }
-int postamble_13_ts_wind_ordrel_resp(int child)
+int postamble_ts_wind_ordrel_resp(int child)
 {
 	int failed = -1;
 	int result = __RESULT_SCRIPT_ERROR;
@@ -26906,7 +26951,7 @@ int postamble_13_ts_wind_ordrel_resp(int child)
 		state = failed;
 	return (result);
 }
-int postamble_13_ts_wind_ordrel_list(int child)
+int postamble_ts_wind_ordrel_list(int child)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if ((result = postamble_2_list(child)) != __RESULT_SUCCESS)
@@ -26917,13 +26962,13 @@ int postamble_13_ts_wind_ordrel_list(int child)
 	return (result);
 }
 
-#define preamble_13_ts_wreq_ordrel_conn		preamble_13_ts_wind_ordrel_conn
-#define preamble_13_ts_wreq_ordrel_resp		preamble_13_ts_wind_ordrel_resp
-#define preamble_13_ts_wreq_ordrel_list		preamble_13_ts_wind_ordrel_list
+#define preamble_ts_wreq_ordrel_conn		preamble_ts_wind_ordrel_conn
+#define preamble_ts_wreq_ordrel_resp		preamble_ts_wind_ordrel_resp
+#define preamble_ts_wreq_ordrel_list		preamble_ts_wind_ordrel_list
 
-#define postamble_13_ts_wreq_ordrel_conn	postamble_13_ts_wind_ordrel_conn
-#define postamble_13_ts_wreq_ordrel_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_ts_wreq_ordrel_list	postamble_13_ts_wind_ordrel_list
+#define postamble_ts_wreq_ordrel_conn	postamble_ts_wind_ordrel_conn
+#define postamble_ts_wreq_ordrel_resp	postamble_ts_wind_ordrel_resp
+#define postamble_ts_wreq_ordrel_list	postamble_ts_wind_ordrel_list
 
 #define tgrp_case_13_1_1 test_group_13
 #define numb_case_13_1_1 "13.1.1"
@@ -27340,13 +27385,13 @@ int test_case_13_2_6_1(int child)
 #define test_case_13_2_6_1_resp	test_case_13_2_6_1
 #define test_case_13_2_6_1_list	test_case_13_2_6_1
 
-#define preamble_13_2_6_1_conn	preamble_13_ts_idle_conn
-#define preamble_13_2_6_1_resp	preamble_13_ts_idle_resp
-#define preamble_13_2_6_1_list	preamble_13_ts_idle_list
+#define preamble_13_2_6_1_conn	preamble_ts_idle_conn
+#define preamble_13_2_6_1_resp	preamble_ts_idle_resp
+#define preamble_13_2_6_1_list	preamble_ts_idle_list
 
-#define postamble_13_2_6_1_conn	postamble_13_ts_idle_conn
-#define postamble_13_2_6_1_resp	postamble_13_ts_idle_resp
-#define postamble_13_2_6_1_list	postamble_13_ts_idle_list
+#define postamble_13_2_6_1_conn	postamble_ts_idle_conn
+#define postamble_13_2_6_1_resp	postamble_ts_idle_resp
+#define postamble_13_2_6_1_list	postamble_ts_idle_list
 
 struct test_stream test_13_2_6_1_conn = { &preamble_13_2_6_1_conn, &test_case_13_2_6_1_conn, &postamble_13_2_6_1_conn };
 struct test_stream test_13_2_6_1_resp = { &preamble_13_2_6_1_resp, &test_case_13_2_6_1_resp, &postamble_13_2_6_1_resp };
@@ -27378,13 +27423,13 @@ int test_case_13_2_6_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_2_6_2_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_2_6_2_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_2_6_2_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_2_6_2_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_2_6_2_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_2_6_2_list	preamble_ts_wcon_creq_list
 
-#define postamble_13_2_6_2_conn	postamble_13_ts_wcon_creq_conn
-#define postamble_13_2_6_2_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_2_6_2_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_2_6_2_conn	postamble_ts_wcon_creq_conn
+#define postamble_13_2_6_2_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_2_6_2_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_2_6_2_conn = { &preamble_13_2_6_2_conn, &test_case_13_2_6_2_conn, &postamble_13_2_6_2_conn };
 struct test_stream test_13_2_6_2_resp = { &preamble_13_2_6_2_resp, &test_case_13_2_6_2_resp, &postamble_13_2_6_2_resp };
@@ -27416,13 +27461,13 @@ int test_case_13_2_6_3_list(int child)
 	return test_case_13_2_6(child);
 }
 
-#define preamble_13_2_6_3_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_2_6_3_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_2_6_3_list	preamble_13_ts_wres_cind_list
+#define preamble_13_2_6_3_conn	preamble_ts_wres_cind_conn
+#define preamble_13_2_6_3_resp	preamble_ts_wres_cind_resp
+#define preamble_13_2_6_3_list	preamble_ts_wres_cind_list
 
-#define postamble_13_2_6_3_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_2_6_3_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_2_6_3_list	postamble_13_ts_wres_cind_list
+#define postamble_13_2_6_3_conn	postamble_ts_wres_cind_conn
+#define postamble_13_2_6_3_resp	postamble_ts_wres_cind_resp
+#define postamble_13_2_6_3_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_2_6_3_conn = { &preamble_13_2_6_3_conn, &test_case_13_2_6_3_conn, &postamble_13_2_6_3_conn };
 struct test_stream test_13_2_6_3_resp = { &preamble_13_2_6_3_resp, &test_case_13_2_6_3_resp, &postamble_13_2_6_3_resp };
@@ -27454,13 +27499,13 @@ int test_case_13_2_6_4_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_2_6_4_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_2_6_4_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_2_6_4_list	preamble_13_ts_data_xfer_list
+#define preamble_13_2_6_4_conn	preamble_ts_data_xfer_conn
+#define preamble_13_2_6_4_resp	preamble_ts_data_xfer_resp
+#define preamble_13_2_6_4_list	preamble_ts_data_xfer_list
 
-#define postamble_13_2_6_4_conn	postamble_13_ts_data_xfer_conn
-#define postamble_13_2_6_4_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_2_6_4_list	postamble_13_ts_data_xfer_list
+#define postamble_13_2_6_4_conn	postamble_ts_data_xfer_conn
+#define postamble_13_2_6_4_resp	postamble_ts_data_xfer_resp
+#define postamble_13_2_6_4_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_2_6_4_conn = { &preamble_13_2_6_4_conn, &test_case_13_2_6_4_conn, &postamble_13_2_6_4_conn };
 struct test_stream test_13_2_6_4_resp = { &preamble_13_2_6_4_resp, &test_case_13_2_6_4_resp, &postamble_13_2_6_4_resp };
@@ -27492,13 +27537,13 @@ int test_case_13_2_6_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_2_6_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_2_6_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_2_6_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_2_6_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_2_6_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_2_6_5_list	preamble_ts_wind_ordrel_list
 
-#define postamble_13_2_6_5_conn	postamble_13_ts_wind_ordrel_conn
-#define postamble_13_2_6_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_2_6_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_2_6_5_conn	postamble_ts_wind_ordrel_conn
+#define postamble_13_2_6_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_2_6_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_2_6_5_conn = { &preamble_13_2_6_5_conn, &test_case_13_2_6_5_conn, &postamble_13_2_6_5_conn };
 struct test_stream test_13_2_6_5_resp = { &preamble_13_2_6_5_resp, &test_case_13_2_6_5_resp, &postamble_13_2_6_5_resp };
@@ -27530,13 +27575,13 @@ int test_case_13_2_6_6_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_2_6_6_conn	preamble_13_ts_wreq_ordrel_conn
-#define preamble_13_2_6_6_resp	preamble_13_ts_wreq_ordrel_resp
-#define preamble_13_2_6_6_list	preamble_13_ts_wreq_ordrel_list
+#define preamble_13_2_6_6_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_13_2_6_6_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_13_2_6_6_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_13_2_6_6_conn	postamble_13_ts_wreq_ordrel_conn
-#define postamble_13_2_6_6_resp	postamble_13_ts_wreq_ordrel_resp
-#define postamble_13_2_6_6_list	postamble_13_ts_wreq_ordrel_list
+#define postamble_13_2_6_6_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_13_2_6_6_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_13_2_6_6_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_13_2_6_6_conn = { &preamble_13_2_6_6_conn, &test_case_13_2_6_6_conn, &postamble_13_2_6_6_conn };
 struct test_stream test_13_2_6_6_resp = { &preamble_13_2_6_6_resp, &test_case_13_2_6_6_resp, &postamble_13_2_6_6_resp };
@@ -27845,13 +27890,13 @@ int test_case_13_4_4_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_4_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_4_4_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_4_4_list	preamble_13_ts_idle_cots_list
+#define preamble_13_4_4_conn	preamble_ts_idle_cots_conn
+#define preamble_13_4_4_resp	preamble_ts_idle_cots_resp
+#define preamble_13_4_4_list	preamble_ts_idle_cots_list
 
-#define postamble_13_4_4_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_4_4_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_4_4_list	postamble_13_ts_idle_cots_list
+#define postamble_13_4_4_conn	postamble_ts_idle_cots_conn
+#define postamble_13_4_4_resp	postamble_ts_idle_cots_resp
+#define postamble_13_4_4_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_4_4_conn = { &preamble_13_4_4_conn, &test_case_13_4_4_conn, &postamble_13_4_4_conn };
 struct test_stream test_13_4_4_resp = { &preamble_13_4_4_resp, &test_case_13_4_4_resp, &postamble_13_4_4_resp };
@@ -27899,13 +27944,13 @@ int test_case_13_4_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_5_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_4_5_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_4_5_list	preamble_13_ts_idle_cots_list
+#define preamble_13_4_5_conn	preamble_ts_idle_cots_conn
+#define preamble_13_4_5_resp	preamble_ts_idle_cots_resp
+#define preamble_13_4_5_list	preamble_ts_idle_cots_list
 
-#define postamble_13_4_5_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_4_5_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_4_5_list	postamble_13_ts_idle_cots_list
+#define postamble_13_4_5_conn	postamble_ts_idle_cots_conn
+#define postamble_13_4_5_resp	postamble_ts_idle_cots_resp
+#define postamble_13_4_5_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_4_5_conn = { &preamble_13_4_5_conn, &test_case_13_4_5_conn, &postamble_13_4_5_conn };
 struct test_stream test_13_4_5_resp = { &preamble_13_4_5_resp, &test_case_13_4_5_resp, &postamble_13_4_5_resp };
@@ -27959,13 +28004,13 @@ int test_case_13_4_6_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_6_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_4_6_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_4_6_list	preamble_13_ts_idle_cots_list
+#define preamble_13_4_6_conn	preamble_ts_idle_cots_conn
+#define preamble_13_4_6_resp	preamble_ts_idle_cots_resp
+#define preamble_13_4_6_list	preamble_ts_idle_cots_list
 
-#define postamble_13_4_6_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_4_6_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_4_6_list	postamble_13_ts_idle_cots_list
+#define postamble_13_4_6_conn	postamble_ts_idle_cots_conn
+#define postamble_13_4_6_resp	postamble_ts_idle_cots_resp
+#define postamble_13_4_6_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_4_6_conn = { &preamble_13_4_6_conn, &test_case_13_4_6_conn, &postamble_13_4_6_conn };
 struct test_stream test_13_4_6_resp = { &preamble_13_4_6_resp, &test_case_13_4_6_resp, &postamble_13_4_6_resp };
@@ -28083,13 +28128,13 @@ int test_case_13_4_8_1_list(int child)
 	return test_case_13_4_8(child);
 }
 
-#define preamble_13_4_8_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_4_8_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_4_8_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_4_8_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_4_8_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_4_8_1_list	preamble_ts_unbnd_cots_list
 
-#define postamble_13_4_8_1_conn	postamble_13_ts_unbnd_cots_conn
-#define postamble_13_4_8_1_resp	postamble_13_ts_unbnd_cots_resp
-#define postamble_13_4_8_1_list	postamble_13_ts_unbnd_cots_list
+#define postamble_13_4_8_1_conn	postamble_ts_unbnd_cots_conn
+#define postamble_13_4_8_1_resp	postamble_ts_unbnd_cots_resp
+#define postamble_13_4_8_1_list	postamble_ts_unbnd_cots_list
 
 struct test_stream test_13_4_8_1_conn = { &preamble_13_4_8_1_conn, &test_case_13_4_8_1_conn, &postamble_13_4_8_1_conn };
 struct test_stream test_13_4_8_1_resp = { &preamble_13_4_8_1_resp, &test_case_13_4_8_1_resp, &postamble_13_4_8_1_resp };
@@ -28121,13 +28166,13 @@ int test_case_13_4_8_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_8_2_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_4_8_2_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_4_8_2_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_4_8_2_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_4_8_2_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_4_8_2_list	preamble_ts_wcon_creq_list
 
-#define postamble_13_4_8_2_conn	postamble_13_ts_wcon_creq_conn
-#define postamble_13_4_8_2_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_4_8_2_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_4_8_2_conn	postamble_ts_wcon_creq_conn
+#define postamble_13_4_8_2_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_4_8_2_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_4_8_2_conn = { &preamble_13_4_8_2_conn, &test_case_13_4_8_2_conn, &postamble_13_4_8_2_conn };
 struct test_stream test_13_4_8_2_resp = { &preamble_13_4_8_2_resp, &test_case_13_4_8_2_resp, &postamble_13_4_8_2_resp };
@@ -28159,13 +28204,13 @@ int test_case_13_4_8_3_list(int child)
 	return test_case_13_4_8(child);
 }
 
-#define preamble_13_4_8_3_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_4_8_3_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_4_8_3_list	preamble_13_ts_wres_cind_list
+#define preamble_13_4_8_3_conn	preamble_ts_wres_cind_conn
+#define preamble_13_4_8_3_resp	preamble_ts_wres_cind_resp
+#define preamble_13_4_8_3_list	preamble_ts_wres_cind_list
 
-#define postamble_13_4_8_3_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_4_8_3_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_4_8_3_list	postamble_13_ts_wres_cind_list
+#define postamble_13_4_8_3_conn	postamble_ts_wres_cind_conn
+#define postamble_13_4_8_3_resp	postamble_ts_wres_cind_resp
+#define postamble_13_4_8_3_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_4_8_3_conn = { &preamble_13_4_8_3_conn, &test_case_13_4_8_3_conn, &postamble_13_4_8_3_conn };
 struct test_stream test_13_4_8_3_resp = { &preamble_13_4_8_3_resp, &test_case_13_4_8_3_resp, &postamble_13_4_8_3_resp };
@@ -28197,13 +28242,13 @@ int test_case_13_4_8_4_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_8_4_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_4_8_4_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_4_8_4_list	preamble_13_ts_data_xfer_list
+#define preamble_13_4_8_4_conn	preamble_ts_data_xfer_conn
+#define preamble_13_4_8_4_resp	preamble_ts_data_xfer_resp
+#define preamble_13_4_8_4_list	preamble_ts_data_xfer_list
 
-#define postamble_13_4_8_4_conn	postamble_13_ts_data_xfer_conn
-#define postamble_13_4_8_4_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_4_8_4_list	postamble_13_ts_data_xfer_list
+#define postamble_13_4_8_4_conn	postamble_ts_data_xfer_conn
+#define postamble_13_4_8_4_resp	postamble_ts_data_xfer_resp
+#define postamble_13_4_8_4_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_4_8_4_conn = { &preamble_13_4_8_4_conn, &test_case_13_4_8_4_conn, &postamble_13_4_8_4_conn };
 struct test_stream test_13_4_8_4_resp = { &preamble_13_4_8_4_resp, &test_case_13_4_8_4_resp, &postamble_13_4_8_4_resp };
@@ -28235,13 +28280,13 @@ int test_case_13_4_8_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_8_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_4_8_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_4_8_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_4_8_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_4_8_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_4_8_5_list	preamble_ts_wind_ordrel_list
 
-#define postamble_13_4_8_5_conn	postamble_13_ts_wind_ordrel_conn
-#define postamble_13_4_8_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_4_8_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_4_8_5_conn	postamble_ts_wind_ordrel_conn
+#define postamble_13_4_8_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_4_8_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_4_8_5_conn = { &preamble_13_4_8_5_conn, &test_case_13_4_8_5_conn, &postamble_13_4_8_5_conn };
 struct test_stream test_13_4_8_5_resp = { &preamble_13_4_8_5_resp, &test_case_13_4_8_5_resp, &postamble_13_4_8_5_resp };
@@ -28273,13 +28318,13 @@ int test_case_13_4_8_6_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_4_8_6_conn	preamble_13_ts_wreq_ordrel_conn
-#define preamble_13_4_8_6_resp	preamble_13_ts_wreq_ordrel_resp
-#define preamble_13_4_8_6_list	preamble_13_ts_wreq_ordrel_list
+#define preamble_13_4_8_6_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_13_4_8_6_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_13_4_8_6_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_13_4_8_6_conn	postamble_13_ts_wreq_ordrel_conn
-#define postamble_13_4_8_6_resp	postamble_13_ts_wreq_ordrel_resp
-#define postamble_13_4_8_6_list	postamble_13_ts_wreq_ordrel_list
+#define postamble_13_4_8_6_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_13_4_8_6_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_13_4_8_6_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_13_4_8_6_conn = { &preamble_13_4_8_6_conn, &test_case_13_4_8_6_conn, &postamble_13_4_8_6_conn };
 struct test_stream test_13_4_8_6_resp = { &preamble_13_4_8_6_resp, &test_case_13_4_8_6_resp, &postamble_13_4_8_6_resp };
@@ -28511,13 +28556,13 @@ int test_case_13_5_4_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_13_5_4_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_5_4_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_5_4_list	preamble_13_ts_wres_cind_list
+#define preamble_13_5_4_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_4_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_4_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_4_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_5_4_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_5_4_list	postamble_13_ts_wres_cind_list
+#define postamble_13_5_4_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_4_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_4_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_4_conn = { &preamble_13_5_4_conn, &test_case_13_5_4_conn, &postamble_13_5_4_conn };
 struct test_stream test_13_5_4_resp = { &preamble_13_5_4_resp, &test_case_13_5_4_resp, &postamble_13_5_4_resp };
@@ -28564,13 +28609,13 @@ int test_case_13_5_5_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_13_5_5_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_5_5_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_5_5_list	preamble_13_ts_wres_cind_list
+#define preamble_13_5_5_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_5_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_5_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_5_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_5_5_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_5_5_list	postamble_13_ts_wres_cind_list
+#define postamble_13_5_5_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_5_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_5_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_5_conn = { &preamble_13_5_5_conn, &test_case_13_5_5_conn, &postamble_13_5_5_conn };
 struct test_stream test_13_5_5_resp = { &preamble_13_5_5_resp, &test_case_13_5_5_resp, &postamble_13_5_5_resp };
@@ -28623,13 +28668,13 @@ int test_case_13_5_6_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_13_5_6_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_5_6_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_5_6_list	preamble_13_ts_wres_cind_list
+#define preamble_13_5_6_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_6_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_6_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_6_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_5_6_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_5_6_list	postamble_13_ts_wres_cind_list
+#define postamble_13_5_6_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_6_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_6_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_6_conn = { &preamble_13_5_6_conn, &test_case_13_5_6_conn, &postamble_13_5_6_conn };
 struct test_stream test_13_5_6_resp = { &preamble_13_5_6_resp, &test_case_13_5_6_resp, &postamble_13_5_6_resp };
@@ -28677,13 +28722,13 @@ int test_case_13_5_7_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_13_5_7_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_5_7_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_5_7_list	preamble_13_ts_wres_cind_list
+#define preamble_13_5_7_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_7_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_7_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_7_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_5_7_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_5_7_list	postamble_13_ts_wres_cind_list
+#define postamble_13_5_7_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_7_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_7_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_7_conn = { &preamble_13_5_7_conn, &test_case_13_5_7_conn, &postamble_13_5_7_conn };
 struct test_stream test_13_5_7_resp = { &preamble_13_5_7_resp, &test_case_13_5_7_resp, &postamble_13_5_7_resp };
@@ -28800,13 +28845,13 @@ int test_case_13_5_9_1_list(int child)
 	return test_case_13_5_9(child);
 }
 
-#define preamble_13_5_9_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_5_9_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_5_9_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_5_9_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_5_9_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_5_9_1_list	preamble_ts_unbnd_cots_list
 
-#define postamble_13_5_9_1_conn	postamble_13_ts_unbnd_cots_conn
-#define postamble_13_5_9_1_resp	postamble_13_ts_unbnd_cots_resp
-#define postamble_13_5_9_1_list	postamble_13_ts_unbnd_cots_list
+#define postamble_13_5_9_1_conn	postamble_ts_unbnd_cots_conn
+#define postamble_13_5_9_1_resp	postamble_ts_unbnd_cots_resp
+#define postamble_13_5_9_1_list	postamble_ts_unbnd_cots_list
 
 struct test_stream test_13_5_9_1_conn = { &preamble_13_5_9_1_conn, &test_case_13_5_9_1_conn, &postamble_13_5_9_1_conn };
 struct test_stream test_13_5_9_1_resp = { &preamble_13_5_9_1_resp, &test_case_13_5_9_1_resp, &postamble_13_5_9_1_resp };
@@ -28838,13 +28883,13 @@ int test_case_13_5_9_2_list(int child)
 	return test_case_13_5_9(child);
 }
 
-#define preamble_13_5_9_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_5_9_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_5_9_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_5_9_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_5_9_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_5_9_2_list	preamble_ts_idle_cots_list
 
-#define postamble_13_5_9_2_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_5_9_2_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_5_9_2_list	postamble_13_ts_idle_cots_list
+#define postamble_13_5_9_2_conn	postamble_ts_idle_cots_conn
+#define postamble_13_5_9_2_resp	postamble_ts_idle_cots_resp
+#define postamble_13_5_9_2_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_5_9_2_conn = { &preamble_13_5_9_2_conn, &test_case_13_5_9_2_conn, &postamble_13_5_9_2_conn };
 struct test_stream test_13_5_9_2_resp = { &preamble_13_5_9_2_resp, &test_case_13_5_9_2_resp, &postamble_13_5_9_2_resp };
@@ -28876,13 +28921,13 @@ int test_case_13_5_9_3_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_9_3_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_5_9_3_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_5_9_3_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_5_9_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_5_9_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_5_9_3_list	preamble_ts_wcon_creq_list
 
-#define postamble_13_5_9_3_conn	postamble_13_ts_wcon_creq_conn
-#define postamble_13_5_9_3_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_5_9_3_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_5_9_3_conn	postamble_ts_wcon_creq_conn
+#define postamble_13_5_9_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_5_9_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_5_9_3_conn = { &preamble_13_5_9_3_conn, &test_case_13_5_9_3_conn, &postamble_13_5_9_3_conn };
 struct test_stream test_13_5_9_3_resp = { &preamble_13_5_9_3_resp, &test_case_13_5_9_3_resp, &postamble_13_5_9_3_resp };
@@ -28914,13 +28959,13 @@ int test_case_13_5_9_4_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_9_4_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_5_9_4_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_5_9_4_list	preamble_13_ts_data_xfer_list
+#define preamble_13_5_9_4_conn	preamble_ts_data_xfer_conn
+#define preamble_13_5_9_4_resp	preamble_ts_data_xfer_resp
+#define preamble_13_5_9_4_list	preamble_ts_data_xfer_list
 
-#define postamble_13_5_9_4_conn	postamble_13_ts_data_xfer_conn
-#define postamble_13_5_9_4_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_5_9_4_list	postamble_13_ts_data_xfer_list
+#define postamble_13_5_9_4_conn	postamble_ts_data_xfer_conn
+#define postamble_13_5_9_4_resp	postamble_ts_data_xfer_resp
+#define postamble_13_5_9_4_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_5_9_4_conn = { &preamble_13_5_9_4_conn, &test_case_13_5_9_4_conn, &postamble_13_5_9_4_conn };
 struct test_stream test_13_5_9_4_resp = { &preamble_13_5_9_4_resp, &test_case_13_5_9_4_resp, &postamble_13_5_9_4_resp };
@@ -28952,13 +28997,13 @@ int test_case_13_5_9_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_9_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_5_9_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_5_9_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_5_9_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_5_9_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_5_9_5_list	preamble_ts_wind_ordrel_list
 
-#define postamble_13_5_9_5_conn	postamble_13_ts_wind_ordrel_conn
-#define postamble_13_5_9_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_5_9_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_5_9_5_conn	postamble_ts_wind_ordrel_conn
+#define postamble_13_5_9_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_5_9_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_5_9_5_conn = { &preamble_13_5_9_5_conn, &test_case_13_5_9_5_conn, &postamble_13_5_9_5_conn };
 struct test_stream test_13_5_9_5_resp = { &preamble_13_5_9_5_resp, &test_case_13_5_9_5_resp, &postamble_13_5_9_5_resp };
@@ -28990,13 +29035,13 @@ int test_case_13_5_9_6_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_9_6_conn	preamble_13_ts_wreq_ordrel_conn
-#define preamble_13_5_9_6_resp	preamble_13_ts_wreq_ordrel_resp
-#define preamble_13_5_9_6_list	preamble_13_ts_wreq_ordrel_list
+#define preamble_13_5_9_6_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_13_5_9_6_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_13_5_9_6_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_13_5_9_6_conn	postamble_13_ts_wreq_ordrel_conn
-#define postamble_13_5_9_6_resp	postamble_13_ts_wreq_ordrel_resp
-#define postamble_13_5_9_6_list	postamble_13_ts_wreq_ordrel_list
+#define postamble_13_5_9_6_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_13_5_9_6_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_13_5_9_6_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_13_5_9_6_conn = { &preamble_13_5_9_6_conn, &test_case_13_5_9_6_conn, &postamble_13_5_9_6_conn };
 struct test_stream test_13_5_9_6_resp = { &preamble_13_5_9_6_resp, &test_case_13_5_9_6_resp, &postamble_13_5_9_6_resp };
@@ -29213,9 +29258,9 @@ int test_case_13_6_1_1_list(int child)
 	return test_case_13_6_1(child);
 }
 
-#define preamble_13_6_1_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_6_1_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_6_1_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_6_1_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_6_1_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_6_1_1_list	preamble_ts_unbnd_cots_list
 
 #define postamble_13_6_1_1_conn	postamble_0
 #define postamble_13_6_1_1_resp	postamble_0
@@ -29251,13 +29296,13 @@ int test_case_13_6_1_2_list(int child)
 	return test_case_13_6_1_nofail(child);
 }
 
-#define preamble_13_6_1_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_6_1_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_6_1_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_6_1_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_6_1_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_6_1_2_list	preamble_ts_idle_cots_list
 
-#define postamble_13_6_1_2_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_6_1_2_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_6_1_2_list	postamble_13_ts_idle_cots_list
+#define postamble_13_6_1_2_conn	postamble_ts_idle_cots_conn
+#define postamble_13_6_1_2_resp	postamble_ts_idle_cots_resp
+#define postamble_13_6_1_2_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_6_1_2_conn = { &preamble_13_6_1_2_conn, &test_case_13_6_1_2_conn, &postamble_13_6_1_2_conn };
 struct test_stream test_13_6_1_2_resp = { &preamble_13_6_1_2_resp, &test_case_13_6_1_2_resp, &postamble_13_6_1_2_resp };
@@ -29289,13 +29334,13 @@ int test_case_13_6_1_3_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_6_1_3_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_6_1_3_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_6_1_3_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_6_1_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_6_1_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_6_1_3_list	preamble_ts_wcon_creq_list
 
 #define postamble_13_6_1_3_conn	postamble_0
-#define postamble_13_6_1_3_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_6_1_3_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_6_1_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_6_1_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_6_1_3_conn = { &preamble_13_6_1_3_conn, &test_case_13_6_1_3_conn, &postamble_13_6_1_3_conn };
 struct test_stream test_13_6_1_3_resp = { &preamble_13_6_1_3_resp, &test_case_13_6_1_3_resp, &postamble_13_6_1_3_resp };
@@ -29330,12 +29375,12 @@ int test_case_13_6_1_4_list(int child)
 	return test_case_13_6_1(child);
 }
 
-#define preamble_13_6_1_4_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_6_1_4_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_6_1_4_list	preamble_13_ts_wres_cind_list
+#define preamble_13_6_1_4_conn	preamble_ts_wres_cind_conn
+#define preamble_13_6_1_4_resp	preamble_ts_wres_cind_resp
+#define preamble_13_6_1_4_list	preamble_ts_wres_cind_list
 
-#define postamble_13_6_1_4_conn	postamble_13_ts_idle_conn
-#define postamble_13_6_1_4_resp	postamble_13_ts_wres_cind_resp
+#define postamble_13_6_1_4_conn	postamble_ts_idle_conn
+#define postamble_13_6_1_4_resp	postamble_ts_wres_cind_resp
 #define postamble_13_6_1_4_list	postamble_0
 
 struct test_stream test_13_6_1_4_conn = { &preamble_13_6_1_4_conn, &test_case_13_6_1_4_conn, &postamble_13_6_1_4_conn };
@@ -29368,13 +29413,13 @@ int test_case_13_6_1_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_6_1_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_6_1_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_6_1_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_6_1_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_6_1_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_6_1_5_list	preamble_ts_wind_ordrel_list
 
 #define postamble_13_6_1_5_conn	postamble_0
-#define postamble_13_6_1_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_6_1_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_6_1_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_6_1_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_6_1_5_conn = { &preamble_13_6_1_5_conn, &test_case_13_6_1_5_conn, &postamble_13_6_1_5_conn };
 struct test_stream test_13_6_1_5_resp = { &preamble_13_6_1_5_resp, &test_case_13_6_1_5_resp, &postamble_13_6_1_5_resp };
@@ -29432,13 +29477,13 @@ int test_case_13_6_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_6_2_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_6_2_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_6_2_list	preamble_13_ts_data_xfer_list
+#define preamble_13_6_2_conn	preamble_ts_data_xfer_conn
+#define preamble_13_6_2_resp	preamble_ts_data_xfer_resp
+#define preamble_13_6_2_list	preamble_ts_data_xfer_list
 
 #define postamble_13_6_2_conn	postamble_0
 #define postamble_13_6_2_resp	postamble_0
-#define postamble_13_6_2_list	postamble_13_ts_data_xfer_list
+#define postamble_13_6_2_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_6_2_conn = { &preamble_13_6_2_conn, &test_case_13_6_2_conn, &postamble_13_6_2_conn };
 struct test_stream test_13_6_2_resp = { &preamble_13_6_2_resp, &test_case_13_6_2_resp, &postamble_13_6_2_resp };
@@ -29521,13 +29566,13 @@ int test_case_13_7_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_7_2_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_7_2_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_7_2_list	preamble_13_ts_data_xfer_list
+#define preamble_13_7_2_conn	preamble_ts_data_xfer_conn
+#define preamble_13_7_2_resp	preamble_ts_data_xfer_resp
+#define preamble_13_7_2_list	preamble_ts_data_xfer_list
 
-#define postamble_13_7_2_conn	postamble_13_ts_data_xfer_conn
-#define postamble_13_7_2_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_7_2_list	postamble_13_ts_data_xfer_list
+#define postamble_13_7_2_conn	postamble_ts_data_xfer_conn
+#define postamble_13_7_2_resp	postamble_ts_data_xfer_resp
+#define postamble_13_7_2_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_7_2_conn = { &preamble_13_7_2_conn, &test_case_13_7_2_conn, &postamble_13_7_2_conn };
 struct test_stream test_13_7_2_resp = { &preamble_13_7_2_resp, &test_case_13_7_2_resp, &postamble_13_7_2_resp };
@@ -29572,13 +29617,13 @@ int test_case_13_7_3_list(int child)
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_13_7_3_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_7_3_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_7_3_list	preamble_13_ts_wres_cind_list
+#define preamble_13_7_3_conn	preamble_ts_wres_cind_conn
+#define preamble_13_7_3_resp	preamble_ts_wres_cind_resp
+#define preamble_13_7_3_list	preamble_ts_wres_cind_list
 
-#define postamble_13_7_3_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_7_3_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_7_3_list	postamble_13_ts_wres_cind_list
+#define postamble_13_7_3_conn	postamble_ts_wres_cind_conn
+#define postamble_13_7_3_resp	postamble_ts_wres_cind_resp
+#define postamble_13_7_3_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_7_3_conn = { &preamble_13_7_3_conn, &test_case_13_7_3_conn, &postamble_13_7_3_conn };
 struct test_stream test_13_7_3_resp = { &preamble_13_7_3_resp, &test_case_13_7_3_resp, &postamble_13_7_3_resp };
@@ -29628,13 +29673,13 @@ int test_case_13_7_4(int child)
 #define test_case_13_7_4_resp	test_case_13_7_4
 #define test_case_13_7_4_list	test_case_13_7_4
 
-#define preamble_13_7_4_conn	preamble_13_ts_unbnd_conn
-#define preamble_13_7_4_resp	preamble_13_ts_unbnd_resp
-#define preamble_13_7_4_list	preamble_13_ts_unbnd_list
+#define preamble_13_7_4_conn	preamble_ts_unbnd_conn
+#define preamble_13_7_4_resp	preamble_ts_unbnd_resp
+#define preamble_13_7_4_list	preamble_ts_unbnd_list
 
-#define postamble_13_7_4_conn	postamble_13_ts_unbnd_conn
-#define postamble_13_7_4_resp	postamble_13_ts_unbnd_resp
-#define postamble_13_7_4_list	postamble_13_ts_unbnd_list
+#define postamble_13_7_4_conn	postamble_ts_unbnd_conn
+#define postamble_13_7_4_resp	postamble_ts_unbnd_resp
+#define postamble_13_7_4_list	postamble_ts_unbnd_list
 
 struct test_stream test_13_7_4_conn = { &preamble_13_7_4_conn, &test_case_13_7_4_conn, &postamble_13_7_4_conn };
 struct test_stream test_13_7_4_resp = { &preamble_13_7_4_resp, &test_case_13_7_4_resp, &postamble_13_7_4_resp };
@@ -29684,13 +29729,13 @@ int test_case_13_7_5_1_list(int child)
 	return test_case_13_7_5(child);
 }
 
-#define preamble_13_7_5_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_7_5_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_7_5_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_7_5_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_7_5_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_7_5_1_list	preamble_ts_unbnd_cots_list
 
-#define postamble_13_7_5_1_conn	postamble_13_ts_unbnd_cots_conn
-#define postamble_13_7_5_1_resp	postamble_13_ts_unbnd_cots_resp
-#define postamble_13_7_5_1_list	postamble_13_ts_unbnd_cots_list
+#define postamble_13_7_5_1_conn	postamble_ts_unbnd_cots_conn
+#define postamble_13_7_5_1_resp	postamble_ts_unbnd_cots_resp
+#define postamble_13_7_5_1_list	postamble_ts_unbnd_cots_list
 
 struct test_stream test_13_7_5_1_conn = { &preamble_13_7_5_1_conn, &test_case_13_7_5_1_conn, &postamble_13_7_5_1_conn };
 struct test_stream test_13_7_5_1_resp = { &preamble_13_7_5_1_resp, &test_case_13_7_5_1_resp, &postamble_13_7_5_1_resp };
@@ -29722,13 +29767,13 @@ int test_case_13_7_5_2_list(int child)
 	return test_case_13_7_5(child);
 }
 
-#define preamble_13_7_5_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_7_5_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_7_5_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_7_5_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_7_5_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_7_5_2_list	preamble_ts_idle_cots_list
 
-#define postamble_13_7_5_2_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_7_5_2_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_7_5_2_list	postamble_13_ts_idle_cots_list
+#define postamble_13_7_5_2_conn	postamble_ts_idle_cots_conn
+#define postamble_13_7_5_2_resp	postamble_ts_idle_cots_resp
+#define postamble_13_7_5_2_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_7_5_2_conn = { &preamble_13_7_5_2_conn, &test_case_13_7_5_2_conn, &postamble_13_7_5_2_conn };
 struct test_stream test_13_7_5_2_resp = { &preamble_13_7_5_2_resp, &test_case_13_7_5_2_resp, &postamble_13_7_5_2_resp };
@@ -29831,9 +29876,9 @@ int test_case_13_8_1_1_list(int child)
 	return test_case_13_8_1(child);
 }
 
-#define preamble_13_8_1_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_8_1_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_8_1_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_8_1_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_8_1_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_8_1_1_list	preamble_ts_unbnd_cots_list
 
 #define postamble_13_8_1_1_conn	postamble_0
 #define postamble_13_8_1_1_resp	postamble_0
@@ -29869,13 +29914,13 @@ int test_case_13_8_1_2_list(int child)
 	return test_case_13_8_1_nofail(child);
 }
 
-#define preamble_13_8_1_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_8_1_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_8_1_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_8_1_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_8_1_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_8_1_2_list	preamble_ts_idle_cots_list
 
-#define postamble_13_8_1_2_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_8_1_2_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_8_1_2_list	postamble_13_ts_idle_cots_list
+#define postamble_13_8_1_2_conn	postamble_ts_idle_cots_conn
+#define postamble_13_8_1_2_resp	postamble_ts_idle_cots_resp
+#define postamble_13_8_1_2_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_8_1_2_conn = { &preamble_13_8_1_2_conn, &test_case_13_8_1_2_conn, &postamble_13_8_1_2_conn };
 struct test_stream test_13_8_1_2_resp = { &preamble_13_8_1_2_resp, &test_case_13_8_1_2_resp, &postamble_13_8_1_2_resp };
@@ -29907,13 +29952,13 @@ int test_case_13_8_1_3_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_8_1_3_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_8_1_3_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_8_1_3_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_8_1_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_8_1_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_8_1_3_list	preamble_ts_wcon_creq_list
 
 #define postamble_13_8_1_3_conn	postamble_0
-#define postamble_13_8_1_3_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_8_1_3_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_8_1_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_8_1_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_8_1_3_conn = { &preamble_13_8_1_3_conn, &test_case_13_8_1_3_conn, &postamble_13_8_1_3_conn };
 struct test_stream test_13_8_1_3_resp = { &preamble_13_8_1_3_resp, &test_case_13_8_1_3_resp, &postamble_13_8_1_3_resp };
@@ -29948,12 +29993,12 @@ int test_case_13_8_1_4_list(int child)
 	return test_case_13_8_1(child);
 }
 
-#define preamble_13_8_1_4_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_8_1_4_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_8_1_4_list	preamble_13_ts_wres_cind_list
+#define preamble_13_8_1_4_conn	preamble_ts_wres_cind_conn
+#define preamble_13_8_1_4_resp	preamble_ts_wres_cind_resp
+#define preamble_13_8_1_4_list	preamble_ts_wres_cind_list
 
-#define postamble_13_8_1_4_conn	postamble_13_ts_idle_conn
-#define postamble_13_8_1_4_resp	postamble_13_ts_wres_cind_resp
+#define postamble_13_8_1_4_conn	postamble_ts_idle_conn
+#define postamble_13_8_1_4_resp	postamble_ts_wres_cind_resp
 #define postamble_13_8_1_4_list	postamble_0
 
 struct test_stream test_13_8_1_4_conn = { &preamble_13_8_1_4_conn, &test_case_13_8_1_4_conn, &postamble_13_8_1_4_conn };
@@ -29986,13 +30031,13 @@ int test_case_13_8_1_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_8_1_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_8_1_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_8_1_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_8_1_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_8_1_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_8_1_5_list	preamble_ts_wind_ordrel_list
 
 #define postamble_13_8_1_5_conn	postamble_0
-#define postamble_13_8_1_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_8_1_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_8_1_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_8_1_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_8_1_5_conn = { &preamble_13_8_1_5_conn, &test_case_13_8_1_5_conn, &postamble_13_8_1_5_conn };
 struct test_stream test_13_8_1_5_resp = { &preamble_13_8_1_5_resp, &test_case_13_8_1_5_resp, &postamble_13_8_1_5_resp };
@@ -30050,13 +30095,13 @@ int test_case_13_8_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_8_2_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_8_2_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_8_2_list	preamble_13_ts_data_xfer_list
+#define preamble_13_8_2_conn	preamble_ts_data_xfer_conn
+#define preamble_13_8_2_resp	preamble_ts_data_xfer_resp
+#define preamble_13_8_2_list	preamble_ts_data_xfer_list
 
 #define postamble_13_8_2_conn	postamble_0
 #define postamble_13_8_2_resp	postamble_0
-#define postamble_13_8_2_list	postamble_13_ts_data_xfer_list
+#define postamble_13_8_2_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_8_2_conn = { &preamble_13_8_2_conn, &test_case_13_8_2_conn, &postamble_13_8_2_conn };
 struct test_stream test_13_8_2_resp = { &preamble_13_8_2_resp, &test_case_13_8_2_resp, &postamble_13_8_2_resp };
@@ -30201,9 +30246,9 @@ int test_case_13_10_1_1_list(int child)
 	return test_case_13_10_1(child);
 }
 
-#define preamble_13_10_1_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_10_1_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_10_1_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_10_1_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_10_1_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_10_1_1_list	preamble_ts_unbnd_cots_list
 
 #define postamble_13_10_1_1_conn	postamble_0
 #define postamble_13_10_1_1_resp	postamble_0
@@ -30239,13 +30284,13 @@ int test_case_13_10_1_2_list(int child)
 	return test_case_13_10_1_nofail(child);
 }
 
-#define preamble_13_10_1_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_10_1_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_10_1_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_10_1_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_10_1_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_10_1_2_list	preamble_ts_idle_cots_list
 
-#define postamble_13_10_1_2_conn	postamble_13_ts_idle_cots_conn
-#define postamble_13_10_1_2_resp	postamble_13_ts_idle_cots_resp
-#define postamble_13_10_1_2_list	postamble_13_ts_idle_cots_list
+#define postamble_13_10_1_2_conn	postamble_ts_idle_cots_conn
+#define postamble_13_10_1_2_resp	postamble_ts_idle_cots_resp
+#define postamble_13_10_1_2_list	postamble_ts_idle_cots_list
 
 struct test_stream test_13_10_1_2_conn = { &preamble_13_10_1_2_conn, &test_case_13_10_1_2_conn, &postamble_13_10_1_2_conn };
 struct test_stream test_13_10_1_2_resp = { &preamble_13_10_1_2_resp, &test_case_13_10_1_2_resp, &postamble_13_10_1_2_resp };
@@ -30277,13 +30322,13 @@ int test_case_13_10_1_3_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_10_1_3_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_10_1_3_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_10_1_3_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_10_1_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_10_1_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_10_1_3_list	preamble_ts_wcon_creq_list
 
 #define postamble_13_10_1_3_conn	postamble_0
-#define postamble_13_10_1_3_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_10_1_3_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_10_1_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_10_1_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_10_1_3_conn = { &preamble_13_10_1_3_conn, &test_case_13_10_1_3_conn, &postamble_13_10_1_3_conn };
 struct test_stream test_13_10_1_3_resp = { &preamble_13_10_1_3_resp, &test_case_13_10_1_3_resp, &postamble_13_10_1_3_resp };
@@ -30318,12 +30363,12 @@ int test_case_13_10_1_4_list(int child)
 	return test_case_13_10_1(child);
 }
 
-#define preamble_13_10_1_4_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_10_1_4_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_10_1_4_list	preamble_13_ts_wres_cind_list
+#define preamble_13_10_1_4_conn	preamble_ts_wres_cind_conn
+#define preamble_13_10_1_4_resp	preamble_ts_wres_cind_resp
+#define preamble_13_10_1_4_list	preamble_ts_wres_cind_list
 
-#define postamble_13_10_1_4_conn	postamble_13_ts_idle_conn
-#define postamble_13_10_1_4_resp	postamble_13_ts_wres_cind_resp
+#define postamble_13_10_1_4_conn	postamble_ts_idle_conn
+#define postamble_13_10_1_4_resp	postamble_ts_wres_cind_resp
 #define postamble_13_10_1_4_list	postamble_0
 
 struct test_stream test_13_10_1_4_conn = { &preamble_13_10_1_4_conn, &test_case_13_10_1_4_conn, &postamble_13_10_1_4_conn };
@@ -30356,13 +30401,13 @@ int test_case_13_10_1_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_10_1_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_10_1_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_10_1_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_10_1_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_10_1_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_10_1_5_list	preamble_ts_wind_ordrel_list
 
 #define postamble_13_10_1_5_conn	postamble_0
-#define postamble_13_10_1_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_10_1_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_10_1_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_10_1_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_10_1_5_conn = { &preamble_13_10_1_5_conn, &test_case_13_10_1_5_conn, &postamble_13_10_1_5_conn };
 struct test_stream test_13_10_1_5_resp = { &preamble_13_10_1_5_resp, &test_case_13_10_1_5_resp, &postamble_13_10_1_5_resp };
@@ -30409,13 +30454,13 @@ int test_case_13_10_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_10_2_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_10_2_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_10_2_list	preamble_13_ts_data_xfer_list
+#define preamble_13_10_2_conn	preamble_ts_data_xfer_conn
+#define preamble_13_10_2_resp	preamble_ts_data_xfer_resp
+#define preamble_13_10_2_list	preamble_ts_data_xfer_list
 
 #define postamble_13_10_2_conn	postamble_0
-#define postamble_13_10_2_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_10_2_list	postamble_13_ts_data_xfer_list
+#define postamble_13_10_2_resp	postamble_ts_data_xfer_resp
+#define postamble_13_10_2_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_10_2_conn = { &preamble_13_10_2_conn, &test_case_13_10_2_conn, &postamble_13_10_2_conn };
 struct test_stream test_13_10_2_resp = { &preamble_13_10_2_resp, &test_case_13_10_2_resp, &postamble_13_10_2_resp };
@@ -30536,13 +30581,13 @@ int test_case_13_11_3(int child)
 #define test_case_13_11_3_resp	test_case_13_11_3
 #define test_case_13_11_3_list	test_case_13_11_3
 
-#define preamble_13_11_3_conn	preamble_13_ts_idle_conn
-#define preamble_13_11_3_resp	preamble_13_ts_idle_resp
-#define preamble_13_11_3_list	preamble_13_ts_idle_list
+#define preamble_13_11_3_conn	preamble_ts_idle_conn
+#define preamble_13_11_3_resp	preamble_ts_idle_resp
+#define preamble_13_11_3_list	preamble_ts_idle_list
 
-#define postamble_13_11_3_conn	postamble_13_ts_idle_conn
-#define postamble_13_11_3_resp	postamble_13_ts_idle_resp
-#define postamble_13_11_3_list	postamble_13_ts_idle_list
+#define postamble_13_11_3_conn	postamble_ts_idle_conn
+#define postamble_13_11_3_resp	postamble_ts_idle_resp
+#define postamble_13_11_3_list	postamble_ts_idle_list
 
 struct test_stream test_13_11_3_conn = { &preamble_13_11_3_conn, &test_case_13_11_3_conn, &postamble_13_11_3_conn };
 struct test_stream test_13_11_3_resp = { &preamble_13_11_3_resp, &test_case_13_11_3_resp, &postamble_13_11_3_resp };
@@ -30588,13 +30633,13 @@ int test_case_13_11_4(int child)
 #define test_case_13_11_4_resp	test_case_13_11_4
 #define test_case_13_11_4_list	test_case_13_11_4
 
-#define preamble_13_11_4_conn	preamble_13_ts_idle_conn
-#define preamble_13_11_4_resp	preamble_13_ts_idle_resp
-#define preamble_13_11_4_list	preamble_13_ts_idle_list
+#define preamble_13_11_4_conn	preamble_ts_idle_conn
+#define preamble_13_11_4_resp	preamble_ts_idle_resp
+#define preamble_13_11_4_list	preamble_ts_idle_list
 
-#define postamble_13_11_4_conn	postamble_13_ts_idle_conn
-#define postamble_13_11_4_resp	postamble_13_ts_idle_resp
-#define postamble_13_11_4_list	postamble_13_ts_idle_list
+#define postamble_13_11_4_conn	postamble_ts_idle_conn
+#define postamble_13_11_4_resp	postamble_ts_idle_resp
+#define postamble_13_11_4_list	postamble_ts_idle_list
 
 struct test_stream test_13_11_4_conn = { &preamble_13_11_4_conn, &test_case_13_11_4_conn, &postamble_13_11_4_conn };
 struct test_stream test_13_11_4_resp = { &preamble_13_11_4_resp, &test_case_13_11_4_resp, &postamble_13_11_4_resp };
@@ -30757,9 +30802,9 @@ int test_case_13_12_1_1_list(int child)
 	return test_case_13_12_1(child);
 }
 
-#define preamble_13_12_1_1_conn	preamble_13_ts_unbnd_cots_conn
-#define preamble_13_12_1_1_resp	preamble_13_ts_unbnd_cots_resp
-#define preamble_13_12_1_1_list	preamble_13_ts_unbnd_cots_list
+#define preamble_13_12_1_1_conn	preamble_ts_unbnd_cots_conn
+#define preamble_13_12_1_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_13_12_1_1_list	preamble_ts_unbnd_cots_list
 
 #define postamble_13_12_1_1_conn	postamble_0
 #define postamble_13_12_1_1_resp	postamble_0
@@ -30795,9 +30840,9 @@ int test_case_13_12_1_2_list(int child)
 	return test_case_13_12_1(child);
 }
 
-#define preamble_13_12_1_2_conn	preamble_13_ts_idle_cots_conn
-#define preamble_13_12_1_2_resp	preamble_13_ts_idle_cots_resp
-#define preamble_13_12_1_2_list	preamble_13_ts_idle_cots_list
+#define preamble_13_12_1_2_conn	preamble_ts_idle_cots_conn
+#define preamble_13_12_1_2_resp	preamble_ts_idle_cots_resp
+#define preamble_13_12_1_2_list	preamble_ts_idle_cots_list
 
 #define postamble_13_12_1_2_conn	postamble_0
 #define postamble_13_12_1_2_resp	postamble_0
@@ -30833,13 +30878,13 @@ int test_case_13_12_1_3_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_12_1_3_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_12_1_3_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_12_1_3_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_12_1_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_12_1_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_12_1_3_list	preamble_ts_wcon_creq_list
 
 #define postamble_13_12_1_3_conn	postamble_0
-#define postamble_13_12_1_3_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_12_1_3_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_12_1_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_12_1_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_12_1_3_conn = { &preamble_13_12_1_3_conn, &test_case_13_12_1_3_conn, &postamble_13_12_1_3_conn };
 struct test_stream test_13_12_1_3_resp = { &preamble_13_12_1_3_resp, &test_case_13_12_1_3_resp, &postamble_13_12_1_3_resp };
@@ -30874,12 +30919,12 @@ int test_case_13_12_1_4_list(int child)
 	return test_case_13_12_1(child);
 }
 
-#define preamble_13_12_1_4_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_12_1_4_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_12_1_4_list	preamble_13_ts_wres_cind_list
+#define preamble_13_12_1_4_conn	preamble_ts_wres_cind_conn
+#define preamble_13_12_1_4_resp	preamble_ts_wres_cind_resp
+#define preamble_13_12_1_4_list	preamble_ts_wres_cind_list
 
-#define postamble_13_12_1_4_conn	postamble_13_ts_idle_conn
-#define postamble_13_12_1_4_resp	postamble_13_ts_wres_cind_resp
+#define postamble_13_12_1_4_conn	postamble_ts_idle_conn
+#define postamble_13_12_1_4_resp	postamble_ts_wres_cind_resp
 #define postamble_13_12_1_4_list	postamble_0
 
 struct test_stream test_13_12_1_4_conn = { &preamble_13_12_1_4_conn, &test_case_13_12_1_4_conn, &postamble_13_12_1_4_conn };
@@ -30912,13 +30957,13 @@ int test_case_13_12_1_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_12_1_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_12_1_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_12_1_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_12_1_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_12_1_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_12_1_5_list	preamble_ts_wind_ordrel_list
 
 #define postamble_13_12_1_5_conn	postamble_0
-#define postamble_13_12_1_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_12_1_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_12_1_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_12_1_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_12_1_5_conn = { &preamble_13_12_1_5_conn, &test_case_13_12_1_5_conn, &postamble_13_12_1_5_conn };
 struct test_stream test_13_12_1_5_resp = { &preamble_13_12_1_5_resp, &test_case_13_12_1_5_resp, &postamble_13_12_1_5_resp };
@@ -31004,13 +31049,13 @@ int test_case_13_13_2_1_list(int child)
 	return test_case_13_13_2(child);
 }
 
-#define preamble_13_13_2_1_conn	preamble_13_ts_unbnd_conn
-#define preamble_13_13_2_1_resp	preamble_13_ts_unbnd_resp
-#define preamble_13_13_2_1_list	preamble_13_ts_unbnd_list
+#define preamble_13_13_2_1_conn	preamble_ts_unbnd_conn
+#define preamble_13_13_2_1_resp	preamble_ts_unbnd_resp
+#define preamble_13_13_2_1_list	preamble_ts_unbnd_list
 
-#define postamble_13_13_2_1_conn	postamble_13_ts_unbnd_conn
-#define postamble_13_13_2_1_resp	postamble_13_ts_unbnd_resp
-#define postamble_13_13_2_1_list	postamble_13_ts_unbnd_list
+#define postamble_13_13_2_1_conn	postamble_ts_unbnd_conn
+#define postamble_13_13_2_1_resp	postamble_ts_unbnd_resp
+#define postamble_13_13_2_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_13_13_2_1_conn = { &preamble_13_13_2_1_conn, &test_case_13_13_2_1_conn, &postamble_13_13_2_1_conn };
 struct test_stream test_13_13_2_1_resp = { &preamble_13_13_2_1_resp, &test_case_13_13_2_1_resp, &postamble_13_13_2_1_resp };
@@ -31042,13 +31087,13 @@ int test_case_13_13_2_2_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_13_2_2_conn	preamble_13_ts_wcon_creq_conn
-#define preamble_13_13_2_2_resp	preamble_13_ts_wcon_creq_resp
-#define preamble_13_13_2_2_list	preamble_13_ts_wcon_creq_list
+#define preamble_13_13_2_2_conn	preamble_ts_wcon_creq_conn
+#define preamble_13_13_2_2_resp	preamble_ts_wcon_creq_resp
+#define preamble_13_13_2_2_list	preamble_ts_wcon_creq_list
 
-#define postamble_13_13_2_2_conn	postamble_13_ts_wcon_creq_conn
-#define postamble_13_13_2_2_resp	postamble_13_ts_wcon_creq_resp
-#define postamble_13_13_2_2_list	postamble_13_ts_wcon_creq_list
+#define postamble_13_13_2_2_conn	postamble_ts_wcon_creq_conn
+#define postamble_13_13_2_2_resp	postamble_ts_wcon_creq_resp
+#define postamble_13_13_2_2_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_13_13_2_2_conn = { &preamble_13_13_2_2_conn, &test_case_13_13_2_2_conn, &postamble_13_13_2_2_conn };
 struct test_stream test_13_13_2_2_resp = { &preamble_13_13_2_2_resp, &test_case_13_13_2_2_resp, &postamble_13_13_2_2_resp };
@@ -31082,13 +31127,13 @@ int test_case_13_13_2_3_list(int child)
 	return test_case_13_13_2(child);
 }
 
-#define preamble_13_13_2_3_conn	preamble_13_ts_wres_cind_conn
-#define preamble_13_13_2_3_resp	preamble_13_ts_wres_cind_resp
-#define preamble_13_13_2_3_list	preamble_13_ts_wres_cind_list
+#define preamble_13_13_2_3_conn	preamble_ts_wres_cind_conn
+#define preamble_13_13_2_3_resp	preamble_ts_wres_cind_resp
+#define preamble_13_13_2_3_list	preamble_ts_wres_cind_list
 
-#define postamble_13_13_2_3_conn	postamble_13_ts_wres_cind_conn
-#define postamble_13_13_2_3_resp	postamble_13_ts_wres_cind_resp
-#define postamble_13_13_2_3_list	postamble_13_ts_wres_cind_list
+#define postamble_13_13_2_3_conn	postamble_ts_wres_cind_conn
+#define postamble_13_13_2_3_resp	postamble_ts_wres_cind_resp
+#define postamble_13_13_2_3_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_13_2_3_conn = { &preamble_13_13_2_3_conn, &test_case_13_13_2_3_conn, &postamble_13_13_2_3_conn };
 struct test_stream test_13_13_2_3_resp = { &preamble_13_13_2_3_resp, &test_case_13_13_2_3_resp, &postamble_13_13_2_3_resp };
@@ -31120,13 +31165,13 @@ int test_case_13_13_2_4_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_13_2_4_conn	preamble_13_ts_data_xfer_conn
-#define preamble_13_13_2_4_resp	preamble_13_ts_data_xfer_resp
-#define preamble_13_13_2_4_list	preamble_13_ts_data_xfer_list
+#define preamble_13_13_2_4_conn	preamble_ts_data_xfer_conn
+#define preamble_13_13_2_4_resp	preamble_ts_data_xfer_resp
+#define preamble_13_13_2_4_list	preamble_ts_data_xfer_list
 
-#define postamble_13_13_2_4_conn	postamble_13_ts_data_xfer_conn
-#define postamble_13_13_2_4_resp	postamble_13_ts_data_xfer_resp
-#define postamble_13_13_2_4_list	postamble_13_ts_data_xfer_list
+#define postamble_13_13_2_4_conn	postamble_ts_data_xfer_conn
+#define postamble_13_13_2_4_resp	postamble_ts_data_xfer_resp
+#define postamble_13_13_2_4_list	postamble_ts_data_xfer_list
 
 struct test_stream test_13_13_2_4_conn = { &preamble_13_13_2_4_conn, &test_case_13_13_2_4_conn, &postamble_13_13_2_4_conn };
 struct test_stream test_13_13_2_4_resp = { &preamble_13_13_2_4_resp, &test_case_13_13_2_4_resp, &postamble_13_13_2_4_resp };
@@ -31158,13 +31203,13 @@ int test_case_13_13_2_5_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_13_2_5_conn	preamble_13_ts_wind_ordrel_conn
-#define preamble_13_13_2_5_resp	preamble_13_ts_wind_ordrel_resp
-#define preamble_13_13_2_5_list	preamble_13_ts_wind_ordrel_list
+#define preamble_13_13_2_5_conn	preamble_ts_wind_ordrel_conn
+#define preamble_13_13_2_5_resp	preamble_ts_wind_ordrel_resp
+#define preamble_13_13_2_5_list	preamble_ts_wind_ordrel_list
 
-#define postamble_13_13_2_5_conn	postamble_13_ts_wind_ordrel_conn
-#define postamble_13_13_2_5_resp	postamble_13_ts_wind_ordrel_resp
-#define postamble_13_13_2_5_list	postamble_13_ts_wind_ordrel_list
+#define postamble_13_13_2_5_conn	postamble_ts_wind_ordrel_conn
+#define postamble_13_13_2_5_resp	postamble_ts_wind_ordrel_resp
+#define postamble_13_13_2_5_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_13_13_2_5_conn = { &preamble_13_13_2_5_conn, &test_case_13_13_2_5_conn, &postamble_13_13_2_5_conn };
 struct test_stream test_13_13_2_5_resp = { &preamble_13_13_2_5_resp, &test_case_13_13_2_5_resp, &postamble_13_13_2_5_resp };
@@ -31196,13 +31241,13 @@ int test_case_13_13_2_6_list(int child)
 	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_13_2_6_conn	preamble_13_ts_wreq_ordrel_conn
-#define preamble_13_13_2_6_resp	preamble_13_ts_wreq_ordrel_resp
-#define preamble_13_13_2_6_list	preamble_13_ts_wreq_ordrel_list
+#define preamble_13_13_2_6_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_13_13_2_6_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_13_13_2_6_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_13_13_2_6_conn	postamble_13_ts_wreq_ordrel_conn
-#define postamble_13_13_2_6_resp	postamble_13_ts_wreq_ordrel_resp
-#define postamble_13_13_2_6_list	postamble_13_ts_wreq_ordrel_list
+#define postamble_13_13_2_6_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_13_13_2_6_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_13_13_2_6_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_13_13_2_6_conn = { &preamble_13_13_2_6_conn, &test_case_13_13_2_6_conn, &postamble_13_13_2_6_conn };
 struct test_stream test_13_13_2_6_resp = { &preamble_13_13_2_6_resp, &test_case_13_13_2_6_resp, &postamble_13_13_2_6_resp };
@@ -31293,9 +31338,9 @@ int test_case_13_14_1_1_list(int child)
 	return test_case_13_14_1(child);
 }
 
-#define preamble_13_14_1_1_conn	preamble_13_ts_unbnd_clts_conn
-#define preamble_13_14_1_1_resp	preamble_13_ts_unbnd_clts_resp
-#define preamble_13_14_1_1_list	preamble_13_ts_unbnd_clts_list
+#define preamble_13_14_1_1_conn	preamble_ts_unbnd_clts_conn
+#define preamble_13_14_1_1_resp	preamble_ts_unbnd_clts_resp
+#define preamble_13_14_1_1_list	preamble_ts_unbnd_clts_list
 
 #define postamble_13_14_1_1_conn	postamble_0
 #define postamble_13_14_1_1_resp	postamble_0
@@ -31341,9 +31386,9 @@ int test_case_13_14_2(int child)
 #define test_case_13_14_2_resp	test_case_13_14_2
 #define test_case_13_14_2_list	test_case_13_14_2
 
-#define preamble_13_14_2_conn	preamble_13_ts_idle_clts_conn
-#define preamble_13_14_2_resp	preamble_13_ts_idle_clts_resp
-#define preamble_13_14_2_list	preamble_13_ts_idle_clts_list
+#define preamble_13_14_2_conn	preamble_ts_idle_clts_conn
+#define preamble_13_14_2_resp	preamble_ts_idle_clts_resp
+#define preamble_13_14_2_list	preamble_ts_idle_clts_list
 
 #define postamble_13_14_2_conn	postamble_0
 #define postamble_13_14_2_resp	postamble_0
@@ -31366,28 +31411,30 @@ Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed s
 TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_UNBND state."
 
-int test_case_14_1_1_conn(int child)
+int test_case_14_1(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (do_signal(child, __TEST_ADDR_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_ADDR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-int test_case_14_1_1_resp(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define test_case_14_1_1_conn	test_case_14_1
+#define test_case_14_1_1_resp	test_case_14_1
+#define test_case_14_1_1_list	test_case_14_1
 
-int test_case_14_1_1_list(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define preamble_14_1_1_conn	preamble_ts_unbnd_conn
+#define preamble_14_1_1_resp	preamble_ts_unbnd_resp
+#define preamble_14_1_1_list	preamble_ts_unbnd_list
 
-#define preamble_14_1_1_conn	preamble_1
-#define preamble_14_1_1_resp	preamble_1
-#define preamble_14_1_1_list	preamble_1
-
-#define postamble_14_1_1_conn	postamble_1
-#define postamble_14_1_1_resp	postamble_1
-#define postamble_14_1_1_list	postamble_1
+#define postamble_14_1_1_conn	postamble_ts_unbnd_conn
+#define postamble_14_1_1_resp	postamble_ts_unbnd_resp
+#define postamble_14_1_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_14_1_1_conn = { &preamble_14_1_1_conn, &test_case_14_1_1_conn, &postamble_14_1_1_conn };
 struct test_stream test_14_1_1_resp = { &preamble_14_1_1_resp, &test_case_14_1_1_resp, &postamble_14_1_1_resp };
@@ -31403,28 +31450,17 @@ Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed s
 TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_IDLE state."
 
-int test_case_14_1_2_conn(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define test_case_14_1_2_conn	test_case_14_1
+#define test_case_14_1_2_resp	test_case_14_1
+#define test_case_14_1_2_list	test_case_14_1
 
-int test_case_14_1_2_resp(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define preamble_14_1_2_conn	preamble_ts_idle_conn
+#define preamble_14_1_2_resp	preamble_ts_idle_resp
+#define preamble_14_1_2_list	preamble_ts_idle_list
 
-int test_case_14_1_2_list(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
-
-#define preamble_14_1_2_conn	preamble_1
-#define preamble_14_1_2_resp	preamble_1
-#define preamble_14_1_2_list	preamble_1
-
-#define postamble_14_1_2_conn	postamble_1
-#define postamble_14_1_2_resp	postamble_1
-#define postamble_14_1_2_list	postamble_1
+#define postamble_14_1_2_conn	postamble_ts_idle_conn
+#define postamble_14_1_2_resp	postamble_ts_idle_resp
+#define postamble_14_1_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_1_2_conn = { &preamble_14_1_2_conn, &test_case_14_1_2_conn, &postamble_14_1_2_conn };
 struct test_stream test_14_1_2_resp = { &preamble_14_1_2_resp, &test_case_14_1_2_resp, &postamble_14_1_2_resp };
@@ -31442,26 +31478,26 @@ can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WCON_CRE
 
 int test_case_14_1_3_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
 int test_case_14_1_3_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_1_3_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_1_3_conn	preamble_1
-#define preamble_14_1_3_resp	preamble_1
-#define preamble_14_1_3_list	preamble_1
+#define preamble_14_1_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_14_1_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_14_1_3_list	preamble_ts_wcon_creq_list
 
-#define postamble_14_1_3_conn	postamble_1
-#define postamble_14_1_3_resp	postamble_1
-#define postamble_14_1_3_list	postamble_1
+#define postamble_14_1_3_conn	postamble_ts_wcon_creq_conn
+#define postamble_14_1_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_1_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_1_3_conn = { &preamble_14_1_3_conn, &test_case_14_1_3_conn, &postamble_14_1_3_conn };
 struct test_stream test_14_1_3_resp = { &preamble_14_1_3_resp, &test_case_14_1_3_resp, &postamble_14_1_3_resp };
@@ -31479,26 +31515,26 @@ can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WRES_CIN
 
 int test_case_14_1_4_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_1_4_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_1_4_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
-#define preamble_14_1_4_conn	preamble_1
-#define preamble_14_1_4_resp	preamble_1
-#define preamble_14_1_4_list	preamble_1
+#define preamble_14_1_4_conn	preamble_ts_wres_cind_conn
+#define preamble_14_1_4_resp	preamble_ts_wres_cind_resp
+#define preamble_14_1_4_list	preamble_ts_wres_cind_list
 
-#define postamble_14_1_4_conn	postamble_1
-#define postamble_14_1_4_resp	postamble_1
-#define postamble_14_1_4_list	postamble_1
+#define postamble_14_1_4_conn	postamble_ts_wres_cind_conn
+#define postamble_14_1_4_resp	postamble_ts_wres_cind_resp
+#define postamble_14_1_4_list	postamble_ts_wres_cind_list
 
 struct test_stream test_14_1_4_conn = { &preamble_14_1_4_conn, &test_case_14_1_4_conn, &postamble_14_1_4_conn };
 struct test_stream test_14_1_4_resp = { &preamble_14_1_4_resp, &test_case_14_1_4_resp, &postamble_14_1_4_resp };
@@ -31516,26 +31552,26 @@ can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_DATA_XFE
 
 int test_case_14_1_5_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
 int test_case_14_1_5_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
 int test_case_14_1_5_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_1_5_conn	preamble_1
-#define preamble_14_1_5_resp	preamble_1
-#define preamble_14_1_5_list	preamble_1
+#define preamble_14_1_5_conn	preamble_ts_data_xfer_conn
+#define preamble_14_1_5_resp	preamble_ts_data_xfer_resp
+#define preamble_14_1_5_list	preamble_ts_data_xfer_list
 
-#define postamble_14_1_5_conn	postamble_1
-#define postamble_14_1_5_resp	postamble_1
-#define postamble_14_1_5_list	postamble_1
+#define postamble_14_1_5_conn	postamble_ts_data_xfer_conn
+#define postamble_14_1_5_resp	postamble_ts_data_xfer_resp
+#define postamble_14_1_5_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_1_5_conn = { &preamble_14_1_5_conn, &test_case_14_1_5_conn, &postamble_14_1_5_conn };
 struct test_stream test_14_1_5_resp = { &preamble_14_1_5_resp, &test_case_14_1_5_resp, &postamble_14_1_5_resp };
@@ -31553,26 +31589,26 @@ can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WIND_ORD
 
 int test_case_14_1_6_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
 int test_case_14_1_6_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_1_6_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_1_6_conn	preamble_1
-#define preamble_14_1_6_resp	preamble_1
-#define preamble_14_1_6_list	preamble_1
+#define preamble_14_1_6_conn	preamble_ts_wind_ordrel_conn
+#define preamble_14_1_6_resp	preamble_ts_wind_ordrel_resp
+#define preamble_14_1_6_list	preamble_ts_wind_ordrel_list
 
-#define postamble_14_1_6_conn	postamble_1
-#define postamble_14_1_6_resp	postamble_1
-#define postamble_14_1_6_list	postamble_1
+#define postamble_14_1_6_conn	postamble_ts_wind_ordrel_conn
+#define postamble_14_1_6_resp	postamble_ts_wind_ordrel_resp
+#define postamble_14_1_6_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_14_1_6_conn = { &preamble_14_1_6_conn, &test_case_14_1_6_conn, &postamble_14_1_6_conn };
 struct test_stream test_14_1_6_resp = { &preamble_14_1_6_resp, &test_case_14_1_6_resp, &postamble_14_1_6_resp };
@@ -31590,26 +31626,26 @@ can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WREQ_ORD
 
 int test_case_14_1_7_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_1_7_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_1(child);
 }
 
 int test_case_14_1_7_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_1_7_conn	preamble_1
-#define preamble_14_1_7_resp	preamble_1
-#define preamble_14_1_7_list	preamble_1
+#define preamble_14_1_7_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_1_7_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_1_7_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_1_7_conn	postamble_1
-#define postamble_14_1_7_resp	postamble_1
-#define postamble_14_1_7_list	postamble_1
+#define postamble_14_1_7_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_1_7_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_1_7_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_1_7_conn = { &preamble_14_1_7_conn, &test_case_14_1_7_conn, &postamble_14_1_7_conn };
 struct test_stream test_14_1_7_resp = { &preamble_14_1_7_resp, &test_case_14_1_7_resp, &postamble_14_1_7_resp };
@@ -31625,28 +31661,34 @@ Checks that the T_BIND_REQ primitive can be successfully issued in the allowed s
 TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_BIND_REQ primitive in the TS_UNBND state."
 
-int test_case_14_2_1_conn(int child)
+int test_case_14_2(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = (child == 2) ? 5 : 0;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-int test_case_14_2_1_resp(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
 
-int test_case_14_2_1_list(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define test_case_14_2_1_conn	test_case_14_2
+#define test_case_14_2_1_resp	test_case_14_2
+#define test_case_14_2_1_list	test_case_14_2
 
-#define preamble_14_2_1_conn	preamble_1
-#define preamble_14_2_1_resp	preamble_1
-#define preamble_14_2_1_list	preamble_1
+#define preamble_14_2_1_conn	preamble_ts_unbnd_conn
+#define preamble_14_2_1_resp	preamble_ts_unbnd_resp
+#define preamble_14_2_1_list	preamble_ts_unbnd_list
 
-#define postamble_14_2_1_conn	postamble_1
-#define postamble_14_2_1_resp	postamble_1
-#define postamble_14_2_1_list	postamble_1
+#define postamble_14_2_1_conn	postamble_ts_idle_conn
+#define postamble_14_2_1_resp	postamble_ts_idle_resp
+#define postamble_14_2_1_list	postamble_ts_idle_list
 
 struct test_stream test_14_2_1_conn = { &preamble_14_2_1_conn, &test_case_14_2_1_conn, &postamble_14_2_1_conn };
 struct test_stream test_14_2_1_resp = { &preamble_14_2_1_resp, &test_case_14_2_1_resp, &postamble_14_2_1_resp };
@@ -31662,28 +31704,31 @@ Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the all
 TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_UNBND state."
 
-int test_case_14_3_1_conn(int child)
+int test_case_14_3(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_prio = 1;
+	if (do_signal(child, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-int test_case_14_3_1_resp(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define test_case_14_3_1_conn	test_case_14_3
+#define test_case_14_3_1_resp	test_case_14_3
+#define test_case_14_3_1_list	test_case_14_3
 
-int test_case_14_3_1_list(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define preamble_14_3_1_conn	preamble_ts_unbnd_conn
+#define preamble_14_3_1_resp	preamble_ts_unbnd_resp
+#define preamble_14_3_1_list	preamble_ts_unbnd_list
 
-#define preamble_14_3_1_conn	preamble_1
-#define preamble_14_3_1_resp	preamble_1
-#define preamble_14_3_1_list	preamble_1
-
-#define postamble_14_3_1_conn	postamble_1
-#define postamble_14_3_1_resp	postamble_1
-#define postamble_14_3_1_list	postamble_1
+#define postamble_14_3_1_conn	postamble_ts_unbnd_conn
+#define postamble_14_3_1_resp	postamble_ts_unbnd_resp
+#define postamble_14_3_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_14_3_1_conn = { &preamble_14_3_1_conn, &test_case_14_3_1_conn, &postamble_14_3_1_conn };
 struct test_stream test_14_3_1_resp = { &preamble_14_3_1_resp, &test_case_14_3_1_resp, &postamble_14_3_1_resp };
@@ -31699,28 +31744,17 @@ Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the all
 TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_IDLE state."
 
-int test_case_14_3_2_conn(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define test_case_14_3_2_conn	test_case_14_3
+#define test_case_14_3_2_resp	test_case_14_3
+#define test_case_14_3_2_list	test_case_14_3
 
-int test_case_14_3_2_resp(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
+#define preamble_14_3_2_conn	preamble_ts_idle_conn
+#define preamble_14_3_2_resp	preamble_ts_idle_resp
+#define preamble_14_3_2_list	preamble_ts_idle_list
 
-int test_case_14_3_2_list(int child)
-{
-	return (__RESULT_NOTAPPL);
-}
-
-#define preamble_14_3_2_conn	preamble_1
-#define preamble_14_3_2_resp	preamble_1
-#define preamble_14_3_2_list	preamble_1
-
-#define postamble_14_3_2_conn	postamble_1
-#define postamble_14_3_2_resp	postamble_1
-#define postamble_14_3_2_list	postamble_1
+#define postamble_14_3_2_conn	postamble_ts_idle_conn
+#define postamble_14_3_2_resp	postamble_ts_idle_resp
+#define postamble_14_3_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_3_2_conn = { &preamble_14_3_2_conn, &test_case_14_3_2_conn, &postamble_14_3_2_conn };
 struct test_stream test_14_3_2_resp = { &preamble_14_3_2_resp, &test_case_14_3_2_resp, &postamble_14_3_2_resp };
@@ -31738,26 +31772,26 @@ can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WC
 
 int test_case_14_3_3_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
 int test_case_14_3_3_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_3_3_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_3_3_conn	preamble_1
-#define preamble_14_3_3_resp	preamble_1
-#define preamble_14_3_3_list	preamble_1
+#define preamble_14_3_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_14_3_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_14_3_3_list	preamble_ts_wcon_creq_list
 
-#define postamble_14_3_3_conn	postamble_1
-#define postamble_14_3_3_resp	postamble_1
-#define postamble_14_3_3_list	postamble_1
+#define postamble_14_3_3_conn	postamble_ts_wcon_creq_conn
+#define postamble_14_3_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_3_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_3_3_conn = { &preamble_14_3_3_conn, &test_case_14_3_3_conn, &postamble_14_3_3_conn };
 struct test_stream test_14_3_3_resp = { &preamble_14_3_3_resp, &test_case_14_3_3_resp, &postamble_14_3_3_resp };
@@ -31775,26 +31809,26 @@ can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WR
 
 int test_case_14_3_4_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_3_4_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_3_4_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
-#define preamble_14_3_4_conn	preamble_1
-#define preamble_14_3_4_resp	preamble_1
-#define preamble_14_3_4_list	preamble_1
+#define preamble_14_3_4_conn	preamble_ts_wres_cind_conn
+#define preamble_14_3_4_resp	preamble_ts_wres_cind_resp
+#define preamble_14_3_4_list	preamble_ts_wres_cind_list
 
-#define postamble_14_3_4_conn	postamble_1
-#define postamble_14_3_4_resp	postamble_1
-#define postamble_14_3_4_list	postamble_1
+#define postamble_14_3_4_conn	postamble_ts_wres_cind_conn
+#define postamble_14_3_4_resp	postamble_ts_wres_cind_resp
+#define postamble_14_3_4_list	postamble_ts_wres_cind_list
 
 struct test_stream test_14_3_4_conn = { &preamble_14_3_4_conn, &test_case_14_3_4_conn, &postamble_14_3_4_conn };
 struct test_stream test_14_3_4_resp = { &preamble_14_3_4_resp, &test_case_14_3_4_resp, &postamble_14_3_4_resp };
@@ -31812,26 +31846,26 @@ can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_DA
 
 int test_case_14_3_5_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
 int test_case_14_3_5_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
 int test_case_14_3_5_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_3_5_conn	preamble_1
-#define preamble_14_3_5_resp	preamble_1
-#define preamble_14_3_5_list	preamble_1
+#define preamble_14_3_5_conn	preamble_ts_data_xfer_conn
+#define preamble_14_3_5_resp	preamble_ts_data_xfer_resp
+#define preamble_14_3_5_list	preamble_ts_data_xfer_list
 
-#define postamble_14_3_5_conn	postamble_1
-#define postamble_14_3_5_resp	postamble_1
-#define postamble_14_3_5_list	postamble_1
+#define postamble_14_3_5_conn	postamble_ts_data_xfer_conn
+#define postamble_14_3_5_resp	postamble_ts_data_xfer_resp
+#define postamble_14_3_5_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_3_5_conn = { &preamble_14_3_5_conn, &test_case_14_3_5_conn, &postamble_14_3_5_conn };
 struct test_stream test_14_3_5_resp = { &preamble_14_3_5_resp, &test_case_14_3_5_resp, &postamble_14_3_5_resp };
@@ -31849,26 +31883,26 @@ can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WI
 
 int test_case_14_3_6_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
 int test_case_14_3_6_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_3_6_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_3_6_conn	preamble_1
-#define preamble_14_3_6_resp	preamble_1
-#define preamble_14_3_6_list	preamble_1
+#define preamble_14_3_6_conn	preamble_ts_wind_ordrel_conn
+#define preamble_14_3_6_resp	preamble_ts_wind_ordrel_resp
+#define preamble_14_3_6_list	preamble_ts_wind_ordrel_list
 
-#define postamble_14_3_6_conn	postamble_1
-#define postamble_14_3_6_resp	postamble_1
-#define postamble_14_3_6_list	postamble_1
+#define postamble_14_3_6_conn	postamble_ts_wind_ordrel_conn
+#define postamble_14_3_6_resp	postamble_ts_wind_ordrel_resp
+#define postamble_14_3_6_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_14_3_6_conn = { &preamble_14_3_6_conn, &test_case_14_3_6_conn, &postamble_14_3_6_conn };
 struct test_stream test_14_3_6_resp = { &preamble_14_3_6_resp, &test_case_14_3_6_resp, &postamble_14_3_6_resp };
@@ -31886,26 +31920,26 @@ can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WR
 
 int test_case_14_3_7_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_3_7_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_3(child);
 }
 
 int test_case_14_3_7_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_3_7_conn	preamble_1
-#define preamble_14_3_7_resp	preamble_1
-#define preamble_14_3_7_list	preamble_1
+#define preamble_14_3_7_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_3_7_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_3_7_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_3_7_conn	postamble_1
-#define postamble_14_3_7_resp	postamble_1
-#define postamble_14_3_7_list	postamble_1
+#define postamble_14_3_7_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_3_7_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_3_7_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_3_7_conn = { &preamble_14_3_7_conn, &test_case_14_3_7_conn, &postamble_14_3_7_conn };
 struct test_stream test_14_3_7_resp = { &preamble_14_3_7_resp, &test_case_14_3_7_resp, &postamble_14_3_7_resp };
@@ -31923,26 +31957,39 @@ can be issued.  This test case tests the T_CONN_REQ primitive in the TS_IDLE sta
 
 int test_case_14_4_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	test_addr = &addrs[2];
+	test_alen = sizeof(addrs[2]);
+	test_opts = NULL;
+	test_olen = 0;
+	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_4_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_4_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_4_1_conn	preamble_1
-#define preamble_14_4_1_resp	preamble_1
-#define preamble_14_4_1_list	preamble_1
+#define preamble_14_4_1_conn	preamble_ts_idle_cots_conn
+#define preamble_14_4_1_resp	preamble_ts_unbnd_cots_resp
+#define preamble_14_4_1_list	preamble_ts_unbnd_cots_list
 
-#define postamble_14_4_1_conn	postamble_1
-#define postamble_14_4_1_resp	postamble_1
-#define postamble_14_4_1_list	postamble_1
+#define postamble_14_4_1_conn	postamble_ts_wcon_creq_conn
+#define postamble_14_4_1_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_4_1_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_4_1_conn = { &preamble_14_4_1_conn, &test_case_14_4_1_conn, &postamble_14_4_1_conn };
 struct test_stream test_14_4_1_resp = { &preamble_14_4_1_resp, &test_case_14_4_1_resp, &postamble_14_4_1_resp };
@@ -31960,26 +32007,40 @@ can be issued.  This test case tests the T_CONN_RES primitive in the TS_WRES_CIN
 
 int test_case_14_5_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_5_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_5_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_resfd = test_fd[1];
+	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_14_5_1_conn	preamble_1
-#define preamble_14_5_1_resp	preamble_1
-#define preamble_14_5_1_list	preamble_1
+#define preamble_14_5_1_conn	preamble_ts_data_xfer_conn
+#define preamble_14_5_1_resp	preamble_ts_data_xfer_resp
+#define preamble_14_5_1_list	preamble_ts_wres_cind_list
 
-#define postamble_14_5_1_conn	postamble_1
-#define postamble_14_5_1_resp	postamble_1
-#define postamble_14_5_1_list	postamble_1
+#define postamble_14_5_1_conn	postamble_ts_data_xfer_conn
+#define postamble_14_5_1_resp	postamble_ts_data_xfer_resp
+#define postamble_14_5_1_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_5_1_conn = { &preamble_14_5_1_conn, &test_case_14_5_1_conn, &postamble_14_5_1_conn };
 struct test_stream test_14_5_1_resp = { &preamble_14_5_1_resp, &test_case_14_5_1_resp, &postamble_14_5_1_resp };
@@ -31997,26 +32058,46 @@ can be issued.  This test case tests the T_DATA_REQ primitive in the TS_DATA_XFE
 
 int test_case_14_6_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "Some data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_6_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Some data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_6_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_6_1_conn	preamble_1
-#define preamble_14_6_1_resp	preamble_1
-#define preamble_14_6_1_list	preamble_1
+#define preamble_14_6_1_conn	preamble_ts_data_xfer_conn
+#define preamble_14_6_1_resp	preamble_ts_data_xfer_resp
+#define preamble_14_6_1_list	preamble_ts_data_xfer_list
 
-#define postamble_14_6_1_conn	postamble_1
-#define postamble_14_6_1_resp	postamble_1
-#define postamble_14_6_1_list	postamble_1
+#define postamble_14_6_1_conn	postamble_ts_data_xfer_conn
+#define postamble_14_6_1_resp	postamble_ts_data_xfer_resp
+#define postamble_14_6_1_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_6_1_conn = { &preamble_14_6_1_conn, &test_case_14_6_1_conn, &postamble_14_6_1_conn };
 struct test_stream test_14_6_1_resp = { &preamble_14_6_1_resp, &test_case_14_6_1_resp, &postamble_14_6_1_resp };
@@ -32034,26 +32115,38 @@ can be issued.  This test case tests the T_DATA_REQ primitive in the TS_WREQ_ORD
 
 int test_case_14_6_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_6_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "Some data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_6_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_6_2_conn	preamble_1
-#define preamble_14_6_2_resp	preamble_1
-#define preamble_14_6_2_list	preamble_1
+#define preamble_14_6_2_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_6_2_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_6_2_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_6_2_conn	postamble_1
-#define postamble_14_6_2_resp	postamble_1
-#define postamble_14_6_2_list	postamble_1
+#define postamble_14_6_2_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_6_2_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_6_2_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_6_2_conn = { &preamble_14_6_2_conn, &test_case_14_6_2_conn, &postamble_14_6_2_conn };
 struct test_stream test_14_6_2_resp = { &preamble_14_6_2_resp, &test_case_14_6_2_resp, &postamble_14_6_2_resp };
@@ -32071,26 +32164,36 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WCON_C
 
 int test_case_14_7_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_7_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_7_1_conn	preamble_1
-#define preamble_14_7_1_resp	preamble_1
-#define preamble_14_7_1_list	preamble_1
+#define preamble_14_7_1_conn	preamble_ts_wcon_creq_conn
+#define preamble_14_7_1_resp	preamble_ts_wcon_creq_resp
+#define preamble_14_7_1_list	preamble_ts_wcon_creq_list
 
-#define postamble_14_7_1_conn	postamble_1
-#define postamble_14_7_1_resp	postamble_1
-#define postamble_14_7_1_list	postamble_1
+#define postamble_14_7_1_conn	postamble_ts_idle_conn
+#define postamble_14_7_1_resp	postamble_ts_idle_resp
+#define postamble_14_7_1_list	postamble_ts_idle_list
 
 struct test_stream test_14_7_1_conn = { &preamble_14_7_1_conn, &test_case_14_7_1_conn, &postamble_14_7_1_conn };
 struct test_stream test_14_7_1_resp = { &preamble_14_7_1_resp, &test_case_14_7_1_resp, &postamble_14_7_1_resp };
@@ -32108,26 +32211,40 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WRES_C
 
 int test_case_14_7_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	state++;
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_7_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_7_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	test_data = NULL;
+	last_sequence = last_sequence;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-#define preamble_14_7_2_conn	preamble_1
-#define preamble_14_7_2_resp	preamble_1
-#define preamble_14_7_2_list	preamble_1
+#define preamble_14_7_2_conn	preamble_ts_wres_cind_conn
+#define preamble_14_7_2_resp	preamble_ts_wres_cind_resp
+#define preamble_14_7_2_list	preamble_ts_wres_cind_list
 
-#define postamble_14_7_2_conn	postamble_1
-#define postamble_14_7_2_resp	postamble_1
-#define postamble_14_7_2_list	postamble_1
+#define postamble_14_7_2_conn	postamble_ts_idle_conn
+#define postamble_14_7_2_resp	postamble_ts_unbnd_resp
+#define postamble_14_7_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_7_2_conn = { &preamble_14_7_2_conn, &test_case_14_7_2_conn, &postamble_14_7_2_conn };
 struct test_stream test_14_7_2_resp = { &preamble_14_7_2_resp, &test_case_14_7_2_resp, &postamble_14_7_2_resp };
@@ -32145,26 +32262,41 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_DATA_X
 
 int test_case_14_7_3_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_3_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_3_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_7_3_conn	preamble_1
-#define preamble_14_7_3_resp	preamble_1
-#define preamble_14_7_3_list	preamble_1
+#define preamble_14_7_3_conn	preamble_ts_data_xfer_conn
+#define preamble_14_7_3_resp	preamble_ts_data_xfer_resp
+#define preamble_14_7_3_list	preamble_ts_data_xfer_list
 
-#define postamble_14_7_3_conn	postamble_1
-#define postamble_14_7_3_resp	postamble_1
-#define postamble_14_7_3_list	postamble_1
+#define postamble_14_7_3_conn	postamble_ts_idle_conn
+#define postamble_14_7_3_resp	postamble_ts_idle_resp
+#define postamble_14_7_3_list	postamble_ts_idle_list
 
 struct test_stream test_14_7_3_conn = { &preamble_14_7_3_conn, &test_case_14_7_3_conn, &postamble_14_7_3_conn };
 struct test_stream test_14_7_3_resp = { &preamble_14_7_3_resp, &test_case_14_7_3_resp, &postamble_14_7_3_resp };
@@ -32182,26 +32314,41 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WIND_O
 
 int test_case_14_7_4_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_4_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_4_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_7_4_conn	preamble_1
-#define preamble_14_7_4_resp	preamble_1
-#define preamble_14_7_4_list	preamble_1
+#define preamble_14_7_4_conn	preamble_ts_wind_ordrel_conn
+#define preamble_14_7_4_resp	preamble_ts_wind_ordrel_resp
+#define preamble_14_7_4_list	preamble_ts_wind_ordrel_list
 
-#define postamble_14_7_4_conn	postamble_1
-#define postamble_14_7_4_resp	postamble_1
-#define postamble_14_7_4_list	postamble_1
+#define postamble_14_7_4_conn	postamble_ts_idle_conn
+#define postamble_14_7_4_resp	postamble_ts_idle_resp
+#define postamble_14_7_4_list	postamble_ts_idle_list
 
 struct test_stream test_14_7_4_conn = { &preamble_14_7_4_conn, &test_case_14_7_4_conn, &postamble_14_7_4_conn };
 struct test_stream test_14_7_4_resp = { &preamble_14_7_4_resp, &test_case_14_7_4_resp, &postamble_14_7_4_resp };
@@ -32219,26 +32366,41 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WREQ_O
 
 int test_case_14_7_5_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_5_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	last_sequence = 0;
+	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_7_5_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_7_5_conn	preamble_1
-#define preamble_14_7_5_resp	preamble_1
-#define preamble_14_7_5_list	preamble_1
+#define preamble_14_7_5_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_7_5_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_7_5_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_7_5_conn	postamble_1
-#define postamble_14_7_5_resp	postamble_1
-#define postamble_14_7_5_list	postamble_1
+#define postamble_14_7_5_conn	postamble_ts_idle_conn
+#define postamble_14_7_5_resp	postamble_ts_idle_resp
+#define postamble_14_7_5_list	postamble_ts_idle_list
 
 struct test_stream test_14_7_5_conn = { &preamble_14_7_5_conn, &test_case_14_7_5_conn, &postamble_14_7_5_conn };
 struct test_stream test_14_7_5_resp = { &preamble_14_7_5_resp, &test_case_14_7_5_resp, &postamble_14_7_5_resp };
@@ -32256,26 +32418,46 @@ can be issued.  This test case tests the T_EXDATA_REQ primitive in the TS_DATA_X
 
 int test_case_14_8_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "A";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_8_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "A";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_8_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_8_1_conn	preamble_1
-#define preamble_14_8_1_resp	preamble_1
-#define preamble_14_8_1_list	preamble_1
+#define preamble_14_8_1_conn	preamble_ts_data_xfer_conn
+#define preamble_14_8_1_resp	preamble_ts_data_xfer_resp
+#define preamble_14_8_1_list	preamble_ts_data_xfer_list
 
-#define postamble_14_8_1_conn	postamble_1
-#define postamble_14_8_1_resp	postamble_1
-#define postamble_14_8_1_list	postamble_1
+#define postamble_14_8_1_conn	postamble_ts_data_xfer_conn
+#define postamble_14_8_1_resp	postamble_ts_data_xfer_resp
+#define postamble_14_8_1_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_8_1_conn = { &preamble_14_8_1_conn, &test_case_14_8_1_conn, &postamble_14_8_1_conn };
 struct test_stream test_14_8_1_resp = { &preamble_14_8_1_resp, &test_case_14_8_1_resp, &postamble_14_8_1_resp };
@@ -32293,26 +32475,38 @@ can be issued.  This test case tests the T_EXDATA_REQ primitive in the TS_WREQ_O
 
 int test_case_14_8_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_8_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "A";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_8_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_8_2_conn	preamble_1
-#define preamble_14_8_2_resp	preamble_1
-#define preamble_14_8_2_list	preamble_1
+#define preamble_14_8_2_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_8_2_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_8_2_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_8_2_conn	postamble_1
-#define postamble_14_8_2_resp	postamble_1
-#define postamble_14_8_2_list	postamble_1
+#define postamble_14_8_2_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_8_2_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_8_2_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_8_2_conn = { &preamble_14_8_2_conn, &test_case_14_8_2_conn, &postamble_14_8_2_conn };
 struct test_stream test_14_8_2_resp = { &preamble_14_8_2_resp, &test_case_14_8_2_resp, &postamble_14_8_2_resp };
@@ -32328,28 +32522,46 @@ Checks that the T_INFO_REQ primitive can be successfully issued in the allowed s
 TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_INFO_REQ primitive in the TS_UNBND state."
 
+int test_case_14_9(int child, ulong CURRENT_state)
+{
+	if (do_signal(child, __TEST_INFO_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_info.CURRENT_state != CURRENT_state)
+		goto inconclusive;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+      inconclusive:
+	return (__RESULT_INCONCLUSIVE);
+}
+
 int test_case_14_9_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_UNBND);
 }
 
 int test_case_14_9_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_UNBND);
 }
 
 int test_case_14_9_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_UNBND);
 }
 
-#define preamble_14_9_1_conn	preamble_1
-#define preamble_14_9_1_resp	preamble_1
-#define preamble_14_9_1_list	preamble_1
+#define preamble_14_9_1_conn	preamble_ts_unbnd_conn
+#define preamble_14_9_1_resp	preamble_ts_unbnd_resp
+#define preamble_14_9_1_list	preamble_ts_unbnd_list
 
-#define postamble_14_9_1_conn	postamble_1
-#define postamble_14_9_1_resp	postamble_1
-#define postamble_14_9_1_list	postamble_1
+#define postamble_14_9_1_conn	postamble_ts_unbnd_conn
+#define postamble_14_9_1_resp	postamble_ts_unbnd_resp
+#define postamble_14_9_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_14_9_1_conn = { &preamble_14_9_1_conn, &test_case_14_9_1_conn, &postamble_14_9_1_conn };
 struct test_stream test_14_9_1_resp = { &preamble_14_9_1_resp, &test_case_14_9_1_resp, &postamble_14_9_1_resp };
@@ -32367,26 +32579,26 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_IDLE sta
 
 int test_case_14_9_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_IDLE);
 }
 
 int test_case_14_9_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_IDLE);
 }
 
 int test_case_14_9_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_IDLE);
 }
 
-#define preamble_14_9_2_conn	preamble_1
-#define preamble_14_9_2_resp	preamble_1
-#define preamble_14_9_2_list	preamble_1
+#define preamble_14_9_2_conn	preamble_ts_idle_conn
+#define preamble_14_9_2_resp	preamble_ts_idle_resp
+#define preamble_14_9_2_list	preamble_ts_idle_list
 
-#define postamble_14_9_2_conn	postamble_1
-#define postamble_14_9_2_resp	postamble_1
-#define postamble_14_9_2_list	postamble_1
+#define postamble_14_9_2_conn	postamble_ts_idle_conn
+#define postamble_14_9_2_resp	postamble_ts_idle_resp
+#define postamble_14_9_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_9_2_conn = { &preamble_14_9_2_conn, &test_case_14_9_2_conn, &postamble_14_9_2_conn };
 struct test_stream test_14_9_2_resp = { &preamble_14_9_2_resp, &test_case_14_9_2_resp, &postamble_14_9_2_resp };
@@ -32404,26 +32616,26 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WCON_CRE
 
 int test_case_14_9_3_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_WCON_CREQ);
 }
 
 int test_case_14_9_3_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_9_3_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_9_3_conn	preamble_1
-#define preamble_14_9_3_resp	preamble_1
-#define preamble_14_9_3_list	preamble_1
+#define preamble_14_9_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_14_9_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_14_9_3_list	preamble_ts_wcon_creq_list
 
-#define postamble_14_9_3_conn	postamble_1
-#define postamble_14_9_3_resp	postamble_1
-#define postamble_14_9_3_list	postamble_1
+#define postamble_14_9_3_conn	postamble_ts_wcon_creq_conn
+#define postamble_14_9_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_9_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_9_3_conn = { &preamble_14_9_3_conn, &test_case_14_9_3_conn, &postamble_14_9_3_conn };
 struct test_stream test_14_9_3_resp = { &preamble_14_9_3_resp, &test_case_14_9_3_resp, &postamble_14_9_3_resp };
@@ -32441,26 +32653,28 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WRES_CIN
 
 int test_case_14_9_4_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_9_4_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_9_4_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	return test_case_14_9(child, TS_WRES_CIND);
 }
 
-#define preamble_14_9_4_conn	preamble_1
-#define preamble_14_9_4_resp	preamble_1
-#define preamble_14_9_4_list	preamble_1
+#define preamble_14_9_4_conn	preamble_ts_wres_cind_conn
+#define preamble_14_9_4_resp	preamble_ts_wres_cind_resp
+#define preamble_14_9_4_list	preamble_ts_wres_cind_list
 
-#define postamble_14_9_4_conn	postamble_1
-#define postamble_14_9_4_resp	postamble_1
-#define postamble_14_9_4_list	postamble_1
+#define postamble_14_9_4_conn	postamble_ts_wres_cind_conn
+#define postamble_14_9_4_resp	postamble_ts_wres_cind_resp
+#define postamble_14_9_4_list	postamble_ts_wres_cind_list
 
 struct test_stream test_14_9_4_conn = { &preamble_14_9_4_conn, &test_case_14_9_4_conn, &postamble_14_9_4_conn };
 struct test_stream test_14_9_4_resp = { &preamble_14_9_4_resp, &test_case_14_9_4_resp, &postamble_14_9_4_resp };
@@ -32478,26 +32692,26 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_DATA_XFE
 
 int test_case_14_9_5_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_DATA_XFER);
 }
 
 int test_case_14_9_5_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_DATA_XFER);
 }
 
 int test_case_14_9_5_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_9_5_conn	preamble_1
-#define preamble_14_9_5_resp	preamble_1
-#define preamble_14_9_5_list	preamble_1
+#define preamble_14_9_5_conn	preamble_ts_data_xfer_conn
+#define preamble_14_9_5_resp	preamble_ts_data_xfer_resp
+#define preamble_14_9_5_list	preamble_ts_data_xfer_list
 
-#define postamble_14_9_5_conn	postamble_1
-#define postamble_14_9_5_resp	postamble_1
-#define postamble_14_9_5_list	postamble_1
+#define postamble_14_9_5_conn	postamble_ts_data_xfer_conn
+#define postamble_14_9_5_resp	postamble_ts_data_xfer_resp
+#define postamble_14_9_5_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_9_5_conn = { &preamble_14_9_5_conn, &test_case_14_9_5_conn, &postamble_14_9_5_conn };
 struct test_stream test_14_9_5_resp = { &preamble_14_9_5_resp, &test_case_14_9_5_resp, &postamble_14_9_5_resp };
@@ -32515,26 +32729,26 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WIND_ORD
 
 int test_case_14_9_6_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_WIND_ORDREL);
 }
 
 int test_case_14_9_6_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_9_6_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_9_6_conn	preamble_1
-#define preamble_14_9_6_resp	preamble_1
-#define preamble_14_9_6_list	preamble_1
+#define preamble_14_9_6_conn	preamble_ts_wind_ordrel_conn
+#define preamble_14_9_6_resp	preamble_ts_wind_ordrel_resp
+#define preamble_14_9_6_list	preamble_ts_wind_ordrel_list
 
-#define postamble_14_9_6_conn	postamble_1
-#define postamble_14_9_6_resp	postamble_1
-#define postamble_14_9_6_list	postamble_1
+#define postamble_14_9_6_conn	postamble_ts_wind_ordrel_conn
+#define postamble_14_9_6_resp	postamble_ts_wind_ordrel_resp
+#define postamble_14_9_6_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_14_9_6_conn = { &preamble_14_9_6_conn, &test_case_14_9_6_conn, &postamble_14_9_6_conn };
 struct test_stream test_14_9_6_resp = { &preamble_14_9_6_resp, &test_case_14_9_6_resp, &postamble_14_9_6_resp };
@@ -32552,26 +32766,26 @@ can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WREQ_ORD
 
 int test_case_14_9_7_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_9_7_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_9(child, TS_WREQ_ORDREL);
 }
 
 int test_case_14_9_7_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_9_7_conn	preamble_1
-#define preamble_14_9_7_resp	preamble_1
-#define preamble_14_9_7_list	preamble_1
+#define preamble_14_9_7_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_9_7_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_9_7_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_9_7_conn	postamble_1
-#define postamble_14_9_7_resp	postamble_1
-#define postamble_14_9_7_list	postamble_1
+#define postamble_14_9_7_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_9_7_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_9_7_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_9_7_conn = { &preamble_14_9_7_conn, &test_case_14_9_7_conn, &postamble_14_9_7_conn };
 struct test_stream test_14_9_7_resp = { &preamble_14_9_7_resp, &test_case_14_9_7_resp, &postamble_14_9_7_resp };
@@ -32589,26 +32803,50 @@ can be issued.  This test case tests the T_OPTDATA_REQ primitive in the TS_DATA_
 
 int test_case_14_10_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "Some data.";
+	test_opts = NULL;
+	test_olen = 0;
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_10_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_data = "Some data.";
+	test_opts = NULL;
+	test_olen = 0;
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_10_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_10_1_conn	preamble_1
-#define preamble_14_10_1_resp	preamble_1
-#define preamble_14_10_1_list	preamble_1
+#define preamble_14_10_1_conn	preamble_ts_data_xfer_conn
+#define preamble_14_10_1_resp	preamble_ts_data_xfer_resp
+#define preamble_14_10_1_list	preamble_ts_data_xfer_list
 
-#define postamble_14_10_1_conn	postamble_1
-#define postamble_14_10_1_resp	postamble_1
-#define postamble_14_10_1_list	postamble_1
+#define postamble_14_10_1_conn	postamble_ts_data_xfer_conn
+#define postamble_14_10_1_resp	postamble_ts_data_xfer_resp
+#define postamble_14_10_1_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_10_1_conn = { &preamble_14_10_1_conn, &test_case_14_10_1_conn, &postamble_14_10_1_conn };
 struct test_stream test_14_10_1_resp = { &preamble_14_10_1_resp, &test_case_14_10_1_resp, &postamble_14_10_1_resp };
@@ -32626,26 +32864,40 @@ can be issued.  This test case tests the T_OPTDATA_REQ primitive in the TS_WREQ_
 
 int test_case_14_10_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_10_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = "Some data.";
+	test_opts = NULL;
+	test_olen = 0;
+	DATA_flag = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_10_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_10_2_conn	preamble_1
-#define preamble_14_10_2_resp	preamble_1
-#define preamble_14_10_2_list	preamble_1
+#define preamble_14_10_2_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_10_2_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_10_2_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_10_2_conn	postamble_1
-#define postamble_14_10_2_resp	postamble_1
-#define postamble_14_10_2_list	postamble_1
+#define postamble_14_10_2_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_10_2_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_10_2_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_10_2_conn = { &preamble_14_10_2_conn, &test_case_14_10_2_conn, &postamble_14_10_2_conn };
 struct test_stream test_14_10_2_resp = { &preamble_14_10_2_resp, &test_case_14_10_2_resp, &postamble_14_10_2_resp };
@@ -32661,28 +32913,44 @@ Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowe
 TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_UNBND state."
 
+int test_case_14_11(int child)
+{
+	test_mgmtflags = T_DEFAULT;
+	test_opts = NULL;
+	test_olen = 0;
+	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 int test_case_14_11_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
-#define preamble_14_11_1_conn	preamble_1
-#define preamble_14_11_1_resp	preamble_1
-#define preamble_14_11_1_list	preamble_1
+#define preamble_14_11_1_conn	preamble_ts_unbnd_conn
+#define preamble_14_11_1_resp	preamble_ts_unbnd_resp
+#define preamble_14_11_1_list	preamble_ts_unbnd_list
 
-#define postamble_14_11_1_conn	postamble_1
-#define postamble_14_11_1_resp	postamble_1
-#define postamble_14_11_1_list	postamble_1
+#define postamble_14_11_1_conn	postamble_ts_unbnd_conn
+#define postamble_14_11_1_resp	postamble_ts_unbnd_resp
+#define postamble_14_11_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_14_11_1_conn = { &preamble_14_11_1_conn, &test_case_14_11_1_conn, &postamble_14_11_1_conn };
 struct test_stream test_14_11_1_resp = { &preamble_14_11_1_resp, &test_case_14_11_1_resp, &postamble_14_11_1_resp };
@@ -32700,26 +32968,26 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_IDLE 
 
 int test_case_14_11_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
-#define preamble_14_11_2_conn	preamble_1
-#define preamble_14_11_2_resp	preamble_1
-#define preamble_14_11_2_list	preamble_1
+#define preamble_14_11_2_conn	preamble_ts_idle_conn
+#define preamble_14_11_2_resp	preamble_ts_idle_resp
+#define preamble_14_11_2_list	preamble_ts_idle_list
 
-#define postamble_14_11_2_conn	postamble_1
-#define postamble_14_11_2_resp	postamble_1
-#define postamble_14_11_2_list	postamble_1
+#define postamble_14_11_2_conn	postamble_ts_idle_conn
+#define postamble_14_11_2_resp	postamble_ts_idle_resp
+#define postamble_14_11_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_11_2_conn = { &preamble_14_11_2_conn, &test_case_14_11_2_conn, &postamble_14_11_2_conn };
 struct test_stream test_14_11_2_resp = { &preamble_14_11_2_resp, &test_case_14_11_2_resp, &postamble_14_11_2_resp };
@@ -32737,26 +33005,26 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WCON_
 
 int test_case_14_11_3_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_3_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_11_3_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_11_3_conn	preamble_1
-#define preamble_14_11_3_resp	preamble_1
-#define preamble_14_11_3_list	preamble_1
+#define preamble_14_11_3_conn	preamble_ts_wcon_creq_conn
+#define preamble_14_11_3_resp	preamble_ts_wcon_creq_resp
+#define preamble_14_11_3_list	preamble_ts_wcon_creq_list
 
-#define postamble_14_11_3_conn	postamble_1
-#define postamble_14_11_3_resp	postamble_1
-#define postamble_14_11_3_list	postamble_1
+#define postamble_14_11_3_conn	postamble_ts_wcon_creq_conn
+#define postamble_14_11_3_resp	postamble_ts_wcon_creq_resp
+#define postamble_14_11_3_list	postamble_ts_wcon_creq_list
 
 struct test_stream test_14_11_3_conn = { &preamble_14_11_3_conn, &test_case_14_11_3_conn, &postamble_14_11_3_conn };
 struct test_stream test_14_11_3_resp = { &preamble_14_11_3_resp, &test_case_14_11_3_resp, &postamble_14_11_3_resp };
@@ -32774,26 +33042,28 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WRES_
 
 int test_case_14_11_4_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_11_4_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_11_4_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	return test_case_14_11(child);
 }
 
-#define preamble_14_11_4_conn	preamble_1
-#define preamble_14_11_4_resp	preamble_1
-#define preamble_14_11_4_list	preamble_1
+#define preamble_14_11_4_conn	preamble_ts_wres_cind_conn
+#define preamble_14_11_4_resp	preamble_ts_wres_cind_resp
+#define preamble_14_11_4_list	preamble_ts_wres_cind_list
 
-#define postamble_14_11_4_conn	postamble_1
-#define postamble_14_11_4_resp	postamble_1
-#define postamble_14_11_4_list	postamble_1
+#define postamble_14_11_4_conn	postamble_ts_wres_cind_conn
+#define postamble_14_11_4_resp	postamble_ts_wres_cind_resp
+#define postamble_14_11_4_list	postamble_ts_wres_cind_list
 
 struct test_stream test_14_11_4_conn = { &preamble_14_11_4_conn, &test_case_14_11_4_conn, &postamble_14_11_4_conn };
 struct test_stream test_14_11_4_resp = { &preamble_14_11_4_resp, &test_case_14_11_4_resp, &postamble_14_11_4_resp };
@@ -32811,26 +33081,26 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_DATA_
 
 int test_case_14_11_5_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_5_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_5_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_11_5_conn	preamble_1
-#define preamble_14_11_5_resp	preamble_1
-#define preamble_14_11_5_list	preamble_1
+#define preamble_14_11_5_conn	preamble_ts_data_xfer_conn
+#define preamble_14_11_5_resp	preamble_ts_data_xfer_resp
+#define preamble_14_11_5_list	preamble_ts_data_xfer_list
 
-#define postamble_14_11_5_conn	postamble_1
-#define postamble_14_11_5_resp	postamble_1
-#define postamble_14_11_5_list	postamble_1
+#define postamble_14_11_5_conn	postamble_ts_data_xfer_conn
+#define postamble_14_11_5_resp	postamble_ts_data_xfer_resp
+#define postamble_14_11_5_list	postamble_ts_data_xfer_list
 
 struct test_stream test_14_11_5_conn = { &preamble_14_11_5_conn, &test_case_14_11_5_conn, &postamble_14_11_5_conn };
 struct test_stream test_14_11_5_resp = { &preamble_14_11_5_resp, &test_case_14_11_5_resp, &postamble_14_11_5_resp };
@@ -32848,26 +33118,26 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WIND_
 
 int test_case_14_11_6_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_6_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_11_6_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_11_6_conn	preamble_1
-#define preamble_14_11_6_resp	preamble_1
-#define preamble_14_11_6_list	preamble_1
+#define preamble_14_11_6_conn	preamble_ts_wind_ordrel_conn
+#define preamble_14_11_6_resp	preamble_ts_wind_ordrel_resp
+#define preamble_14_11_6_list	preamble_ts_wind_ordrel_list
 
-#define postamble_14_11_6_conn	postamble_1
-#define postamble_14_11_6_resp	postamble_1
-#define postamble_14_11_6_list	postamble_1
+#define postamble_14_11_6_conn	postamble_ts_wind_ordrel_conn
+#define postamble_14_11_6_resp	postamble_ts_wind_ordrel_resp
+#define postamble_14_11_6_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_14_11_6_conn = { &preamble_14_11_6_conn, &test_case_14_11_6_conn, &postamble_14_11_6_conn };
 struct test_stream test_14_11_6_resp = { &preamble_14_11_6_resp, &test_case_14_11_6_resp, &postamble_14_11_6_resp };
@@ -32885,26 +33155,26 @@ can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WREQ_
 
 int test_case_14_11_7_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
 int test_case_14_11_7_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_11(child);
 }
 
 int test_case_14_11_7_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_11_7_conn	preamble_1
-#define preamble_14_11_7_resp	preamble_1
-#define preamble_14_11_7_list	preamble_1
+#define preamble_14_11_7_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_11_7_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_11_7_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_11_7_conn	postamble_1
-#define postamble_14_11_7_resp	postamble_1
-#define postamble_14_11_7_list	postamble_1
+#define postamble_14_11_7_conn	postamble_ts_wreq_ordrel_conn
+#define postamble_14_11_7_resp	postamble_ts_wreq_ordrel_resp
+#define postamble_14_11_7_list	postamble_ts_wreq_ordrel_list
 
 struct test_stream test_14_11_7_conn = { &preamble_14_11_7_conn, &test_case_14_11_7_conn, &postamble_14_11_7_conn };
 struct test_stream test_14_11_7_resp = { &preamble_14_11_7_resp, &test_case_14_11_7_resp, &postamble_14_11_7_resp };
@@ -32922,26 +33192,37 @@ can be issued.  This test case tests the T_ORDREL_REQ primitive in the TS_DATA_X
 
 int test_case_14_12_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_12_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_12_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_12_1_conn	preamble_1
-#define preamble_14_12_1_resp	preamble_1
-#define preamble_14_12_1_list	preamble_1
+#define preamble_14_12_1_conn	preamble_ts_data_xfer_conn
+#define preamble_14_12_1_resp	preamble_ts_data_xfer_resp
+#define preamble_14_12_1_list	preamble_ts_data_xfer_list
 
-#define postamble_14_12_1_conn	postamble_1
-#define postamble_14_12_1_resp	postamble_1
-#define postamble_14_12_1_list	postamble_1
+#define postamble_14_12_1_conn	postamble_ts_wind_ordrel_conn
+#define postamble_14_12_1_resp	postamble_ts_wind_ordrel_resp
+#define postamble_14_12_1_list	postamble_ts_wind_ordrel_list
 
 struct test_stream test_14_12_1_conn = { &preamble_14_12_1_conn, &test_case_14_12_1_conn, &postamble_14_12_1_conn };
 struct test_stream test_14_12_1_resp = { &preamble_14_12_1_resp, &test_case_14_12_1_resp, &postamble_14_12_1_resp };
@@ -32959,26 +33240,37 @@ can be issued.  This test case tests the T_ORDREL_REQ primitive in the TS_WREQ_O
 
 int test_case_14_12_2_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	if (expect(child, LONGER_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_12_2_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	test_data = NULL;
+	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_14_12_2_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_14_12_2_conn	preamble_1
-#define preamble_14_12_2_resp	preamble_1
-#define preamble_14_12_2_list	preamble_1
+#define preamble_14_12_2_conn	preamble_ts_wreq_ordrel_conn
+#define preamble_14_12_2_resp	preamble_ts_wreq_ordrel_resp
+#define preamble_14_12_2_list	preamble_ts_wreq_ordrel_list
 
-#define postamble_14_12_2_conn	postamble_1
-#define postamble_14_12_2_resp	postamble_1
-#define postamble_14_12_2_list	postamble_1
+#define postamble_14_12_2_conn	postamble_ts_idle_conn
+#define postamble_14_12_2_resp	postamble_ts_idle_resp
+#define postamble_14_12_2_list	postamble_ts_idle_list
 
 struct test_stream test_14_12_2_conn = { &preamble_14_12_2_conn, &test_case_14_12_2_conn, &postamble_14_12_2_conn };
 struct test_stream test_14_12_2_resp = { &preamble_14_12_2_resp, &test_case_14_12_2_resp, &postamble_14_12_2_resp };
@@ -32994,28 +33286,41 @@ Checks that the T_UNBIND_REQ primitive can be successfully issued in the allowed
 TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_UNBIND_REQ primitive in the TS_IDLE state."
 
+int test_case_14_13(int child)
+{
+	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 int test_case_14_13_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_13(child);
 }
 
 int test_case_14_13_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_13(child);
 }
 
 int test_case_14_13_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_13(child);
 }
 
-#define preamble_14_13_1_conn	preamble_1
-#define preamble_14_13_1_resp	preamble_1
-#define preamble_14_13_1_list	preamble_1
+#define preamble_14_13_1_conn	preamble_ts_idle_conn
+#define preamble_14_13_1_resp	preamble_ts_idle_resp
+#define preamble_14_13_1_list	preamble_ts_idle_list
 
-#define postamble_14_13_1_conn	postamble_1
-#define postamble_14_13_1_resp	postamble_1
-#define postamble_14_13_1_list	postamble_1
+#define postamble_14_13_1_conn	postamble_ts_unbnd_conn
+#define postamble_14_13_1_resp	postamble_ts_unbnd_resp
+#define postamble_14_13_1_list	postamble_ts_unbnd_list
 
 struct test_stream test_14_13_1_conn = { &preamble_14_13_1_conn, &test_case_14_13_1_conn, &postamble_14_13_1_conn };
 struct test_stream test_14_13_1_resp = { &preamble_14_13_1_resp, &test_case_14_13_1_resp, &postamble_14_13_1_resp };
@@ -33031,28 +33336,49 @@ Checks that the T_UNITDATA_REQ primitive can be successfully issued in the allow
 TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
 can be issued.  This test case tests the T_UNITDATA_REQ primitive in the TS_IDLE state."
 
+int test_case_14_14(int child)
+{
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	test_data = "Some data.";
+	test_addr = &addrs[(child + 1) % 3];
+	test_alen = sizeof(addrs[(child + 1) % 3]);
+	test_opts = NULL;
+	test_olen = 0;
+	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	expect(child, NORMAL_WAIT, __TEST_UNITDATA_IND);
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 int test_case_14_14_1_conn(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_14(child);
 }
 
 int test_case_14_14_1_resp(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_14(child);
 }
 
 int test_case_14_14_1_list(int child)
 {
-	return (__RESULT_NOTAPPL);
+	return test_case_14_14(child);
 }
 
-#define preamble_14_14_1_conn	preamble_1
-#define preamble_14_14_1_resp	preamble_1
-#define preamble_14_14_1_list	preamble_1
+#define preamble_14_14_1_conn	preamble_ts_idle_clts_conn
+#define preamble_14_14_1_resp	preamble_ts_idle_clts_resp
+#define preamble_14_14_1_list	preamble_ts_idle_clts_list
 
-#define postamble_14_14_1_conn	postamble_1
-#define postamble_14_14_1_resp	postamble_1
-#define postamble_14_14_1_list	postamble_1
+#define postamble_14_14_1_conn	postamble_ts_idle_clts_conn
+#define postamble_14_14_1_resp	postamble_ts_idle_clts_resp
+#define postamble_14_14_1_list	postamble_ts_idle_clts_list
 
 struct test_stream test_14_14_1_conn = { &preamble_14_14_1_conn, &test_case_14_14_1_conn, &postamble_14_14_1_conn };
 struct test_stream test_14_14_1_resp = { &preamble_14_14_1_resp, &test_case_14_14_1_resp, &postamble_14_14_1_resp };
