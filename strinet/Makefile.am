@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/06/16 04:33:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/06/16 20:44:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 04:33:33 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 20:44:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
@@ -140,7 +140,7 @@ libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-EXTRA_KERNEL_MODULES		+= 
+EXTRA_KERNEL_MODULES		+=
 
 ## RPM_BUILD_KERNEL
 endif
@@ -169,7 +169,7 @@ sbin_PROGRAMS			= \
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		= 
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
@@ -226,7 +226,7 @@ libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-EXTRA_KERNEL_MODULES		+= 
+EXTRA_KERNEL_MODULES		+=
 
 ## RPM_BUILD_KERNEL
 endif
@@ -290,7 +290,7 @@ endif
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-
+##
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
@@ -406,8 +406,8 @@ include am/archive.am
 ##
 ## Rules for making rpms
 ##
-AM_RPMFLAGS 			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS 			= $(AM_RPMFLAGS)
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 

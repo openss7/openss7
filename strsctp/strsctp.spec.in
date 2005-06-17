@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/05/31 05:10:40 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/06/16 21:06:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/31 05:10:40 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 21:06:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,10 +89,10 @@
 
 %global modules     streams-sctp
 #global preloads    
-#global libraries
+#global libraries   
 %global tools       strsctp_mknod test-sctp test-sctp_n test-sctp_nc test-sctp_ns test-sctp_t
 %global infofiles   %{name}
-#global initfiles
+#global initfiles   strsctp
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -1497,7 +1497,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{_sysconfdir}/%{name}.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %{_modutildir}/*
@@ -1507,7 +1507,7 @@ fi
 %files init
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_sysconfdir}/%{name}.conf
+%{_sysconfdir}/%{name}.conf
 %{_initrddir}/../*
 %{_configdir}/*
 %endif
@@ -1529,6 +1529,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
+# Revision 0.9.2.69  2005/06/16 21:06:05  brian
+# - added init scripts
+#
 # Revision 0.9.2.68  2005/05/31 05:10:40  brian
 # - correct case on modutildir filename
 #

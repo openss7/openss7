@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/16 20:44:06 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -9,9 +9,9 @@
 # permissions.
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-name='strinet'
+name='strsctp'
 config="/etc/default/$name"
-desc="the STREAMS INET subsystem"
+desc="the STREAMS SCTP subsystem"
 
 [ -e /proc/modules ] || exit 0
 
@@ -36,7 +36,7 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
-    for module in streams-inet ; do
+    for module in streams-sctp ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
@@ -99,7 +99,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/16 20:44:06 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -145,7 +145,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 20:44:06 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 21:06:11 $ by $Author: brian $
 #
 # =============================================================================
 

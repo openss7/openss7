@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:18 $
+ @(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:18 $ by $Author: brian $
+ Last Modified $Date: 2005/06/16 21:07:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:18 $"
+#ident "@(#) $RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $"
 
-static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:29:18 $";
+static char const ident[] = "$RCSfile: sctp_hmac_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $";
+
+#undef _DEBUG
+#undef SCTP_CONFIG_DEBUG
 
 #include "sctp_compat.h"
 #include "sctp_md5.h"

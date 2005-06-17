@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/05/28 04:43:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/06/16 21:06:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:43:07 $ by $Author: brian $
+# Last Modified $Date: 2005/06/16 21:06:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,14 +66,14 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-libexec_PROGRAMS		= \
+EXTRA_PROGRAMS			+= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t
 
-EXTRA_PROGRAMS			+= \
+libexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
@@ -243,14 +243,14 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-libexec_PROGRAMS		= \
+EXTRA_PROGRAMS			+= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
 				  test-sctp_ns \
 				  test-sctp_t
 
-EXTRA_PROGRAMS			+= \
+libexec_PROGRAMS		= \
 				  test-sctp \
 				  test-sctp_n \
 				  test-sctp_nc \
@@ -501,20 +501,24 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				src/util/init/strsctp.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		=
+dist_initrd_SCRIPTS		= \
+				src/util/init/strsctp
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		=
+dist_sysconf_DATA		= \
+				src/util/sysconfig/strsctp.conf
 
-dist_config_DATA		=
+dist_config_DATA		= \
+				src/util/sysconfig/strsctp
 
 ## INSTALL_INITSCRIPTS
 endif

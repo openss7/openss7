@@ -1,0 +1,278 @@
+#!/bin/sh
+#
+# @(#) $RCSfile: strsctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# All Rights Reserved.
+#
+# Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
+# permissions.
+#
+# Redhat chkconfig init script conventions
+#
+# strsctp:	start and stop STREAMS SCTP subsystem
+# chkconfig:	345 03 96
+# lockfile:	/var/lock/subsys/strsctp
+# config:	/etc/sysconfig/strsctp
+# probe:	true
+# hide:		false
+# license:	GPL
+# description:	This STREAMS SCTP init script is part of Linux Fast-STREAMS.  \
+#		It is responsible for ensuring that the necessary STREAMS \
+#		character devices are present in the /dev directory and \
+#		that the STREAMS SCTP subsystem is configured and loaded.
+#
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strsctp
+# Required-Start: streams
+# Required-Stop: streams
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# Short-Description: start and stop STREAMS SCTP subsystem
+# License: GPL
+# Description:	This STREAMS SCTP init script is part of Linux Fast-STREAMS.
+#	It is reponsible for ensuring that the necessary STREAMS SCTP character
+#	devices are present in the /dev directory and that the STREAMS SCTP
+#	subsystem is configured and loaded.
+### END INIT INFO
+
+# Source init script functions library.
+. /etc/init.d/functions
+
+name='strsctp'
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name"
+
+[ -f /proc/modules ] || exit 0
+
+for STRSCTP_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
+    if [ -x $STRSCTP_MKNOD ] ; then
+	break
+    else
+	STRSCTP_MKNOD=
+    fi
+done
+
+# Specify defaults
+
+STRSCTP_MAKEDEVICES="no"
+STRSCTP_REMOVEDEVICES="no"
+
+# Source redhat and/or debian config file
+for file in $config ; do
+    [ -f $file ] && . $file
+done
+
+[ -z "$STRSCTP_MKNOD" ] && STRSCTP_MAKEDEVICES='no'
+[ -z "$STRSCTP_MKNOD" ] && STRSCTP_REMOVEDEVICES='no'
+
+RETVAL=0
+
+umask 077
+
+start() {
+    for module in streams-sctp ; do
+	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	    action $"Loading kernel module $module: " \
+		modprobe -k -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
+    if grep '^[[:space:]]*'$name'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
+	action $"Reconfiguring kernel parameters: " \
+	    sysctl -e -p /etc/sysctl.conf || :
+    fi
+    if [ -f /etc/$name.conf ] ; then
+	action $"Configuring STREAMS SCTP parameters: " \
+	    sysctl -e -p /etc/$name.conf || :
+    fi
+    if [ -n "$STRSCTP_MKNOD" ] ; then
+	if [ ":$STRSCTP_MAKEDEVICES" = ":yes" ] ; then
+	    if [ -n "$STRSCTP_MKNOD" ] ; then
+		action $"Making STREAMS SCTP devices: " \
+		    $STRSCTP_MKNOD
+		RETVAL=$?
+	    fi
+	fi
+    fi
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+remove_modules() {
+    modules=
+    while read -a module ; do
+	modules="${modules}${modules:+ }${module[0]}"
+    done
+    if [ -n "$modules" ] ; then
+	action $"Removing STREAMS SCTP modules: " \
+		rmmod $modules
+	RETVAL=$?
+    fi
+    RETVAL=0
+    return $RETVAL
+}
+
+stop() {
+    if [ -n "$STRSCTP_MKNOD" -a ":$STRSCTP_REMOVEDEVICES" = ":yes" ] ; then
+	action $"Removing STREAMS SCTP devices: " \
+	    $STRSCTP_MKNOD --remove
+	RETVAL=$?
+    fi
+    [ $RETVAL -eq 0 ] && egrep '^streams[-_]sctp' /proc/modules 2>/dev/null | remove_modules
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    RETVAL=$?
+    return $RETVAL
+}
+
+restart() {
+    stop
+    start
+    return $?
+}
+
+reload() {
+    stop
+    start
+    return $?
+}
+
+case "$1" in
+    (start|stop|reload|restart)
+	$1 || RETVAL=$?
+	;;
+    (status)
+	LOADED='yes'
+	for module in streams-sctp ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    if true ; then
+		echo $"$name is running..."
+		RETVAL=0
+	    fi
+	else
+	    if [ -f $lockfile ] ; then
+		echo $"$name is stopped but sybsys locked"
+		RETVAL=2
+	    else
+		echo $"$name is stopped"
+		RETVAL=3
+	    fi
+	fi
+	;;
+    (condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	LOADED='yes'
+	for module in streams-sctp ; do
+	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+		LOADED='no'
+		break
+	    fi
+	done
+	if [ ":$LOADED" = ":yes" ] ; then
+	    # loaded
+	    if true ; then
+		if [ ! -f $lockfile ] ; then
+		    # loaded, but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # loaded and subsystem locked
+		    for file in $config /etc/$name.conf ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updeated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# loaded, but with wrong options, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # unloaded
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		if true ; then
+		    # unloaded but subsystem locked, need to restart
+		    echo 'restart'
+		fi
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
+    (*)
+	echo "Usage: $0 (start|stop|status|restart|condrestart|probe)"
+	;;
+esac
+
+[ "${0##*/}" = "$name" ] && exit $RETVAL
+
+# =============================================================================
+# 
+# @(#) $RCSfile: strsctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/16 21:06:11 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/06/16 21:06:11 $ by $Author: brian $
+#
+# =============================================================================
+
+# vim: ft=sh sw=4 tw=80
+
