@@ -1,0 +1,13 @@
+                                                                                
+                              |                  |                              
+           DL_CONNECT ----\   |                  |                              
+              request      \->|- - - - - - - - - |-------->  DL_CONNECT         
+                              |                  |           indication         
+        DL_DISCONNECT ----\   |                  |                              
+              request      \->|- - - - - - - - - |-------->  DL_DISCONNECT      
+                            / |                  |           indication         
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

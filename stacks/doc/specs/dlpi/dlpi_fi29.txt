@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+             DL_UDQOS ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

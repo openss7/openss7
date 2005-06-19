@@ -1,0 +1,18 @@
+                                                                                
+                              |                  |                              
+            DL_UNBIND ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                              |                  |                              
+       DL_SUBS_UNBIND ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+                DL_OK <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

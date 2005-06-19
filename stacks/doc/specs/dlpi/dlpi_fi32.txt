@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+          DL_DATA_ACK ----\   |                  |           DL_DATA_ACK        
+              request      \->|- - - - - - - - - |------->   indication         
+                              |                  |                              
+                           /--|                  |                              
+   DL_DATA_ACK_STATUS <---/   |                  |                              
+           indication         |                  |                              
+                              |                  |                              
+                                                                                

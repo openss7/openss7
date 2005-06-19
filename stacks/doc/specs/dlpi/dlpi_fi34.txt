@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+      DL_REPLY_UPDATE ----\   |                  |                              
+              request      \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+DL_REPLY_UPDATE_STATUS<---/   |                  |                              
+           indication         |                  |                              
+                              |                  |                              
+                                                                                

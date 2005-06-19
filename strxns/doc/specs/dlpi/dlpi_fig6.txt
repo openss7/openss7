@@ -1,0 +1,18 @@
+                                                                                
+                              |                  |                              
+              DL_BIND ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+              DL_BIND <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                              |                  |                              
+         DL_SUBS_BIND ----\   |                  |                              
+              request      \->|                  |                              
+                            / |                  |                              
+                           /  |                  |                              
+         DL_SUBS_BIND <---/   |                  |                              
+          acknowledge         |                  |                              
+                              |                  |                              
+                                                                                

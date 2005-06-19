@@ -1,0 +1,10 @@
+                                                                                
+                              |                  |                              
+           DL_CONNECT ----\   |                  |                              
+              request      \->|                  |                              
+                              |                  |                              
+                           /--|                  |                              
+        DL_DISCONNECT <---/   |                  |                              
+           indication         |                  |                              
+                              |                  |                              
+                                                                                
