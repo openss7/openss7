@@ -1,0 +1,56 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS H
+box center tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|l.
+FSM EVENT:DESCRIPTION:SERVICE
+::TYPE
+_
+.TH
+BIND_ACK:DL_BIND_ACK primitive:ALL
+SUBS_BIND_ACK:DL_SUBS_BIND_ACK primitive:ALL
+UNITDATA_IND:DL_UNITDATA_IND primitive:DL_CLDLS
+UDERROR_IND:DL_UDERROR_IND primitive:DL_CLDLS
+CONNECT_IND:DL_CONNECT_IND primitive:DL_CODLS
+CONNECT_CON:DL_CONNECT_CON primitive:DL_CODLS
+DISCON_IND1:DL_DISCONNECT_IND primitive:DL_CODLS
+:when outcnt == 0:
+DISCON_IND2:DL_DISCONNECT_IND primitive:DL_CODLS
+:when outcnt == 1:
+DISCON_IND3:DL_DISCONNECT_IND primitive:DL_CODLS
+:when outcnt > 1:
+DATA_IND:DL_DATA_IND primitive:DL_CODLS
+RESET_IND:DL_RESET_IND primitive:DL_CODLS
+RESET_CON:DL_RESET_CON primitive:DL_CODLS
+OK_ACK1:DL_OK_ACK primitive:ALL
+:when outcnt == 0:
+OK_ACK2:DL_OK_ACK primitive:DL_CODLS
+:when outcnt == 1 and token == 0:
+OK_ACK3:DL_OK_ACK primitive:DL_CODLS
+:when outcnt == 1 and token != 0:
+OK_ACK4:DL_OK_ACK primitive:DL_CODLS
+:when outcnt > 1 and token != 0:
+ERROR_ACK:DL_ERROR_ACK:ALL
+DATA_ACK_IND:DL_DATA_ACK_IND:ACLDLS
+DATA_ACK_STATUS_IND:DL_DATA_ACK_STATUS_IND:ACLDLS
+REPLY_IND:DL_REPLY_IND:ACLDLS
+REPLY_STATUS_IND:DL_REPLY_STATUS_IND:ACLDLS
+REPLY_UPDATE_STATUS_IND:DL_REPLY_UPDATE_STATUS_IND:ACLDLS
+.TE

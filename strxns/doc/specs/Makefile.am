@@ -1,5 +1,5 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = npi
+SUBDIRS = dlpi npi
 

@@ -1,0 +1,36 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center tab(:);
+c|lsssss.
+\-:T{
+.hy 0
+.ad l
+This transition cannot occur.
+T}
+n:T{
+.hy 0
+.ad l
+The current input results in a transition to state "n".
+T}
+n[a]:T{
+.hy 0
+.ad l
+The list of actions "a" should be executed following the specified statetransition "n" (see table 4 for actions).
+T}
+.TE

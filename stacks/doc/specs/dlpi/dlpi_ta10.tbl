@@ -1,0 +1,46 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS H
+box center tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|l.
+FSM EVENT:DESCRIPTION:SERVICE
+::TYPE
+_
+.TH
+ATTACH_REQ:DL_ATTACH_REQ primitive:ALL
+DETACH_REQ:DL_DETACH_REQ primitive:ALL
+BIND_REQ:DL_BIND_REQ primitive:ALL
+SUBS_BIND_REQ:DL_SUBS_BIND_REQ primitive:ALL
+UNBIND_REQ:DL_UNBIND_REQ primitive:ALL
+SUBS_UNBIND_REQ:DL_SUBS_UNBIND_REQ primitive:ALL
+UNITDATA_REQ:DL_UNITDATA_REQ primitive:DL_CLDLS
+UDQOS_REQ:DL_UDQOS_REQ primitive:DL_CLDLS
+CONNECT_REQ:DL_CONNECT_REQ primitive:DL_CODLS
+CONNECT_RES:DL_CONNECT_RES primitive:DL_CODLS
+PASS_CONN:Received a passed connection:DL_CODLS
+:from a DL_CONNECT_RES primitive:
+DISCON_REQ:DL_DISCONNECT_REQ primitive:DL_CODLS
+DATA_REQ:DL_DATA_REQ primitive:DL_CODLS
+RESET_REQ:DL_RESET_REQ primitive:DL_CODLS
+RESET_RES:DL_RESET_RES primitive:DL_CODLS
+DATA_ACK_REQ:DL_DATA_ACK_REQ primitive:DL_ACLDLS
+REPLY_REQ:DL_REPLY_REQ primitive:DL_ACLDLS
+REPLY_UPDATE_REQ:DL_REPLY_UPDATE_REQ primitive:DL_ACLDLS
+.TE

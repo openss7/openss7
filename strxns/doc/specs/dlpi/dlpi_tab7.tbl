@@ -1,0 +1,66 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 22.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS H
+box center expand tab(:);
+cb|cb|cb|cb
+l|l|l|l.
+STATE:DLPI STATE:DESCRIPTION:SERVICE
+:::TYPE
+_
+.TH
+15) DiSCON 8 PEND:DL_DISCON8_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DISCONNECT_REQ issued
+from the DL_OUTCON_PENDING state
+T}:DL_CODLS
+16) DISCON 9 PEND:DL_DISCON9_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DISCONNECT_REQ issued
+from the DL_INCON_PENDING state
+T}:DL_CODLS
+17) DISCON 11 PEND:DL_DISCON11_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DISCONNECT_REQ issued
+from the DL_DATAXFER state
+T}:DL_CODLS
+18) DISCON 12 PEND:DL_DISCON12_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DISCONNECT_REQ issued
+from the DL_USER_RESET_PENDING state
+T}:DL_CODLS
+19) DISCON 13 PEND:DL_DISCON13_PENDING:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_DISCONNECT_REQ issued
+from the DL_PROV_RESET_PNEDING state
+T}:DL_CODLS
+20) SUBS_BIND PEND:DL_SUBS_BIND_PND:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_SUBS_BIND_REQ
+T}:ALL
+21) SUBS_UNBIND REQ:DL_SUBS_UNBIND_REQ:T{
+.hy 0
+.ad l
+The DLS user is waiting for an acknowledgement of a DL_SUBS_UNBIND_REQ
+T}:ALL
+.TE

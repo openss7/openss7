@@ -1,0 +1,36 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS H
+box center tab(:);
+cb|cb|cb
+l|l|l.
+Parameter:Service Mode:Negotiation
+=
+.TH
+throughput:connection:end-to-end
+_
+transit delay:both:end-to-end
+_
+priority:both:local
+_
+protection:both:local
+_
+residual error rate:both:none
+_
+resilience:connection:none
+.TE

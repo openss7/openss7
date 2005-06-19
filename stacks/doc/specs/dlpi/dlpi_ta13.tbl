@@ -1,0 +1,39 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center tab(:);
+r|c|c|c|c|c|c|c|c|c
+c|c|c|c|c|c|c|c|c|c
+c|c|c|c|c|c|c|c|c|c
+l|c|c|c|c|c|c|c|c|c.
+STATES:UNATT.:ATTACH:DETACH:UNBND:BND:UNBND:IDLE:SUBS BND:SUBS
+::PEND:PEND::PND:PND::PND:UNBND
+:::::::::PND
+EVENTS:0:1:2:3:4:5:6:20:21
+_
+ATTACH_REQ:1:\-:\-:\-:\-:\-:\-:\-:\-
+DETACH_REQ:\-:\-:\-:2:\-:\-:\-:\-:\-
+BIND_REQ:\-:\-:\-:4:\-:\-:\-:\-:\-
+BIND_ACK:\-:\-:\-:\-:6:\-:\-:\-:\-
+SUBS_BIND_REQ:\-:\-:\-:\-:\-:\-:20:\-:\-
+SUBS_BIND_ACK:\-:\-:\-:\-:\-:\-:\-:6:\-
+UNBIND_REQ:\-:\-:\-:\-:\-:5:\-:\-:\-
+OK_ACK1:\-:3:0:\-:\-:3:\-:\-:6
+ERROR_ACK:\-:0:3:\-:3:6:\-:\-:\-
+SUBS_UNBND_REQ:\-:\-:\-:\-:\-:\-:21:\-:\-
+.TE
