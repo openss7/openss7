@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.2.2 2005/06/20 12:00:30 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+@c Last Modified $Date: 2005/06/20 12:00:30 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -151,11 +151,15 @@ This section discusses compatibility with major prerequisites.
 @item RedHat Enterprise Linux 4 (EL4)
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
+@item Fedora Cored 4 (FC4)
+@item Debian 3.1r0a Sarge
+@item Lineox 4.026 (LEL4)
+@item Mandriva Linux LE2005 (MDK102)
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
 compatible with a  much broader array of distributions than those listed above.  These are the
-distributions against which the current maintainer creates builds.
+distributions against which the current maintainer creates and tests builds.
 
 @node Linux Kernel
 @subsection Kernel
