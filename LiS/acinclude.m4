@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.22 $) $Date: 2005/06/01 02:42:26 $
+# @(#) $RCSFile$ $Name:  $($Revision: 1.1.6.23 $) $Date: 2005/06/22 07:43:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/01 02:42:26 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 07:43:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -424,7 +424,7 @@ dnl
 AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
-			  linux/cpumask.h linux/kref.h linux/security.h], [:], [:], [
+			  linux/cpumask.h linux/kref.h linux/security.h asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -443,7 +443,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pcibios_read_config_word pcibios_write_config_byte \
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
-			pci_dac_dma_sync_single_for_device \
+			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
@@ -478,10 +478,13 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
 			 num_online_cpus \
-			 cpumask_scnprintf], [:], [:], [
+			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -510,6 +513,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:28:30 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:30 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:41:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:28:30 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:28:30 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -111,6 +111,10 @@ static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.11 
 # include <inttypes.h>
 #elif HAVE_STDINT_H
 # include <stdint.h>
+#endif
+
+#ifndef __EXCEPTIONS
+#define __EXCEPTIONS 1
 #endif
 
 #include <unistd.h>
@@ -2540,7 +2544,6 @@ int
 __xnet_t_listen(int fd, struct t_call *call)
 {
 	struct _t_user *user;
-	union T_primitives *p = (typeof(p)) user->ctlbuf;
 	if (!(user = __xnet_t_tstuser(fd, T_LISTEN, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_WRES_CIND | TSF_IDLE)))
 		goto error;
 	if ((user->statef & TSF_IDLE) && user->qlen <= 0)
@@ -5894,10 +5897,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.11 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.12 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.11 $)
- * @date \$Date: 2005/05/14 08:28:30 $
+ * @version \$Name:  $(\$Revision: 0.9.2.12 $)
+ * @date \$Date: 2005/06/22 07:41:48 $
  *
  * @}
  */

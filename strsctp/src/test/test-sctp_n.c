@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/07 00:52:19 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/06/22 07:39:52 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/07 00:52:19 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -3410,7 +3410,7 @@ are complete."
 int test_case_7_1_conn(int fd)
 {
 	int i;
-	unsigned char lbuf[100000];
+	char lbuf[100000];
 	const char nrm[] = "Hello.";
 	const char urg[] = "Urgent.";
 	bzero(lbuf, sizeof(lbuf));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/05/14 08:30:05 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:05 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:37:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/05/14 08:30:05 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2005/05/14 08:30:05 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -6331,7 +6331,7 @@ void
 
   struct sockaddr_in myaddr_in, peeraddr_in;
   SOCKET s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	trans_received;
   int	trans_remaining;
   float	elapsed_time;
@@ -7725,7 +7725,7 @@ recv_xti_sctp_conn_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   char	*temp_message_ptr;
@@ -9107,7 +9107,7 @@ recv_xti_tcp_conn_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   char	*temp_message_ptr;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/06/16 20:43:38 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/06/22 07:38:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 20:43:38 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:38:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/06/16 20:43:38 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/06/22 07:38:44 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/06/16 20:43:38 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/06/22 07:38:44 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -120,73 +120,133 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.39 
 #define sk_receive_queue	receive_queue
 #define sk_rmem_alloc		rmem_alloc
 
-#define sock_tst_dead(_sk)	(((struct sock *)_sk)->dead ? 1 : 0)
-#define sock_tst_done(_sk)	(((struct sock *)_sk)->done ? 1 : 0)
-#define sock_tst_urginline(_sk)	(((struct sock *)_sk)->urginline ? 1 : 0)
-#define sock_tst_keepopen(_sk)	(((struct sock *)_sk)->keepopen ? 1 : 0)
-#define sock_tst_linger(_sk)	(((struct sock *)_sk)->linger ? 1 : 0)
-#define sock_tst_destroy(_sk)	(((struct sock *)_sk)->destroy ? 1 : 0)
-#define sock_tst_broadcast(_sk)	(((struct sock *)_sk)->broadcast ? 1 : 0)
+#define sock_tst_dead(_sk)		(((struct sock *)_sk)->dead ? 1 : 0)
+#define sock_tst_done(_sk)		(((struct sock *)_sk)->done ? 1 : 0)
+#define sock_tst_urginline(_sk)		(((struct sock *)_sk)->urginline ? 1 : 0)
+#define sock_tst_keepopen(_sk)		(((struct sock *)_sk)->keepopen ? 1 : 0)
+#define sock_tst_linger(_sk)		(((struct sock *)_sk)->linger ? 1 : 0)
+#define sock_tst_destroy(_sk)		(((struct sock *)_sk)->destroy ? 1 : 0)
+#define sock_tst_broadcast(_sk)		(((struct sock *)_sk)->broadcast ? 1 : 0)
+#define sock_tst_localroute(_sk)	(((struct sock *)_sk)->localroute ? 1 : 0)
+#define sock_tst_debug(_sk)		(((struct sock *)_sk)->debug ? 1 : 0)
 
-#define sock_set_dead(_sk)	(((struct sock *)_sk)->dead = 1)
-#define sock_set_done(_sk)	(((struct sock *)_sk)->done = 1)
-#define sock_set_urginline(_sk)	(((struct sock *)_sk)->urginline = 1)
-#define sock_set_keepopen(_sk)	(((struct sock *)_sk)->keepopen = 1)
-#define sock_set_linger(_sk)	(((struct sock *)_sk)->linger = 1)
-#define sock_set_destroy(_sk)	(((struct sock *)_sk)->destroy = 1)
-#define sock_set_broadcast(_sk)	(((struct sock *)_sk)->broadcast = 1)
+#define sock_set_dead(_sk)		(((struct sock *)_sk)->dead = 1)
+#define sock_set_done(_sk)		(((struct sock *)_sk)->done = 1)
+#define sock_set_urginline(_sk)		(((struct sock *)_sk)->urginline = 1)
+#define sock_set_keepopen(_sk)		(((struct sock *)_sk)->keepopen = 1)
+#define sock_set_linger(_sk)		(((struct sock *)_sk)->linger = 1)
+#define sock_set_destroy(_sk)		(((struct sock *)_sk)->destroy = 1)
+#define sock_set_broadcast(_sk)		(((struct sock *)_sk)->broadcast = 1)
+#define sock_set_localroute(_sk)	(((struct sock *)_sk)->localroute = 1)
+#define sock_set_debug(_sk)		(((struct sock *)_sk)->debug = 1)
 
-#define sock_clr_dead(_sk)	(((struct sock *)_sk)->dead = 0)
-#define sock_clr_done(_sk)	(((struct sock *)_sk)->done = 0)
-#define sock_clr_urginline(_sk)	(((struct sock *)_sk)->urginline = 0)
-#define sock_clr_keepopen(_sk)	(((struct sock *)_sk)->keepopen = 0)
-#define sock_clr_linger(_sk)	(((struct sock *)_sk)->linger = 0)
-#define sock_clr_destroy(_sk)	(((struct sock *)_sk)->destroy = 0)
-#define sock_clr_broadcast(_sk)	(((struct sock *)_sk)->broadcast = 0)
+#define sock_clr_dead(_sk)		(((struct sock *)_sk)->dead = 0)
+#define sock_clr_done(_sk)		(((struct sock *)_sk)->done = 0)
+#define sock_clr_urginline(_sk)		(((struct sock *)_sk)->urginline = 0)
+#define sock_clr_keepopen(_sk)		(((struct sock *)_sk)->keepopen = 0)
+#define sock_clr_linger(_sk)		(((struct sock *)_sk)->linger = 0)
+#define sock_clr_destroy(_sk)		(((struct sock *)_sk)->destroy = 0)
+#define sock_clr_broadcast(_sk)		(((struct sock *)_sk)->broadcast = 0)
+#define sock_clr_localroute(_sk)	(((struct sock *)_sk)->localroute = 0)
+#define sock_clr_debug(_sk)		(((struct sock *)_sk)->debug = 0)
 
 #undef inet_sk
-#define inet_sk(_sk)		(&(((struct sock *)_sk)->protinfo.af_inet))
+#define inet_sk(_sk)			(&(((struct sock *)_sk)->protinfo.af_inet))
 #undef tcp_sk
-#define tcp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_tcp))
+#define tcp_sk(_sk)			(&(((struct sock *)_sk)->tp_pinfo.af_tcp))
 #undef sctp_sk
-#define sctp_sk(_sk)		(&(((struct sock *)_sk)->tp_pinfo.af_sctp))
+#define sctp_sk(_sk)			(&(((struct sock *)_sk)->tp_pinfo.af_sctp))
 
-#define sock_saddr(_sk)		(((struct sock *)_sk)->saddr)
-#define sock_sport(_sk)		(((struct sock *)_sk)->sport)
-#define sock_daddr(_sk)		(((struct sock *)_sk)->daddr)
-#define sock_dport(_sk)		(((struct sock *)_sk)->dport)
+#define sock_saddr(_sk)			(((struct sock *)_sk)->saddr)
+#define sock_sport(_sk)			(((struct sock *)_sk)->sport)
+#define sock_daddr(_sk)			(((struct sock *)_sk)->daddr)
+#define sock_dport(_sk)			(((struct sock *)_sk)->dport)
+
+#define tcp_user_mss(_tp)		((_tp)->user_mss)
+
+#elif HAVE_TRN_SOCK_STRUCTURE
+
+#define sock_tst_dead(_sk)		(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
+#define sock_tst_done(_sk)		(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
+#define sock_tst_urginline(_sk)		(sock_flag(_sk, SOCK_URGINLINE) ? 1 : 0)
+#define sock_tst_keepopen(_sk)		(sock_flag(_sk, SOCK_KEEPOPEN) ? 1 : 0)
+#define sock_tst_linger(_sk)		(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
+#define sock_tst_destroy(_sk)		(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
+#define sock_tst_broadcast(_sk)		(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
+#define sock_tst_localroute(_sk)	(((struct sock *)_sk)->sk_localroute ? 1 : 0)
+#define sock_tst_debug(_sk)		(((struct sock *)_sk)->sk_debug ? 1 : 0)
+
+#define sock_set_dead(_sk)		(sock_set_flag(_sk, SOCK_DEAD))
+#define sock_set_done(_sk)		(sock_set_flag(_sk, SOCK_DONE))
+#define sock_set_urginline(_sk)		(sock_set_flag(_sk, SOCK_URGINLINE))
+#define sock_set_keepopen(_sk)		(sock_set_flag(_sk, SOCK_KEEPOPEN))
+#define sock_set_linger(_sk)		(sock_set_flag(_sk, SOCK_LINGER))
+#define sock_set_destroy(_sk)		(sock_set_flag(_sk, SOCK_DESTROY))
+#define sock_set_broadcast(_sk)		(sock_set_flag(_sk, SOCK_BROADCAST))
+#define sock_set_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 1)
+#define sock_set_debug(_sk)		(((struct sock *)_sk)->sk_debug = 1)
+
+#define sock_clr_dead(_sk)		(sock_reset_flag(_sk, SOCK_DEAD))
+#define sock_clr_done(_sk)		(sock_reset_flag(_sk, SOCK_DONE))
+#define sock_clr_urginline(_sk)		(sock_reset_flag(_sk, SOCK_URGINLINE))
+#define sock_clr_keepopen(_sk)		(sock_reset_flag(_sk, SOCK_KEEPOPEN))
+#define sock_clr_linger(_sk)		(sock_reset_flag(_sk, SOCK_LINGER))
+#define sock_clr_destroy(_sk)		(sock_reset_flag(_sk, SOCK_DESTROY))
+#define sock_clr_broadcast(_sk)		(sock_reset_flag(_sk, SOCK_BROADCAST))
+#define sock_clr_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 0)
+#define sock_clr_debug(_sk)		(((struct sock *)_sk)->sk_debug = 0)
+
+#define sock_saddr(_sk)			(inet_sk(_sk)->saddr)
+#define sock_sport(_sk)			(inet_sk(_sk)->sport)
+#define sock_daddr(_sk)			(inet_sk(_sk)->daddr)
+#define sock_dport(_sk)			(inet_sk(_sk)->dport)
+
+#define tcp_user_mss(_tp)		((_tp)->user_mss)
+
+#elif HAVE_NEW_SOCK_STRUCTURE
+
+#define sock_tst_dead(_sk)		(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
+#define sock_tst_done(_sk)		(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
+#define sock_tst_urginline(_sk)		(sock_flag(_sk, SOCK_URGINLINE) ? 1 : 0)
+#define sock_tst_keepopen(_sk)		(sock_flag(_sk, SOCK_KEEPOPEN) ? 1 : 0)
+#define sock_tst_linger(_sk)		(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
+#define sock_tst_destroy(_sk)		(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
+#define sock_tst_broadcast(_sk)		(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
+#define sock_tst_localroute(_sk)	(sock_flag(_sk, SOCK_LOCALROUTE) ? 1 : 0)
+#define sock_tst_debug(_sk)		(sock_flag(_sk, SOCK_DBG) ? 1 : 0)
+
+#define sock_set_dead(_sk)		(sock_set_flag(_sk, SOCK_DEAD))
+#define sock_set_done(_sk)		(sock_set_flag(_sk, SOCK_DONE))
+#define sock_set_urginline(_sk)		(sock_set_flag(_sk, SOCK_URGINLINE))
+#define sock_set_keepopen(_sk)		(sock_set_flag(_sk, SOCK_KEEPOPEN))
+#define sock_set_linger(_sk)		(sock_set_flag(_sk, SOCK_LINGER))
+#define sock_set_destroy(_sk)		(sock_set_flag(_sk, SOCK_DESTROY))
+#define sock_set_broadcast(_sk)		(sock_set_flag(_sk, SOCK_BROADCAST))
+#define sock_set_localroute(_sk)	(sock_set_flag(_sk, SOCK_LOCALROUTE))
+#define sock_set_debug(_sk)		(sock_set_flag(_sk, SOCK_DBG))
+
+#define sock_clr_dead(_sk)		(sock_reset_flag(_sk, SOCK_DEAD))
+#define sock_clr_done(_sk)		(sock_reset_flag(_sk, SOCK_DONE))
+#define sock_clr_urginline(_sk)		(sock_reset_flag(_sk, SOCK_URGINLINE))
+#define sock_clr_keepopen(_sk)		(sock_reset_flag(_sk, SOCK_KEEPOPEN))
+#define sock_clr_linger(_sk)		(sock_reset_flag(_sk, SOCK_LINGER))
+#define sock_clr_destroy(_sk)		(sock_reset_flag(_sk, SOCK_DESTROY))
+#define sock_clr_broadcast(_sk)		(sock_reset_flag(_sk, SOCK_BROADCAST))
+#define sock_clr_localroute(_sk)	(sock_reset_flag(_sk, SOCK_LOCALROUTE))
+#define sock_clr_debug(_sk)		(sock_reset_flag(_sk, SOCK_DBG))
+
+#define sock_saddr(_sk)			(inet_sk(_sk)->saddr)
+#define sock_sport(_sk)			(inet_sk(_sk)->sport)
+#define sock_daddr(_sk)			(inet_sk(_sk)->daddr)
+#define sock_dport(_sk)			(inet_sk(_sk)->dport)
+
+#define inet_opt	inet_sock
+#define tcp_opt		tcp_sock
+
+#define tcp_user_mss(_tp)		((_tp)->rx_opt.user_mss)
 
 #else
-
-#define sock_tst_dead(_sk)	(sock_flag(_sk, SOCK_DEAD) ? 1 : 0)
-#define sock_tst_done(_sk)	(sock_flag(_sk, SOCK_DONE) ? 1 : 0)
-#define sock_tst_urginline(_sk)	(sock_flag(_sk, SOCK_URGINLINE) ? 1 : 0)
-#define sock_tst_keepopen(_sk)	(sock_flag(_sk, SOCK_KEEPOPEN) ? 1 : 0)
-#define sock_tst_linger(_sk)	(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
-#define sock_tst_destroy(_sk)	(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
-#define sock_tst_broadcast(_sk)	(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
-
-#define sock_set_dead(_sk)	(sock_set_flag(_sk, SOCK_DEAD))
-#define sock_set_done(_sk)	(sock_set_flag(_sk, SOCK_DONE))
-#define sock_set_urginline(_sk)	(sock_set_flag(_sk, SOCK_URGINLINE))
-#define sock_set_keepopen(_sk)	(sock_set_flag(_sk, SOCK_KEEPOPEN))
-#define sock_set_linger(_sk)	(sock_set_flag(_sk, SOCK_LINGER))
-#define sock_set_destroy(_sk)	(sock_set_flag(_sk, SOCK_DESTROY))
-#define sock_set_broadcast(_sk)	(sock_set_flag(_sk, SOCK_BROADCAST))
-
-#define sock_clr_dead(_sk)	(sock_reset_flag(_sk, SOCK_DEAD))
-#define sock_clr_done(_sk)	(sock_reset_flag(_sk, SOCK_DONE))
-#define sock_clr_urginline(_sk)	(sock_reset_flag(_sk, SOCK_URGINLINE))
-#define sock_clr_keepopen(_sk)	(sock_reset_flag(_sk, SOCK_KEEPOPEN))
-#define sock_clr_linger(_sk)	(sock_reset_flag(_sk, SOCK_LINGER))
-#define sock_clr_destroy(_sk)	(sock_reset_flag(_sk, SOCK_DESTROY))
-#define sock_clr_broadcast(_sk)	(sock_reset_flag(_sk, SOCK_BROADCAST))
-
-#define sock_saddr(_sk)		(inet_sk(_sk)->saddr)
-#define sock_sport(_sk)		(inet_sk(_sk)->sport)
-#define sock_daddr(_sk)		(inet_sk(_sk)->daddr)
-#define sock_dport(_sk)		(inet_sk(_sk)->dport)
-
+#error One of HAVE_OLD_SOCK_STRUCTURE, HAVE_TRN_SOCK_STRUCTURE or HAVE_NEW_SOCK_STRUCTURE must be defined.
 #endif
 
 #ifndef SK_WMEM_MAX
@@ -305,7 +365,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/06/16 20:43:38 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/06/22 07:38:44 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1542,9 +1602,9 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 			oh->level = T_INET_IP;
 			oh->name = T_IP_DONTROUTE;
 			oh->status = T_SUCCESS;
-			if ((ss->options.ip.dontroute == T_NO) != (sk->sk_localroute == 0)) {
+			if ((ss->options.ip.dontroute == T_NO) != (sock_tst_localroute(sk) == 0)) {
 				oh->status = T_PARTSUCCESS;
-				ss->options.ip.dontroute = sk->sk_localroute ? T_YES : T_NO;
+				ss->options.ip.dontroute = sock_tst_localroute(sk) ? T_YES : T_NO;
 			}
 			*((unsigned int *) T_OPT_DATA(oh)) = ss->options.ip.dontroute;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -1590,10 +1650,10 @@ t_build_conn_opts(ss_t * ss, unsigned char *op, size_t olen)
 				oh->level = T_INET_TCP;
 				oh->name = T_TCP_MAXSEG;
 				oh->status = T_SUCCESS;
-				if (ss->options.tcp.maxseg != tp->user_mss) {
-					if (ss->options.tcp.maxseg > tp->user_mss)
+				if (ss->options.tcp.maxseg != tcp_user_mss(tp)) {
+					if (ss->options.tcp.maxseg > tcp_user_mss(tp))
 						oh->status = T_PARTSUCCESS;
-					ss->options.tcp.maxseg = tp->user_mss;
+					ss->options.tcp.maxseg = tcp_user_mss(tp);
 				}
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.tcp.maxseg;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
@@ -2239,7 +2299,10 @@ t_set_options(ss_t * ss)
 		}
 		if (t_tst_bit(_T_BIT_IP_DONTROUTE, ss->options.flags)) {
 			unsigned int *valp = &ss->options.ip.dontroute;
-			sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
+			if (*valp == T_YES)
+				sock_set_localroute(sk);
+			else
+				sock_clr_localroute(sk);
 		}
 		if (t_tst_bit(_T_BIT_IP_BROADCAST, ss->options.flags)) {
 			unsigned int *valp = &ss->options.ip.broadcast;
@@ -2272,7 +2335,7 @@ t_set_options(ss_t * ss)
 					*valp = 8;
 				if (*valp > MAX_TCP_WINDOW)
 					*valp = MAX_TCP_WINDOW;
-				tp->user_mss = *valp;
+				tcp_user_mss(tp) = *valp;
 			}
 			if (t_tst_bit(_T_BIT_TCP_KEEPALIVE, ss->options.flags)) {
 				struct t_kpalive *valp = &ss->options.tcp.keepalive;
@@ -2867,7 +2930,10 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 					t_set_bit(_T_BIT_IP_DONTROUTE, ss->options.flags);
 					if (!request)
 						continue;
-					sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
+					if (*valp == T_YES)
+						sock_set_localroute(sk);
+					else
+						sock_clr_localroute(sk);
 					continue;
 				}
 				case T_IP_BROADCAST:
@@ -2953,7 +3019,7 @@ t_parse_conn_opts(ss_t * ss, const unsigned char *ip, size_t ilen, int request)
 						*valp = 8;
 					if (*valp > MAX_TCP_WINDOW)
 						*valp = MAX_TCP_WINDOW;
-					tp->user_mss = *valp;
+					tcp_user_mss(tp) = *valp;
 					continue;
 				}
 				case T_TCP_KEEPALIVE:
@@ -9192,7 +9258,10 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
 						bzero(t->options.xti.debug, sizeof(t->options.xti.debug));
 						if (oh->len > sizeof(*oh))
 							bcopy(valp, t->options.xti.debug, oh->len - sizeof(*oh));
-						sk->sk_debug = t->options.xti.debug[0] & 0x01;
+						if (t->options.xti.debug[0] & 0x01)
+							sock_set_debug(sk);
+						else
+							sock_clr_debug(sk);
 					}
 				}
 				if (ih->name != T_ALLOPT)
@@ -9522,7 +9591,10 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
 								goto einval;
 						}
 						t->options.ip.dontroute = *valp;
-						sk->sk_localroute = (*valp == T_YES) ? 1 : 0;
+						if (*valp == T_YES)
+							sock_set_localroute(sk);
+						else
+							sock_clr_localroute(sk);
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -9696,7 +9768,7 @@ t_build_negotiate_options(ss_t * t, const unsigned char *ip, size_t ilen, unsign
 							}
 						}
 						t->options.tcp.maxseg = *valp;
-						tp->user_mss = *valp;
+						tcp_user_mss(tp) = *valp;
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -12044,7 +12116,7 @@ t_uderror_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 	mblk_t *mp;
 	struct T_uderror_ind *p;
 	size_t opt_len = ss_errs_size(ss, msg);
-	int etype;
+	int etype = 0;
 	if (canputnext(ss->rq)) {
 		if ((mp = ss_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;

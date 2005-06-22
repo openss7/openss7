@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.9 $) $Date: 2005/06/01 02:42:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/06/01 02:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.9 $) $Date: 2005/06/01 02:42:27 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.9.4.1 2003/12/10 11:09:02 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.9 2005/06/01 02:42:27 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -2678,15 +2678,19 @@ static struct inode* lis_fifo_info_new(struct inode* i)
 {
     i->i_pipe = kmalloc(sizeof(struct pipe_inode_info), GFP_KERNEL);
     if (i->i_pipe) {
+#if 1
+	bzero(i->i_pipe, sizeof(struct pipe_inode_info));
+#endif
 	init_waitqueue_head(PIPE_WAIT(*i));
-	PIPE_BASE(*i) = NULL;;
+#if 0
+	PIPE_BASE(*i) = NULL;
 	PIPE_START(*i) = PIPE_LEN(*i) = 0;
 	PIPE_READERS(*i) = PIPE_WRITERS(*i) = 0;
 #if !defined(KERNEL_2_5)
 	PIPE_WAITING_READERS(*i) = PIPE_WAITING_WRITERS(*i) = 0;
 #endif
 	PIPE_RCOUNTER(*i) = PIPE_WCOUNTER(*i) = 1;
-	
+#endif
 	return i;
     } else {
 	return NULL;
@@ -3718,7 +3722,11 @@ int	lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len)
 int lis_check_umem(struct file *fp, int rd_wr_fcn,
 		   const void *usr_addr, int lgth)
 {
+#if HAVE_KMACRO_ACCESS_OK
+    return(access_ok(rd_wr_fcn,usr_addr,lgth) ? 0 : -EFAULT);
+#else
     return(verify_area(rd_wr_fcn,usr_addr,lgth)) ;
+#endif
 }
 
 /************************************************************************

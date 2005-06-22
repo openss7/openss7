@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:21 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:21 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:42:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.6  2005/06/22 07:42:44  brian
+ - changes for gcc 4 compiler on FC4
+
  Revision 0.9.2.5  2005/05/14 08:26:21  brian
  - copyright header correction
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:21 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:44 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:21 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:44 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients
@@ -213,7 +216,7 @@ void dumpbuf(struct strbuf buf)
     }
 }
 
-void dumphex(unsigned char *data, int len)
+void dumphex(char *data, int len)
 {
     while (len--)
     {
@@ -222,14 +225,14 @@ void dumphex(unsigned char *data, int len)
     }
 }
 
-void dumpbytes(char *prompt, unsigned char *data, int len)
+void dumpbytes(char *prompt, char *data, int len)
 {
     printf("%s: ", prompt);
     dumphex(data, len);
     printf("\n");
 }
 
-void dumpaddr(char *prompt, unsigned char *addr, int addrlen)
+void dumpaddr(char *prompt, char *addr, int addrlen)
 {
     printf("%s: ", prompt);
     if (addrlen)
@@ -260,15 +263,15 @@ void dump8022(char *prompt, unsigned char *buf, int length)
 
     printf("%s: ", prompt);
     printf("daddr=");
-    dumphex(buf, 6);
+    dumphex((char *)buf, 6);
     printf(" saddr=");
-    dumphex(buf + 6, 6);
+    dumphex((char *)buf + 6, 6);
     printf("\n    length=");
-    dumphex(buf + 12, 2);
+    dumphex((char *)buf + 12, 2);
     printf(" dsap=%02x ssap=%02x ctl=%02x\n", buf[14], buf[15], buf[16]);
     if (length >= 17 && ff_cnt != 6)
     {
-	dumpbytes("    data", buf + 17, length - 17);
+	dumpbytes("    data", (char *)buf + 17, length - 17);
     }
 }
 

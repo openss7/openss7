@@ -741,7 +741,7 @@ recv_stream_stream()
   
   struct sockaddr_un myaddr_un, peeraddr_un;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len;
   int	receive_calls = 0;
   float	elapsed_time;
@@ -2771,7 +2771,7 @@ recv_dg_rr()
   struct	sockaddr_un        myaddr_un,
   peeraddr_un;
   SOCKET s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	trans_received = 0;
   int	trans_remaining;
   float	elapsed_time;
@@ -3059,7 +3059,7 @@ recv_stream_rr()
   struct	sockaddr_un        myaddr_un,
   peeraddr_un;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received = 0;
   int	trans_remaining;

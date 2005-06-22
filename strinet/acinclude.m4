@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/05/13 03:54:29 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/06/22 10:49:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:29 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 10:49:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -191,9 +191,30 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
-    _LINUX_CHECK_MEMBER([struct sock.__sk_common], [:],
+    _LINUX_CHECK_MEMBER([struct sock.__sk_common], [
+	_LINUX_CHECK_MEMBER([struct inet_opt.tos],
+	[AC_DEFINE([HAVE_TRN_SOCK_STRUCTURE], [1], [Define to 1 i you have the transitional Linux
+						    2.6 style struct inet_opt.  Otherwise, leave
+						    undefined for the newer Linux 2.6 or older Linux
+						    2.4 struct sock.])],
+	[AC_DEFINE([HAVE_NEW_SOCK_STRUCTURE], [1], [Define to 1 if you have the newer Linux 2.6
+						    style struct inet_sock.  Otherwise, leave
+						    undefined for either the transitional Linux 2.6
+						    or older Linux 2.4 socket structure.])], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+#include <linux/ip.h>
+	])],
 	[AC_DEFINE([HAVE_OLD_SOCK_STRUCTURE], [1], [Define to 1 if you have the older Linux 2.4
-	 style struct sock.  Otherwise leave undefined for the new Linux 2.6 struct sock.])], [
+						    style struct sock.  Otherwise leave undefined
+						    for the new Linux 2.6 struct sock.])], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

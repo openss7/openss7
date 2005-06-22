@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:04 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:37:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/05/14 08:30:04 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -312,7 +312,7 @@ get_sctp_info(SOCKET socket, int *mss)
 {
 
 #ifdef SCTP_MAXSEG
-  int sock_opt_len;
+  unsigned int sock_opt_len;
 
   sock_opt_len = sizeof(int);
   if (getsockopt(socket,
@@ -345,7 +345,7 @@ get_tcp_info(SOCKET socket, int *mss)
 {
 
 #ifdef TCP_MAXSEG
-  int sock_opt_len;
+  unsigned int sock_opt_len;
 
   sock_opt_len = sizeof(int);
   if (getsockopt(socket,
@@ -5379,7 +5379,7 @@ recv_sctp_stream()
   
   struct sockaddr_in myaddr_in, peeraddr_in;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len;
   unsigned int	receive_calls;
   float	elapsed_time;
@@ -5720,7 +5720,7 @@ recv_tcp_stream()
   
   struct sockaddr_in myaddr_in, peeraddr_in;
   SOCKET s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len;
   unsigned int	receive_calls;
   float	elapsed_time;
@@ -6061,7 +6061,7 @@ recv_sctp_maerts()
   
   struct sockaddr_in myaddr_in, peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len;
   unsigned int	send_calls;
   float	elapsed_time;
@@ -6413,7 +6413,7 @@ recv_tcp_maerts()
   
   struct sockaddr_in myaddr_in, peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len;
   unsigned int	send_calls;
   float	elapsed_time;
@@ -8720,7 +8720,7 @@ recv_udp_stream()
 
   struct sockaddr_in myaddr_in;
   SOCKET	s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	len = 0;
   unsigned int	bytes_received = 0;
   float	elapsed_time;
@@ -9038,7 +9038,7 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
   double	thruput;
   
   struct	sockaddr_in	server, myaddr_in;
-  int	                        addrlen;
+  unsigned int	                        addrlen;
   
   struct	udp_rr_request_struct	*udp_rr_request;
   struct	udp_rr_response_struct	*udp_rr_response;
@@ -9646,7 +9646,7 @@ recv_udp_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   int	trans_received;
   int	trans_remaining;
   int   request_bytes_recvd;
@@ -9944,7 +9944,7 @@ recv_sctp_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -10284,7 +10284,7 @@ recv_tcp_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -12033,7 +12033,7 @@ recv_sctp_conn_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   char	*temp_message_ptr;
@@ -12408,7 +12408,7 @@ recv_tcp_conn_rr()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   char	*temp_message_ptr;
@@ -13441,7 +13441,7 @@ recv_sctp_tran_rr(void)
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
 
   char	*recv_message_ptr;
   char	*send_message_ptr;
@@ -14517,7 +14517,7 @@ recv_tcp_tran_rr(void)
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
 
   char	*recv_message_ptr;
   char	*send_message_ptr;
@@ -15624,7 +15624,7 @@ recv_sctp_nbrr(void)
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -16687,7 +16687,7 @@ recv_tcp_nbrr(void)
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*temp_message_ptr;
   int	trans_received;
   int	trans_remaining;
@@ -17701,7 +17701,7 @@ recv_sctp_cc()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   int	trans_received;
@@ -18682,7 +18682,7 @@ recv_tcp_cc()
   struct	sockaddr_in        myaddr_in,
   peeraddr_in;
   SOCKET	s_listen,s_data;
-  int 	addrlen;
+  unsigned int 	addrlen;
   char	*recv_message_ptr;
   char	*send_message_ptr;
   int	trans_received;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/16 21:07:15 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 21:07:15 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:39:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/16 21:07:15 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/16 21:07:15 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/06/16 21:07:15 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -626,6 +626,19 @@ STATIC struct sctp_options sctp_defaults = {
 };
 #define t_defaults sctp_defaults
 #endif				/* STREAMS */
+
+/*
+ *  Foolish me, I thought that this structure was stable...
+ *  Define the transitional (Linux 2.6.10) version
+ */
+#undef inet_opt
+#define inet_opt    my_inet_opt
+
+struct inet_opt {
+	int uc_ttl;
+	int tos;
+	__u16 id;
+};
 
 struct sctp_ifops;			/* interface operations */
 /*
@@ -1965,7 +1978,7 @@ STATIC int sctp_recv_err(struct sctp *sp, mblk_t *mp);
 STATIC INLINE uint32_t
 nocsum_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (!verify_area(VERIFY_READ, src, len)) {
+	if (access_ok(VERIFY_READ, src, len)) {
 		bcopy(src, dst, len);
 		return (sum);
 	}
@@ -2044,7 +2057,7 @@ __adler32_partial_copy_from_user(register const unsigned char *src, register uns
 STATIC INLINE uint32_t
 adler32_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (!verify_area(VERIFY_READ, src, len))
+	if (access_ok(VERIFY_READ, src, len))
 		return __adler32_partial_copy_from_user(src, dst, len, sum, errp);
 	if (len)
 		*errp = -EFAULT;
@@ -2131,7 +2144,7 @@ __crc32c_partial_copy_from_user(register const unsigned char *src, register unsi
 STATIC INLINE uint32_t
 crc32c_and_copy_from_user(const char *src, char *dst, int len, int sum, int *errp)
 {
-	if (!verify_area(VERIFY_READ, src, len))
+	if (access_ok(VERIFY_READ, src, len))
 		return __crc32c_partial_copy_from_user(src, dst, len, sum, errp);
 	if (len)
 		*errp = -EFAULT;
@@ -4531,7 +4544,7 @@ sctp_choose_best(sctp_t *sp)
 #endif				/* defined(SCTP_CONFIG_DEBUG) &&
 				   defined(SCTP_CONFIG_ERROR_GENERATOR) */
 STATIC INLINE int
-dst_check(struct dst_entry **dstp)
+my_dst_check(struct dst_entry **dstp)
 {
 	struct dst_entry *dst;
 	if (dstp) {
@@ -4554,6 +4567,12 @@ sp_dst_reset(struct sctp *sp)
 		if (sd->dst_cache)
 			dst_release(xchg(&sd->dst_cache, NULL));
 }
+
+#if HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#undef dst_pmtu
+#define dst_pmtu dst_mtu
+#endif
 
 #undef RT_CONN_FLAGS
 #define RT_CONN_FLAGS(__sp) (RT_TOS(sp->inet.tos) | sp->localroute)
@@ -4585,7 +4604,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		printd(("INFO: Checking stream %p route for %d.%d.%d.%d\n", sp,
 			(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
 			(sd->daddr >> 24) & 0xff));
-		if (!sd->dst_cache || (sd->dst_cache->obsolete && !dst_check(&sd->dst_cache))) {
+		if (!sd->dst_cache || (sd->dst_cache->obsolete && !my_dst_check(&sd->dst_cache))) {
 			rt = NULL;
 			sd->saddr = 0;
 			route_changed = 1;
@@ -4928,11 +4947,15 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->ihl = 5;
 			iph->tos = ip->tos;
 			iph->frag_off = 0;
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 			iph->ttl = ip->ttl;
 #elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 			iph->ttl = ip->uc_ttl;
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+			iph->ttl = ip->uc_ttl;
+#endif
 			iph->daddr = rt->rt_dst;
 			iph->saddr = saddr;
 			iph->protocol = sp->protocol;
@@ -5068,11 +5091,15 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->ihl = 5;
 		iph->tos = ip->tos;
 		iph->frag_off = 0;
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		iph->ttl = ip->ttl;
 #elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 		iph->ttl = ip->uc_ttl;
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+		iph->ttl = ip->uc_ttl;
+#endif
 		iph->daddr = sd->daddr;	/* XXX */
 		iph->saddr = sd->saddr;
 		iph->protocol = sp->protocol;
@@ -12527,7 +12554,7 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
  */
 STATIC int sctp_port_rover = 0;
 /* FIXME: the following should be done in the hooks file. */
-#ifdef sysctl_local_port_range
+#if HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 extern int sysctl_local_port_range[2];
 #else				/* sysctl_local_port_range */
 STATIC int sysctl_local_port_range[2] = { 1024, 4999 };
@@ -12829,11 +12856,15 @@ sctp_init_struct(struct sctp *sp)
 	sctp_change_state(sp, SCTP_CLOSED);
 	/* ip defaults */
 	sp->inet.tos = sctp_defaults.ip.tos;
+#if 0
 #ifdef HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 	sp->inet.ttl = sysctl_ip_default_ttl;
 #elif HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 	sp->inet.uc_ttl = sysctl_ip_default_ttl;
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+	sp->inet.uc_ttl = sysctl_ip_default_ttl;
+#endif
 	sp->protocol = IPPROTO_SCTP;
 	sp->localroute = sctp_defaults.ip.dontroute;
 	sp->broadcast = sctp_defaults.ip.broadcast;
@@ -15574,11 +15605,15 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 						continue;
 					if (*valp < 1)
 						*valp = 1;
+#if 0
 #if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 					np->ttl = *valp;
 #elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 					np->uc_ttl = *valp;
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+					np->uc_ttl = *valp;
+#endif
 					continue;
 				}
 				case T_IP_REUSEADDR:
@@ -18413,6 +18448,7 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 		oh->name = T_IP_TTL;
 		oh->len = _T_LENGTH_SIZEOF(sp->options.ip.ttl);
 		oh->status = T_SUCCESS;
+#if 0
 #if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 		if (sp->options.ip.ttl != np->ttl) {
 			if (sp->options.ip.ttl > np->ttl)
@@ -18426,6 +18462,13 @@ t_build_conn_opts(struct sctp *sp, unsigned char *op, size_t olen)
 			sp->options.ip.ttl = np->uc_ttl;
 		}
 #endif				/* HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+		if (sp->options.ip.ttl != np->uc_ttl) {
+			if (sp->options.ip.ttl > np->uc_ttl)
+				oh->status = T_PARTSUCCESS;
+			sp->options.ip.ttl = np->uc_ttl;
+		}
+#endif
 		*((unsigned char *) T_OPT_DATA(oh)) = sp->options.ip.ttl;
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
@@ -22055,11 +22098,15 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 #endif
 						}
 						t->options.ip.ttl = *valp;
+#if 0
 #if defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_TTL
 						np->ttl = *valp;
 #elif defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL
 						np->uc_ttl = *valp;
 #endif				/* defined HAVE_KMEMB_STRUCT_SOCK_PROTINFO_AF_INET_UC_TTL */
+#else
+						np->uc_ttl = *valp;
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;

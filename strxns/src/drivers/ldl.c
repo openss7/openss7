@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/14 08:26:11 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/22 07:42:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:11 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:42:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/14 08:26:11 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/22 07:42:43 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/05/14 08:26:11 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/22 07:42:43 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -84,7 +84,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2005/05/14 08:26:11 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2005/06/22 07:42:43 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -915,6 +915,7 @@ hangup_set(struct dl *dl)
 /*
  *  hangup_do  - do the actual hangup on an endpoint
  */
+STATIC void ndev_release(struct dl *dl);
 STATIC INLINE void
 hangup_do(struct dl *dl)
 {
@@ -953,7 +954,6 @@ hangup_do(struct dl *dl)
 		dl->dlstate = DL_UNBOUND;
 	}
 	if (dl->dlstate == DL_UNBOUND) {
-		STATIC void ndev_release(struct dl *dl);
 
 		ndev_release(dl);
 		dl->addr_len = 0;

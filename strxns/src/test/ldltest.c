@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:13 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:13 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:42:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.6  2005/06/22 07:42:43  brian
+ - changes for gcc 4 compiler on FC4
+
  Revision 0.9.2.5  2005/05/14 08:26:13  brian
  - copyright header correction
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:13 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:43 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:26:13 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/06/22 07:42:43 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -378,7 +381,7 @@ char           *hex(unsigned char c)
       return s;
 }
 
-void dumpbytes(char *prompt, unsigned char *data, int len)
+void dumpbytes(char *prompt, char *data, int len)
 {
       if (!verbose)
 	    return;
@@ -434,7 +437,7 @@ void dumpbuf(struct strbuf buf)
       }
 }
 
-void dumpaddr(char *prompt, unsigned char *addr, int addrlen)
+void dumpaddr(char *prompt, char *addr, int addrlen)
 {
       if (!verbose)
 	    return;
@@ -1316,7 +1319,7 @@ int do_bind_peer(int fd, char *sap, int saplen)
       return 0;
 }
 
-int do_send_unitdata(int fd, unsigned char *data, int datalen, unsigned char *dlsap)
+int do_send_unitdata(int fd, unsigned char *data, int datalen, caddr_t dlsap)
 {
       struct {
 	    struct ethhdr hdr __attribute__ ((packed));
@@ -1426,7 +1429,7 @@ int send_arp_request(int fd)
       arp->ar_hln = addr_len;
       arp->ar_pln = 4;
       arp->ar_op = htons(ARPOP_REQUEST);
-      p = (char *) (arp + 1);
+      p = (unsigned char *) (arp + 1);
       memcpy(p, my_addr, addr_len);
       p += addr_len;
       memcpy(p, &my_ip_addr, sizeof(struct in_addr));
@@ -1437,7 +1440,7 @@ int send_arp_request(int fd)
       p += sizeof(struct in_addr);
 
       *(unsigned short *) sap = ETH_P_ARP;
-      build_dlsap(dlsap, my_brd_addr, sap);
+      build_dlsap(dlsap, (char *)my_brd_addr, sap);
 
       return do_send_unitdata(fd, databuf, p - databuf, dlsap);
 }
@@ -1466,7 +1469,7 @@ int process_arp_reply(int fd, char *databuf, int datalen, char *dlsap)
 	    return 0;		/* Not an IP request */
       }
 
-      pr = (char *) (arp + 1);
+      pr = (unsigned char *) (arp + 1);
       if (memcmp(pr + addr_len, &target_ip_addr, 4)) {
 	    if (verbose > 2) {
 		  struct in_addr  ip_addr;
@@ -1483,7 +1486,7 @@ int process_arp_reply(int fd, char *databuf, int datalen, char *dlsap)
       memcpy(target_addr, pr, addr_len);
 
       if (verbose > 2)
-	    dumpbytes("Got ARP reply: Target hardware address", target_addr, addr_len);
+	    dumpbytes("Got ARP reply: Target hardware address", (char *)target_addr, addr_len);
 
       got_target_addr = 1;
       kill(getpid(), SIGALRM);
@@ -1515,7 +1518,7 @@ int process_arp_request(int fd, char *databuf, int datalen, char *dlsap)
 	    return 0;
       }
 
-      pr = (char *) (arp + 1);
+      pr = (unsigned char *) (arp + 1);
       if (memcmp(pr + 2 * addr_len + 4, &my_ip_addr, 4)) {
 	    if (verbose > 2) {
 		  struct in_addr  ip_addr;
@@ -1535,8 +1538,8 @@ int process_arp_request(int fd, char *databuf, int datalen, char *dlsap)
       arp->ar_op = htons(ARPOP_REPLY);
       {
 	    int             i;
-	    char           *a = pr,
-	                   *b = pr + addr_len + 4;
+	    char           *a = (char *)pr,
+	                   *b = (char *)pr + addr_len + 4;
 
 	    for (i = 0; i < addr_len + 4; ++i) {
 		  char            c = a[i];
@@ -1548,7 +1551,7 @@ int process_arp_request(int fd, char *databuf, int datalen, char *dlsap)
 
       if (verbose)
 	    printf("process_arp_request() replying\n");
-      return do_send_unitdata(fd, databuf, datalen, dlsap);
+      return do_send_unitdata(fd, (unsigned char *)databuf, datalen, dlsap);
 }
 
 int process_incoming_arp(int fd, char *databuf, int datalen, char *dlsap)
@@ -1640,7 +1643,7 @@ int process_incoming_echo_request(int fd, char *databuf, int datalen, char *dlsa
       /*
        *  Send reply
        */
-      return do_send_unitdata(fd, databuf, datalen, dlsap);
+      return do_send_unitdata(fd, (unsigned char *)databuf, datalen, dlsap);
 }
 
 int process_incoming_llc_request(int fd, char *databuf, int datalen,
@@ -1704,7 +1707,7 @@ int _do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *s
       ctlbuf.buf = buf;
       databuf.maxlen = *datalen;
       databuf.len = 0;
-      databuf.buf = data;
+      databuf.buf = (char *)data;
 
       flags = 0;
       if (verbose > 1)
@@ -1936,7 +1939,7 @@ int do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *sr
 	    if (pkt_type == ETH_P_ARP) {
 		  if (verbose > 2)
 			printf("do_rcv_unitdata(): Got ARP packet.\n");
-		  process_incoming_arp(fd, data, dlen, src_dlsap);
+		  process_incoming_arp(fd, (char *)data, dlen, (char *)src_dlsap);
 
 		  continue;
 	    }
@@ -1944,7 +1947,7 @@ int do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *sr
 	    if (pkt_type == ETH_P_IP) {
 		  if (verbose > 2)
 			printf("do_rcv_unitdata(): Got IP packet.\n");
-		  if (memcmp(my_addr, dlsap_addr(dst_dlsap), addr_len)) {
+		  if (memcmp(my_addr, dlsap_addr((char *)dst_dlsap), addr_len)) {
 			if (verbose > 2)
 			      printf
 				  ("do_rcv_unitdata(): IP packet not for my MAC address.\n");
@@ -1954,20 +1957,20 @@ int do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *sr
 			continue;
 		  if (((struct iphdr *) data)->protocol == 1 /* ICMP */  &&
 		      ((struct ping_pkt *) data)->icmp_hdr.type == ICMP_ECHO) {
-			process_incoming_echo_request(fd, data, dlen, src_dlsap);
+			process_incoming_echo_request(fd, (char *)data, dlen, (char *)src_dlsap);
 			continue;
 		  }
 	    }
 	    else if (ntohs(pkt_type) < 1536) {
 		  if (verbose > 2)
 			printf("do_rcv_unitdata(): Got LLC frame.\n");
-		  if (memcmp(my_addr, dlsap_addr(dst_dlsap), addr_len)) {
+		  if (memcmp(my_addr, dlsap_addr((char *)dst_dlsap), addr_len)) {
 			if (verbose > 2)
 			      printf
 				  ("do_rcv_unitdata(): LLC frame not for my MAC address.\n");
 			continue;
 		  }
-		  if (process_incoming_llc_request(fd, data, dlen, src_dlsap, dst_dlsap)
+		  if (process_incoming_llc_request(fd, (char *)data, dlen, src_dlsap, dst_dlsap)
 		      <= 0)
 			continue;	/* keep going if cmnd rcvd */
 		  /*
@@ -2039,7 +2042,7 @@ int do_arp(int fd, struct in_addr ip, unsigned char *target_addr)
 			fprintf(stderr, "Timed out while waiting for ARP reply\n");
 		  return -1;
 	    }
-	    build_dlsap(target_dlsap, target_addr, dlsap_sap(my_dlsap));
+	    build_dlsap((char *)target_dlsap, (char *)target_addr, dlsap_sap((char *)my_dlsap));
 	    return 0;
       }
       signal(SIGALRM, arp_timeout);
@@ -2050,7 +2053,7 @@ int do_arp(int fd, struct in_addr ip, unsigned char *target_addr)
 	    unsigned char   dst_dlsap[MAX_DL_ADDR_LEN + MAX_DL_SAP_LEN];
 
 	    buflen = 1000;
-	    if (do_rcv_unitdata(fd, buf, &buflen, src_dlsap, dst_dlsap) < 0)
+	    if (do_rcv_unitdata(fd, (unsigned char *)buf, &buflen, src_dlsap, dst_dlsap) < 0)
 		  return -1;
       }
 }
@@ -2100,7 +2103,7 @@ int send_ping(int fd, __u16 id, __u16 sequence)
       memset(pkt.filler, 0, sizeof(pkt.filler));
       pkt.icmp_hdr.checksum = in_cksum(&pkt.icmp_hdr, sizeof(pkt) - sizeof(pkt.ip_hdr));
 
-      if (do_send_unitdata(fd, (char *) &pkt, sizeof(pkt), target_dlsap) < 0) {
+      if (do_send_unitdata(fd, (unsigned char *) &pkt, sizeof(pkt), (char *)target_dlsap) < 0) {
 	    if (verbose)
 		  fprintf(stderr, "send_ping: do_send_unitdata() failed.\n");
 	    return -1;
@@ -2133,7 +2136,7 @@ int rcv_ping(int fd, __u16 id, __u16 * sequence)
 	    printf("--\nrcv_ping: Waiting for data...\n");
 
       buflen = sizeof(pkt);
-      if (do_rcv_unitdata(fd, (char *) &pkt, &buflen, s_dlsap, d_dlsap) < 0) {
+      if (do_rcv_unitdata(fd, (unsigned char *) &pkt, &buflen, s_dlsap, d_dlsap) < 0) {
 	    if (verbose)
 		  printf("rcv_ping: do_rcv_unitdata() failed\n");
 	    return -1;
@@ -2144,10 +2147,10 @@ int rcv_ping(int fd, __u16 id, __u16 * sequence)
 	    return -1;
       }
 
-      dsap = dlsap_sap(d_dlsap);
-      ssap = dlsap_sap(s_dlsap);
-      daddr = dlsap_addr(d_dlsap);
-      saddr = dlsap_addr(s_dlsap);
+      dsap = (unsigned char *)dlsap_sap((char *)d_dlsap);
+      ssap = (unsigned char *)dlsap_sap((char *)s_dlsap);
+      daddr = (unsigned char *)dlsap_addr((char *)d_dlsap);
+      saddr = (unsigned char *)dlsap_addr((char *)s_dlsap);
 
       if (memcmp(daddr, my_addr, addr_len)) {
 	    if (verbose > 2)
@@ -2248,7 +2251,7 @@ int send_test_xid(int fd, int cmnd)
 	     * Fill in header 
 	     */
 	    memcpy(frm.h_source, my_addr, ETH_ALEN);
-	    memcpy(frm.h_dest, dlsap_addr(target_dlsap), addr_len);
+	    memcpy(frm.h_dest, dlsap_addr((char *)target_dlsap), addr_len);
 	    frm.h_len_hi = 0;
 	    frm.h_len_lo = 3;	/* 3 bytes of LLC hdr */
 	    frm.llc_dsap = target_sap[0];
@@ -2270,7 +2273,7 @@ int send_test_xid(int fd, int cmnd)
 	    tp->acf = 0x10;	/* canned */
 	    tp->fcf = 0x40;	/* canned */
 	    memcpy(tp->dst_addr, my_addr, TR_ALEN);
-	    memcpy(tp->src_addr, dlsap_addr(target_dlsap), TR_ALEN);
+	    memcpy(tp->src_addr, dlsap_addr((char *)target_dlsap), TR_ALEN);
 	    tp->src_addr[0] &= ~SADDR_0_RTE_PRES;	/* no route */
 
 	    llcp = (tr_llc_frm_hdr_t *) (((char *) (tp + 1)) - 2);
@@ -2313,16 +2316,16 @@ int rcv_test_xid(int fd)
 	    printf("--\nrcv_test_xid: Waiting for data...\n");
 
       buflen = sizeof(pkt);
-      if (do_rcv_unitdata(fd, (char *) &pkt, &buflen, s_dlsap, d_dlsap) < 0) {
+      if (do_rcv_unitdata(fd, (unsigned char *) &pkt, &buflen, s_dlsap, d_dlsap) < 0) {
 	    if (verbose)
 		  printf("rcv_test_xid: do_rcv_unitdata() failed\n");
 	    return -1;
       }
 
-      dsap = dlsap_sap(d_dlsap) + 2;
-      ssap = dlsap_sap(s_dlsap);
-      daddr = dlsap_addr(d_dlsap);
-      saddr = dlsap_addr(s_dlsap);
+      dsap = (unsigned char *)dlsap_sap((char *)d_dlsap) + 2;
+      ssap = (unsigned char *)dlsap_sap((char *)s_dlsap);
+      daddr = (unsigned char *)dlsap_addr((char *)d_dlsap);
+      saddr = (unsigned char *)dlsap_addr((char *)s_dlsap);
 
       if (verbose > 2) {
 	    printf("rcv_test_xid: daddr=");
@@ -2344,7 +2347,7 @@ int rcv_test_xid(int fd)
 		  printf("rcv_test_xid: Reply is not for our SAP\n");
 	    return -1;
       }
-      if (memcmp(saddr, dlsap_addr(target_dlsap), addr_len)) {
+      if (memcmp(saddr, dlsap_addr((char *)target_dlsap), addr_len)) {
 	    if (verbose > 2)
 		  printf("rcv_test_xid: Packet is not from our target MAC addr.\n");
 	    return -1;
@@ -2817,7 +2820,7 @@ int main(int argc, char *argv[])
 		  printf("Running in echo mode\n");
 	    for (;;) {
 		  buflen = 4096;
-		  do_rcv_unitdata(fd, buf, &buflen, s_dlsap, d_dlsap);
+		  do_rcv_unitdata(fd, (unsigned char *)buf, &buflen, s_dlsap, d_dlsap);
 	    }
       }
 

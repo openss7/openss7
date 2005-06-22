@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/05/13 03:54:29 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/06/22 07:39:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:29 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 07:39:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -366,7 +366,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output ip_dst_output ip_route_output_key], [], [], [
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output ip_route_output_key], [], [], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -450,6 +450,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 			   socket_get_info,
 			   sysctl_ip_dynaddr,
 			   sysctl_ip_nonlocal_bind,
+			   sysctl_local_port_range,
 			   tcp_prot,
 			   udp_prot,
 			   raw_prot,

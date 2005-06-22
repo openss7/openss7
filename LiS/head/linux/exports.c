@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.6 $) $Date: 2005/04/12 22:45:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:14 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.6 $) $Date: 2005/04/12 22:45:14 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -402,7 +402,9 @@ EXPORT_SYMBOL_GPL(lis_osif_pci_unmap_single);
 EXPORT_SYMBOL_GPL(lis_osif_sg_dma_address);
 EXPORT_SYMBOL_GPL(lis_osif_sg_dma_len);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)      /* 2.4.13 or later */
+#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_set_dma_mask);
+#endif
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_supported);
 EXPORT_SYMBOL_GPL(lis_osif_pci_unmap_page);
 EXPORT_SYMBOL_GPL(lis_osif_pci_map_page);

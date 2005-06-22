@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $
+ @(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/22 07:37:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:03 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netserver.c,v $
+ Revision 1.1.1.11  2005/06/22 07:37:27  brian
+ - signed vs unsigned pointer corrections for gcc 4 on FC4
+
  Revision 1.1.1.10  2005/05/14 08:30:03  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $"
+#ident "@(#) $RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/22 07:37:27 $"
 
-static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/05/14 08:30:03 $";
+static char const ident[] = "$RCSfile: netserver.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/22 07:37:27 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -587,7 +590,7 @@ void set_up_server(int af)
 #endif
   
   SOCKET server_control;
-  int sockaddr_len;
+  unsigned int sockaddr_len;
   int on=1;
 
   if (af == AF_INET) {
@@ -1237,7 +1240,7 @@ main(int argc, char *argv[])
 #endif
 
 struct sockaddr name;
-  int namelen = sizeof(name);
+  unsigned int namelen = sizeof(name);
 
 #if defined _GNU_SOURCE
   int option_index = 0;

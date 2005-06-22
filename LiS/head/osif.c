@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/04/12 22:45:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/04/12 22:45:00 $"
 
 /************************************************************************
 *                   Operating System Interface                          *
@@ -469,10 +469,12 @@ void  _RP lis_osif_pci_unmap_page(struct pci_dev *hwdev,
     pci_unmap_page(hwdev, dma_address, size, direction) ;
 }
 
+#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 int  _RP lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
     return(pci_dac_set_dma_mask(hwdev, mask)) ;
 }
+#endif
 
 dma_addr_t  _RP lis_osif_pci_map_page(struct pci_dev *hwdev,
 				struct page *page, unsigned long offset,

@@ -2890,7 +2890,7 @@ set_sock_buffer (int sd, enum sock_buffer which, int requested_size, int *effect
 {
 #ifdef SO_SNDBUF
   int optname = (which == SEND_BUFFER) ? SO_SNDBUF : SO_RCVBUF;
-  int sock_opt_len;
+  unsigned int sock_opt_len;
 
   if (requested_size > 0) {
     if (setsockopt(sd, SOL_SOCKET, optname,

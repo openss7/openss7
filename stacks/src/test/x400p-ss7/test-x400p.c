@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:40 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/06/22 07:58:44 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:40 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:58:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.5  2005/06/22 07:58:44  brian
+ - unsigned/signed pointer corrections for gcc4 on FC4
+
  Revision 0.9.2.4  2005/05/14 08:31:40  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:40 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/06/22 07:58:44 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:40 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/06/22 07:58:44 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -410,7 +413,7 @@ static unsigned long iut_t7 = 1 * HZ;
 static unsigned long pt_flags = SDT_FLAGS_ONE;
 
 int pt_fd = 0;
-unsigned char pt_buf[BUFSIZE];
+char pt_buf[BUFSIZE];
 unsigned char pt_fib = 0x80;
 unsigned char pt_fsn = 0x7f;
 unsigned char pt_bib = 0x80;
@@ -419,7 +422,7 @@ unsigned char pt_li = 0;
 unsigned char pt_sio = 0;
 
 int iut_fd = 0;
-unsigned char iut_buf[BUFSIZE];
+char iut_buf[BUFSIZE];
 unsigned char iut_fib = 0x80;
 unsigned char iut_fsn = 0x7f;
 unsigned char iut_bib = 0x80;
@@ -1229,7 +1232,7 @@ pt_decode_data(void)
 }
 
 static int
-pt_decode_msg(unsigned char *buf)
+pt_decode_msg(char *buf)
 {
 	union SDT_primitives *p = (union SDT_primitives *) buf;
 	// printf("pt decode msg:\n"); FFLUSH(stdout);
@@ -1306,7 +1309,7 @@ iut_decode_data(void)
 }
 
 static int
-iut_decode_msg(unsigned char *buf)
+iut_decode_msg(char *buf)
 {
 	char *reason;
 	union SL_primitives *p = (union SL_primitives *) buf;
@@ -1486,7 +1489,7 @@ wait_event(int wait)
 			// FFLUSH(stdout);
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
 				int flags = 0;
-				unsigned char cbuf[BUFSIZE];
+				char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
 				BUFSIZE, 0, pt_buf};
 				// printf("getmsg from pt:\n");
@@ -1505,7 +1508,7 @@ wait_event(int wait)
 			}
 			if (pfd[1].revents & (POLLIN | POLLPRI)) {
 				int flags = 0;
-				unsigned char cbuf[BUFSIZE];
+				char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
 				BUFSIZE, 0, iut_buf};
 				// printf("getmsg from iut:\n");

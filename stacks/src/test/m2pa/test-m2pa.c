@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:31 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:31 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:58:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.11  2005/06/22 07:58:43  brian
+ - unsigned/signed pointer corrections for gcc4 on FC4
+
  Revision 0.9.2.10  2005/05/14 08:31:31  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:31 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:31 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -714,7 +717,7 @@ static unsigned long iut_options = 0;
 static int mgm_fd = 0;
 static ulong mgm_tok = 0;
 static ulong mgm_seq = 0;
-static unsigned char mgm_buf[BUFSIZE];
+static char mgm_buf[BUFSIZE];
 
 /* 
    protocol tester file descriptor
@@ -722,7 +725,7 @@ static unsigned char mgm_buf[BUFSIZE];
 static int pt_fd = 0;
 static ulong pt_tok = 0;
 static ulong pt_seq = 0;
-static unsigned char pt_buf[BUFSIZE];
+static char pt_buf[BUFSIZE];
 static unsigned char pt_fib = 0x0;
 static unsigned char pt_bib = 0x0;
 #if defined(M2PA_VERSION_DRAFT9)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
@@ -741,7 +744,7 @@ static unsigned int pt_bsn = 0x0;
 static int iut_fd = 0;
 static ulong iut_tok = 0;
 static ulong iut_seq = 0;
-static unsigned char iut_buf[BUFSIZE];
+static char iut_buf[BUFSIZE];
 static unsigned char iut_fib = 0x0;
 static unsigned char iut_bib = 0x0;
 #if defined(M2PA_VERSION_DRAFT9)||defined(M2PA_VERSION_DRAFT10)||defined(M2PA_VERSION_DRAFT11)
@@ -1902,7 +1905,7 @@ pt_decode_data(void)
  *  -------------------------------------------------------------------------
  */
 static int
-pt_decode_msg(unsigned char *buf)
+pt_decode_msg(char *buf)
 {
 	union primitives *p = (union primitives *) buf;
 	if (debug && verbose > 1)
@@ -2038,7 +2041,7 @@ iut_decode_data(void)
  *  -------------------------------------------------------------------------
  */
 static int
-iut_decode_msg(unsigned char *buf)
+iut_decode_msg(char *buf)
 {
 	char *reason;
 	union primitives *p = (union primitives *) buf;
@@ -2303,7 +2306,7 @@ mgm_decode_data(void)
  *  -------------------------------------------------------------------------
  */
 static int
-mgm_decode_msg(unsigned char *buf)
+mgm_decode_msg(char *buf)
 {
 	union primitives *p = (union primitives *) buf;
 	if (p->npi.type != oldmgm) {
@@ -2478,7 +2481,7 @@ wait_event(int wait)
 			if (pfd[0].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
 				int ret = UNKNOWN;
 				int flags = 0;
-				unsigned char cbuf[BUFSIZE];
+				char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
 				BUFSIZE, 0, pt_buf};
 				if (debug && verbose > 1) {
@@ -2504,7 +2507,7 @@ wait_event(int wait)
 			if (pfd[1].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
 				int ret = UNKNOWN;
 				int flags = 0;
-				unsigned char cbuf[BUFSIZE];
+				char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
 				BUFSIZE, 0, iut_buf};
 				if (debug && verbose > 1) {
@@ -2530,7 +2533,7 @@ wait_event(int wait)
 			if (pfd[2].revents & (POLLIN | POLLPRI | POLLERR | POLLHUP)) {
 				int ret = UNKNOWN;
 				int flags = 0;
-				unsigned char cbuf[BUFSIZE];
+				char cbuf[BUFSIZE];
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf }, data = {
 				BUFSIZE, 0, mgm_buf};
 				if (debug && verbose > 1) {
