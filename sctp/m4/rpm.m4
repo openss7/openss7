@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/05/28 07:17:05 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.49 $) $Date: 2005/06/22 04:05:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 07:17:05 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 04:05:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -158,6 +158,12 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (4|4.0)	rpm_cv_dist_extra=".centos4" ;;
 			esac
 			;;
+		    (lineox)
+			case $dist_cv_host_release in
+			    (3|3.?)	rpm_cv_dist_extra=".lel3" ;;
+			    (4|4.0)	rpm_cv_dist_extra=".lel4" ;;
+			esac
+			;;
 		    (whitebox)
 			case $dist_cv_host_release in
 			    (3|3.0)	rpm_cv_dist_extra=".WB3" ;;
@@ -169,6 +175,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (1)		rpm_cv_dist_extra=".FC1" ;;
 			    (2)		rpm_cv_dist_extra=".FC2" ;;
 			    (3)		rpm_cv_dist_extra=".FC3" ;;
+			    (4)		rpm_cv_dist_extra=".FC4" ;;
 			esac
 			;;
 		    (redhat)
@@ -201,6 +208,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
 	case "$dist_cv_host_flavor" in
 	    (centos)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
+	    (lineox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (whitebox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (fedora)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
 	    (mandrake)	rpm_cv_dist_topdir='/usr/src/RPM'    ;;

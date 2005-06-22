@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/03/31 00:06:42 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/22 04:05:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/31 00:06:42 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 04:05:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,6 +128,7 @@ dist_get_flavor() {
 dnl AC_MSG_WARN([checking for flavor in $[1]])
     case "$[1]" in
 	(*CentOS*)	echo 'centos'   ;;
+	(*Lineox*)	echo 'lineox'	;;
 	(*White?Box*)	echo 'whitebox' ;;
 	(*Fedora?Core*)	echo 'fedora'   ;;
 	(*Mandrake*)	echo 'mandrake' ;;
@@ -140,6 +141,7 @@ dist_get_vendor() {
 dnl AC_MSG_WARN([checking for vendor in $[1]])
     case "$[1]" in
 	(centos)	echo 'centos'	;;
+	(lineox)	echo 'lineox'	;;
 	(whitebox)	echo 'whitebox' ;;
 	(fedora)	echo 'redhat'   ;;
 	(mandrake)	echo 'mandrake' ;;
@@ -158,6 +160,7 @@ dist_get_distrib() {
 dnl AC_MSG_WARN([checking for distrib in $[1]])
     case "$[1]" in
 	(centos)	echo 'CentOS Enterprise Linux' ;;
+	(lineox)	echo 'Lineox Enterprise Linux' ;;
 	(whitebox)	echo 'White Box Enterprise Linux' ;;
 	(fedora)	echo 'Fedora Core' ;;
 	(mandrake)	echo 'Mandrake Linux' ;;
@@ -213,6 +216,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     AC_CACHE_CHECK([for dist build release file], [dist_cv_build_rel_file], [dnl
 	eval "dist_search_path=\"
 	    /etc/centos-release
+	    /etc/lineox-release
 	    /etc/whitebox-release
 	    /etc/fedora-release
 	    /etc/mandrake-release
@@ -370,6 +374,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     AC_CACHE_CHECK([for dist host release file], [dist_cv_host_rel_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/centos-release
+	    ${DESTDIR}${sysconfdir}/lineox-release
 	    ${DESTDIR}${sysconfdir}/whitebox-release
 	    ${DESTDIR}${sysconfdir}/fedora-release
 	    ${DESTDIR}${sysconfdir}/mandrake-release
@@ -516,7 +521,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     AC_MSG_CHECKING([build system type])
     build_vendor="$dist_cv_build_vendor"
     case "$build_vendor" in
-	(centos|whitebox|redhat|suse|debian)  
+	(centos|lineox|whitebox|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
 	(mandrake)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
@@ -531,7 +536,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	host_vendor="$dist_cv_host_vendor"
 	case "$host_vendor" in
-	    (centos|whitebox|redhat|suse|debian)  
+	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
 	    (mandrake)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
@@ -547,7 +552,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	target_vendor="$dist_cv_host_vendor"
 	case "$target_vendor" in
-	    (centos|whitebox|redhat|suse|debian)  
+	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
 	    (mandrake)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;

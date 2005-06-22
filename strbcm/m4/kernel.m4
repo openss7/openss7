@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.99 $) $Date: 2005/06/02 03:05:12 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/06/22 04:05:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/02 03:05:12 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 04:05:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,6 +97,25 @@ dnl but with module flags included
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS="$CFLAGS -Werror"
+dnl careful about -Wno warnings which we must keep, so put them back one at a time
+    for i in $KERNEL_MODFLAGS $KERNEL_CPPFLAGS ; do
+	case "$i" in
+	    -Wno-*)
+		CPPFLAGS="$CPPFLAGS $i" ;;
+	esac
+    done
+    for i in $KERNEL_CFLAGS ; do
+	case "$i" in
+	    -Wno-*)
+		CFLAGS="$CFLAGS $i" ;;
+	esac
+    done
+    for i in $KERNEL_LDFLAGS ; do
+	case "$i" in
+	    -Wno-*)
+		LDCFLAGS="$LDCFLAGS $i" ;;
+	esac
+    done
 }
 ])# _LINUX_KERNEL_ENV_FUNCTIONS
 
