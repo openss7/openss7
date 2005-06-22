@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/06/16 20:44:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/06/22 10:50:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 20:44:34 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 10:50:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -310,7 +310,13 @@ include am/strconf.am
 INET_MKDEV			= scripts/inet_mkdev
 INET_RMDEV			= scripts/inet_rmdev
 
-sbin_SCRIPTS = $(INET_MKDEV) $(INET_RMDEV)
+if PKG_BUILD_ARCH
+if RPM_BUILD_USER
+## these go with the utilities package
+dist_sbin_SCRIPTS = $(INET_MKDEV) $(INET_RMDEV)
+endif
+endif
+
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
 EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 

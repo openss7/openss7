@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/07 08:16:09 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/22 09:44:17 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -63,6 +63,14 @@ for INET_MKDEV in /sbin/inet_mkdev /usr/sbin/inet_mkdev /bin/inet_mkdev /usr/bin
     fi
 done
 
+for INET_RMDEV in /sbin/inet_rmdev /usr/sbin/inet_rmdev /bin/inet_rmdev /usr/bin/inet_rmdev ; do
+    if [ -x $INET_RMDEV ] ; then
+	break
+    else
+	INET_RMDEV=
+    fi
+done
+
 # Specify defaults
 
 STRINET_MAKEDEVICES="no"
@@ -74,7 +82,7 @@ for file in $config ; do
 done
 
 [ -z "$STRINET_MKNOD" -a -z "$INET_MKDEV" ] && STRINET_MAKEDEVICES='no'
-[ -z "$STRINET_MKNOD" -a -z "$INET_MKDEV" ] && STRINET_REMOVEDEVICES='no'
+[ -z "$STRINET_MKNOD" -a -z "$INET_RMDEV" ] && STRINET_REMOVEDEVICES='no'
 
 RETVAL=0
 
@@ -99,14 +107,14 @@ start() {
     fi
     if [ -n "$STRINET_MKNOD" -o -n "$INET_MKDEV" ] ; then
 	if [ ":$STRINET_MAKEDEVICES" = ":yes" ] ; then
+	    if [ -n "$INET_MKDEV" ] ; then
+		action $"Making STREAMS iBCS devices: " \
+		    $INET_MKDEV
+		RETVAL=$?
+	    fi
 	    if [ -n "$STRINET_MKNOD" ] ; then
 		action $"Making STREAMS INET devices: " \
 		    $STRINET_MKNOD
-		RETVAL=$?
-	    fi
-	    if [ -n "$INET_MKDEV" ] ; then
-		action $"Making STREAMS INET devices: " \
-		    $INET_MKDEV
 		RETVAL=$?
 	    fi
 	fi
@@ -131,10 +139,19 @@ remove_modules() {
 }
 
 stop() {
-    if [ -n "$STRINET_MKNOD" -a ":$STRINET_REMOVEDEVICES" = ":yes" ] ; then
-	action $"Removing STREAMS INET devices: " \
-	    $STRINET_MKNOD --remove
-	RETVAL=$?
+    if [ -n "$STRINET_MKNOD" -o -n "$INET_RMDEV" ] ; then
+	if [ ":$STRINET_REMOVEDEVICES" = ":yes" ] ; then
+	    if [ -n "$STRINET_MKNOD" ] ; then
+		action $"Removing STREAMS INET devices: " \
+		    $STRINET_MKNOD --remove
+		RETVAL=$?
+	    fi
+	    if [ -n "$INET_RMDEV" ] ; then
+		action $"Removing STREAMS iBCS devices: " \
+		    $INET_RMDEV
+		RETVAL=$?
+	    fi
+	fi
     fi
     [ $RETVAL -eq 0 ] && egrep '^streams[-_]inet' /proc/modules 2>/dev/null | remove_modules
     RETVAL=$?
@@ -237,7 +254,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/06/07 08:16:09 $
+# @(#) $RCSfile: strinet,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/22 09:44:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -283,7 +300,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/07 08:16:09 $ by $Author: brian $
+# Last Modified $Date: 2005/06/22 09:44:17 $ by $Author: brian $
 #
 # =============================================================================
 
