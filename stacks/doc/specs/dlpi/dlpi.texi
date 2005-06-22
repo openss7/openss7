@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.3 2005/06/20 12:02:27 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.4 2005/06/22 08:57:47 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/06/20 12:02:27 $ by $Author: brian $
+% Last Modified $Date: 2005/06/22 08:57:47 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -353,10 +353,12 @@ obligation to provide any feature listed herein.
 
 @macro tabfig {image, number, caption}
 @iftex
+@cartouche
 @float Table,Table \number\
 @image{\image\}
 @caption{\caption\}
 @end float
+@end cartouche
 @end iftex
 @ifnottex
 @image{\image\} @anchor{Table \number\}@center @emph{Table \number\.@:  \caption\}
@@ -366,10 +368,12 @@ obligation to provide any feature listed herein.
 
 @macro tabfigsized {image, number, caption, size}
 @iftex
+@cartouche
 @float Table,Table \number\
 @image{\image\,\size\}
 @caption{\caption\}
 @end float
+@end cartouche
 @end iftex
 @ifnottex
 @image{\image\,\size\} @anchor{Table \number\}@center @emph{Table \number\.@:  \caption\}
@@ -388,12 +392,12 @@ obligation to provide any feature listed herein.
 
 @macro figure {image, number, caption}
 @iftex
-@c @cartouche
+@cartouche
 @float Figure,Figure \number\
 @image{\image\}
 @caption{\caption\}
 @end float
-@c @end cartouche
+@end cartouche
 @end iftex
 @ifnottex
 @image{\image\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
@@ -404,12 +408,12 @@ obligation to provide any feature listed herein.
 
 @macro figuresized {image, number, caption, size}
 @iftex
-@c @cartouche
+@cartouche
 @float Figure,Figure \number\
 @image{\image\,\size\}
 @caption{\caption\}
 @end float
-@c @end cartouche
+@end cartouche
 @end iftex
 @ifnottex
 @image{\image\,\size\} @anchor{Figure \number\}@center @emph{Figure \number\.@:  \caption\}
@@ -8303,7 +8307,7 @@ DL_@-RE@-SET_@-CON.
 The following table presents the allowed sequence of DLPI primitives for the
 common local management phase of communication.
 
-@tabfigsized{dlpi_ta13,7,DLPI State Transition Table - Local Management Phase,5.5in}
+@tabfig{dlpi_ta13,7,DLPI State Transition Table - Local Management Phase}
 
 The following table presents the allowed sequence of DLPI primitives for the
 connectionless data transfer phase.
@@ -8315,23 +8319,12 @@ connectionless data transfer phase.
 The following table presents the allowed sequence of DLPI primitives for the
 connection establishment phase of connection mode service.
 
-@tabfigsized{dlpi_ta16,10,DLPI State Transition Table - Connection Establishment Phase,5.5in}
+@tabfig{dlpi_ta16,10,DLPI State Transition Table - Connection Establishment Phase}
 
-The following table presents the allowed sequence of DLPI primitives for the connection mode data transfer phase.
+The following table presents the allowed sequence of DLPI primitives for the
+connection mode data transfer phase.
 
-STATES IDLE DATA- USER PROV RESET_RES DISCON 11 DISCON 12 DISCON 13
-
-XFER RESET RESET PEND PEND PEND PENDPEND PEND
-
-EVENTS 6 11 12 13 14 17 18 19 DISCON_REQ - 17 18 19 - - - - DATA_REQ - 11 - - - - - -RESET_REQ - 12 - - - - - -
-
-RESET_RES - - - 14 - - - - DISCON_IND1 - 6 6 6 - - - - (outcnt == 0)
-
-DATA_IND - 11 - - - - - - RESET_IND - 13 - - - - - -RESET_CON - - 11 - - - - -
-
-OK_ACK1 - - - - 11 6 6 6 (outcnt == 0) ERROR_ACK - - 11 - 13 11 12 13
-
-TABLE 11.  DLPI State Transition Table - Connection-mode Data Transfer Phase
+@tabfig{dlpi_ta17,11,DLPI State Transition Table - Connection-mode Data Transfer Phase}
 
 @node Precedence of DLPI Primitives
 @appendix Precedence of DLPI Primitives
@@ -8415,15 +8408,7 @@ primitive that is associated with the same correlation number (this is indicated
 in the table below).
 @end itemize
 
-PRIM Y P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15PRIM X (on queue) P1 DL_INFO_REQ P2 DL_ATTACH_REQ P3 DL_DETACH_REQ P4 DL_BIND_REQ P5 DL_UNBIND_REQ P6 DL_UNITDATA_REQ 1 P7 DL_UDQOS_REQ P8 DL_CONNECT_REQ 4 P9 DL_CONNECT_RES 3 1 1 P10 DL_TOKEN_REQ P11 DL_DISCONNECT_REQ 1 P12 DL_DATA_REQ 5 1 3 3 P13 DL_RESET_REQ 3 P14 DL_RESET_RES 3 1 1 P15 DL_SUBS_BIND_REQ
-
-TABLE 12.  Write Queue Precedence
-
-KEY: Code Interpretation
-
-Empty box indicates a scenario which cannot take place." "
-
-Y has no precedence over X and should be placed on queue behind X.1 Y has precedence over X and may advance ahead of X.2 Y has precedence over X and X must be removed.3 Y has precedence over X and both X and Y must be removed.4 Y may have precedence over X (DLS provider's choice), and if so then X must be removed.5
+@tabfig{dlpi_ta18,12,Write Queue Precedence}
 
 @page
 @node Read Queue Precedence
@@ -8553,15 +8538,7 @@ it should be matched (using the correlation number) against any stored connect
 indications.  The matched connect indication should then be removed, just as is
 done in the single-threaded scenario.
 
-PRIM Y P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14PRIM X (on queue) P1 DL_INFO_ACK 1 1 1 1 1 1 1 1 P2 DL_BIND_ACK 1 1 P3 DL_UNITDATA_IND 2 1 2 2 2 P4 DL_UDERROR_IND 2 1 1 2 2 P5 DL_CONNECT_IND 2 2 4 P6 DL_CONNECT_CON 2 2 3 1 1 P7 DL_TOKEN_ACK 1 1 1 1 1 1 P8 DL_DISCONNECT_IND 2 1 2 2 P9 DL_DATA_IND 2 2 5 1 3 3 2 P10 DL_RESET_IND 2 2 3 2 P11 DL_RESET_CON 2 2 3 1 1 2 P12 DL_OK_ACK 1 1 1 1 1 1 P13 DL_ERROR_ACK 1 1 1 1 1 1 1 P14 DL_SUBS_BIND_ACK 1 1
-
-TABLE 13.  Read Queue Precedence
-
-KEY: Code Interpretation
-
-Empty box indicates a scenario which cannot take place." "
-
-Y has no precedence over X and should be placed on queue behind X.1 Y has precedence over X and may advance ahead of X.2 Y has precedence over X and X must be removed.3 Y has precedence over X and both X and Y must be removed.4 Y may have precedence over X (DLS provider's choice), and if so then X must be removed.5
+@tabfig{dlpi_ta19,13,Read Queue Precedence}
 
 @node Glossary of DLPI Terms and Acronyms
 @appendix Glossary of DLPI Terms and Acronyms
@@ -10167,30 +10144,47 @@ union DL_primitives @{
 @node Index
 @unnumbered Index
 
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+@end menu
+
+@node Concept Index
 @section Concept Index
 @printindex cp
 
 @page
+@node Protocol State Index
 @section Protocol State Index
 @printindex st
 
 @page
+@node Primitive Index
 @section Primitive Index
 @printindex pr
 
 @page
+@node Primitive Structure and Type Index
 @section Primitive Structure and Type Index
 @printindex tp
 
 @page
+@node Primitive Structure Field Index
 @section Primitive Structure Field Index
 @printindex vr
 
 @page
+@node Primitive Values Index
 @section Primitive Values Index
 @printindex pv
 
 @page
+@node Primitive Error Values Index
 @section Primitive Error Values Index
 @printindex pe
 

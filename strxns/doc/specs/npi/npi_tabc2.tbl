@@ -1,10 +1,16 @@
 .ie '\*(.T'ps' \{\
 \X'ps: pagesize letter'
-.in 0.5i
+.in 0.0i
 .ll 6.0i
 .lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
 .nr LL 6.0i
 .nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
 .pl 11.0i
 .\}
 .el \{\
@@ -14,12 +20,15 @@
 .lt 8.0i
 .nr LL 8.0i
 .nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
 .\}
 .TS
 box center tab(:);
-rb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
-lb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb|cb
-l|c|c|c|c|c|c|c|c|c|c|c|c|c|c.
+rb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
+lb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
+l1|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c.
 PRIM X:I1:I2:I3:I4:I5:I6:I7:I8:I9:I10:I11:I12:I13:I14
 PRIM Y on queue
 =
@@ -50,20 +59,25 @@ _
 I13 n_reset_con:::3:::2
 _
 I14 n_datack_ind:::5::2:::::::1
-.TE
-
-.TS
-tab(:);
-ll.
-Blank:not applicable - queue should be empty.
-
-1:X has no precedence over Y.
-
-2:X has precedence over Y.
-
-3:X has precedence over Y and Y must be removed.
-
-4:X has precedence over Y and both X and Y must be removed.
-
-5:X may have precedence over Y (choice of user). If it does then it is the same as 3.
+.T&
+r1l0s0s0s0s0s0s0s0s0s0s0s0s.
+_
+Blank:T{
+not applicable - queue should be empty.
+T}
+1:T{
+X has no precedence over Y.
+T}
+2:T{
+X has precedence over Y.
+T}
+3:T{
+X has precedence over Y and Y must be removed.
+T}
+4:T{
+X has precedence over Y and both X and Y must be removed.
+T}
+5:T{
+X may have precedence over Y (choice of user). If it does then it is the same as 3.
+T}
 .TE

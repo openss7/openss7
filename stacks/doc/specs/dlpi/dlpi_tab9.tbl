@@ -1,10 +1,16 @@
 .ie '\*(.T'ps' \{\
 \X'ps: pagesize letter'
-.in 0.5i
+.in 0.0i
 .ll 6.0i
 .lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
 .nr LL 6.0i
 .nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
 .pl 11.0i
 .\}
 .el \{\
@@ -12,16 +18,19 @@
 .pl 11.0i
 .ll 8.0i
 .lt 8.0i
+.po 0.0i
 .nr LL 8.0i
 .nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
 .\}
-.TS H
+.TS
 box center tab(:);
 cb|cbsss
 c|lsss.
 ACTION:DESCRIPTION
 _
-.TH
 1:outcnt = outcnt + 1
 2:outcnt = outcnt - 1
 3:T{
