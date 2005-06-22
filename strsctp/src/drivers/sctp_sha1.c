@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $
+ @(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 12:07:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $"
+#ident "@(#) $RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $"
 
-static char const ident[] = "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $";
+static char const ident[] = "$RCSfile: sctp_sha1.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/06/22 12:07:11 $";
 
 #include "sctp_compat.h"
 #include "sctp_sha1.h"
@@ -348,5 +348,5 @@ SHAFinal(uint8_t *out, SHA_CTX * sha1)
 		out[j] = (uint8_t) ((sha1->dig[i] >> 24) & 0xff);
 	}
 	/* Zeroise sensitive stuff */
-	memset(sha1, 0, sizeof(sha1));
+	memset(sha1, 0, sizeof(*sha1));
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $
+ @(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/16 21:07:34 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 12:07:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $"
+#ident "@(#) $RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $"
 
-static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/16 21:07:34 $";
+static char const ident[] = "$RCSfile: sctp_md5.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/22 12:07:10 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG
@@ -251,5 +251,5 @@ MD5Final(uint8_t dig[16], MD5_CTX * md5)
 	MD5Transform(md5->buf, md5->dat);
 	byteSwap(md5->buf, 4);
 	memcpy(dig, md5->buf, 16);
-	memset(md5, 0, sizeof(md5));	/* In case it's sensitive */
+	memset(md5, 0, sizeof(*md5));	/* In case it's sensitive */
 }
