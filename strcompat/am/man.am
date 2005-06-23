@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/14 07:46:09 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/22 23:56:00 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 07:46:09 $ by $Author: brian $
+## Last Modified $Date: 2005/06/22 23:56:00 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -403,13 +403,18 @@ post-manpages:
 	done ; \
 	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		if test -n '$(mandir)' ; then \
-			$(ECHO) "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
-			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$?; \
 		else \
-			$(ECHO) "$(MAKEWHATIS) -u -w" ; \
-			$(MAKEWHATIS) -u -w ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$?; \
 		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
 	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
 
 ##
 # When we comrpess manpages, we must remove the compressed versions after uninstall.
@@ -488,13 +493,18 @@ postun-manpages:
 	done ; \
 	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		if test -n "$(mandir)" ; then \
-			$(ECHO) "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
-			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
 		else \
-			$(ECHO) "$(MAKEWHATIS) -u -w" ; \
-			$(MAKEWHATIS) -u -w ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
 		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
 	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
 
 ## COMPRESS_MANPAGES
 else
@@ -503,24 +513,34 @@ else
 post-manpages:
 	@if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
 		if test -n "$(mandir)" ; then \
-			$(ECHO) "$(MAKEWHATIS) -u $(DESTDIR)$(mandir)" ; \
-			$(MAKEWHATIS) -u $(DESTDIR)$(mandir) ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
 		else \
-			$(ECHO) "$(MAKEWHATIS) -u -w" ; \
-			$(MAKEWHATIS) -u -w ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
 		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
 	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
 
 postun-manpages:
 	@if test -z '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
 		if test -n '$(mandir)' ; then \
-			$(ECHO) "$(MAKEWHATIS) -u $(mandir)" ; \
-			$(MAKEWHATIS) -u $(mandir) ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(mandir) || retval=$$? ; \
 		else \
-			$(ECHO) "$(MAKEWHATIS) -u -w" ; \
-			$(MAKEWHATIS) -u -w ; \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
 		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
 	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
 
 ## ! COMPRESS_MANPAGES
 endif
