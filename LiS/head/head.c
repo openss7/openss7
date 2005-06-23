@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.3 $) $Date: 2005/04/12 22:44:59 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.4 $) $Date: 2005/06/02 09:58:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:44:59 $ by $Author: brian $
+ Last Modified $Date: 2005/06/02 09:58:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.3 $) $Date: 2005/04/12 22:44:59 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.4 $) $Date: 2005/06/02 09:58:31 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.3 2005/04/12 22:44:59 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.4 2005/06/02 09:58:31 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -5095,6 +5095,15 @@ lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 
     CHECK_INO(i,"lis_strwrite"); /* may return */
 
+#if 0
+    /*
+     *	This no longer works on FC4 2.6.11 kernel: validity checks are performed
+     *	on the length before we get here.  We might as well patch this out for
+     *	all kernels and use the ioctl method instead.  Emulating an system call
+     *	in this fashion was foolish in the first place: the normal method for
+     *	system call emulation under UNIX is with ioctl. -bb
+     *	Wed Jun 22 20:56:59 MDT 2005
+     */
     if (ulen == LIS_GETMSG_PUTMSG_ULEN)
     {
 	putpmsg_args_t	args ;
@@ -5106,6 +5115,7 @@ lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op)
 				 args.band, args.flags);
 	return(err) ;
     }
+#endif
 
     hd = FILE_STR(fp) ;
     if (hd == NULL)
@@ -5425,6 +5435,15 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 
     CHECK_INO(i,"lis_strrread");
 
+#if 0
+    /*
+     *	This no longer works on FC4 2.6.11 kernel: validity checks are performed
+     *	on the length before we get here.  We might as well patch this out for
+     *	all kernels and use the ioctl method instead.  Emulating an system call
+     *	in this fashion was foolish in the first place: the normal method for
+     *	system call emulation under UNIX is with ioctl. -bb
+     *	Wed Jun 22 20:56:59 MDT 2005
+     */
     if (ulen == LIS_GETMSG_PUTMSG_ULEN)
     {
 	getpmsg_args_t	args ;
@@ -5436,6 +5455,7 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 				 args.bandp, args.flagsp, 1);
 	return(err) ;
     }
+#endif
     
     hd = FILE_STR(fp) ;
     if (hd == NULL)
@@ -7350,6 +7370,44 @@ lis_strioctl( struct inode *i, struct file *f, unsigned int cmd,
 	CLOCKON() ;
 
 	RTN(err) ;
+
+    case I_PUTPMSG:
+    {
+	struct strpmsg args, *argsp = (typeof(argsp)) arg;
+	struct strbuf *ctlp = NULL;
+	struct strbuf *datp = NULL;
+	if ((err = lis_check_umem(f,VERIFY_READ,(char*)arg,sizeof(args))) < 0)
+	    RTN(err);
+	if ((err = lis_copyin(f,&args,(char*)arg,sizeof(args))) < 0)
+	    RTN(err);
+	if (args.ctlbuf.len != -1 || args.ctlbuf.buf != NULL)
+	    ctlp = &argsp->ctlbuf;
+	if (args.databuf.len != -1 || args.databuf.buf != NULL)
+	    datp = &argsp->databuf;
+	RTN(lis_strputpmsg(i,f,ctlp,datp,args.band,args.flags));
+    }
+
+    case I_GETPMSG:
+    {
+	struct strpmsg args, *argsp = (typeof(argsp)) arg;
+	struct strbuf *ctlp = NULL;
+	struct strbuf *datp = NULL;
+	int *bandp = NULL;
+	int *flagsp = NULL;
+	if ((err = lis_check_umem(f,VERIFY_READ,(char*)arg,sizeof(args))) < 0)
+	    RTN(err);
+	if ((err = lis_copyin(f,&args,(char*)arg,sizeof(args))) < 0)
+	    RTN(err);
+	if (args.ctlbuf.len != -1 || args.ctlbuf.buf != NULL)
+	    ctlp = &argsp->ctlbuf;
+	if (args.databuf.len != -1 || args.databuf.buf != NULL)
+	    datp = &argsp->databuf;
+	if (args.band != -1)
+	    bandp = &argsp->band;
+	if (args.flags != -1)
+	    flagsp = &argsp->flags;
+	RTN(lis_strgetpmsg(i,f,ctlp,datp,bandp,flagsp,1));
+    }
 
     /*
      *  the following three _ioc_ routines do their own user-to-

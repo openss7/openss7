@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.12 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.13 2005/06/23 10:50:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 10:50:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STROPTS_H__
 #define __SYS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/23 10:50:01 $"
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -108,18 +108,18 @@
 #define I_BIGPIPE	(__SID |37)	/* UnixWare */
 #define I_GETTP		(__SID |38)	/* UnixWare */
 
-#define I_GETMSG	(__SID |40)	/* HP-UX */
-#define I_PUTMSG	(__SID |41)	/* HP-UX */
+#define I_GETMSG	(__SID |40)	/* HP-UX, OSF */
+#define I_PUTMSG	(__SID |41)	/* HP-UX, OSF */
+#define I_GETPMSG	(__SID |42)	/* HP-UX, OSF, LiS 251, Mac OT 40 */
+#define I_PUTPMSG	(__SID |43)	/* HP-UX, OSF, LiS 250, Mac OT 41 */
+#define I_PIPE		(__SID |44)	/* HP-UX, OSF, LiS 254/243, Mac OT 49 */
+#define I_FIFO		(__SID |45)	/* HP-UX, OSF, Mac OT 51 */
 
 #define I_AUTOPUSH	(__SID |48)	/* Mac OT */
 #define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
-#define I_FIFO		(__SID |51)	/* Mac OT, 45 on HP-UX */
 
-#define I_PUTPMSG	(__SID |250)	/* LiS, 41 on Mac OT, 43 on HP-UX */
-#define I_GETPMSG	(__SID |251)	/* LiS, 40 on Mac OT, 42 on HP-UX */
-#define I_FATTACH	(__SID |252)	/* LiS */
-#define I_FDETACH	(__SID |253)	/* LiS */
-#define I_PIPE		(__SID |254)	/* LiS, 49 on Mac OT, 44 on HP-UX */
+#define I_FATTACH	(__SID |52)	/* LiS (252 then 244) */
+#define I_FDETACH	(__SID |53)	/* LiS (253 then 245) */
 
 #define INFTIM		(-1UL)
 

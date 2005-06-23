@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: stropts.h,v 1.1.1.3.4.2 2005/04/12 22:45:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/04/12 22:45:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -53,7 +53,7 @@
  * <stropts> --- STREAMS ops.
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: stropts.h,v 1.1.1.2 2003/04/24 16:54:55 brian Exp $
+ * RCS Id          ; $Id: stropts.h,v 1.1.1.3.4.2 2005/04/12 22:45:21 brian Exp $
  * Last Modified By: David Grothe
  *                 :
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros
@@ -67,7 +67,7 @@
 #define _SYS_STROPTS_H
 #define	_LIS_SYS_STROPTS_H	/* so you can tell which stropts.h you got */
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:21 $"
 
 #ifdef __cplusplus
 extern "C" {
@@ -309,58 +309,83 @@ extern int gcom_open( const char *__path, int __oflag, ... );
 #define I_FIND          (__SID |11)
 #define I_LINK          (__SID |12)
 #define I_UNLINK        (__SID |13)
-#ifdef USE_OLD_CONSTS
-#define I_PEEK          (__SID |14)
-#define I_FDINSERT      (__SID |15)
-#define I_SENDFD        (__SID |16)
-#define I_RECVFD        (__SID |17)
-#define I_SWROPT        (__SID |18)
-#define I_GWROPT        (__SID |19)
-#define I_LIST          (__SID |20)
-#define I_PLINK         (__SID |21)
-#define I_PUNLINK       (__SID |22)
-#define I_FLUSHBAND     (__SID |27)
-#define I_CKBAND        (__SID |28)
-#define I_GETBAND       (__SID |29)
-#define I_ATMARK        (__SID |30)
-#define I_SETCLTIME     (__SID |31)
-#define I_GETCLTIME     (__SID |32)
-#define I_CANPUT        (__SID |33)
-#else
+
+#define I_ISASTREAM	(__SID |14)	/* OSF isastream() system call */
+
+#define I_RECVFD	(__SID |14)	/* OSF 18, non-EFT definition */
 #define I_PEEK          (__SID |15)
 #define I_FDINSERT      (__SID |16)
 #define I_SENDFD        (__SID |17)
-#if defined(_KERNEL)			/* this gambit for Solaris/UW compat */
-#define I_RECVFD        (__SID |18)
-#define I_E_RECVFD      (__SID |14)
-#elif !defined(_STYPES)
-#define I_RECVFD        (__SID |14)
-#else
-#define I_RECVFD        (__SID |18)
-#endif
-#define I_SWROPT        (__SID |19)
-#define I_GWROPT        (__SID |20)
-#define I_LIST          (__SID |21)
-#define I_PLINK         (__SID |22)
-#define I_PUNLINK       (__SID |23)
-#define I_FLUSHBAND     (__SID |28)
-#define I_CKBAND        (__SID |29)
-#define I_GETBAND       (__SID |30)
-#define I_ATMARK        (__SID |31)
-#define I_SETCLTIME     (__SID |32)
-#define I_GETCLTIME     (__SID |33)
-#define I_CANPUT        (__SID |34)
-#endif
+#define I_E_RECVFD	(__SID |18)	/* Unixware: EFT definition */
+#define I_SWROPT        (__SID |19)	/* OSF 20, Mac OT 20 */
+#define I_GWROPT        (__SID |20)	/* OSF 21, Mac OT 21 */
+#define I_LIST          (__SID |21)	/* OSF 22, Mac OT 22 */
+#define I_PLINK		(__SID |22)	/* OSF 29, Mac OT 29 */
+#define I_PUNLINK	(__SID |23)	/* OSF 30, Mac OT 30 */
+
+/* This is were SVR3 stops and SVR4 starts */
+
+#define I_FLUSHBAND	(__SID |28)	/* OSF 19, Mac OT 19 */
+#define I_CKBAND	(__SID |29)	/* OSF 24, Mac OT 24 */
+#define I_GETBAND	(__SID |30)	/* OSF 25, Mac OT 25 */
+#define I_ATMARK	(__SID |31)	/* OSF 23, Mac OT 23 */
+#define I_SETCLTIME	(__SID |32)	/* OSF 27, Mac OT 27 */
+#define I_GETCLTIME	(__SID |33)	/* OSF 28, Mac OT 28 */
+#define I_CANPUT	(__SID |34)	/* OSF 26, Mac OT 26 */
+
+/* This is where POSIX standard stops and implementation specifics start */
+
+#define I_SERROPT	(__SID |35)	/* Solaris */
+#define I_GERROPT	(__SID |36)	/* Solaris */
+#define I_ANCHOR	(__SID |37)	/* Solaris (24 on 2.6) */
+#define I_ESETSIG	(__SID |37)	/* Solaris 2.6 */
+#define I_EGETSIG	(__SID |38)	/* Solaris 2.6 */
+
+#define I_S_RECVFD	(__SID |35)	/* Unixware */
+#define I_STATS		(__SID |36)	/* Unixware */
+#define I_BIGPIPE	(__SID |37)	/* Unixware */
+#define I_GETTP		(__SID |38)	/* Unixware */
+
+#define I_TILDE		(__SID |37)	/* OSF tty tilde option */
+
+#define I_GETMSG	(__SID |40)	/* HP-UX, OSF getmsg() system call */
+#define I_PUTMSG	(__SID |41)	/* HP-UX, OSF putmsg() system call */
+#define I_GETPMSG	(__SID |42)	/* HP-UX, OSF, Mac OT (40), LiS (251), */
+#define I_PUTPMSG	(__SID |43)	/* HP-UX, OSF, Mac OT (41), LiS (250), */
+#define I_PIPE		(__SID |44)	/* HP-UX, OSF, Mac OT (49), LiS (254 then 243), connect two streams as a pipe */
+#define I_FIFO		(__SID |45)	/* HP-UX, OSF, Mac OT (51), convert a stream into a FIFO */
+
+#define I_POLL		(__SID |42)	/* Mac OT */
+#define I_SETDELAY	(__SID |43)	/* Mac OT */
+#define I_GETDELAY	(__SID |44)	/* Mac OT */
+#define I_RUN_QUEUES	(__SID |45)	/* Mac OT */
+#define I_AUTOPUSH	(__SID |48)	/* Mac OT */
+#define I_HEAP_REPORT	(__SID |50)	/* Mac OT */
+
+#define I_FATTACH	(__SID |52)	/* LiS (252 then 244) */
+#define I_FDETACH	(__SID |53)	/* LiS (253 then 245) */
+
 /*
  * The following ioctls are specific to this STREAMS implementation.
  */
-#define I_LIS_SEMTIME 		(__SID |239)	/* sem wakeup histogram */
-#define I_LIS_LOCKS 		(__SID |240)	/* lock contention */
-#define I_LIS_SDBGMSK2 		(__SID |241)	/* 2nd debug mask */
-#define	I_LIS_QRUN_STATS	(__SID |242)	/* see qrun_stats_t */
-#define I_LIS_PIPE              (__SID |243)    /* pipe() */
-#define I_LIS_FATTACH           (__SID |244)    /* fattach() */
-#define I_LIS_FDETACH           (__SID |245)    /* fdetach() */
+#define I_LIS_PIPE              I_PIPE		/* pipe() */
+#define I_LIS_FATTACH           I_FATTACH	/* fattach() */
+#define I_LIS_FDETACH           I_FDETACH	/* fdetach() */
+/*
+ *  Note that, athough these two were removed in 2.18.0, they need to go back in
+ *  to support Linux kernel 2.6.11 on FC4.  Attempting to overload the
+ *  read()/write() system call was a foolish way to go that does not work with
+ *  the 2.6.11 kernel on FC4.  The proper way to go was to use an ioctl to
+ *  emulate a system call as is done on so many other UNIX(-like) systems. -bb
+ *  Wed Jun 22 22:31:13 MDT 2005
+ */
+#define I_LIS_GETPMSG		I_GETPMSG	/* getpmsg() */
+#define I_LIS_PUTPMSG		I_PUTPMSG	/* putpmsg() */
+
+#define I_LIS_SEMTIME 		(__SID |242)	/* sem wakeup histogram */
+#define I_LIS_LOCKS 		(__SID |243)	/* lock contention */
+#define I_LIS_SDBGMSK2 		(__SID |244)	/* 2nd debug mask */
+#define	I_LIS_QRUN_STATS	(__SID |245)	/* see qrun_stats_t */
 
 #define	I_LIS_PRNTQUEUES 	(__SID |246)	/* print all the queues */
 #define	I_LIS_PRNTSPL		(__SID |247)	/* print spl tracking table */
@@ -501,8 +526,21 @@ typedef struct
  * interpreted as one of these structures.
  */
 
+#if 0
+/*
+ *  This no longer works on FC4 2.6.11 kernel: validity checks are performed on
+ *  the length before we get here.  We might as well patch this out for all
+ *  kernels and use the ioctl method instead.  Emulating an system call in this
+ *  fashion was foolish in the first place: the normal method for system call
+ *  emulation under UNIX is with ioctl. -bb
+ *  Wed Jun 22 20:56:59 MDT 2005
+ */
 #define LIS_GETMSG_PUTMSG_ULEN 	(0x12345678)
 
+/*
+ *  Also, nobody does the argument passing this way.  See strpmsg below... -bb
+ *  Wed Jun 22 22:41:03 MDT 2005
+ */
 typedef struct getpmsg_args
 {
     int		 	 fd ;
@@ -522,7 +560,17 @@ typedef struct putpmsg_args
     int			 flags ;
 
 } putpmsg_args_t ;
+#endif
 
+/* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg(), matches Mac OT, HP-UX, OSF:
+ * probably a Mentat thing...  This matches the Linux Fast-STREAMS definition. */
+
+struct strpmsg {
+	struct strbuf ctlbuf;
+	struct strbuf databuf;
+	int band;
+	int flags;			/* actually long in Mac OT, HP-UX and OSF */
+};
 
 /*  *******************************************************************  */
 /*                         Shared global variables                       */

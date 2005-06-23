@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2005/05/28 04:42:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/06/23 10:43:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:42:48 $ by $Author: brian $
+# Last Modified $Date: 2005/06/23 10:43:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -616,8 +616,13 @@ libSS7m3ua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $
 libSS7m3ua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7m3ua_a_OBJECTS:		$(libSS7m3ua_a_DEPENDENCIES)
 
+if WITH_KO_MODULES
+streams_m3ua.o: $(libSS7m3ua_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-m3ua.o: $(libSS7m3ua_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 nodist_EXTRA_libSS7sscop_a_SOURCES = \
 				  src/modules/sscop/sscop_ip.c \
@@ -647,8 +652,13 @@ libSS7sscop_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) 
 libSS7sscop_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sscop_a_OBJECTS:		$(libSS7sscop_a_DEPENDENCIES)
 
+if WITH_KO_MODULES
+streams_sscop.o: $(libSS7sscop_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-sscop.o: $(libSS7sscop_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 nodist_EXTRA_libSS7sua_a_SOURCES = \
 				  src/modules/sua/sua_asp.c \
@@ -682,8 +692,13 @@ libSS7sua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(
 libSS7sua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7sua_a_OBJECTS:		$(libSS7sua_a_DEPENDENCIES)
 
+if WITH_KO_MODULES
+streams_sua.o: $(libSS7sua_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-sua.o: $(libSS7sua_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 nodist_EXTRA_libSS7tua_a_SOURCES = \
 				  src/modules/tua/tua_asp.c \
@@ -704,8 +719,13 @@ libSS7tua_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(
 libSS7tua_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tua_a_OBJECTS:		$(libSS7tua_a_DEPENDENCIES)
 
+if WITH_KO_MODULES
+streams_tua.o: $(libSS7tua_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-tua.o: $(libSS7tua_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 nodist_EXTRA_libSS7tali_a_SOURCES = \
 				  src/modules/tali/tali.c \
@@ -725,10 +745,19 @@ libSS7tali_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $
 libSS7tali_a_CFLAGS		= $(KERNEL_CFLAGS)
 libSS7tali_a_OBJECTS:		$(libSS7tali_a_DEPENDENCIES)
 
+if WITH_KO_MODULES
+streams_tali.o: $(libSS7tali_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-tali.o: $(libSS7tali_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
+if WITH_KO_MODULES
+EXTRA_KERNEL_MODULES		+= streams_m3ua.o streams_sscop.o streams_sua.o streams_tua.o streams_tali.o
+else
 EXTRA_KERNEL_MODULES		+= streams-m3ua.o streams-sscop.o streams-sua.o streams-tua.o streams-tali.o
+endif
 
 ## RPM_BUILD_KERNEL
 endif

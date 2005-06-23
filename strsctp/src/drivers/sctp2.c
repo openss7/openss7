@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:39:49 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 10:50:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/06/22 07:39:49 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -89,6 +89,9 @@ MODULE_LICENSE(SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sctp");
+#ifdef LFS
+MODULE_ALIAS("streams-driver-sctp");
+#endif
 #endif
 #endif				/* SCTP_CONFIG_MODULE */
 #endif				/* LINUX */
@@ -15226,6 +15229,21 @@ MODULE_PARM(n_major, "h");
 module_param(n_major, uint, 0);
 #endif
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
+
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(SCTP_N_DRV_ID));
+MODULE_ALIAS("streams-major-" __stringify(SCTP_N_CMAJOR_0));
+MODULE_ALIAS("/dev/streams/sctp_n");
+MODULE_ALIAS("/dev/streams/sctp_n/*");
+MODULE_ALIAS("/dev/streams/clone/sctp_n");
+#endif
+MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SCTP_N_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/sctp_n");
+#endif				/* MODULE_ALIAS */
+
 #endif				/* LINUX */
 
 #ifdef LFS
@@ -25619,6 +25637,21 @@ MODULE_PARM(t_major, "h");
 module_param(t_major, uint, 0);
 #endif
 MODULE_PARM_DESC(t_major, "Major device number for STREAMS SCTP TPI driver (0 for allocation).");
+
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(SCTP_T_DRV_ID));
+MODULE_ALIAS("streams-major-" __stringify(SCTP_T_CMAJOR_0));
+MODULE_ALIAS("/dev/streams/sctp_t");
+MODULE_ALIAS("/dev/streams/sctp_t/*");
+MODULE_ALIAS("/dev/streams/clone/sctp_t");
+#endif
+MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(SCTP_T_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/sctp_t");
+#endif				/* MODULE_ALIAS */
+
 #endif				/* LINUX */
 
 #ifdef LFS

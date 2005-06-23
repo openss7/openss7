@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/06/16 21:06:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/23 10:43:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 21:06:05 $ by $Author: brian $
+# Last Modified $Date: 2005/06/23 10:43:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,7 +121,11 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPsctp.a
+if WITH_KO_MODULES
+ADDON_MODS			= streams_sctp.o
+else
 ADDON_MODS			= streams-sctp.o
+endif
 ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS)
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
@@ -228,8 +232,13 @@ libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) 
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
+if WITH_KO_MODULES
+streams_sctp.o: $(libSCTPsctp_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 EXTRA_KERNEL_MODULES		+=
 
@@ -298,7 +307,11 @@ if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
 
 ADDON_LIBS			= libSCTPsctp.a
+if WITH_KO_MODULES
+ADDON_MODS			= streams_sctp.o
+else
 ADDON_MODS			= streams-sctp.o
+endif
 ADDON_OBJS			= $(libSCTPsctp_a_OBJECTS)
 
 noinst_LIBRARIES		= $(ADDON_LIBS)
@@ -405,8 +418,13 @@ libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) 
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 libSCTPsctp_a_OBJECTS: $(libSCTPsctp_a_DEPENDENCIES)
+if WITH_KO_MODULES
+streams_sctp.o: $(libSCTPsctp_a_OBJECTS)
+	$(LD) -r -o $@ $^
+else
 streams-sctp.o: $(libSCTPsctp_a_OBJECTS)
 	$(LD) -r -o $@ $^
+endif
 
 EXTRA_KERNEL_MODULES		+=
 
