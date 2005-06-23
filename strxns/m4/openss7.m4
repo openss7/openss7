@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/13 03:47:47 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/06/23 11:27:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:47:47 $ by $Author: brian $
+# Last Modified $Date: 2005/06/23 11:27:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -156,8 +156,9 @@ AC_DEFUN([_OPENSS7_DEBUG], [dnl
 	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wall||;s|  | |g'`
 	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Werror||;s|  | |g'`
 	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wundef||;s|  | |g'`
+	CFLAGS=`echo "$CFLAGS" | sed -e 's|-Wp,-D_FORTIFY_SOURCE=[0-9]*||;s|  | |g'`
 	CFLAGS=`echo "$CFLAGS" | sed -e 's|^  *||;s|  *$||;s|    | |g;s|   | |g;s|  | |g'`
-	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Werror"
+	CFLAGS="${CFLAGS}${CFLAGS:+ }-Wall -Wstrict-prototypes -Wno-trigraphs -Wundef -Wp,-D_FORTIFY_SOURCE=2 -Werror"
     fi
 ])# _OPENSS7_DEBUG
 # =============================================================================
