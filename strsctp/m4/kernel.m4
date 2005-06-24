@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.100 $) $Date: 2005/06/22 04:05:14 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.101 $) $Date: 2005/06/23 21:46:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/22 04:05:14 $ by $Author: brian $
+# Last Modified $Date: 2005/06/23 21:46:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1602,6 +1602,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wnested-externs"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror"
 	fi
 	AC_ARG_ENABLE([k-inline],

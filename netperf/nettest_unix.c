@@ -3382,7 +3382,9 @@ void
 print_unix_usage(void)
 {
 
-  fwrite(unix_usage, sizeof(char), strlen(unix_usage), stdout);
+  int ret;
+  if ((ret = fwrite(unix_usage, sizeof(char), strlen(unix_usage), stdout)) < 0)
+	  perror(__FUNCTION__);
   exit(1);
 
 }

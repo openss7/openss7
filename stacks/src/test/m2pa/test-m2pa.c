@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:58:43 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 22:09:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.12  2005/06/23 22:09:55  brian
+ - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
+
  Revision 0.9.2.11  2005/06/22 07:58:43  brian
  - unsigned/signed pointer corrections for gcc4 on FC4
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/06/22 07:58:43 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/23 22:09:55 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -143,6 +146,8 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #ifndef HZ
 #define HZ 100
 #endif
+
+int dummy = 0;
 
 /*
  *  -------------------------------------------------------------------------
@@ -11986,10 +11991,10 @@ do_tests(void)
 	show_fisus = 1;
 	show_timeout = 1;
 	if (verbose) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nM2PA - OpenSS7 STREAMS M2PA - Conformance Test Program.\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	for (i = 0; i < sizeof(test_suite) / sizeof(struct test_case) && test_suite[i].numb; i++) {
 		if (!retry && test_suite[i].result)
@@ -11999,10 +12004,10 @@ do_tests(void)
 			continue;
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\nM2PA Test Case:Q.781/%s:\n%s\n", test_suite[i].numb, test_suite[i].name);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		fprintf(stdout, "\n");
 		begin_test();
@@ -12110,7 +12115,7 @@ do_tests(void)
 			break;
 		}
 	}
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (summary && verbose) {
 		fprintf(stdout, "\n\n");
 		for (i = 0; i < (sizeof(test_suite) / sizeof(struct test_case)) && test_suite[i].numb; i++) {
@@ -12144,7 +12149,7 @@ do_tests(void)
 	fprintf(stdout, "========= %2d inconclusive  \n", inconclusive);
 	fprintf(stdout, "========= %2d not applicable\n", notapplicable);
 	fprintf(stdout, "========= %2d script error  \n", scripterror);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (0);
 }
 

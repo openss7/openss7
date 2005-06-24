@@ -3734,7 +3734,8 @@ void
   print_dlpi_usage(void)
 
 {
-  fwrite(dlpi_usage, sizeof(char), strlen(dlpi_usage), stdout);
+	int ret;
+  ret = fwrite(dlpi_usage, sizeof(char), strlen(dlpi_usage), stdout);
 }
 
 

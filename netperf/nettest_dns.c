@@ -902,7 +902,9 @@ void
 print_dns_usage(void)
 {
 
-  fwrite(dns_usage, sizeof(char), strlen(dns_usage), stdout);
+  int ret;
+  if ((ret = fwrite(dns_usage, sizeof(char), strlen(dns_usage), stdout)) < 0)
+	  perror(__FUNCTION__);
   exit(1);
 
 }

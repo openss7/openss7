@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/07 00:52:26 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 22:07:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.15  2005/06/23 22:07:13  brian
+ - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
+
  Revision 0.9.2.14  2005/06/07 00:52:26  brian
  - upgrading test suites
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/07 00:52:26 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -280,6 +283,8 @@ struct strfdinsert fdi = {
 	0
 };
 int flags = 0;
+
+int dummy = 0;
 
 struct timeval when;
 
@@ -482,11 +487,11 @@ static long now(void)
 	struct timeval now;
 	if (gettimeofday(&now, NULL)) {
 		last_errno = errno;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
 		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		return (0);
 	}
 	if (!test_start)	/* avoid blowing over precision */
@@ -498,24 +503,24 @@ static long now(void)
 static long milliseconds(char *t)
 {
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    .               :               .  .                    \n");
 		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
 		fprintf(stdout, "                    .               :               .  .                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return now();
 }
 static long milliseconds_2nd(char *t)
 {
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    .               :   :           .  .                    \n");
 		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
 		fprintf(stdout, "                    .               :   :           .  .                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return now();
 }
@@ -538,10 +543,10 @@ static int check_time(const char *t, long i, long lo, long hi)
 	dhi = dhi / 1000;
 	tol = tol / 1000;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	if (dlo - tol <= itv && itv <= dhi + tol)
 		return __RESULT_SUCCESS;
@@ -562,10 +567,10 @@ static int time_event(int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    |  | %11.6g                    |                   <%d>\n", t, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return (event);
 }
@@ -1319,7 +1324,7 @@ void print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		int i;
 		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
@@ -1332,7 +1337,7 @@ void print_addr(char *add_ptr, size_t add_len)
 		fprintf(stdout, "(no address)");
 	fprintf(stdout, "\n");
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 char *addr_string(char *add_ptr, size_t add_len)
 {
@@ -2025,7 +2030,7 @@ void print_less(int child)
 {
 	if (verbose < 1 || !show)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	switch (child) {
 	case 0:
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
@@ -2044,7 +2049,7 @@ void print_less(int child)
 		break;
 	}
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	show = 0;
 	return;
 }
@@ -2056,34 +2061,34 @@ void print_more(void)
 
 void print_simple(int child, const char *msgs[])
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_simple_int(int child, const char *msgs[], int val)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_double_int(int child, const char *msgs[], int val, int val2)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_simple_string(int child, const char *msgs[], const char *string)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_pipe(int child)
@@ -2269,10 +2274,10 @@ void print_nothing(int child)
 
 void print_string_state(int child, const char *msgs[], const char *string)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_syscall(int child, const char *command)
@@ -2325,10 +2330,10 @@ void print_ack_prim(int child, const char *command)
 
 void print_long_state(int child, const char *msgs[], long value)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], value, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_no_prim(int child, long prim)
@@ -2345,10 +2350,10 @@ void print_no_prim(int child, long prim)
 
 void print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], string, val, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_rx_data(int child, const char *command, size_t bytes)
@@ -2491,10 +2496,10 @@ void print_string(int child, const char *string)
 
 void print_time_state(int child, const char *msgs[], ulong time)
 {
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], time, state);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void print_waiting(int child, ulong time)
@@ -2610,9 +2615,9 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 {
 	if (flags & MSG_BAND || band) {
 		if (verbose > 3) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
@@ -2630,9 +2635,9 @@ int test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, 
 		}
 	} else {
 		if (verbose > 3) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
@@ -2744,10 +2749,10 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	int tpi_error;
 	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	print_ti_ioctl(child, cmd, arg);
 	for (;;) {
@@ -2763,10 +2768,10 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	}
 	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "got ioctl from %d: cmd=%d, timout=%d, len=%d, dp=%p\n", child, icp->ic_cmd, icp->ic_timout, icp->ic_len, icp->ic_dp);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	if (last_retval == 0)
 		return __RESULT_SUCCESS;
@@ -2776,14 +2781,14 @@ int test_ti_ioctl(int child, int cmd, intptr_t arg)
 	else
 		last_errno = 0;
 	if (verbose) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "***************ERROR: ioctl failed\n");
 		if (verbose > 3)
 			fprintf(stdout, "                    : %s; result = %d\n", __FUNCTION__, last_retval);
 		fprintf(stdout, "                    : %s; TPI error = %d\n", __FUNCTION__, tpi_error);
 		if (tpi_error == TSYSERR)
 			fprintf(stdout, "                    : %s; %s\n", __FUNCTION__, strerror(last_errno));
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		fflush(stdout);
 	}
 	return (__RESULT_FAILURE);
@@ -3578,10 +3583,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3593,10 +3598,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvcall.udata.len, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3608,10 +3613,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3623,10 +3628,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", 0, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3638,10 +3643,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3653,10 +3658,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3685,10 +3690,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -3708,10 +3713,10 @@ static int do_signal(int child, int action)
 			return (__RESULT_FAILURE);
 		}
 		if (verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (verbose > 3)
 			print_success_value(child, last_retval);
@@ -4271,10 +4276,10 @@ int any_wait_event(int source, int wait)
 			return time_event(__EVENT_TIMEOUT);
 		}
 		if (verbose > 3) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "polling:\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		pfd[0].fd = test_fd[0];
 		pfd[0].events = (source & IUT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
@@ -4301,17 +4306,17 @@ int any_wait_event(int source, int wait)
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, dbuf };
 				if (verbose > 3) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "getmsg from top:\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				if (getmsg(test_fd[0], &ctrl, &data, &flags) == 0) {
 					if (verbose > 3) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from top [%d,%d]:\n", ctrl.len, data.len);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if ((last_event = do_decode_msg(0, &ctrl, &data)) != __EVENT_NO_MSG)
 						return time_event(last_event);
@@ -4324,17 +4329,17 @@ int any_wait_event(int source, int wait)
 				struct strbuf ctrl = { BUFSIZE, 0, cbuf };
 				struct strbuf data = { BUFSIZE, 0, dbuf };
 				if (verbose > 3) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "getmsg from bot:\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				if (getmsg(test_fd[1], &ctrl, &data, &flags) == 0) {
 					if (verbose > 3) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from bot [%d,%d,%d]:\n", ctrl.len, data.len, flags);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if ((last_event = do_decode_msg(1, &ctrl, &data)) != __EVENT_NO_MSG)
 						return time_event(last_event);
@@ -4404,10 +4409,10 @@ int wait_event(int child, int wait)
 					if (verbose > 4)
 						print_success(child);
 					if (verbose > 4) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "gotmsg from %d [%d,%d]:\n", child, ctrl.len, data.len);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if ((last_event = do_decode_msg(child, &ctrl, &data)) != __EVENT_NO_MSG)
 						return time_event(last_event);
@@ -15538,10 +15543,10 @@ void print_header(void)
 {
 	if (verbose <= 0)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "\n%s - %s - %s - Conformance Test Suite\n", lstdname, lpkgname, shortname);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 int do_tests(void)
@@ -15556,10 +15561,10 @@ int do_tests(void)
 	print_header();
 	show = 0;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\nUsing device %s\n\n", devname);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	if (begin_tests(0) == __RESULT_SUCCESS) {
 		end_tests();
@@ -15578,14 +15583,14 @@ int do_tests(void)
 				continue;
 			}
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				if (verbose > 1)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1)
 					fprintf(stdout, "%s\n", tests[i].desc);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
 				goto inconclusive;
@@ -15595,23 +15600,23 @@ int do_tests(void)
 			case __RESULT_SUCCESS:
 				successes++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "*********\n");
 					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
 					fprintf(stdout, "*********\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			case __RESULT_FAILURE:
 				failures++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "XXXXXXXXX\n");
 					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
 					fprintf(stdout, "XXXXXXXXX\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			default:
@@ -15619,12 +15624,12 @@ int do_tests(void)
 			      inconclusive:
 				inconclusive++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "?????????\n");
 					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
 					fprintf(stdout, "?????????\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			}
@@ -15633,42 +15638,42 @@ int do_tests(void)
 				aborted = 1;
 		}
 		if (summary && verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 				if (tests[i].run) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname, shortname, tests[i].numb);
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					switch (tests[i].result) {
 					case __RESULT_SUCCESS:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "SUCCESS\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					case __RESULT_FAILURE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "FAILURE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					default:
 					case __RESULT_INCONCLUSIVE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "INCONCLUSIVE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					}
 				}
 			}
 		}
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
 			fprintf(stdout, "========= %3d successes   \n", successes);
 			fprintf(stdout, "========= %3d failures    \n", failures);
@@ -15679,35 +15684,35 @@ int do_tests(void)
 			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (aborted) {
-			lockf(fileno(stderr), F_LOCK, 0);
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fprintf(stderr, "Test Suite aborted due to failure.\n");
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fflush(stderr);
-			lockf(fileno(stderr), F_ULOCK, 0);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		} else if (failures) {
-			lockf(fileno(stderr), F_LOCK, 0);
+			dummy = lockf(fileno(stderr), F_LOCK, 0);
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fprintf(stderr, "Test Suite failed.\n");
 			if (verbose > 0)
 				fprintf(stderr, "\n");
 			fflush(stderr);
-			lockf(fileno(stderr), F_ULOCK, 0);
+			dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		}
 		return (aborted);
 	} else {
 		end_tests();
 		show = 1;
-		lockf(fileno(stderr), F_LOCK, 0);
+		dummy = lockf(fileno(stderr), F_LOCK, 0);
 		fprintf(stderr, "Test Suite setup failed!\n");
 		fflush(stderr);
-		lockf(fileno(stderr), F_ULOCK, 0);
+		dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		return (2);
 	}
 }

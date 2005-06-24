@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:37:27 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 22:05:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/22 07:37:27 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.11 $) $Date: 2005/06/23 22:05:33 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -19021,7 +19021,9 @@ void
 print_sockets_usage(void)
 {
 
-  fwrite(sockets_usage, sizeof(char), strlen(sockets_usage), stdout);
+  int ret;
+  if ((ret = fwrite(sockets_usage, sizeof(char), strlen(sockets_usage), stdout)) < 0)
+	  perror(__FUNCTION__);
   exit(1);
 
 }

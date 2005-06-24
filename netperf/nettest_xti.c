@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:37:28 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 22:05:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2005/06/22 07:37:28 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.10 $) $Date: 2005/06/23 22:05:37 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -9469,7 +9469,9 @@ void
 print_xti_usage(void)
 {
 
-  fwrite(xti_usage, sizeof(char), strlen(xti_usage), stdout);
+  int ret;
+  if ((ret = fwrite(xti_usage, sizeof(char), strlen(xti_usage), stdout)) < 0)
+	  perror(__FUNCTION__);
   exit(1);
 
 }

@@ -2506,7 +2506,7 @@ proc_stat_cpu_idle (long *res)
   char *p = proc_stat_buf;
 
   lseek (proc_stat_fd, 0, SEEK_SET);
-  read (proc_stat_fd, p, proc_stat_buflen);
+  i = read (proc_stat_fd, p, proc_stat_buflen);
 
   /* Skip first line (total) on SMP */
   if (n > 1) p = strchr (p, '\n');

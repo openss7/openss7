@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/23 22:06:50 $
 
  -----------------------------------------------------------------------------
 
@@ -47,13 +47,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:39:52 $ by <bidulock@openss7.org>
+ Last Modified $Date: 2005/06/23 22:06:50 $ by <bidulock@openss7.org>
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/23 22:06:50 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/22 07:39:52 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/06/23 22:06:50 $";
 
 /* 
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -135,6 +135,8 @@ struct strfdinsert fdi = {
 	0
 };
 int flags = 0;
+
+int dummy = 0;
 
 #ifndef SCTP_VERSION_2
 typedef struct addr {
@@ -230,10 +232,10 @@ static int time_event(int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return (event);
 }
@@ -773,7 +775,7 @@ void print_addr(char *add_ptr, size_t add_len)
 {
 	sctp_addr_t *a = (sctp_addr_t *) add_ptr;
 	size_t anum = add_len >= sizeof(a->port) ? (add_len - sizeof(a->port)) / sizeof(a->addr[0]) : 0;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		int i;
 		if (add_len != sizeof(a->port) + anum * sizeof(a->addr[0]))
@@ -786,7 +788,7 @@ void print_addr(char *add_ptr, size_t add_len)
 		fprintf(stdout, "(no address)");
 	fprintf(stdout, "\n");
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 char *addr_string(char *add_ptr, size_t add_len)
@@ -815,7 +817,7 @@ void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
 	size_t anum = add_len / sizeof(*a);
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len > 0) {
 		int i;
 		if (add_len != anum * sizeof(*a))
@@ -829,7 +831,7 @@ void print_addr(char *add_ptr, size_t add_len)
 		fprintf(stdout, "(no address)");
 	fprintf(stdout, "\n");
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 char *addr_string(char *add_ptr, size_t add_len)
@@ -1278,7 +1280,7 @@ void print_event(int fd, int event)
 {
 	if (verbose < 1 || !show)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (fd == conn_fd)
 		print_event_conn(fd, event);
 	else if (fd == list_fd)
@@ -1286,7 +1288,7 @@ void print_event(int fd, int event)
 	else if (fd == resp_fd)
 		print_event_resp(fd, event);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return;
 }
 
@@ -1294,7 +1296,7 @@ void print_less(int fd)
 {
 	if (verbose < 1 || !show)
 		return;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (fd == conn_fd) {
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
 		fprintf(stdout, " .  (more) .  <---->|               .               :  :                    [%d]\n", state);
@@ -1309,7 +1311,7 @@ void print_less(int fd)
 		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
 	}
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	show = 0;
 	return;
 }
@@ -1322,7 +1324,7 @@ void print_more(void)
 void print_open(int *fdp)
 {
 	if (verbose > 3) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fdp == &conn_fd)
 			fprintf(stdout, "open()        ----->v                                                       \n");
 		else if (fdp == &resp_fd)
@@ -1330,14 +1332,14 @@ void print_open(int *fdp)
 		else if (fdp == &list_fd)
 			fprintf(stdout, "                    |                               v<-|---- open()         \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 }
 
 void print_close(int *fdp)
 {
 	if (verbose > 3) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fdp == &conn_fd)
 			fprintf(stdout, "close()       ----->X                               |  |                    \n");
 		else if (fdp == &resp_fd)
@@ -1345,14 +1347,14 @@ void print_close(int *fdp)
 		else if (fdp == &list_fd)
 			fprintf(stdout, "                                                    X<------ close()        \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 }
 
 void print_command(int fd, const char *command)
 {
 	if (verbose > 3) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fd == conn_fd)
 			fprintf(stdout, "%-14s----->|                               |  |                    [%d]\n", command, state);
 		else if (fd == resp_fd)
@@ -1360,14 +1362,14 @@ void print_command(int fd, const char *command)
 		else if (fd == list_fd)
 			fprintf(stdout, "                    |                               |<-+---- %-14s [%d]\n", command, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 }
 
 void print_errno(int fd, long error)
 {
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fd == conn_fd)
 			fprintf(stdout, "%-14s<----/|                               |  |                    [%d]\n", errno_string(error), state);
 		else if (fd == resp_fd)
@@ -1375,14 +1377,14 @@ void print_errno(int fd, long error)
 		else if (fd == list_fd)
 			fprintf(stdout, "                    |                               |\\-+---> %-14s [%d]\n", errno_string(error), state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 }
 
 void print_success(int fd)
 {
 	if (verbose > 4) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fd == conn_fd)
 			fprintf(stdout, "ok            <----/|                               |  |                    [%d]\n", state);
 		else if (fd == resp_fd)
@@ -1390,7 +1392,7 @@ void print_success(int fd)
 		else if (fd == list_fd)
 			fprintf(stdout, "                    |                               |\\-+---> ok             [%d]\n", state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 }
 
@@ -1518,7 +1520,7 @@ int wait_event(int fd, int wait)
 		if (timer_timeout) {
 			timer_timeout = 0;
 			if (show_timeout || verbose > 1) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				if (fd == conn_fd)
 					fprintf(stdout, "++++++++++++++++++++|+++++++++++ TIMEOUT +++++++++++|  |                    [%d]\n", state);
 				else if (fd == resp_fd)
@@ -1526,7 +1528,7 @@ int wait_event(int fd, int wait)
 				else if (fd == list_fd)
 					fprintf(stdout, "                    |+++++++++++ TIMEOUT +++++++++++|++|++++++++++++++++++++[%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				show_timeout--;
 			}
 			last_event = __EVENT_TIMEOUT;
@@ -1587,7 +1589,7 @@ int get_event(int fd)
 void test_sleep(int fd, unsigned long t)
 {
 	if (verbose > 1 && show) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fd == conn_fd)
 			fprintf(stdout, "/ / / / / / / / / / | / / / Waiting %03lu seconds / / |  |                    [%d]\n", t, state);
 		else if (fd == resp_fd)
@@ -1595,7 +1597,7 @@ void test_sleep(int fd, unsigned long t)
 		else if (fd == list_fd)
 			fprintf(stdout, "                    | / / / Waiting %03lu seconds / / |/ | / / / / / / / / / /[%d]\n", t, state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	sleep(t);
 }
@@ -1605,7 +1607,7 @@ int expect(int fd, int wait, int want)
 	if ((last_event = wait_event(fd, wait)) == want)
 		return (__RESULT_SUCCESS);
 	if (verbose > 1 && show) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		if (fd == conn_fd)
 			fprintf(stdout, "- (%-15s) | - - - - - [Expected]- - - - - |  |                    [%d]\n", event_string(want), state);
 		else if (fd == resp_fd)
@@ -1613,7 +1615,7 @@ int expect(int fd, int wait, int want)
 		else if (fd == list_fd)
 			fprintf(stdout, "                    | - - - - - [Expected]- - - - - |- | (%-15s) -[%d]\n", event_string(want), state);
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	return (__RESULT_FAILURE);
 }
@@ -3465,11 +3467,11 @@ int test_case_7_1_resp(int fd)
 	}
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "i = %d, j = %d, k = %d\n", 4, 4, 4);
 	fprintf(stdout, "Received %u bytes, expecting %u\n", len, 4 * 100000 + 4 * 8 + 4 * 7);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -3516,10 +3518,10 @@ int test_case_7_2_conn(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "Sent %3d messages making %6u bytes.\n", s, snd_bytes);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
 	return (__RESULT_FAILURE);
 }
@@ -3564,10 +3566,10 @@ int test_case_7_2_resp(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "Rcvd %3d messages making %6u bytes.\n", r, rcv_bytes);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	print_more();
 	return (__RESULT_FAILURE);
 }
@@ -3784,10 +3786,10 @@ int test_case_9_1_conn(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "%d sent %d inds %d acks %d\n", fd, i, j, k);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -3821,10 +3823,10 @@ int test_case_9_1_resp(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "%d sent %d inds %d acks %d\n", fd, i, j, k);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -3865,10 +3867,10 @@ int test_case_9_2_conn(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "%d sent %d inds %d\n", fd, i, j);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -3899,10 +3901,10 @@ int test_case_9_2_resp(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, "%d sent %d inds %d\n", fd, i, j);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -3969,11 +3971,11 @@ int test_case_9_3_conn(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -4025,11 +4027,11 @@ int test_case_9_3_resp(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -4102,13 +4104,13 @@ int test_case_9_4_conn(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d\n", fd, o[s], p[s]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -4175,13 +4177,13 @@ int test_case_9_4_resp(int fd)
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d acks %d\n", fd, i[s], j[s], k[s]);
 	for (s = 0; s < TEST_STREAMS; s++)
 		fprintf(stdout, "%d send %d inds %d\n", fd, o[s], p[s]);
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
 
@@ -4308,7 +4310,7 @@ int test_case_10_2_conn(int fd)
 		}
 	}
 	show = 1;
-	lockf(fileno(stdout), F_LOCK, 0);
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	for (j = 0, n = 0; n < 3 * SETS * REPS; n++) {
 		for (i = 0; i < SETS * REPS; i++) {
 			if (times[i].req_idx == n) {
@@ -4329,7 +4331,7 @@ int test_case_10_2_conn(int fd)
 	fprintf(stdout, "                    |  ack average = %9ld usec |  |                    \n", atotal);
 	fprintf(stdout, "                    |               |               |  |                    \n");
 	fflush(stdout);
-	lockf(fileno(stdout), F_ULOCK, 0);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	show = 1;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4382,90 +4384,90 @@ int conn_run(struct test_side *side)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "--------------------+------------Preamble-----------+--+                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	state = 0;
 	if (side->preamble && side->preamble(conn_fd) != __RESULT_SUCCESS) {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		result = __RESULT_INCONCLUSIVE;
 	} else {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "--------------------+--------------Test-------------+--+                    \n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		switch (side->testcase(conn_fd)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_INCONCLUSIVE;
 			break;
 		case __RESULT_FAILURE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "XXXXXXXXXXXXXXXXXXXX|XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|                    [%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_FAILURE;
 			break;
 		case __RESULT_SCRIPT_ERROR:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "####################|########## SCRIPT ERROR #######|##|                    [%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SCRIPT_ERROR;
 			break;
 		case __RESULT_SUCCESS:
 			if (verbose > 2) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "********************|************ PASSED ***********|**|                    [%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SUCCESS;
 			break;
 		}
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "--------------------+------------Postamble----------+--+                    \n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		if (side->postamble && side->postamble(conn_fd) != __RESULT_SUCCESS) {
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "???????????????????\?|???????\? INCONCLUSIVE ????????\?|?\?|                    [%d]\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if (result == __RESULT_SUCCESS)
 				result = __RESULT_INCONCLUSIVE;
 		}
 	}
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "--------------------+-------------------------------+--+                    \n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	exit(result);
 }
@@ -4474,90 +4476,90 @@ int resp_run(struct test_side *side)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    +------------Preamble-----------+  +--------------------\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	state = 0;
 	if (side->preamble && side->preamble(resp_fd) != __RESULT_SUCCESS) {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		result = __RESULT_INCONCLUSIVE;
 	} else {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    +--------------Test-------------+  +--------------------\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		switch (side->testcase(resp_fd)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_INCONCLUSIVE;
 			break;
 		case __RESULT_FAILURE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|  |XXXXXXXXXXXXXXXXXXX(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_FAILURE;
 			break;
 		case __RESULT_SCRIPT_ERROR:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |######### SCRIPT ERROR ########|  |###################(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SCRIPT_ERROR;
 			break;
 		case __RESULT_SUCCESS:
 			if (verbose > 2) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |************ PASSED ***********|  |********************(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SUCCESS;
 			break;
 		}
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    +------------Postamble----------+  +--------------------\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		if (side->postamble && side->postamble(resp_fd) != __RESULT_SUCCESS) {
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|  |???????????????????\?(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if (result == __RESULT_SUCCESS)
 				result = __RESULT_INCONCLUSIVE;
 		}
 	}
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    +-------------------------------+  +--------------------\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	exit(result);
 }
@@ -4566,90 +4568,90 @@ int list_run(struct test_side *side)
 {
 	int result = __RESULT_SCRIPT_ERROR;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    +------------Preamble-----------+--+--------------------\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	state = 0;
 	if (side->preamble && side->preamble(list_fd) != __RESULT_SUCCESS) {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		result = __RESULT_INCONCLUSIVE;
 	} else {
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    +--------------Test-------------+--+--------------------\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		switch (side->testcase(list_fd)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_INCONCLUSIVE;
 			break;
 		case __RESULT_FAILURE:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |XXXXXXXXXXXX FAILED XXXXXXXXXXX|XX|XXXXXXXXXXXXXXXXXXX(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_FAILURE;
 			break;
 		case __RESULT_SCRIPT_ERROR:
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |######### SCRIPT ERROR ########|##|###################(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SCRIPT_ERROR;
 			break;
 		case __RESULT_SUCCESS:
 			if (verbose > 2) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |************ PASSED ***********|**|********************(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			result = __RESULT_SUCCESS;
 			break;
 		}
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "                    +------------Postamble----------+--+--------------------\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		state = 0;
 		if (side->postamble && side->postamble(list_fd) != __RESULT_SUCCESS) {
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "                    |???????\? INCONCLUSIVE ????????\?|?\?|???????????????????\?(%d)\n", state);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if (result == __RESULT_SUCCESS)
 				result = __RESULT_INCONCLUSIVE;
 		}
 	}
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "                    +-------------------------------+--+--------------------\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	exit(result);
 }
@@ -4727,10 +4729,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				int signal = WTERMSIG(got_stat);
 				if (got_chld == conn_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "@@@@@@@@@@@@@@@@@@@@|@@@@@@@@@@ TERMINATED @@@@@@@@@|  |                    {%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (resp_chld)
 						kill(resp_chld, SIGKILL);
@@ -4741,10 +4743,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				}
 				if (got_chld == resp_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|  |@@@@@@@@@@@@@@@@@@@@{%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (conn_chld)
 						kill(conn_chld, SIGKILL);
@@ -4755,10 +4757,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				}
 				if (got_chld == list_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "                    |@@@@@@@@@@ TERMINATED @@@@@@@@@|@@|@@@@@@@@@@@@@@@@@@@@{%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (conn_chld)
 						kill(conn_chld, SIGKILL);
@@ -4771,10 +4773,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				int signal = WSTOPSIG(got_stat);
 				if (got_chld == conn_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "&&&&&&&&&&&&&&&&&&&&|&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |                    {%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (resp_chld)
 						kill(resp_chld, SIGKILL);
@@ -4785,10 +4787,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				}
 				if (got_chld == resp_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|  |&&&&&&&&&&&&&&&&&&&&{%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (conn_chld)
 						kill(conn_chld, SIGKILL);
@@ -4799,10 +4801,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 				}
 				if (got_chld == list_chld) {
 					if (verbose > 0) {
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "                    |&&&&&&&&&&& STOPPED &&&&&&&&&&&|&&|&&&&&&&&&&&&&&&&&&&&{%d}\n", signal);
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
 					if (conn_chld)
 						kill(conn_chld, SIGKILL);
@@ -4816,10 +4818,10 @@ int test_run(struct test_side *conn_side, struct test_side *resp_side, struct te
 			if (timer_timeout) {
 				timer_timeout = 0;
 				if (show_timeout || verbose) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++{%d}\n", state);
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					show_timeout--;
 				}
 				last_event = __EVENT_TIMEOUT;
@@ -4976,10 +4978,10 @@ int do_tests(void)
 	int successes = 0;
 	int failures = 0;
 	if (verbose > 0) {
-		lockf(fileno(stdout), F_LOCK, 0);
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
 		fprintf(stdout, "\n\nRFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Program.\n");
 		fflush(stdout);
-		lockf(fileno(stdout), F_ULOCK, 0);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
 	show = 0;
 	state = 0;
@@ -4994,12 +4996,12 @@ int do_tests(void)
 				continue;
 			}
 			if (verbose > 0) {
-				lockf(fileno(stdout), F_LOCK, 0);
+				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				fprintf(stdout, "\nTest Case SCTP-NPI/%s: %s\n", tests[i].numb, tests[i].name);
 				if (verbose > 1)
 					fprintf(stdout, "%s\n", tests[i].desc);
 				fflush(stdout);
-				lockf(fileno(stdout), F_ULOCK, 0);
+				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			state = 0;
 			if ((result = begin_tests()) != __RESULT_SUCCESS)
@@ -5010,23 +5012,23 @@ int do_tests(void)
 			case __RESULT_SUCCESS:
 				successes++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "*********\n");
 					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
 					fprintf(stdout, "*********\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			case __RESULT_FAILURE:
 				failures++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "XXXXXXXXX\n");
 					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
 					fprintf(stdout, "XXXXXXXXX\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			default:
@@ -5034,70 +5036,70 @@ int do_tests(void)
 			      inconclusive:
 				inconclusive++;
 				if (verbose > 0) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "?????????\n");
 					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
 					fprintf(stdout, "?????????\n\n");
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
 			}
 			tests[i].result = result;
 		}
 		if (summary && verbose) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 				if (tests[i].run) {
-					lockf(fileno(stdout), F_LOCK, 0);
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "Test Case SCTP-NPI/%-10s ", tests[i].numb);
 					fflush(stdout);
-					lockf(fileno(stdout), F_ULOCK, 0);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					switch (tests[i].result) {
 					case __RESULT_SUCCESS:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "SUCCESS\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					case __RESULT_FAILURE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "FAILURE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					default:
 					case __RESULT_INCONCLUSIVE:
-						lockf(fileno(stdout), F_LOCK, 0);
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
 						fprintf(stdout, "INCONCLUSIVE\n");
 						fflush(stdout);
-						lockf(fileno(stdout), F_ULOCK, 0);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
 					}
 				}
 			}
 		}
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "Done.\n\n");
 			fprintf(stdout, "========= %2d successes   \n", successes);
 			fprintf(stdout, "========= %2d failures    \n", failures);
 			fprintf(stdout, "========= %2d inconclusive\n", inconclusive);
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		return (0);
 	} else {
 		end_tests();
 		show = 1;
 		if (verbose > 0) {
-			lockf(fileno(stdout), F_LOCK, 0);
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "Test setup failed!\n");
 			fflush(stdout);
-			lockf(fileno(stdout), F_ULOCK, 0);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		return (2);
 	}

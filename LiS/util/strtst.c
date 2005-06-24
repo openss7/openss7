@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $
+ @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/30 19:44:15 $ by $Author: brian $
+ Last Modified $Date: 2005/05/30 20:29:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strtst.c,v $
+ Revision 1.1.1.5.4.7  2005/05/30 20:29:47  brian
+ - I do not think that the band backenable test can always pass
+
  Revision 1.1.1.5.4.6  2005/05/30 19:44:15  brian
  - tried a little harder to test the band test to run consistently
 
@@ -69,9 +72,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $"
+#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $"
 
-static char const ident[] = "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/05/30 19:44:15 $";
+static char const ident[] = "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $";
 
 
 /*
@@ -299,13 +302,14 @@ msg_to_syslog(char *msg)
 * Like printf only it also arranges to print to syslog for Linux.	*
 *									*
 ************************************************************************/
+#undef vsprintf
 void
 print(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 void
 print(char *fmt, ...)
 {
     char	 bfr[2048];
-    extern int	 vsprintf (char *, const char *, va_list);
+    extern int	 vsprintf (char *, const char *, va_list args);
     va_list	 args;
 
     va_start (args, fmt);
@@ -319,7 +323,8 @@ print(char *fmt, ...)
     {
 	strcpy(bfr, "strtst:") ;
 	bfr[7] = ' ' ;
-	user_write(printk_fd, bfr, strlen(bfr)) ;
+	if (user_write(printk_fd, bfr, strlen(bfr)) < 0)
+		perror(__FUNCTION__);
     }
 
 } /* print */
@@ -4723,7 +4728,7 @@ void sad_test(struct test_context *ctx)
 	tprint("%s", "sad_test: Testing SAD_VML IOCTL\n");
 
 	tprint("%s", "sad_test: Testing SAD_VML ioctl (a bad module)\n");
-	strcpy(mlist[0].l_name, "nosuchmodule");
+	strncpy(mlist[0].l_name, "nosuchmodule", sizeof(mlist[0].l_name));
 	list.sl_nmods = 1;
 	list.sl_modlist = mlist;
 	rslt = sad_vml_test(ctx, fd, &list);
@@ -4735,8 +4740,8 @@ void sad_test(struct test_context *ctx)
 	}
 
 	tprint("%s", "sad_test: Testing SAD_VML ioctl (a good and a bad module)\n");
-	strcpy(mlist[0].l_name, "relay");
-	strcpy(mlist[1].l_name, "nosuchmodule");
+	strncpy(mlist[0].l_name, "relay", sizeof(mlist[0].l_name));
+	strncpy(mlist[1].l_name, "nosuchmodule", sizeof(mlist[1].l_name));
 	list.sl_nmods = 2;
 	rslt = sad_vml_test(ctx, fd, &list);
 	if (rslt == 0) {
@@ -4747,7 +4752,7 @@ void sad_test(struct test_context *ctx)
 	}
 
 	tprint("%s", "sad_test: Testing SAD_VML ioctl (two good modules)\n");
-	strcpy(mlist[1].l_name, "relay2");
+	strncpy(mlist[1].l_name, "relay2", sizeof(mlist[1].l_name));
 	rslt = sad_vml_test(ctx, fd, &list);
 	if (rslt == 1) {
 		tprint("%s", "sad_test: SAD says modules"
@@ -4790,8 +4795,8 @@ void sad_test(struct test_context *ctx)
 	apush.sap_major = SLOOP__CMAJOR_0;
 	apush.sap_minor = 1;
 	apush.sap_npush = 2;
-	strcpy(apush.sap_list[0], "relay");
-	strcpy(apush.sap_list[1], "relay2");
+	strncpy(apush.sap_list[0], "relay", sizeof(apush.sap_list[0]));
+	strncpy(apush.sap_list[1], "relay2", sizeof(apush.sap_list[0]));
 	rslt = user_ioctl(fd, SAD_SAP, &apush);
 	if (rslt < 0) {
 		FAIL("sad_test: SAD_SAP ioctl failed: %s\n", STRERROR(-rslt));
@@ -5940,7 +5945,10 @@ void mt_open_test(struct test_context *ctx)
     pthread_mutexattr_t	 attr ;
 
     print("Begin multi-thread open test\n") ;
-    system("rmmod streams-mtdrv 2>&1") ;
+    if (system("rmmod streams-mtdrv 2>&1") != 0)
+    {
+	print("rmmod failed: %s\n", strerror(errno)) ;
+    }
     if (system("modprobe streams-mtdrv 2>&1") != 0)
     {
 	print("modprobe failed: %s\n", strerror(errno)) ;
@@ -5957,7 +5965,9 @@ void mt_open_test(struct test_context *ctx)
     {
 	fprintf(stderr, "Thread #%d: ", 1) ;
 	perror("pthread_create") ;
-	system("rmmod streams-mtdrv 2>&1") ;
+	if (system("rmmod streams-mtdrv 2>&1") != 0) {
+	    print("rmmod failed: %s\n", strerror(errno)) ;
+	}
 	xit() ;
     }
 
@@ -5966,7 +5976,9 @@ void mt_open_test(struct test_context *ctx)
     {
 	fprintf(stderr, "Thread #%d: ", 2) ;
 	perror("pthread_create") ;
-	system("rmmod streams-mtdrv 2>&1") ;
+	if (system("rmmod streams-mtdrv 2>&1") != 0) {
+	    print("rmmod failed: %s\n", strerror(errno)) ;
+	}
 	xit() ;
     }
 
@@ -5974,7 +5986,9 @@ void mt_open_test(struct test_context *ctx)
     mt_set_state(1) ;
     pthread_mutex_lock(&mt_quit) ;		/* waits until thread exit */
     print("multi-thread open test OK\n") ;
-    system("rmmod streams-mtdrv 2>&1") ;
+    if (system("rmmod streams-mtdrv 2>&1") != 0) {
+	print("rmmod failed: %s\n", strerror(errno)) ;
+    }
 }
 #endif
 
