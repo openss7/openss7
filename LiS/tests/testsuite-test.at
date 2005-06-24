@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-test.at,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2005/05/30 14:25:54 $
+dnl @(#) $RCSfile: testsuite-test.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/06/24 16:58:46 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/24 16:58:46 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-test.at,v $
+dnl Revision 1.1.2.4  2005/06/24 16:58:46  brian
+dnl - testsuite as always verbose internally
+dnl
 dnl Revision 1.1.2.3  2005/05/30 14:25:54  brian
 dnl - packaged standalong test suites
 dnl
@@ -84,7 +87,6 @@ AT_SETUP([lis_test])
 AT_KEYWORDS([LiS test])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     lis_test
     ], [], [ignore], [], [], [])
 AT_CLEANUP

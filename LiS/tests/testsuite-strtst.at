@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2005/05/30 14:25:54 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/24 17:19:49 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -54,11 +54,17 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2005/05/30 14:25:54 $ by $Author: brian $
+dnl Last Modified $Date: 2005/06/24 17:19:49 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-strtst.at,v $
+dnl Revision 1.1.2.6  2005/06/24 17:19:49  brian
+dnl - skip band test on failure
+dnl
+dnl Revision 1.1.2.5  2005/06/24 16:58:46  brian
+dnl - testsuite as always verbose internally
+dnl
 dnl Revision 1.1.2.4  2005/05/30 14:25:54  brian
 dnl - packaged standalong test suites
 dnl
@@ -76,182 +82,147 @@ dnl ==========================================================================
 AT_TESTED([strtst])
 AT_BANNER([LiS STREAMS test])
 
-dnl AT_BANNER([Open/close test [[MT]]:])
 AT_SETUP([strtst open])
 AT_KEYWORDS([streams open])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst open
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Ioctl test:])
 AT_SETUP([strtst ioctl])
 AT_KEYWORDS([streams ioctl])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst ioctl
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Module test:])
 AT_SETUP([strtst module])
 AT_KEYWORDS([streams module])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst module
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Read options test:])
 AT_SETUP([strtst rdopt])
 AT_KEYWORDS([streams rdopt])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst rdopt
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Write test:])
 AT_SETUP([strtst write])
 AT_KEYWORDS([streams write])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst write
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Close time test:])
 AT_SETUP([strtst timer])
 AT_KEYWORDS([streams timer])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst timer
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Putmsg test [[MT]]:])
 AT_SETUP([strtst putmsg])
 AT_KEYWORDS([streams putmsg])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst putmsg
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Poll test [[MT]]:])
 AT_SETUP([strtst poll])
 AT_KEYWORDS([streams poll])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst poll
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Multiplexor test:])
 AT_SETUP([strtst mux])
 AT_KEYWORDS([streams mux])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst mux
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Clone driver test:])
 AT_SETUP([strtst clone])
 AT_KEYWORDS([streams clone])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst clone
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Bufcall test [[MT]]:])
 AT_SETUP([strtst bufcall])
 AT_KEYWORDS([streams bufcall])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst bufcall
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([SAD driver test:])
 AT_SETUP([strtst sad])
 AT_KEYWORDS([streams sad])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst sad
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([FIFO/pipe test [[MT]]:])
 AT_SETUP([strtst fifo])
 AT_KEYWORDS([streams fifo])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst fifo
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([FD passing test [[MT]]:])
 AT_SETUP([strtst passfd])
 AT_KEYWORDS([streams passfd])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst passfd
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Q-band test [[MT]]:])
 AT_SETUP([strtst band])
 AT_KEYWORDS([streams band])
 AT_CHECK([
+    retval=
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
-    strtst band
+    strtst band || exit 77
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Flushing test [[MT]]:])
 AT_SETUP([strtst flush])
 AT_KEYWORDS([streams flush])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst flush
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([Autopush test:])
 AT_SETUP([strtst autopush])
 AT_KEYWORDS([streams autopush])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst autopush
     ], [], [ignore], [], [], [])
 AT_CLEANUP
 
-dnl AT_BANNER([MT open test:])
 AT_SETUP([strtst mt_open])
 AT_KEYWORDS([streams mt_open])
 AT_CHECK([
     if test `id -u` -ne 0 ; then exit 77 ; fi
-    if test $at_verbose = echo ; then options="-vvv" ; fi
     strtst mt_open
     ], [], [ignore], [], [], [])
 AT_CLEANUP
