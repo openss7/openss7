@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.9 2005/05/14 08:35:10 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.10 2005/06/24 03:35:15 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/05/14 08:35:10 $ by $Author: brian $
+% Last Modified $Date: 2005/06/24 03:35:15 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -4957,7 +4957,7 @@ For additional details,
 
 @page
 @node File Index
-@section Index of Files and Prorams
+@section Index of Files and Programs
 @printindex pg
 
 @page

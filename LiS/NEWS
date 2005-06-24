@@ -1,4 +1,4 @@
-OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-03-15
+OpenSS7 Linux STREAMS (LiS) -- history of user-visible changes.  2005-06-13
 Copyright (c) 2001-2005  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions.
@@ -18,6 +18,14 @@ See the end for copying conditions.
   calculations for 64bit machines, DMA patch for mblk buffer alignment, flush
   handling patch, panic patch, smp patch, parisc syscall patch, appq patch, and
   multithreaded test program patches, POSIX threads compilant library functions.
+
+  Additional changes made to support later 2.6 kernels and distributions.
+  Switched putpmsg()/getpmsg() to use ioctl for system call emulation instead of
+  read()/write(), primarily because 2.6.11 kernels check for a valid count
+  before calling the driver's read()/write() file operations.  Updates to the
+  build system to support a wider range of kernels and distributions.  See the
+  installation and reference manual for a complete list of supported kernels and
+  distributions.
 
   Please note that the entire package is released under GPL.
 

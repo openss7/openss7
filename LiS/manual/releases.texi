@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.10 2005/06/20 12:00:00 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.11 2005/06/24 03:35:16 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/20 12:00:00 $ by $Author: brian $
+@c Last Modified $Date: 2005/06/24 03:35:16 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -352,7 +352,7 @@ fattach/fdetach functions on kernel versions 2.4.7 and beyond.  There are also k
 pipe/FIFO code.  All of these problems are scheduled to be fixed in early 2002.
 
 LiS-2.13 adds the ability for drivers to make their own "/dev" nodes via the @dfn{lis_mknod}
-function (see @pxref{System Calls from within the Kernel}).  Also provided is an @dfn{lis_unlink}
+function (@pxref{System Calls from within the Kernel}).  Also provided is an @dfn{lis_unlink}
 function that allows drivers to remove their device files.
 
 There is almost no new functionality added by LiS-2.13.  The differences between LiS-2.13 and
@@ -368,12 +368,13 @@ If you have drivers that have worked with LiS-2.10 or LiS-2.11 (or earlier) plea
 using the header files from LiS-2.12.  This may be the last recompile in quite some time that you
 will need for your driver code.
 
-LiS-2.12 contains a sufficient Driver/Kernel Interface (DKI), (see @pxref{Development}), that it is straightforward to write a STREAMS driver that can be compiled against
-LiS-2.12 and the resulting object modules used either on a 2.2 or 2.4 kernel, with only LiS needing
-recompilation on the target machine.
+LiS-2.12 contains a sufficient Driver/Kernel Interface (DKI), (@pxref{Development}), that it is
+straightforward to write a STREAMS driver that can be compiled against LiS-2.12 and the resulting
+object modules used either on a 2.2 or 2.4 kernel, with only LiS needing recompilation on the target
+machine.
 
-When run on 2.4 kernels, LiS makes full use of multiple CPUs (see @pxref{LiS SMP Implementation}).
-It forks a queue runner task for each CPU and locks each task onto its CPU.  Queue runner tasks are
+When run on 2.4 kernels, LiS makes full use of multiple CPUs (@pxref{LiS SMP Implementation}).  It
+forks a queue runner task for each CPU and locks each task onto its CPU.  Queue runner tasks are
 awakened to assist with service procedure processing as the number of scheduled queues increases.
 
 Because of this aggressive use of processors, you may find that your drivers do not function
@@ -464,6 +465,30 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+
+This is a port forward of most of the build and patches from 2.16.19 forward
+and applied over 2.18.0.  This is our first LiS-2.18 release.  All further
+development on 2.16.19 will now cease.  2.18.1 is maintained on both 2.4 and
+2.6 kernels.  No active development will be performed on 2.18.1, only
+maintenance.  For an active development release, see the Linux Fast-STREAMS
+releases.
+
+Major changes from LiS-2.18.0 include all of the autoconf build system, manual
+pages and texi/pdf manual for LiS that were applied on the 2.16.19 release.
+This includes a number of 64 bit, HPPA, PARISC, printf, atomic stats, HZ
+calculations for 64bit machines, DMA patch for mblk buffer alignment, flush
+handling patch, panic patch, smp patch, parisc syscall patch, appq patch, and
+multithreaded test program patches, POSIX threads compilant library functions.
+
+Additional changes made to support later 2.6 kernels and distributions.
+Switched putpmsg()/getpmsg() to use ioctl for system call emulation instead of
+read()/write(), primarily because 2.6.11 kernels check for a valid count
+before calling the driver's read()/write() file operations.  Updates to the
+build system to support a wider range of kernels and distributions.  See the
+installation and reference manual for a complete list of supported kernels and
+distributions.
+
+Please note that the entire package is released under GPL.
 
 @node Release LiS-2.16.19
 @subsection Release LiS-2.16.19

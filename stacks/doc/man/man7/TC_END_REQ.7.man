@@ -1,7 +1,7 @@
 '\" rt
 .\" -*- nroff -*- vim: ft=groff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: TC_END_REQ.7.man,v 0.9.2.3 2005/03/30 13:39:36 brian Exp $
+.\" @(#) $Id: TC_END_REQ.7.man,v 0.9.2.4 2005/06/24 03:28:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -31,7 +31,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Modified $Date: 2005/03/30 13:39:36 $ by $Author: brian $
+.\" Modified $Date: 2005/06/24 03:28:12 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strss7.macros
@@ -52,7 +52,7 @@ sort-adjacent-labels
 .TH TC_END_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Transaction Component Interface (TCI)"
 .SH NAME
 .PP
-.BR TC_END_REQ ", " TC_RESP_REQ
+.B TC_END_REQ, TC_RESP_REQ
 \- Dialogue End Request
 .SH SYNOPSIS
 .PP
