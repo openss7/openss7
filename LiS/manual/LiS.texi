@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.10 2005/06/24 03:35:15 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.11 2005/06/24 13:38:56 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/06/24 03:35:15 $ by $Author: brian $
+% Last Modified $Date: 2005/06/24 13:38:56 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -211,6 +211,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
 * Copying::			Copying information for this Software
 * Documentation License::	Copying information for this Manual
 * Indices::			Indices
@@ -425,6 +426,7 @@ This document is organized (loosely) into several sections as follows:
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
 @iftex
@@ -441,6 +443,8 @@ This document is organized (loosely) into several sections as follows:
 @tab Releases of the package
 @item @ref{Installation}.
 @tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
 @end multitable
 @end iftex
 @ifinfo
@@ -457,6 +461,8 @@ This document is organized (loosely) into several sections as follows:
 @tab Releases of the package
 @item @ref{Installation}.
 @tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
 @end multitable
 @end ifinfo
 
@@ -4890,6 +4896,15 @@ For additional details,
 @cindex installation
 
 @include install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include testsuite.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

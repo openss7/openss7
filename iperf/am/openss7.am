@@ -1,7 +1,7 @@
 ## vim: ft=automake
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2005/05/30 00:10:16 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/06/24 13:27:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/30 00:10:16 $ by $Author: brian $
+## Last Modified $Date: 2005/06/24 13:27:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -244,7 +244,8 @@ TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
 			  libexec_PROGRAMS='$(libexec_PROGRAMS)' \
 			  dist_bin_SCRIPTS='$(dist_bin_SCRIPTS)' \
 			  dist_sbin_SCRIPTS='$(dist_sbin_SCRIPTS)' \
-			  dist_libexec_SCRIPTS='$(dist_libexec_SCRIPTS)'
+			  dist_libexec_SCRIPTS='$(dist_libexec_SCRIPTS)' \
+			  AM_INSTALLCHECK_STD_OPTIONS_EXEMPT='$(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)'
 else
 dist_check_SCRIPTS	= 
 TESTS			= 

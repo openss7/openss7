@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.2 2005/06/24 13:38:58 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+% Last Modified $Date: 2005/06/24 13:38:58 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -262,6 +262,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
 
 * GPL::				GNU General Public License
 * LGPL::			GNU Lesser General Public License
@@ -456,6 +457,7 @@ This document is organized (loosely) into several sections as follows:
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
 @end menu
 @end ifnottex
 @iftex
@@ -472,6 +474,8 @@ This document is organized (loosely) into several sections as follows:
 @tab Releases of the package
 @item @ref{Installation}.
 @tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
 @end multitable
 @end iftex
 
@@ -1750,6 +1754,15 @@ receive.
 @cindex installation
 
 @include texi/install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include texi/testsuite.texi
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

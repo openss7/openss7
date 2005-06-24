@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.40 $) $Date: 2005/05/31 05:10:39 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.41 $) $Date: 2005/06/24 13:40:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/31 05:10:39 $ by $Author: brian $
+# Last Modified $Date: 2005/06/24 13:40:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -417,14 +417,14 @@ fi
 
 %post lib
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # After a fresh install or upgrade, do a load config.
     /sbin/ldconfig
 fi
 
 %postun lib
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -or $1 = 1 ] ; then
+if [ $1 = 0 -o $1 = 1 ] ; then
     # Whether complete removal or upgrade, do a load config.
     /sbin/ldconfig
 fi
@@ -577,32 +577,47 @@ The %{name}-doc package contains html documentation for the development of
 
 %post doc
 # ---------------------------------------------------------------------------
-if [ -x /sbin/install-info ] ; then
-    # Older rpm versions do not compress info files.
-    for n in %{infofiles} ; do
-        if [ -f %{_infodir}/$n.info ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
-        elif [ -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-        fi
-    done
+if [ $1 = 1 ] ; then : # fresh install
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+    fi
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
-if [ "$1" = 0 -a -x /sbin/install-info ] ; then
-    # Older rpm versions do not compress info files.
-    for n in %{infofiles} ; do
-        if [ -f %{_infodir}/$n.info ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
-        elif [ -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-        fi
-    done
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+fi
+
+%postun doc
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+    fi
 fi
 
 %if %{FILES_doclibs}
@@ -663,9 +678,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 1.1.2.40  2005/05/31 05:10:39  brian
-# - correct case on modutildir filename
+# Revision 1.1.2.41  2005/06/24 13:40:40  brian
+# - some install/erase script corrections
 #
+
+* Tue May 31 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.40  2005/05/31 05:10:39  brian
+- correct case on modutildir filename
 
 * Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.39  2005/05/30 14:25:49  brian
