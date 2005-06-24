@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.9 $) $Date: 2005/06/01 02:42:27 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.10 $) $Date: 2005/06/22 07:43:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/01 02:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/06/22 07:43:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.9 $) $Date: 2005/06/01 02:42:27 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.10 $) $Date: 2005/06/22 07:43:40 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.9 2005/06/01 02:42:27 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.10 2005/06/22 07:43:40 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -4005,6 +4005,7 @@ int lis_init_module( void )
 
     printk(
 	"Linux STREAMS Subsystem ready.\n"
+	"Copyright (c) 2004-2005 OpenSS7 Corporation.  All Rights Reserved.\n"
 	"Copyright (c) 1997-2004 David Grothe, et al, http://www.gcom.com\n"
 	"Major device number %d.\n"
 	"Version %s %s. Compiled for kernel version %s.\n"

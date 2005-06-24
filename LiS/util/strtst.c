@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $
+ @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/30 20:29:47 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 22:05:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strtst.c,v $
+ Revision 1.1.1.5.4.8  2005/06/23 22:05:24  brian
+ - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
+
  Revision 1.1.1.5.4.7  2005/05/30 20:29:47  brian
  - I do not think that the band backenable test can always pass
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $"
+#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $"
 
-static char const ident[] = "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2005/05/30 20:29:47 $";
+static char const ident[] = "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2005/06/23 22:05:24 $";
 
 
 /*
@@ -6345,7 +6348,7 @@ void copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
 Copyright (c) 1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
@@ -6388,7 +6391,7 @@ void version(int argc, char *argv[])
     fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2001-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
     Copyright (c) 1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2005/06/16 21:06:05 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/06/24 13:40:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/16 21:06:05 $ by $Author: brian $
+# Last Modified $Date: 2005/06/24 13:40:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -92,7 +92,7 @@
 #global libraries   
 %global tools       strsctp_mknod test-sctp test-sctp_n test-sctp_nc test-sctp_ns test-sctp_t
 %global infofiles   %{name}
-#global initfiles   strsctp
+%global initfiles   strsctp
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -102,9 +102,11 @@
 %if %{without_ko_modules}
 # assume devs for older kernels
 %global NEED_devs     1
+%global NEED_init     1
 %else
 # assume no devs for newer kernels
 %global NEED_devs     0
+%global NEED_init     0
 %endif
 
 %{!?_configdir:      %{expand: %%global _configdir    %%{_sysconfdir}/sysconfig}}
@@ -114,7 +116,6 @@
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
-%{?_without_devfs:   %{expand: %%global NEED_devs     1}}
 %{?_without_modules: %{expand: %%global BUILD_modules 0}}
 %{?_without_tools:   %{expand: %%global BUILD_tools   0}}
 %{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
@@ -269,6 +270,7 @@
 %if %{have_initscripts}
 %global FILES_ko_noinit     0
 %global FILES_noinit        0
+%global NEED_init           1
 %else
 %global FILES_ko_init       0
 %global FILES_init          0
@@ -567,7 +569,7 @@ Group:          System Environment/Kernel
 Prefix:         /%{_lib}/modules/%{kernel_version}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{kernel_version}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\n")
 Requires:       %{_streams}-%{core_name} >= %{_strvers}
-%if %{without_ko_modules}
+%if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_devs}
@@ -598,6 +600,7 @@ for the same kernel.
 
 %pre %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
+arg="$1"
 function remove_depmods() {
     local t
     [ $# -gt 0 ] || return 0
@@ -607,7 +610,7 @@ function remove_depmods() {
         eval "remove_depmods \$$prereq"
     done
 }
-if [ $1 = 1 ] ; then : # fresh install
+if [ $arg = 1 ] ; then : # fresh install
     # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
     # installed kernel modules hanging around for this kernel version.
     list="%{modules}"
@@ -656,7 +659,7 @@ if [ $1 = 1 ] ; then : # fresh install
         done
     fi
 fi
-if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
+if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
         # the running kernel, we have to worry about previous loaded modules for the old version or
@@ -692,25 +695,45 @@ fi
 
 %post %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # This is a running kernel, do a /sbin/depmod on the modules directory for the running
         # kernel.
         /sbin/depmod -ae
+%if %{have_initscripts}
+        # Running kernels do need init scripts run.
+        if [ -x /sbin/service ] ; then
+            list="%{initfiles}" ; for i in $list ; do
+                /sbin/service $i start || :
+            done
+        fi
+%endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
         # Non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway, but
         # try one now.
         UNAME_MACHINE=%{_target_cpu} \
         /sbin/depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version}
+        # Non-running kernels do not need init scripts run.
     fi
 fi
 
 %preun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -or $1 = 1 ] ; then : # final removal or upgrade
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # We are about to uninstall for good on a running kernel then we have to worry about which
         # modules are running
+%if %{have_initscripts}
+        # First lets try shutting down using any init script first in reverse order
+        if [ -x /sbin/service ] ; then
+            list="%{initfiles}" ; for i in $list ; do
+                reverse="$i${reverse:+ $reverse}"
+            done
+            for i in $reverse ; do
+                /sbin/service $i stop || :
+            done
+        fi
+%endif
         mods="%{modules}" ; for m in $mods ; do
             if ( /sbin/lsmod | grep -q "^$m" ) ; then
                 # modules running, kick the stack
@@ -742,7 +765,7 @@ fi
 
 %postun %{_streams}-%{core_name}
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -or $1 = 1 ] ; then : # final removal or upgrade
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
         # This is a running kernel, do a /sbin/depmod on the modules directory for.
         /sbin/depmod -ae
@@ -853,14 +876,14 @@ fi
 
 %post %{_streams}-lib
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -or $1 = 2 ] ; then : # fresh install or upgrade
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # After a fresh install or upgrade, do a load config.
     /sbin/ldconfig
 fi
 
 %postun %{_streams}-lib
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -or $1 = 1 ] ; then
+if [ $1 = 0 -o $1 = 1 ] ; then
     # Whether complete removal or upgrade, do a load config.
     /sbin/ldconfig
 fi
@@ -1061,32 +1084,47 @@ OpenSS7 %{_STREAMS} STREAMS %{stitle} applications, modules and drivers.
 
 %post doc
 # ---------------------------------------------------------------------------
-if [ -x /sbin/install-info ] ; then
-    # Older rpm versions do not compress info files.
-    for n in %{infofiles} ; do
-        if [ -f %{_infodir}/$n.info ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
-        elif [ -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-            /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-        fi
-    done
+if [ $1 = 1 ] ; then : # fresh install
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+    fi
 fi
 
 %preun doc
 # ---------------------------------------------------------------------------
-if [ "$1" = 0 -a -x /sbin/install-info ] ; then
-    # Older rpm versions do not compress info files.
-    for n in %{infofiles} ; do
-        if [ -f %{_infodir}/$n.info ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
-        elif [ -f %{_infodir}/$n.info.gz ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-        elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-            /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-        fi
-    done
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+fi
+
+%postun doc
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} || :
+    fi
 fi
 
 %if %{FILES_doclibs}
@@ -1167,6 +1205,7 @@ associated with the %{title} package.
 
 %pre init
 # ---------------------------------------------------------------------------
+arg="$1"
 function remove_depmods() {
     local t
     [ $# -gt 0 ] || return 0
@@ -1179,7 +1218,7 @@ function remove_depmods() {
 # This is an initial installation of the init subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
 # treat every fresh installation like an upgrade from non-deb/rpm install.
-if [ $1 = 1 ] ; then : # fresh install
+if [ $arg = 1 ] ; then : # fresh install
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
     # postun actions.
@@ -1290,7 +1329,7 @@ if [ $1 = 1 ] ; then : # fresh install
         done
     fi
 fi
-if [ $1 = 2 ] ; then : # upgrade
+if [ $arg = 2 ] ; then : # upgrade
     # Because we are doing an upgrade, the preun and postun scriplets for the old rpm are going to
     # be called.  Hopefully the old rpm can handle removal correctly.
 fi
@@ -1529,12 +1568,24 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.69  2005/06/16 21:06:05  brian
-# - added init scripts
+# Revision 0.9.2.71  2005/06/24 13:40:43  brian
+# - some install/erase script corrections
 #
-# Revision 0.9.2.68  2005/05/31 05:10:40  brian
-# - correct case on modutildir filename
-#
+
+* Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.70  2005/06/24 09:00:36  brian
+- init package must be installed first because it cleans
+  out any non-rpm modules and other things before the first
+  fresh RPM install
+- this wasn't happending on 2.6 systems
+
+* Thu Jun 16 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.69  2005/06/16 21:06:05  brian
+- added init scripts
+
+* Tue May 31 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.68  2005/05/31 05:10:40  brian
+- correct case on modutildir filename
 
 * Mon May 30 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.67  2005/05/30 14:25:52  brian

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.1.12.1 $) $Date: 2005/03/09 23:13:50 $
+ @(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/05/14 08:35:09 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,9 +46,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/03/09 23:13:50 $ by $Author: brian $
+ Last Modified $Date: 2005/05/14 08:35:09 $ by $Author: brian $
 
  $Log: stropts.h,v $
+ Revision 1.1.1.1.12.2  2005/05/14 08:35:09  brian
+ - copyright header correction
+
  Revision 1.1.1.1.12.1  2005/03/09 23:13:50  brian
  - First stab at autoconf'ed 2.18.0.  Results of merge.
 
@@ -58,7 +61,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 1.1.1.1.12.1 $) Copyright (c) 1997-2004  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 1.1.1.1.12.2 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

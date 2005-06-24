@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/05/14 08:35:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: thrtst.c,v $
+ Revision 1.1.1.1.12.3  2005/05/14 08:35:16  brian
+ - copyright header correction
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /************************************************************************
 *                     Multi-Threaded Test                               *
@@ -401,7 +404,7 @@ void copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2003-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 2001       David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
 All Rights Reserved.\n\
@@ -443,7 +446,7 @@ void version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 2001       David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/05/14 08:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: timetst.c,v $
+ Revision 1.1.1.2.4.3  2005/05/14 08:35:14  brian
+ - copyright header correction
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/05/14 08:35:14 $";
 
 
 /*
@@ -624,7 +627,7 @@ void copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2003-2004  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2003-2005  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
 All Rights Reserved.\n\
@@ -663,7 +666,7 @@ void version(int argc, char *argv[])
     fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1997       David Grothe, Gcom, Inc <dave@gcom.com>\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2, included\n\
