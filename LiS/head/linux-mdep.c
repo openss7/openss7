@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.10 $) $Date: 2005/06/22 07:43:40 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.11 $) $Date: 2005/06/24 09:01:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:43:40 $ by $Author: brian $
+ Last Modified $Date: 2005/06/24 09:01:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.10 $) $Date: 2005/06/22 07:43:40 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.11 $) $Date: 2005/06/24 09:01:11 $"
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.10 2005/06/22 07:43:40 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.11 2005/06/24 09:01:11 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -2689,8 +2689,8 @@ static struct inode* lis_fifo_info_new(struct inode* i)
 #if !defined(KERNEL_2_5)
 	PIPE_WAITING_READERS(*i) = PIPE_WAITING_WRITERS(*i) = 0;
 #endif
-	PIPE_RCOUNTER(*i) = PIPE_WCOUNTER(*i) = 1;
 #endif
+	PIPE_RCOUNTER(*i) = PIPE_WCOUNTER(*i) = 1;
 	return i;
     } else {
 	return NULL;
