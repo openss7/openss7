@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/23 22:05:45 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/25 07:03:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:05:45 $ by $Author: brian $
+ Last Modified $Date: 2005/06/25 07:03:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.35  2005/06/25 07:03:46  brian
+ - updated streams tests program
+
  Revision 0.9.2.34  2005/06/23 22:05:45  brian
  - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
 
@@ -201,9 +204,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/23 22:05:45 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/25 07:03:46 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/23 22:05:45 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/25 07:03:46 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2404,7 +2407,7 @@ void print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|                    [%d:%03d]\n",
 		"                    |++++++++++++ TIMEOUT! ++++++++++|  |+++++++++++++++++++ [%d:%03d]\n",
 		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 	if (show_timeout || verbose > 0) {
 		print_double_int(child, msgs, child, state);
@@ -2438,7 +2441,7 @@ void print_syscall(int child, const char *command)
 		"%-14s----->|                                |  |                    [%d:%03d]\n",
 		"                    |                                |  |<---%-14s  [%d:%03d]\n",
 		"                    |                                |<-+----%-14s  [%d:%03d]\n",
-		"                    |                                |  |                    [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);

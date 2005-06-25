@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.34 $) $Date: 2005/06/24 13:40:40 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.35 $) $Date: 2005/06/25 07:01:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/24 13:40:40 $ by $Author: brian $
+# Last Modified $Date: 2005/06/25 07:01:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -488,7 +488,7 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_libexecdir}/%{name}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
 Obsoletes:      %{name}-tests
 #Conflicts:      %{_conflict}-test
 Autoreq:        true
@@ -635,9 +635,13 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 1.1.2.34  2005/06/24 13:40:40  brian
-# - some install/erase script corrections
+# Revision 1.1.2.35  2005/06/25 07:01:48  brian
+# - more efficient dependency checking
 #
+
+* Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.34  2005/06/24 13:40:40  brian
+- some install/erase script corrections
 
 * Tue May 31 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.33  2005/05/31 05:10:40  brian
