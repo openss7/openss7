@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/06/22 10:49:47 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/06/28 03:18:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/22 10:49:47 $ by $Author: brian $
+# Last Modified $Date: 2005/06/28 03:18:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -225,6 +225,21 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #endif
 #include <net/sock.h>
 ])
+    _LINUX_CHECK_MEMBERS([struct sock.sk_localroute,
+			  struct sock.sk_debug], [], [], [
+#include <linux/compiler.h>
+#include <linux/config.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#if HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <net/sock.h>
+])
+    _LINUX_KERNEL_SYMBOLS([sock_alloc,
+			   tcp_current_mss,
+			   tcp_set_skb_tso_segs], [], [])
 ])# _INET_CONFIG_KERNEL
 # =============================================================================
 

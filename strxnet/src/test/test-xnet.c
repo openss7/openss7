@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:07:13 $ by $Author: brian $
+ Last Modified $Date: 2005/06/28 03:18:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.16  2005/06/28 03:18:56  brian
+ - upgrading test suites
+
  Revision 0.9.2.15  2005/06/23 22:07:13  brian
  - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/23 22:07:13 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -183,6 +186,7 @@ static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <time.h>
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -238,6 +242,8 @@ static int last_sequence = 1;
 static int last_servtype = T_COTS_ORD;
 static int last_provflag = T_SENDZERO | T_ORDRELDATA | T_XPG4_1;
 static int last_tstate = TS_UNBND;
+struct T_info_ack last_info = { 0, };
+static int last_prio = 0;
 
 static int MORE_flag = 0;
 static int DATA_flag = T_ODF_EX | T_ODF_MORE;
@@ -248,10 +254,10 @@ int test_fd[3] = { 0, 0, 0 };
 
 #define FFLUSH(stream)
 
-#define SHORT_WAIT 100		// 10
-#define NORMAL_WAIT 500		// 100
-#define LONG_WAIT 5000		// 500
-#define LONGER_WAIT 10000	// 5000
+#define SHORT_WAIT	  20	// 100		// 10
+#define NORMAL_WAIT	 100	// 500		// 100
+#define LONG_WAIT	 500	// 5000		// 500
+#define LONGER_WAIT	1000	// 10000	// 5000
 
 
 char cbuf[BUFSIZE];
@@ -274,6 +280,9 @@ static socklen_t test_alen = sizeof(*test_addr);
 static const char *test_data = NULL;
 static int test_resfd = -1;
 static int test_timout = 200;
+static void *test_opts = NULL;
+static int test_olen = 0;
+static int test_prio = 1;
 
 struct strfdinsert fdi = {
 	{BUFSIZE, 0, cbuf},
@@ -396,6 +405,7 @@ enum {
 	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
+	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
 };
 
 /*
@@ -555,7 +565,7 @@ static int check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int time_event(int event)
+static int time_event(int child, int event)
 {
 	if (verbose > 4) {
 		float t, m;
@@ -568,7 +578,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |  | %11.6g                    |                   <%d>\n", t, state);
+		fprintf(stdout, "                    |  | %11.6g                    |                    <%d:%03d>\n", t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -681,16 +691,24 @@ struct {
 	{ sizeof(struct t_opthdr) + sizeof(t_scalar_t), XTI_GENERIC, XTI_SNDBUF, T_SUCCESS} , 32767
 };
 
-#if 1
-typeof(opt_data) *test_opt_data = NULL;
-typeof(opt_conn) *test_opt_conn = NULL;
-typeof(opt_optm) *test_opt_optm = NULL;
-#endif
-#if 0
-typeof(opt_data) *test_opt_data = &opt_data;
-typeof(opt_conn) *test_opt_conn = &opt_conn;
-typeof(opt_optm) *test_opt_optm = &opt_optm;
-#endif
+struct t_opthdr *find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
+{
+	const char *opt_ptr = cmd_buf + opt_ofs;
+	struct t_opthdr *oh = NULL;
+	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+		int len = oh->len - sizeof(*oh);
+		if (len < 0) {
+			oh = NULL;
+			break;
+		}
+		if (oh->level != level)
+			continue;
+		if (oh->name != name)
+			continue;
+		break;
+	}
+	return (oh);
+}
 
 /*
  *  -------------------------------------------------------------------------
@@ -1277,6 +1295,20 @@ const char *ioctl_string(int cmd, intptr_t arg)
 	}
 }
 
+const char *service_type(ulong type)
+{
+	switch (type) {
+	case T_CLTS:
+		return ("T_CLTS");
+	case T_COTS:
+		return ("T_COTS");
+	case T_COTS_ORD:
+		return ("T_COTS_ORD");
+	default:
+		return ("(unknown)");
+	}
+}
+
 const char *state_string(ulong state)
 {
 	switch (state) {
@@ -1366,13 +1398,16 @@ void print_addrs(int fd, char *add_ptr, size_t add_len)
 void print_addr(char *add_ptr, size_t add_len)
 {
 	struct sockaddr_in *a = (struct sockaddr_in *) add_ptr;
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	if (add_len) {
 		if (add_len != sizeof(*a))
-			printf("Aaarrg! add_len = %d, ", add_len);
-		printf("%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
+			fprintf(stdout, "Aaarrg! add_len = %d, ", add_len);
+		fprintf(stdout, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
-		printf("(no address)");
-	printf("\n");
+		fprintf(stdout, "(no address)");
+	fprintf(stdout, "\n");
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 char *addr_string(char *add_ptr, size_t add_len)
@@ -1386,8 +1421,27 @@ char *addr_string(char *add_ptr, size_t add_len)
 		len += snprintf(buf + len, sizeof(buf) - len, "%d.%d.%d.%d:%d", (a->sin_addr.s_addr >> 0) & 0xff, (a->sin_addr.s_addr >> 8) & 0xff, (a->sin_addr.s_addr >> 16) & 0xff, (a->sin_addr.s_addr >> 24) & 0xff, ntohs(a->sin_port));
 	} else
 		len += snprintf(buf + len, sizeof(buf) - len, "(no address)");
-	/* snprintf(buf + len, sizeof(buf) - len, "\0"); */
+	/* len += snprintf(buf + len, sizeof(buf) - len, "\0"); */
 	return buf;
+}
+void print_addrs(int fd, char *add_ptr, size_t add_len)
+{
+	struct sockaddr_in *sin;
+	if (verbose < 3)
+		return;
+	for (sin = (typeof(sin)) add_ptr; add_len >= sizeof(*sin); sin++, add_len -= sizeof(*sin)) {
+		char buf[128];
+		snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", (sin->sin_addr.s_addr >> 0) & 0xff, (sin->sin_addr.s_addr >> 8) & 0xff, (sin->sin_addr.s_addr >> 16) & 0xff, (sin->sin_addr.s_addr >> 24) & 0xff, ntohs(sin->sin_port));
+		if (fd == test_fd[0]) {
+			fprintf(stdout, "%-20s|  |                               |                    \n", buf);
+		}
+		if (fd == test_fd[1]) {
+			fprintf(stdout, "                    |  |                               |     %-15s\n", buf);
+		}
+		if (fd == test_fd[2]) {
+			fprintf(stdout, "                    |  |                               |     %-15s\n", buf);
+		}
+	}
 }
 #endif
 
@@ -1629,7 +1683,7 @@ char *number_string(struct t_opthdr *oh)
 	return (buf);
 }
 
-char *value_string(struct t_opthdr *oh)
+char *value_string(int child, struct t_opthdr *oh)
 {
 #if 0
 	static char buf[64] = "(invalid)";
@@ -1695,7 +1749,7 @@ char *value_string(struct t_opthdr *oh)
 				snprintf(buf, sizeof(buf), "%lu", (ulong) *((t_uscalar_t *) T_OPT_DATA(oh)));
 			return buf;
 		case T_TCP_KEEPALIVE:
-			return yesno_string(oh);
+			break;
 		case T_TCP_CORK:
 			return yesno_string(oh);
 		case T_TCP_KEEPIDLE:
@@ -1727,7 +1781,7 @@ char *value_string(struct t_opthdr *oh)
 		case T_SCTP_PPI:
 			return number_string(oh);;
 		case T_SCTP_SID:
-			sid[fd] = *((t_uscalar_t *) T_OPT_DATA(oh));
+			/* sid[child] = *((t_uscalar_t *) T_OPT_DATA(oh)); */
 			return number_string(oh);;
 		case T_SCTP_SSN:
 		case T_SCTP_TSN:
@@ -2034,17 +2088,17 @@ void print_less(int child)
 	switch (child) {
 	case 0:
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                    [%d]\n", state);
+		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
 		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
 		break;
 	case 1:
 		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
 		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
 		break;
 	case 2:
 		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .   [%d]\n", state);
+		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
 		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
 		break;
 	}
@@ -2079,6 +2133,14 @@ void print_double_int(int child, const char *msgs[], int val, int val2)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	fprintf(stdout, msgs[child], val, val2);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_triple_int(int child, const char *msgs[], int val, int val2, int val3)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], val, val2, val3);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -2131,23 +2193,47 @@ void print_preamble(int child)
 	static const char *msgs[] = {
 		"--------------------+  +----------Preamble--------------+                   \n",
 		"                    +  +----------Preamble--------------+-------------------\n",
-		"                    +  +----------Preamble--------------+-------------------\n",
+		"                    +--+----------Preamble--------------+                   \n",
 		"--------------------+--+----------Preamble--------------+-------------------\n",
 	};
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
 
+void print_notapplicable(int child)
+{
+	static const char *msgs[] = {
+		"X-X-X-X-X-X-X-X-X-X-|  |-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"                    |  |-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+		"                    |X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|                    [%d:%03d]\n",
+		"X-X-X-X-X-X-X-X-X-X-|X-|-X-X-X NOT APPLICABLE -X-X-X-X-X|X-X-X-X-X-X-X-X-X-X [%d:%03d]\n",
+	};
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+}
+
+void print_skipped(int child)
+{
+	static const char *msgs[] = {
+		"::::::::::::::::::::|  |::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"                    |  |::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
+		"                    |::|::::::::: SKIPPED ::::::::::::::|                    [%d:%03d]\n",
+		"::::::::::::::::::::|::|::::::::: SKIPPED ::::::::::::::|::::::::::::::::::: [%d:%03d]\n",
+	};
+	if (verbose > 0)
+		print_double_int(child, msgs, child, state);
+}
+
 void print_inconclusive(int child)
 {
 	static const char *msgs[] = {
-		"????????????????????|  |??????? INCONCLUSIVE ???????????|                   [%d]\n",
-		"                    |  |??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
-		"                    |  |??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
-		"????????????????????|??|??????? INCONCLUSIVE ???????????|???????????????????[%d]\n",
+		"????????????????????|  |??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"                    |  |??????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
+		"                    |??|??????? INCONCLUSIVE ???????????|                    [%d:%03d]\n",
+		"????????????????????|??|??????? INCONCLUSIVE ???????????|??????????????????? [%d:%03d]\n",
 	};
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_test(int child)
@@ -2155,7 +2241,7 @@ void print_test(int child)
 	static const char *msgs[] = {
 		"--------------------+  +------------Test----------------+                   \n",
 		"                    +  +------------Test----------------+-------------------\n",
-		"                    +  +------------Test----------------+-------------------\n",
+		"                    +--+------------Test----------------+                   \n",
 		"--------------------+--+------------Test----------------+-------------------\n",
 	};
 	if (verbose > 0)
@@ -2165,37 +2251,37 @@ void print_test(int child)
 void print_failed(int child)
 {
 	static const char *msgs[] = {
-		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
-		"                    |  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX[%d]\n",
-		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                   [%d]\n",
-		"XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX[%d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"                    |  |XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
+		"                    |XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|                    [%d:%03d]\n",
+		"XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXXX FAILED XXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX [%d:%03d]\n",
 	};
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_script_error(int child)
 {
 	static const char *msgs[] = {
-		"####################|  |######## SCRIPT ERROR ##########|                   [%d]\n",
-		"                    |  |######## SCRIPT ERROR ##########|###################[%d]\n",
-		"                    |##|######## SCRIPT ERROR ##########|                   [%d]\n",
-		"####################|##|######## SCRIPT ERROR ##########|###################[%d]\n",
+		"####################|  |######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"                    |  |######## SCRIPT ERROR ##########|################### [%d:%03d]\n",
+		"                    |##|######## SCRIPT ERROR ##########|                    [%d:%03d]\n",
+		"####################|##|######## SCRIPT ERROR ##########|################### [%d:%03d]\n",
 	};
 	if (verbose > 0)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_passed(int child)
 {
 	static const char *msgs[] = {
-		"********************|  |********** PASSED **************|                   [%d]\n",
-		"                    |  |********** PASSED **************|*******************[%d]\n",
-		"                    |**|********** PASSED **************|                   [%d]\n",
-		"********************|**|********** PASSED **************|*******************[%d]\n",
+		"********************|  |********** PASSED **************|                    [%d:%03d]\n",
+		"                    |  |********** PASSED **************|******************* [%d:%03d]\n",
+		"                    |**|********** PASSED **************|                    [%d:%03d]\n",
+		"********************|**|********** PASSED **************|******************* [%d:%03d]\n",
 	};
 	if (verbose > 2)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_postamble(int child)
@@ -2215,7 +2301,7 @@ void print_test_end(int child)
 	static const char *msgs[] = {
 		"--------------------+  +--------------------------------+                   \n",
 		"                    +  +--------------------------------+-------------------\n",
-		"                    +--+--------------------------------+-------------------\n",
+		"                    +--+--------------------------------+                   \n",
 		"--------------------+--+--------------------------------+-------------------\n",
 	};
 	if (verbose > 0)
@@ -2225,37 +2311,37 @@ void print_test_end(int child)
 void print_terminated(int child, int signal)
 {
 	static const char *msgs[] = {
-		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                   {%d}\n",
-		"                    |  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
-		"                    |@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
-		"@@@@@@@@@@@@@@@@@@@@|@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@{%d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"                    |  |@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
+		"                    |@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|                    {%d:%03d}\n",
+		"@@@@@@@@@@@@@@@@@@@@|@@|@@@@@@@@ TERMINATED @@@@@@@@@@@@|@@@@@@@@@@@@@@@@@@@ {%d:%03d}\n",
 	};
 	if (verbose > 0)
-		print_simple_int(child, msgs, signal);
+		print_double_int(child, msgs, child, signal);
 }
 
 void print_stopped(int child, int signal)
 {
 	static const char *msgs[] = {
-		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
-		"                    |  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
-		"                    |&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                   {%d}\n",
-		"&&&&&&&&&&&&&&&&&&&&|&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&&{%d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"                    |  |&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
+		"                    |&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|                    {%d:%03d}\n",
+		"&&&&&&&&&&&&&&&&&&&&|&&|&&&&&&&&& STOPPED &&&&&&&&&&&&&&|&&&&&&&&&&&&&&&&&&& {%d:%03d}\n",
 	};
 	if (verbose > 0)
-		print_simple_int(child, msgs, signal);
+		print_double_int(child, msgs, child, signal);
 }
 
 void print_timeout(int child)
 {
 	static const char *msgs[] = {
-		"++++++++++++++++++++|  |+++++++++ TIMEOUT! +++++++++++++|                   [%d]\n",
-		"                    |  |+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++[%d]\n",
-		"                    |++|+++++++++ TIMEOUT! +++++++++++++|                   [%d]\n",
-		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++[%d]\n",
+		"++++++++++++++++++++|  |+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"                    |  |+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
+		"                    |++|+++++++++ TIMEOUT! +++++++++++++|                    [%d:%03d]\n",
+		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 	if (show_timeout || verbose > 0) {
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
 }
@@ -2263,19 +2349,19 @@ void print_timeout(int child)
 void print_nothing(int child)
 {
 	static const char *msgs[] = {
-		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                   [%d]\n",
-		"                    |  |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
-		"                    |- |- - - - - nothing! - - - - - - -|                   [%d]\n",
-		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - -[%d]\n",
+		"- - - - - - - - - - |  |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
+		"                    |  |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
+		"                    |- |- - - - - nothing! - - - - - - -|                    [%d:%03d]\n",
+		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
 	if (verbose > 1)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_string_state(int child, const char *msgs[], const char *string)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, state);
+	fprintf(stdout, msgs[child], string, child, state);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -2283,10 +2369,10 @@ void print_string_state(int child, const char *msgs[], const char *string)
 void print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"  %-14s--->|  |                                |                   [%d]\n",
-		"                    |  |                                |<---%14s [%d]\n",
-		"                    |  |                                |<---%14s [%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"  %-14s--->|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<---%14s  [%d:%03d]\n",
+		"                    |  |                                |<---%14s  [%d:%03d]\n",
+		"                    |  |                                |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2295,10 +2381,10 @@ void print_syscall(int child, const char *command)
 void print_tx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"--%16s->|  |                                |                   [%d]\n",
-		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
-		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s-[%d]\n",
-		"                    |  |                                |                   [%d]\n",
+		"--%16s->|  |                                |                    [%d:%03d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
+		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
+		"                    |  |                                |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2307,10 +2393,10 @@ void print_tx_prim(int child, const char *command)
 void print_rx_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s--|  |                                |                   [%d]\n",
-		"                    |  |- - - - - - - - - - - - - - - ->|-%16s->[%d]\n",
-		"                    |  |- - - - - - - - - - - - - - - ->|-%16s->[%d]\n",
-		"                    |  |      <%16s>        |                   [%d]\n",
+		"<-%16s--|  |                                |                    [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|-%16s-> [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|-%16s-> [%d:%03d]\n",
+		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2319,10 +2405,10 @@ void print_rx_prim(int child, const char *command)
 void print_ack_prim(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"<-%16s-/|  |                                |                   [%d]\n",
-		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s->[%d]\n",
-		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s->[%d]\n",
-		"                    |  |      <%16s>        |                   [%d]\n",
+		"<-%16s-/|  |                                |                    [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s-> [%d:%03d]\n",
+		"                    |  |- - - - - - - - - - - - - - - ->|\\%16s-> [%d:%03d]\n",
+		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2331,7 +2417,7 @@ void print_ack_prim(int child, const char *command)
 void print_long_state(int child, const char *msgs[], long value)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], value, state);
+	fprintf(stdout, msgs[child], value, child, state);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -2339,10 +2425,10 @@ void print_long_state(int child, const char *msgs[], long value)
 void print_no_prim(int child, long prim)
 {
 	static const char *msgs[] = {
-		"????%4ld????  ?----?|  | ?- - - - - - - - - - - - - -? |                    [%d]\n",
-		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????   [%d]\n",
-		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????   [%d]\n",
-		"                    |  | ?- - - - - %4ld  - - - - - -? |                    [%d]\n",
+		"????%4ld????  ?----?|  | ?- - - - - - - - - - - - - -? |                     [%d:%03d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    |  | ?- - - - - - - - - - - - - -? |?--? ????%4ld????    [%d:%03d]\n",
+		"                    |  | ?- - - - - %4ld  - - - - - -? |                     [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_long_state(child, msgs, prim);
@@ -2351,7 +2437,7 @@ void print_no_prim(int child, long prim)
 void print_string_int_state(int child, const char *msgs[], const char *string, int val)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, val, state);
+	fprintf(stdout, msgs[child], string, val, child, state);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -2359,10 +2445,10 @@ void print_string_int_state(int child, const char *msgs[], const char *string, i
 void print_rx_data(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"<-%1$16s--|  |  %2$4d bytes                    |                   [%3$d]\n",
-		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s>[%3$d]\n",
-		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s>[%3$d]\n",
-		"                    |  |  %2$4d bytes  %1$16s  |                   [%3$d]\n",
+		"<-%1$16s--|  |  %2$4d bytes                    |                    [%3$d:%4$03d]\n",
+		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |  |- %2$4d bytes - - - - - - - - - >|--%1$16s> [%3$d:%4$03d]\n",
+		"                    |  |  %2$4d bytes  %1$16s  |                    [%3$d:%4$03d]\n",
 	};
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
@@ -2371,10 +2457,10 @@ void print_rx_data(int child, const char *command, size_t bytes)
 void print_errno(int child, long error)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|  |                                |                   [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |       [%14s]         |                   [%d]\n",
+		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 	if (verbose > 3)
 		print_string_state(child, msgs, errno_string(error));
@@ -2383,34 +2469,34 @@ void print_errno(int child, long error)
 void print_success(int child)
 {
 	static const char *msgs[] = {
-		"  ok          <----/|  |                                |                   [%d]\n",
-		"                    |  |                                |\\---->         ok  [%d]\n",
-		"                    |  |                                |\\---->         ok  [%d]\n",
-		"                    |  |              ok                |                   [%d]\n",
+		"  ok          <----/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\---->         ok   [%d:%03d]\n",
+		"                    |  |                                |\\---->         ok   [%d:%03d]\n",
+		"                    |  |              ok                |                    [%d:%03d]\n",
 	};
 	if (verbose > 4)
-		print_simple_int(child, msgs, state);
+		print_double_int(child, msgs, child, state);
 }
 
 void print_success_value(int child, int value)
 {
 	static const char *msgs[] = {
-		"  %10d  <----/|  |                                |                   [%d]\n",
-		"                    |  |                                |\\---->  %10d [%d]\n",
-		"                    |  |                                |\\---->  %10d [%d]\n",
-		"                    |  |         [%10d]           |                   [%d]\n",
+		"  %10d  <----/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\---->  %10d  [%d:%03d]\n",
+		"                    |  |                                |\\---->  %10d  [%d:%03d]\n",
+		"                    |  |         [%10d]           |                    [%d:%03d]\n",
 	};
 	if (verbose)
-		print_double_int(child, msgs, value, state);
+		print_triple_int(child, msgs, value, child, state);
 }
 
 void print_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	static const char *msgs[] = {
-		"--ioctl(2)--------->|  |    %16s            |                   [%d]\n",
-		"                    |  |    %16s            |<---ioctl(2)------ [%d]\n",
-		"                    |  |    %16s            |<---ioctl(2)------ [%d]\n",
-		"                    |  |    %16s ioctl(2)   |                   [%d]\n",
+		"--ioctl(2)--------->|  |    %16s            |                    [%d:%03d]\n",
+		"                    |  |    %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |  |    %16s            |<---ioctl(2)------  [%d:%03d]\n",
+		"                    |  |    %16s ioctl(2)   |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
@@ -2425,10 +2511,10 @@ void print_ioctl(int child, int cmd, intptr_t arg)
 void print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
-		"  %1$16s->|- | %2$4d bytes- - - - - - - - - - >|                   [%3$d]\n",
-		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s [%3$d]\n",
-		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s [%3$d]\n",
-		"                    |< + %2$4d bytes %1$16s |  |                   [%3$d]\n",
+		"  %1$16s->|- | %2$4d bytes- - - - - - - - - - >|                    [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes- - - - - - - - - - -|<-%1$16s  [%3$d:%4$03d]\n",
+		"                    |< + %2$4d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 	if ((verbose && show_data) || verbose > 1)
 		print_string_int_state(child, msgs, command, bytes);
@@ -2437,10 +2523,10 @@ void print_datcall(int child, const char *command, size_t bytes)
 void print_libcall(int child, const char *command)
 {
 	static const char *msgs[] = {
-		"  %-16s->|  |                                |                   [%d]\n",
-		"                    |  |                                |<-%16s [%d]\n",
-		"                    |  |                                |<-%16s [%d]\n",
-		"                    |  |     [%16s]         |                   [%d]\n",
+		"  %-16s->|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<-%16s  [%d:%03d]\n",
+		"                    |  |                                |<-%16s  [%d:%03d]\n",
+		"                    |  |     [%16s]         |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2449,10 +2535,10 @@ void print_libcall(int child, const char *command)
 void print_terror(int child, long error, long terror)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|  |                                |                   [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |       [%14s]         |                   [%d]\n",
+		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, t_errno_string(terror, error));
@@ -2461,10 +2547,10 @@ void print_terror(int child, long error, long terror)
 void print_tlook(int child, int tlook)
 {
 	static const char *msgs[] = {
-		"  %-14s<--/|  |                                |                   [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |                                |\\-->%14s [%d]\n",
-		"                    |  |       [%14s]         |                   [%d]\n",
+		"  %-14s<--/|  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |                                |\\-->%14s  [%d:%03d]\n",
+		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, t_look_string(tlook));
@@ -2473,10 +2559,10 @@ void print_tlook(int child, int tlook)
 void print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		" (%-16s) |  | - - - -[Expected]- - - - - - - |                    [%d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d]\n",
-		"                    |- |- [Expected %-16s ] -|                    [%d]\n",
+		" (%-16s) |  | - - - -[Expected]- - - - - - - |                     [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
+		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
 	};
 	if (verbose > 1 && show)
 		print_string_state(child, msgs, event_string(want));
@@ -2497,7 +2583,7 @@ void print_string(int child, const char *string)
 void print_time_state(int child, const char *msgs[], ulong time)
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], time, state);
+	fprintf(stdout, msgs[child], time, child, state);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -2505,13 +2591,38 @@ void print_time_state(int child, const char *msgs[], ulong time)
 void print_waiting(int child, ulong time)
 {
 	static const char *msgs[] = {
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                   [%d]\n",
-		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
-		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
-		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / / [%d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"                    |  |/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
+		"                    | /|/ / Waiting %03lu seconds / / / / |                    [%d:%03d]\n",
+		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
+}
+
+void print_float_state(int child, const char *msgs[], float time)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], time, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void print_mwaiting(int child, struct timespec *time)
+{
+	static const char *msgs[] = {
+		"/ / / / / / / / / / |  |/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
+		"                    |  |/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
+		"                    | /|/ Waiting %8.4f seconds / / /|                    [%d:%03d]\n",
+		"/ / / / / / / / / / | /|/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
+	};
+	if (verbose > 0 && show) {
+		float delay;
+		delay = time->tv_nsec;
+		delay = delay / 1000000000;
+		delay = delay + time->tv_sec;
+		print_float_state(child, msgs, delay);
+	}
 }
 
 void print_mgmtflag(int child, t_uscalar_t flag)
@@ -2537,26 +2648,77 @@ void print_opt_status(int child, struct t_opthdr *oh)
 	if (status)
 		print_string(child, status);
 }
+void print_opt_length(int child, struct t_opthdr *oh)
+{
+	int len = oh->len - sizeof(*oh);
+	if (len) {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "(len=%d)", len);
+		print_string(child, buf);
+	}
+}
 void print_opt_value(int child, struct t_opthdr *oh)
 {
-	char *value = value_string(oh);
+	char *value = value_string(child, oh);
 	if (value)
 		print_string(child, value);
 }
-void print_options(int child, char *opt_ptr, size_t opt_len)
+void print_options(int child, const char *cmd_buf, size_t opt_ofs, size_t opt_len)
 {
 	struct t_opthdr *oh;
+	const char *opt_ptr = cmd_buf + opt_ofs;
+	char buf[64];
 	if (verbose < 4)
 		return;
-	for (oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
-		int len = oh->len - sizeof(*oh);
-		if (len < 0)
-			break;
+	snprintf(buf, sizeof(buf), "opt len = %d", opt_len);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "opt ofs = %d", opt_ofs);
+	print_string(child, buf);
+	oh = _T_OPT_FIRSTHDR_OFS(opt_ptr, opt_len, 0);
+	if (oh) {
+		for (; oh; oh = _T_OPT_NEXTHDR_OFS(opt_ptr, opt_len, oh, 0)) {
+			int len = oh->len - sizeof(*oh);
+			print_opt_level(child, oh);
+			print_opt_name(child, oh);
+			print_opt_status(child, oh);
+			print_opt_length(child, oh);
+			if (len < 0)
+				break;
+			print_opt_value(child, oh);
+		}
+	} else {
+		oh = (typeof(oh)) opt_ptr;
 		print_opt_level(child, oh);
 		print_opt_name(child, oh);
 		print_opt_status(child, oh);
-		print_opt_value(child, oh);
+		print_opt_length(child, oh);
 	}
+}
+
+void print_info(int child, struct T_info_ack *info) {
+	char buf[64];
+	if (verbose < 4)
+		return;
+	snprintf(buf, sizeof(buf), "TSDU  = %ld", (long) info->TSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ETSDU = %ld", (long) info->ETSDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "CDATA = %ld", (long) info->CDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "DDATA = %ld", (long) info->DDATA_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "ADDR  = %ld", (long) info->ADDR_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "OPT   = %ld", (long) info->OPT_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "TIDU  = %ld", (long) info->TIDU_size);
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", service_type(info->SERV_type));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "<%s>", state_string(info->CURRENT_state));
+	print_string(child, buf);
+	snprintf(buf, sizeof(buf), "PROV  = %ld", (long) info->PROVIDER_flag);
+	print_string(child, buf);
 }
 
 /*
@@ -2986,7 +3148,7 @@ static int begin_tests(int index)
 	return __RESULT_FAILURE;
 }
 
-static int end_tests(void)
+static int end_tests(int index)
 {
 	show_acks = 0;
 	if (stream_stop(2) != __RESULT_SUCCESS)
@@ -3014,7 +3176,7 @@ static int end_tests(void)
 static int do_signal(int child, int action)
 {
 	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
-	char cbuf[256], dbuf[256];
+	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
 	ic.ic_cmd = 0;
@@ -3029,7 +3191,7 @@ static int do_signal(int child, int action)
 	test_pband = 0;
 	switch (action) {
 	case __TEST_WRITE:
-		data->len = sprintf(dbuf, "Write test data.");
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Write test data.");
 		return test_write(child, dbuf, data->len);
 	case __TEST_WRITEV:
 	{
@@ -3056,38 +3218,38 @@ static int do_signal(int child, int action)
 		return test_block(child);
 	case __TEST_PUTMSG_DATA:
 		ctrl = NULL;
-		data->len = sprintf(dbuf, "Putmsg test data.");
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Putmsg test data.");
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_PUTPMSG_DATA:
 		ctrl = NULL;
-		data->len = sprintf(dbuf, "Putpmsg band test data.");
+		data->len = snprintf(dbuf, BUFSIZE, "%s", "Putpmsg band test data.");
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_REQ:
 		ctrl->len = sizeof(p->conn_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opt_conn ? sizeof(*test_opt_conn) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->conn_req.PRIM_type = T_CONN_REQ;
 		p->conn_req.DEST_length = test_addr ? test_alen : 0;
 		p->conn_req.DEST_offset = test_addr ? sizeof(p->conn_req) : 0;
-		p->conn_req.OPT_length = test_opt_conn ? sizeof(*test_opt_conn) : 0;
-		p->conn_req.OPT_offset = test_opt_conn ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
+		p->conn_req.OPT_length = test_opts ? test_olen : 0;
+		p->conn_req.OPT_offset = test_opts ? sizeof(p->conn_req) + p->conn_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->conn_req.DEST_offset, p->conn_req.DEST_length);
-		if (test_opt_conn)
-			bcopy(test_opt_conn, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		print_string(child, addr_string(cbuf + p->conn_req.DEST_offset, p->conn_req.DEST_length));
-		print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+		print_options(child, cbuf, p->conn_req.OPT_offset, p->conn_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
 		ctrl->len = sizeof(p->conn_ind);
@@ -3097,27 +3259,33 @@ static int do_signal(int child, int action)
 		p->conn_ind.OPT_length = 0;
 		p->conn_ind.OPT_offset = 0;
 		p->conn_ind.SEQ_number = last_sequence;
-		data->len = sprintf(dbuf, "Connection indication test data.");
-		test_pflags = MSG_BAND;
-		test_pband = 0;
-		print_tx_prim(child, prim_string(p->type));
-		print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
-		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
-	case __TEST_CONN_RES:
-		ctrl->len = sizeof(p->conn_res);
-		p->conn_res.PRIM_type = T_CONN_RES;
-		p->conn_res.ACCEPTOR_id = 0;
-		p->conn_res.OPT_length = 0;
-		p->conn_res.OPT_offset = 0;
-		p->conn_res.SEQ_number = last_sequence;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-		print_options(child, cbuf + p->conn_res.OPT_offset, p->conn_res.OPT_length);
+		print_options(child, cbuf, p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_CONN_RES:
+		ctrl->len = sizeof(p->conn_res)
+			+ (test_opts ? test_olen : 0);
+		p->conn_res.PRIM_type = T_CONN_RES;
+		p->conn_res.ACCEPTOR_id = 0;
+		p->conn_res.OPT_length = test_opts ? test_olen : 0;
+		p->conn_res.OPT_offset = test_opts ? sizeof(p->conn_res) : 0;
+		p->conn_res.SEQ_number = last_sequence;
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->conn_res.OPT_offset, p->conn_res.OPT_length);
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		print_options(child, cbuf, p->conn_res.OPT_offset, p->conn_res.OPT_length);
 		if (test_resfd == -1)
 			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 		else
@@ -3129,18 +3297,21 @@ static int do_signal(int child, int action)
 		p->conn_con.RES_offset = 0;
 		p->conn_con.OPT_length = 0;
 		p->conn_con.OPT_offset = 0;
-		data->len = sprintf(dbuf, "Connection confirmation test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
-		print_options(child, cbuf + p->conn_con.OPT_offset, p->conn_con.OPT_length);
+		print_options(child, cbuf, p->conn_con.OPT_offset, p->conn_con.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_DISCON_REQ:
 		ctrl->len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
@@ -3152,7 +3323,10 @@ static int do_signal(int child, int action)
 		p->discon_ind.PRIM_type = T_DISCON_IND;
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.SEQ_number = last_sequence;
-		data->len = sprintf(dbuf, "Disconnection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3162,7 +3336,7 @@ static int do_signal(int child, int action)
 		p->data_req.PRIM_type = T_DATA_REQ;
 		p->data_req.MORE_flag = MORE_flag;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
@@ -3173,7 +3347,10 @@ static int do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_ind);
 		p->data_ind.PRIM_type = T_DATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = sprintf(dbuf, "Normal test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3183,7 +3360,7 @@ static int do_signal(int child, int action)
 		p->exdata_req.PRIM_type = T_EXDATA_REQ;
 		p->exdata_req.MORE_flag = MORE_flag;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
@@ -3194,7 +3371,10 @@ static int do_signal(int child, int action)
 		ctrl->len = sizeof(p->exdata_ind);
 		p->data_ind.PRIM_type = T_EXDATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = sprintf(dbuf, "Expedited test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		print_tx_prim(child, prim_string(p->type));
@@ -3224,6 +3404,7 @@ static int do_signal(int child, int action)
 		test_pflags = MSG_HIPRI;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
+		print_info(child, &p->info_ack);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
 		ctrl->len = sizeof(p->bind_req) + (test_addr ? test_alen : 0);
@@ -3283,25 +3464,25 @@ static int do_signal(int child, int action)
 	case __TEST_UNITDATA_REQ:
 		ctrl->len = sizeof(p->unitdata_req)
 		    + (test_addr ? test_alen : 0)
-		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->unitdata_req.PRIM_type = T_UNITDATA_REQ;
 		p->unitdata_req.DEST_length = test_addr ? test_alen : 0;
 		p->unitdata_req.DEST_offset = test_addr ? sizeof(p->unitdata_req) : 0;
-		p->unitdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
-		p->unitdata_req.OPT_offset = test_opt_data ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
+		p->unitdata_req.OPT_length = test_opts ? test_olen : 0;
+		p->unitdata_req.OPT_offset = test_opts ? sizeof(p->unitdata_req) + p->unitdata_req.DEST_length : 0;
 		if (test_addr)
 			bcopy(test_addr, ctrl->buf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length);
-		if (test_opt_data)
-			bcopy(test_opt_data, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
-		print_options(child, cbuf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+		print_options(child, cbuf, p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UNITDATA_IND:
 		ctrl->len = sizeof(p->unitdata_ind);
@@ -3310,12 +3491,15 @@ static int do_signal(int child, int action)
 		p->unitdata_ind.SRC_offset = 0;
 		p->unitdata_ind.OPT_length = 0;
 		p->unitdata_ind.OPT_offset = 0;
-		data->len = sprintf(dbuf, "Unit test data indication.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
-		print_options(child, cbuf + p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
+		print_options(child, cbuf, p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_UDERROR_IND:
 		ctrl->len = sizeof(p->uderror_ind);
@@ -3332,19 +3516,19 @@ static int do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTMGMT_REQ:
 		ctrl->len = sizeof(p->optmgmt_req)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		print_mgmtflag(child, p->optmgmt_req.MGMT_flags);
-		print_options(child, cbuf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		print_options(child, cbuf, p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTMGMT_ACK:
 		ctrl->len = sizeof(p->optmgmt_ack);
@@ -3354,13 +3538,13 @@ static int do_signal(int child, int action)
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		print_mgmtflag(child, p->optmgmt_ack.MGMT_flags);
-		print_options(child, cbuf + p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
+		print_options(child, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_ORDREL_REQ:
 		ctrl->len = sizeof(p->ordrel_req);
 		p->ordrel_req.PRIM_type = T_ORDREL_REQ;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
 		test_pflags = MSG_BAND;
@@ -3370,24 +3554,27 @@ static int do_signal(int child, int action)
 	case __TEST_ORDREL_IND:
 		ctrl->len = sizeof(p->ordrel_ind);
 		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-		data->len = sprintf(dbuf, "Orderly release indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_OPTDATA_REQ:
 		ctrl->len = sizeof(p->optdata_req)
-		    + (test_opt_data ? sizeof(*test_opt_data) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optdata_req.PRIM_type = T_OPTDATA_REQ;
 		p->optdata_req.DATA_flag = DATA_flag;
-		p->optdata_req.OPT_length = test_opt_data ? sizeof(*test_opt_data) : 0;
-		p->optdata_req.OPT_offset = test_opt_data ? sizeof(p->optdata_req) : 0;
+		p->optdata_req.OPT_length = test_opts ? test_olen : 0;
+		p->optdata_req.OPT_offset = test_opts ? sizeof(p->optdata_req) : 0;
 		if (test_data)
-			data->len = sprintf(dbuf, test_data);
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
 		else
 			data = NULL;
-		if (test_opt_data)
-			bcopy(test_opt_data, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 		test_pflags = MSG_BAND;
 		test_pband = (DATA_flag & T_ODF_EX) ? 1 : 0;
 		if (p->optdata_req.DATA_flag & T_ODF_EX) {
@@ -3401,7 +3588,7 @@ static int do_signal(int child, int action)
 			else
 				print_tx_prim(child, "T_OPTDATA_REQ   ");
 		}
-		print_options(child, cbuf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+		print_options(child, cbuf, p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_NRM_OPTDATA_IND:
 		ctrl->len = sizeof(p->optdata_ind);
@@ -3409,14 +3596,17 @@ static int do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = 0;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = sprintf(dbuf, "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
 			print_tx_prim(child, "T_OPTDATA_IND+  ");
 		else
 			print_tx_prim(child, "T_OPTDATA_IND   ");
-		print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+		print_options(child, cbuf, p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_EXP_OPTDATA_IND:
 		ctrl->len = sizeof(p->optdata_ind);
@@ -3424,14 +3614,17 @@ static int do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = T_ODF_EX;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = sprintf(dbuf, "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
 			print_tx_prim(child, "T_OPTDATA_IND!+ ");
 		else
 			print_tx_prim(child, "T_OPTDATA_IND!  ");
-		print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+		print_options(child, cbuf, p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_ADDR_REQ:
 		ctrl->len = sizeof(p->addr_req);
@@ -3460,7 +3653,7 @@ static int do_signal(int child, int action)
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
 		data = NULL;
-		test_pflags = MSG_HIPRI;
+		test_pflags = test_prio ? MSG_HIPRI : MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
@@ -3584,7 +3777,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3599,7 +3792,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvcall.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", test_rcvcall.udata.len, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3614,7 +3807,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", test_rcvdis.udata.len, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3629,7 +3822,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", 0, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", 0, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3644,7 +3837,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvdis.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", test_rcvdis.udata.len, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3659,7 +3852,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", test_rcvudata.udata.len, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3691,7 +3884,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", last_retval, test_rcvflags & T_MORE ? '+' : '$', test_rcvflags & T_EXPEDITED ? '!' : ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3714,7 +3907,7 @@ static int do_signal(int child, int action)
 		}
 		if (verbose) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                   [%d]\n", test_rcvudata.udata.len, ' ', ' ', state);
+			fprintf(stdout, "  %4d bytes%c%c      |  |                                |                    [%d:%03d]\n", test_rcvudata.udata.len, ' ', ' ', child, state);
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
@@ -3834,13 +4027,13 @@ static int do_signal(int child, int action)
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
@@ -3863,13 +4056,13 @@ static int do_signal(int child, int action)
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
@@ -3922,13 +4115,13 @@ static int do_signal(int child, int action)
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
-		    + (test_opt_optm ? sizeof(*test_opt_optm) : 0);
+		    + (test_opts ? test_olen : 0);
 		p->optmgmt_req.PRIM_type = T_OPTMGMT_REQ;
-		p->optmgmt_req.OPT_length = test_opt_optm ? sizeof(*test_opt_optm) : 0;
-		p->optmgmt_req.OPT_offset = test_opt_optm ? sizeof(p->optmgmt_req) : 0;
+		p->optmgmt_req.OPT_length = test_opts ? test_olen : 0;
+		p->optmgmt_req.OPT_offset = test_opts ? sizeof(p->optmgmt_req) : 0;
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
-		if (test_opt_optm)
-			bcopy(test_opt_optm, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+		if (test_opts)
+			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
@@ -4068,12 +4261,12 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 		case T_CONN_REQ:
 			event = __TEST_CONN_REQ;
 			print_rx_prim(child, prim_string(p->type));
-			print_options(child, cbuf + p->conn_req.OPT_offset, p->conn_req.OPT_length);
+			print_options(child, cbuf, p->conn_req.OPT_offset, p->conn_req.OPT_length);
 			break;
 		case T_CONN_RES:
 			event = __TEST_CONN_RES;
 			print_rx_prim(child, prim_string(p->type));
-			print_options(child, cbuf + p->conn_res.OPT_offset, p->conn_res.OPT_length);
+			print_options(child, cbuf, p->conn_res.OPT_offset, p->conn_res.OPT_length);
 			break;
 		case T_DISCON_REQ:
 			event = __TEST_DISCON_REQ;
@@ -4107,13 +4300,13 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_UNITDATA_REQ;
 			print_rx_prim(child, prim_string(p->type));
 			print_string(child, addr_string(cbuf + p->unitdata_req.DEST_offset, p->unitdata_req.DEST_length));
-			print_options(child, cbuf + p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
+			print_options(child, cbuf, p->unitdata_req.OPT_offset, p->unitdata_req.OPT_length);
 			break;
 		case T_OPTMGMT_REQ:
 			event = __TEST_OPTMGMT_REQ;
 			print_rx_prim(child, prim_string(p->type));
 			print_mgmtflag(child, p->optmgmt_req.MGMT_flags);
-			print_options(child, cbuf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
+			print_options(child, cbuf, p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
 			break;
 		case T_ORDREL_REQ:
 			event = __TEST_ORDREL_REQ;
@@ -4132,7 +4325,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 				else
 					print_rx_prim(child, "T_OPTDATA_REQ   ");
 			}
-			print_options(child, cbuf + p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
+			print_options(child, cbuf, p->optdata_req.OPT_offset, p->optdata_req.OPT_length);
 			break;
 		case T_ADDR_REQ:
 			event = __TEST_ADDR_REQ;
@@ -4147,12 +4340,12 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			last_sequence = p->conn_ind.SEQ_number;
 			print_rx_prim(child, prim_string(p->type));
 			print_string(child, addr_string(cbuf + p->conn_ind.SRC_offset, p->conn_ind.SRC_length));
-			print_options(child, cbuf + p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
+			print_options(child, cbuf, p->conn_ind.OPT_offset, p->conn_ind.OPT_length);
 			break;
 		case T_CONN_CON:
 			event = __TEST_CONN_CON;
 			print_rx_prim(child, prim_string(p->type));
-			print_options(child, cbuf + p->conn_con.OPT_offset, p->conn_con.OPT_length);
+			print_options(child, cbuf, p->conn_con.OPT_offset, p->conn_con.OPT_length);
 			break;
 		case T_DISCON_IND:
 			event = __TEST_DISCON_IND;
@@ -4168,7 +4361,9 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_INFO_ACK:
 			event = __TEST_INFO_ACK;
+			last_info = p->info_ack;
 			print_ack_prim(child, prim_string(p->type));
+			print_info(child, &p->info_ack);
 			break;
 		case T_BIND_ACK:
 			event = __TEST_BIND_ACK;
@@ -4191,7 +4386,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_UNITDATA_IND;
 			print_rx_prim(child, prim_string(p->type));
 			print_string(child, addr_string(cbuf + p->unitdata_ind.SRC_offset, p->unitdata_ind.SRC_length));
-			print_options(child, cbuf + p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
+			print_options(child, cbuf, p->unitdata_ind.OPT_offset, p->unitdata_ind.OPT_length);
 			break;
 		case T_UDERROR_IND:
 			event = __TEST_UDERROR_IND;
@@ -4201,7 +4396,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_OPTMGMT_ACK;
 			print_ack_prim(child, prim_string(p->type));
 			print_mgmtflag(child, p->optmgmt_ack.MGMT_flags);
-			print_options(child, cbuf + p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
+			print_options(child, cbuf, p->optmgmt_ack.OPT_offset, p->optmgmt_ack.OPT_length);
 			break;
 		case T_ORDREL_IND:
 			event = __TEST_ORDREL_IND;
@@ -4221,7 +4416,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 				else
 					print_rx_prim(child, "T_OPTDATA_IND   ");
 			}
-			print_options(child, cbuf + p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
+			print_options(child, cbuf, p->optdata_ind.OPT_offset, p->optdata_ind.OPT_length);
 			break;
 		case T_ADDR_ACK:
 			event = __TEST_ADDR_ACK;
@@ -4231,6 +4426,7 @@ static int do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		case T_CAPABILITY_ACK:
 			event = __TEST_CAPABILITY_ACK;
+			last_info = p->capability_ack.INFO_ack;
 			print_ack_prim(child, prim_string(p->type));
 			break;
 		default:
@@ -4249,10 +4445,10 @@ static int do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	if (ctrl->len > 0) {
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
-			return time_event(last_event);
+			return time_event(child, last_event);
 	} else if (data->len > 0) {
 		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
-			return time_event(last_event);
+			return time_event(child, last_event);
 	}
 	return ((last_event = __EVENT_NO_MSG));
 }
@@ -4360,7 +4556,7 @@ int wait_event(int child, int wait)
 			timer_timeout = 0;
 			print_timeout(child);
 			last_event = __EVENT_TIMEOUT;
-			return time_event(__EVENT_TIMEOUT);
+			return time_event(child, __EVENT_TIMEOUT);
 		}
 		if (verbose > 4)
 			print_syscall(child, "poll()");
@@ -4378,7 +4574,7 @@ int wait_event(int child, int wait)
 				print_success(child);
 			print_nothing(child);
 			last_event = __EVENT_NO_MSG;
-			return time_event(__EVENT_NO_MSG);
+			return time_event(child, __EVENT_NO_MSG);
 		case 1:
 			if (verbose > 4)
 				print_success(child);
@@ -4414,8 +4610,9 @@ int wait_event(int child, int wait)
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					}
+					last_prio = (flags == RS_HIPRI);
 					if ((last_event = do_decode_msg(child, &ctrl, &data)) != __EVENT_NO_MSG)
-						return time_event(last_event);
+						return time_event(child, last_event);
 				}
 			}
 		default:
@@ -4495,6 +4692,15 @@ void test_sleep(int child, unsigned long t)
 	sleep(t);
 }
 
+void test_msleep(int child, unsigned long m)
+{
+	struct timespec time;
+	time.tv_sec = m / 1000;
+	time.tv_nsec = (m % 1000) * 1000000;
+	print_mwaiting(child, &time);
+	nanosleep(&time, NULL);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -4504,30 +4710,37 @@ void test_sleep(int child, unsigned long t)
  */
 static int preamble_0(int child)
 {
-	start_tt(1000);
+	start_tt(20000);
 	return (__RESULT_SUCCESS);
 }
 
 static int postamble_0(int child)
 {
-	stop_tt();
-	state++;
-	start_tt(1000);
-	for (;;) {
-		state++;
-		switch (wait_event(child, 0)) {
+	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			break;
 		case __EVENT_TIMEOUT:
 			break;
+		case __RESULT_FAILURE:
+			break;
 		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
 			continue;
 		}
 		break;
 	}
 	state++;
 	stop_tt();
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
 }
 
 static int preamble_1_top(int child)
@@ -4780,6 +4993,7 @@ static int preamble_3_bot(int child)
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4912,9 +5126,14 @@ static int preamble_2_conn(int child)
 	if (preamble_1s(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]);
 	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4924,7 +5143,7 @@ static int preamble_2_conn(int child)
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4936,7 +5155,7 @@ static int preamble_2_resp(int child)
 	if (preamble_1s(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4948,18 +5167,20 @@ static int preamble_2_list(int child)
 	if (preamble_1s(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
 	test_data = NULL;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4969,16 +5190,35 @@ static int preamble_2_list(int child)
 static int postamble_2_conn(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	test_data = NULL;
 	last_sequence = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4991,19 +5231,33 @@ static int postamble_2_conn(int child)
 static int postamble_2_resp(int child)
 {
 	int failed = -1;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		failed = (failed == -1) ? state : failed;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		case __TEST_DISCON_IND:
+			goto got_disconnect;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
 	state++;
-	test_data = NULL;
-	last_sequence = 0;
-	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
-	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		failed = (failed == -1) ? state : failed;
+      got_disconnect:
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5016,8 +5270,27 @@ static int postamble_2_resp(int child)
 static int postamble_2_list(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5033,9 +5306,14 @@ static int preamble_2b_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_addr = &addrs[1];
 	test_alen = sizeof(addrs[1]);
 	test_data = "Hello World";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5058,7 +5336,7 @@ static int preamble_2b_resp(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5071,11 +5349,13 @@ static int preamble_2b_list(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
 	test_data = "Hello There!";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5091,6 +5371,23 @@ static int preamble_2b_list(int child)
 static int postamble_3_conn(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
@@ -5107,6 +5404,8 @@ static int postamble_3_conn(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
+	stop_tt();
+	state++;
 	if (failed != -1)
 		goto failure;
 	return (__RESULT_SUCCESS);
@@ -5118,8 +5417,28 @@ static int postamble_3_conn(int child)
 static int postamble_3_resp(int child)
 {
 	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		case __TEST_ORDREL_IND:
+			goto got_release;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
+      got_release:
 	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
@@ -5136,6 +5455,8 @@ static int postamble_3_resp(int child)
 		if (postamble_1(child) != __RESULT_SUCCESS)
 			failed = (failed == -1) ? state : failed;
 	}
+	state++;
+	stop_tt();
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5298,6 +5619,7 @@ struct test_stream {
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
 #define name_case_1_1 "Normal push and pop sequence"
+#define sref_case_1_1 "(none)"
 #define desc_case_1_1 "\
 This test case tests the simple pushing and popping of the timod module.  It\n\
 ensures that pushing the module on an empty stream has no effect, while\n\
@@ -5344,6 +5666,7 @@ static struct test_stream test_1_1_bot = { &preamble_1_1_bot, &test_case_1_1_bot
 #define tgrp_case_1_2_1 test_group_2
 #define numb_case_1_2_1 "1.2.1"
 #define name_case_1_2_1 "Syncrhonization after \"timod\" pushed -- normal operation"
+#define sref_case_1_2_1 "(none)"
 #define desc_case_1_2_1 "\
 This test case tests syncrhonization of the XTI library to a file descriptor\n\
 on the test harness upon which the \"timod\" module has been pushed."
@@ -5391,6 +5714,7 @@ static struct test_stream test_1_2_1_bot = { &preamble_1_2_1_bot, &test_case_1_2
 #define tgrp_case_1_2_2 test_group_2
 #define numb_case_1_2_2 "1.2.2"
 #define name_case_1_2_2 "Syncrhonization after \"timod\" pushed -- closed file descriptor"
+#define sref_case_1_2_2 "(none)"
 #define desc_case_1_2_2 "\
 This test case tests synchronization of the XTI library to a file descriptor\n\
 that is closed."
@@ -5430,6 +5754,7 @@ static struct test_stream test_1_2_2_bot = { &preamble_1_2_2_bot, &test_case_1_2
 #define tgrp_case_1_2_3 test_group_2
 #define numb_case_1_2_3 "1.2.3"
 #define name_case_1_2_3 "Synchronization after \"timod\" pushed -- system error"
+#define sref_case_1_2_3 "(none)"
 #define desc_case_1_2_3 "\
 This test case tests synchronization of the XTI library to a file descriptor\n\
 on the test harness with a system error (ENOMEM)."
@@ -5477,6 +5802,7 @@ static struct test_stream test_1_2_3_bot = { &preamble_1_2_3_bot, &test_case_1_2
 #define tgrp_case_2_1_1 test_group_3
 #define numb_case_2_1_1 "2.1.1"
 #define name_case_2_1_1 "Successful bind operation"
+#define sref_case_2_1_1 "(none)"
 #define desc_case_2_1_1 "\
 This test case tests successful bind of the XTI stream."
 
@@ -5513,6 +5839,7 @@ static struct test_stream test_2_1_1_bot = { &preamble_2_1_1_bot, &test_case_2_1
 #define tgrp_case_2_1_2 test_group_3
 #define numb_case_2_1_2 "2.1.2"
 #define name_case_2_1_2 "Unsuccessful bind operation -- TACCES error"
+#define sref_case_2_1_2 "(none)"
 #define desc_case_2_1_2 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5561,6 +5888,7 @@ static struct test_stream test_2_1_2_bot = { &preamble_2_1_2_bot, &test_case_2_1
 #define tgrp_case_2_1_3 test_group_3
 #define numb_case_2_1_3 "2.1.3"
 #define name_case_2_1_3 "Unsuccessful bind operation -- TADDRBUSY error"
+#define sref_case_2_1_3 "(none)"
 #define desc_case_2_1_3 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5586,6 +5914,7 @@ static struct test_stream test_2_1_3_bot = { &preamble_2_1_3_bot, &test_case_2_1
 #define tgrp_case_2_1_4 test_group_3
 #define numb_case_2_1_4 "2.1.4"
 #define name_case_2_1_4 "Unsuccessful bind operation -- TBADADDR error"
+#define sref_case_2_1_4 "(none)"
 #define desc_case_2_1_4 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5611,6 +5940,7 @@ static struct test_stream test_2_1_4_bot = { &preamble_2_1_4_bot, &test_case_2_1
 #define tgrp_case_2_1_5 test_group_3
 #define numb_case_2_1_5 "2.1.5"
 #define name_case_2_1_5 "Unsuccessful bind operation -- TOUTSTATE error"
+#define sref_case_2_1_5 "(none)"
 #define desc_case_2_1_5 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5636,6 +5966,7 @@ static struct test_stream test_2_1_5_bot = { &preamble_2_1_5_bot, &test_case_2_1
 #define tgrp_case_2_1_6 test_group_3
 #define numb_case_2_1_6 "2.1.6"
 #define name_case_2_1_6 "Unsuccessful bind operation -- TNOADDR error"
+#define sref_case_2_1_6 "(none)"
 #define desc_case_2_1_6 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5661,6 +5992,7 @@ static struct test_stream test_2_1_6_bot = { &preamble_2_1_6_bot, &test_case_2_1
 #define tgrp_case_2_1_7 test_group_3
 #define numb_case_2_1_7 "2.1.7"
 #define name_case_2_1_7 "Unsuccessful bind operation -- TOUTSTATE error"
+#define sref_case_2_1_7 "(none)"
 #define desc_case_2_1_7 "\
 This test case test unsuccessful bind of the XTI stream."
 
@@ -5686,6 +6018,7 @@ static struct test_stream test_2_1_7_bot = { &preamble_2_1_7_bot, &test_case_2_1
 #define tgrp_case_2_1_8 test_group_3
 #define numb_case_2_1_8 "2.1.8"
 #define name_case_2_1_8 "Unsuccessful bind operation -- double bind error"
+#define sref_case_2_1_8 "(none)"
 #define desc_case_2_1_8 "\
 This test case tests unsuccessful bind of the XTI stream."
 
@@ -5741,6 +6074,7 @@ static struct test_stream test_2_1_8_bot = { &preamble_2_1_8_bot, &test_case_2_1
 #define tgrp_case_2_2 test_group_3
 #define numb_case_2_2 "2.2"
 #define name_case_2_2 "Successful bind and unbind operation"
+#define sref_case_2_2 "(none)"
 #define desc_case_2_2 "\
 This test case tests successful bind and unbind of the XTI stream."
 
@@ -5789,6 +6123,7 @@ static struct test_stream test_2_2_bot = { &preamble_2_2_bot, &test_case_2_2_bot
 #define tgrp_case_2_3_1 test_group_4
 #define numb_case_2_3_1 "2.3.1"
 #define name_case_2_3_1 "Successful connect and disconnect operation -- immediate confirmation, synchronous mode"
+#define sref_case_2_3_1 "(none)"
 #define desc_case_2_3_1 "\
 This test case tests successful connect and disconnect of the XTI stream."
 
@@ -5813,6 +6148,7 @@ int test_case_2_3_1_bot(int child)
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -5839,6 +6175,7 @@ static struct test_stream test_2_3_1_bot = { &preamble_2_3_1_bot, &test_case_2_3
 #define tgrp_case_2_3_2 test_group_4
 #define numb_case_2_3_2 "2.3.2"
 #define name_case_2_3_2 "Successful connect and disconnect operation -- delayed confirmation, synchronous mode"
+#define sref_case_2_3_2 "(none)"
 #define desc_case_2_3_2 "\
 This test case tests successful connect and disconnect of the XTI stream."
 
@@ -5868,6 +6205,7 @@ int test_case_2_3_2_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -5894,6 +6232,7 @@ static struct test_stream test_2_3_2_bot = { &preamble_2_3_2_bot, &test_case_2_3
 #define tgrp_case_2_3_3 test_group_4
 #define numb_case_2_3_3 "2.3.3"
 #define name_case_2_3_3 "Successful connect and disconnect operation -- delayed confirmation, asynchronous mode"
+#define sref_case_2_3_3 "(none)"
 #define desc_case_2_3_3 "\
 This test case tests successful connect and disconnect of the XTI stream."
 
@@ -5936,6 +6275,7 @@ int test_case_2_3_3_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -5962,6 +6302,7 @@ static struct test_stream test_2_3_3_bot = { &preamble_2_3_3_bot, &test_case_2_3
 #define tgrp_case_2_3_4 test_group_4
 #define numb_case_2_3_4 "2.3.4"
 #define name_case_2_3_4 "Unsuccessful connect operation -- TACCES error"
+#define sref_case_2_3_4 "(none)"
 #define desc_case_2_3_4 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TACCES error."
@@ -6011,6 +6352,7 @@ static struct test_stream test_2_3_4_bot = { &preamble_2_3_4_bot, &test_case_2_3
 #define tgrp_case_2_3_5 test_group_4
 #define numb_case_2_3_5 "2.3.5"
 #define name_case_2_3_5 "Unsuccessful connect operation -- TADDRBUSY error"
+#define sref_case_2_3_5 "(none)"
 #define desc_case_2_3_5 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TADDRBUSY error."
@@ -6037,6 +6379,7 @@ static struct test_stream test_2_3_5_bot = { &preamble_2_3_5_bot, &test_case_2_3
 #define tgrp_case_2_3_6 test_group_4
 #define numb_case_2_3_6 "2.3.6"
 #define name_case_2_3_6 "Unsuccessful connect operation -- TBADADDR error"
+#define sref_case_2_3_6 "(none)"
 #define desc_case_2_3_6 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TBADADDR error."
@@ -6063,6 +6406,7 @@ static struct test_stream test_2_3_6_bot = { &preamble_2_3_6_bot, &test_case_2_3
 #define tgrp_case_2_3_7 test_group_4
 #define numb_case_2_3_7 "2.3.7"
 #define name_case_2_3_7 "Unsuccessful connect operation -- TBADOPT error"
+#define sref_case_2_3_7 "(none)"
 #define desc_case_2_3_7 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TBADOPT error."
@@ -6089,6 +6433,7 @@ static struct test_stream test_2_3_7_bot = { &preamble_2_3_7_bot, &test_case_2_3
 #define tgrp_case_2_3_8 test_group_4
 #define numb_case_2_3_8 "2.3.8"
 #define name_case_2_3_8 "Unsuccessful connect operation -- TNOTSUPPORT error"
+#define sref_case_2_3_8 "(none)"
 #define desc_case_2_3_8 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TNOTSUPPORT error."
@@ -6115,6 +6460,7 @@ static struct test_stream test_2_3_8_bot = { &preamble_2_3_8_bot, &test_case_2_3
 #define tgrp_case_2_3_9 test_group_4
 #define numb_case_2_3_9 "2.3.9"
 #define name_case_2_3_9 "Unsuccessful connect operation -- TOUTSTATE error"
+#define sref_case_2_3_9 "(none)"
 #define desc_case_2_3_9 "\
 This test case test unsuccessful connection of the XTI stream with a\n\
 TOUTSTATE error."
@@ -6142,6 +6488,7 @@ static struct test_stream test_2_3_9_bot = { &preamble_2_3_9_bot, &test_case_2_3
 #define tgrp_case_2_4_1 test_group_5
 #define numb_case_2_4_1 "2.4.1"
 #define name_case_2_4_1 "Successful connection and disconnection operation -- synchronous mode"
+#define sref_case_2_4_1 "(none)"
 #define desc_case_2_4_1 "\
 This test case tests successful incoming connection and disconnection of\n\
 the XTI stream."
@@ -6159,6 +6506,7 @@ int test_case_2_4_1_top(int child)
 
 int test_case_2_4_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6186,6 +6534,7 @@ static struct test_stream test_2_4_1_bot = { &preamble_2_4_1_bot, &test_case_2_4
 #define tgrp_case_2_5_1 test_group_6
 #define numb_case_2_5_1 "2.5.1"
 #define name_case_2_5_1 "Incoming connection before outgoing"
+#define sref_case_2_5_1 "(none)"
 #define desc_case_2_5_1 "\
 This test case tests unsuccessful outgoing connection due to incoming\n\
 connection indication on an XTI stream."
@@ -6226,6 +6575,7 @@ int test_case_2_5_1_top(int child)
 
 int test_case_2_5_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6268,6 +6618,7 @@ static struct test_stream test_2_5_1_bot = { &preamble_2_5_1_bot, &test_case_2_5
 #define tgrp_case_3_1_1 test_group_7
 #define numb_case_3_1_1 "3.1.1"
 #define name_case_3_1_1 "T_CONN_IND event"
+#define sref_case_3_1_1 "(none)"
 #define desc_case_3_1_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_CONN_IND TPI event."
@@ -6312,6 +6663,7 @@ int test_case_3_1_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != 0)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6338,6 +6690,7 @@ static struct test_stream test_3_1_1_bot = { &preamble_3_1_1_bot, &test_case_3_1
 #define tgrp_case_3_2_1 test_group_7
 #define numb_case_3_2_1 "3.2.1"
 #define name_case_3_2_1 "T_CONN_CON event"
+#define sref_case_3_2_1 "(none)"
 #define desc_case_3_2_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_CONN_CON TPI event."
@@ -6391,6 +6744,7 @@ int test_case_3_2_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6417,6 +6771,7 @@ static struct test_stream test_3_2_1_bot = { &preamble_3_2_1_bot, &test_case_3_2
 #define tgrp_case_3_3_1 test_group_7
 #define numb_case_3_3_1 "3.3.1"
 #define name_case_3_3_1 "T_DISCON_IND event"
+#define sref_case_3_3_1 "(none)"
 #define desc_case_3_3_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DISCON_IND TPI event."
@@ -6467,6 +6822,7 @@ int test_case_3_3_1_bot(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	last_sequence = 0;
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6485,6 +6841,7 @@ static struct test_stream test_3_3_1_bot = { &preamble_3_3_1_bot, &test_case_3_3
 #define tgrp_case_3_4_1 test_group_7
 #define numb_case_3_4_1 "3.4.1"
 #define name_case_3_4_1 "T_ORDREL_IND event"
+#define sref_case_3_4_1 "(none)"
 #define desc_case_3_4_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_ORDREL_IND TPI event."
@@ -6542,6 +6899,7 @@ int test_case_3_4_1_bot(int child)
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6574,6 +6932,7 @@ static struct test_stream test_3_4_1_bot = { &preamble_3_4_1_bot, &test_case_3_4
 #define tgrp_case_3_4_2 test_group_7
 #define numb_case_3_4_2 "3.4.2"
 #define name_case_3_4_2 "T_ORDREL_IND w/ DATA event"
+#define sref_case_3_4_2 "(none)"
 #define desc_case_3_4_2 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_ORDREL_IND w/ DATA TPI event."
@@ -6631,6 +6990,7 @@ int test_case_3_4_2_bot(int child)
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6663,6 +7023,7 @@ static struct test_stream test_3_4_2_bot = { &preamble_3_4_2_bot, &test_case_3_4
 #define tgrp_case_3_5_1 test_group_7
 #define numb_case_3_5_1 "3.5.1"
 #define name_case_3_5_1 "T_DATA_IND event -- t_rcv used as receive function"
+#define sref_case_3_5_1 "(none)"
 #define desc_case_3_5_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DATA_IND TPI event."
@@ -6708,6 +7069,7 @@ int test_case_3_5_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6726,6 +7088,7 @@ static struct test_stream test_3_5_1_bot = { &preamble_3_5_1_bot, &test_case_3_5
 #define tgrp_case_3_5_2 test_group_7
 #define numb_case_3_5_2 "3.5.2"
 #define name_case_3_5_2 "T_DATA_IND event -- t_rcvv used as receive function"
+#define sref_case_3_5_2 "(none)"
 #define desc_case_3_5_2 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_DATA_IND TPI event."
@@ -6771,6 +7134,7 @@ int test_case_3_5_2_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6789,6 +7153,7 @@ static struct test_stream test_3_5_2_bot = { &preamble_3_5_2_bot, &test_case_3_5
 #define tgrp_case_3_6_1 test_group_7
 #define numb_case_3_6_1 "3.6.1"
 #define name_case_3_6_1 "T_UNITDATA_IND event"
+#define sref_case_3_6_1 "(none)"
 #define desc_case_3_6_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_UNITDATA_IND TPI event."
@@ -6835,6 +7200,7 @@ int test_case_3_6_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = "Unit test data.";
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -6853,6 +7219,7 @@ static struct test_stream test_3_6_1_bot = { &preamble_3_6_1_bot, &test_case_3_6
 #define tgrp_case_3_7_1 test_group_7
 #define numb_case_3_7_1 "3.7.1"
 #define name_case_3_7_1 "T_UDERROR_IND event"
+#define sref_case_3_7_1 "(none)"
 #define desc_case_3_7_1 "\
 This test case tests the response of the t_look function to events.\n\
 This test case tests the response to the T_UDERROR_IND TPI event."
@@ -6918,6 +7285,7 @@ static struct test_stream test_3_7_1_bot = { &preamble_3_7_1_bot, &test_case_3_7
 #define tgrp_case_4_1_1 test_group_8
 #define numb_case_4_1_1 "4.1.1"
 #define name_case_4_1_1 "t_accept library call"
+#define sref_case_4_1_1 "(none)"
 #define desc_case_4_1_1 "\
 This test case tests the response of the t_accept library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -6966,9 +7334,11 @@ int test_case_4_1_1_top(int child)
 int test_case_4_1_1_bot(int child)
 {
 	int begstate = state;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state = begstate + 1;
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state = begstate + 2;
@@ -7010,6 +7380,7 @@ static struct test_stream test_4_1_1_bot = { &preamble_4_1_1_bot, &test_case_4_1
 #define tgrp_case_4_1_2 test_group_8
 #define numb_case_4_1_2 "4.1.2"
 #define name_case_4_1_2 "t_accept library call"
+#define sref_case_4_1_2 "(none)"
 #define desc_case_4_1_2 "\
 This test case tests the response of the t_accept library call to an\n\
 asynchronous T_LISTEN event."
@@ -7060,10 +7431,12 @@ int test_case_4_1_2_top(int child)
 int test_case_4_1_2_bot(int child)
 {
 	int begstate = state;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state = begstate + 1;
 	last_sequence = 2;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state = begstate + 2;
@@ -7118,6 +7491,7 @@ static struct test_stream test_4_1_2_bot = { &preamble_4_1_2_bot, &test_case_4_1
 #define tgrp_case_4_2_1 test_group_8
 #define numb_case_4_2_1 "4.2.1"
 #define name_case_4_2_1 "t_connect library call"
+#define sref_case_4_2_1 "(none)"
 #define desc_case_4_2_1 "\
 This test case tests the response of the t_connect library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7152,6 +7526,7 @@ int test_case_4_2_1_bot(int child)
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7170,6 +7545,7 @@ static struct test_stream test_4_2_1_bot = { &preamble_4_2_1_bot, &test_case_4_2
 #define tgrp_case_4_2_2 test_group_8
 #define numb_case_4_2_2 "4.2.2"
 #define name_case_4_2_2 "t_connect library call"
+#define sref_case_4_2_2 "(none)"
 #define desc_case_4_2_2 "\
 This test case tests the response of the t_connect library call to an\n\
 asynchronous T_LISTEN event."
@@ -7207,6 +7583,7 @@ int test_case_4_2_2_top(int child)
 int test_case_4_2_2_bot(int child)
 {
 	int begstate = state;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state = begstate + 1;
@@ -7252,6 +7629,7 @@ static struct test_stream test_4_2_2_bot = { &preamble_4_2_2_bot, &test_case_4_2
 #define tgrp_case_4_3_1 test_group_8
 #define numb_case_4_3_1 "4.3.1"
 #define name_case_4_3_1 "t_listen library call"
+#define sref_case_4_3_1 "(none)"
 #define desc_case_4_3_1 "\
 This test case tests the response of the t_listen library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7288,9 +7666,11 @@ int test_case_4_3_1_top(int child)
 
 int test_case_4_3_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7309,6 +7689,7 @@ static struct test_stream test_4_3_1_bot = { &preamble_4_3_1_bot, &test_case_4_3
 #define tgrp_case_4_4_1 test_group_8
 #define numb_case_4_4_1 "4.4.1"
 #define name_case_4_4_1 "t_rcv library call"
+#define sref_case_4_4_1 "(none)"
 #define desc_case_4_4_1 "\
 This test case tests the response of the t_rcv library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7335,6 +7716,7 @@ int test_case_4_4_1_top(int child)
 
 int test_case_4_4_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7353,6 +7735,7 @@ static struct test_stream test_4_4_1_bot = { &preamble_4_4_1_bot, &test_case_4_4
 #define tgrp_case_4_4_2 test_group_8
 #define numb_case_4_4_2 "4.4.2"
 #define name_case_4_4_2 "t_rcv library call"
+#define sref_case_4_4_2 "(none)"
 #define desc_case_4_4_2 "\
 This test case tests the response of the t_rcv library call to an\n\
 asynchronous T_ORDREL event."
@@ -7405,6 +7788,7 @@ static struct test_stream test_4_4_2_bot = { &preamble_4_4_2_bot, &test_case_4_4
 #define tgrp_case_4_4_3 test_group_8
 #define numb_case_4_4_3 "4.4.3"
 #define name_case_4_4_3 "t_rcvv library call"
+#define sref_case_4_4_3 "(none)"
 #define desc_case_4_4_3 "\
 This test case tests the response of the t_rcvv library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7431,6 +7815,7 @@ int test_case_4_4_3_top(int child)
 
 int test_case_4_4_3_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7449,6 +7834,7 @@ static struct test_stream test_4_4_3_bot = { &preamble_4_4_3_bot, &test_case_4_4
 #define tgrp_case_4_4_4 test_group_8
 #define numb_case_4_4_4 "4.4.4"
 #define name_case_4_4_4 "t_rcvv library call"
+#define sref_case_4_4_4 "(none)"
 #define desc_case_4_4_4 "\
 This test case tests the response of the t_rcvv library call to an\n\
 asynchronous T_ORDREL event."
@@ -7501,6 +7887,7 @@ static struct test_stream test_4_4_4_bot = { &preamble_4_4_4_bot, &test_case_4_4
 #define tgrp_case_4_4_5 test_group_8
 #define numb_case_4_4_5 "4.4.5"
 #define name_case_4_4_5 "t_snd library call"
+#define sref_case_4_4_5 "(none)"
 #define desc_case_4_4_5 "\
 This test case tests the response of the t_snd library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7534,6 +7921,7 @@ int test_case_4_4_5_top(int child)
 
 int test_case_4_4_5_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7552,6 +7940,7 @@ static struct test_stream test_4_4_5_bot = { &preamble_4_4_5_bot, &test_case_4_4
 #define tgrp_case_4_4_6 test_group_8
 #define numb_case_4_4_6 "4.4.6"
 #define name_case_4_4_6 "t_snd library call"
+#define sref_case_4_4_6 "(none)"
 #define desc_case_4_4_6 "\
 This test case tests the response of the t_snd library call to an\n\
 asynchronous T_ORDREL event."
@@ -7611,6 +8000,7 @@ static struct test_stream test_4_4_6_bot = { &preamble_4_4_6_bot, &test_case_4_4
 #define tgrp_case_4_4_7 test_group_8
 #define numb_case_4_4_7 "4.4.7"
 #define name_case_4_4_7 "t_sndv library call"
+#define sref_case_4_4_7 "(none)"
 #define desc_case_4_4_7 "\
 This test case tests the response of the t_sndv library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7644,6 +8034,7 @@ int test_case_4_4_7_top(int child)
 
 int test_case_4_4_7_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7662,6 +8053,7 @@ static struct test_stream test_4_4_7_bot = { &preamble_4_4_7_bot, &test_case_4_4
 #define tgrp_case_4_4_8 test_group_8
 #define numb_case_4_4_8 "4.4.8"
 #define name_case_4_4_8 "t_sndv library call"
+#define sref_case_4_4_8 "(none)"
 #define desc_case_4_4_8 "\
 This test case tests the response of the t_sndv library call to an\n\
 asynchronous T_ORDREL event."
@@ -7721,6 +8113,7 @@ static struct test_stream test_4_4_8_bot = { &preamble_4_4_8_bot, &test_case_4_4
 #define tgrp_case_4_5_1 test_group_8
 #define numb_case_4_5_1 "4.5.1"
 #define name_case_4_5_1 "t_rcvconnect library call"
+#define sref_case_4_5_1 "(none)"
 #define desc_case_4_5_1 "\
 This test case tests the response of the t_rcvconnect library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7776,6 +8169,7 @@ int test_case_4_5_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	state++;
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7794,6 +8188,7 @@ static struct test_stream test_4_5_1_bot = { &preamble_4_5_1_bot, &test_case_4_5
 #define tgrp_case_4_6_1 test_group_8
 #define numb_case_4_6_1 "4.6.1"
 #define name_case_4_6_1 "t_rcvrel library call"
+#define sref_case_4_6_1 "(none)"
 #define desc_case_4_6_1 "\
 This test case tests the response of the t_rcvrel library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7827,6 +8222,7 @@ int test_case_4_6_1_top(int child)
 
 int test_case_4_6_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7845,6 +8241,7 @@ static struct test_stream test_4_6_1_bot = { &preamble_4_6_1_bot, &test_case_4_6
 #define tgrp_case_4_6_2 test_group_8
 #define numb_case_4_6_2 "4.6.2"
 #define name_case_4_6_2 "t_rcvreldata library call"
+#define sref_case_4_6_2 "(none)"
 #define desc_case_4_6_2 "\
 This test case tests the response of the t_rcvreldata library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7878,6 +8275,7 @@ int test_case_4_6_2_top(int child)
 
 int test_case_4_6_2_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7896,6 +8294,7 @@ static struct test_stream test_4_6_2_bot = { &preamble_4_6_2_bot, &test_case_4_6
 #define tgrp_case_4_6_3 test_group_8
 #define numb_case_4_6_3 "4.6.3"
 #define name_case_4_6_3 "t_sndrel library call"
+#define sref_case_4_6_3 "(none)"
 #define desc_case_4_6_3 "\
 This test case tests the response of the t_sndrel library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7929,6 +8328,7 @@ int test_case_4_6_3_top(int child)
 
 int test_case_4_6_3_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7947,6 +8347,7 @@ static struct test_stream test_4_6_3_bot = { &preamble_4_6_3_bot, &test_case_4_6
 #define tgrp_case_4_6_4 test_group_8
 #define numb_case_4_6_4 "4.6.4"
 #define name_case_4_6_4 "t_sndreldata library call"
+#define sref_case_4_6_4 "(none)"
 #define desc_case_4_6_4 "\
 This test case tests the response of the t_sndreldata library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -7980,6 +8381,7 @@ int test_case_4_6_4_top(int child)
 
 int test_case_4_6_4_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -7998,6 +8400,7 @@ static struct test_stream test_4_6_4_bot = { &preamble_4_6_4_bot, &test_case_4_6
 #define tgrp_case_4_7_1 test_group_8
 #define numb_case_4_7_1 "4.7.1"
 #define name_case_4_7_1 "t_rcvudata library call"
+#define sref_case_4_7_1 "(none)"
 #define desc_case_4_7_1 "\
 This test case tests the response of the t_rcvudata library call to an\n\
 asynchronous T_UDERR event."
@@ -8049,6 +8452,7 @@ static struct test_stream test_4_7_1_bot = { &preamble_4_7_1_bot, &test_case_4_7
 #define tgrp_case_4_7_2 test_group_8
 #define numb_case_4_7_2 "4.7.2"
 #define name_case_4_7_2 "t_rcvvudata library call"
+#define sref_case_4_7_2 "(none)"
 #define desc_case_4_7_2 "\
 This test case tests the response of the t_rcvvudata library call to an\n\
 asynchronous T_UDERR event."
@@ -8100,6 +8504,7 @@ static struct test_stream test_4_7_2_bot = { &preamble_4_7_2_bot, &test_case_4_7
 #define tgrp_case_4_7_3 test_group_8
 #define numb_case_4_7_3 "4.7.3"
 #define name_case_4_7_3 "t_sndudata library call"
+#define sref_case_4_7_3 "(none)"
 #define desc_case_4_7_3 "\
 This test case tests the response of the t_sndudata library call to an\n\
 asynchronous T_UDERR event."
@@ -8151,6 +8556,7 @@ static struct test_stream test_4_7_3_bot = { &preamble_4_7_3_bot, &test_case_4_7
 #define tgrp_case_4_7_4 test_group_8
 #define numb_case_4_7_4 "4.7.4"
 #define name_case_4_7_4 "t_sndvudata library call"
+#define sref_case_4_7_4 "(none)"
 #define desc_case_4_7_4 "\
 This test case tests the response of the t_sndvudata library call to an\n\
 asynchronous T_UDERR event."
@@ -8202,6 +8608,7 @@ static struct test_stream test_4_7_4_bot = { &preamble_4_7_4_bot, &test_case_4_7
 #define tgrp_case_4_8_1 test_group_8
 #define numb_case_4_8_1 "4.8.1"
 #define name_case_4_8_1 "t_unbind library call"
+#define sref_case_4_8_1 "(none)"
 #define desc_case_4_8_1 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_LISTEN event."
@@ -8238,6 +8645,7 @@ int test_case_4_8_1_top(int child)
 
 int test_case_4_8_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8264,6 +8672,7 @@ static struct test_stream test_4_8_1_bot = { &preamble_4_8_1_bot, &test_case_4_8
 #define tgrp_case_4_8_2 test_group_8
 #define numb_case_4_8_2 "4.8.2"
 #define name_case_4_8_2 "t_unbind library call"
+#define sref_case_4_8_2 "(none)"
 #define desc_case_4_8_2 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_DATA event."
@@ -8297,6 +8706,7 @@ int test_case_4_8_2_top(int child)
 
 int test_case_4_8_2_bot(int child)
 {
+	test_data = "Unit test data.";
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8315,6 +8725,7 @@ static struct test_stream test_4_8_2_bot = { &preamble_4_8_2_bot, &test_case_4_8
 #define tgrp_case_4_8_3 test_group_8
 #define numb_case_4_8_3 "4.8.3"
 #define name_case_4_8_3 "t_unbind library call"
+#define sref_case_4_8_3 "(none)"
 #define desc_case_4_8_3 "\
 This test case tests the response of the t_unbind library call to an\n\
 asynchronous T_UDERR event."
@@ -8366,6 +8777,7 @@ static struct test_stream test_4_8_3_bot = { &preamble_4_8_3_bot, &test_case_4_8
 #define tgrp_case_4_9_1 test_group_8
 #define numb_case_4_9_1 "4.9.1"
 #define name_case_4_9_1 "t_snddis library call"
+#define sref_case_4_9_1 "(none)"
 #define desc_case_4_9_1 "\
 This test case tests the response of the t_snddis library call to an\n\
 asynchronous T_DISCONNECT event."
@@ -8399,6 +8811,7 @@ int test_case_4_9_1_top(int child)
 
 int test_case_4_9_1_bot(int child)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -8418,6 +8831,7 @@ static struct test_stream test_4_9_1_bot = { &preamble_4_9_1_bot, &test_case_4_9
 #define tgrp_case_5_1_1 test_group_9
 #define numb_case_5_1_1 "5.1.1"
 #define name_case_5_1_1 "t_accept operation"
+#define sref_case_5_1_1 "(none)"
 #define desc_case_5_1_1 "\
 This test case tests the t_accept operation on a closed file descriptor."
 
@@ -8461,6 +8875,7 @@ static struct test_stream test_5_1_1_bot = { &preamble_5_1_1_bot, &test_case_5_1
 #define tgrp_case_5_1_2 test_group_9
 #define numb_case_5_1_2 "5.1.2"
 #define name_case_5_1_2 "t_bind operation"
+#define sref_case_5_1_2 "(none)"
 #define desc_case_5_1_2 "\
 This test case tests the t_bind operation on a closed file descriptor."
 
@@ -8486,6 +8901,7 @@ static struct test_stream test_5_1_2_bot = { &preamble_5_1_2_bot, &test_case_5_1
 #define tgrp_case_5_1_3 test_group_9
 #define numb_case_5_1_3 "5.1.3"
 #define name_case_5_1_3 "t_close operation"
+#define sref_case_5_1_3 "(none)"
 #define desc_case_5_1_3 "\
 This test case tests the t_close operation on a closed file descriptor."
 
@@ -8511,6 +8927,7 @@ static struct test_stream test_5_1_3_bot = { &preamble_5_1_3_bot, &test_case_5_1
 #define tgrp_case_5_1_4 test_group_9
 #define numb_case_5_1_4 "5.1.4"
 #define name_case_5_1_4 "t_connect operation"
+#define sref_case_5_1_4 "(none)"
 #define desc_case_5_1_4 "\
 This test case tests the t_connect operation on a closed file descriptor."
 
@@ -8536,6 +8953,7 @@ static struct test_stream test_5_1_4_bot = { &preamble_5_1_4_bot, &test_case_5_1
 #define tgrp_case_5_1_5 test_group_9
 #define numb_case_5_1_5 "5.1.5"
 #define name_case_5_1_5 "t_getinfo operation"
+#define sref_case_5_1_5 "(none)"
 #define desc_case_5_1_5 "\
 This test case tests the t_getinfo operation on a closed file descriptor."
 
@@ -8561,6 +8979,7 @@ static struct test_stream test_5_1_5_bot = { &preamble_5_1_5_bot, &test_case_5_1
 #define tgrp_case_5_1_6 test_group_9
 #define numb_case_5_1_6 "5.1.6"
 #define name_case_5_1_6 "t_getprotaddr operation"
+#define sref_case_5_1_6 "(none)"
 #define desc_case_5_1_6 "\
 This test case tests the t_getprotaddr operation on a closed file descriptor."
 
@@ -8586,6 +9005,7 @@ static struct test_stream test_5_1_6_bot = { &preamble_5_1_6_bot, &test_case_5_1
 #define tgrp_case_5_1_7 test_group_9
 #define numb_case_5_1_7 "5.1.7"
 #define name_case_5_1_7 "t_getstate operation"
+#define sref_case_5_1_7 "(none)"
 #define desc_case_5_1_7 "\
 This test case tests the t_getstate operation on a closed file descriptor."
 
@@ -8611,6 +9031,7 @@ static struct test_stream test_5_1_7_bot = { &preamble_5_1_7_bot, &test_case_5_1
 #define tgrp_case_5_1_8 test_group_9
 #define numb_case_5_1_8 "5.1.8"
 #define name_case_5_1_8 "t_listen operation"
+#define sref_case_5_1_8 "(none)"
 #define desc_case_5_1_8 "\
 This test case tests the t_listen operation on a closed file descriptor."
 
@@ -8636,6 +9057,7 @@ static struct test_stream test_5_1_8_bot = { &preamble_5_1_8_bot, &test_case_5_1
 #define tgrp_case_5_1_9 test_group_9
 #define numb_case_5_1_9 "5.1.9"
 #define name_case_5_1_9 "t_look operation"
+#define sref_case_5_1_9 "(none)"
 #define desc_case_5_1_9 "\
 This test case tests the t_look operation on a closed file descriptor."
 
@@ -8661,6 +9083,7 @@ static struct test_stream test_5_1_9_bot = { &preamble_5_1_9_bot, &test_case_5_1
 #define tgrp_case_5_1_10 test_group_9
 #define numb_case_5_1_10 "5.1.10"
 #define name_case_5_1_10 "t_optmgmt operation"
+#define sref_case_5_1_10 "(none)"
 #define desc_case_5_1_10 "\
 This test case tests the t_optmgmt operation on a closed file descriptor."
 
@@ -8686,6 +9109,7 @@ static struct test_stream test_5_1_10_bot = { &preamble_5_1_10_bot, &test_case_5
 #define tgrp_case_5_1_11 test_group_9
 #define numb_case_5_1_11 "5.1.11"
 #define name_case_5_1_11 "t_rcv operation"
+#define sref_case_5_1_11 "(none)"
 #define desc_case_5_1_11 "\
 This test case tests the t_rcv operation on a closed file descriptor."
 
@@ -8711,6 +9135,7 @@ static struct test_stream test_5_1_11_bot = { &preamble_5_1_11_bot, &test_case_5
 #define tgrp_case_5_1_12 test_group_9
 #define numb_case_5_1_12 "5.1.12"
 #define name_case_5_1_12 "t_rcvconnect operation"
+#define sref_case_5_1_12 "(none)"
 #define desc_case_5_1_12 "\
 This test case tests the t_rcvconnect operation on a closed file descriptor."
 
@@ -8736,6 +9161,7 @@ static struct test_stream test_5_1_12_bot = { &preamble_5_1_12_bot, &test_case_5
 #define tgrp_case_5_1_13 test_group_9
 #define numb_case_5_1_13 "5.1.13"
 #define name_case_5_1_13 "t_rcvdis operation"
+#define sref_case_5_1_13 "(none)"
 #define desc_case_5_1_13 "\
 This test case tests the t_rcvdis operation on a closed file descriptor."
 
@@ -8761,6 +9187,7 @@ static struct test_stream test_5_1_13_bot = { &preamble_5_1_13_bot, &test_case_5
 #define tgrp_case_5_1_14 test_group_9
 #define numb_case_5_1_14 "5.1.14"
 #define name_case_5_1_14 "t_rcvrel operation"
+#define sref_case_5_1_14 "(none)"
 #define desc_case_5_1_14 "\
 This test case tests the t_rcvrel operation on a closed file descriptor."
 
@@ -8786,6 +9213,7 @@ static struct test_stream test_5_1_14_bot = { &preamble_5_1_14_bot, &test_case_5
 #define tgrp_case_5_1_15 test_group_9
 #define numb_case_5_1_15 "5.1.15"
 #define name_case_5_1_15 "t_rcvreldata operation"
+#define sref_case_5_1_15 "(none)"
 #define desc_case_5_1_15 "\
 This test case tests the t_rcvreldata operation on a closed file descriptor."
 
@@ -8811,6 +9239,7 @@ static struct test_stream test_5_1_15_bot = { &preamble_5_1_15_bot, &test_case_5
 #define tgrp_case_5_1_16 test_group_9
 #define numb_case_5_1_16 "5.1.16"
 #define name_case_5_1_16 "t_rcvudata operation"
+#define sref_case_5_1_16 "(none)"
 #define desc_case_5_1_16 "\
 This test case tests the t_rcvudata operation on a closed file descriptor."
 
@@ -8836,6 +9265,7 @@ static struct test_stream test_5_1_16_bot = { &preamble_5_1_16_bot, &test_case_5
 #define tgrp_case_5_1_17 test_group_9
 #define numb_case_5_1_17 "5.1.17"
 #define name_case_5_1_17 "t_rcvuderr operation"
+#define sref_case_5_1_17 "(none)"
 #define desc_case_5_1_17 "\
 This test case tests the t_rcvuderr operation on a closed file descriptor."
 
@@ -8861,6 +9291,7 @@ static struct test_stream test_5_1_17_bot = { &preamble_5_1_17_bot, &test_case_5
 #define tgrp_case_5_1_18 test_group_9
 #define numb_case_5_1_18 "5.1.18"
 #define name_case_5_1_18 "t_rcvv operation"
+#define sref_case_5_1_18 "(none)"
 #define desc_case_5_1_18 "\
 This test case tests the t_rcvv operation on a closed file descriptor."
 
@@ -8886,6 +9317,7 @@ static struct test_stream test_5_1_18_bot = { &preamble_5_1_18_bot, &test_case_5
 #define tgrp_case_5_1_19 test_group_9
 #define numb_case_5_1_19 "5.1.19"
 #define name_case_5_1_19 "t_rcvvudata operation"
+#define sref_case_5_1_19 "(none)"
 #define desc_case_5_1_19 "\
 This test case tests the t_rcvvudata operation on a closed file descriptor."
 
@@ -8911,6 +9343,7 @@ static struct test_stream test_5_1_19_bot = { &preamble_5_1_19_bot, &test_case_5
 #define tgrp_case_5_1_20 test_group_9
 #define numb_case_5_1_20 "5.1.20"
 #define name_case_5_1_20 "t_snd operation"
+#define sref_case_5_1_20 "(none)"
 #define desc_case_5_1_20 "\
 This test case tests the t_snd operation on a closed file descriptor."
 
@@ -8936,6 +9369,7 @@ static struct test_stream test_5_1_20_bot = { &preamble_5_1_20_bot, &test_case_5
 #define tgrp_case_5_1_21 test_group_9
 #define numb_case_5_1_21 "5.1.21"
 #define name_case_5_1_21 "t_snddis operation"
+#define sref_case_5_1_21 "(none)"
 #define desc_case_5_1_21 "\
 This test case tests the t_snddis operation on a closed file descriptor."
 
@@ -8961,6 +9395,7 @@ static struct test_stream test_5_1_21_bot = { &preamble_5_1_21_bot, &test_case_5
 #define tgrp_case_5_1_22 test_group_9
 #define numb_case_5_1_22 "5.1.22"
 #define name_case_5_1_22 "t_sndrel operation"
+#define sref_case_5_1_22 "(none)"
 #define desc_case_5_1_22 "\
 This test case tests the t_sndrel operation on a closed file descriptor."
 
@@ -8986,6 +9421,7 @@ static struct test_stream test_5_1_22_bot = { &preamble_5_1_22_bot, &test_case_5
 #define tgrp_case_5_1_23 test_group_9
 #define numb_case_5_1_23 "5.1.23"
 #define name_case_5_1_23 "t_sndreldata operation"
+#define sref_case_5_1_23 "(none)"
 #define desc_case_5_1_23 "\
 This test case tests the t_sndreldata operation on a closed file descriptor."
 
@@ -9011,6 +9447,7 @@ static struct test_stream test_5_1_23_bot = { &preamble_5_1_23_bot, &test_case_5
 #define tgrp_case_5_1_24 test_group_9
 #define numb_case_5_1_24 "5.1.24"
 #define name_case_5_1_24 "t_sndudata operation"
+#define sref_case_5_1_24 "(none)"
 #define desc_case_5_1_24 "\
 This test case tests the t_sndudata operation on a closed file descriptor."
 
@@ -9036,6 +9473,7 @@ static struct test_stream test_5_1_24_bot = { &preamble_5_1_24_bot, &test_case_5
 #define tgrp_case_5_1_25 test_group_9
 #define numb_case_5_1_25 "5.1.25"
 #define name_case_5_1_25 "t_sndv operation"
+#define sref_case_5_1_25 "(none)"
 #define desc_case_5_1_25 "\
 This test case tests the t_sndv operation on a closed file descriptor."
 
@@ -9061,6 +9499,7 @@ static struct test_stream test_5_1_25_bot = { &preamble_5_1_25_bot, &test_case_5
 #define tgrp_case_5_1_26 test_group_9
 #define numb_case_5_1_26 "5.1.26"
 #define name_case_5_1_26 "t_sndvudata operation"
+#define sref_case_5_1_26 "(none)"
 #define desc_case_5_1_26 "\
 This test case tests the t_sndvudata operation on a closed file descriptor."
 
@@ -9086,6 +9525,7 @@ static struct test_stream test_5_1_26_bot = { &preamble_5_1_26_bot, &test_case_5
 #define tgrp_case_5_1_27 test_group_9
 #define numb_case_5_1_27 "5.1.27"
 #define name_case_5_1_27 "t_sync operation"
+#define sref_case_5_1_27 "(none)"
 #define desc_case_5_1_27 "\
 This test case tests the t_sync operation on a closed file descriptor."
 
@@ -9111,6 +9551,7 @@ static struct test_stream test_5_1_27_bot = { &preamble_5_1_27_bot, &test_case_5
 #define tgrp_case_5_1_28 test_group_9
 #define numb_case_5_1_28 "5.1.28"
 #define name_case_5_1_28 "t_unbind operation"
+#define sref_case_5_1_28 "(none)"
 #define desc_case_5_1_28 "\
 This test case tests the t_unbind operation on a closed file descriptor."
 
@@ -9137,6 +9578,7 @@ static struct test_stream test_5_1_28_bot = { &preamble_5_1_28_bot, &test_case_5
 #define tgrp_case_5_2_1 test_group_10
 #define numb_case_5_2_1 "5.2.1"
 #define name_case_5_2_1 "t_accept operation"
+#define sref_case_5_2_1 "(none)"
 #define desc_case_5_2_1 "\
 This test case tests the t_accept operation on a non-STREAMS file descriptor."
 
@@ -9183,6 +9625,7 @@ static struct test_stream test_5_2_1_bot = { &preamble_5_2_1_bot, &test_case_5_2
 #define tgrp_case_5_2_2 test_group_10
 #define numb_case_5_2_2 "5.2.2"
 #define name_case_5_2_2 "t_bind operation"
+#define sref_case_5_2_2 "(none)"
 #define desc_case_5_2_2 "\
 This test case tests the t_bind operation on a non-STREAMS file descriptor."
 
@@ -9208,6 +9651,7 @@ static struct test_stream test_5_2_2_bot = { &preamble_5_2_2_bot, &test_case_5_2
 #define tgrp_case_5_2_3 test_group_10
 #define numb_case_5_2_3 "5.2.3"
 #define name_case_5_2_3 "t_close operation"
+#define sref_case_5_2_3 "(none)"
 #define desc_case_5_2_3 "\
 This test case tests the t_close operation on a non-STREAMS file descriptor."
 
@@ -9233,6 +9677,7 @@ static struct test_stream test_5_2_3_bot = { &preamble_5_2_3_bot, &test_case_5_2
 #define tgrp_case_5_2_4 test_group_10
 #define numb_case_5_2_4 "5.2.4"
 #define name_case_5_2_4 "t_connect operation"
+#define sref_case_5_2_4 "(none)"
 #define desc_case_5_2_4 "\
 This test case tests the t_connect operation on a non-STREAMS file descriptor."
 
@@ -9258,6 +9703,7 @@ static struct test_stream test_5_2_4_bot = { &preamble_5_2_4_bot, &test_case_5_2
 #define tgrp_case_5_2_5 test_group_10
 #define numb_case_5_2_5 "5.2.5"
 #define name_case_5_2_5 "t_getinfo operation"
+#define sref_case_5_2_5 "(none)"
 #define desc_case_5_2_5 "\
 This test case tests the t_getinfo operation on a non-STREAMS file descriptor."
 
@@ -9283,6 +9729,7 @@ static struct test_stream test_5_2_5_bot = { &preamble_5_2_5_bot, &test_case_5_2
 #define tgrp_case_5_2_6 test_group_10
 #define numb_case_5_2_6 "5.2.6"
 #define name_case_5_2_6 "t_getprotaddr operation"
+#define sref_case_5_2_6 "(none)"
 #define desc_case_5_2_6 "\
 This test case tests the t_getprotaddr operation on a non-STREAMS file descriptor."
 
@@ -9308,6 +9755,7 @@ static struct test_stream test_5_2_6_bot = { &preamble_5_2_6_bot, &test_case_5_2
 #define tgrp_case_5_2_7 test_group_10
 #define numb_case_5_2_7 "5.2.7"
 #define name_case_5_2_7 "t_getstate operation"
+#define sref_case_5_2_7 "(none)"
 #define desc_case_5_2_7 "\
 This test case tests the t_getstate operation on a non-STREAMS file descriptor."
 
@@ -9333,6 +9781,7 @@ static struct test_stream test_5_2_7_bot = { &preamble_5_2_7_bot, &test_case_5_2
 #define tgrp_case_5_2_8 test_group_10
 #define numb_case_5_2_8 "5.2.8"
 #define name_case_5_2_8 "t_listen operation"
+#define sref_case_5_2_8 "(none)"
 #define desc_case_5_2_8 "\
 This test case tests the t_listen operation on a non-STREAMS file descriptor."
 
@@ -9358,6 +9807,7 @@ static struct test_stream test_5_2_8_bot = { &preamble_5_2_8_bot, &test_case_5_2
 #define tgrp_case_5_2_9 test_group_10
 #define numb_case_5_2_9 "5.2.9"
 #define name_case_5_2_9 "t_look operation"
+#define sref_case_5_2_9 "(none)"
 #define desc_case_5_2_9 "\
 This test case tests the t_look operation on a non-STREAMS file descriptor."
 
@@ -9383,6 +9833,7 @@ static struct test_stream test_5_2_9_bot = { &preamble_5_2_9_bot, &test_case_5_2
 #define tgrp_case_5_2_10 test_group_10
 #define numb_case_5_2_10 "5.2.10"
 #define name_case_5_2_10 "t_optmgmt operation"
+#define sref_case_5_2_10 "(none)"
 #define desc_case_5_2_10 "\
 This test case tests the t_optmgmt operation on a non-STREAMS file descriptor."
 
@@ -9408,6 +9859,7 @@ static struct test_stream test_5_2_10_bot = { &preamble_5_2_10_bot, &test_case_5
 #define tgrp_case_5_2_11 test_group_10
 #define numb_case_5_2_11 "5.2.11"
 #define name_case_5_2_11 "t_rcv operation"
+#define sref_case_5_2_11 "(none)"
 #define desc_case_5_2_11 "\
 This test case tests the t_rcv operation on a non-STREAMS file descriptor."
 
@@ -9433,6 +9885,7 @@ static struct test_stream test_5_2_11_bot = { &preamble_5_2_11_bot, &test_case_5
 #define tgrp_case_5_2_12 test_group_10
 #define numb_case_5_2_12 "5.2.12"
 #define name_case_5_2_12 "t_rcvconnect operation"
+#define sref_case_5_2_12 "(none)"
 #define desc_case_5_2_12 "\
 This test case tests the t_rcvconnect operation on a non-STREAMS file descriptor."
 
@@ -9458,6 +9911,7 @@ static struct test_stream test_5_2_12_bot = { &preamble_5_2_12_bot, &test_case_5
 #define tgrp_case_5_2_13 test_group_10
 #define numb_case_5_2_13 "5.2.13"
 #define name_case_5_2_13 "t_rcvdis operation"
+#define sref_case_5_2_13 "(none)"
 #define desc_case_5_2_13 "\
 This test case tests the t_rcvdis operation on a non-STREAMS file descriptor."
 
@@ -9483,6 +9937,7 @@ static struct test_stream test_5_2_13_bot = { &preamble_5_2_13_bot, &test_case_5
 #define tgrp_case_5_2_14 test_group_10
 #define numb_case_5_2_14 "5.2.14"
 #define name_case_5_2_14 "t_rcvrel operation"
+#define sref_case_5_2_14 "(none)"
 #define desc_case_5_2_14 "\
 This test case tests the t_rcvrel operation on a non-STREAMS file descriptor."
 
@@ -9508,6 +9963,7 @@ static struct test_stream test_5_2_14_bot = { &preamble_5_2_14_bot, &test_case_5
 #define tgrp_case_5_2_15 test_group_10
 #define numb_case_5_2_15 "5.2.15"
 #define name_case_5_2_15 "t_rcvreldata operation"
+#define sref_case_5_2_15 "(none)"
 #define desc_case_5_2_15 "\
 This test case tests the t_rcvreldata operation on a non-STREAMS file descriptor."
 
@@ -9533,6 +9989,7 @@ static struct test_stream test_5_2_15_bot = { &preamble_5_2_15_bot, &test_case_5
 #define tgrp_case_5_2_16 test_group_10
 #define numb_case_5_2_16 "5.2.16"
 #define name_case_5_2_16 "t_rcvudata operation"
+#define sref_case_5_2_16 "(none)"
 #define desc_case_5_2_16 "\
 This test case tests the t_rcvudata operation on a non-STREAMS file descriptor."
 
@@ -9558,6 +10015,7 @@ static struct test_stream test_5_2_16_bot = { &preamble_5_2_16_bot, &test_case_5
 #define tgrp_case_5_2_17 test_group_10
 #define numb_case_5_2_17 "5.2.17"
 #define name_case_5_2_17 "t_rcvuderr operation"
+#define sref_case_5_2_17 "(none)"
 #define desc_case_5_2_17 "\
 This test case tests the t_rcvuderr operation on a non-STREAMS file descriptor."
 
@@ -9583,6 +10041,7 @@ static struct test_stream test_5_2_17_bot = { &preamble_5_2_17_bot, &test_case_5
 #define tgrp_case_5_2_18 test_group_10
 #define numb_case_5_2_18 "5.2.18"
 #define name_case_5_2_18 "t_rcvv operation"
+#define sref_case_5_2_18 "(none)"
 #define desc_case_5_2_18 "\
 This test case tests the t_rcvv operation on a non-STREAMS file descriptor."
 
@@ -9608,6 +10067,7 @@ static struct test_stream test_5_2_18_bot = { &preamble_5_2_18_bot, &test_case_5
 #define tgrp_case_5_2_19 test_group_10
 #define numb_case_5_2_19 "5.2.19"
 #define name_case_5_2_19 "t_rcvvudata operation"
+#define sref_case_5_2_19 "(none)"
 #define desc_case_5_2_19 "\
 This test case tests the t_rcvvudata operation on a non-STREAMS file descriptor."
 
@@ -9633,6 +10093,7 @@ static struct test_stream test_5_2_19_bot = { &preamble_5_2_19_bot, &test_case_5
 #define tgrp_case_5_2_20 test_group_10
 #define numb_case_5_2_20 "5.2.20"
 #define name_case_5_2_20 "t_snd operation"
+#define sref_case_5_2_20 "(none)"
 #define desc_case_5_2_20 "\
 This test case tests the t_snd operation on a non-STREAMS file descriptor."
 
@@ -9658,6 +10119,7 @@ static struct test_stream test_5_2_20_bot = { &preamble_5_2_20_bot, &test_case_5
 #define tgrp_case_5_2_21 test_group_10
 #define numb_case_5_2_21 "5.2.21"
 #define name_case_5_2_21 "t_snddis operation"
+#define sref_case_5_2_21 "(none)"
 #define desc_case_5_2_21 "\
 This test case tests the t_snddis operation on a non-STREAMS file descriptor."
 
@@ -9683,6 +10145,7 @@ static struct test_stream test_5_2_21_bot = { &preamble_5_2_21_bot, &test_case_5
 #define tgrp_case_5_2_22 test_group_10
 #define numb_case_5_2_22 "5.2.22"
 #define name_case_5_2_22 "t_sndrel operation"
+#define sref_case_5_2_22 "(none)"
 #define desc_case_5_2_22 "\
 This test case tests the t_sndrel operation on a non-STREAMS file descriptor."
 
@@ -9708,6 +10171,7 @@ static struct test_stream test_5_2_22_bot = { &preamble_5_2_22_bot, &test_case_5
 #define tgrp_case_5_2_23 test_group_10
 #define numb_case_5_2_23 "5.2.23"
 #define name_case_5_2_23 "t_sndreldata operation"
+#define sref_case_5_2_23 "(none)"
 #define desc_case_5_2_23 "\
 This test case tests the t_sndreldata operation on a non-STREAMS file descriptor."
 
@@ -9733,6 +10197,7 @@ static struct test_stream test_5_2_23_bot = { &preamble_5_2_23_bot, &test_case_5
 #define tgrp_case_5_2_24 test_group_10
 #define numb_case_5_2_24 "5.2.24"
 #define name_case_5_2_24 "t_sndudata operation"
+#define sref_case_5_2_24 "(none)"
 #define desc_case_5_2_24 "\
 This test case tests the t_sndudata operation on a non-STREAMS file descriptor."
 
@@ -9758,6 +10223,7 @@ static struct test_stream test_5_2_24_bot = { &preamble_5_2_24_bot, &test_case_5
 #define tgrp_case_5_2_25 test_group_10
 #define numb_case_5_2_25 "5.2.25"
 #define name_case_5_2_25 "t_sndv operation"
+#define sref_case_5_2_25 "(none)"
 #define desc_case_5_2_25 "\
 This test case tests the t_sndv operation on a non-STREAMS file descriptor."
 
@@ -9783,6 +10249,7 @@ static struct test_stream test_5_2_25_bot = { &preamble_5_2_25_bot, &test_case_5
 #define tgrp_case_5_2_26 test_group_10
 #define numb_case_5_2_26 "5.2.26"
 #define name_case_5_2_26 "t_sndvudata operation"
+#define sref_case_5_2_26 "(none)"
 #define desc_case_5_2_26 "\
 This test case tests the t_sndvudata operation on a non-STREAMS file descriptor."
 
@@ -9808,6 +10275,7 @@ static struct test_stream test_5_2_26_bot = { &preamble_5_2_26_bot, &test_case_5
 #define tgrp_case_5_2_27 test_group_10
 #define numb_case_5_2_27 "5.2.27"
 #define name_case_5_2_27 "t_sync operation"
+#define sref_case_5_2_27 "(none)"
 #define desc_case_5_2_27 "\
 This test case tests the t_sync operation on a non-STREAMS file descriptor."
 
@@ -9833,6 +10301,7 @@ static struct test_stream test_5_2_27_bot = { &preamble_5_2_27_bot, &test_case_5
 #define tgrp_case_5_2_28 test_group_10
 #define numb_case_5_2_28 "5.2.28"
 #define name_case_5_2_28 "t_unbind operation"
+#define sref_case_5_2_28 "(none)"
 #define desc_case_5_2_28 "\
 This test case tests the t_unbind operation on a non-STREAMS file descriptor."
 
@@ -9859,6 +10328,7 @@ static struct test_stream test_5_2_28_bot = { &preamble_5_2_28_bot, &test_case_5
 #define tgrp_case_5_3_1 test_group_11
 #define numb_case_5_3_1 "5.3.1"
 #define name_case_5_3_1 "Without \"timod\" pushed -- t_accept operation"
+#define sref_case_5_3_1 "(none)"
 #define desc_case_5_3_1 "\
 This test case tests the t_accept operation on a STREAMS file descriptor."
 
@@ -9902,6 +10372,7 @@ static struct test_stream test_5_3_1_bot = { &preamble_5_3_1_bot, &test_case_5_3
 #define tgrp_case_5_3_2 test_group_11
 #define numb_case_5_3_2 "5.3.2"
 #define name_case_5_3_2 "Without \"timod\" pushed -- t_bind operation"
+#define sref_case_5_3_2 "(none)"
 #define desc_case_5_3_2 "\
 This test case tests the t_bind operation on a STREAMS file descriptor."
 
@@ -9927,6 +10398,7 @@ static struct test_stream test_5_3_2_bot = { &preamble_5_3_2_bot, &test_case_5_3
 #define tgrp_case_5_3_3 test_group_11
 #define numb_case_5_3_3 "5.3.3"
 #define name_case_5_3_3 "Without \"timod\" pushed -- t_close operation"
+#define sref_case_5_3_3 "(none)"
 #define desc_case_5_3_3 "\
 This test case tests the t_close operation on a STREAMS file descriptor."
 
@@ -9952,6 +10424,7 @@ static struct test_stream test_5_3_3_bot = { &preamble_5_3_3_bot, &test_case_5_3
 #define tgrp_case_5_3_4 test_group_11
 #define numb_case_5_3_4 "5.3.4"
 #define name_case_5_3_4 "Without \"timod\" pushed -- t_connect operation"
+#define sref_case_5_3_4 "(none)"
 #define desc_case_5_3_4 "\
 This test case tests the t_connect operation on a STREAMS file descriptor."
 
@@ -9977,6 +10450,7 @@ static struct test_stream test_5_3_4_bot = { &preamble_5_3_4_bot, &test_case_5_3
 #define tgrp_case_5_3_5 test_group_11
 #define numb_case_5_3_5 "5.3.5"
 #define name_case_5_3_5 "Without \"timod\" pushed -- t_getinfo operation"
+#define sref_case_5_3_5 "(none)"
 #define desc_case_5_3_5 "\
 This test case tests the t_getinfo operation on a STREAMS file descriptor."
 
@@ -10002,6 +10476,7 @@ static struct test_stream test_5_3_5_bot = { &preamble_5_3_5_bot, &test_case_5_3
 #define tgrp_case_5_3_6 test_group_11
 #define numb_case_5_3_6 "5.3.6"
 #define name_case_5_3_6 "Without \"timod\" pushed -- t_getprotaddr operation"
+#define sref_case_5_3_6 "(none)"
 #define desc_case_5_3_6 "\
 This test case tests the t_getprotaddr operation on a STREAMS file descriptor."
 
@@ -10027,6 +10502,7 @@ static struct test_stream test_5_3_6_bot = { &preamble_5_3_6_bot, &test_case_5_3
 #define tgrp_case_5_3_7 test_group_11
 #define numb_case_5_3_7 "5.3.7"
 #define name_case_5_3_7 "Without \"timod\" pushed -- t_getstate operation"
+#define sref_case_5_3_7 "(none)"
 #define desc_case_5_3_7 "\
 This test case tests the t_getstate operation on a STREAMS file descriptor."
 
@@ -10052,6 +10528,7 @@ static struct test_stream test_5_3_7_bot = { &preamble_5_3_7_bot, &test_case_5_3
 #define tgrp_case_5_3_8 test_group_11
 #define numb_case_5_3_8 "5.3.8"
 #define name_case_5_3_8 "Without \"timod\" pushed -- t_listen operation"
+#define sref_case_5_3_8 "(none)"
 #define desc_case_5_3_8 "\
 This test case tests the t_listen operation on a STREAMS file descriptor."
 
@@ -10077,6 +10554,7 @@ static struct test_stream test_5_3_8_bot = { &preamble_5_3_8_bot, &test_case_5_3
 #define tgrp_case_5_3_9 test_group_11
 #define numb_case_5_3_9 "5.3.9"
 #define name_case_5_3_9 "Without \"timod\" pushed -- t_look operation"
+#define sref_case_5_3_9 "(none)"
 #define desc_case_5_3_9 "\
 This test case tests the t_look operation on a STREAMS file descriptor."
 
@@ -10102,6 +10580,7 @@ static struct test_stream test_5_3_9_bot = { &preamble_5_3_9_bot, &test_case_5_3
 #define tgrp_case_5_3_10 test_group_11
 #define numb_case_5_3_10 "5.3.10"
 #define name_case_5_3_10 "Without \"timod\" pushed -- t_optmgmt operation"
+#define sref_case_5_3_10 "(none)"
 #define desc_case_5_3_10 "\
 This test case tests the t_optmgmt operation on a STREAMS file descriptor."
 
@@ -10127,6 +10606,7 @@ static struct test_stream test_5_3_10_bot = { &preamble_5_3_10_bot, &test_case_5
 #define tgrp_case_5_3_11 test_group_11
 #define numb_case_5_3_11 "5.3.11"
 #define name_case_5_3_11 "Without \"timod\" pushed -- t_rcv operation"
+#define sref_case_5_3_11 "(none)"
 #define desc_case_5_3_11 "\
 This test case tests the t_rcv operation on a STREAMS file descriptor."
 
@@ -10152,6 +10632,7 @@ static struct test_stream test_5_3_11_bot = { &preamble_5_3_11_bot, &test_case_5
 #define tgrp_case_5_3_12 test_group_11
 #define numb_case_5_3_12 "5.3.12"
 #define name_case_5_3_12 "Without \"timod\" pushed -- t_rcvconnect operation"
+#define sref_case_5_3_12 "(none)"
 #define desc_case_5_3_12 "\
 This test case tests the t_rcvconnect operation on a STREAMS file descriptor."
 
@@ -10177,6 +10658,7 @@ static struct test_stream test_5_3_12_bot = { &preamble_5_3_12_bot, &test_case_5
 #define tgrp_case_5_3_13 test_group_11
 #define numb_case_5_3_13 "5.3.13"
 #define name_case_5_3_13 "Without \"timod\" pushed -- t_rcvdis operation"
+#define sref_case_5_3_13 "(none)"
 #define desc_case_5_3_13 "\
 This test case tests the t_rcvdis operation on a STREAMS file descriptor."
 
@@ -10202,6 +10684,7 @@ static struct test_stream test_5_3_13_bot = { &preamble_5_3_13_bot, &test_case_5
 #define tgrp_case_5_3_14 test_group_11
 #define numb_case_5_3_14 "5.3.14"
 #define name_case_5_3_14 "Without \"timod\" pushed -- t_rcvrel operation"
+#define sref_case_5_3_14 "(none)"
 #define desc_case_5_3_14 "\
 This test case tests the t_rcvrel operation on a STREAMS file descriptor."
 
@@ -10227,6 +10710,7 @@ static struct test_stream test_5_3_14_bot = { &preamble_5_3_14_bot, &test_case_5
 #define tgrp_case_5_3_15 test_group_11
 #define numb_case_5_3_15 "5.3.15"
 #define name_case_5_3_15 "Without \"timod\" pushed -- t_rcvreldata operation"
+#define sref_case_5_3_15 "(none)"
 #define desc_case_5_3_15 "\
 This test case tests the t_rcvreldata operation on a STREAMS file descriptor."
 
@@ -10252,6 +10736,7 @@ static struct test_stream test_5_3_15_bot = { &preamble_5_3_15_bot, &test_case_5
 #define tgrp_case_5_3_16 test_group_11
 #define numb_case_5_3_16 "5.3.16"
 #define name_case_5_3_16 "Without \"timod\" pushed -- t_rcvudata operation"
+#define sref_case_5_3_16 "(none)"
 #define desc_case_5_3_16 "\
 This test case tests the t_rcvudata operation on a STREAMS file descriptor."
 
@@ -10277,6 +10762,7 @@ static struct test_stream test_5_3_16_bot = { &preamble_5_3_16_bot, &test_case_5
 #define tgrp_case_5_3_17 test_group_11
 #define numb_case_5_3_17 "5.3.17"
 #define name_case_5_3_17 "Without \"timod\" pushed -- t_rcvuderr operation"
+#define sref_case_5_3_17 "(none)"
 #define desc_case_5_3_17 "\
 This test case tests the t_rcvuderr operation on a STREAMS file descriptor."
 
@@ -10302,6 +10788,7 @@ static struct test_stream test_5_3_17_bot = { &preamble_5_3_17_bot, &test_case_5
 #define tgrp_case_5_3_18 test_group_11
 #define numb_case_5_3_18 "5.3.18"
 #define name_case_5_3_18 "Without \"timod\" pushed -- t_rcvv operation"
+#define sref_case_5_3_18 "(none)"
 #define desc_case_5_3_18 "\
 This test case tests the t_rcvv operation on a STREAMS file descriptor."
 
@@ -10327,6 +10814,7 @@ static struct test_stream test_5_3_18_bot = { &preamble_5_3_18_bot, &test_case_5
 #define tgrp_case_5_3_19 test_group_11
 #define numb_case_5_3_19 "5.3.19"
 #define name_case_5_3_19 "Without \"timod\" pushed -- t_rcvvudata operation"
+#define sref_case_5_3_19 "(none)"
 #define desc_case_5_3_19 "\
 This test case tests the t_rcvvudata operation on a STREAMS file descriptor."
 
@@ -10352,6 +10840,7 @@ static struct test_stream test_5_3_19_bot = { &preamble_5_3_19_bot, &test_case_5
 #define tgrp_case_5_3_20 test_group_11
 #define numb_case_5_3_20 "5.3.20"
 #define name_case_5_3_20 "Without \"timod\" pushed -- t_snd operation"
+#define sref_case_5_3_20 "(none)"
 #define desc_case_5_3_20 "\
 This test case tests the t_snd operation on a STREAMS file descriptor."
 
@@ -10377,6 +10866,7 @@ static struct test_stream test_5_3_20_bot = { &preamble_5_3_20_bot, &test_case_5
 #define tgrp_case_5_3_21 test_group_11
 #define numb_case_5_3_21 "5.3.21"
 #define name_case_5_3_21 "Without \"timod\" pushed -- t_snddis operation"
+#define sref_case_5_3_21 "(none)"
 #define desc_case_5_3_21 "\
 This test case tests the t_snddis operation on a STREAMS file descriptor."
 
@@ -10402,6 +10892,7 @@ static struct test_stream test_5_3_21_bot = { &preamble_5_3_21_bot, &test_case_5
 #define tgrp_case_5_3_22 test_group_11
 #define numb_case_5_3_22 "5.3.22"
 #define name_case_5_3_22 "Without \"timod\" pushed -- t_sndrel operation"
+#define sref_case_5_3_22 "(none)"
 #define desc_case_5_3_22 "\
 This test case tests the t_sndrel operation on a STREAMS file descriptor."
 
@@ -10427,6 +10918,7 @@ static struct test_stream test_5_3_22_bot = { &preamble_5_3_22_bot, &test_case_5
 #define tgrp_case_5_3_23 test_group_11
 #define numb_case_5_3_23 "5.3.23"
 #define name_case_5_3_23 "Without \"timod\" pushed -- t_sndreldata operation"
+#define sref_case_5_3_23 "(none)"
 #define desc_case_5_3_23 "\
 This test case tests the t_sndreldata operation on a STREAMS file descriptor."
 
@@ -10452,6 +10944,7 @@ static struct test_stream test_5_3_23_bot = { &preamble_5_3_23_bot, &test_case_5
 #define tgrp_case_5_3_24 test_group_11
 #define numb_case_5_3_24 "5.3.24"
 #define name_case_5_3_24 "Without \"timod\" pushed -- t_sndudata operation"
+#define sref_case_5_3_24 "(none)"
 #define desc_case_5_3_24 "\
 This test case tests the t_sndudata operation on a STREAMS file descriptor."
 
@@ -10477,6 +10970,7 @@ static struct test_stream test_5_3_24_bot = { &preamble_5_3_24_bot, &test_case_5
 #define tgrp_case_5_3_25 test_group_11
 #define numb_case_5_3_25 "5.3.25"
 #define name_case_5_3_25 "Without \"timod\" pushed -- t_sndv operation"
+#define sref_case_5_3_25 "(none)"
 #define desc_case_5_3_25 "\
 This test case tests the t_sndv operation on a STREAMS file descriptor."
 
@@ -10502,6 +10996,7 @@ static struct test_stream test_5_3_25_bot = { &preamble_5_3_25_bot, &test_case_5
 #define tgrp_case_5_3_26 test_group_11
 #define numb_case_5_3_26 "5.3.26"
 #define name_case_5_3_26 "Without \"timod\" pushed -- t_sndvudata operation"
+#define sref_case_5_3_26 "(none)"
 #define desc_case_5_3_26 "\
 This test case tests the t_sndvudata operation on a STREAMS file descriptor."
 
@@ -10527,6 +11022,7 @@ static struct test_stream test_5_3_26_bot = { &preamble_5_3_26_bot, &test_case_5
 #define tgrp_case_5_3_27 test_group_11
 #define numb_case_5_3_27 "5.3.27"
 #define name_case_5_3_27 "Without \"timod\" pushed -- t_sync operation"
+#define sref_case_5_3_27 "(none)"
 #define desc_case_5_3_27 "\
 This test case tests the t_sync operation on a STREAMS file descriptor."
 
@@ -10552,6 +11048,7 @@ static struct test_stream test_5_3_27_bot = { &preamble_5_3_27_bot, &test_case_5
 #define tgrp_case_5_3_28 test_group_11
 #define numb_case_5_3_28 "5.3.28"
 #define name_case_5_3_28 "Without \"timod\" pushed -- t_unbind operation"
+#define sref_case_5_3_28 "(none)"
 #define desc_case_5_3_28 "\
 This test case tests the t_unbind operation on a STREAMS file descriptor."
 
@@ -10578,6 +11075,7 @@ static struct test_stream test_5_3_28_bot = { &preamble_5_3_28_bot, &test_case_5
 #define tgrp_case_6_1_1 test_group_12
 #define numb_case_6_1_1 "6.1.1"
 #define name_case_6_1_1 "t_accept library call -- TACCES error"
+#define sref_case_6_1_1 "(none)"
 #define desc_case_6_1_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10611,6 +11109,7 @@ int test_case_6_1_x_top(int child, int terror, int error)
 
 int test_case_6_1_x_bot(int child, int terror, int error)
 {
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -10657,6 +11156,7 @@ static struct test_stream test_6_1_1_bot = { &preamble_6_1_1_bot, &test_case_6_1
 #define tgrp_case_6_1_2 test_group_12
 #define numb_case_6_1_2 "6.1.2"
 #define name_case_6_1_2 "t_accept library call -- TBADADDR error"
+#define sref_case_6_1_2 "(none)"
 #define desc_case_6_1_2 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10683,6 +11183,7 @@ static struct test_stream test_6_1_2_bot = { &preamble_6_1_2_bot, &test_case_6_1
 #define tgrp_case_6_1_3 test_group_12
 #define numb_case_6_1_3 "6.1.3"
 #define name_case_6_1_3 "t_accept library call -- TBADDATA error"
+#define sref_case_6_1_3 "(none)"
 #define desc_case_6_1_3 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10709,6 +11210,7 @@ static struct test_stream test_6_1_3_bot = { &preamble_6_1_3_bot, &test_case_6_1
 #define tgrp_case_6_1_4 test_group_12
 #define numb_case_6_1_4 "6.1.4"
 #define name_case_6_1_4 "t_accept library call -- TBADF error"
+#define sref_case_6_1_4 "(none)"
 #define desc_case_6_1_4 "\
 This test case tests the TBADF error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10735,6 +11237,7 @@ static struct test_stream test_6_1_4_bot = { &preamble_6_1_4_bot, &test_case_6_1
 #define tgrp_case_6_1_5 test_group_12
 #define numb_case_6_1_5 "6.1.5"
 #define name_case_6_1_5 "t_accept library call -- TBADOPT error"
+#define sref_case_6_1_5 "(none)"
 #define desc_case_6_1_5 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10761,6 +11264,7 @@ static struct test_stream test_6_1_5_bot = { &preamble_6_1_5_bot, &test_case_6_1
 #define tgrp_case_6_1_6 test_group_12
 #define numb_case_6_1_6 "6.1.6"
 #define name_case_6_1_6 "t_accept library call -- TBADSEQ error"
+#define sref_case_6_1_6 "(none)"
 #define desc_case_6_1_6 "\
 This test case tests the TBADSEQ error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10787,6 +11291,7 @@ static struct test_stream test_6_1_6_bot = { &preamble_6_1_6_bot, &test_case_6_1
 #define tgrp_case_6_1_7 test_group_12
 #define numb_case_6_1_7 "6.1.7"
 #define name_case_6_1_7 "t_accept library call -- TNOTSUPPORT error"
+#define sref_case_6_1_7 "(none)"
 #define desc_case_6_1_7 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10813,6 +11318,7 @@ static struct test_stream test_6_1_7_bot = { &preamble_6_1_7_bot, &test_case_6_1
 #define tgrp_case_6_1_8 test_group_12
 #define numb_case_6_1_8 "6.1.8"
 #define name_case_6_1_8 "t_accept library call -- TOUTSTATE error"
+#define sref_case_6_1_8 "(none)"
 #define desc_case_6_1_8 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10839,6 +11345,7 @@ static struct test_stream test_6_1_8_bot = { &preamble_6_1_8_bot, &test_case_6_1
 #define tgrp_case_6_1_9 test_group_12
 #define numb_case_6_1_9 "6.1.9"
 #define name_case_6_1_9 "t_accept library call -- TPROVMISMATCH error"
+#define sref_case_6_1_9 "(none)"
 #define desc_case_6_1_9 "\
 This test case tests the TPROVMISMATCH error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10865,6 +11372,7 @@ static struct test_stream test_6_1_9_bot = { &preamble_6_1_9_bot, &test_case_6_1
 #define tgrp_case_6_1_10 test_group_12
 #define numb_case_6_1_10 "6.1.10"
 #define name_case_6_1_10 "t_accept library call -- TRESADDR error"
+#define sref_case_6_1_10 "(none)"
 #define desc_case_6_1_10 "\
 This test case tests the TRESADDR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10891,6 +11399,7 @@ static struct test_stream test_6_1_10_bot = { &preamble_6_1_10_bot, &test_case_6
 #define tgrp_case_6_1_11 test_group_12
 #define numb_case_6_1_11 "6.1.11"
 #define name_case_6_1_11 "t_accept library call -- TRESQLEN error"
+#define sref_case_6_1_11 "(none)"
 #define desc_case_6_1_11 "\
 This test case tests the TRESQLEN error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10917,6 +11426,7 @@ static struct test_stream test_6_1_11_bot = { &preamble_6_1_11_bot, &test_case_6
 #define tgrp_case_6_1_12 test_group_12
 #define numb_case_6_1_12 "6.1.12"
 #define name_case_6_1_12 "t_accept library call -- TSYSERR error"
+#define sref_case_6_1_12 "(none)"
 #define desc_case_6_1_12 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_accept library call."
@@ -10943,6 +11453,7 @@ static struct test_stream test_6_1_12_bot = { &preamble_6_1_12_bot, &test_case_6
 #define tgrp_case_6_2_1 test_group_12
 #define numb_case_6_2_1 "6.2.1"
 #define name_case_6_2_1 "t_bind library call -- TACCES error"
+#define sref_case_6_2_1 "(none)"
 #define desc_case_6_2_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -10996,6 +11507,7 @@ static struct test_stream test_6_2_1_bot = { &preamble_6_2_1_bot, &test_case_6_2
 #define tgrp_case_6_2_2 test_group_12
 #define numb_case_6_2_2 "6.2.2"
 #define name_case_6_2_2 "t_bind library call -- TADDRBUSY error"
+#define sref_case_6_2_2 "(none)"
 #define desc_case_6_2_2 "\
 This test case tests the TADDRBUSY error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -11022,6 +11534,7 @@ static struct test_stream test_6_2_2_bot = { &preamble_6_2_2_bot, &test_case_6_2
 #define tgrp_case_6_2_3 test_group_12
 #define numb_case_6_2_3 "6.2.3"
 #define name_case_6_2_3 "t_bind library call -- TBADADDR error"
+#define sref_case_6_2_3 "(none)"
 #define desc_case_6_2_3 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -11048,6 +11561,7 @@ static struct test_stream test_6_2_3_bot = { &preamble_6_2_3_bot, &test_case_6_2
 #define tgrp_case_6_2_4 test_group_12
 #define numb_case_6_2_4 "6.2.4"
 #define name_case_6_2_4 "t_bind library call -- TNOADDR error"
+#define sref_case_6_2_4 "(none)"
 #define desc_case_6_2_4 "\
 This test case tests the TNOADDR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -11074,6 +11588,7 @@ static struct test_stream test_6_2_4_bot = { &preamble_6_2_4_bot, &test_case_6_2
 #define tgrp_case_6_2_5 test_group_12
 #define numb_case_6_2_5 "6.2.5"
 #define name_case_6_2_5 "t_bind library call -- TOUTSTATE error"
+#define sref_case_6_2_5 "(none)"
 #define desc_case_6_2_5 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -11100,6 +11615,7 @@ static struct test_stream test_6_2_5_bot = { &preamble_6_2_5_bot, &test_case_6_2
 #define tgrp_case_6_2_6 test_group_12
 #define numb_case_6_2_6 "6.2.6"
 #define name_case_6_2_6 "t_bind library call -- TSYSERR error"
+#define sref_case_6_2_6 "(none)"
 #define desc_case_6_2_6 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_bind library call."
@@ -11126,6 +11642,7 @@ static struct test_stream test_6_2_6_bot = { &preamble_6_2_6_bot, &test_case_6_2
 #define tgrp_case_6_3_1 test_group_12
 #define numb_case_6_3_1 "6.3.1"
 #define name_case_6_3_1 "t_connect library call -- TACCES error"
+#define sref_case_6_3_1 "(none)"
 #define desc_case_6_3_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11181,6 +11698,7 @@ static struct test_stream test_6_3_1_bot = { &preamble_6_3_1_bot, &test_case_6_3
 #define tgrp_case_6_3_2 test_group_12
 #define numb_case_6_3_2 "6.3.2"
 #define name_case_6_3_2 "t_connect library call -- TADDRBUSY error"
+#define sref_case_6_3_2 "(none)"
 #define desc_case_6_3_2 "\
 This test case tests the TADDRBUSY error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11207,6 +11725,7 @@ static struct test_stream test_6_3_2_bot = { &preamble_6_3_2_bot, &test_case_6_3
 #define tgrp_case_6_3_3 test_group_12
 #define numb_case_6_3_3 "6.3.3"
 #define name_case_6_3_3 "t_connect library call -- TBADADDR error"
+#define sref_case_6_3_3 "(none)"
 #define desc_case_6_3_3 "\
 This test case tests the TBADADDR error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11233,6 +11752,7 @@ static struct test_stream test_6_3_3_bot = { &preamble_6_3_3_bot, &test_case_6_3
 #define tgrp_case_6_3_4 test_group_12
 #define numb_case_6_3_4 "6.3.4"
 #define name_case_6_3_4 "t_connect library call -- TBADDATA error"
+#define sref_case_6_3_4 "(none)"
 #define desc_case_6_3_4 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11259,6 +11779,7 @@ static struct test_stream test_6_3_4_bot = { &preamble_6_3_4_bot, &test_case_6_3
 #define tgrp_case_6_3_5 test_group_12
 #define numb_case_6_3_5 "6.3.5"
 #define name_case_6_3_5 "t_connect library call -- TBADOPT error"
+#define sref_case_6_3_5 "(none)"
 #define desc_case_6_3_5 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11285,6 +11806,7 @@ static struct test_stream test_6_3_5_bot = { &preamble_6_3_5_bot, &test_case_6_3
 #define tgrp_case_6_3_6 test_group_12
 #define numb_case_6_3_6 "6.3.6"
 #define name_case_6_3_6 "t_connect library call -- TNOTSUPPORT error"
+#define sref_case_6_3_6 "(none)"
 #define desc_case_6_3_6 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11311,6 +11833,7 @@ static struct test_stream test_6_3_6_bot = { &preamble_6_3_6_bot, &test_case_6_3
 #define tgrp_case_6_3_7 test_group_12
 #define numb_case_6_3_7 "6.3.7"
 #define name_case_6_3_7 "t_connect library call -- TOUTSTATE error"
+#define sref_case_6_3_7 "(none)"
 #define desc_case_6_3_7 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11337,6 +11860,7 @@ static struct test_stream test_6_3_7_bot = { &preamble_6_3_7_bot, &test_case_6_3
 #define tgrp_case_6_3_8 test_group_12
 #define numb_case_6_3_8 "6.3.8"
 #define name_case_6_3_8 "t_connect library call -- TSYSERR error"
+#define sref_case_6_3_8 "(none)"
 #define desc_case_6_3_8 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_connect library call."
@@ -11363,6 +11887,7 @@ static struct test_stream test_6_3_8_bot = { &preamble_6_3_8_bot, &test_case_6_3
 #define tgrp_case_6_4_1 test_group_12
 #define numb_case_6_4_1 "6.4.1"
 #define name_case_6_4_1 "t_optmgmt library call -- TACCES error"
+#define sref_case_6_4_1 "(none)"
 #define desc_case_6_4_1 "\
 This test case tests the TACCES error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11418,6 +11943,7 @@ static struct test_stream test_6_4_1_bot = { &preamble_6_4_1_bot, &test_case_6_4
 #define tgrp_case_6_4_2 test_group_12
 #define numb_case_6_4_2 "6.4.2"
 #define name_case_6_4_2 "t_optmgmt library call -- TBADFLAG error"
+#define sref_case_6_4_2 "(none)"
 #define desc_case_6_4_2 "\
 This test case tests the TBADFLAG error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11444,6 +11970,7 @@ static struct test_stream test_6_4_2_bot = { &preamble_6_4_2_bot, &test_case_6_4
 #define tgrp_case_6_4_3 test_group_12
 #define numb_case_6_4_3 "6.4.3"
 #define name_case_6_4_3 "t_optmgmt library call -- TBADOPT error"
+#define sref_case_6_4_3 "(none)"
 #define desc_case_6_4_3 "\
 This test case tests the TBADOPT error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11470,6 +11997,7 @@ static struct test_stream test_6_4_3_bot = { &preamble_6_4_3_bot, &test_case_6_4
 #define tgrp_case_6_4_4 test_group_12
 #define numb_case_6_4_4 "6.4.4"
 #define name_case_6_4_4 "t_optmgmt library call -- TOUTSTATE error"
+#define sref_case_6_4_4 "(none)"
 #define desc_case_6_4_4 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11496,6 +12024,7 @@ static struct test_stream test_6_4_4_bot = { &preamble_6_4_4_bot, &test_case_6_4
 #define tgrp_case_6_4_5 test_group_12
 #define numb_case_6_4_5 "6.4.5"
 #define name_case_6_4_5 "t_optmgmt library call -- TNOTSUPPORT error"
+#define sref_case_6_4_5 "(none)"
 #define desc_case_6_4_5 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11522,6 +12051,7 @@ static struct test_stream test_6_4_5_bot = { &preamble_6_4_5_bot, &test_case_6_4
 #define tgrp_case_6_4_6 test_group_12
 #define numb_case_6_4_6 "6.4.6"
 #define name_case_6_4_6 "t_optmgmt library call -- TSYSERR error"
+#define sref_case_6_4_6 "(none)"
 #define desc_case_6_4_6 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_optmgmt library call."
@@ -11548,6 +12078,7 @@ static struct test_stream test_6_4_6_bot = { &preamble_6_4_6_bot, &test_case_6_4
 #define tgrp_case_6_5_1 test_group_12
 #define numb_case_6_5_1 "6.5.1"
 #define name_case_6_5_1 "t_snddis library call -- TBADDATA error"
+#define sref_case_6_5_1 "(none)"
 #define desc_case_6_5_1 "\
 This test case tests the TBADDATA error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
@@ -11603,6 +12134,7 @@ static struct test_stream test_6_5_1_bot = { &preamble_6_5_1_bot, &test_case_6_5
 #define tgrp_case_6_5_2 test_group_12
 #define numb_case_6_5_2 "6.5.2"
 #define name_case_6_5_2 "t_snddis library call -- TBADSEQ error"
+#define sref_case_6_5_2 "(none)"
 #define desc_case_6_5_2 "\
 This test case tests the TBADSEQ error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
@@ -11629,6 +12161,7 @@ static struct test_stream test_6_5_2_bot = { &preamble_6_5_2_bot, &test_case_6_5
 #define tgrp_case_6_5_3 test_group_12
 #define numb_case_6_5_3 "6.5.3"
 #define name_case_6_5_3 "t_snddis library call -- TNOTSUPPORT error"
+#define sref_case_6_5_3 "(none)"
 #define desc_case_6_5_3 "\
 This test case tests the TNOTSUPPORT error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
@@ -11655,6 +12188,7 @@ static struct test_stream test_6_5_3_bot = { &preamble_6_5_3_bot, &test_case_6_5
 #define tgrp_case_6_5_4 test_group_12
 #define numb_case_6_5_4 "6.5.4"
 #define name_case_6_5_4 "t_snddis library call -- TOUTSTATE error"
+#define sref_case_6_5_4 "(none)"
 #define desc_case_6_5_4 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
@@ -11681,6 +12215,7 @@ static struct test_stream test_6_5_4_bot = { &preamble_6_5_4_bot, &test_case_6_5
 #define tgrp_case_6_5_5 test_group_12
 #define numb_case_6_5_5 "6.5.5"
 #define name_case_6_5_5 "t_snddis library call -- TSYSERR error"
+#define sref_case_6_5_5 "(none)"
 #define desc_case_6_5_5 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_snddis library call."
@@ -11707,6 +12242,7 @@ static struct test_stream test_6_5_5_bot = { &preamble_6_5_5_bot, &test_case_6_5
 #define tgrp_case_6_6_1 test_group_12
 #define numb_case_6_6_1 "6.6.1"
 #define name_case_6_6_1 "t_unbind library call -- TOUTSTATE error"
+#define sref_case_6_6_1 "(none)"
 #define desc_case_6_6_1 "\
 This test case tests the TOUTSTATE error acknowledgement from the TPI provider\n\
 in response to the t_unbind library call."
@@ -11764,6 +12300,7 @@ static struct test_stream test_6_6_1_bot = { &preamble_6_6_1_bot, &test_case_6_6
 #define tgrp_case_6_6_2 test_group_12
 #define numb_case_6_6_2 "6.6.2"
 #define name_case_6_6_2 "t_unbind library call -- TSYSERR error"
+#define sref_case_6_6_2 "(none)"
 #define desc_case_6_6_2 "\
 This test case tests the TSYSERR error acknowledgement from the TPI provider\n\
 in response to the t_unbind library call."
@@ -11791,6 +12328,7 @@ static struct test_stream test_6_6_2_bot = { &preamble_6_6_2_bot, &test_case_6_6
 #define tgrp_case_7_1_1 test_group_13
 #define numb_case_7_1_1 "7.1.1"
 #define name_case_7_1_1 "t_accept library call -- TINDOUT error"
+#define sref_case_7_1_1 "(none)"
 #define desc_case_7_1_1 "\
 This test case tests the TINDOUT error from the XTI library in response to\n\
 the t_accept library call."
@@ -11823,10 +12361,12 @@ int test_case_7_1_1_top(int child)
 int test_case_7_1_1_bot(int child)
 {
 	last_sequence = 1;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	last_sequence = 2;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -11857,6 +12397,7 @@ static struct test_stream test_7_1_1_bot = { &preamble_7_1_1_bot, &test_case_7_1
 #define tgrp_case_7_1_2 test_group_13
 #define numb_case_7_1_2 "7.1.2"
 #define name_case_7_1_2 "t_accept library call -- TNOTSUPPORT error"
+#define sref_case_7_1_2 "(none)"
 #define desc_case_7_1_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_accept library call."
@@ -11889,6 +12430,7 @@ static struct test_stream test_7_1_2_bot = { &preamble_7_1_2_bot, &test_case_7_1
 #define tgrp_case_7_1_3 test_group_13
 #define numb_case_7_1_3 "7.1.3"
 #define name_case_7_1_3 "t_accept library call -- TOUTSTATE error"
+#define sref_case_7_1_3 "(none)"
 #define desc_case_7_1_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_accept library call."
@@ -11921,6 +12463,7 @@ static struct test_stream test_7_1_3_bot = { &preamble_7_1_3_bot, &test_case_7_1
 #define tgrp_case_7_2_1 test_group_13
 #define numb_case_7_2_1 "7.2.1"
 #define name_case_7_2_1 "t_connect library call -- TOUTSTATE error"
+#define sref_case_7_2_1 "(none)"
 #define desc_case_7_2_1 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_connect library call."
@@ -11953,6 +12496,7 @@ static struct test_stream test_7_2_1_bot = { &preamble_7_2_1_bot, &test_case_7_2
 #define tgrp_case_7_3_1 test_group_13
 #define numb_case_7_3_1 "7.3.1"
 #define name_case_7_3_1 "t_listen library call -- TBADQLEN error"
+#define sref_case_7_3_1 "(none)"
 #define desc_case_7_3_1 "\
 This test case tests the TBADQLEN error from the XTI library in response to\n\
 the t_listen library call."
@@ -12005,6 +12549,7 @@ static struct test_stream test_7_3_1_bot = { &preamble_7_3_1_bot, &test_case_7_3
 #define tgrp_case_7_3_2 test_group_13
 #define numb_case_7_3_2 "7.3.2"
 #define name_case_7_3_2 "t_listen library call -- TNOTSUPPORT error"
+#define sref_case_7_3_2 "(none)"
 #define desc_case_7_3_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_listen library call."
@@ -12037,6 +12582,7 @@ static struct test_stream test_7_3_2_bot = { &preamble_7_3_2_bot, &test_case_7_3
 #define tgrp_case_7_3_3 test_group_13
 #define numb_case_7_3_3 "7.3.3"
 #define name_case_7_3_3 "t_listen library call -- TOUTSTATE error"
+#define sref_case_7_3_3 "(none)"
 #define desc_case_7_3_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_listen library call."
@@ -12069,6 +12615,7 @@ static struct test_stream test_7_3_3_bot = { &preamble_7_3_3_bot, &test_case_7_3
 #define tgrp_case_7_3_4 test_group_13
 #define numb_case_7_3_4 "7.3.4"
 #define name_case_7_3_4 "t_listen library call -- TQFULL error"
+#define sref_case_7_3_4 "(none)"
 #define desc_case_7_3_4 "\
 This test case tests the TQFULL error from the XTI library in response to\n\
 the t_listen library call."
@@ -12099,10 +12646,12 @@ int test_case_7_3_4_top(int child)
 int test_case_7_3_4_bot(int child)
 {
 	last_sequence = 1;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	last_sequence = 2;
+	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -12133,6 +12682,7 @@ static struct test_stream test_7_3_4_bot = { &preamble_7_3_4_bot, &test_case_7_3
 #define tgrp_case_7_3_5 test_group_13
 #define numb_case_7_3_5 "7.3.5"
 #define name_case_7_3_5 "t_listen library call -- TNODATA error"
+#define sref_case_7_3_5 "(none)"
 #define desc_case_7_3_5 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_listen library call."
@@ -12168,6 +12718,7 @@ static struct test_stream test_7_3_5_bot = { &preamble_7_3_5_bot, &test_case_7_3
 #define tgrp_case_7_4_1 test_group_13
 #define numb_case_7_4_1 "7.4.1"
 #define name_case_7_4_1 "t_rcv library call -- TNODATA error"
+#define sref_case_7_4_1 "(none)"
 #define desc_case_7_4_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcv library call."
@@ -12203,6 +12754,7 @@ static struct test_stream test_7_4_1_bot = { &preamble_7_4_1_bot, &test_case_7_4
 #define tgrp_case_7_4_2 test_group_13
 #define numb_case_7_4_2 "7.4.2"
 #define name_case_7_4_2 "t_rcv library call -- TNOTSUPPORT error"
+#define sref_case_7_4_2 "(none)"
 #define desc_case_7_4_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcv library call."
@@ -12235,6 +12787,7 @@ static struct test_stream test_7_4_2_bot = { &preamble_7_4_2_bot, &test_case_7_4
 #define tgrp_case_7_4_3 test_group_13
 #define numb_case_7_4_3 "7.4.3"
 #define name_case_7_4_3 "t_rcv library call -- TOUTSTATE error"
+#define sref_case_7_4_3 "(none)"
 #define desc_case_7_4_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcv library call."
@@ -12267,6 +12820,7 @@ static struct test_stream test_7_4_3_bot = { &preamble_7_4_3_bot, &test_case_7_4
 #define tgrp_case_7_5_1 test_group_13
 #define numb_case_7_5_1 "7.5.1"
 #define name_case_7_5_1 "t_rcvv library call -- TNODATA error"
+#define sref_case_7_5_1 "(none)"
 #define desc_case_7_5_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvv library call."
@@ -12302,6 +12856,7 @@ static struct test_stream test_7_5_1_bot = { &preamble_7_5_1_bot, &test_case_7_5
 #define tgrp_case_7_5_2 test_group_13
 #define numb_case_7_5_2 "7.5.2"
 #define name_case_7_5_2 "t_rcvv library call -- TNOTSUPPORT error"
+#define sref_case_7_5_2 "(none)"
 #define desc_case_7_5_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvv library call."
@@ -12334,6 +12889,7 @@ static struct test_stream test_7_5_2_bot = { &preamble_7_5_2_bot, &test_case_7_5
 #define tgrp_case_7_5_3 test_group_13
 #define numb_case_7_5_3 "7.5.3"
 #define name_case_7_5_3 "t_rcvv library call -- TOUTSTATE error"
+#define sref_case_7_5_3 "(none)"
 #define desc_case_7_5_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvv library call."
@@ -12366,6 +12922,7 @@ static struct test_stream test_7_5_3_bot = { &preamble_7_5_3_bot, &test_case_7_5
 #define tgrp_case_7_6_1 test_group_13
 #define numb_case_7_6_1 "7.6.1"
 #define name_case_7_6_1 "t_rcvconnect library call -- TNODATA error"
+#define sref_case_7_6_1 "(none)"
 #define desc_case_7_6_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvconnect library call."
@@ -12422,6 +12979,7 @@ static struct test_stream test_7_6_1_bot = { &preamble_7_6_1_bot, &test_case_7_6
 #define tgrp_case_7_6_2 test_group_13
 #define numb_case_7_6_2 "7.6.2"
 #define name_case_7_6_2 "t_rcvconnect library call -- TNOTSUPPORT error"
+#define sref_case_7_6_2 "(none)"
 #define desc_case_7_6_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvconnect library call."
@@ -12454,6 +13012,7 @@ static struct test_stream test_7_6_2_bot = { &preamble_7_6_2_bot, &test_case_7_6
 #define tgrp_case_7_6_3 test_group_13
 #define numb_case_7_6_3 "7.6.3"
 #define name_case_7_6_3 "t_rcvconnect library call -- TOUTSTATE error"
+#define sref_case_7_6_3 "(none)"
 #define desc_case_7_6_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvconnect library call."
@@ -12486,6 +13045,7 @@ static struct test_stream test_7_6_3_bot = { &preamble_7_6_3_bot, &test_case_7_6
 #define tgrp_case_7_7_1 test_group_13
 #define numb_case_7_7_1 "7.7.1"
 #define name_case_7_7_1 "t_rcvdis library call -- TNODIS error"
+#define sref_case_7_7_1 "(none)"
 #define desc_case_7_7_1 "\
 This test case tests the TNODIS error from the XTI library in response to\n\
 the t_rcvdis library call."
@@ -12521,6 +13081,7 @@ static struct test_stream test_7_7_1_bot = { &preamble_7_7_1_bot, &test_case_7_7
 #define tgrp_case_7_7_2 test_group_13
 #define numb_case_7_7_2 "7.7.2"
 #define name_case_7_7_2 "t_rcvdis library call -- TNOTSUPPORT error"
+#define sref_case_7_7_2 "(none)"
 #define desc_case_7_7_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvdis library call."
@@ -12553,6 +13114,7 @@ static struct test_stream test_7_7_2_bot = { &preamble_7_7_2_bot, &test_case_7_7
 #define tgrp_case_7_7_3 test_group_13
 #define numb_case_7_7_3 "7.7.3"
 #define name_case_7_7_3 "t_rcvdis library call -- TOUTSTATE error"
+#define sref_case_7_7_3 "(none)"
 #define desc_case_7_7_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvdis library call."
@@ -12585,6 +13147,7 @@ static struct test_stream test_7_7_3_bot = { &preamble_7_7_3_bot, &test_case_7_7
 #define tgrp_case_7_8_1 test_group_13
 #define numb_case_7_8_1 "7.8.1"
 #define name_case_7_8_1 "t_rcvrel library call -- TNOREL error"
+#define sref_case_7_8_1 "(none)"
 #define desc_case_7_8_1 "\
 This test case tests the TNOREL error from the XTI library in response to\n\
 the t_rcvrel library call."
@@ -12620,6 +13183,7 @@ static struct test_stream test_7_8_1_bot = { &preamble_7_8_1_bot, &test_case_7_8
 #define tgrp_case_7_8_2 test_group_13
 #define numb_case_7_8_2 "7.8.2"
 #define name_case_7_8_2 "t_rcvrel library call -- TNOTSUPPORT error"
+#define sref_case_7_8_2 "(none)"
 #define desc_case_7_8_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvrel library call."
@@ -12652,6 +13216,7 @@ static struct test_stream test_7_8_2_bot = { &preamble_7_8_2_bot, &test_case_7_8
 #define tgrp_case_7_8_3 test_group_13
 #define numb_case_7_8_3 "7.8.3"
 #define name_case_7_8_3 "t_rcvrel library call -- TOUTSTATE error"
+#define sref_case_7_8_3 "(none)"
 #define desc_case_7_8_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvrel library call."
@@ -12684,6 +13249,7 @@ static struct test_stream test_7_8_3_bot = { &preamble_7_8_3_bot, &test_case_7_8
 #define tgrp_case_7_9_1 test_group_13
 #define numb_case_7_9_1 "7.9.1"
 #define name_case_7_9_1 "t_rcvreldata library call -- TNOREL error"
+#define sref_case_7_9_1 "(none)"
 #define desc_case_7_9_1 "\
 This test case tests the TNOREL error from the XTI library in response to\n\
 the t_rcvreldata library call."
@@ -12719,6 +13285,7 @@ static struct test_stream test_7_9_1_bot = { &preamble_7_9_1_bot, &test_case_7_9
 #define tgrp_case_7_9_2 test_group_13
 #define numb_case_7_9_2 "7.9.2"
 #define name_case_7_9_2 "t_rcvreldata library call -- TNOTSUPPORT error"
+#define sref_case_7_9_2 "(none)"
 #define desc_case_7_9_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvreldata library call."
@@ -12751,6 +13318,7 @@ static struct test_stream test_7_9_2_bot = { &preamble_7_9_2_bot, &test_case_7_9
 #define tgrp_case_7_9_3 test_group_13
 #define numb_case_7_9_3 "7.9.3"
 #define name_case_7_9_3 "t_rcvreldata library call -- TOUTSTATE error"
+#define sref_case_7_9_3 "(none)"
 #define desc_case_7_9_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvreldata library call."
@@ -12783,6 +13351,7 @@ static struct test_stream test_7_9_3_bot = { &preamble_7_9_3_bot, &test_case_7_9
 #define tgrp_case_7_10_1 test_group_13
 #define numb_case_7_10_1 "7.10.1"
 #define name_case_7_10_1 "t_rcvudata library call -- TNODATA error"
+#define sref_case_7_10_1 "(none)"
 #define desc_case_7_10_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvudata library call."
@@ -12818,6 +13387,7 @@ static struct test_stream test_7_10_1_bot = { &preamble_7_10_1_bot, &test_case_7
 #define tgrp_case_7_10_2 test_group_13
 #define numb_case_7_10_2 "7.10.2"
 #define name_case_7_10_2 "t_rcvudata library call -- TNOTSUPPORT error"
+#define sref_case_7_10_2 "(none)"
 #define desc_case_7_10_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvudata library call."
@@ -12850,6 +13420,7 @@ static struct test_stream test_7_10_2_bot = { &preamble_7_10_2_bot, &test_case_7
 #define tgrp_case_7_10_3 test_group_13
 #define numb_case_7_10_3 "7.10.3"
 #define name_case_7_10_3 "t_rcvudata library call -- TOUTSTATE error"
+#define sref_case_7_10_3 "(none)"
 #define desc_case_7_10_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvudata library call."
@@ -12882,6 +13453,7 @@ static struct test_stream test_7_10_3_bot = { &preamble_7_10_3_bot, &test_case_7
 #define tgrp_case_7_11_1 test_group_13
 #define numb_case_7_11_1 "7.11.1"
 #define name_case_7_11_1 "t_rcvvudata library call -- TNODATA error"
+#define sref_case_7_11_1 "(none)"
 #define desc_case_7_11_1 "\
 This test case tests the TNODATA error from the XTI library in response to\n\
 the t_rcvvudata library call."
@@ -12917,6 +13489,7 @@ static struct test_stream test_7_11_1_bot = { &preamble_7_11_1_bot, &test_case_7
 #define tgrp_case_7_11_2 test_group_13
 #define numb_case_7_11_2 "7.11.2"
 #define name_case_7_11_2 "t_rcvvudata library call -- TNOTSUPPORT error"
+#define sref_case_7_11_2 "(none)"
 #define desc_case_7_11_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvvudata library call."
@@ -12949,6 +13522,7 @@ static struct test_stream test_7_11_2_bot = { &preamble_7_11_2_bot, &test_case_7
 #define tgrp_case_7_11_3 test_group_13
 #define numb_case_7_11_3 "7.11.3"
 #define name_case_7_11_3 "t_rcvvudata library call -- TOUTSTATE error"
+#define sref_case_7_11_3 "(none)"
 #define desc_case_7_11_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvvudata library call."
@@ -12981,6 +13555,7 @@ static struct test_stream test_7_11_3_bot = { &preamble_7_11_3_bot, &test_case_7
 #define tgrp_case_7_12_1 test_group_13
 #define numb_case_7_12_1 "7.12.1"
 #define name_case_7_12_1 "t_rcvuderr library call -- TNOUDERR error"
+#define sref_case_7_12_1 "(none)"
 #define desc_case_7_12_1 "\
 This test case tests the TNOUDERR error from the XTI library in response to\n\
 the t_rcvuderr library call."
@@ -13016,6 +13591,7 @@ static struct test_stream test_7_12_1_bot = { &preamble_7_12_1_bot, &test_case_7
 #define tgrp_case_7_12_2 test_group_13
 #define numb_case_7_12_2 "7.12.2"
 #define name_case_7_12_2 "t_rcvuderr library call -- TNOTSUPPORT error"
+#define sref_case_7_12_2 "(none)"
 #define desc_case_7_12_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_rcvuderr library call."
@@ -13048,6 +13624,7 @@ static struct test_stream test_7_12_2_bot = { &preamble_7_12_2_bot, &test_case_7
 #define tgrp_case_7_12_3 test_group_13
 #define numb_case_7_12_3 "7.12.3"
 #define name_case_7_12_3 "t_rcvuderr library call -- TOUTSTATE error"
+#define sref_case_7_12_3 "(none)"
 #define desc_case_7_12_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_rcvuderr library call."
@@ -13080,6 +13657,7 @@ static struct test_stream test_7_12_3_bot = { &preamble_7_12_3_bot, &test_case_7
 #define tgrp_case_7_13_1 test_group_13
 #define numb_case_7_13_1 "7.13.1"
 #define name_case_7_13_1 "t_snd library call -- TFLOW error"
+#define sref_case_7_13_1 "(none)"
 #define desc_case_7_13_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_snd library call."
@@ -13149,6 +13727,7 @@ static struct test_stream test_7_13_1_bot = { &preamble_7_13_1_bot, &test_case_7
 #define tgrp_case_7_13_2 test_group_13
 #define numb_case_7_13_2 "7.13.2"
 #define name_case_7_13_2 "t_snd library call -- TNOTSUPPORT error"
+#define sref_case_7_13_2 "(none)"
 #define desc_case_7_13_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_snd library call."
@@ -13181,6 +13760,7 @@ static struct test_stream test_7_13_2_bot = { &preamble_7_13_2_bot, &test_case_7
 #define tgrp_case_7_13_3 test_group_13
 #define numb_case_7_13_3 "7.13.3"
 #define name_case_7_13_3 "t_snd library call -- TOUTSTATE error"
+#define sref_case_7_13_3 "(none)"
 #define desc_case_7_13_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_snd library call."
@@ -13213,6 +13793,7 @@ static struct test_stream test_7_13_3_bot = { &preamble_7_13_3_bot, &test_case_7
 #define tgrp_case_7_14_1 test_group_13
 #define numb_case_7_14_1 "7.14.1"
 #define name_case_7_14_1 "t_sndv library call -- TFLOW error"
+#define sref_case_7_14_1 "(none)"
 #define desc_case_7_14_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndv library call."
@@ -13282,6 +13863,7 @@ static struct test_stream test_7_14_1_bot = { &preamble_7_14_1_bot, &test_case_7
 #define tgrp_case_7_14_2 test_group_13
 #define numb_case_7_14_2 "7.14.2"
 #define name_case_7_14_2 "t_sndv library call -- TNOTSUPPORT error"
+#define sref_case_7_14_2 "(none)"
 #define desc_case_7_14_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndv library call."
@@ -13314,6 +13896,7 @@ static struct test_stream test_7_14_2_bot = { &preamble_7_14_2_bot, &test_case_7
 #define tgrp_case_7_14_3 test_group_13
 #define numb_case_7_14_3 "7.14.3"
 #define name_case_7_14_3 "t_sndv library call -- TOUTSTATE error"
+#define sref_case_7_14_3 "(none)"
 #define desc_case_7_14_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndv library call."
@@ -13346,6 +13929,7 @@ static struct test_stream test_7_14_3_bot = { &preamble_7_14_3_bot, &test_case_7
 #define tgrp_case_7_15_1 test_group_13
 #define numb_case_7_15_1 "7.15.1"
 #define name_case_7_15_1 "t_sndudata library call -- TFLOW error"
+#define sref_case_7_15_1 "(none)"
 #define desc_case_7_15_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndudata library call."
@@ -13415,6 +13999,7 @@ static struct test_stream test_7_15_1_bot = { &preamble_7_15_1_bot, &test_case_7
 #define tgrp_case_7_15_2 test_group_13
 #define numb_case_7_15_2 "7.15.2"
 #define name_case_7_15_2 "t_sndudata library call -- TNOTSUPPORT error"
+#define sref_case_7_15_2 "(none)"
 #define desc_case_7_15_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndudata library call."
@@ -13447,6 +14032,7 @@ static struct test_stream test_7_15_2_bot = { &preamble_7_15_2_bot, &test_case_7
 #define tgrp_case_7_15_3 test_group_13
 #define numb_case_7_15_3 "7.15.3"
 #define name_case_7_15_3 "t_sndudata library call -- TOUTSTATE error"
+#define sref_case_7_15_3 "(none)"
 #define desc_case_7_15_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndudata library call."
@@ -13479,6 +14065,7 @@ static struct test_stream test_7_15_3_bot = { &preamble_7_15_3_bot, &test_case_7
 #define tgrp_case_7_16_1 test_group_13
 #define numb_case_7_16_1 "7.16.1"
 #define name_case_7_16_1 "t_sndvudata library call -- TFLOW error"
+#define sref_case_7_16_1 "(none)"
 #define desc_case_7_16_1 "\
 This test case tests the TFLOW error from the XTI library in response to\n\
 the t_sndvudata library call."
@@ -13548,6 +14135,7 @@ static struct test_stream test_7_16_1_bot = { &preamble_7_16_1_bot, &test_case_7
 #define tgrp_case_7_16_2 test_group_13
 #define numb_case_7_16_2 "7.16.2"
 #define name_case_7_16_2 "t_sndvudata library call -- TNOTSUPPORT error"
+#define sref_case_7_16_2 "(none)"
 #define desc_case_7_16_2 "\
 This test case tests the TNOTSUPPORT error from the XTI library in response to\n\
 the t_sndvudata library call."
@@ -13580,6 +14168,7 @@ static struct test_stream test_7_16_2_bot = { &preamble_7_16_2_bot, &test_case_7
 #define tgrp_case_7_16_3 test_group_13
 #define numb_case_7_16_3 "7.16.3"
 #define name_case_7_16_3 "t_sndvudata library call -- TOUTSTATE error"
+#define sref_case_7_16_3 "(none)"
 #define desc_case_7_16_3 "\
 This test case tests the TOUTSTATE error from the XTI library in response to\n\
 the t_sndvudata library call."
@@ -13612,6 +14201,7 @@ static struct test_stream test_7_16_3_bot = { &preamble_7_16_3_bot, &test_case_7
 #define tgrp_case_7_17_1 test_group_13
 #define numb_case_7_17_1 "7.17.1"
 #define name_case_7_17_1 "t_sync library call -- TSTATECHNG error"
+#define sref_case_7_17_1 "(none)"
 #define desc_case_7_17_1 "\
 This test case tests the TSTATECHNG error from the XTI library in response to\n\
 the t_sync library call."
@@ -13665,6 +14255,7 @@ static struct test_stream test_7_17_1_bot = { &preamble_7_17_1_bot, &test_case_7
 #define tgrp_case_8_1_1 test_group_14
 #define numb_case_8_1_1 "8.1.1"
 #define name_case_8_1_1 "receiving data with t_rcv -- normal data"
+#define sref_case_8_1_1 "(none)"
 #define desc_case_8_1_1 "\
 This test case tests positive test cases for the t_rcv library call."
 
@@ -13693,6 +14284,7 @@ int test_case_8_1_1_bot(int child)
 		return (__RESULT_FAILURE);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
+		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
@@ -13715,6 +14307,7 @@ static struct test_stream test_8_1_1_bot = { &preamble_8_1_1_bot, &test_case_8_1
 #define tgrp_case_8_1_2 test_group_14
 #define numb_case_8_1_2 "8.1.2"
 #define name_case_8_1_2 "receiving data with t_rcv -- expedited data"
+#define sref_case_8_1_2 "(none)"
 #define desc_case_8_1_2 "\
 This test case tests positive test cases for the t_rcv library call."
 
@@ -13765,6 +14358,7 @@ static struct test_stream test_8_1_2_bot = { &preamble_8_1_2_bot, &test_case_8_1
 #define tgrp_case_8_1_3 test_group_14
 #define numb_case_8_1_3 "8.1.3"
 #define name_case_8_1_3 "receiving data with t_rcv -- normal data with intermingled expedited data"
+#define sref_case_8_1_3 "(none)"
 #define desc_case_8_1_3 "\
 This test case tests positive test cases for the t_rcv library call."
 
@@ -13794,6 +14388,7 @@ int test_case_8_1_3_bot(int child)
 		return (__RESULT_FAILURE);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
+		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
@@ -13836,6 +14431,7 @@ static struct test_stream test_8_1_3_bot = { &preamble_8_1_3_bot, &test_case_8_1
 #define tgrp_case_8_1_4 test_group_14
 #define numb_case_8_1_4 "8.1.4"
 #define name_case_8_1_4 "receiving data with t_rcv -- normal data with intermingled expedited data -- receive buffer smaller that received data"
+#define sref_case_8_1_4 "(none)"
 #define desc_case_8_1_4 "\
 This test case tests positive test cases for the t_rcv library call."
 
@@ -13869,6 +14465,7 @@ int test_case_8_1_4_bot(int child)
 		return (__RESULT_FAILURE);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
+		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
@@ -13911,6 +14508,7 @@ static struct test_stream test_8_1_4_bot = { &preamble_8_1_4_bot, &test_case_8_1
 #define tgrp_case_8_2_1 test_group_14
 #define numb_case_8_2_1 "8.2.1"
 #define name_case_8_2_1 "receiving data with t_rcvv -- normal data"
+#define sref_case_8_2_1 "(none)"
 #define desc_case_8_2_1 "\
 This test case tests positive test cases for the t_rcvv library call."
 
@@ -13939,6 +14537,7 @@ int test_case_8_2_1_bot(int child)
 		return (__RESULT_FAILURE);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
+		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
@@ -13961,6 +14560,7 @@ static struct test_stream test_8_2_1_bot = { &preamble_8_2_1_bot, &test_case_8_2
 #define tgrp_case_8_2_2 test_group_14
 #define numb_case_8_2_2 "8.2.2"
 #define name_case_8_2_2 "receiving data with t_rcvv -- expedited data"
+#define sref_case_8_2_2 "(none)"
 #define desc_case_8_2_2 "\
 This test case tests positive test cases for the t_rcvv library call."
 
@@ -14011,6 +14611,7 @@ static struct test_stream test_8_2_2_bot = { &preamble_8_2_2_bot, &test_case_8_2
 #define tgrp_case_8_2_3 test_group_14
 #define numb_case_8_2_3 "8.2.3"
 #define name_case_8_2_3 "receiving data with t_rcvv -- normal data with intermingled expedited data"
+#define sref_case_8_2_3 "(none)"
 #define desc_case_8_2_3 "\
 This test case tests positive test cases for the t_rcvv library call."
 
@@ -14040,6 +14641,7 @@ int test_case_8_2_3_bot(int child)
 		return (__RESULT_FAILURE);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
+		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
 			return (__RESULT_FAILURE);
@@ -14082,6 +14684,7 @@ static struct test_stream test_8_2_3_bot = { &preamble_8_2_3_bot, &test_case_8_2
 #define tgrp_case_8_3_1 test_group_14
 #define numb_case_8_3_1 "8.3.1"
 #define name_case_8_3_1 "receiving data with t_rcvudata -- within TIDU sized data"
+#define sref_case_8_3_1 "(none)"
 #define desc_case_8_3_1 "\
 This test case tests positive test cases for the t_rcvudata library call."
 
@@ -14109,6 +14712,7 @@ int test_case_8_3_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	for (; state < endstate; state++) {
+		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
 	}
@@ -14128,6 +14732,7 @@ static struct test_stream test_8_3_1_bot = { &preamble_8_3_1_bot, &test_case_8_3
 #define tgrp_case_8_3_2 test_group_14
 #define numb_case_8_3_2 "8.3.2"
 #define name_case_8_3_2 "receiving data with t_rcvudata -- within TIDU sized data -- receive buffer smaller than received data size"
+#define sref_case_8_3_2 "(none)"
 #define desc_case_8_3_2 "\
 This test case tests positive test cases for the t_rcvudata library call."
 
@@ -14159,6 +14764,7 @@ int test_case_8_3_2_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	for (; state < endstate; state++) {
+		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
 	}
@@ -14178,6 +14784,7 @@ static struct test_stream test_8_3_2_bot = { &preamble_8_3_2_bot, &test_case_8_3
 #define tgrp_case_8_4_1 test_group_14
 #define numb_case_8_4_1 "8.4.1"
 #define name_case_8_4_1 "receiving data with t_rcvvudata -- within TIDU sized data"
+#define sref_case_8_4_1 "(none)"
 #define desc_case_8_4_1 "\
 This test case tests positive test cases for the t_rcvvudata library call."
 
@@ -14205,6 +14812,7 @@ int test_case_8_4_1_bot(int child)
 	if (get_event(child) != __EVENT_TIMEOUT)
 		return (__RESULT_FAILURE);
 	for (; state < endstate; state++) {
+		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
 	}
@@ -14224,6 +14832,7 @@ static struct test_stream test_8_4_1_bot = { &preamble_8_4_1_bot, &test_case_8_4
 #define tgrp_case_8_5_1 test_group_14
 #define numb_case_8_5_1 "8.5.1"
 #define name_case_8_5_1 "sending data with t_snd -- normal data"
+#define sref_case_8_5_1 "(none)"
 #define desc_case_8_5_1 "\
 This test case tests positive test cases for the t_snd library call."
 
@@ -14280,6 +14889,7 @@ static struct test_stream test_8_5_1_bot = { &preamble_8_5_1_bot, &test_case_8_5
 #define tgrp_case_8_5_2 test_group_14
 #define numb_case_8_5_2 "8.5.2"
 #define name_case_8_5_2 "sending data with t_snd -- expedited data"
+#define sref_case_8_5_2 "(none)"
 #define desc_case_8_5_2 "\
 This test case tests positive test cases for the t_snd library call."
 
@@ -14336,6 +14946,7 @@ static struct test_stream test_8_5_2_bot = { &preamble_8_5_2_bot, &test_case_8_5
 #define tgrp_case_8_5_3 test_group_14
 #define numb_case_8_5_3 "8.5.3"
 #define name_case_8_5_3 "sending data with t_snd -- expedited data intermingled with normal data"
+#define sref_case_8_5_3 "(none)"
 #define desc_case_8_5_3 "\
 This test case tests positive test cases for the t_snd library call."
 
@@ -14415,6 +15026,7 @@ static struct test_stream test_8_5_3_bot = { &preamble_8_5_3_bot, &test_case_8_5
 #define tgrp_case_8_5_4 test_group_14
 #define numb_case_8_5_4 "8.5.4"
 #define name_case_8_5_4 "sending data with t_snd -- expedited data intermingled with normal data -- data larget than TIDU size"
+#define sref_case_8_5_4 "(none)"
 #define desc_case_8_5_4 "\
 This test case tests positive test cases for the t_snd library call."
 
@@ -14494,6 +15106,7 @@ static struct test_stream test_8_5_4_bot = { &preamble_8_5_4_bot, &test_case_8_5
 #define tgrp_case_8_6_1 test_group_14
 #define numb_case_8_6_1 "8.6.1"
 #define name_case_8_6_1 "sending data with t_sndv -- normal data"
+#define sref_case_8_6_1 "(none)"
 #define desc_case_8_6_1 "\
 This test case tests positive test cases for the t_sndv library call."
 
@@ -14550,6 +15163,7 @@ static struct test_stream test_8_6_1_bot = { &preamble_8_6_1_bot, &test_case_8_6
 #define tgrp_case_8_6_2 test_group_14
 #define numb_case_8_6_2 "8.6.2"
 #define name_case_8_6_2 "sending data with t_sndv -- expedited data"
+#define sref_case_8_6_2 "(none)"
 #define desc_case_8_6_2 "\
 This test case tests positive test cases for the t_sndv library call."
 
@@ -14606,6 +15220,7 @@ static struct test_stream test_8_6_2_bot = { &preamble_8_6_2_bot, &test_case_8_6
 #define tgrp_case_8_6_3 test_group_14
 #define numb_case_8_6_3 "8.6.3"
 #define name_case_8_6_3 "sending data with t_sndv -- expedited data intermingled with normal data"
+#define sref_case_8_6_3 "(none)"
 #define desc_case_8_6_3 "\
 This test case tests positive test cases for the t_sndv library call."
 
@@ -14685,6 +15300,7 @@ static struct test_stream test_8_6_3_bot = { &preamble_8_6_3_bot, &test_case_8_6
 #define tgrp_case_8_7_1 test_group_14
 #define numb_case_8_7_1 "8.7.1"
 #define name_case_8_7_1 "sending data with t_sndudata -- within TIDU sized data"
+#define sref_case_8_7_1 "(none)"
 #define desc_case_8_7_1 "\
 This test case tests positive test cases for the t_sndudata library call."
 
@@ -14737,6 +15353,7 @@ static struct test_stream test_8_7_1_bot = { &preamble_8_7_1_bot, &test_case_8_7
 #define tgrp_case_8_8_1 test_group_14
 #define numb_case_8_8_1 "8.8.1"
 #define name_case_8_8_1 "sending data with t_sndvudata -- within TIDU sized data"
+#define sref_case_8_8_1 "(none)"
 #define desc_case_8_8_1 "\
 This test case tests positive test cases for the t_sndvudata library call."
 
@@ -14796,11 +15413,25 @@ static struct test_stream test_8_8_1_bot = { &preamble_8_8_1_bot, &test_case_8_8
 int run_stream(int child, struct test_stream *stream)
 {
 	int result = __RESULT_SCRIPT_ERROR;
+	int pre_result = __RESULT_SCRIPT_ERROR;
+	int post_result = __RESULT_SCRIPT_ERROR;
 	print_preamble(child);
 	state = 100;
-	if (stream->preamble && stream->preamble(child) != __RESULT_SUCCESS) {
-		print_inconclusive(child);
-		result = __RESULT_INCONCLUSIVE;
+	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
+		switch (pre_result) {
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
+			break;
+		default:
+			print_inconclusive(child);
+			result = __RESULT_INCONCLUSIVE;
+			break;
+		}
 	} else {
 		print_test(child);
 		state = 200;
@@ -14809,6 +15440,14 @@ int run_stream(int child, struct test_stream *stream)
 		case __RESULT_INCONCLUSIVE:
 			print_inconclusive(child);
 			result = __RESULT_INCONCLUSIVE;
+			break;
+		case __RESULT_NOTAPPL:
+			print_notapplicable(child);
+			result = __RESULT_NOTAPPL;
+			break;
+		case __RESULT_SKIPPED:
+			print_skipped(child);
+			result = __RESULT_SKIPPED;
 			break;
 		case __RESULT_FAILURE:
 			print_failed(child);
@@ -14825,10 +15464,22 @@ int run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
-		if (stream->postamble && stream->postamble(child) != __RESULT_SUCCESS) {
-			print_inconclusive(child);
-			if (result == __RESULT_SUCCESS)
-				result = __RESULT_INCONCLUSIVE;
+		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
+			switch (post_result) {
+			case __RESULT_NOTAPPL:
+				print_notapplicable(child);
+				result = __RESULT_NOTAPPL;
+				break;
+			case __RESULT_SKIPPED:
+				print_skipped(child);
+				result = __RESULT_SKIPPED;
+				break;
+			default:
+				print_inconclusive(child);
+				if (result == __RESULT_SUCCESS)
+					result = __RESULT_INCONCLUSIVE;
+				break;
+			}
 		}
 	}
 	print_test_end(child);
@@ -14847,33 +15498,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	start_tt(5000);
-	if (stream[0]) {
-		switch ((child[0] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
-		case -1:	/* error */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[0] = __RESULT_SUCCESS;
-	if (stream[1]) {
-		switch ((child[1] = fork())) {
-		case 00:	/* we are the child */
-			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
-		case -1:	/* error */
-			if (child[0])
-				kill(child[0], SIGKILL);	/* toast stream[0] child */
-			return __RESULT_FAILURE;
-		default:	/* we are the parent */
-			children++;
-			break;
-		}
-	} else
-		status[1] = __RESULT_SUCCESS;
+	start_tt(20000);
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -14890,6 +15515,32 @@ int test_run(struct test_stream *stream[])
 		}
 	} else
 		status[2] = __RESULT_SUCCESS;
+	if (stream[1]) {
+		switch ((child[1] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(1, stream[1]));	/* execute stream[1] state machine */
+		case -1:	/* error */
+			if (child[0])
+				kill(child[0], SIGKILL);	/* toast stream[0] child */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[1] = __RESULT_SUCCESS;
+	if (stream[0]) {
+		switch ((child[0] = fork())) {
+		case 00:	/* we are the child */
+			exit(run_stream(0, stream[0]));	/* execute stream[0] state machine */
+		case -1:	/* error */
+			return __RESULT_FAILURE;
+		default:	/* we are the parent */
+			children++;
+			break;
+		}
+	} else
+		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
@@ -15010,6 +15661,10 @@ int test_run(struct test_stream *stream[])
 		}
 	}
 	stop_tt();
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+		return (__RESULT_NOTAPPL);
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+		return (__RESULT_SKIPPED);
 	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
@@ -15030,512 +15685,266 @@ struct test_case {
 	const char *tgrp;		/* test case group */
 	const char *name;		/* test case name */
 	const char *desc;		/* test case description */
+	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
+	int (*start)(int);		/* start function */
+	int (*stop)(int);		/* stop function */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
 } tests[] = {
 	{
-		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, {
-	&test_1_1_top, &test_1_1_bot, NULL}, 0, 0}, {
-		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, {
-	&test_1_2_1_top, &test_1_2_1_bot, NULL}, 0, 0}, {
-		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, {
-	&test_1_2_2_top, &test_1_2_2_bot, NULL}, 0, 0}, {
-		numb_case_1_2_3, tgrp_case_1_2_3, name_case_1_2_3, desc_case_1_2_3, {
-	&test_1_2_3_top, &test_1_2_3_bot, NULL}, 0, 0}, {
-		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, {
-	&test_2_1_1_top, &test_2_1_1_bot, NULL}, 0, 0}, {
-		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, {
-	&test_2_1_2_top, &test_2_1_2_bot, NULL}, 0, 0}, {
-		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, {
-	&test_2_1_3_top, &test_2_1_3_bot, NULL}, 0, 0}, {
-		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, {
-	&test_2_1_4_top, &test_2_1_4_bot, NULL}, 0, 0}, {
-		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, {
-	&test_2_1_5_top, &test_2_1_5_bot, NULL}, 0, 0}, {
-		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, {
-	&test_2_1_6_top, &test_2_1_6_bot, NULL}, 0, 0}, {
-		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, {
-	&test_2_1_7_top, &test_2_1_7_bot, NULL}, 0, 0}, {
-		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, {
-	&test_2_1_8_top, &test_2_1_8_bot, NULL}, 0, 0}, {
-		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, {
-	&test_2_2_top, &test_2_2_bot, NULL}, 0, 0}, {
-		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, {
-	&test_2_3_1_top, &test_2_3_1_bot, NULL}, 0, 0}, {
-		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, {
-	&test_2_3_2_top, &test_2_3_2_bot, NULL}, 0, 0}, {
-		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, {
-	&test_2_3_3_top, &test_2_3_3_bot, NULL}, 0, 0}, {
-		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, {
-	&test_2_3_4_top, &test_2_3_4_bot, NULL}, 0, 0}, {
-		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, {
-	&test_2_3_5_top, &test_2_3_5_bot, NULL}, 0, 0}, {
-		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, {
-	&test_2_3_6_top, &test_2_3_6_bot, NULL}, 0, 0}, {
-		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, {
-	&test_2_3_7_top, &test_2_3_7_bot, NULL}, 0, 0}, {
-		numb_case_2_3_8, tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, {
-	&test_2_3_8_top, &test_2_3_8_bot, NULL}, 0, 0}, {
-		numb_case_2_3_9, tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, {
-	&test_2_3_9_top, &test_2_3_9_bot, NULL}, 0, 0}, {
-		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, {
-	&test_2_4_1_top, &test_2_4_1_bot, NULL}, 0, 0}, {
-		numb_case_2_5_1, tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, {
-	&test_2_5_1_top, &test_2_5_1_bot, NULL}, 0, 0}, {
-		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, {
-	&test_3_1_1_top, &test_3_1_1_bot, NULL}, 0, 0}, {
-		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, {
-	&test_3_2_1_top, &test_3_2_1_bot, NULL}, 0, 0}, {
-		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, {
-	&test_3_3_1_top, &test_3_3_1_bot, NULL}, 0, 0}, {
-		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, {
-	&test_3_4_1_top, &test_3_4_1_bot, NULL}, 0, 0}, {
-		numb_case_3_4_2, tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, {
-	&test_3_4_2_top, &test_3_4_2_bot, NULL}, 0, 0}, {
-		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, {
-	&test_3_5_1_top, &test_3_5_1_bot, NULL}, 0, 0}, {
-		numb_case_3_5_2, tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, {
-	&test_3_5_2_top, &test_3_5_2_bot, NULL}, 0, 0}, {
-		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, {
-	&test_3_6_1_top, &test_3_6_1_bot, NULL}, 0, 0}, {
-		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, {
-	&test_3_7_1_top, &test_3_7_1_bot, NULL}, 0, 0}, {
-		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, {
-	&test_4_1_1_top, &test_4_1_1_bot, NULL}, 0, 0}, {
-		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, {
-	&test_4_1_2_top, &test_4_1_2_bot, NULL}, 0, 0}, {
-		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, {
-	&test_4_2_1_top, &test_4_2_1_bot, NULL}, 0, 0}, {
-		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, {
-	&test_4_2_2_top, &test_4_2_2_bot, NULL}, 0, 0}, {
-		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, {
-	&test_4_3_1_top, &test_4_3_1_bot, NULL}, 0, 0}, {
-		numb_case_4_4_1, tgrp_case_4_4_1, name_case_4_4_1, desc_case_4_4_1, {
-	&test_4_4_1_top, &test_4_4_1_bot, NULL}, 0, 0}, {
-		numb_case_4_4_2, tgrp_case_4_4_2, name_case_4_4_2, desc_case_4_4_2, {
-	&test_4_4_2_top, &test_4_4_2_bot, NULL}, 0, 0}, {
-		numb_case_4_4_3, tgrp_case_4_4_3, name_case_4_4_3, desc_case_4_4_3, {
-	&test_4_4_3_top, &test_4_4_3_bot, NULL}, 0, 0}, {
-		numb_case_4_4_4, tgrp_case_4_4_4, name_case_4_4_4, desc_case_4_4_4, {
-	&test_4_4_4_top, &test_4_4_4_bot, NULL}, 0, 0}, {
-		numb_case_4_4_5, tgrp_case_4_4_5, name_case_4_4_5, desc_case_4_4_5, {
-	&test_4_4_5_top, &test_4_4_5_bot, NULL}, 0, 0}, {
-		numb_case_4_4_6, tgrp_case_4_4_6, name_case_4_4_6, desc_case_4_4_6, {
-	&test_4_4_6_top, &test_4_4_6_bot, NULL}, 0, 0}, {
-		numb_case_4_4_7, tgrp_case_4_4_7, name_case_4_4_7, desc_case_4_4_7, {
-	&test_4_4_7_top, &test_4_4_7_bot, NULL}, 0, 0}, {
-		numb_case_4_4_8, tgrp_case_4_4_8, name_case_4_4_8, desc_case_4_4_8, {
-	&test_4_4_8_top, &test_4_4_8_bot, NULL}, 0, 0}, {
-		numb_case_4_5_1, tgrp_case_4_5_1, name_case_4_5_1, desc_case_4_5_1, {
-	&test_4_5_1_top, &test_4_5_1_bot, NULL}, 0, 0}, {
-		numb_case_4_6_1, tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, {
-	&test_4_6_1_top, &test_4_6_1_bot, NULL}, 0, 0}, {
-		numb_case_4_6_2, tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, {
-	&test_4_6_2_top, &test_4_6_2_bot, NULL}, 0, 0}, {
-		numb_case_4_6_3, tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, {
-	&test_4_6_3_top, &test_4_6_3_bot, NULL}, 0, 0}, {
-		numb_case_4_6_4, tgrp_case_4_6_4, name_case_4_6_4, desc_case_4_6_4, {
-	&test_4_6_4_top, &test_4_6_4_bot, NULL}, 0, 0}, {
-		numb_case_4_7_1, tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, {
-	&test_4_7_1_top, &test_4_7_1_bot, NULL}, 0, 0}, {
-		numb_case_4_7_2, tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, {
-	&test_4_7_2_top, &test_4_7_2_bot, NULL}, 0, 0}, {
-		numb_case_4_7_3, tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, {
-	&test_4_7_3_top, &test_4_7_3_bot, NULL}, 0, 0}, {
-		numb_case_4_7_4, tgrp_case_4_7_4, name_case_4_7_4, desc_case_4_7_4, {
-	&test_4_7_4_top, &test_4_7_4_bot, NULL}, 0, 0}, {
-		numb_case_4_8_1, tgrp_case_4_8_1, name_case_4_8_1, desc_case_4_8_1, {
-	&test_4_8_1_top, &test_4_8_1_bot, NULL}, 0, 0}, {
-		numb_case_4_8_2, tgrp_case_4_8_2, name_case_4_8_2, desc_case_4_8_2, {
-	&test_4_8_2_top, &test_4_8_2_bot, NULL}, 0, 0}, {
-		numb_case_4_8_3, tgrp_case_4_8_3, name_case_4_8_3, desc_case_4_8_3, {
-	&test_4_8_3_top, &test_4_8_3_bot, NULL}, 0, 0}, {
-		numb_case_4_9_1, tgrp_case_4_9_1, name_case_4_9_1, desc_case_4_9_1, {
-	&test_4_9_1_top, &test_4_9_1_bot, NULL}, 0, 0}, {
-		numb_case_5_1_1, tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, {
-	&test_5_1_1_top, &test_5_1_1_bot, NULL}, 0, 0}, {
-		numb_case_5_1_2, tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, {
-	&test_5_1_2_top, &test_5_1_2_bot, NULL}, 0, 0}, {
-		numb_case_5_1_3, tgrp_case_5_1_3, name_case_5_1_3, desc_case_5_1_3, {
-	&test_5_1_3_top, &test_5_1_3_bot, NULL}, 0, 0}, {
-		numb_case_5_1_4, tgrp_case_5_1_4, name_case_5_1_4, desc_case_5_1_4, {
-	&test_5_1_4_top, &test_5_1_4_bot, NULL}, 0, 0}, {
-		numb_case_5_1_5, tgrp_case_5_1_5, name_case_5_1_5, desc_case_5_1_5, {
-	&test_5_1_5_top, &test_5_1_5_bot, NULL}, 0, 0}, {
-		numb_case_5_1_6, tgrp_case_5_1_6, name_case_5_1_6, desc_case_5_1_6, {
-	&test_5_1_6_top, &test_5_1_6_bot, NULL}, 0, 0}, {
-		numb_case_5_1_7, tgrp_case_5_1_7, name_case_5_1_7, desc_case_5_1_7, {
-	&test_5_1_7_top, &test_5_1_7_bot, NULL}, 0, 0}, {
-		numb_case_5_1_8, tgrp_case_5_1_8, name_case_5_1_8, desc_case_5_1_8, {
-	&test_5_1_8_top, &test_5_1_8_bot, NULL}, 0, 0}, {
-		numb_case_5_1_9, tgrp_case_5_1_9, name_case_5_1_9, desc_case_5_1_9, {
-	&test_5_1_9_top, &test_5_1_9_bot, NULL}, 0, 0}, {
-		numb_case_5_1_10, tgrp_case_5_1_10, name_case_5_1_10, desc_case_5_1_10, {
-	&test_5_1_10_top, &test_5_1_10_bot, NULL}, 0, 0}, {
-		numb_case_5_1_11, tgrp_case_5_1_11, name_case_5_1_11, desc_case_5_1_11, {
-	&test_5_1_11_top, &test_5_1_11_bot, NULL}, 0, 0}, {
-		numb_case_5_1_12, tgrp_case_5_1_12, name_case_5_1_12, desc_case_5_1_12, {
-	&test_5_1_12_top, &test_5_1_12_bot, NULL}, 0, 0}, {
-		numb_case_5_1_13, tgrp_case_5_1_13, name_case_5_1_13, desc_case_5_1_13, {
-	&test_5_1_13_top, &test_5_1_13_bot, NULL}, 0, 0}, {
-		numb_case_5_1_14, tgrp_case_5_1_14, name_case_5_1_14, desc_case_5_1_14, {
-	&test_5_1_14_top, &test_5_1_14_bot, NULL}, 0, 0}, {
-		numb_case_5_1_15, tgrp_case_5_1_15, name_case_5_1_15, desc_case_5_1_15, {
-	&test_5_1_15_top, &test_5_1_15_bot, NULL}, 0, 0}, {
-		numb_case_5_1_16, tgrp_case_5_1_16, name_case_5_1_16, desc_case_5_1_16, {
-	&test_5_1_16_top, &test_5_1_16_bot, NULL}, 0, 0}, {
-		numb_case_5_1_17, tgrp_case_5_1_17, name_case_5_1_17, desc_case_5_1_17, {
-	&test_5_1_17_top, &test_5_1_17_bot, NULL}, 0, 0}, {
-		numb_case_5_1_18, tgrp_case_5_1_18, name_case_5_1_18, desc_case_5_1_18, {
-	&test_5_1_18_top, &test_5_1_18_bot, NULL}, 0, 0}, {
-		numb_case_5_1_19, tgrp_case_5_1_19, name_case_5_1_19, desc_case_5_1_19, {
-	&test_5_1_19_top, &test_5_1_19_bot, NULL}, 0, 0}, {
-		numb_case_5_1_20, tgrp_case_5_1_20, name_case_5_1_20, desc_case_5_1_20, {
-	&test_5_1_20_top, &test_5_1_20_bot, NULL}, 0, 0}, {
-		numb_case_5_1_21, tgrp_case_5_1_21, name_case_5_1_21, desc_case_5_1_21, {
-	&test_5_1_21_top, &test_5_1_21_bot, NULL}, 0, 0}, {
-		numb_case_5_1_22, tgrp_case_5_1_22, name_case_5_1_22, desc_case_5_1_22, {
-	&test_5_1_22_top, &test_5_1_22_bot, NULL}, 0, 0}, {
-		numb_case_5_1_23, tgrp_case_5_1_23, name_case_5_1_23, desc_case_5_1_23, {
-	&test_5_1_23_top, &test_5_1_23_bot, NULL}, 0, 0}, {
-		numb_case_5_1_24, tgrp_case_5_1_24, name_case_5_1_24, desc_case_5_1_24, {
-	&test_5_1_24_top, &test_5_1_24_bot, NULL}, 0, 0}, {
-		numb_case_5_1_25, tgrp_case_5_1_25, name_case_5_1_25, desc_case_5_1_25, {
-	&test_5_1_25_top, &test_5_1_25_bot, NULL}, 0, 0}, {
-		numb_case_5_1_26, tgrp_case_5_1_26, name_case_5_1_26, desc_case_5_1_26, {
-	&test_5_1_26_top, &test_5_1_26_bot, NULL}, 0, 0}, {
-		numb_case_5_1_27, tgrp_case_5_1_27, name_case_5_1_27, desc_case_5_1_27, {
-	&test_5_1_27_top, &test_5_1_27_bot, NULL}, 0, 0}, {
-		numb_case_5_1_28, tgrp_case_5_1_28, name_case_5_1_28, desc_case_5_1_28, {
-	&test_5_1_28_top, &test_5_1_28_bot, NULL}, 0, 0}, {
-		numb_case_5_2_1, tgrp_case_5_2_1, name_case_5_2_1, desc_case_5_2_1, {
-	&test_5_2_1_top, &test_5_2_1_bot, NULL}, 0, 0}, {
-		numb_case_5_2_2, tgrp_case_5_2_2, name_case_5_2_2, desc_case_5_2_2, {
-	&test_5_2_2_top, &test_5_2_2_bot, NULL}, 0, 0}, {
-		numb_case_5_2_3, tgrp_case_5_2_3, name_case_5_2_3, desc_case_5_2_3, {
-	&test_5_2_3_top, &test_5_2_3_bot, NULL}, 0, 0}, {
-		numb_case_5_2_4, tgrp_case_5_2_4, name_case_5_2_4, desc_case_5_2_4, {
-	&test_5_2_4_top, &test_5_2_4_bot, NULL}, 0, 0}, {
-		numb_case_5_2_5, tgrp_case_5_2_5, name_case_5_2_5, desc_case_5_2_5, {
-	&test_5_2_5_top, &test_5_2_5_bot, NULL}, 0, 0}, {
-		numb_case_5_2_6, tgrp_case_5_2_6, name_case_5_2_6, desc_case_5_2_6, {
-	&test_5_2_6_top, &test_5_2_6_bot, NULL}, 0, 0}, {
-		numb_case_5_2_7, tgrp_case_5_2_7, name_case_5_2_7, desc_case_5_2_7, {
-	&test_5_2_7_top, &test_5_2_7_bot, NULL}, 0, 0}, {
-		numb_case_5_2_8, tgrp_case_5_2_8, name_case_5_2_8, desc_case_5_2_8, {
-	&test_5_2_8_top, &test_5_2_8_bot, NULL}, 0, 0}, {
-		numb_case_5_2_9, tgrp_case_5_2_9, name_case_5_2_9, desc_case_5_2_9, {
-	&test_5_2_9_top, &test_5_2_9_bot, NULL}, 0, 0}, {
-		numb_case_5_2_10, tgrp_case_5_2_10, name_case_5_2_10, desc_case_5_2_10, {
-	&test_5_2_10_top, &test_5_2_10_bot, NULL}, 0, 0}, {
-		numb_case_5_2_11, tgrp_case_5_2_11, name_case_5_2_11, desc_case_5_2_11, {
-	&test_5_2_11_top, &test_5_2_11_bot, NULL}, 0, 0}, {
-		numb_case_5_2_12, tgrp_case_5_2_12, name_case_5_2_12, desc_case_5_2_12, {
-	&test_5_2_12_top, &test_5_2_12_bot, NULL}, 0, 0}, {
-		numb_case_5_2_13, tgrp_case_5_2_13, name_case_5_2_13, desc_case_5_2_13, {
-	&test_5_2_13_top, &test_5_2_13_bot, NULL}, 0, 0}, {
-		numb_case_5_2_14, tgrp_case_5_2_14, name_case_5_2_14, desc_case_5_2_14, {
-	&test_5_2_14_top, &test_5_2_14_bot, NULL}, 0, 0}, {
-		numb_case_5_2_15, tgrp_case_5_2_15, name_case_5_2_15, desc_case_5_2_15, {
-	&test_5_2_15_top, &test_5_2_15_bot, NULL}, 0, 0}, {
-		numb_case_5_2_16, tgrp_case_5_2_16, name_case_5_2_16, desc_case_5_2_16, {
-	&test_5_2_16_top, &test_5_2_16_bot, NULL}, 0, 0}, {
-		numb_case_5_2_17, tgrp_case_5_2_17, name_case_5_2_17, desc_case_5_2_17, {
-	&test_5_2_17_top, &test_5_2_17_bot, NULL}, 0, 0}, {
-		numb_case_5_2_18, tgrp_case_5_2_18, name_case_5_2_18, desc_case_5_2_18, {
-	&test_5_2_18_top, &test_5_2_18_bot, NULL}, 0, 0}, {
-		numb_case_5_2_19, tgrp_case_5_2_19, name_case_5_2_19, desc_case_5_2_19, {
-	&test_5_2_19_top, &test_5_2_19_bot, NULL}, 0, 0}, {
-		numb_case_5_2_20, tgrp_case_5_2_20, name_case_5_2_20, desc_case_5_2_20, {
-	&test_5_2_20_top, &test_5_2_20_bot, NULL}, 0, 0}, {
-		numb_case_5_2_21, tgrp_case_5_2_21, name_case_5_2_21, desc_case_5_2_21, {
-	&test_5_2_21_top, &test_5_2_21_bot, NULL}, 0, 0}, {
-		numb_case_5_2_22, tgrp_case_5_2_22, name_case_5_2_22, desc_case_5_2_22, {
-	&test_5_2_22_top, &test_5_2_22_bot, NULL}, 0, 0}, {
-		numb_case_5_2_23, tgrp_case_5_2_23, name_case_5_2_23, desc_case_5_2_23, {
-	&test_5_2_23_top, &test_5_2_23_bot, NULL}, 0, 0}, {
-		numb_case_5_2_24, tgrp_case_5_2_24, name_case_5_2_24, desc_case_5_2_24, {
-	&test_5_2_24_top, &test_5_2_24_bot, NULL}, 0, 0}, {
-		numb_case_5_2_25, tgrp_case_5_2_25, name_case_5_2_25, desc_case_5_2_25, {
-	&test_5_2_25_top, &test_5_2_25_bot, NULL}, 0, 0}, {
-		numb_case_5_2_26, tgrp_case_5_2_26, name_case_5_2_26, desc_case_5_2_26, {
-	&test_5_2_26_top, &test_5_2_26_bot, NULL}, 0, 0}, {
-		numb_case_5_2_27, tgrp_case_5_2_27, name_case_5_2_27, desc_case_5_2_27, {
-	&test_5_2_27_top, &test_5_2_27_bot, NULL}, 0, 0}, {
-		numb_case_5_2_28, tgrp_case_5_2_28, name_case_5_2_28, desc_case_5_2_28, {
-	&test_5_2_28_top, &test_5_2_28_bot, NULL}, 0, 0}, {
-		numb_case_5_3_1, tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, {
-	&test_5_3_1_top, &test_5_3_1_bot, NULL}, 0, 0}, {
-		numb_case_5_3_2, tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, {
-	&test_5_3_2_top, &test_5_3_2_bot, NULL}, 0, 0}, {
-		numb_case_5_3_3, tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, {
-	&test_5_3_3_top, &test_5_3_3_bot, NULL}, 0, 0}, {
-		numb_case_5_3_4, tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, {
-	&test_5_3_4_top, &test_5_3_4_bot, NULL}, 0, 0}, {
-		numb_case_5_3_5, tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, {
-	&test_5_3_5_top, &test_5_3_5_bot, NULL}, 0, 0}, {
-		numb_case_5_3_6, tgrp_case_5_3_6, name_case_5_3_6, desc_case_5_3_6, {
-	&test_5_3_6_top, &test_5_3_6_bot, NULL}, 0, 0}, {
-		numb_case_5_3_7, tgrp_case_5_3_7, name_case_5_3_7, desc_case_5_3_7, {
-	&test_5_3_7_top, &test_5_3_7_bot, NULL}, 0, 0}, {
-		numb_case_5_3_8, tgrp_case_5_3_8, name_case_5_3_8, desc_case_5_3_8, {
-	&test_5_3_8_top, &test_5_3_8_bot, NULL}, 0, 0}, {
-		numb_case_5_3_9, tgrp_case_5_3_9, name_case_5_3_9, desc_case_5_3_9, {
-	&test_5_3_9_top, &test_5_3_9_bot, NULL}, 0, 0}, {
-		numb_case_5_3_10, tgrp_case_5_3_10, name_case_5_3_10, desc_case_5_3_10, {
-	&test_5_3_10_top, &test_5_3_10_bot, NULL}, 0, 0}, {
-		numb_case_5_3_11, tgrp_case_5_3_11, name_case_5_3_11, desc_case_5_3_11, {
-	&test_5_3_11_top, &test_5_3_11_bot, NULL}, 0, 0}, {
-		numb_case_5_3_12, tgrp_case_5_3_12, name_case_5_3_12, desc_case_5_3_12, {
-	&test_5_3_12_top, &test_5_3_12_bot, NULL}, 0, 0}, {
-		numb_case_5_3_13, tgrp_case_5_3_13, name_case_5_3_13, desc_case_5_3_13, {
-	&test_5_3_13_top, &test_5_3_13_bot, NULL}, 0, 0}, {
-		numb_case_5_3_14, tgrp_case_5_3_14, name_case_5_3_14, desc_case_5_3_14, {
-	&test_5_3_14_top, &test_5_3_14_bot, NULL}, 0, 0}, {
-		numb_case_5_3_15, tgrp_case_5_3_15, name_case_5_3_15, desc_case_5_3_15, {
-	&test_5_3_15_top, &test_5_3_15_bot, NULL}, 0, 0}, {
-		numb_case_5_3_16, tgrp_case_5_3_16, name_case_5_3_16, desc_case_5_3_16, {
-	&test_5_3_16_top, &test_5_3_16_bot, NULL}, 0, 0}, {
-		numb_case_5_3_17, tgrp_case_5_3_17, name_case_5_3_17, desc_case_5_3_17, {
-	&test_5_3_17_top, &test_5_3_17_bot, NULL}, 0, 0}, {
-		numb_case_5_3_18, tgrp_case_5_3_18, name_case_5_3_18, desc_case_5_3_18, {
-	&test_5_3_18_top, &test_5_3_18_bot, NULL}, 0, 0}, {
-		numb_case_5_3_19, tgrp_case_5_3_19, name_case_5_3_19, desc_case_5_3_19, {
-	&test_5_3_19_top, &test_5_3_19_bot, NULL}, 0, 0}, {
-		numb_case_5_3_20, tgrp_case_5_3_20, name_case_5_3_20, desc_case_5_3_20, {
-	&test_5_3_20_top, &test_5_3_20_bot, NULL}, 0, 0}, {
-		numb_case_5_3_21, tgrp_case_5_3_21, name_case_5_3_21, desc_case_5_3_21, {
-	&test_5_3_21_top, &test_5_3_21_bot, NULL}, 0, 0}, {
-		numb_case_5_3_22, tgrp_case_5_3_22, name_case_5_3_22, desc_case_5_3_22, {
-	&test_5_3_22_top, &test_5_3_22_bot, NULL}, 0, 0}, {
-		numb_case_5_3_23, tgrp_case_5_3_23, name_case_5_3_23, desc_case_5_3_23, {
-	&test_5_3_23_top, &test_5_3_23_bot, NULL}, 0, 0}, {
-		numb_case_5_3_24, tgrp_case_5_3_24, name_case_5_3_24, desc_case_5_3_24, {
-	&test_5_3_24_top, &test_5_3_24_bot, NULL}, 0, 0}, {
-		numb_case_5_3_25, tgrp_case_5_3_25, name_case_5_3_25, desc_case_5_3_25, {
-	&test_5_3_25_top, &test_5_3_25_bot, NULL}, 0, 0}, {
-		numb_case_5_3_26, tgrp_case_5_3_26, name_case_5_3_26, desc_case_5_3_26, {
-	&test_5_3_26_top, &test_5_3_26_bot, NULL}, 0, 0}, {
-		numb_case_5_3_27, tgrp_case_5_3_27, name_case_5_3_27, desc_case_5_3_27, {
-	&test_5_3_27_top, &test_5_3_27_bot, NULL}, 0, 0}, {
-		numb_case_5_3_28, tgrp_case_5_3_28, name_case_5_3_28, desc_case_5_3_28, {
-	&test_5_3_28_top, &test_5_3_28_bot, NULL}, 0, 0}, {
-		numb_case_6_1_1, tgrp_case_6_1_1, name_case_6_1_1, desc_case_6_1_1, {
-	&test_6_1_1_top, &test_6_1_1_bot, NULL}, 0, 0}, {
-		numb_case_6_1_2, tgrp_case_6_1_2, name_case_6_1_2, desc_case_6_1_2, {
-	&test_6_1_2_top, &test_6_1_2_bot, NULL}, 0, 0}, {
-		numb_case_6_1_3, tgrp_case_6_1_3, name_case_6_1_3, desc_case_6_1_3, {
-	&test_6_1_3_top, &test_6_1_3_bot, NULL}, 0, 0}, {
-		numb_case_6_1_4, tgrp_case_6_1_4, name_case_6_1_4, desc_case_6_1_4, {
-	&test_6_1_4_top, &test_6_1_4_bot, NULL}, 0, 0}, {
-		numb_case_6_1_5, tgrp_case_6_1_5, name_case_6_1_5, desc_case_6_1_5, {
-	&test_6_1_5_top, &test_6_1_5_bot, NULL}, 0, 0}, {
-		numb_case_6_1_6, tgrp_case_6_1_6, name_case_6_1_6, desc_case_6_1_6, {
-	&test_6_1_6_top, &test_6_1_6_bot, NULL}, 0, 0}, {
-		numb_case_6_1_7, tgrp_case_6_1_7, name_case_6_1_7, desc_case_6_1_7, {
-	&test_6_1_7_top, &test_6_1_7_bot, NULL}, 0, 0}, {
-		numb_case_6_1_8, tgrp_case_6_1_8, name_case_6_1_8, desc_case_6_1_8, {
-	&test_6_1_8_top, &test_6_1_8_bot, NULL}, 0, 0}, {
-		numb_case_6_1_9, tgrp_case_6_1_9, name_case_6_1_9, desc_case_6_1_9, {
-	&test_6_1_9_top, &test_6_1_9_bot, NULL}, 0, 0}, {
-		numb_case_6_1_10, tgrp_case_6_1_10, name_case_6_1_10, desc_case_6_1_10, {
-	&test_6_1_10_top, &test_6_1_10_bot, NULL}, 0, 0}, {
-		numb_case_6_1_11, tgrp_case_6_1_11, name_case_6_1_11, desc_case_6_1_11, {
-	&test_6_1_11_top, &test_6_1_11_bot, NULL}, 0, 0}, {
-		numb_case_6_1_12, tgrp_case_6_1_12, name_case_6_1_12, desc_case_6_1_12, {
-	&test_6_1_12_top, &test_6_1_12_bot, NULL}, 0, 0}, {
-		numb_case_6_2_1, tgrp_case_6_2_1, name_case_6_2_1, desc_case_6_2_1, {
-	&test_6_2_1_top, &test_6_2_1_bot, NULL}, 0, 0}, {
-		numb_case_6_2_2, tgrp_case_6_2_2, name_case_6_2_2, desc_case_6_2_2, {
-	&test_6_2_2_top, &test_6_2_2_bot, NULL}, 0, 0}, {
-		numb_case_6_2_3, tgrp_case_6_2_3, name_case_6_2_3, desc_case_6_2_3, {
-	&test_6_2_3_top, &test_6_2_3_bot, NULL}, 0, 0}, {
-		numb_case_6_2_4, tgrp_case_6_2_4, name_case_6_2_4, desc_case_6_2_4, {
-	&test_6_2_4_top, &test_6_2_4_bot, NULL}, 0, 0}, {
-		numb_case_6_2_5, tgrp_case_6_2_5, name_case_6_2_5, desc_case_6_2_5, {
-	&test_6_2_5_top, &test_6_2_5_bot, NULL}, 0, 0}, {
-		numb_case_6_2_6, tgrp_case_6_2_6, name_case_6_2_6, desc_case_6_2_6, {
-	&test_6_2_6_top, &test_6_2_6_bot, NULL}, 0, 0}, {
-		numb_case_6_3_1, tgrp_case_6_3_1, name_case_6_3_1, desc_case_6_3_1, {
-	&test_6_3_1_top, &test_6_3_1_bot, NULL}, 0, 0}, {
-		numb_case_6_3_2, tgrp_case_6_3_2, name_case_6_3_2, desc_case_6_3_2, {
-	&test_6_3_2_top, &test_6_3_2_bot, NULL}, 0, 0}, {
-		numb_case_6_3_3, tgrp_case_6_3_3, name_case_6_3_3, desc_case_6_3_3, {
-	&test_6_3_3_top, &test_6_3_3_bot, NULL}, 0, 0}, {
-		numb_case_6_3_4, tgrp_case_6_3_4, name_case_6_3_4, desc_case_6_3_4, {
-	&test_6_3_4_top, &test_6_3_4_bot, NULL}, 0, 0}, {
-		numb_case_6_3_5, tgrp_case_6_3_5, name_case_6_3_5, desc_case_6_3_5, {
-	&test_6_3_5_top, &test_6_3_5_bot, NULL}, 0, 0}, {
-		numb_case_6_3_6, tgrp_case_6_3_6, name_case_6_3_6, desc_case_6_3_6, {
-	&test_6_3_6_top, &test_6_3_6_bot, NULL}, 0, 0}, {
-		numb_case_6_3_7, tgrp_case_6_3_7, name_case_6_3_7, desc_case_6_3_7, {
-	&test_6_3_7_top, &test_6_3_7_bot, NULL}, 0, 0}, {
-		numb_case_6_3_8, tgrp_case_6_3_8, name_case_6_3_8, desc_case_6_3_8, {
-	&test_6_3_8_top, &test_6_3_8_bot, NULL}, 0, 0}, {
-		numb_case_6_4_1, tgrp_case_6_4_1, name_case_6_4_1, desc_case_6_4_1, {
-	&test_6_4_1_top, &test_6_4_1_bot, NULL}, 0, 0}, {
-		numb_case_6_4_2, tgrp_case_6_4_2, name_case_6_4_2, desc_case_6_4_2, {
-	&test_6_4_2_top, &test_6_4_2_bot, NULL}, 0, 0}, {
-		numb_case_6_4_3, tgrp_case_6_4_3, name_case_6_4_3, desc_case_6_4_3, {
-	&test_6_4_3_top, &test_6_4_3_bot, NULL}, 0, 0}, {
-		numb_case_6_4_4, tgrp_case_6_4_4, name_case_6_4_4, desc_case_6_4_4, {
-	&test_6_4_4_top, &test_6_4_4_bot, NULL}, 0, 0}, {
-		numb_case_6_4_5, tgrp_case_6_4_5, name_case_6_4_5, desc_case_6_4_5, {
-	&test_6_4_5_top, &test_6_4_5_bot, NULL}, 0, 0}, {
-		numb_case_6_4_6, tgrp_case_6_4_6, name_case_6_4_6, desc_case_6_4_6, {
-	&test_6_4_6_top, &test_6_4_6_bot, NULL}, 0, 0}, {
-		numb_case_6_5_1, tgrp_case_6_5_1, name_case_6_5_1, desc_case_6_5_1, {
-	&test_6_5_1_top, &test_6_5_1_bot, NULL}, 0, 0}, {
-		numb_case_6_5_2, tgrp_case_6_5_2, name_case_6_5_2, desc_case_6_5_2, {
-	&test_6_5_2_top, &test_6_5_2_bot, NULL}, 0, 0}, {
-		numb_case_6_5_3, tgrp_case_6_5_3, name_case_6_5_3, desc_case_6_5_3, {
-	&test_6_5_3_top, &test_6_5_3_bot, NULL}, 0, 0}, {
-		numb_case_6_5_4, tgrp_case_6_5_4, name_case_6_5_4, desc_case_6_5_4, {
-	&test_6_5_4_top, &test_6_5_4_bot, NULL}, 0, 0}, {
-		numb_case_6_5_5, tgrp_case_6_5_5, name_case_6_5_5, desc_case_6_5_5, {
-	&test_6_5_5_top, &test_6_5_5_bot, NULL}, 0, 0}, {
-		numb_case_6_6_1, tgrp_case_6_6_1, name_case_6_6_1, desc_case_6_6_1, {
-	&test_6_6_1_top, &test_6_6_1_bot, NULL}, 0, 0}, {
-		numb_case_6_6_2, tgrp_case_6_6_2, name_case_6_6_2, desc_case_6_6_2, {
-	&test_6_6_2_top, &test_6_6_2_bot, NULL}, 0, 0}, {
-		numb_case_7_1_1, tgrp_case_7_1_1, name_case_7_1_1, desc_case_7_1_1, {
-	&test_7_1_1_top, &test_7_1_1_bot, NULL}, 0, 0}, {
-		numb_case_7_1_2, tgrp_case_7_1_2, name_case_7_1_2, desc_case_7_1_2, {
-	&test_7_1_2_top, &test_7_1_2_bot, NULL}, 0, 0}, {
-		numb_case_7_1_3, tgrp_case_7_1_3, name_case_7_1_3, desc_case_7_1_3, {
-	&test_7_1_3_top, &test_7_1_3_bot, NULL}, 0, 0}, {
-		numb_case_7_2_1, tgrp_case_7_2_1, name_case_7_2_1, desc_case_7_2_1, {
-	&test_7_2_1_top, &test_7_2_1_bot, NULL}, 0, 0}, {
-		numb_case_7_3_1, tgrp_case_7_3_1, name_case_7_3_1, desc_case_7_3_1, {
-	&test_7_3_1_top, &test_7_3_1_bot, NULL}, 0, 0}, {
-		numb_case_7_3_2, tgrp_case_7_3_2, name_case_7_3_2, desc_case_7_3_2, {
-	&test_7_3_2_top, &test_7_3_2_bot, NULL}, 0, 0}, {
-		numb_case_7_3_3, tgrp_case_7_3_3, name_case_7_3_3, desc_case_7_3_3, {
-	&test_7_3_3_top, &test_7_3_3_bot, NULL}, 0, 0}, {
-		numb_case_7_3_4, tgrp_case_7_3_4, name_case_7_3_4, desc_case_7_3_4, {
-	&test_7_3_4_top, &test_7_3_4_bot, NULL}, 0, 0}, {
-		numb_case_7_3_5, tgrp_case_7_3_5, name_case_7_3_5, desc_case_7_3_5, {
-	&test_7_3_5_top, &test_7_3_5_bot, NULL}, 0, 0}, {
-		numb_case_7_4_1, tgrp_case_7_4_1, name_case_7_4_1, desc_case_7_4_1, {
-	&test_7_4_1_top, &test_7_4_1_bot, NULL}, 0, 0}, {
-		numb_case_7_4_2, tgrp_case_7_4_2, name_case_7_4_2, desc_case_7_4_2, {
-	&test_7_4_2_top, &test_7_4_2_bot, NULL}, 0, 0}, {
-		numb_case_7_4_3, tgrp_case_7_4_3, name_case_7_4_3, desc_case_7_4_3, {
-	&test_7_4_3_top, &test_7_4_3_bot, NULL}, 0, 0}, {
-		numb_case_7_5_1, tgrp_case_7_5_1, name_case_7_5_1, desc_case_7_5_1, {
-	&test_7_5_1_top, &test_7_5_1_bot, NULL}, 0, 0}, {
-		numb_case_7_5_2, tgrp_case_7_5_2, name_case_7_5_2, desc_case_7_5_2, {
-	&test_7_5_2_top, &test_7_5_2_bot, NULL}, 0, 0}, {
-		numb_case_7_5_3, tgrp_case_7_5_3, name_case_7_5_3, desc_case_7_5_3, {
-	&test_7_5_3_top, &test_7_5_3_bot, NULL}, 0, 0}, {
-		numb_case_7_6_1, tgrp_case_7_6_1, name_case_7_6_1, desc_case_7_6_1, {
-	&test_7_6_1_top, &test_7_6_1_bot, NULL}, 0, 0}, {
-		numb_case_7_6_2, tgrp_case_7_6_2, name_case_7_6_2, desc_case_7_6_2, {
-	&test_7_6_2_top, &test_7_6_2_bot, NULL}, 0, 0}, {
-		numb_case_7_6_3, tgrp_case_7_6_3, name_case_7_6_3, desc_case_7_6_3, {
-	&test_7_6_3_top, &test_7_6_3_bot, NULL}, 0, 0}, {
-		numb_case_7_7_1, tgrp_case_7_7_1, name_case_7_7_1, desc_case_7_7_1, {
-	&test_7_7_1_top, &test_7_7_1_bot, NULL}, 0, 0}, {
-		numb_case_7_7_2, tgrp_case_7_7_2, name_case_7_7_2, desc_case_7_7_2, {
-	&test_7_7_2_top, &test_7_7_2_bot, NULL}, 0, 0}, {
-		numb_case_7_7_3, tgrp_case_7_7_3, name_case_7_7_3, desc_case_7_7_3, {
-	&test_7_7_3_top, &test_7_7_3_bot, NULL}, 0, 0}, {
-		numb_case_7_8_1, tgrp_case_7_8_1, name_case_7_8_1, desc_case_7_8_1, {
-	&test_7_8_1_top, &test_7_8_1_bot, NULL}, 0, 0}, {
-		numb_case_7_8_2, tgrp_case_7_8_2, name_case_7_8_2, desc_case_7_8_2, {
-	&test_7_8_2_top, &test_7_8_2_bot, NULL}, 0, 0}, {
-		numb_case_7_8_3, tgrp_case_7_8_3, name_case_7_8_3, desc_case_7_8_3, {
-	&test_7_8_3_top, &test_7_8_3_bot, NULL}, 0, 0}, {
-		numb_case_7_9_1, tgrp_case_7_9_1, name_case_7_9_1, desc_case_7_9_1, {
-	&test_7_9_1_top, &test_7_9_1_bot, NULL}, 0, 0}, {
-		numb_case_7_9_2, tgrp_case_7_9_2, name_case_7_9_2, desc_case_7_9_2, {
-	&test_7_9_2_top, &test_7_9_2_bot, NULL}, 0, 0}, {
-		numb_case_7_9_3, tgrp_case_7_9_3, name_case_7_9_3, desc_case_7_9_3, {
-	&test_7_9_3_top, &test_7_9_3_bot, NULL}, 0, 0}, {
-		numb_case_7_10_1, tgrp_case_7_10_1, name_case_7_10_1, desc_case_7_10_1, {
-	&test_7_10_1_top, &test_7_10_1_bot, NULL}, 0, 0}, {
-		numb_case_7_10_2, tgrp_case_7_10_2, name_case_7_10_2, desc_case_7_10_2, {
-	&test_7_10_2_top, &test_7_10_2_bot, NULL}, 0, 0}, {
-		numb_case_7_10_3, tgrp_case_7_10_3, name_case_7_10_3, desc_case_7_10_3, {
-	&test_7_10_3_top, &test_7_10_3_bot, NULL}, 0, 0}, {
-		numb_case_7_11_1, tgrp_case_7_11_1, name_case_7_11_1, desc_case_7_11_1, {
-	&test_7_11_1_top, &test_7_11_1_bot, NULL}, 0, 0}, {
-		numb_case_7_11_2, tgrp_case_7_11_2, name_case_7_11_2, desc_case_7_11_2, {
-	&test_7_11_2_top, &test_7_11_2_bot, NULL}, 0, 0}, {
-		numb_case_7_11_3, tgrp_case_7_11_3, name_case_7_11_3, desc_case_7_11_3, {
-	&test_7_11_3_top, &test_7_11_3_bot, NULL}, 0, 0}, {
-		numb_case_7_12_1, tgrp_case_7_12_1, name_case_7_12_1, desc_case_7_12_1, {
-	&test_7_12_1_top, &test_7_12_1_bot, NULL}, 0, 0}, {
-		numb_case_7_12_2, tgrp_case_7_12_2, name_case_7_12_2, desc_case_7_12_2, {
-	&test_7_12_2_top, &test_7_12_2_bot, NULL}, 0, 0}, {
-		numb_case_7_12_3, tgrp_case_7_12_3, name_case_7_12_3, desc_case_7_12_3, {
-	&test_7_12_3_top, &test_7_12_3_bot, NULL}, 0, 0}, {
-		numb_case_7_13_1, tgrp_case_7_13_1, name_case_7_13_1, desc_case_7_13_1, {
-	&test_7_13_1_top, &test_7_13_1_bot, NULL}, 0, 0}, {
-		numb_case_7_13_2, tgrp_case_7_13_2, name_case_7_13_2, desc_case_7_13_2, {
-	&test_7_13_2_top, &test_7_13_2_bot, NULL}, 0, 0}, {
-		numb_case_7_13_3, tgrp_case_7_13_3, name_case_7_13_3, desc_case_7_13_3, {
-	&test_7_13_3_top, &test_7_13_3_bot, NULL}, 0, 0}, {
-		numb_case_7_14_1, tgrp_case_7_14_1, name_case_7_14_1, desc_case_7_14_1, {
-	&test_7_14_1_top, &test_7_14_1_bot, NULL}, 0, 0}, {
-		numb_case_7_14_2, tgrp_case_7_14_2, name_case_7_14_2, desc_case_7_14_2, {
-	&test_7_14_2_top, &test_7_14_2_bot, NULL}, 0, 0}, {
-		numb_case_7_14_3, tgrp_case_7_14_3, name_case_7_14_3, desc_case_7_14_3, {
-	&test_7_14_3_top, &test_7_14_3_bot, NULL}, 0, 0}, {
-		numb_case_7_15_1, tgrp_case_7_15_1, name_case_7_15_1, desc_case_7_15_1, {
-	&test_7_15_1_top, &test_7_15_1_bot, NULL}, 0, 0}, {
-		numb_case_7_15_2, tgrp_case_7_15_2, name_case_7_15_2, desc_case_7_15_2, {
-	&test_7_15_2_top, &test_7_15_2_bot, NULL}, 0, 0}, {
-		numb_case_7_15_3, tgrp_case_7_15_3, name_case_7_15_3, desc_case_7_15_3, {
-	&test_7_15_3_top, &test_7_15_3_bot, NULL}, 0, 0}, {
-		numb_case_7_16_1, tgrp_case_7_16_1, name_case_7_16_1, desc_case_7_16_1, {
-	&test_7_16_1_top, &test_7_16_1_bot, NULL}, 0, 0}, {
-		numb_case_7_16_2, tgrp_case_7_16_2, name_case_7_16_2, desc_case_7_16_2, {
-	&test_7_16_2_top, &test_7_16_2_bot, NULL}, 0, 0}, {
-		numb_case_7_16_3, tgrp_case_7_16_3, name_case_7_16_3, desc_case_7_16_3, {
-	&test_7_16_3_top, &test_7_16_3_bot, NULL}, 0, 0}, {
-		numb_case_7_17_1, tgrp_case_7_17_1, name_case_7_17_1, desc_case_7_17_1, {
-	&test_7_17_1_top, &test_7_17_1_bot, NULL}, 0, 0}, {
-		numb_case_8_1_1, tgrp_case_8_1_1, name_case_8_1_1, desc_case_8_1_1, {
-	&test_8_1_1_top, &test_8_1_1_bot, NULL}, 0, 0}, {
-		numb_case_8_1_2, tgrp_case_8_1_2, name_case_8_1_2, desc_case_8_1_2, {
-	&test_8_1_2_top, &test_8_1_2_bot, NULL}, 0, 0}, {
-		numb_case_8_1_3, tgrp_case_8_1_3, name_case_8_1_3, desc_case_8_1_3, {
-	&test_8_1_3_top, &test_8_1_3_bot, NULL}, 0, 0}, {
-		numb_case_8_1_4, tgrp_case_8_1_4, name_case_8_1_4, desc_case_8_1_4, {
-	&test_8_1_4_top, &test_8_1_4_bot, NULL}, 0, 0}, {
-		numb_case_8_2_1, tgrp_case_8_2_1, name_case_8_2_1, desc_case_8_2_1, {
-	&test_8_2_1_top, &test_8_2_1_bot, NULL}, 0, 0}, {
-		numb_case_8_2_2, tgrp_case_8_2_2, name_case_8_2_2, desc_case_8_2_2, {
-	&test_8_2_2_top, &test_8_2_2_bot, NULL}, 0, 0}, {
-		numb_case_8_2_3, tgrp_case_8_2_3, name_case_8_2_3, desc_case_8_2_3, {
-	&test_8_2_3_top, &test_8_2_3_bot, NULL}, 0, 0}, {
-		numb_case_8_3_1, tgrp_case_8_3_1, name_case_8_3_1, desc_case_8_3_1, {
-	&test_8_3_1_top, &test_8_3_1_bot, NULL}, 0, 0}, {
-		numb_case_8_3_2, tgrp_case_8_3_2, name_case_8_3_2, desc_case_8_3_2, {
-	&test_8_3_2_top, &test_8_3_2_bot, NULL}, 0, 0}, {
-		numb_case_8_4_1, tgrp_case_8_4_1, name_case_8_4_1, desc_case_8_4_1, {
-	&test_8_4_1_top, &test_8_4_1_bot, NULL}, 0, 0}, {
-		numb_case_8_5_1, tgrp_case_8_5_1, name_case_8_5_1, desc_case_8_5_1, {
-	&test_8_5_1_top, &test_8_5_1_bot, NULL}, 0, 0}, {
-		numb_case_8_5_2, tgrp_case_8_5_2, name_case_8_5_2, desc_case_8_5_2, {
-	&test_8_5_2_top, &test_8_5_2_bot, NULL}, 0, 0}, {
-		numb_case_8_5_3, tgrp_case_8_5_3, name_case_8_5_3, desc_case_8_5_3, {
-	&test_8_5_3_top, &test_8_5_3_bot, NULL}, 0, 0}, {
-		numb_case_8_5_4, tgrp_case_8_5_4, name_case_8_5_4, desc_case_8_5_4, {
-	&test_8_5_4_top, &test_8_5_4_bot, NULL}, 0, 0}, {
-		numb_case_8_6_1, tgrp_case_8_6_1, name_case_8_6_1, desc_case_8_6_1, {
-	&test_8_6_1_top, &test_8_6_1_bot, NULL}, 0, 0}, {
-		numb_case_8_6_2, tgrp_case_8_6_2, name_case_8_6_2, desc_case_8_6_2, {
-	&test_8_6_2_top, &test_8_6_2_bot, NULL}, 0, 0}, {
-		numb_case_8_6_3, tgrp_case_8_6_3, name_case_8_6_3, desc_case_8_6_3, {
-	&test_8_6_3_top, &test_8_6_3_bot, NULL}, 0, 0}, {
-		numb_case_8_7_1, tgrp_case_8_7_1, name_case_8_7_1, desc_case_8_7_1, {
-	&test_8_7_1_top, &test_8_7_1_bot, NULL}, 0, 0}, {
-		numb_case_8_8_1, tgrp_case_8_8_1, name_case_8_8_1, desc_case_8_8_1, {
-	&test_8_8_1_top, &test_8_8_1_bot, NULL}, 0, 0}, {
-NULL,}};
+		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, sref_case_1_2_1, { &test_1_2_1_top, &test_1_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, sref_case_1_2_2, { &test_1_2_2_top, &test_1_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_1_2_3, tgrp_case_1_2_3, name_case_1_2_3, desc_case_1_2_3, sref_case_1_2_3, { &test_1_2_3_top, &test_1_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, { &test_2_1_1_top, &test_2_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, sref_case_2_1_2, { &test_2_1_2_top, &test_2_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, sref_case_2_1_3, { &test_2_1_3_top, &test_2_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, sref_case_2_1_4, { &test_2_1_4_top, &test_2_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, sref_case_2_1_5, { &test_2_1_5_top, &test_2_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, sref_case_2_1_6, { &test_2_1_6_top, &test_2_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, sref_case_2_1_7, { &test_2_1_7_top, &test_2_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, sref_case_2_1_8, { &test_2_1_8_top, &test_2_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, { &test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, sref_case_2_3_1, { &test_2_3_1_top, &test_2_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, sref_case_2_3_2, { &test_2_3_2_top, &test_2_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, sref_case_2_3_3, { &test_2_3_3_top, &test_2_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, sref_case_2_3_4, { &test_2_3_4_top, &test_2_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, sref_case_2_3_5, { &test_2_3_5_top, &test_2_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, sref_case_2_3_6, { &test_2_3_6_top, &test_2_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, sref_case_2_3_7, { &test_2_3_7_top, &test_2_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_8, tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, sref_case_2_3_8, { &test_2_3_8_top, &test_2_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_3_9, tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, sref_case_2_3_9, { &test_2_3_9_top, &test_2_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, sref_case_2_4_1, { &test_2_4_1_top, &test_2_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_2_5_1, tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, sref_case_2_5_1, { &test_2_5_1_top, &test_2_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, { &test_3_1_1_top, &test_3_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, { &test_3_2_1_top, &test_3_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, sref_case_3_3_1, { &test_3_3_1_top, &test_3_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, sref_case_3_4_1, { &test_3_4_1_top, &test_3_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_4_2, tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, sref_case_3_4_2, { &test_3_4_2_top, &test_3_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, sref_case_3_5_1, { &test_3_5_1_top, &test_3_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_5_2, tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, sref_case_3_5_2, { &test_3_5_2_top, &test_3_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, sref_case_3_6_1, { &test_3_6_1_top, &test_3_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, sref_case_3_7_1, { &test_3_7_1_top, &test_3_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, { &test_4_1_1_top, &test_4_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, { &test_4_1_2_top, &test_4_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, { &test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, { &test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, sref_case_4_3_1, { &test_4_3_1_top, &test_4_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_1, tgrp_case_4_4_1, name_case_4_4_1, desc_case_4_4_1, sref_case_4_4_1, { &test_4_4_1_top, &test_4_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_2, tgrp_case_4_4_2, name_case_4_4_2, desc_case_4_4_2, sref_case_4_4_2, { &test_4_4_2_top, &test_4_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_3, tgrp_case_4_4_3, name_case_4_4_3, desc_case_4_4_3, sref_case_4_4_3, { &test_4_4_3_top, &test_4_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_4, tgrp_case_4_4_4, name_case_4_4_4, desc_case_4_4_4, sref_case_4_4_4, { &test_4_4_4_top, &test_4_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_5, tgrp_case_4_4_5, name_case_4_4_5, desc_case_4_4_5, sref_case_4_4_5, { &test_4_4_5_top, &test_4_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_6, tgrp_case_4_4_6, name_case_4_4_6, desc_case_4_4_6, sref_case_4_4_6, { &test_4_4_6_top, &test_4_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_7, tgrp_case_4_4_7, name_case_4_4_7, desc_case_4_4_7, sref_case_4_4_7, { &test_4_4_7_top, &test_4_4_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_4_8, tgrp_case_4_4_8, name_case_4_4_8, desc_case_4_4_8, sref_case_4_4_8, { &test_4_4_8_top, &test_4_4_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_5_1, tgrp_case_4_5_1, name_case_4_5_1, desc_case_4_5_1, sref_case_4_5_1, { &test_4_5_1_top, &test_4_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_6_1, tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, sref_case_4_6_1, { &test_4_6_1_top, &test_4_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_6_2, tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, sref_case_4_6_2, { &test_4_6_2_top, &test_4_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_6_3, tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, sref_case_4_6_3, { &test_4_6_3_top, &test_4_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_6_4, tgrp_case_4_6_4, name_case_4_6_4, desc_case_4_6_4, sref_case_4_6_4, { &test_4_6_4_top, &test_4_6_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_7_1, tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, sref_case_4_7_1, { &test_4_7_1_top, &test_4_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_7_2, tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, sref_case_4_7_2, { &test_4_7_2_top, &test_4_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_7_3, tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, sref_case_4_7_3, { &test_4_7_3_top, &test_4_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_7_4, tgrp_case_4_7_4, name_case_4_7_4, desc_case_4_7_4, sref_case_4_7_4, { &test_4_7_4_top, &test_4_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_8_1, tgrp_case_4_8_1, name_case_4_8_1, desc_case_4_8_1, sref_case_4_8_1, { &test_4_8_1_top, &test_4_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_8_2, tgrp_case_4_8_2, name_case_4_8_2, desc_case_4_8_2, sref_case_4_8_2, { &test_4_8_2_top, &test_4_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_8_3, tgrp_case_4_8_3, name_case_4_8_3, desc_case_4_8_3, sref_case_4_8_3, { &test_4_8_3_top, &test_4_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_4_9_1, tgrp_case_4_9_1, name_case_4_9_1, desc_case_4_9_1, sref_case_4_9_1, { &test_4_9_1_top, &test_4_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_1, tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, sref_case_5_1_1, { &test_5_1_1_top, &test_5_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_2, tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, sref_case_5_1_2, { &test_5_1_2_top, &test_5_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_3, tgrp_case_5_1_3, name_case_5_1_3, desc_case_5_1_3, sref_case_5_1_3, { &test_5_1_3_top, &test_5_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_4, tgrp_case_5_1_4, name_case_5_1_4, desc_case_5_1_4, sref_case_5_1_4, { &test_5_1_4_top, &test_5_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_5, tgrp_case_5_1_5, name_case_5_1_5, desc_case_5_1_5, sref_case_5_1_5, { &test_5_1_5_top, &test_5_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_6, tgrp_case_5_1_6, name_case_5_1_6, desc_case_5_1_6, sref_case_5_1_6, { &test_5_1_6_top, &test_5_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_7, tgrp_case_5_1_7, name_case_5_1_7, desc_case_5_1_7, sref_case_5_1_7, { &test_5_1_7_top, &test_5_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_8, tgrp_case_5_1_8, name_case_5_1_8, desc_case_5_1_8, sref_case_5_1_8, { &test_5_1_8_top, &test_5_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_9, tgrp_case_5_1_9, name_case_5_1_9, desc_case_5_1_9, sref_case_5_1_9, { &test_5_1_9_top, &test_5_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_10, tgrp_case_5_1_10, name_case_5_1_10, desc_case_5_1_10, sref_case_5_1_10, { &test_5_1_10_top, &test_5_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_11, tgrp_case_5_1_11, name_case_5_1_11, desc_case_5_1_11, sref_case_5_1_11, { &test_5_1_11_top, &test_5_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_12, tgrp_case_5_1_12, name_case_5_1_12, desc_case_5_1_12, sref_case_5_1_12, { &test_5_1_12_top, &test_5_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_13, tgrp_case_5_1_13, name_case_5_1_13, desc_case_5_1_13, sref_case_5_1_13, { &test_5_1_13_top, &test_5_1_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_14, tgrp_case_5_1_14, name_case_5_1_14, desc_case_5_1_14, sref_case_5_1_14, { &test_5_1_14_top, &test_5_1_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_15, tgrp_case_5_1_15, name_case_5_1_15, desc_case_5_1_15, sref_case_5_1_15, { &test_5_1_15_top, &test_5_1_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_16, tgrp_case_5_1_16, name_case_5_1_16, desc_case_5_1_16, sref_case_5_1_16, { &test_5_1_16_top, &test_5_1_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_17, tgrp_case_5_1_17, name_case_5_1_17, desc_case_5_1_17, sref_case_5_1_17, { &test_5_1_17_top, &test_5_1_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_18, tgrp_case_5_1_18, name_case_5_1_18, desc_case_5_1_18, sref_case_5_1_18, { &test_5_1_18_top, &test_5_1_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_19, tgrp_case_5_1_19, name_case_5_1_19, desc_case_5_1_19, sref_case_5_1_19, { &test_5_1_19_top, &test_5_1_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_20, tgrp_case_5_1_20, name_case_5_1_20, desc_case_5_1_20, sref_case_5_1_20, { &test_5_1_20_top, &test_5_1_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_21, tgrp_case_5_1_21, name_case_5_1_21, desc_case_5_1_21, sref_case_5_1_21, { &test_5_1_21_top, &test_5_1_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_22, tgrp_case_5_1_22, name_case_5_1_22, desc_case_5_1_22, sref_case_5_1_22, { &test_5_1_22_top, &test_5_1_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_23, tgrp_case_5_1_23, name_case_5_1_23, desc_case_5_1_23, sref_case_5_1_23, { &test_5_1_23_top, &test_5_1_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_24, tgrp_case_5_1_24, name_case_5_1_24, desc_case_5_1_24, sref_case_5_1_24, { &test_5_1_24_top, &test_5_1_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_25, tgrp_case_5_1_25, name_case_5_1_25, desc_case_5_1_25, sref_case_5_1_25, { &test_5_1_25_top, &test_5_1_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_26, tgrp_case_5_1_26, name_case_5_1_26, desc_case_5_1_26, sref_case_5_1_26, { &test_5_1_26_top, &test_5_1_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_27, tgrp_case_5_1_27, name_case_5_1_27, desc_case_5_1_27, sref_case_5_1_27, { &test_5_1_27_top, &test_5_1_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_1_28, tgrp_case_5_1_28, name_case_5_1_28, desc_case_5_1_28, sref_case_5_1_28, { &test_5_1_28_top, &test_5_1_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_1, tgrp_case_5_2_1, name_case_5_2_1, desc_case_5_2_1, sref_case_5_2_1, { &test_5_2_1_top, &test_5_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_2, tgrp_case_5_2_2, name_case_5_2_2, desc_case_5_2_2, sref_case_5_2_2, { &test_5_2_2_top, &test_5_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_3, tgrp_case_5_2_3, name_case_5_2_3, desc_case_5_2_3, sref_case_5_2_3, { &test_5_2_3_top, &test_5_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_4, tgrp_case_5_2_4, name_case_5_2_4, desc_case_5_2_4, sref_case_5_2_4, { &test_5_2_4_top, &test_5_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_5, tgrp_case_5_2_5, name_case_5_2_5, desc_case_5_2_5, sref_case_5_2_5, { &test_5_2_5_top, &test_5_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_6, tgrp_case_5_2_6, name_case_5_2_6, desc_case_5_2_6, sref_case_5_2_6, { &test_5_2_6_top, &test_5_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_7, tgrp_case_5_2_7, name_case_5_2_7, desc_case_5_2_7, sref_case_5_2_7, { &test_5_2_7_top, &test_5_2_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_8, tgrp_case_5_2_8, name_case_5_2_8, desc_case_5_2_8, sref_case_5_2_8, { &test_5_2_8_top, &test_5_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_9, tgrp_case_5_2_9, name_case_5_2_9, desc_case_5_2_9, sref_case_5_2_9, { &test_5_2_9_top, &test_5_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_10, tgrp_case_5_2_10, name_case_5_2_10, desc_case_5_2_10, sref_case_5_2_10, { &test_5_2_10_top, &test_5_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_11, tgrp_case_5_2_11, name_case_5_2_11, desc_case_5_2_11, sref_case_5_2_11, { &test_5_2_11_top, &test_5_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_12, tgrp_case_5_2_12, name_case_5_2_12, desc_case_5_2_12, sref_case_5_2_12, { &test_5_2_12_top, &test_5_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_13, tgrp_case_5_2_13, name_case_5_2_13, desc_case_5_2_13, sref_case_5_2_13, { &test_5_2_13_top, &test_5_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_14, tgrp_case_5_2_14, name_case_5_2_14, desc_case_5_2_14, sref_case_5_2_14, { &test_5_2_14_top, &test_5_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_15, tgrp_case_5_2_15, name_case_5_2_15, desc_case_5_2_15, sref_case_5_2_15, { &test_5_2_15_top, &test_5_2_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_16, tgrp_case_5_2_16, name_case_5_2_16, desc_case_5_2_16, sref_case_5_2_16, { &test_5_2_16_top, &test_5_2_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_17, tgrp_case_5_2_17, name_case_5_2_17, desc_case_5_2_17, sref_case_5_2_17, { &test_5_2_17_top, &test_5_2_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_18, tgrp_case_5_2_18, name_case_5_2_18, desc_case_5_2_18, sref_case_5_2_18, { &test_5_2_18_top, &test_5_2_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_19, tgrp_case_5_2_19, name_case_5_2_19, desc_case_5_2_19, sref_case_5_2_19, { &test_5_2_19_top, &test_5_2_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_20, tgrp_case_5_2_20, name_case_5_2_20, desc_case_5_2_20, sref_case_5_2_20, { &test_5_2_20_top, &test_5_2_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_21, tgrp_case_5_2_21, name_case_5_2_21, desc_case_5_2_21, sref_case_5_2_21, { &test_5_2_21_top, &test_5_2_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_22, tgrp_case_5_2_22, name_case_5_2_22, desc_case_5_2_22, sref_case_5_2_22, { &test_5_2_22_top, &test_5_2_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_23, tgrp_case_5_2_23, name_case_5_2_23, desc_case_5_2_23, sref_case_5_2_23, { &test_5_2_23_top, &test_5_2_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_24, tgrp_case_5_2_24, name_case_5_2_24, desc_case_5_2_24, sref_case_5_2_24, { &test_5_2_24_top, &test_5_2_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_25, tgrp_case_5_2_25, name_case_5_2_25, desc_case_5_2_25, sref_case_5_2_25, { &test_5_2_25_top, &test_5_2_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_26, tgrp_case_5_2_26, name_case_5_2_26, desc_case_5_2_26, sref_case_5_2_26, { &test_5_2_26_top, &test_5_2_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_27, tgrp_case_5_2_27, name_case_5_2_27, desc_case_5_2_27, sref_case_5_2_27, { &test_5_2_27_top, &test_5_2_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_2_28, tgrp_case_5_2_28, name_case_5_2_28, desc_case_5_2_28, sref_case_5_2_28, { &test_5_2_28_top, &test_5_2_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_1, tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, sref_case_5_3_1, { &test_5_3_1_top, &test_5_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_2, tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, sref_case_5_3_2, { &test_5_3_2_top, &test_5_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_3, tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, sref_case_5_3_3, { &test_5_3_3_top, &test_5_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_4, tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, sref_case_5_3_4, { &test_5_3_4_top, &test_5_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_5, tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, sref_case_5_3_5, { &test_5_3_5_top, &test_5_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_6, tgrp_case_5_3_6, name_case_5_3_6, desc_case_5_3_6, sref_case_5_3_6, { &test_5_3_6_top, &test_5_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_7, tgrp_case_5_3_7, name_case_5_3_7, desc_case_5_3_7, sref_case_5_3_7, { &test_5_3_7_top, &test_5_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_8, tgrp_case_5_3_8, name_case_5_3_8, desc_case_5_3_8, sref_case_5_3_8, { &test_5_3_8_top, &test_5_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_9, tgrp_case_5_3_9, name_case_5_3_9, desc_case_5_3_9, sref_case_5_3_9, { &test_5_3_9_top, &test_5_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_10, tgrp_case_5_3_10, name_case_5_3_10, desc_case_5_3_10, sref_case_5_3_10, { &test_5_3_10_top, &test_5_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_11, tgrp_case_5_3_11, name_case_5_3_11, desc_case_5_3_11, sref_case_5_3_11, { &test_5_3_11_top, &test_5_3_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_12, tgrp_case_5_3_12, name_case_5_3_12, desc_case_5_3_12, sref_case_5_3_12, { &test_5_3_12_top, &test_5_3_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_13, tgrp_case_5_3_13, name_case_5_3_13, desc_case_5_3_13, sref_case_5_3_13, { &test_5_3_13_top, &test_5_3_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_14, tgrp_case_5_3_14, name_case_5_3_14, desc_case_5_3_14, sref_case_5_3_14, { &test_5_3_14_top, &test_5_3_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_15, tgrp_case_5_3_15, name_case_5_3_15, desc_case_5_3_15, sref_case_5_3_15, { &test_5_3_15_top, &test_5_3_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_16, tgrp_case_5_3_16, name_case_5_3_16, desc_case_5_3_16, sref_case_5_3_16, { &test_5_3_16_top, &test_5_3_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_17, tgrp_case_5_3_17, name_case_5_3_17, desc_case_5_3_17, sref_case_5_3_17, { &test_5_3_17_top, &test_5_3_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_18, tgrp_case_5_3_18, name_case_5_3_18, desc_case_5_3_18, sref_case_5_3_18, { &test_5_3_18_top, &test_5_3_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_19, tgrp_case_5_3_19, name_case_5_3_19, desc_case_5_3_19, sref_case_5_3_19, { &test_5_3_19_top, &test_5_3_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_20, tgrp_case_5_3_20, name_case_5_3_20, desc_case_5_3_20, sref_case_5_3_20, { &test_5_3_20_top, &test_5_3_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_21, tgrp_case_5_3_21, name_case_5_3_21, desc_case_5_3_21, sref_case_5_3_21, { &test_5_3_21_top, &test_5_3_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_22, tgrp_case_5_3_22, name_case_5_3_22, desc_case_5_3_22, sref_case_5_3_22, { &test_5_3_22_top, &test_5_3_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_23, tgrp_case_5_3_23, name_case_5_3_23, desc_case_5_3_23, sref_case_5_3_23, { &test_5_3_23_top, &test_5_3_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_24, tgrp_case_5_3_24, name_case_5_3_24, desc_case_5_3_24, sref_case_5_3_24, { &test_5_3_24_top, &test_5_3_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_25, tgrp_case_5_3_25, name_case_5_3_25, desc_case_5_3_25, sref_case_5_3_25, { &test_5_3_25_top, &test_5_3_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_26, tgrp_case_5_3_26, name_case_5_3_26, desc_case_5_3_26, sref_case_5_3_26, { &test_5_3_26_top, &test_5_3_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_27, tgrp_case_5_3_27, name_case_5_3_27, desc_case_5_3_27, sref_case_5_3_27, { &test_5_3_27_top, &test_5_3_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_5_3_28, tgrp_case_5_3_28, name_case_5_3_28, desc_case_5_3_28, sref_case_5_3_28, { &test_5_3_28_top, &test_5_3_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_1, tgrp_case_6_1_1, name_case_6_1_1, desc_case_6_1_1, sref_case_6_1_1, { &test_6_1_1_top, &test_6_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_2, tgrp_case_6_1_2, name_case_6_1_2, desc_case_6_1_2, sref_case_6_1_2, { &test_6_1_2_top, &test_6_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_3, tgrp_case_6_1_3, name_case_6_1_3, desc_case_6_1_3, sref_case_6_1_3, { &test_6_1_3_top, &test_6_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_4, tgrp_case_6_1_4, name_case_6_1_4, desc_case_6_1_4, sref_case_6_1_4, { &test_6_1_4_top, &test_6_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_5, tgrp_case_6_1_5, name_case_6_1_5, desc_case_6_1_5, sref_case_6_1_5, { &test_6_1_5_top, &test_6_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_6, tgrp_case_6_1_6, name_case_6_1_6, desc_case_6_1_6, sref_case_6_1_6, { &test_6_1_6_top, &test_6_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_7, tgrp_case_6_1_7, name_case_6_1_7, desc_case_6_1_7, sref_case_6_1_7, { &test_6_1_7_top, &test_6_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_8, tgrp_case_6_1_8, name_case_6_1_8, desc_case_6_1_8, sref_case_6_1_8, { &test_6_1_8_top, &test_6_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_9, tgrp_case_6_1_9, name_case_6_1_9, desc_case_6_1_9, sref_case_6_1_9, { &test_6_1_9_top, &test_6_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_10, tgrp_case_6_1_10, name_case_6_1_10, desc_case_6_1_10, sref_case_6_1_10, { &test_6_1_10_top, &test_6_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_11, tgrp_case_6_1_11, name_case_6_1_11, desc_case_6_1_11, sref_case_6_1_11, { &test_6_1_11_top, &test_6_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_1_12, tgrp_case_6_1_12, name_case_6_1_12, desc_case_6_1_12, sref_case_6_1_12, { &test_6_1_12_top, &test_6_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_1, tgrp_case_6_2_1, name_case_6_2_1, desc_case_6_2_1, sref_case_6_2_1, { &test_6_2_1_top, &test_6_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_2, tgrp_case_6_2_2, name_case_6_2_2, desc_case_6_2_2, sref_case_6_2_2, { &test_6_2_2_top, &test_6_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_3, tgrp_case_6_2_3, name_case_6_2_3, desc_case_6_2_3, sref_case_6_2_3, { &test_6_2_3_top, &test_6_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_4, tgrp_case_6_2_4, name_case_6_2_4, desc_case_6_2_4, sref_case_6_2_4, { &test_6_2_4_top, &test_6_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_5, tgrp_case_6_2_5, name_case_6_2_5, desc_case_6_2_5, sref_case_6_2_5, { &test_6_2_5_top, &test_6_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_2_6, tgrp_case_6_2_6, name_case_6_2_6, desc_case_6_2_6, sref_case_6_2_6, { &test_6_2_6_top, &test_6_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_1, tgrp_case_6_3_1, name_case_6_3_1, desc_case_6_3_1, sref_case_6_3_1, { &test_6_3_1_top, &test_6_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_2, tgrp_case_6_3_2, name_case_6_3_2, desc_case_6_3_2, sref_case_6_3_2, { &test_6_3_2_top, &test_6_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_3, tgrp_case_6_3_3, name_case_6_3_3, desc_case_6_3_3, sref_case_6_3_3, { &test_6_3_3_top, &test_6_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_4, tgrp_case_6_3_4, name_case_6_3_4, desc_case_6_3_4, sref_case_6_3_4, { &test_6_3_4_top, &test_6_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_5, tgrp_case_6_3_5, name_case_6_3_5, desc_case_6_3_5, sref_case_6_3_5, { &test_6_3_5_top, &test_6_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_6, tgrp_case_6_3_6, name_case_6_3_6, desc_case_6_3_6, sref_case_6_3_6, { &test_6_3_6_top, &test_6_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_7, tgrp_case_6_3_7, name_case_6_3_7, desc_case_6_3_7, sref_case_6_3_7, { &test_6_3_7_top, &test_6_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_3_8, tgrp_case_6_3_8, name_case_6_3_8, desc_case_6_3_8, sref_case_6_3_8, { &test_6_3_8_top, &test_6_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_1, tgrp_case_6_4_1, name_case_6_4_1, desc_case_6_4_1, sref_case_6_4_1, { &test_6_4_1_top, &test_6_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_2, tgrp_case_6_4_2, name_case_6_4_2, desc_case_6_4_2, sref_case_6_4_2, { &test_6_4_2_top, &test_6_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_3, tgrp_case_6_4_3, name_case_6_4_3, desc_case_6_4_3, sref_case_6_4_3, { &test_6_4_3_top, &test_6_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_4, tgrp_case_6_4_4, name_case_6_4_4, desc_case_6_4_4, sref_case_6_4_4, { &test_6_4_4_top, &test_6_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_5, tgrp_case_6_4_5, name_case_6_4_5, desc_case_6_4_5, sref_case_6_4_5, { &test_6_4_5_top, &test_6_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_4_6, tgrp_case_6_4_6, name_case_6_4_6, desc_case_6_4_6, sref_case_6_4_6, { &test_6_4_6_top, &test_6_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_5_1, tgrp_case_6_5_1, name_case_6_5_1, desc_case_6_5_1, sref_case_6_5_1, { &test_6_5_1_top, &test_6_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_5_2, tgrp_case_6_5_2, name_case_6_5_2, desc_case_6_5_2, sref_case_6_5_2, { &test_6_5_2_top, &test_6_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_5_3, tgrp_case_6_5_3, name_case_6_5_3, desc_case_6_5_3, sref_case_6_5_3, { &test_6_5_3_top, &test_6_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_5_4, tgrp_case_6_5_4, name_case_6_5_4, desc_case_6_5_4, sref_case_6_5_4, { &test_6_5_4_top, &test_6_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_5_5, tgrp_case_6_5_5, name_case_6_5_5, desc_case_6_5_5, sref_case_6_5_5, { &test_6_5_5_top, &test_6_5_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_6_1, tgrp_case_6_6_1, name_case_6_6_1, desc_case_6_6_1, sref_case_6_6_1, { &test_6_6_1_top, &test_6_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_6_6_2, tgrp_case_6_6_2, name_case_6_6_2, desc_case_6_6_2, sref_case_6_6_2, { &test_6_6_2_top, &test_6_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_1_1, tgrp_case_7_1_1, name_case_7_1_1, desc_case_7_1_1, sref_case_7_1_1, { &test_7_1_1_top, &test_7_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_1_2, tgrp_case_7_1_2, name_case_7_1_2, desc_case_7_1_2, sref_case_7_1_2, { &test_7_1_2_top, &test_7_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_1_3, tgrp_case_7_1_3, name_case_7_1_3, desc_case_7_1_3, sref_case_7_1_3, { &test_7_1_3_top, &test_7_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_2_1, tgrp_case_7_2_1, name_case_7_2_1, desc_case_7_2_1, sref_case_7_2_1, { &test_7_2_1_top, &test_7_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_3_1, tgrp_case_7_3_1, name_case_7_3_1, desc_case_7_3_1, sref_case_7_3_1, { &test_7_3_1_top, &test_7_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_3_2, tgrp_case_7_3_2, name_case_7_3_2, desc_case_7_3_2, sref_case_7_3_2, { &test_7_3_2_top, &test_7_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_3_3, tgrp_case_7_3_3, name_case_7_3_3, desc_case_7_3_3, sref_case_7_3_3, { &test_7_3_3_top, &test_7_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_3_4, tgrp_case_7_3_4, name_case_7_3_4, desc_case_7_3_4, sref_case_7_3_4, { &test_7_3_4_top, &test_7_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_3_5, tgrp_case_7_3_5, name_case_7_3_5, desc_case_7_3_5, sref_case_7_3_5, { &test_7_3_5_top, &test_7_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_4_1, tgrp_case_7_4_1, name_case_7_4_1, desc_case_7_4_1, sref_case_7_4_1, { &test_7_4_1_top, &test_7_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_4_2, tgrp_case_7_4_2, name_case_7_4_2, desc_case_7_4_2, sref_case_7_4_2, { &test_7_4_2_top, &test_7_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_4_3, tgrp_case_7_4_3, name_case_7_4_3, desc_case_7_4_3, sref_case_7_4_3, { &test_7_4_3_top, &test_7_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_5_1, tgrp_case_7_5_1, name_case_7_5_1, desc_case_7_5_1, sref_case_7_5_1, { &test_7_5_1_top, &test_7_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_5_2, tgrp_case_7_5_2, name_case_7_5_2, desc_case_7_5_2, sref_case_7_5_2, { &test_7_5_2_top, &test_7_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_5_3, tgrp_case_7_5_3, name_case_7_5_3, desc_case_7_5_3, sref_case_7_5_3, { &test_7_5_3_top, &test_7_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_6_1, tgrp_case_7_6_1, name_case_7_6_1, desc_case_7_6_1, sref_case_7_6_1, { &test_7_6_1_top, &test_7_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_6_2, tgrp_case_7_6_2, name_case_7_6_2, desc_case_7_6_2, sref_case_7_6_2, { &test_7_6_2_top, &test_7_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_6_3, tgrp_case_7_6_3, name_case_7_6_3, desc_case_7_6_3, sref_case_7_6_3, { &test_7_6_3_top, &test_7_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_7_1, tgrp_case_7_7_1, name_case_7_7_1, desc_case_7_7_1, sref_case_7_7_1, { &test_7_7_1_top, &test_7_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_7_2, tgrp_case_7_7_2, name_case_7_7_2, desc_case_7_7_2, sref_case_7_7_2, { &test_7_7_2_top, &test_7_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_7_3, tgrp_case_7_7_3, name_case_7_7_3, desc_case_7_7_3, sref_case_7_7_3, { &test_7_7_3_top, &test_7_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_8_1, tgrp_case_7_8_1, name_case_7_8_1, desc_case_7_8_1, sref_case_7_8_1, { &test_7_8_1_top, &test_7_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_8_2, tgrp_case_7_8_2, name_case_7_8_2, desc_case_7_8_2, sref_case_7_8_2, { &test_7_8_2_top, &test_7_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_8_3, tgrp_case_7_8_3, name_case_7_8_3, desc_case_7_8_3, sref_case_7_8_3, { &test_7_8_3_top, &test_7_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_9_1, tgrp_case_7_9_1, name_case_7_9_1, desc_case_7_9_1, sref_case_7_9_1, { &test_7_9_1_top, &test_7_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_9_2, tgrp_case_7_9_2, name_case_7_9_2, desc_case_7_9_2, sref_case_7_9_2, { &test_7_9_2_top, &test_7_9_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_9_3, tgrp_case_7_9_3, name_case_7_9_3, desc_case_7_9_3, sref_case_7_9_3, { &test_7_9_3_top, &test_7_9_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_10_1, tgrp_case_7_10_1, name_case_7_10_1, desc_case_7_10_1, sref_case_7_10_1, { &test_7_10_1_top, &test_7_10_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_10_2, tgrp_case_7_10_2, name_case_7_10_2, desc_case_7_10_2, sref_case_7_10_2, { &test_7_10_2_top, &test_7_10_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_10_3, tgrp_case_7_10_3, name_case_7_10_3, desc_case_7_10_3, sref_case_7_10_3, { &test_7_10_3_top, &test_7_10_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_11_1, tgrp_case_7_11_1, name_case_7_11_1, desc_case_7_11_1, sref_case_7_11_1, { &test_7_11_1_top, &test_7_11_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_11_2, tgrp_case_7_11_2, name_case_7_11_2, desc_case_7_11_2, sref_case_7_11_2, { &test_7_11_2_top, &test_7_11_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_11_3, tgrp_case_7_11_3, name_case_7_11_3, desc_case_7_11_3, sref_case_7_11_3, { &test_7_11_3_top, &test_7_11_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_12_1, tgrp_case_7_12_1, name_case_7_12_1, desc_case_7_12_1, sref_case_7_12_1, { &test_7_12_1_top, &test_7_12_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_12_2, tgrp_case_7_12_2, name_case_7_12_2, desc_case_7_12_2, sref_case_7_12_2, { &test_7_12_2_top, &test_7_12_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_12_3, tgrp_case_7_12_3, name_case_7_12_3, desc_case_7_12_3, sref_case_7_12_3, { &test_7_12_3_top, &test_7_12_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_13_1, tgrp_case_7_13_1, name_case_7_13_1, desc_case_7_13_1, sref_case_7_13_1, { &test_7_13_1_top, &test_7_13_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_13_2, tgrp_case_7_13_2, name_case_7_13_2, desc_case_7_13_2, sref_case_7_13_2, { &test_7_13_2_top, &test_7_13_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_13_3, tgrp_case_7_13_3, name_case_7_13_3, desc_case_7_13_3, sref_case_7_13_3, { &test_7_13_3_top, &test_7_13_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_14_1, tgrp_case_7_14_1, name_case_7_14_1, desc_case_7_14_1, sref_case_7_14_1, { &test_7_14_1_top, &test_7_14_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_14_2, tgrp_case_7_14_2, name_case_7_14_2, desc_case_7_14_2, sref_case_7_14_2, { &test_7_14_2_top, &test_7_14_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_14_3, tgrp_case_7_14_3, name_case_7_14_3, desc_case_7_14_3, sref_case_7_14_3, { &test_7_14_3_top, &test_7_14_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_15_1, tgrp_case_7_15_1, name_case_7_15_1, desc_case_7_15_1, sref_case_7_15_1, { &test_7_15_1_top, &test_7_15_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_15_2, tgrp_case_7_15_2, name_case_7_15_2, desc_case_7_15_2, sref_case_7_15_2, { &test_7_15_2_top, &test_7_15_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_15_3, tgrp_case_7_15_3, name_case_7_15_3, desc_case_7_15_3, sref_case_7_15_3, { &test_7_15_3_top, &test_7_15_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_16_1, tgrp_case_7_16_1, name_case_7_16_1, desc_case_7_16_1, sref_case_7_16_1, { &test_7_16_1_top, &test_7_16_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_16_2, tgrp_case_7_16_2, name_case_7_16_2, desc_case_7_16_2, sref_case_7_16_2, { &test_7_16_2_top, &test_7_16_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_16_3, tgrp_case_7_16_3, name_case_7_16_3, desc_case_7_16_3, sref_case_7_16_3, { &test_7_16_3_top, &test_7_16_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_7_17_1, tgrp_case_7_17_1, name_case_7_17_1, desc_case_7_17_1, sref_case_7_17_1, { &test_7_17_1_top, &test_7_17_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_1_1, tgrp_case_8_1_1, name_case_8_1_1, desc_case_8_1_1, sref_case_8_1_1, { &test_8_1_1_top, &test_8_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_1_2, tgrp_case_8_1_2, name_case_8_1_2, desc_case_8_1_2, sref_case_8_1_2, { &test_8_1_2_top, &test_8_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_1_3, tgrp_case_8_1_3, name_case_8_1_3, desc_case_8_1_3, sref_case_8_1_3, { &test_8_1_3_top, &test_8_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_1_4, tgrp_case_8_1_4, name_case_8_1_4, desc_case_8_1_4, sref_case_8_1_4, { &test_8_1_4_top, &test_8_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_2_1, tgrp_case_8_2_1, name_case_8_2_1, desc_case_8_2_1, sref_case_8_2_1, { &test_8_2_1_top, &test_8_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_2_2, tgrp_case_8_2_2, name_case_8_2_2, desc_case_8_2_2, sref_case_8_2_2, { &test_8_2_2_top, &test_8_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_2_3, tgrp_case_8_2_3, name_case_8_2_3, desc_case_8_2_3, sref_case_8_2_3, { &test_8_2_3_top, &test_8_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_3_1, tgrp_case_8_3_1, name_case_8_3_1, desc_case_8_3_1, sref_case_8_3_1, { &test_8_3_1_top, &test_8_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_3_2, tgrp_case_8_3_2, name_case_8_3_2, desc_case_8_3_2, sref_case_8_3_2, { &test_8_3_2_top, &test_8_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_4_1, tgrp_case_8_4_1, name_case_8_4_1, desc_case_8_4_1, sref_case_8_4_1, { &test_8_4_1_top, &test_8_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_5_1, tgrp_case_8_5_1, name_case_8_5_1, desc_case_8_5_1, sref_case_8_5_1, { &test_8_5_1_top, &test_8_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_5_2, tgrp_case_8_5_2, name_case_8_5_2, desc_case_8_5_2, sref_case_8_5_2, { &test_8_5_2_top, &test_8_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_5_3, tgrp_case_8_5_3, name_case_8_5_3, desc_case_8_5_3, sref_case_8_5_3, { &test_8_5_3_top, &test_8_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_5_4, tgrp_case_8_5_4, name_case_8_5_4, desc_case_8_5_4, sref_case_8_5_4, { &test_8_5_4_top, &test_8_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_6_1, tgrp_case_8_6_1, name_case_8_6_1, desc_case_8_6_1, sref_case_8_6_1, { &test_8_6_1_top, &test_8_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_6_2, tgrp_case_8_6_2, name_case_8_6_2, desc_case_8_6_2, sref_case_8_6_2, { &test_8_6_2_top, &test_8_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_6_3, tgrp_case_8_6_3, name_case_8_6_3, desc_case_8_6_3, sref_case_8_6_3, { &test_8_6_3_top, &test_8_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_7_1, tgrp_case_8_7_1, name_case_8_7_1, desc_case_8_7_1, sref_case_8_7_1, { &test_8_7_1_top, &test_8_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+		numb_case_8_8_1, tgrp_case_8_8_1, name_case_8_8_1, desc_case_8_8_1, sref_case_8_8_1, { &test_8_8_1_top, &test_8_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+	NULL,}
+};
 
 static int summary = 0;
 
@@ -15549,14 +15958,16 @@ void print_header(void)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
-int do_tests(void)
+int do_tests(int num_tests)
 {
 	int i;
 	int result = __RESULT_INCONCLUSIVE;
+	int notapplicable = 0;
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
 	int skipped = 0;
+	int notselected = 0;
 	int aborted = 0;
 	print_header();
 	show = 0;
@@ -15566,15 +15977,14 @@ int do_tests(void)
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (begin_tests(0) == __RESULT_SUCCESS) {
-		end_tests();
+	if (num_tests == 1 || begin_tests(0) == __RESULT_SUCCESS) {
+		if (num_tests != 1)
+			end_tests(0);
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
-			if (tests[i].result)
-				continue;
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
-				skipped++;
+				notselected++;
 				continue;
 			}
 			if (aborted) {
@@ -15588,19 +15998,44 @@ int do_tests(void)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
 				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
 				if (verbose > 1)
+					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
+				if (verbose > 1)
 					fprintf(stdout, "%s\n", tests[i].desc);
+				fprintf(stdout, "\n");
 				fflush(stdout);
 				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
-			if ((result = begin_tests(i)) != __RESULT_SUCCESS)
-				goto inconclusive;
-			result = test_run(tests[i].stream);
-			end_tests();
+			if ((result = tests[i].result) == 0) {
+				if ((result = (*tests[i].start)(i)) != __RESULT_SUCCESS)
+					goto inconclusive;
+				result = test_run(tests[i].stream);
+				(*tests[i].stop)(i);
+			} else {
+				switch (result) {
+				case __RESULT_SUCCESS:
+					print_passed(3);
+					break;
+				case __RESULT_FAILURE:
+					print_failed(3);
+					break;
+				case __RESULT_NOTAPPL:
+					print_notapplicable(3);
+					break;
+				case __RESULT_SKIPPED:
+					print_skipped(3);
+					break;
+				default:
+				case __RESULT_INCONCLUSIVE:
+					print_inconclusive(3);
+					break;
+				}
+			}
 			switch (result) {
 			case __RESULT_SUCCESS:
 				successes++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "*********\n");
 					fprintf(stdout, "********* Test Case SUCCESSFUL\n");
 					fprintf(stdout, "*********\n\n");
@@ -15612,8 +16047,33 @@ int do_tests(void)
 				failures++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "XXXXXXXXX\n");
 					fprintf(stdout, "XXXXXXXXX Test Case FAILED\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_NOTAPPL:
+				notapplicable++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case NOT APPLICABLE\n");
+					fprintf(stdout, "XXXXXXXXX\n\n");
+					fflush(stdout);
+					dummy = lockf(fileno(stdout), F_ULOCK, 0);
+				}
+				break;
+			case __RESULT_SKIPPED:
+				skipped++;
+				if (verbose > 0) {
+					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
+					fprintf(stdout, "XXXXXXXXX\n");
+					fprintf(stdout, "XXXXXXXXX Test Case SKIPPED\n");
 					fprintf(stdout, "XXXXXXXXX\n\n");
 					fflush(stdout);
 					dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -15625,6 +16085,7 @@ int do_tests(void)
 				inconclusive++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
+					fprintf(stdout, "\n");
 					fprintf(stdout, "?????????\n");
 					fprintf(stdout, "????????? Test Case INCONCLUSIVE\n");
 					fprintf(stdout, "?????????\n\n");
@@ -15634,7 +16095,7 @@ int do_tests(void)
 				break;
 			}
 			tests[i].result = result;
-			if (exit_on_failure && result != __RESULT_SUCCESS)
+			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
 		}
 		if (summary && verbose) {
@@ -15661,6 +16122,18 @@ int do_tests(void)
 						fflush(stdout);
 						dummy = lockf(fileno(stdout), F_ULOCK, 0);
 						break;
+					case __RESULT_NOTAPPL:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "NOT APPLICABLE\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
+					case __RESULT_SKIPPED:
+						dummy = lockf(fileno(stdout), F_LOCK, 0);
+						fprintf(stdout, "SKIPPED\n");
+						fflush(stdout);
+						dummy = lockf(fileno(stdout), F_ULOCK, 0);
+						break;
 					default:
 					case __RESULT_INCONCLUSIVE:
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -15672,15 +16145,17 @@ int do_tests(void)
 				}
 			}
 		}
-		if (verbose > 0) {
+		if (verbose > 0 && num_tests > 1) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "\n");
-			fprintf(stdout, "========= %3d successes   \n", successes);
-			fprintf(stdout, "========= %3d failures    \n", failures);
-			fprintf(stdout, "========= %3d inconclusive\n", inconclusive);
-			fprintf(stdout, "========= %3d skipped     \n", skipped);
-			fprintf(stdout, "==========================\n");
-			fprintf(stdout, "========= %3d total       \n", successes + failures + inconclusive + skipped);
+			fprintf(stdout, "========= %3d successes     \n", successes);
+			fprintf(stdout, "========= %3d failures      \n", failures);
+			fprintf(stdout, "========= %3d inconclusive  \n", inconclusive);
+			fprintf(stdout, "========= %3d not applicable\n", notapplicable);
+			fprintf(stdout, "========= %3d skipped       \n", skipped);
+			fprintf(stdout, "========= %3d not selected  \n", notselected);
+			fprintf(stdout, "============================\n");
+			fprintf(stdout, "========= %3d total         \n", successes + failures + inconclusive + notapplicable + skipped + notselected);
 			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
@@ -15705,9 +16180,21 @@ int do_tests(void)
 			fflush(stderr);
 			dummy = lockf(fileno(stderr), F_ULOCK, 0);
 		}
+		if (num_tests == 1) {
+			if (successes)
+				return (0);
+			if (failures)
+				return (1);
+			if (inconclusive)
+				return (1);
+			if (notapplicable)
+				return (0);
+			if (skipped)
+				return (77);
+		}
 		return (aborted);
 	} else {
-		end_tests();
+		end_tests(0);
 		show = 1;
 		dummy = lockf(fileno(stderr), F_LOCK, 0);
 		fprintf(stderr, "Test Suite setup failed!\n");
@@ -15907,6 +16394,8 @@ int main(int argc, char *argv[])
 						if (verbose > 2)
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
 						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (verbose > 2)
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
@@ -15927,6 +16416,8 @@ int main(int argc, char *argv[])
 					if (verbose > 2)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
 					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (verbose > 2)
+						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1)
 						fprintf(stdout, "%s\n\n", t->desc);
 					fflush(stdout);
@@ -15957,11 +16448,11 @@ int main(int argc, char *argv[])
 				range = 1;
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, 16)) {
-						if (!t->result) {
+						// if (!t->result) {
 							t->run = 1;
 							n++;
 							tests_to_run++;
-						}
+						// }
 					}
 				if (!n) {
 					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
@@ -15993,11 +16484,11 @@ int main(int argc, char *argv[])
 			range = 1;
 			for (n = 0, t = tests; t->numb; t++)
 				if (!strncmp(t->numb, optarg, l)) {
-					if (!t->result) {
+					// if (!t->result) {
 						t->run = 1;
 						n++;
 						tests_to_run++;
-					}
+					// }
 				}
 			if (!n) {
 				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
@@ -16053,6 +16544,5 @@ int main(int argc, char *argv[])
 	default:
 		copying(argc, argv);
 	}
-	do_tests();
-	exit(0);
+	exit(do_tests(tests_to_run));
 }

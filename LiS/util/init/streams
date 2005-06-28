@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/04/12 00:05:38 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/28 03:17:24 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -28,8 +28,6 @@
 #
 ### BEGIN INIT INFO
 # Provides: streams
-# Required-Start: specfs
-# Required-Stop: specfs
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 # Short-Description: start and stop streams subsystem
@@ -224,7 +222,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2005/04/12 00:05:38 $
+# @(#) $RCSfile: streams,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2005/06/28 03:17:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -270,7 +268,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/04/12 00:05:38 $ by $Author: brian $
+# Last Modified $Date: 2005/06/28 03:17:24 $ by $Author: brian $
 #
 # =============================================================================
 

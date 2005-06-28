@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/06/24 13:42:05 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/06/28 03:18:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/24 13:42:05 $ by $Author: brian $
+ Last Modified $Date: 2005/06/28 03:18:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/06/24 13:42:05 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/06/28 03:18:16 $"
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/06/24 13:42:05 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/06/28 03:18:16 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -212,8 +212,16 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 
 #define sock_tst_linger(_sk)		(sock_flag(_sk, SOCK_LINGER) ? 1 : 0)
 #define sock_tst_destroy(_sk)		(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
 #define sock_tst_broadcast(_sk)		(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
+#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#define sock_tst_localroute(_sk)	(((struct sock *)_sk)->sk_localroute ? 1 : 0)
+#else
 #define sock_tst_localroute(_sk)	(sock_flag(_sk, SOCK_LOCALROUTE) ? 1 : 0)
+#endif
+#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#define sock_tst_debug(_sk)		(((struct sock *)_sk)->sk_debug ? 1 : 0)
+#else
 #define sock_tst_debug(_sk)		(sock_flag(_sk, SOCK_DBG) ? 1 : 0)
+#endif
 
 #define sock_set_dead(_sk)		(sock_set_flag(_sk, SOCK_DEAD))
 #define sock_set_done(_sk)		(sock_set_flag(_sk, SOCK_DONE))
@@ -222,8 +230,16 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 
 #define sock_set_linger(_sk)		(sock_set_flag(_sk, SOCK_LINGER))
 #define sock_set_destroy(_sk)		(sock_set_flag(_sk, SOCK_DESTROY))
 #define sock_set_broadcast(_sk)		(sock_set_flag(_sk, SOCK_BROADCAST))
+#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#define sock_set_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 1)
+#else
 #define sock_set_localroute(_sk)	(sock_set_flag(_sk, SOCK_LOCALROUTE))
+#endif
+#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#define sock_set_debug(_sk)		(((struct sock *)_sk)->sk_debug = 1)
+#else
 #define sock_set_debug(_sk)		(sock_set_flag(_sk, SOCK_DBG))
+#endif
 
 #define sock_clr_dead(_sk)		(sock_reset_flag(_sk, SOCK_DEAD))
 #define sock_clr_done(_sk)		(sock_reset_flag(_sk, SOCK_DONE))
@@ -232,8 +248,16 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 
 #define sock_clr_linger(_sk)		(sock_reset_flag(_sk, SOCK_LINGER))
 #define sock_clr_destroy(_sk)		(sock_reset_flag(_sk, SOCK_DESTROY))
 #define sock_clr_broadcast(_sk)		(sock_reset_flag(_sk, SOCK_BROADCAST))
+#if HAVE_KMEMB_STRUCT_SOCK_SK_LOCALROUTE
+#define sock_clr_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 0)
+#else
 #define sock_clr_localroute(_sk)	(sock_reset_flag(_sk, SOCK_LOCALROUTE))
+#endif
+#if HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#define sock_clr_debug(_sk)		(((struct sock *)_sk)->sk_debug = 0)
+#else
 #define sock_clr_debug(_sk)		(sock_reset_flag(_sk, SOCK_DBG))
+#endif
 
 #define sock_saddr(_sk)			(inet_sk(_sk)->saddr)
 #define sock_sport(_sk)			(inet_sk(_sk)->sport)
@@ -348,6 +372,27 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #endif
 #endif
 
+#ifndef tcp_current_mss
+#ifdef HAVE_TCP_CURRENT_MSS_ADDR
+unsigned int tcp_current_mss(struct sock *sk, int large)
+{
+	static unsigned int (*func) (struct sock *, int) = (typeof(func)) HAVE_TCP_CURRENT_MSS_ADDR;
+	return func(sk, large);
+}
+#endif
+#endif
+
+#ifndef tcp_set_skb_tso_segs
+#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
+void
+tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
+{
+	static void (*func)(struct sk_buff *, unsigned int) = (typeof(func)) HAVE_TCP_SET_SKB_TSO_SEGS_ADDR;
+	return func(skb, mss_std);
+}
+#endif
+#endif
+
 #if defined HAVE_TIHDR_H
 #   include <tihdr.h>
 #else
@@ -365,7 +410,7 @@ static __u32 *const _sysctl_tcp_fin_timeout_location =
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/06/24 13:42:05 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/06/28 03:18:16 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -11299,6 +11344,9 @@ STATIC int
 ss_accept(ss_t * ss, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
+#if HAVE_SOCK_ALLOC_ADDR
+	struct socket *(*sock_alloc)(void) = (typeof(sock_alloc))HAVE_SOCK_ALLOC_ADDR;
+#endif
 	ensure(newsock, return (-EFAULT));
 	ensure(cp, return (-EFAULT));
 	ensure(ss, return (-EFAULT));

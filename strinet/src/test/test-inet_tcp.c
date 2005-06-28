@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/23 22:06:15 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:52 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 22:06:15 $ by $Author: brian $
+ Last Modified $Date: 2005/06/28 03:18:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.34  2005/06/28 03:18:52  brian
+ - upgrading test suites
+
  Revision 0.9.2.33  2005/06/23 22:06:15  brian
  - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
 
@@ -195,9 +198,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/23 22:06:15 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:52 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/23 22:06:15 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:52 $";
 
 /*
  *  Simple test program for INET streams.
@@ -298,6 +301,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500		// 100
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
+#define INFINITE_WAIT	-1UL
 
 
 char cbuf[BUFSIZE];
@@ -317,6 +321,7 @@ static struct sockaddr_in *test_addr = NULL;
 static socklen_t test_alen = sizeof(*test_addr);
 static const char *test_data = NULL;
 static int test_resfd = -1;
+static int test_timout = 200;
 static void *test_opts = NULL;
 static int test_olen = 0;
 static int test_prio = 1;
@@ -2410,7 +2415,7 @@ void print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|                    [%d:%03d]\n",
 		"                    |++++++++++++ TIMEOUT! ++++++++++|  |+++++++++++++++++++ [%d:%03d]\n",
 		"                    |++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
-		"++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
+		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 	if (show_timeout || verbose > 0) {
 		print_double_int(child, msgs, child, state);
@@ -2444,7 +2449,7 @@ void print_syscall(int child, const char *command)
 		"%-14s----->|                                |  |                    [%d:%03d]\n",
 		"                    |                                |  |<---%-14s  [%d:%03d]\n",
 		"                    |                                |<-+----%-14s  [%d:%03d]\n",
-		"                    |                                |  |                    [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 	if (verbose > 0)
 		print_string_state(child, msgs, command);
@@ -2671,7 +2676,6 @@ void print_float_state(int child, const char *msgs[], float time)
 void print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
-		"                    |                                |  |                    \n",
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |  |                    [%d:%03d]\n",
 		"                    | / / Waiting %8.4f seconds / |  | / / / / / / / / /  [%d:%03d]\n",
 		"                    | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
@@ -3228,7 +3232,7 @@ static int do_signal(int child, int action)
 	union T_primitives *p = (typeof(p)) cbuf;
 	struct strioctl ic;
 	ic.ic_cmd = 0;
-	ic.ic_timout = 200;
+	ic.ic_timout = test_timout;
 	ic.ic_len = sizeof(cbuf);
 	ic.ic_dp = cbuf;
 	ctrl->maxlen = 0;
@@ -16782,9 +16786,9 @@ int test_case_2_2_list(int child)
 int postamble_2_2(int child)
 {
 	if (last_info.SERV_type == T_CLTS)
-		return postamble_1(child);
-	else
 		return postamble_0(child);
+	else
+		return postamble_1(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
@@ -21579,11 +21583,18 @@ int test_case_4_1_3_list(int child)
 	state++;
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	expect(child, LONG_WAIT, __EVENT_NO_MSG);
+	switch(last_event) {
+	case __EVENT_NO_MSG:
+		state++;
+		if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		break;
+	default:
 		goto failure;
-	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		goto failure;
+	}
 	state++;
 	expect(child, LONG_WAIT, __EVENT_NO_MSG);
 	switch (last_event) {
@@ -22171,7 +22182,7 @@ int test_case_4_1_7_conn_part(int child)
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT << 1, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -22185,7 +22196,7 @@ int test_case_4_1_7_resp_part(int child)
 {
 	test_msleep(child, LONG_WAIT);
 	state++;
-	if (expect(child, LONGER_WAIT << 3, __TEST_DATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, SHORT_WAIT);
@@ -35426,7 +35437,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	start_tt(5000);
+	start_tt(20000);
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
