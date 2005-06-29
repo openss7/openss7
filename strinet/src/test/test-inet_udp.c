@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:53 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/29 04:21:18 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/28 03:18:53 $ by $Author: brian $
+ Last Modified $Date: 2005/06/29 04:21:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.35  2005/06/29 04:21:18  brian
+ - further upgrades of test suites
+
  Revision 0.9.2.34  2005/06/28 03:18:53  brian
  - upgrading test suites
 
@@ -213,9 +216,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:53 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/29 04:21:18 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/06/28 03:18:53 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/06/29 04:21:18 $";
 
 /*
  *  Simple test program for INET streams.
@@ -316,6 +319,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500		// 100
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
+#define INFINITE_WAIT	-1UL
 
 
 char cbuf[BUFSIZE];
@@ -557,6 +561,7 @@ static int timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -3309,7 +3314,10 @@ static int do_signal(int child, int action)
 		p->conn_ind.OPT_length = 0;
 		p->conn_ind.OPT_offset = 0;
 		p->conn_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3344,7 +3352,10 @@ static int do_signal(int child, int action)
 		p->conn_con.RES_offset = 0;
 		p->conn_con.OPT_length = 0;
 		p->conn_con.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Connection confirmation test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3367,7 +3378,10 @@ static int do_signal(int child, int action)
 		p->discon_ind.PRIM_type = T_DISCON_IND;
 		p->discon_ind.DISCON_reason = 0;
 		p->discon_ind.SEQ_number = last_sequence;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Disconnection indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3388,7 +3402,10 @@ static int do_signal(int child, int action)
 		ctrl->len = sizeof(p->data_ind);
 		p->data_ind.PRIM_type = T_DATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Normal test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3409,7 +3426,10 @@ static int do_signal(int child, int action)
 		ctrl->len = sizeof(p->exdata_ind);
 		p->data_ind.PRIM_type = T_EXDATA_IND;
 		p->data_ind.MORE_flag = MORE_flag;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Expedited test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		print_tx_prim(child, prim_string(p->type));
@@ -3526,7 +3546,10 @@ static int do_signal(int child, int action)
 		p->unitdata_ind.SRC_offset = 0;
 		p->unitdata_ind.OPT_length = 0;
 		p->unitdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Unit test data indication.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3586,7 +3609,10 @@ static int do_signal(int child, int action)
 	case __TEST_ORDREL_IND:
 		ctrl->len = sizeof(p->ordrel_ind);
 		p->ordrel_ind.PRIM_type = T_ORDREL_IND;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Orderly release indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		print_tx_prim(child, prim_string(p->type));
@@ -3625,7 +3651,10 @@ static int do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = 0;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -3640,7 +3669,10 @@ static int do_signal(int child, int action)
 		p->optdata_ind.DATA_flag = T_ODF_EX;
 		p->optdata_ind.OPT_length = 0;
 		p->optdata_ind.OPT_offset = 0;
-		data->len = snprintf(dbuf, BUFSIZE, "%s", "Option data indication test data.");
+		if (test_data)
+			data->len = snprintf(dbuf, BUFSIZE, "%s", test_data);
+		else
+			data = NULL;
 		test_pflags = MSG_BAND;
 		test_pband = 1;
 		if (p->optdata_ind.DATA_flag & T_ODF_MORE)
@@ -4407,8 +4439,11 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	start_tt(20000);
+	if (start_tt(20000) != __RESULT_SUCCESS)
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_0(int child)
@@ -4430,7 +4465,8 @@ static int postamble_0(int child)
 		break;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4509,7 +4545,8 @@ static int postamble_1(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4544,7 +4581,8 @@ static int postamble_1e(int child)
 		failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4652,7 +4690,8 @@ static int postamble_2_conn(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4691,7 +4730,8 @@ static int postamble_2_resp(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4724,7 +4764,8 @@ static int postamble_2_list(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4837,7 +4878,8 @@ static int postamble_3_conn(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4889,7 +4931,8 @@ static int postamble_3_resp(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5045,6 +5088,31 @@ struct test_stream {
 	int (*testcase) (int);		/* test case */
 	int (*postamble) (int);		/* test postamble */
 };
+
+/*
+ *  Check test case guard timer.
+ */
+#define test_group_0 "Sanity checks"
+#define tgrp_case_0_1 test_group_0
+#define numb_case_0_1 "0.1"
+#define name_case_0_1 "Check test case guard timer."
+#define sref_case_0_1 "(none)"
+#define desc_case_0_1 "\
+Checks that the test case guard timer will fire and bring down the children."
+
+int test_case_0_1(int child)
+{
+	test_sleep(child, 40);
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_0_1		preamble_0
+#define postamble_0_1		postamble_0
+
+struct test_stream test_0_1_conn = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_resp = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+
 
 /*
  *  Open and Close 3 streams.
@@ -16740,7 +16808,9 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	test_data = msg;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	start_tt(20000);
+	state++;
+	if (start_tt(20000) != __RESULT_SUCCESS)
+		goto failure;
 	for (;;) {
 		state++;
 		switch (wait_event(child, NORMAL_WAIT)) {
@@ -26785,7 +26855,8 @@ int postamble_ts_wcon_creq_conn(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -26881,6 +26952,8 @@ int preamble_ts_wind_ordrel_conn(int child)
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -29450,9 +29523,19 @@ int test_case_13_6_2_conn(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -29468,9 +29551,19 @@ int test_case_13_6_2_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -30068,9 +30161,19 @@ int test_case_13_8_2_conn(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -30086,9 +30189,19 @@ int test_case_13_8_2_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		break;
+	case __TEST_DISCON_IND:
+		goto again;
+	case __TEST_ORDREL_IND:
+		goto again;
+	default:
 		goto failure;
+	}
 	state++;
 	if (last_errno != EPROTO)
 		goto failure;
@@ -33486,7 +33599,8 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	start_tt(20000);
+	if (start_tt(10000) != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -33530,6 +33644,7 @@ int test_run(struct test_stream *stream[])
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
+	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
@@ -33628,27 +33743,18 @@ int test_run(struct test_stream *stream[])
 			if (timer_timeout) {
 				timer_timeout = 0;
 				print_timeout(3);
-				last_event = __EVENT_TIMEOUT;
 			}
-			if (child[0]) {
+			if (child[0])
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_INCONCLUSIVE;
-				child[0] = 0;
-			}
-			if (child[1]) {
+			if (child[1])
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_INCONCLUSIVE;
-				child[1] = 0;
-			}
-			if (child[2]) {
+			if (child[2])
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_INCONCLUSIVE;
-				child[2] = 0;
-			}
-			break;
+			goto waitagain;
 		}
 	}
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
 	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
@@ -33657,6 +33763,7 @@ int test_run(struct test_stream *stream[])
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
+      inconclusive:
 	return (__RESULT_INCONCLUSIVE);
 }
 
@@ -33681,6 +33788,7 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
+		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, { &test_0_1_conn, &test_0_1_resp, &test_0_1_list }, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_conn, &test_1_1_resp, &test_1_1_list }, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, { &test_1_2_conn, &test_1_2_resp, &test_1_2_list }, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_3_1, tgrp_case_1_3_1, name_case_1_3_1, desc_case_1_3_1, sref_case_1_3_1, { &test_1_3_1_conn, &test_1_3_1_resp, &test_1_3_1_list }, &begin_tests, &end_tests, 0, 0}, {

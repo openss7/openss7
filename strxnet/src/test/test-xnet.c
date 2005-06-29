@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/28 03:18:56 $ by $Author: brian $
+ Last Modified $Date: 2005/06/29 04:21:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.17  2005/06/29 04:21:22  brian
+ - further upgrades of test suites
+
  Revision 0.9.2.16  2005/06/28 03:18:56  brian
  - upgrading test suites
 
@@ -99,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/06/28 03:18:56 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -258,6 +261,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500		// 100
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
+#define INFINITE_WAIT	-1UL
 
 
 char cbuf[BUFSIZE];
@@ -402,7 +406,7 @@ unsigned int test_iovcount = 4;
  *  -------------------------------------------------------------------------
  */
 enum {
-	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__EVENT_EOF = -7, __EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
@@ -606,6 +610,7 @@ static int timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -1049,6 +1054,8 @@ char *terrno_string(ulong terr, long uerr)
 const char *event_string(int event)
 {
 	switch (event) {
+	case __EVENT_EOF:
+		return ("END OF FILE");
 	case __EVENT_NO_MSG:
 		return ("NO MESSAGE");
 	case __EVENT_TIMEOUT:
@@ -4445,12 +4452,14 @@ static int do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	if (ctrl->len > 0) {
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
-			return time_event(child, last_event);
+			return (time_event(child, last_event));
 	} else if (data->len > 0) {
 		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
-			return time_event(child, last_event);
+			return (time_event(child, last_event));
+	} else if (data->len == 0) {
+		return (time_event(child, (last_event = __EVENT_EOF)));
 	}
-	return ((last_event = __EVENT_NO_MSG));
+	return (time_event(child, (last_event = __EVENT_NO_MSG)));
 }
 
 #if 0
@@ -4710,8 +4719,11 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	start_tt(20000);
+	if (start_tt(20000) != __RESULT_SUCCESS)
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_0(int child)
@@ -4721,7 +4733,9 @@ static int postamble_0(int child)
 		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
 		switch (last_event) {
 		case __EVENT_NO_MSG:
+		case __EVENT_EOF:
 		case __EVENT_TIMEOUT:
+		case __TEST_DISCON_REQ:
 			break;
 		case __RESULT_FAILURE:
 			break;
@@ -4733,7 +4747,8 @@ static int postamble_0(int child)
 		break;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4745,15 +4760,18 @@ static int postamble_0(int child)
 
 static int preamble_1_top(int child)
 {
-	start_tt(1000);
+	if (start_tt(1000) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_1_top(int child)
@@ -4761,23 +4779,27 @@ static int postamble_1_top(int child)
 	start_tt(200);
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	stop_tt();
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int preamble_1_bot(int child)
 {
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 static int postamble_1_bot(int child)
@@ -4801,6 +4823,8 @@ static int postamble_1_bot(int child)
 	state++;
 	stop_tt();
 	state++;
+	goto failure;
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -4834,59 +4858,65 @@ static int preamble_2_top(int child)
 	start_tt(1000);
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int postamble_2_top(int child)
 {
 	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int preamble_2_bot(int child)
 {
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int postamble_2_bot(int child)
 {
 	start_tt(2000);
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
@@ -4904,6 +4934,8 @@ static int postamble_2_bot(int child)
 		return __RESULT_SUCCESS;
 	}
 	state++;
+	goto failure;
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -4937,85 +4969,91 @@ static int preamble_3_top(int child)
 	start_tt(1000);
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int postamble_3_top(int child)
 {
 	start_tt(1000);
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	stop_tt();
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int preamble_3_bot(int child)
 {
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_data = "Connection confirmation test data.";
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 static int postamble_3_bot(int child)
 {
 	start_tt(2000);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
@@ -5036,6 +5074,8 @@ static int postamble_3_bot(int child)
 	state++;
 	stop_tt();
 	state++;
+	goto failure;
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -5063,11 +5103,17 @@ static int postamble_3s_bot(int child)
 #if 0
 static int preamble_1(int child)
 {
+	union T_primitives *p = (typeof(p)) cbuf;
 	test_mgmtflags = T_NEGOTIATE;
+	test_opts = &opt_optm;
+	test_olen = sizeof(opt_optm);
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[child];
@@ -5089,7 +5135,7 @@ static int preamble_1s(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_sleep(child, 1);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5098,32 +5144,79 @@ static int preamble_1s(int child)
 
 static int postamble_1(int child)
 {
+	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			failed = (failed == -1) ? state : failed;
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
 static int postamble_1e(int child)
 {
-	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
-		expect(child, SHORT_WAIT, __TEST_OK_ACK);
-		goto failure;
+	int failed = -1;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
 	}
 	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
 static int preamble_2_conn(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
@@ -5140,6 +5233,11 @@ static int preamble_2_conn(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_addr = &addrs[0];
+	test_alen = sizeof(addrs[0]);
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5152,7 +5250,7 @@ static int preamble_2_conn(int child)
 
 static int preamble_2_resp(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -5164,7 +5262,7 @@ static int preamble_2_resp(int child)
 
 static int preamble_2_list(int child)
 {
-	if (preamble_1s(child) != __RESULT_SUCCESS)
+	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
@@ -5218,7 +5316,8 @@ static int postamble_2_conn(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5257,7 +5356,8 @@ static int postamble_2_resp(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5290,7 +5390,8 @@ static int postamble_2_list(int child)
 	if (postamble_1(child) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5320,6 +5421,11 @@ static int preamble_2b_conn(int child)
 	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_addr = &addrs[0];
+	test_alen = sizeof(addrs[0]);
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5404,7 +5510,8 @@ static int postamble_3_conn(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5456,7 +5563,8 @@ static int postamble_3_resp(int child)
 			failed = (failed == -1) ? state : failed;
 	}
 	state++;
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -5615,6 +5723,31 @@ struct test_stream {
 	int (*postamble) (int);		/* test postamble */
 };
 
+/*
+ *  Check test case guard timer.
+ */
+#define test_group_0 "Sanity checks"
+#define tgrp_case_0_1 test_group_0
+#define numb_case_0_1 "0.1"
+#define name_case_0_1 "Check test case guard timer."
+#define sref_case_0_1 "(none)"
+#define desc_case_0_1 "\
+Checks that the test case guard timer will fire and bring down the children."
+
+int test_case_0_1(int child)
+{
+	test_sleep(child, 40);
+	return (__RESULT_SUCCESS);
+}
+
+#define preamble_0_1		preamble_0
+#define postamble_0_1		postamble_0
+
+struct test_stream test_0_1_conn = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_resp = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
+
+
 #define test_group_1 "Pushing and popping the timod module"
 #define tgrp_case_1_1 test_group_1
 #define numb_case_1_1 "1.1"
@@ -5629,17 +5762,20 @@ transport peer."
 int test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_1_bot(int child)
 {
-	start_tt(200);
+	if (start_tt(200) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	while (get_event(child) == __EVENT_NO_MSG) ;
 	state++;
@@ -5650,17 +5786,19 @@ int test_case_1_1_bot(int child)
 		return (__RESULT_SUCCESS);
 	}
 	state++;
+      failure:
 	return (__RESULT_FAILURE);
 }
 
-#define preamble_1_1_top preamble_0
-#define preamble_1_1_bot preamble_0
+#define preamble_1_1_top	preamble_0
+#define preamble_1_1_bot	preamble_0
 
-#define postamble_1_1_top postamble_0
-#define postamble_1_1_bot postamble_0
+#define postamble_1_1_top	postamble_0
+#define postamble_1_1_bot	postamble_0
 
-static struct test_stream test_1_1_top = { &preamble_1_1_top, &test_case_1_1_top, &postamble_1_1_top };
-static struct test_stream test_1_1_bot = { &preamble_1_1_bot, &test_case_1_1_bot, &postamble_1_1_bot };
+struct test_stream test_1_1_top = { &preamble_1_1_top, &test_case_1_1_top, &postamble_1_1_top };
+struct test_stream test_1_1_bot = { &preamble_1_1_bot, &test_case_1_1_bot, &postamble_1_1_bot };
+
 
 #define test_group_2 "Syncrhonizing the library to a file descriptor"
 #define tgrp_case_1_2_1 test_group_2
@@ -5674,32 +5812,39 @@ on the test harness upon which the \"timod\" module has been pushed."
 int test_case_1_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_2_1_bot(int child)
 {
-	start_tt(200);
+	if (start_tt(200) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(200);
+	if (start_tt(200) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_1_2_1_top preamble_0
@@ -5726,20 +5871,25 @@ int test_case_1_2_2_top(int child)
 	state++;
 	test_fd[child] = 10;
 	if (do_signal(child, __TEST_T_SYNC) == __RESULT_SUCCESS || last_t_errno != TBADF)
-		return (__RESULT_FAILURE);
+		goto failure;
 	test_fd[child] = old_fd;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_2_2_bot(int child)
 {
-	start_tt(200);
+	if (start_tt(200) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_1_2_2_top preamble_0
@@ -5762,12 +5912,14 @@ on the test harness with a system error (ENOMEM)."
 int test_case_1_2_3_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) == __RESULT_SUCCESS || last_t_errno != TSYSERR || last_errno != ENOMEM)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_2_3_bot(int child)
@@ -5775,18 +5927,20 @@ int test_case_1_2_3_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = TSYSERR;
 	last_errno = ENOMEM;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_1_2_3_top preamble_0
@@ -5809,9 +5963,11 @@ This test case tests successful bind of the XTI stream."
 int test_case_2_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_1_1_bot(int child)
@@ -5819,12 +5975,14 @@ int test_case_2_1_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_1_1_top preamble_1_top
@@ -5846,9 +6004,11 @@ This test case test unsuccessful bind of the XTI stream."
 int test_case_2_1_x_top(int child, int terror)
 {
 	if (do_signal(child, __TEST_T_BIND) == __RESULT_SUCCESS || last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_1_x_bot(int child, int terror)
@@ -5856,14 +6016,16 @@ int test_case_2_1_x_bot(int child, int terror)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = 0;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_1_2_top(int child)
@@ -6025,15 +6187,17 @@ This test case tests unsuccessful bind of the XTI stream."
 int test_case_2_1_8_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_BIND) == __RESULT_SUCCESS || last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_1_8_bot(int child)
@@ -6041,25 +6205,27 @@ int test_case_2_1_8_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_1_8_top preamble_1_top
@@ -6081,12 +6247,14 @@ This test case tests successful bind and unbind of the XTI stream."
 int test_case_2_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_2_bot(int child)
@@ -6094,20 +6262,22 @@ int test_case_2_2_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_2_top preamble_1_top
@@ -6130,12 +6300,14 @@ This test case tests successful connect and disconnect of the XTI stream."
 int test_case_2_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_3_1_bot(int child)
@@ -6143,24 +6315,30 @@ int test_case_2_3_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_3_1_top preamble_2_top
@@ -6182,12 +6360,14 @@ This test case tests successful connect and disconnect of the XTI stream."
 int test_case_2_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_3_2_bot(int child)
@@ -6195,29 +6375,35 @@ int test_case_2_3_2_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_3_2_top preamble_2_top
@@ -6239,25 +6425,27 @@ This test case tests successful connect and disconnect of the XTI stream."
 int test_case_2_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS || last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(600);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_3_3_bot(int child)
@@ -6265,29 +6453,35 @@ int test_case_2_3_3_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_3_3_top preamble_2_top
@@ -6310,9 +6504,11 @@ TACCES error."
 int test_case_2_3_x_top(int child, int terror)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS || last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_3_x_bot(int child, int terror)
@@ -6320,14 +6516,16 @@ int test_case_2_3_x_bot(int child, int terror)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = 0;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_3_4_top(int child)
@@ -6496,29 +6694,37 @@ the XTI stream."
 int test_case_2_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_4_1_bot(int child)
 {
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_4_1_top preamble_2_top
@@ -6546,12 +6752,12 @@ int test_case_2_5_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	switch (last_t_errno) {
 	case TLOOK:
@@ -6559,25 +6765,31 @@ int test_case_2_5_1_top(int child)
 		break;
 	default:
 		state++;
-		return (__RESULT_FAILURE);
+		goto failure;
 	}
 	state++;
 	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_5_1_bot(int child)
 {
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
@@ -6586,23 +6798,25 @@ int test_case_2_5_1_bot(int child)
 		case __TEST_DISCON_REQ:
 			state++;
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		case __TEST_CONN_REQ:
 			state++;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			continue;
 		default:
 			state++;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_5_1_top preamble_2_top
@@ -6626,34 +6840,36 @@ This test case tests the response to the T_CONN_IND TPI event."
 int test_case_3_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_LISTEN)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_1_1_bot(int child)
@@ -6661,21 +6877,27 @@ int test_case_3_1_1_bot(int child)
 	start_tt(50);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != 0)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_1_1_top preamble_2_top
@@ -6698,35 +6920,37 @@ This test case tests the response to the T_CONN_CON TPI event."
 int test_case_3_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_CONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 0;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_2_1_bot(int child)
@@ -6734,29 +6958,35 @@ int test_case_3_2_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection confirmation test data.";
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_2_1_top preamble_2_top
@@ -6779,31 +7009,33 @@ This test case tests the response to the T_DISCON_IND TPI event."
 int test_case_3_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_3_1_bot(int child)
@@ -6811,22 +7043,24 @@ int test_case_3_3_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 0;
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_3_1_top preamble_2_top
@@ -6849,22 +7083,22 @@ This test case tests the response to the T_ORDREL_IND TPI event."
 int test_case_3_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS) {
 		state++;
 		if (last_t_errno != TNODATA)
-			return (__RESULT_FAILURE);
+			goto failure;
 		state++;
 		start_tt(200);
 		state++;
 		pause();
 		state++;
 		if (get_event(child) != __EVENT_TIMEOUT)
-			return (__RESULT_FAILURE);
+			goto failure;
 		state++;
 		if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	start_tt(400);
@@ -6872,21 +7106,23 @@ int test_case_3_4_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_4_1_bot(int child)
@@ -6894,30 +7130,37 @@ int test_case_3_4_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 0;
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_4_1_top preamble_2_top
@@ -6940,22 +7183,22 @@ This test case tests the response to the T_ORDREL_IND w/ DATA TPI event."
 int test_case_3_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) != __RESULT_SUCCESS) {
 		state++;
 		if (last_t_errno != TNODATA)
-			return (__RESULT_FAILURE);
+			goto failure;
 		state++;
 		start_tt(200);
 		state++;
 		pause();
 		state++;
 		if (get_event(child) != __EVENT_TIMEOUT)
-			return (__RESULT_FAILURE);
+			goto failure;
 		state++;
 		if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	start_tt(400);
@@ -6963,21 +7206,23 @@ int test_case_3_4_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVRELDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDRELDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_4_2_bot(int child)
@@ -6985,30 +7230,37 @@ int test_case_3_4_2_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_data = "Connection confirmation test data.";
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 0;
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_4_2_top preamble_2_top
@@ -7031,33 +7283,35 @@ This test case tests the response to the T_DATA_IND TPI event."
 int test_case_3_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS || last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_5_1_bot(int child)
@@ -7067,13 +7321,15 @@ int test_case_3_5_1_bot(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_5_1_top preamble_3_top
@@ -7096,33 +7352,35 @@ This test case tests the response to the T_DATA_IND TPI event."
 int test_case_3_5_2_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS || last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_5_2_bot(int child)
@@ -7132,13 +7390,15 @@ int test_case_3_5_2_bot(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_5_2_top preamble_3_top
@@ -7161,34 +7421,36 @@ This test case tests the response to the T_UNITDATA_IND TPI event."
 int test_case_3_6_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS || last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_6_1_bot(int child)
@@ -7198,13 +7460,15 @@ int test_case_3_6_1_bot(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Unit test data.";
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_6_1_top preamble_2cl_top
@@ -7227,34 +7491,36 @@ This test case tests the response to the T_UDERROR_IND TPI event."
 int test_case_3_7_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOUDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(400);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS || last_t_errno != TNOUDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_7_1_bot(int child)
@@ -7264,12 +7530,14 @@ int test_case_3_7_1_bot(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_7_1_top preamble_2cl_top
@@ -7297,50 +7565,56 @@ int test_case_4_1_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	pause();
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_1_1_bot(int child)
 {
 	int begstate = state;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state = begstate + 1;
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state = begstate + 2;
 	start_tt(500);
 	state = begstate + 3;
@@ -7352,20 +7626,22 @@ int test_case_4_1_1_bot(int child)
 			return (__RESULT_SUCCESS);
 		case __TEST_CONN_RES:
 			if (state != begstate + 3)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 5;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 6;
 			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
 			state = begstate + 7;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_1_1_top preamble_2_top
@@ -7393,10 +7669,10 @@ int test_case_4_1_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	seq = last_sequence;
 	state++;
 	start_tt(200);
@@ -7404,41 +7680,51 @@ int test_case_4_1_2_top(int child)
 	pause();
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_LISTEN)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = seq;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_1_2_bot(int child)
 {
 	int begstate = state;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state = begstate + 1;
 	last_sequence = 2;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state = begstate + 2;
 	start_tt(1000);
 	state = begstate + 3;
@@ -7446,15 +7732,15 @@ int test_case_4_1_2_bot(int child)
 		switch (get_event(child)) {
 		case __EVENT_TIMEOUT:
 			state = begstate + 4;
-			return (__RESULT_FAILURE);
+			goto failure;
 		case __TEST_CONN_RES:
 			if (state != begstate + 3)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 5;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 6;
 			start_tt(200);
 			continue;
@@ -7462,21 +7748,23 @@ int test_case_4_1_2_bot(int child)
 			if (state != begstate + 8) {
 				state = begstate + 7;
 				if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-					return (__RESULT_FAILURE);
+					goto failure;
 				state = begstate + 8;
 				continue;
 			}
 			state = begstate + 9;
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 10;
 			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
 			state = begstate + 11;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_1_2_top preamble_2_top
@@ -7499,21 +7787,23 @@ asynchronous T_DISCONNECT event."
 int test_case_4_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_2_1_bot(int child)
@@ -7521,16 +7811,18 @@ int test_case_4_2_1_bot(int child)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_2_1_top preamble_2_top
@@ -7557,35 +7849,41 @@ int test_case_4_2_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_LISTEN)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_2_2_bot(int child)
 {
 	int begstate = state;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state = begstate + 1;
 	start_tt(500);
 	state = begstate + 2;
@@ -7593,18 +7891,18 @@ int test_case_4_2_2_bot(int child)
 		switch (get_event(child)) {
 		case __TEST_CONN_REQ:
 			if (state != begstate + 2)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 3;
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 4;
 			continue;
 		case __TEST_DISCON_REQ:
 			state = begstate + 5;
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-				return (__RESULT_FAILURE);
+				goto failure;
 			state = begstate + 6;
 			return (__RESULT_SUCCESS);
 		case __EVENT_TIMEOUT:
@@ -7612,9 +7910,11 @@ int test_case_4_2_2_bot(int child)
 			return (__RESULT_SUCCESS);
 		default:
 			state = begstate + 8;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_2_2_top preamble_2_top
@@ -7641,40 +7941,48 @@ int test_case_4_3_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_3_1_bot(int child)
 {
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_3_1_top preamble_2_top
@@ -7697,30 +8005,34 @@ asynchronous T_DISCONNECT event."
 int test_case_4_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_1_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_1_top preamble_3_top
@@ -7743,37 +8055,42 @@ asynchronous T_ORDREL event."
 int test_case_4_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_2_bot(int child)
 {
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_2_top preamble_3_top
@@ -7796,30 +8113,34 @@ asynchronous T_DISCONNECT event."
 int test_case_4_4_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_3_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_3_top preamble_3_top
@@ -7842,37 +8163,42 @@ asynchronous T_ORDREL event."
 int test_case_4_4_4_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_4_bot(int child)
 {
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_4_top preamble_3_top
@@ -7899,33 +8225,37 @@ int test_case_4_4_5_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_5_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_5_top preamble_3_top
@@ -7952,40 +8282,45 @@ int test_case_4_4_6_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_6_bot(int child)
 {
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_6_top preamble_3_top
@@ -8012,33 +8347,37 @@ int test_case_4_4_7_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_7_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_7_top preamble_3_top
@@ -8065,40 +8404,45 @@ int test_case_4_4_8_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_ORDREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_4_8_bot(int child)
 {
+	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_ORDREL_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_4_8_top preamble_3_top
@@ -8121,37 +8465,39 @@ asynchronous T_DISCONNECT event."
 int test_case_4_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(300);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_5_1_bot(int child)
@@ -8159,21 +8505,23 @@ int test_case_4_5_1_bot(int child)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_5_1_top preamble_2_top
@@ -8200,33 +8548,37 @@ int test_case_4_6_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_6_1_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_6_1_top preamble_3_top
@@ -8253,33 +8605,37 @@ int test_case_4_6_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_6_2_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_6_2_top preamble_3_top
@@ -8306,33 +8662,37 @@ int test_case_4_6_3_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_6_3_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_6_3_top preamble_3_top
@@ -8359,33 +8719,37 @@ int test_case_4_6_4_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDRELDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_6_4_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_6_4_top preamble_3_top
@@ -8412,32 +8776,36 @@ int test_case_4_7_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_7_1_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_7_1_top preamble_2cl_top
@@ -8464,32 +8832,36 @@ int test_case_4_7_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_7_2_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_7_2_top preamble_2cl_top
@@ -8516,32 +8888,36 @@ int test_case_4_7_3_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_7_3_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_7_3_top preamble_2cl_top
@@ -8568,32 +8944,36 @@ int test_case_4_7_4_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_7_4_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_7_4_top preamble_2cl_top
@@ -8620,44 +9000,52 @@ int test_case_4_8_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_LISTEN)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_8_1_bot(int child)
 {
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_8_1_top preamble_2_top
@@ -8684,33 +9072,37 @@ int test_case_4_8_2_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_8_2_bot(int child)
 {
 	test_data = "Unit test data.";
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_8_2_top preamble_2cl_top
@@ -8737,32 +9129,36 @@ int test_case_4_8_3_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_UDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_8_3_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_8_3_top preamble_2cl_top
@@ -8789,33 +9185,37 @@ int test_case_4_9_1_top(int child)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TLOOK)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_tevent != T_DISCONNECT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_9_1_bot(int child)
 {
-	test_data = NULL;
+	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_4_9_1_top preamble_3_top
@@ -8842,10 +9242,12 @@ int test_case_5_1_x_top(int child, int function)
 	state++;
 	test_fd[child] = 10;
 	if (do_signal(child, function) == __RESULT_SUCCESS || last_t_errno != TBADF)
-		return (__RESULT_FAILURE);
+		goto failure;
 	test_fd[child] = old_fd;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_5_1_x_bot(int child, int function)
@@ -9587,10 +9989,12 @@ int test_case_5_2_x_top(int child, int function)
 	test_fd[0] = fileno(stderr);
 	state++;
 	if (do_signal(child, function) == __RESULT_SUCCESS || last_t_errno != TBADF)
-		return (__RESULT_FAILURE);
+		goto failure;
 	test_fd[0] = child;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_5_2_x_bot(int child, int function)
@@ -9598,9 +10002,11 @@ int test_case_5_2_x_bot(int child, int function)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_5_2_1_top(int child)
@@ -10335,9 +10741,11 @@ This test case tests the t_accept operation on a STREAMS file descriptor."
 int test_case_5_3_x_top(int child, int function)
 {
 	if (do_signal(child, function) == __RESULT_SUCCESS || last_t_errno != TBADF)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_5_3_x_bot(int child, int function)
@@ -10345,9 +10753,11 @@ int test_case_5_3_x_bot(int child, int function)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_5_3_1_top(int child)
@@ -11087,41 +11497,47 @@ int test_case_6_1_x_top(int child, int terror, int error)
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_1_x_bot(int child, int terror, int error)
 {
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_CONN_RES)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(500);
 	state++;
@@ -11129,9 +11545,11 @@ int test_case_6_1_x_bot(int child, int terror, int error)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_1_1_top(int child)
@@ -11461,13 +11879,15 @@ in response to the t_bind library call."
 int test_case_6_2_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_BIND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_2_x_bot(int child, int terror, int error)
@@ -11475,14 +11895,16 @@ int test_case_6_2_x_bot(int child, int terror, int error)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_2_1_top(int child)
@@ -11650,15 +12072,17 @@ in response to the t_connect library call."
 int test_case_6_3_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_3_x_bot(int child, int terror, int error)
@@ -11666,14 +12090,16 @@ int test_case_6_3_x_bot(int child, int terror, int error)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_3_1_top(int child)
@@ -11895,15 +12321,17 @@ in response to the t_optmgmt library call."
 int test_case_6_4_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_OPTMGMT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_4_x_bot(int child, int terror, int error)
@@ -11911,14 +12339,16 @@ int test_case_6_4_x_bot(int child, int terror, int error)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_OPTMGMT_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_4_1_top(int child)
@@ -12086,15 +12516,17 @@ in response to the t_snddis library call."
 int test_case_6_5_x_top(int child, int terror, int error)
 {
 	if (do_signal(child, __TEST_T_SNDDIS) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_5_x_bot(int child, int terror, int error)
@@ -12102,14 +12534,16 @@ int test_case_6_5_x_bot(int child, int terror, int error)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_5_1_top(int child)
@@ -12252,15 +12686,17 @@ int test_case_6_6_x_top(int child, int terror, int error)
 	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != terror)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno == TSYSERR && last_errno != error)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_6_x_bot(int child, int terror, int error)
@@ -12268,14 +12704,16 @@ int test_case_6_6_x_bot(int child, int terror, int error)
 	start_tt(500);
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_6_6_1_top(int child)
@@ -12336,53 +12774,65 @@ the t_accept library call."
 int test_case_7_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TINDOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 1;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 2;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_1_1_bot(int child)
 {
 	last_sequence = 1;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 2;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_1_1_top preamble_2_top
@@ -12405,12 +12855,14 @@ the t_accept library call."
 int test_case_7_1_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_1_2_bot(int child)
@@ -12438,12 +12890,14 @@ the t_accept library call."
 int test_case_7_1_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_1_3_bot(int child)
@@ -12471,12 +12925,14 @@ the t_connect library call."
 int test_case_7_2_1_top(int child)
 {
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_2_1_bot(int child)
@@ -12505,36 +12961,40 @@ int test_case_7_3_1_top(int child)
 {
 	last_qlen = 0;
 	if (do_signal(child, __TEST_T_BIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TBADQLEN)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_3_1_bot(int child)
 {
 	if (get_event(child) != __TEST_BIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_UNBIND_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_3_1_top preamble_1_top
@@ -12557,12 +13017,14 @@ the t_listen library call."
 int test_case_7_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_3_2_bot(int child)
@@ -12590,12 +13052,14 @@ the t_listen library call."
 int test_case_7_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_3_3_bot(int child)
@@ -12623,51 +13087,63 @@ the t_listen library call."
 int test_case_7_3_4_top(int child)
 {
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TQFULL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_3_4_bot(int child)
 {
 	last_sequence = 1;
-	test_data = NULL;
+	test_data = "Connection indication test data.";
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_sequence = 2;
-	test_data = NULL;
+	test_addr = NULL;
+	test_alen = 0;
+	test_opts = &opt_conn;
+	test_olen = sizeof(opt_conn);
+	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_3_4_top preamble_2_top
@@ -12690,15 +13166,17 @@ the t_listen library call."
 int test_case_7_3_5_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_3_5_bot(int child)
@@ -12726,15 +13204,17 @@ the t_rcv library call."
 int test_case_7_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_4_1_bot(int child)
@@ -12762,12 +13242,14 @@ the t_rcv library call."
 int test_case_7_4_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_4_2_bot(int child)
@@ -12795,12 +13277,14 @@ the t_rcv library call."
 int test_case_7_4_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_4_3_bot(int child)
@@ -12828,15 +13312,17 @@ the t_rcvv library call."
 int test_case_7_5_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_5_1_bot(int child)
@@ -12864,12 +13350,14 @@ the t_rcvv library call."
 int test_case_7_5_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_5_2_bot(int child)
@@ -12897,12 +13385,14 @@ the t_rcvv library call."
 int test_case_7_5_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_5_3_bot(int child)
@@ -12930,41 +13420,45 @@ the t_rcvconnect library call."
 int test_case_7_6_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_6_1_bot(int child)
 {
 	if (get_event(child) != __TEST_CONN_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_event(child) != __TEST_DISCON_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_6_1_top preamble_2_top
@@ -12987,12 +13481,14 @@ the t_rcvconnect library call."
 int test_case_7_6_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_6_2_bot(int child)
@@ -13020,12 +13516,14 @@ the t_rcvconnect library call."
 int test_case_7_6_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_6_3_bot(int child)
@@ -13053,15 +13551,17 @@ the t_rcvdis library call."
 int test_case_7_7_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODIS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_7_1_bot(int child)
@@ -13089,12 +13589,14 @@ the t_rcvdis library call."
 int test_case_7_7_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_7_2_bot(int child)
@@ -13122,12 +13624,14 @@ the t_rcvdis library call."
 int test_case_7_7_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVDIS) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_7_3_bot(int child)
@@ -13155,15 +13659,17 @@ the t_rcvrel library call."
 int test_case_7_8_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_8_1_bot(int child)
@@ -13191,12 +13697,14 @@ the t_rcvrel library call."
 int test_case_7_8_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_8_2_bot(int child)
@@ -13224,12 +13732,14 @@ the t_rcvrel library call."
 int test_case_7_8_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_8_3_bot(int child)
@@ -13257,15 +13767,17 @@ the t_rcvreldata library call."
 int test_case_7_9_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOREL)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_9_1_bot(int child)
@@ -13293,12 +13805,14 @@ the t_rcvreldata library call."
 int test_case_7_9_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_9_2_bot(int child)
@@ -13326,12 +13840,14 @@ the t_rcvreldata library call."
 int test_case_7_9_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_9_3_bot(int child)
@@ -13359,15 +13875,17 @@ the t_rcvudata library call."
 int test_case_7_10_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_10_1_bot(int child)
@@ -13395,12 +13913,14 @@ the t_rcvudata library call."
 int test_case_7_10_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_10_2_bot(int child)
@@ -13428,12 +13948,14 @@ the t_rcvudata library call."
 int test_case_7_10_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_10_3_bot(int child)
@@ -13461,15 +13983,17 @@ the t_rcvvudata library call."
 int test_case_7_11_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNODATA)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_11_1_bot(int child)
@@ -13497,12 +14021,14 @@ the t_rcvvudata library call."
 int test_case_7_11_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_11_2_bot(int child)
@@ -13530,12 +14056,14 @@ the t_rcvvudata library call."
 int test_case_7_11_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_11_3_bot(int child)
@@ -13563,15 +14091,17 @@ the t_rcvuderr library call."
 int test_case_7_12_1_top(int child)
 {
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOUDERR)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_12_1_bot(int child)
@@ -13599,12 +14129,14 @@ the t_rcvuderr library call."
 int test_case_7_12_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_12_2_bot(int child)
@@ -13632,12 +14164,14 @@ the t_rcvuderr library call."
 int test_case_7_12_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_RCVUDERR) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_12_3_bot(int child)
@@ -13667,26 +14201,28 @@ int test_case_7_13_1_top(int child)
 	start_tt(5000);
 	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	show_data = 0;
 	while (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS) ;
 	show_data = 1;
 	state++;
 	if (last_t_errno != TFLOW)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(6000);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_13_1_bot(int child)
@@ -13707,12 +14243,14 @@ int test_case_7_13_1_bot(int child)
 		default:
 			state++;
 			show_data = 1;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_13_1_top preamble_3_top
@@ -13735,12 +14273,14 @@ the t_snd library call."
 int test_case_7_13_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_13_2_bot(int child)
@@ -13768,12 +14308,14 @@ the t_snd library call."
 int test_case_7_13_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_13_3_bot(int child)
@@ -13803,26 +14345,28 @@ int test_case_7_14_1_top(int child)
 	start_tt(5000);
 	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	show_data = 0;
 	while (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS) ;
 	show_data = 1;
 	state++;
 	if (last_t_errno != TFLOW)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(6000);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_14_1_bot(int child)
@@ -13843,12 +14387,14 @@ int test_case_7_14_1_bot(int child)
 		default:
 			state++;
 			show_data = 1;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_14_1_top preamble_3_top
@@ -13871,12 +14417,14 @@ the t_sndv library call."
 int test_case_7_14_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_14_2_bot(int child)
@@ -13904,12 +14452,14 @@ the t_sndv library call."
 int test_case_7_14_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_14_3_bot(int child)
@@ -13939,26 +14489,28 @@ int test_case_7_15_1_top(int child)
 	start_tt(5000);
 	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDUDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	show_data = 0;
 	while (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS) ;
 	show_data = 1;
 	state++;
 	if (last_t_errno != TFLOW)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(6000);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_15_1_bot(int child)
@@ -13979,12 +14531,14 @@ int test_case_7_15_1_bot(int child)
 		default:
 			state++;
 			show_data = 1;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_15_1_top preamble_2cl_top
@@ -14007,12 +14561,14 @@ the t_sndudata library call."
 int test_case_7_15_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_15_2_bot(int child)
@@ -14040,12 +14596,14 @@ the t_sndudata library call."
 int test_case_7_15_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_15_3_bot(int child)
@@ -14075,26 +14633,28 @@ int test_case_7_16_1_top(int child)
 	start_tt(5000);
 	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SNDVUDATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	show_data = 0;
 	while (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS) ;
 	show_data = 1;
 	state++;
 	if (last_t_errno != TFLOW)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	start_tt(6000);
 	state++;
 	pause();
 	state++;
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_16_1_bot(int child)
@@ -14115,12 +14675,14 @@ int test_case_7_16_1_bot(int child)
 		default:
 			state++;
 			show_data = 1;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_16_1_top preamble_2cl_top
@@ -14143,12 +14705,14 @@ the t_sndvudata library call."
 int test_case_7_16_2_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TNOTSUPPORT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_16_2_bot(int child)
@@ -14176,12 +14740,14 @@ the t_sndvudata library call."
 int test_case_7_16_3_top(int child)
 {
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TOUTSTATE)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_16_3_bot(int child)
@@ -14211,21 +14777,23 @@ int test_case_7_17_1_top(int child)
 	start_tt(1000);
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_SYNC) == __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (last_t_errno != TSTATECHNG)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_7_17_1_bot(int child)
@@ -14233,13 +14801,15 @@ int test_case_7_17_1_bot(int child)
 	start_tt(200);
 	state++;
 	if (get_event(child) != __TEST_CAPABILITY_REQ)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	last_tstate = TS_WACK_BREQ;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_7_17_1_top preamble_0
@@ -14267,13 +14837,15 @@ int test_case_8_1_1_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_1_1_bot(int child)
@@ -14281,18 +14853,20 @@ int test_case_8_1_1_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_1_1_top preamble_3_top
@@ -14319,13 +14893,15 @@ int test_case_8_1_2_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_1_2_bot(int child)
@@ -14333,17 +14909,19 @@ int test_case_8_1_2_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_1_2_top preamble_3_top
@@ -14370,13 +14948,15 @@ int test_case_8_1_3_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_1_3_bot(int child)
@@ -14385,38 +14965,40 @@ int test_case_8_1_3_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_1_3_top preamble_3_top
@@ -14445,7 +15027,7 @@ int test_case_8_1_4_top(int child)
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT) {
 				test_bufsize = 256;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 			break;
 		}
@@ -14454,6 +15036,8 @@ int test_case_8_1_4_top(int child)
 	state++;
 	test_bufsize = 256;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_1_4_bot(int child)
@@ -14462,38 +15046,40 @@ int test_case_8_1_4_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_1_4_top preamble_3_top
@@ -14520,13 +15106,15 @@ int test_case_8_2_1_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_2_1_bot(int child)
@@ -14534,18 +15122,20 @@ int test_case_8_2_1_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_2_1_top preamble_3_top
@@ -14572,13 +15162,15 @@ int test_case_8_2_2_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_2_2_bot(int child)
@@ -14586,17 +15178,19 @@ int test_case_8_2_2_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_2_2_top preamble_3_top
@@ -14623,13 +15217,15 @@ int test_case_8_2_3_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_2_3_bot(int child)
@@ -14638,38 +15234,40 @@ int test_case_8_2_3_bot(int child)
 	int endstate = state + 19;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
 		if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS) {
 			MORE_flag = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
 	MORE_flag = 0;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_2_3_top preamble_3_top
@@ -14696,13 +15294,15 @@ int test_case_8_3_1_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_3_1_bot(int child)
@@ -14710,14 +15310,16 @@ int test_case_8_3_1_bot(int child)
 	int endstate = state + 20;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_3_1_top preamble_2cl_top
@@ -14746,7 +15348,7 @@ int test_case_8_3_2_top(int child)
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT) {
 				test_rcvudata.udata.maxlen = 256;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 			break;
 		}
@@ -14755,6 +15357,8 @@ int test_case_8_3_2_top(int child)
 	state++;
 	test_rcvudata.udata.maxlen = 256;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_3_2_bot(int child)
@@ -14762,14 +15366,16 @@ int test_case_8_3_2_bot(int child)
 	int endstate = state + 20;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_3_2_top preamble_2cl_top
@@ -14796,13 +15402,15 @@ int test_case_8_4_1_top(int child)
 			continue;
 		case __RESULT_FAILURE:
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			break;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_4_1_bot(int child)
@@ -14810,14 +15418,16 @@ int test_case_8_4_1_bot(int child)
 	int endstate = state + 20;
 	start_tt(200);
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_4_1_top preamble_2cl_top
@@ -14842,21 +15452,23 @@ int test_case_8_5_1_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = (state < endstate) ? T_MORE : 0;
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 			test_sndflags = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_5_1_bot(int child)
@@ -14869,12 +15481,14 @@ int test_case_8_5_1_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_5_1_top preamble_3_top
@@ -14899,21 +15513,23 @@ int test_case_8_5_2_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0) | T_EXPEDITED;
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 			test_sndflags = T_EXPEDITED;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_5_2_bot(int child)
@@ -14926,12 +15542,14 @@ int test_case_8_5_2_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_5_2_top preamble_3_top
@@ -14957,33 +15575,33 @@ int test_case_8_5_3_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 			test_sndflags = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
@@ -14991,9 +15609,11 @@ int test_case_8_5_3_top(int child)
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_5_3_bot(int child)
@@ -15006,12 +15626,14 @@ int test_case_8_5_3_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_5_3_top preamble_3_top
@@ -15037,33 +15659,33 @@ int test_case_8_5_4_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 			test_sndflags = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
@@ -15071,9 +15693,11 @@ int test_case_8_5_4_top(int child)
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_5_4_bot(int child)
@@ -15086,12 +15710,14 @@ int test_case_8_5_4_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_5_4_top preamble_3s_top
@@ -15116,21 +15742,23 @@ int test_case_8_6_1_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = (state < endstate) ? T_MORE : 0;
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 			test_sndflags = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_6_1_bot(int child)
@@ -15143,12 +15771,14 @@ int test_case_8_6_1_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_6_1_top preamble_3_top
@@ -15173,21 +15803,23 @@ int test_case_8_6_2_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0) | T_EXPEDITED;
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 			test_sndflags = T_EXPEDITED;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_6_2_bot(int child)
@@ -15200,12 +15832,14 @@ int test_case_8_6_2_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_6_2_top preamble_3_top
@@ -15231,33 +15865,33 @@ int test_case_8_6_3_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 			test_sndflags = 0;
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		if (state == begstate + 10) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 		if (state == begstate + 15) {
 			start_tt(200);
 			pause();
 			if (get_event(child) != __EVENT_TIMEOUT)
-				return (__RESULT_FAILURE);
+				goto failure;
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
-				return (__RESULT_FAILURE);
+				goto failure;
 			}
 		}
 	}
@@ -15265,9 +15899,11 @@ int test_case_8_6_3_top(int child)
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_6_3_bot(int child)
@@ -15280,12 +15916,14 @@ int test_case_8_6_3_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_6_3_top preamble_3_top
@@ -15310,18 +15948,20 @@ int test_case_8_7_1_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate; state++) {
 		if (do_signal(child, __TEST_T_SNDUDATA) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_7_1_bot(int child)
@@ -15333,12 +15973,14 @@ int test_case_8_7_1_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_7_1_top preamble_2cl_top
@@ -15363,18 +16005,20 @@ int test_case_8_8_1_top(int child)
 	start_tt(200);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	for (; state < endstate; state++) {
 		if (do_signal(child, __TEST_T_SNDVUDATA) != __RESULT_SUCCESS)
-			return (__RESULT_FAILURE);
+			goto failure;
 	}
 	state++;
 	start_tt(1000);
 	pause();
 	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_8_8_1_bot(int child)
@@ -15386,12 +16030,14 @@ int test_case_8_8_1_bot(int child)
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_8_8_1_top preamble_2cl_top
@@ -15498,7 +16144,8 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	start_tt(20000);
+	if (start_tt(10000) != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -15542,6 +16189,7 @@ int test_run(struct test_stream *stream[])
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
+	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
@@ -15640,27 +16288,18 @@ int test_run(struct test_stream *stream[])
 			if (timer_timeout) {
 				timer_timeout = 0;
 				print_timeout(3);
-				last_event = __EVENT_TIMEOUT;
 			}
-			if (child[0]) {
+			if (child[0])
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_INCONCLUSIVE;
-				child[0] = 0;
-			}
-			if (child[1]) {
+			if (child[1])
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_INCONCLUSIVE;
-				child[1] = 0;
-			}
-			if (child[2]) {
+			if (child[2])
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_INCONCLUSIVE;
-				child[2] = 0;
-			}
-			break;
+			goto waitagain;
 		}
 	}
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
 	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
@@ -15669,6 +16308,7 @@ int test_run(struct test_stream *stream[])
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
+      inconclusive:
 	return (__RESULT_INCONCLUSIVE);
 }
 
@@ -15693,6 +16333,7 @@ struct test_case {
 	int result;			/* results of test */
 } tests[] = {
 	{
+		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, { &test_0_1_conn, &test_0_1_resp, &test_0_1_list }, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, { &test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, sref_case_1_2_1, { &test_1_2_1_top, &test_1_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, sref_case_1_2_2, { &test_1_2_2_top, &test_1_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
