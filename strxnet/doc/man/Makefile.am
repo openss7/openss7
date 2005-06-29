@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:28:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/29 08:10:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:28:23 $ by $Author: brian $
+# Last Modified $Date: 2005/06/29 08:10:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -247,7 +247,11 @@ xnet_man_MANS	= \
 	man3/__xnet_t_peek.3 \
 	man3/xnet.3 \
 	man3/xti.3 \
-	man8/strxnet_mknod.8
+	man8/strxnet_mknod.8\
+	man8/test-timod.8 \
+	man8/test-tirdwr.8 \
+	man8/test-xnet.8 \
+	man8/test-xnet_thr.8
 
 sock_man_MANS	= \
 	man3/accept.3 \
@@ -476,7 +480,11 @@ xnet_dist_noinst_MANS	= \
 	man3/__xnet_t_peek.3.man \
 	man3/xnet.3.man \
 	man3/xti.3.man \
-	man8/strxnet_mknod.8.man
+	man8/strxnet_mknod.8.man \
+	man8/test-timod.8.man \
+	man8/test-tirdwr.8.man \
+	man8/test-xnet.8.man \
+	man8/test-xnet_thr.8.man
 
 sock_dist_noinst_MANS	= \
 	man3/accept.3.man \

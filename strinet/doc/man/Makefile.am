@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:28:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/29 08:08:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:28:49 $ by $Author: brian $
+# Last Modified $Date: 2005/06/29 08:08:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,10 @@ man_MANS = \
 	man7/tpi_ip.7 \
 	man7/tpi_udp.7 \
 	man7/tpi_tcp.7 \
-	man8/strinet_mknod.8
+	man8/strinet_mknod.8 \
+	man8/test-inet_raw.8 \
+	man8/test-inet_tcp.8 \
+	man8/test-inet_udp.8
 
 if WITH_OPENSS7_SCTP
 ## WITH_OPENSS7_SCTP
@@ -91,7 +94,8 @@ man_MANS += \
 	man3/xti_sctp.3 \
 	man4/sctp.4 \
 	man4/sctp_ioctl.4 \
-	man7/tpi_sctp.7
+	man7/tpi_sctp.7 \
+	man8/test-inet_sctp.8
 ## WITH_OPENSS7_SCTP
 endif
 
@@ -125,7 +129,11 @@ dist_noinst_MANS = \
 	man7/tpi_udp.7.man \
 	man7/tpi_tcp.7.man \
 	man7/tpi_sctp.7.man \
-	man8/strinet_mknod.8.man
+	man8/strinet_mknod.8.man \
+	man8/test-inet_raw.8.man \
+	man8/test-inet_sctp.8.man \
+	man8/test-inet_tcp.8.man \
+	man8/test-inet_udp.8.man
 
 ## PKG_BUILD_INDEP
 endif

@@ -1,0 +1,250 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: test-x400p-sdt2.8.man,v 0.9.2.2 2005/06/29 08:12:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Unauthorized distribution or duplication is prohibited.
+.\"
+.\" This software and related documentation is protected by copyright and
+.\" distributed under licenses restricting its use, copying, distribution
+.\" and decompilation.  No part of this software or related documentation
+.\" may be reproduced in any form by any means without the prior written
+.\" authorization of the copyright holder, and licensors, if any.
+.\"
+.\" The recipient of this document, by its retention and use, warrants that
+.\" the recipient will protect this information and keep it confidential,
+.\" and will not disclose the information contained in this document
+.\" without the written permission of its owner.
+.\"
+.\" The author reserves the right to revise this software and documentation
+.\" for any reason, including but not limited to, conformity with standards
+.\" promulgated by various agencies, utilization of advances in the state
+.\" of the technical arts, or the reflection of changes in the design of any
+.\" techniques, or procedures embodied, described, or referred to herein.
+.\" The author is under no obligation to provide any feature listed herein.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/06/29 08:12:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: test-x400p-sdt2.8.man,v $
+.\" Revision 0.9.2.2  2005/06/29 08:12:42  brian
+.\" - corrections
+.\"
+.\" Revision 0.9.2.1  2005/06/29 08:07:41  brian
+.\" - makefile and manual pages necessary to pass a check target
+.\"
+.\" =========================================================================
+.so strss7.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TEST-X400P-SDT2 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-x400p-sdt2
+\- test suite executable for M2PA(4) STREAMS module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBtest-x400p-sdt2\fR [\fIoptions\fR]
+.PD 0
+.HP 12
+\fBtest-x400p-sdt2\fR {\fB-h\fR, \fB--help\fR}
+.HP 12
+\fBtest-x400p-sdt2\fR {\fB-V\fR, \fB--version\fR}
+.HP 12
+\fBtest-x400p-sdt2\fR {\fB-C\fR, \fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B test-x400p-sdt2
+is a test suite executable for the
+.BR M2PA (4)
+.I STREAMS
+module.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-f\fR, \fB--fast\fR [\fISCALE\fR]
+When this option is present, test cases are run faster by the integer scaling factor
+.IR SCALE .
+If
+.I SCALE
+is not provided, then the default scale factor is
+.BR 50 .
+This has the effect of scaling timers both in the implementation under test as well as in the test
+suite.  If the scale factor,
+.IR SCALE ,
+is too large, test cases may fail that would otherwise pass.  This option is useful for long test
+suite runs that would otherwise take an inordinate amount of time to execute.  Timers can be scaled
+for development, diagnostic or regression testing, however, for full validation testing this option
+should not be used.
+.TP
+\fB-s\fR, \fB--summary\fR
+Print a test case summary with each test case result at the end of the test suite run.  The default
+if this option is not present is to not print a summary.
+.TP
+\fB-o\fR, \fB--onetest\fR [\fITESTCASE\fR]
+Specifies a single test case to run.
+.I TESTCASE
+is the individual test case number.  This option may be repeated and is accumulative: that is, each
+test case added with an occurence of this option will be added to the other test cases selected with
+.B --onetest
+or with
+.BR --tests .
+.TP
+\fB-t\fR, \fB--test\fR [\fIRANGE\fR]
+Specifies a range of test cases to run.
+.I RANGE
+specifies the range of test cases and will match all test cases that have this string as an initial 
+substring of the test case number.  If
+.I RANGE
+is not specified, all test cases are assumed.
+.TP
+\fB-m\fR, \fB--messages\fR
+Indicates whether messages, in hexadecimal, should be included in the test case output.  This is
+independent of any \fB--verbose\fR setting.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and that normal output should be
+suppressed.  This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.  For example,
+.B -vvvvv
+is equivalent to
+.BR --verbose=5 .
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B test-x400p-sdt2
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-x400p-sdt2
+is normally invoked from the @PACKAGE@-@VERSION@ testsuite.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+.BR x400p-sdt2 (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP /usr/libexec/@PACKAGE@/test-x400p-sdt2
+contains the
+.B test-x400p-sdt2
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR x400p-sdt2 (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-x400p-sdt2
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-x400p-sdt2
+is provided with the \(lq@PACKAGE_TITLE@\(rq package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

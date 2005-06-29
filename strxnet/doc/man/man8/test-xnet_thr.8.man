@@ -1,0 +1,1 @@
+.so test-xnet.8.man

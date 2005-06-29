@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/05/14 08:32:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/06/29 08:07:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:32:21 $ by $Author: brian $
+# Last Modified $Date: 2005/06/29 08:07:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -968,10 +968,28 @@ ss7_man_MANS = \
 	man8/strss7_mknod.8 \
 	man8/sua.8 \
 	man8/tcap.8 \
+	man8/test-m2pa.8 \
+	man8/test-q781.8 \
+	man8/test-q781-pipe.8 \
+	man8/test-q784.8 \
+	man8/test-tcpc.8 \
+	man8/test-tcps.8 \
+	man8/test-udpc.8 \
+	man8/test-udps.8 \
+	man8/test-x100p.8 \
+	man8/test-x400p.8 \
+	man8/test-x400p-cap2.8 \
+	man8/test-x400p-cap.8 \
+	man8/test-x400p-hsl.8 \
+	man8/test-x400p-perf.8 \
+	man8/test-x400p-sdl.8 \
+	man8/test-x400p-sdt2.8 \
+	man8/test-x400p-sdt.8 \
+	man8/test-x400p-sl.8 \
 	man8/tua.8 \
 	man8/uaconfd.8 \
-	man8/voipconfd.8 \
-	man8/undoc.8
+	man8/undoc.8 \
+	man8/voipconfd.8
 
 xnet_man_MANS = \
 	man3/t_accept.3 \
@@ -2277,10 +2295,29 @@ ss7_dist_noinst_MANS = \
 	man8/strss7_mknod.8.man \
 	man8/sua.8.man \
 	man8/tcap.8.man \
+	man8/test-m2pa.8.man \
+	man8/test-q781.8.man \
+	man8/test-q781-pipe.8.man \
+	man8/test-q784.8.man \
+	man8/test-tcpc.8.man \
+	man8/test-tcps.8.man \
+	man8/test-udpc.8.man \
+	man8/test-udps.8.man \
+	man8/test-x100p.8.man \
+	man8/test-x400p.8.man \
+	man8/test-x400p-cap2.8.man \
+	man8/test-x400p-cap.8.man \
+	man8/test-x400p-hsl.8.man \
+	man8/test-x400p-perf.8.man \
+	man8/test-x400p-sdl.8.man \
+	man8/test-x400p-sdt2.8.man \
+	man8/test-x400p-sdt.8.man \
+	man8/test-x400p-sl.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
-	man8/voipconfd.8.man \
-	man8/undoc.8.man
+	man8/undoc.8.man \
+	man8/voipconfd.8.man
+
 
 xnet_dist_noinst_MANS = \
 	man3/t_accept.3.man \

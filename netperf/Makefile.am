@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.32 $) $Date: 2005/05/30 08:44:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.33 $) $Date: 2005/06/29 08:06:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/30 08:44:00 $ by $Author: brian $
+# Last Modified $Date: 2005/06/29 08:06:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,12 +121,14 @@ libnetperf_la_DEPENDENCIES	= $(libnetperf_la_SOURCES)
 $(libnetperf_la_OBJECTS):	./config.h
 
 netperf_SOURCES			= netperf.c
-netperf_LDADD			= libnetperf.la $(NETPERF_LDADD)
+netperf_LDADD			= libnetperf.la
+netperf_LDFLAGS			= $(NETPERF_LDADD)
 netperf_DEPENDENCIES		= libnetperf.la ./config.h
 
 
 netserver_SOURCES		= netserver.c
-netserver_LDADD			= libnetperf.la $(NETPERF_LDADD)
+netserver_LDADD			= libnetperf.la
+netserver_LDFLAGS		= $(NETPERF_LDADD)
 netserver_DEPENDENCIES		= libnetperf.la ./config.h
 
 ## RPM_BUILD_USER

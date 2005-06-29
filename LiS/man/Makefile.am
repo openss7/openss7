@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2005/05/14 08:35:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.7 $) $Date: 2005/06/29 08:05:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:35:10 $ by $Author: brian $
+# Last Modified $Date: 2005/06/29 08:05:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,12 +84,17 @@ man_MANS = \
 	man7/streamio.7 \
 	man8/fattach.8 \
 	man8/fdetach.8 \
+	man8/lis_test2.8 \
+	man8/lis_test.8 \
 	man8/mkfifo.8s \
 	man8/streams.8 \
 	man8/strmakenodes.8 \
 	man8/strms_down.8 \
 	man8/strms_status.8 \
 	man8/strms_up.8 \
+	man8/strtst.8 \
+	man8/thrtst.8 \
+	man8/timetst.8 \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
 	man9/allocb_physreq.9 \
@@ -605,12 +610,17 @@ dist_noinst_MANS = \
 	man7/streamio.7.man \
 	man8/fattach.8.man \
 	man8/fdetach.8.man \
+	man8/lis_test2.8.man \
+	man8/lis_test.8.man \
 	man8/mkfifo.8s.man \
 	man8/streams.8.man \
 	man8/strmakenodes.8.man \
 	man8/strms_down.8.man \
 	man8/strms_status.8.man \
 	man8/strms_up.8.man \
+	man8/strtst.8.man \
+	man8/thrtst.8.man \
+	man8/timetst.8.man \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
 	man9/allocb_physreq.9.man \
