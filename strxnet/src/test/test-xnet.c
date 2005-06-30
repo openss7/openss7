@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/30 07:10:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/29 23:20:41 $ by $Author: brian $
+ Last Modified $Date: 2005/06/30 07:10:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.21  2005/06/30 07:10:16  brian
+ - corrected some more timing
+
  Revision 0.9.2.20  2005/06/29 23:20:41  brian
  - a couple more timing adjustments
 
@@ -111,9 +114,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/30 07:10:16 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/06/30 07:10:16 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -4740,8 +4743,7 @@ static int postamble_0(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_EOF:
 		case __EVENT_TIMEOUT:
@@ -4806,9 +4808,10 @@ static int preamble_1_bot(int child)
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4889,15 +4892,17 @@ static int preamble_2_bot(int child)
 	if (preamble_0(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -4908,17 +4913,17 @@ static int preamble_2_bot(int child)
 static int postamble_2_bot(int child)
 {
 	int failed = -1;
-	if (expect(child, LONGER_WAIT << 1, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	test_msleep(child, NORMAL_WAIT);
 	state++;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_EOF:
 		case __EVENT_TIMEOUT:
@@ -5015,25 +5020,29 @@ static int postamble_3_top(int child)
 }
 static int preamble_3_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = "Connection confirmation test data.";
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5044,23 +5053,24 @@ static int preamble_3_bot(int child)
 static int postamble_3_bot(int child)
 {
 	int failed = -1;
-	if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	test_msleep(child, NORMAL_WAIT);
 	state++;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_EOF:
 		case __EVENT_TIMEOUT:
@@ -5118,7 +5128,7 @@ static int preamble_1(int child)
 	if (do_signal(child, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OPTMGMT_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (p->optmgmt_ack.MGMT_flags != T_SUCCESS)
@@ -5130,7 +5140,7 @@ static int preamble_1(int child)
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5154,8 +5164,7 @@ static int postamble_1(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5173,7 +5182,7 @@ static int postamble_1(int child)
 	if (do_signal(child, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (stop_tt() != __RESULT_SUCCESS)
@@ -5191,8 +5200,7 @@ static int postamble_1e(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5207,7 +5215,7 @@ static int postamble_1e(int child)
 	}
 	state++;
 	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
-		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		expect(child, NORMAL_WAIT, __TEST_OK_ACK);
 		failed = (failed == -1) ? state : failed;
 	}
 	state++;
@@ -5227,7 +5235,7 @@ static int preamble_2_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[2];
@@ -5238,7 +5246,7 @@ static int preamble_2_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[0];
@@ -5246,7 +5254,7 @@ static int preamble_2_conn(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -5273,7 +5281,7 @@ static int preamble_2_list(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -5283,7 +5291,7 @@ static int preamble_2_list(int child)
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_msleep(child, LONG_WAIT);
@@ -5297,8 +5305,7 @@ static int postamble_2_conn(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5318,7 +5325,7 @@ static int postamble_2_conn(int child)
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (postamble_1(child) != __RESULT_SUCCESS)
@@ -5339,8 +5346,7 @@ static int postamble_2_resp(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5357,7 +5363,7 @@ static int postamble_2_resp(int child)
 		break;
 	}
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
       got_disconnect:
 	state++;
@@ -5379,8 +5385,7 @@ static int postamble_2_list(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5415,7 +5420,7 @@ static int preamble_2b_conn(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[1];
@@ -5426,7 +5431,7 @@ static int preamble_2b_conn(int child)
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_addr = &addrs[0];
@@ -5434,10 +5439,10 @@ static int preamble_2b_conn(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
-	if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5450,7 +5455,7 @@ static int preamble_2b_resp(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5463,7 +5468,7 @@ static int preamble_2b_list(int child)
 	if (preamble_1(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_resfd = test_fd[1];
@@ -5473,7 +5478,7 @@ static int preamble_2b_list(int child)
 	if (do_signal(child, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, SHORT_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5486,8 +5491,7 @@ static int postamble_3_conn(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5506,7 +5510,7 @@ static int postamble_3_conn(int child)
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (failed != -1) {
@@ -5533,8 +5537,7 @@ static int postamble_3_resp(int child)
 {
 	int failed = -1;
 	while (1) {
-		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __EVENT_NO_MSG:
 		case __EVENT_TIMEOUT:
 			break;
@@ -5551,7 +5554,7 @@ static int postamble_3_resp(int child)
 		break;
 	}
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
       got_release:
 	state++;
@@ -5559,7 +5562,7 @@ static int postamble_3_resp(int child)
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
-	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		failed = (failed == -1) ? state : failed;
 	state++;
 	if (failed != -1) {
@@ -5782,8 +5785,7 @@ int test_case_1_1_top(int child)
 
 int test_case_1_1_bot(int child)
 {
-	expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
-	switch (last_event) {
+	switch (wait_event(child, NORMAL_WAIT)) {
 	case __TEST_DISCON_REQ:
 	case __EVENT_NO_MSG:
 		break;
@@ -5833,9 +5835,10 @@ int test_case_1_2_1_top(int child)
 
 int test_case_1_2_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -5920,9 +5923,10 @@ int test_case_1_2_3_top(int child)
 
 int test_case_1_2_3_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = TSYSERR;
 	last_errno = ENOMEM;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -5964,9 +5968,10 @@ int test_case_2_1_1_top(int child)
 
 int test_case_2_1_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6003,9 +6008,10 @@ int test_case_2_1_x_top(int child, int terror)
 
 int test_case_2_1_x_bot(int child, int terror)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = 0;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -6190,15 +6196,17 @@ int test_case_2_1_8_top(int child)
 
 int test_case_2_1_8_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6240,15 +6248,17 @@ int test_case_2_2_top(int child)
 
 int test_case_2_2_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6289,9 +6299,10 @@ int test_case_2_3_1_top(int child)
 
 int test_case_2_3_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6300,12 +6311,14 @@ int test_case_2_3_1_bot(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6345,9 +6358,10 @@ int test_case_2_3_2_top(int child)
 
 int test_case_2_3_2_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6358,12 +6372,14 @@ int test_case_2_3_2_bot(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6396,7 +6412,7 @@ int test_case_2_3_3_top(int child)
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS || last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, LONG_WAIT + NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
 		goto failure;
@@ -6411,9 +6427,10 @@ int test_case_2_3_3_top(int child)
 
 int test_case_2_3_3_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6424,12 +6441,14 @@ int test_case_2_3_3_bot(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6467,9 +6486,10 @@ int test_case_2_3_x_top(int child, int terror)
 
 int test_case_2_3_x_bot(int child, int terror)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = 0;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -6658,6 +6678,7 @@ int test_case_2_4_1_top(int child)
 
 int test_case_2_4_1_bot(int child)
 {
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -6666,9 +6687,10 @@ int test_case_2_4_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6724,6 +6746,7 @@ int test_case_2_5_1_top(int child)
 
 int test_case_2_5_1_bot(int child)
 {
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -6733,14 +6756,14 @@ int test_case_2_5_1_bot(int child)
 		goto failure;
       again:
 	state++;
-	expect(child, LONG_WAIT, __TEST_DISCON_REQ);
-	state++;
-	switch (last_event) {
+	switch (wait_event(child, LONG_WAIT)) {
 	case __TEST_DISCON_REQ:
+		test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 		if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		break;
 	case __TEST_CONN_REQ:
+		test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 		last_t_errno = TOUTSTATE;
 		last_errno = 0;
 		if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -6806,6 +6829,7 @@ int test_case_3_1_1_bot(int child)
 {
 	test_msleep(child, SHORT_WAIT);
 	state++;
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -6814,9 +6838,10 @@ int test_case_3_1_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != 0)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6875,9 +6900,10 @@ int test_case_3_2_1_top(int child)
 
 int test_case_3_2_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6888,12 +6914,14 @@ int test_case_3_2_1_bot(int child)
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
 	test_data = "Connection confirmation test data.";
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -6948,9 +6976,10 @@ int test_case_3_3_1_top(int child)
 
 int test_case_3_3_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7020,9 +7049,10 @@ int test_case_3_4_1_top(int child)
 
 int test_case_3_4_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7031,6 +7061,7 @@ int test_case_3_4_1_bot(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7041,7 +7072,7 @@ int test_case_3_4_1_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7103,9 +7134,10 @@ int test_case_3_4_2_top(int child)
 
 int test_case_3_4_2_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7114,6 +7146,7 @@ int test_case_3_4_2_bot(int child)
 	test_data = "Connection confirmation test data.";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7124,7 +7157,7 @@ int test_case_3_4_2_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7305,8 +7338,6 @@ int test_case_3_6_1_bot(int child)
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONGER_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -7398,6 +7429,7 @@ int test_case_4_1_1_top(int child)
 	state++;
 	test_msleep(child, NORMAL_WAIT);
 	state++;
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7423,6 +7455,7 @@ int test_case_4_1_1_top(int child)
 int test_case_4_1_1_bot(int child)
 {
 	int begstate = state;
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -7437,8 +7470,7 @@ int test_case_4_1_1_bot(int child)
 	state = begstate + 2;
 	state = begstate + 3;
 	for (;;) {
-		expect(child, LONG_WAIT, __TEST_CONN_RES);
-		switch (last_event) {
+		switch (wait_event(child, LONG_WAIT)) {
 		case __EVENT_NO_MSG:
 			state++;
 			return (__RESULT_SUCCESS);
@@ -7446,6 +7478,7 @@ int test_case_4_1_1_bot(int child)
 			if (state != begstate + 3)
 				goto failure;
 			state = begstate + 5;
+			test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -7489,6 +7522,7 @@ int test_case_4_1_2_top(int child)
 	state++;
 	test_msleep(child, NORMAL_WAIT);
 	state++;
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7519,6 +7553,7 @@ int test_case_4_1_2_top(int child)
 int test_case_4_1_2_bot(int child)
 {
 	int begstate = state;
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -7538,8 +7573,7 @@ int test_case_4_1_2_bot(int child)
 	state = begstate + 2;
 	state = begstate + 3;
 	for (;;) {
-		expect(child, LONG_WAIT, __TEST_CONN_RES);
-		switch (last_event) {
+		switch (wait_event(child, LONG_WAIT)) {
 		case __EVENT_NO_MSG:
 			state = begstate + 4;
 			goto failure;
@@ -7547,6 +7581,7 @@ int test_case_4_1_2_bot(int child)
 			if (state != begstate + 3)
 				goto failure;
 			state = begstate + 5;
+			test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -7556,12 +7591,14 @@ int test_case_4_1_2_bot(int child)
 		case __TEST_DISCON_REQ:
 			if (state != begstate + 8) {
 				state = begstate + 7;
+				test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 				if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 					goto failure;
 				state = begstate + 8;
 				continue;
 			}
 			state = begstate + 9;
+			test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 				goto failure;
 			state = begstate + 10;
@@ -7616,17 +7653,16 @@ int test_case_4_2_1_top(int child)
 
 int test_case_4_2_1_bot(int child)
 {
-	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7680,6 +7716,7 @@ int test_case_4_2_2_top(int child)
 int test_case_4_2_2_bot(int child)
 {
 	int begstate = state;
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -7690,12 +7727,12 @@ int test_case_4_2_2_bot(int child)
 	state = begstate + 1;
 	state = begstate + 2;
 	for (;;) {
-		expect(child, LONG_WAIT, __TEST_CONN_REQ);
-		switch (last_event) {
+		switch (wait_event(child, LONG_WAIT)) {
 		case __TEST_CONN_REQ:
 			if (state != begstate + 2)
 				goto failure;
 			state = begstate + 3;
+			test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 			last_t_errno = TOUTSTATE;
 			last_errno = 0;
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -7704,6 +7741,7 @@ int test_case_4_2_2_bot(int child)
 			continue;
 		case __TEST_DISCON_REQ:
 			state = begstate + 5;
+			test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 				goto failure;
 			state = begstate + 6;
@@ -7766,6 +7804,7 @@ int test_case_4_3_1_top(int child)
 
 int test_case_4_3_1_bot(int child)
 {
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -7777,8 +7816,6 @@ int test_case_4_3_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7829,8 +7866,6 @@ int test_case_4_4_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7885,7 +7920,7 @@ int test_case_4_4_2_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7937,8 +7972,6 @@ int test_case_4_4_3_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7993,7 +8026,7 @@ int test_case_4_4_4_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8047,8 +8080,6 @@ int test_case_4_4_5_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8105,7 +8136,7 @@ int test_case_4_4_6_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8159,8 +8190,6 @@ int test_case_4_4_7_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8217,7 +8246,7 @@ int test_case_4_4_8_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8277,9 +8306,10 @@ int test_case_4_5_1_top(int child)
 
 int test_case_4_5_1_bot(int child)
 {
-	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8288,8 +8318,6 @@ int test_case_4_5_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8343,8 +8371,6 @@ int test_case_4_6_1_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8396,8 +8422,6 @@ int test_case_4_6_2_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8451,8 +8475,6 @@ int test_case_4_6_3_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8505,8 +8527,6 @@ int test_case_4_6_4_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8557,8 +8577,6 @@ int test_case_4_7_1_bot(int child)
 {
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8764,6 +8782,7 @@ int test_case_4_8_1_top(int child)
 
 int test_case_4_8_1_bot(int child)
 {
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -8772,9 +8791,10 @@ int test_case_4_8_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8933,8 +8953,6 @@ int test_case_4_9_1_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	test_msleep(child, LONG_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8979,6 +8997,7 @@ int test_case_5_1_x_bot(int child, int function)
 
 int test_case_5_1_1_top(int child)
 {
+	last_sequence = 1;
 	return test_case_5_1_x_top(child, __TEST_T_ACCEPT);
 }
 
@@ -9731,6 +9750,7 @@ int test_case_5_2_x_bot(int child, int function)
 
 int test_case_5_2_1_top(int child)
 {
+	last_sequence = 1;
 	return test_case_5_2_x_top(child, __TEST_T_ACCEPT);
 }
 
@@ -10480,6 +10500,7 @@ int test_case_5_3_x_bot(int child, int function)
 
 int test_case_5_3_1_top(int child)
 {
+	last_sequence = 1;
 	return test_case_5_3_x_top(child, __TEST_T_ACCEPT);
 }
 
@@ -11215,6 +11236,7 @@ int test_case_6_1_x_top(int child, int terror, int error)
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -11234,6 +11256,7 @@ int test_case_6_1_x_top(int child, int terror, int error)
 
 int test_case_6_1_x_bot(int child, int terror, int error)
 {
+	last_sequence = 1;
 	test_addr = NULL;
 	test_alen = 0;
 	test_opts = &opt_conn;
@@ -11242,21 +11265,23 @@ int test_case_6_1_x_bot(int child, int terror, int error)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_CONN_RES) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
+	test_msleep(child, NORMAL_WAIT); /* delay to avoid LiS ioctl bug */
+	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	test_msleep(child, LONGER_WAIT << 1);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -11603,9 +11628,10 @@ int test_case_6_2_x_top(int child, int terror, int error)
 
 int test_case_6_2_x_bot(int child, int terror, int error)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -11796,9 +11822,10 @@ int test_case_6_3_x_top(int child, int terror, int error)
 
 int test_case_6_3_x_bot(int child, int terror, int error)
 {
-	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -12043,9 +12070,10 @@ int test_case_6_4_x_top(int child, int terror, int error)
 
 int test_case_6_4_x_bot(int child, int terror, int error)
 {
-	if (expect(child, LONG_WAIT, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -12236,9 +12264,10 @@ int test_case_6_5_x_top(int child, int terror, int error)
 
 int test_case_6_5_x_bot(int child, int terror, int error)
 {
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -12402,9 +12431,10 @@ int test_case_6_6_x_top(int child, int terror, int error)
 
 int test_case_6_6_x_bot(int child, int terror, int error)
 {
-	if (expect(child, LONG_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	last_t_errno = terror;
 	last_errno = error;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
@@ -12478,6 +12508,7 @@ int test_case_7_1_1_top(int child)
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12517,15 +12548,17 @@ int test_case_7_1_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12553,6 +12586,7 @@ the t_accept library call."
 
 int test_case_7_1_2_top(int child)
 {
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12588,6 +12622,7 @@ the t_accept library call."
 
 int test_case_7_1_3_top(int child)
 {
+	last_sequence = 1;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12678,16 +12713,18 @@ int test_case_7_3_1_top(int child)
 
 int test_case_7_3_1_bot(int child)
 {
-	if (expect(child, LONG_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_qlen = 0;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12828,15 +12865,17 @@ int test_case_7_3_4_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -13143,15 +13182,17 @@ int test_case_7_6_1_top(int child)
 
 int test_case_7_6_1_bot(int child)
 {
-	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -13910,7 +13951,7 @@ int test_case_7_13_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
+	test_msleep(child, LONGER_WAIT << 2);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -13919,10 +13960,10 @@ int test_case_7_13_1_top(int child)
 
 int test_case_7_13_1_bot(int child)
 {
+	test_msleep(child, LONGER_WAIT << 1);
 	for (;;) {
 		state++;
-		expect(child, LONGER_WAIT << 2, __TEST_DATA_REQ);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __TEST_DATA_REQ:
 			show_data = 0;
 			continue;
@@ -14043,7 +14084,7 @@ int test_case_7_14_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
+	test_msleep(child, LONGER_WAIT << 2);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14052,10 +14093,10 @@ int test_case_7_14_1_top(int child)
 
 int test_case_7_14_1_bot(int child)
 {
+	test_msleep(child, LONGER_WAIT << 1);
 	for (;;) {
 		state++;
-		expect(child, LONGER_WAIT << 2, __TEST_DATA_REQ);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __TEST_DATA_REQ:
 			show_data = 0;
 			continue;
@@ -14176,7 +14217,7 @@ int test_case_7_15_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
+	test_msleep(child, LONGER_WAIT << 2);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14185,10 +14226,10 @@ int test_case_7_15_1_top(int child)
 
 int test_case_7_15_1_bot(int child)
 {
+	test_msleep(child, LONGER_WAIT << 1);
 	for (;;) {
 		state++;
-		expect(child, LONGER_WAIT << 2, __TEST_UNITDATA_REQ);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __TEST_UNITDATA_REQ:
 			show_data = 0;
 			continue;
@@ -14309,7 +14350,7 @@ int test_case_7_16_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
+	test_msleep(child, LONGER_WAIT << 2);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14318,10 +14359,10 @@ int test_case_7_16_1_top(int child)
 
 int test_case_7_16_1_bot(int child)
 {
+	test_msleep(child, LONGER_WAIT << 1);
 	for (;;) {
 		state++;
-		expect(child, LONGER_WAIT << 2, __TEST_UNITDATA_REQ);
-		switch (last_event) {
+		switch (wait_event(child, NORMAL_WAIT)) {
 		case __TEST_UNITDATA_REQ:
 			show_data = 0;
 			continue;
@@ -14451,10 +14492,11 @@ int test_case_7_17_1_top(int child)
 
 int test_case_7_17_1_bot(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
+	if (expect(child, INFINITE_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_tstate = TS_WACK_BREQ;
+	test_msleep(child, SHORT_WAIT); /* delay to avoid LiS ioctl bug */
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14493,6 +14535,9 @@ int test_case_8_1_1_top(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14548,6 +14593,9 @@ int test_case_8_1_2_top(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14600,6 +14648,9 @@ int test_case_8_1_3_top(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14676,6 +14727,9 @@ int test_case_8_1_4_top(int child)
 	}
 	state++;
 	test_bufsize = 256;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14747,6 +14801,9 @@ int test_case_8_2_1_top(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14801,6 +14858,9 @@ int test_case_8_2_2_top(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14853,6 +14913,9 @@ int test_case_8_2_3_top(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14925,6 +14988,9 @@ int test_case_8_3_1_top(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -14979,6 +15045,9 @@ int test_case_8_3_2_top(int child)
 	}
 	state++;
 	test_rcvudata.udata.maxlen = 256;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15028,6 +15097,9 @@ int test_case_8_4_1_top(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15088,7 +15160,7 @@ int test_case_8_5_1_bot(int child)
 {
 	int endstate = state + 19;
 	for (; state < endstate + 1; state++) {
-		if (expect(child, LONG_WAIT, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		if (expect(child, INFINITE_WAIT, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	return (__RESULT_SUCCESS);
@@ -15135,7 +15207,7 @@ int test_case_8_5_2_bot(int child)
 {
 	int endstate = state + 19;
 	for (; state < endstate + 1; state++) {
-		if (expect(child, LONG_WAIT, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		if (expect(child, INFINITE_WAIT, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	return (__RESULT_SUCCESS);
@@ -15210,6 +15282,9 @@ int test_case_8_5_3_bot(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15282,6 +15357,9 @@ int test_case_8_5_4_bot(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15337,6 +15415,9 @@ int test_case_8_6_1_bot(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15391,6 +15472,9 @@ int test_case_8_6_2_bot(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15464,6 +15548,9 @@ int test_case_8_6_3_bot(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15515,6 +15602,9 @@ int test_case_8_7_1_bot(int child)
 		break;
 	}
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15565,6 +15655,9 @@ int test_case_8_8_1_bot(int child)
 		}
 		break;
 	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
