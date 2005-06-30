@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_rcvconnect.3.man,v 0.9.2.5 2005/05/14 08:28:24 brian Exp $
+.\" @(#) $Id: t_rcvconnect.3.man,v 0.9.2.6 2005/06/29 20:50:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:28:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/06/29 20:50:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -144,7 +144,7 @@ When
 is zero, no responding address will be returned.
 When
 .I call->addr.len
-returns zero, not responding address was available.
+returns zero, no responding address was available.
 .TP
 .I opt
 is a
@@ -160,7 +160,7 @@ When
 is zero, no responding options will be returned.
 When
 .I call->opt.len
-returns zero, not responding options were available.
+returns zero, no responding options were available.
 .TP
 .I udata
 is a
@@ -176,7 +176,7 @@ When
 is zero, no responding connection data will be returned.
 When
 .I call->udata.len
-returns zero, not responding connection data was available.
+returns zero, no responding connection data was available.
 .TP
 .I sequence
 is not used by
