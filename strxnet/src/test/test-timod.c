@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:46 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/29 04:21:22 $ by $Author: brian $
+ Last Modified $Date: 2005/06/29 23:17:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.18  2005/06/29 23:17:46  brian
+ - converted to expect operation
+
  Revision 0.9.2.17  2005/06/29 04:21:22  brian
  - further upgrades of test suites
 
@@ -102,9 +105,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:46 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:46 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the
@@ -252,6 +255,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
 #define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 
 char cbuf[BUFSIZE];
@@ -4264,7 +4268,7 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4955,28 +4959,29 @@ transport peer."
 int test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_1_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	while (get_event(child) == __EVENT_NO_MSG) ;
+	expect(child, NORMAL_WAIT, __TEST_DISCON_REQ);
 	state++;
 	switch (last_event) {
 	case __TEST_DISCON_REQ:
-	case __EVENT_TIMEOUT:
-		state++;
-		return (__RESULT_SUCCESS);
+	case __EVENT_NO_MSG:
+		break;
+	default:
+		goto failure;
 	}
 	state++;
+	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
@@ -5003,34 +5008,32 @@ results on using the timod module."
 int test_case_2_1_top(int child, int command)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, command) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-int test_case_2_1_bot(int child, int signal, int expect)
+int test_case_2_1_bot(int child, int signal, int expected)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != signal)
+	if (do_signal(child, expected) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, expect) != __RESULT_SUCCESS)
-		goto failure;
+	expect(child, NORMAL_WAIT, __TEST_DISCON_REQ);
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (get_event(child)) {
+	switch (last_event) {
 	case __TEST_DISCON_REQ:
-	case __EVENT_TIMEOUT:
+	case __EVENT_NO_MSG:
 		break;
 	default:
 		state++;
@@ -5398,36 +5401,34 @@ results on using the timod module."
 int test_case_2_2_top(int child, int command)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
-	state++;
-	if (do_signal(child, command) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
-	state++;
-	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
-	state++;
-	return (__RESULT_SUCCESS);
-}
-
-int test_case_2_2_bot(int child, int signal, int expect)
-{
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != signal)
+	if (do_signal(child, command) == __RESULT_SUCCESS || last_errno != EPROTO)
+		goto failure;
+	state++;
+	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
+int test_case_2_2_bot(int child, int signal, int expected)
+{
+	if (expect(child, NORMAL_WAIT, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = TSYSERR;
 	last_errno = EPROTO;
-	if (do_signal(child, expect) != __RESULT_SUCCESS)
+	if (do_signal(child, expected) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
+	expect(child, NORMAL_WAIT, __TEST_DISCON_REQ);
 	state++;
-	switch (get_event(child)) {
+	switch (last_event) {
 	case __TEST_DISCON_REQ:
-	case __EVENT_TIMEOUT:
+	case __EVENT_NO_MSG:
 		break;
 	default:
 		state++;
@@ -5850,67 +5851,21 @@ int test_case_2_3_top(int child)
 
 int test_case_2_3_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	switch (get_event(child)) {
-	case __TEST_INFO_REQ:
-		state++;
-		break;
-	case __EVENT_TIMEOUT:
-		state++;
-		goto failure;
-	default:
-		state++;
-		goto failure;
-	}
-	state++;
-	if (start_tt(SHORT_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	switch (get_event(child)) {
-	case __EVENT_TIMEOUT:
-		state++;
-		break;
-	case __TEST_INFO_REQ:
-		state++;
-		goto failure;
-	default:
-		state++;
-		goto failure;
-	}
 	state++;
 	if (do_signal(child, __TEST_INFO_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_INFO_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	switch (get_event(child)) {
-	case __TEST_INFO_REQ:
-		state++;
-		break;
-	case __EVENT_TIMEOUT:
-		state++;
-		goto failure;
-	default:
-		state++;
-		goto failure;
-	}
 	state++;
 	last_t_errno = TSYSERR;
 	last_errno = EPROTO;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	switch (get_event(child)) {
-	case __EVENT_TIMEOUT:
-		state++;
-		break;
-	default:
-		state++;
-		goto failure;
-	}
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
     failure:
@@ -5939,34 +5894,32 @@ This test case tests the TI_SETMYNAME IO control."
 int test_case_2_4_top(int child, int control)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, control) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
-int test_case_2_4_bot(int child, int signal, int expect)
+int test_case_2_4_bot(int child, int signal, int expected)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != signal)
+	if (do_signal(child, expected) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (do_signal(child, expect) != __RESULT_SUCCESS)
-		goto failure;
+	expect(child, NORMAL_WAIT, __TEST_DISCON_REQ);
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	switch (get_event(child)) {
+	switch (last_event) {
 	case __TEST_DISCON_REQ:
-	case __EVENT_TIMEOUT:
+	case __EVENT_NO_MSG:
 		break;
 	default:
 		state++;
@@ -6088,7 +6041,7 @@ struct test_stream test_2_4_4_bot = { &preamble_2_4_4_bot, &test_case_2_4_4_bot,
 This test case test the pass through of T_INFO_REQ with positive\n\
 acknowledgement."
 
-int test_case_3_1_top(int child, int signal, int expect)
+int test_case_3_1_top(int child, int signal, int expected)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -6096,48 +6049,26 @@ int test_case_3_1_top(int child, int signal, int expect)
 	if (do_signal(child, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, expected) != __RESULT_SUCCESS)
 		goto failure;
-	if (get_event(child) == expect) {
-		state++;
-		if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-			goto failure;
-		state++;
-		return (__RESULT_SUCCESS);
-	} else if (last_event == __EVENT_TIMEOUT) {
-		state++;
-		goto failure;
-	}
 	state++;
+	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
 
-int test_case_3_1_bot(int child, int signal, int expect)
+int test_case_3_1_bot(int child, int signal, int expected)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) == signal) {
-		state++;
-	} else if (last_event == __EVENT_TIMEOUT) {
-		state++;
-		goto failure;
-	} else {
-		state++;
-		goto failure;
-	}
-	state++;
-	if (do_signal(child, expect) != __RESULT_SUCCESS)
+	if (do_signal(child, expected) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6395,48 +6326,26 @@ int test_case_3_2_top(int child, int signal)
 	if (do_signal(child, signal) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
-	if (get_event(child) == __TEST_ERROR_ACK) {
-		state++;
-		if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-			goto failure;
-		state++;
-		return (__RESULT_SUCCESS);
-	} else if (last_event == __EVENT_TIMEOUT) {
-		state++;
-		goto failure;
-	}
 	state++;
+	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
 
 int test_case_3_2_bot(int child, int signal)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
+	if (expect(child, NORMAL_WAIT, signal) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	if (get_event(child) == signal) {
-		state++;
-	} else if (last_event == __EVENT_TIMEOUT) {
-		state++;
-		goto failure;
-	} else {
-		state++;
-		goto failure;
-	}
 	state++;
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6773,7 +6682,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	if (start_tt(10000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:47 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/29 04:21:22 $ by $Author: brian $
+ Last Modified $Date: 2005/06/29 23:17:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.18  2005/06/29 23:17:47  brian
+ - converted to expect operation
+
  Revision 0.9.2.17  2005/06/29 04:21:22  brian
  - further upgrades of test suites
 
@@ -102,9 +105,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:47 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/06/29 23:17:47 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -252,6 +255,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
 #define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 
 char cbuf[BUFSIZE];
@@ -4255,7 +4259,7 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4946,28 +4950,28 @@ transport peer."
 int test_case_1_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_1_1_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	state++;
+	expect(child, NORMAL_WAIT, __TEST_DISCON_REQ);
 	switch (last_event) {
 	case __TEST_DISCON_REQ:
 	case __EVENT_TIMEOUT:
-		state++;
-		return (__RESULT_SUCCESS);
+		break;
+	default:
+		goto failure;
 	}
 	state++;
+	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
@@ -4995,31 +4999,21 @@ int test_case_1_2_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
-	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
   again:
-	while (get_event(child) == __EVENT_NO_MSG) ;
+	state++;
+	expect(child, LONG_WAIT, __TEST_DATA);
 	switch (last_event) {
 	case __EVENT_EOF:
-		state++;
-		if (stop_tt() != __RESULT_SUCCESS)
-			goto failure;
-		break;
-	case __EVENT_TIMEOUT:
-		state++;
-		if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-			goto failure;
+	case __EVENT_NO_MSG:
 		break;
 	case __TEST_DATA:
-		state++;
 		goto again;
 	default:
 		goto failure;
 	}
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5032,15 +5026,13 @@ int test_case_1_2_bot(int child)
 	state++;
 	test_data = "Orderly release test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	switch (last_event) {
-	case __TEST_ORDREL_REQ:
-		state++;
-		return (__RESULT_SUCCESS);
-	}
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
+	return (__RESULT_SUCCESS);
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -5063,18 +5055,7 @@ of M_DATA have been received on the stream."
 
 int test_case_1_3_top(int child)
 {
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	switch (get_event(child)) {
-	case __EVENT_TIMEOUT:
-		if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-			goto failure;
-		break;
-	default:
-		goto failure;
-	}
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -5099,21 +5080,19 @@ int test_case_1_3_top(int child)
 int test_case_1_3_bot(int child)
 {
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	switch (last_event) {
-	case __TEST_DISCON_REQ:
-		state++;
-		return (__RESULT_SUCCESS);
-	}
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
+	return (__RESULT_SUCCESS);
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -5136,18 +5115,7 @@ already received T_DATA_IND primitives."
 
 int test_case_1_4_top(int child)
 {
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	switch (get_event(child)) {
-	case __EVENT_TIMEOUT:
-		if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-			goto failure;
-		break;
-	default:
-		goto failure;
-	}
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUSH) == __RESULT_SUCCESS || last_errno != EPROTO)
 		goto failure;
@@ -5170,17 +5138,19 @@ int test_case_1_4_bot(int child)
 {
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_1_4_top	preamble_0
@@ -5207,27 +5177,16 @@ int test_case_2_1_top(int child)
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
-	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
 			continue;
 		case __TEST_DATA:
 			continue;
 		case __EVENT_EOF:
-			stop_tt();
-			break;
-		case __EVENT_TIMEOUT:
 			break;
 		default:
 			goto failure;
@@ -5245,13 +5204,7 @@ int test_case_2_1_top(int child)
 
 int test_case_2_1_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
@@ -5265,14 +5218,8 @@ int test_case_2_1_bot(int child)
 	test_data = "Orderly release test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	state++;
-	switch (last_event) {
-	case __TEST_ORDREL_REQ:
-		break;
-	default:
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5301,27 +5248,16 @@ int test_case_2_2_top(int child)
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
-	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __EVENT_EOF:
-			stop_tt();
-			break;
-		case __EVENT_TIMEOUT:
 			break;
 		default:
 			goto failure;
@@ -5339,13 +5275,7 @@ int test_case_2_2_top(int child)
 
 int test_case_2_2_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
@@ -5362,14 +5292,9 @@ int test_case_2_2_bot(int child)
 	test_data = "Orderly release test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
-	while (get_event(child) == __EVENT_NO_MSG) ;
 	state++;
-	switch (last_event) {
-	case __TEST_ORDREL_REQ:
-		break;
-	default:
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5398,27 +5323,16 @@ int test_case_2_3_top(int child)
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
-	state++;
-	if (start_tt(LONG_WAIT) != __RESULT_SUCCESS)
-		goto failure;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __EVENT_EOF:
-			stop_tt();
-			break;
-		case __EVENT_TIMEOUT:
 			break;
 		default:
 			goto failure;
@@ -5436,13 +5350,7 @@ int test_case_2_3_top(int child)
 
 int test_case_2_3_bot(int child)
 {
-	if (start_tt(NORMAL_WAIT) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Option test data.";
 	if (do_signal(child, __TEST_NRM_OPTDATA_IND) != __RESULT_SUCCESS)
@@ -5459,14 +5367,9 @@ int test_case_2_3_bot(int child)
 	test_data = "Orderly release test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
-	while (get_event(child) == __EVENT_NO_MSG) ;
 	state++;
-	switch (last_event) {
-	case __TEST_ORDREL_REQ:
-		break;
-	default:
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
-	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5496,81 +5399,62 @@ int test_case_2_4_top(int child)
 {
 	int count = 0;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	state++;
-	start_tt(LONG_WAIT);
+	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
 			continue;
 		case __TEST_DATA:
 			count++;
-			if (count == 4) {
-				stop_tt();
+			if (count == 4)
 				break;
-			}
 			continue;
-		case __EVENT_TIMEOUT:
-			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
-	start_tt(LONG_WAIT);
 	state++;
 	if (get_data(child, __TEST_READ) != 0)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_4_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	start_tt(LONG_WAIT);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Orderly release test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	state++;
-	switch (last_event) {
-	case __TEST_ORDREL_REQ:
-		break;
-	default:
-		return (__RESULT_FAILURE);
-	}
+		goto failure;
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_4_top	preamble_0
@@ -5595,16 +5479,9 @@ been received."
 int test_case_2_5_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	state++;
-	start_tt(LONGER_WAIT);
+	test_msleep(child, LONG_WAIT);
 	for (;;) {
 		state++;
 		expect(child, NORMAL_WAIT, __TEST_DATA);
@@ -5614,64 +5491,51 @@ int test_case_2_5_top(int child)
 		case __TEST_DATA:
 			continue;
 		case __EVENT_EOF:
-			stop_tt();
 			break;
 		case __EVENT_TIMEOUT:
 			break;
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	if (get_data(child, __TEST_READ) != 0)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_2_5_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	start_tt(LONGER_WAIT);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	test_data = "Disconnect test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	while (1) {
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
-		break;
-	}
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_2_5_top	preamble_0
@@ -5695,45 +5559,45 @@ Tests that data can be sent with write(2) after pushing the module."
 int test_case_3_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_1_bot(int child)
 {
-	start_tt(LONG_WAIT);
-	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_DISCON_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_1_top	preamble_0
@@ -5755,45 +5619,45 @@ Tests that data can be sent with writev(2) after pushing the module."
 int test_case_3_2_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_2_bot(int child)
 {
-	start_tt(LONG_WAIT);
-	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_DISCON_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_2_top	preamble_0
@@ -5815,45 +5679,45 @@ Tests that data can be sent with putmsg(2) after pushing the module."
 int test_case_3_3_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_3_bot(int child)
 {
-	start_tt(LONG_WAIT);
-	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_DISCON_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_3_top	preamble_0
@@ -5875,45 +5739,45 @@ Tests that expedited data cannot be sent with putpmsg(2) after pushing the modul
 int test_case_3_4_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_4_bot(int child)
 {
-	start_tt(LONG_WAIT);
-	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_DISCON_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_4_top	preamble_0
@@ -5935,61 +5799,53 @@ Tests that data can be sent with write(2) after orderly release."
 int test_case_3_5_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_5_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, NORMAL_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_ORDREL_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_5_top	preamble_0
@@ -6011,65 +5867,49 @@ Tests that data cannot be sent with write(2) after disconnect."
 int test_case_3_6_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_6_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(NORMAL_WAIT);
-	for (;;) {
-		state++;
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __TEST_DATA:
-			return (__RESULT_FAILURE);
-		case __TEST_ORDREL_REQ:
-			return (__RESULT_FAILURE);
-		case __EVENT_EOF:
-			stop_tt();
-			break;
-		case __EVENT_TIMEOUT:
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
+	expect(child, LONG_WAIT, __EVENT_EOF);
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+	case __EVENT_EOF:
 		break;
+	default:
+	case __TEST_DATA:
+	case __TEST_ORDREL_REQ:
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_6_top	preamble_0
@@ -6091,61 +5931,53 @@ Tests that data can be sent with putmsg(2) after orderly release."
 int test_case_3_7_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_7_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	for (;;) {
 		state++;
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_DATA);
+		switch (last_event) {
 		case __EVENT_NO_MSG:
-			continue;
 		case __TEST_DATA:
 			continue;
 		case __TEST_ORDREL_REQ:
 			break;
-		case __EVENT_TIMEOUT:
-			return (__RESULT_FAILURE);
 		default:
-			return (__RESULT_FAILURE);
+			goto failure;
 		}
 		break;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_7_top	preamble_0
@@ -6167,62 +5999,41 @@ Tests that data cannot be sent with putmsg(2) after disconnect."
 int test_case_3_8_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) == __RESULT_SUCCESS || last_errno != ENXIO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_3_8_bot(int child)
 {
-	start_tt(NORMAL_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = NULL;
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(NORMAL_WAIT);
-	for (;;) {
-		state++;
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __TEST_DATA:
-			return (__RESULT_FAILURE);
-		case __TEST_ORDREL_REQ:
-			return (__RESULT_FAILURE);
-		case __EVENT_TIMEOUT:
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
-		break;
-	}
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define preamble_3_8_top	preamble_0
@@ -6247,73 +6058,61 @@ an error on the stream."
 int test_case_4_1_top(int child)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	start_tt(LONG_WAIT);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	start_tt(LONG_WAIT);
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (get_data(child, __TEST_READ) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_1_bot(int child, int signal)
 {
-	start_tt(NORMAL_WAIT);
+	test_msleep(child, LONG_WAIT);
 	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		return (__RESULT_FAILURE);
-	start_tt(LONG_WAIT);
 	if (do_signal(child, signal) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
-	for (;;) {
-		state++;
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		case __TEST_DISCON_REQ:	/* is this ok? */
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
+		goto failure;
+	state++;
+	expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+	case __TEST_DISCON_REQ:	/* is this ok? */
 		break;
+	default:
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 #define test_case_4_1_1_top test_case_4_1_top
@@ -6601,60 +6400,58 @@ error on the stream."
 int test_case_4_2_top(int child, int signal)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, signal) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_READ) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_2_bot(int child)
 {
-	start_tt(LONGER_WAIT);
-	for (;;) {
-		state++;
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		case __TEST_DISCON_REQ:	/* is this ok? */
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
+	expect(child, LONGER_WAIT, __EVENT_NO_MSG);
+	state++;
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+	case __TEST_DISCON_REQ:	/* is this ok? */
 		break;
+	default:
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_2_1_top(int child)
@@ -6989,60 +6786,58 @@ results in an error on the stream."
 int test_case_4_3_top(int child, int signal)
 {
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, signal) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_READ) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_READV) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (get_data(child, __TEST_GETPMSG) >= 0 || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_WRITEV) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_POP) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_3_bot(int child)
 {
-	start_tt(LONGER_WAIT);
-	for (;;) {
-		state++;
-		switch (get_event(child)) {
-		case __EVENT_NO_MSG:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		case __TEST_DISCON_REQ:	/* is this ok? */
-			break;
-		default:
-			return (__RESULT_FAILURE);
-		}
+	expect(child, LONGER_WAIT, __EVENT_NO_MSG);
+	state++;
+	switch (last_event) {
+	case __EVENT_NO_MSG:
+	case __TEST_DISCON_REQ:	/* is this ok? */
 		break;
+	default:
+		goto failure;
 	}
 	state++;
 	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int test_case_4_3_1_top(int child)
@@ -7385,7 +7180,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	if (start_tt(10000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
