@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: t_getprotaddr.3.man,v 0.9.2.5 2005/05/14 08:28:24 brian Exp $
+.\" @(#) $Id: t_getprotaddr.3.man,v 0.9.2.6 2005/06/30 10:15:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:28:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/06/30 10:15:42 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strxnet.macros
@@ -246,8 +246,10 @@ A \fBLinux\fR system error occured and the \fBLinux\fR error number is set in
 has no known bugs.
 .BR t_getprotaddr ()
 has been tested for the described behavior using the
-.I /usr/bin/test-xnet
-conformance test program.
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+conformance test suites.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -265,6 +267,14 @@ SUSv2.
 .[
 susv2
 .]
+Compatibility is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH "CONFORMING TO"
@@ -286,6 +296,14 @@ SUSv2.
 .[
 susv2
 .]
+Conformance is tested using the
+.BR test-xnet (8)
+and
+.BR test-xnet_thr (8)
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
