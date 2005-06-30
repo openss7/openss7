@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.11 2005/06/20 12:00:44 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.12 2005/06/29 20:01:08 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/20 12:00:44 $ by $Author: brian $
+@c Last Modified $Date: 2005/06/29 20:01:08 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -148,7 +148,7 @@ This section discusses compatibility with major prerequisites.
 @item RedHat Enterprise Linux 4 (EL4)
 @item CentOS Enterprise Linux 4.0 (centos4)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
-@item Fedora Cored 4 (FC4)
+@item Fedora Core 4 (FC4)
 @item Debian 3.1r0a Sarge
 @item Lineox 4.026 (LEL4)
 @item Mandriva Linux LE2005 (MDK102)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/29 04:21:22 $ by $Author: brian $
+ Last Modified $Date: 2005/06/29 23:20:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.20  2005/06/29 23:20:41  brian
+ - a couple more timing adjustments
+
+ Revision 0.9.2.19  2005/06/29 23:17:47  brian
+ - converted to expect operation
+
+ Revision 0.9.2.18  2005/06/29 20:01:57  brian
+ - conversion to expect syntax
+
  Revision 0.9.2.17  2005/06/29 04:21:22  brian
  - further upgrades of test suites
 
@@ -102,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/06/29 04:21:22 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/29 23:20:41 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -262,6 +271,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
 #define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 
 char cbuf[BUFSIZE];
@@ -4719,7 +4729,7 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
@@ -4748,7 +4758,7 @@ static int postamble_0(int child)
 	}
 	state++;
 	if (stop_tt() != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (failed != -1)
 		goto failure;
@@ -4760,7 +4770,7 @@ static int postamble_0(int child)
 
 static int preamble_1_top(int child)
 {
-	if (start_tt(1000) != __RESULT_SUCCESS)
+	if (preamble_0(child) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
@@ -4776,22 +4786,27 @@ static int preamble_1_top(int child)
 
 static int postamble_1_top(int child)
 {
-	start_tt(200);
-	state++;
+	int failed = -1;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
 		goto failure;
-	state++;
-	stop_tt();
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 static int preamble_1_bot(int child)
 {
-	start_tt(200);
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
@@ -4804,28 +4819,7 @@ static int preamble_1_bot(int child)
 
 static int postamble_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) == __EVENT_TIMEOUT) {
-		state++;
-		return (__RESULT_SUCCESS);
-	}
-	state++;
-	switch (last_event) {
-	case __TEST_DISCON_REQ:
-		stop_tt();
-		state++;
-		return __RESULT_SUCCESS;
-	case __EVENT_NO_MSG:
-		state++;
-		return __RESULT_SUCCESS;
-	}
-	state++;
-	stop_tt();
-	state++;
-	goto failure;
-      failure:
-	return (__RESULT_FAILURE);
+	return postamble_0(child);
 }
 
 static int preamble_1cl_top(int child)
@@ -4855,7 +4849,8 @@ static int postamble_1cl_bot(int child)
 
 static int preamble_2_top(int child)
 {
-	start_tt(1000);
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -4872,33 +4867,35 @@ static int preamble_2_top(int child)
 }
 static int postamble_2_top(int child)
 {
-	start_tt(500);
-	state++;
+	int failed = -1;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	start_tt(500);
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
+		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 static int preamble_2_bot(int child)
 {
-	start_tt(200);
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
@@ -4910,32 +4907,41 @@ static int preamble_2_bot(int child)
 }
 static int postamble_2_bot(int child)
 {
-	start_tt(2000);
-	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
-		goto failure;
+	int failed = -1;
+	if (expect(child, LONGER_WAIT << 1, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_EOF:
+		case __EVENT_TIMEOUT:
+		case __TEST_DISCON_REQ:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
 		goto failure;
-	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) == __EVENT_TIMEOUT) {
-		state++;
-		return (__RESULT_SUCCESS);
-	}
-	state++;
-	switch (last_event) {
-	case __TEST_DISCON_REQ:
-		state++;
-		return __RESULT_SUCCESS;
-	case __EVENT_NO_MSG:
-		state++;
-		return __RESULT_SUCCESS;
-	}
-	state++;
-	goto failure;
+	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
@@ -4966,7 +4972,8 @@ static int postamble_2cl_bot(int child)
 
 static int preamble_3_top(int child)
 {
-	start_tt(1000);
+	if (preamble_0(child) != __RESULT_SUCCESS)
+		goto failure;
 	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
@@ -4986,44 +4993,41 @@ static int preamble_3_top(int child)
 }
 static int postamble_3_top(int child)
 {
-	start_tt(1000);
-	state++;
+	int failed = -1;
 	if (do_signal(child, __TEST_T_SNDDIS) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) != __RESULT_SUCCESS)
-		goto failure;
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (do_signal(child, __TEST_T_CLOSE) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
 		goto failure;
-	state++;
-	stop_tt();
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 static int preamble_3_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -5039,43 +5043,47 @@ static int preamble_3_bot(int child)
 }
 static int postamble_3_bot(int child)
 {
-	start_tt(2000);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
-		goto failure;
-	state++;
-	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
-		goto failure;
+	int failed = -1;
+	if (expect(child, LONGER_WAIT << 1, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_EOF:
+		case __EVENT_TIMEOUT:
+		case __TEST_DISCON_REQ:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		failed = (failed == -1) ? state : failed;
+	state++;
+	if (failed != -1)
 		goto failure;
-	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) == __EVENT_TIMEOUT) {
-		state++;
-		return (__RESULT_SUCCESS);
-	}
-	state++;
-	switch (last_event) {
-	case __TEST_DISCON_REQ:
-		stop_tt();
-		state++;
-		return __RESULT_SUCCESS;
-	case __EVENT_NO_MSG:
-		state++;
-		return __RESULT_SUCCESS;
-	}
-	state++;
-	stop_tt();
-	state++;
-	goto failure;
+	return (__RESULT_SUCCESS);
       failure:
+	state = failed;
 	return (__RESULT_FAILURE);
 }
 
@@ -5774,18 +5782,16 @@ int test_case_1_1_top(int child)
 
 int test_case_1_1_bot(int child)
 {
-	if (start_tt(200) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	while (get_event(child) == __EVENT_NO_MSG) ;
-	state++;
+	expect(child, NORMAL_WAIT, __EVENT_NO_MSG);
 	switch (last_event) {
 	case __TEST_DISCON_REQ:
-	case __EVENT_TIMEOUT:
-		state++;
-		return (__RESULT_SUCCESS);
+	case __EVENT_NO_MSG:
+		break;
+	default:
+		goto failure;
 	}
 	state++;
+	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
 }
@@ -5827,20 +5833,13 @@ int test_case_1_2_1_top(int child)
 
 int test_case_1_2_1_bot(int child)
 {
-	if (start_tt(200) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_CAPABILITY_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (start_tt(200) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5881,10 +5880,7 @@ int test_case_1_2_2_top(int child)
 
 int test_case_1_2_2_bot(int child)
 {
-	if (start_tt(200) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5924,9 +5920,7 @@ int test_case_1_2_3_top(int child)
 
 int test_case_1_2_3_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = TSYSERR;
@@ -5934,9 +5928,7 @@ int test_case_1_2_3_bot(int child)
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -5972,9 +5964,7 @@ int test_case_2_1_1_top(int child)
 
 int test_case_2_1_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
@@ -6013,9 +6003,7 @@ int test_case_2_1_x_top(int child, int terror)
 
 int test_case_2_1_x_bot(int child, int terror)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -6202,26 +6190,19 @@ int test_case_2_1_8_top(int child)
 
 int test_case_2_1_8_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6259,17 +6240,13 @@ int test_case_2_2_top(int child)
 
 int test_case_2_2_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6312,9 +6289,7 @@ int test_case_2_3_1_top(int child)
 
 int test_case_2_3_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6328,9 +6303,7 @@ int test_case_2_3_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6372,18 +6345,13 @@ int test_case_2_3_2_top(int child)
 
 int test_case_2_3_2_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	test_addr = NULL;
 	test_alen = 0;
@@ -6393,9 +6361,7 @@ int test_case_2_3_2_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6430,12 +6396,7 @@ int test_case_2_3_3_top(int child)
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS || last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(600);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
 		goto failure;
@@ -6450,18 +6411,13 @@ int test_case_2_3_3_top(int child)
 
 int test_case_2_3_3_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	test_addr = NULL;
 	test_alen = 0;
@@ -6471,9 +6427,7 @@ int test_case_2_3_3_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6513,9 +6467,7 @@ int test_case_2_3_x_top(int child, int terror)
 
 int test_case_2_3_x_bot(int child, int terror)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -6714,9 +6666,7 @@ int test_case_2_4_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6747,14 +6697,7 @@ connection indication on an XTI stream."
 
 int test_case_2_5_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
-	state++;
-	start_tt(500);
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		goto failure;
@@ -6767,8 +6710,6 @@ int test_case_2_5_1_top(int child)
 		state++;
 		goto failure;
 	}
-	state++;
-	start_tt(500);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
@@ -6790,30 +6731,24 @@ int test_case_2_5_1_bot(int child)
 	test_data = "Connection indication test data.";
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
+      again:
 	state++;
-	start_tt(500);
+	expect(child, LONG_WAIT, __TEST_DISCON_REQ);
 	state++;
-	for (;;) {
-		switch (get_event(child)) {
-		case __TEST_DISCON_REQ:
-			state++;
-			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
-				goto failure;
-			break;
-		case __TEST_CONN_REQ:
-			state++;
-			last_t_errno = TOUTSTATE;
-			last_errno = 0;
-			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
-				goto failure;
-			continue;
-		default:
-			state++;
+	switch (last_event) {
+	case __TEST_DISCON_REQ:
+		if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 			goto failure;
-		}
 		break;
+	case __TEST_CONN_REQ:
+		last_t_errno = TOUTSTATE;
+		last_errno = 0;
+		if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+			goto failure;
+		goto again;
+	default:
+		goto failure;
 	}
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -6848,12 +6783,7 @@ int test_case_3_1_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -6874,10 +6804,7 @@ int test_case_3_1_1_top(int child)
 
 int test_case_3_1_1_bot(int child)
 {
-	start_tt(50);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, SHORT_WAIT);
 	state++;
 	test_addr = NULL;
 	test_alen = 0;
@@ -6887,9 +6814,7 @@ int test_case_3_1_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != 0)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -6928,12 +6853,7 @@ int test_case_3_2_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -6955,18 +6875,13 @@ int test_case_3_2_1_top(int child)
 
 int test_case_3_2_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_addr = NULL;
 	test_alen = 0;
@@ -6976,9 +6891,7 @@ int test_case_3_2_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONGER_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -7017,12 +6930,7 @@ int test_case_3_3_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7040,18 +6948,13 @@ int test_case_3_3_1_top(int child)
 
 int test_case_3_3_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	last_sequence = 0;
 	test_data = "Disconnect indication test data.";
@@ -7090,23 +6993,13 @@ int test_case_3_4_1_top(int child)
 		if (last_t_errno != TNODATA)
 			goto failure;
 		state++;
-		start_tt(200);
-		state++;
-		pause();
-		state++;
-		if (get_event(child) != __EVENT_TIMEOUT)
-			goto failure;
+		test_msleep(child, NORMAL_WAIT);
 		state++;
 		if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7127,9 +7020,7 @@ int test_case_3_4_1_top(int child)
 
 int test_case_3_4_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -7143,19 +7034,14 @@ int test_case_3_4_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	last_sequence = 0;
 	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7190,23 +7076,13 @@ int test_case_3_4_2_top(int child)
 		if (last_t_errno != TNODATA)
 			goto failure;
 		state++;
-		start_tt(200);
-		state++;
-		pause();
-		state++;
-		if (get_event(child) != __EVENT_TIMEOUT)
-			goto failure;
+		test_msleep(child, NORMAL_WAIT);
 		state++;
 		if (do_signal(child, __TEST_T_RCVCONNECT) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7227,9 +7103,7 @@ int test_case_3_4_2_top(int child)
 
 int test_case_3_4_2_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -7243,19 +7117,14 @@ int test_case_3_4_2_bot(int child)
 	if (do_signal(child, __TEST_CONN_CON) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	last_sequence = 0;
 	test_data = "Orderly release indication test data.";
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -7291,12 +7160,7 @@ int test_case_3_5_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7316,12 +7180,7 @@ int test_case_3_5_1_top(int child)
 
 int test_case_3_5_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
@@ -7360,12 +7219,7 @@ int test_case_3_5_2_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7385,12 +7239,7 @@ int test_case_3_5_2_top(int child)
 
 int test_case_3_5_2_bot(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Normal test data.";
 	if (do_signal(child, __TEST_DATA_IND) != __RESULT_SUCCESS)
@@ -7429,12 +7278,7 @@ int test_case_3_6_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7455,16 +7299,13 @@ int test_case_3_6_1_top(int child)
 
 int test_case_3_6_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Unit test data.";
 	if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7499,12 +7340,7 @@ int test_case_3_7_1_top(int child)
 	if (last_t_errno != TNOUDERR)
 		goto failure;
 	state++;
-	start_tt(400);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LOOK) != __RESULT_SUCCESS)
 		goto failure;
@@ -7525,12 +7361,7 @@ int test_case_3_7_1_top(int child)
 
 int test_case_3_7_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		goto failure;
@@ -7560,19 +7391,12 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_1_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	pause();
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
@@ -7589,12 +7413,7 @@ int test_case_4_1_1_top(int child)
 	if (do_signal(child, __TEST_T_RCVDIS) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7616,13 +7435,12 @@ int test_case_4_1_1_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state = begstate + 2;
-	start_tt(500);
 	state = begstate + 3;
 	for (;;) {
-		switch (get_event(child)) {
-		case __EVENT_TIMEOUT:
+		expect(child, LONG_WAIT, __TEST_CONN_RES);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
 			state++;
-			stop_tt();
 			return (__RESULT_SUCCESS);
 		case __TEST_CONN_RES:
 			if (state != begstate + 3)
@@ -7633,7 +7451,6 @@ int test_case_4_1_1_bot(int child)
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 				goto failure;
 			state = begstate + 6;
-			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
 			state = begstate + 7;
@@ -7664,20 +7481,13 @@ asynchronous T_LISTEN event."
 int test_case_4_1_2_top(int child)
 {
 	int seq;
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
 	seq = last_sequence;
 	state++;
-	start_tt(200);
-	state++;
-	pause();
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_ACCEPT) == __RESULT_SUCCESS)
 		goto failure;
@@ -7726,11 +7536,11 @@ int test_case_4_1_2_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state = begstate + 2;
-	start_tt(1000);
 	state = begstate + 3;
 	for (;;) {
-		switch (get_event(child)) {
-		case __EVENT_TIMEOUT:
+		expect(child, LONG_WAIT, __TEST_CONN_RES);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
 			state = begstate + 4;
 			goto failure;
 		case __TEST_CONN_RES:
@@ -7742,7 +7552,6 @@ int test_case_4_1_2_bot(int child)
 			if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 				goto failure;
 			state = begstate + 6;
-			start_tt(200);
 			continue;
 		case __TEST_DISCON_REQ:
 			if (state != begstate + 8) {
@@ -7756,7 +7565,6 @@ int test_case_4_1_2_bot(int child)
 			if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 				goto failure;
 			state = begstate + 10;
-			stop_tt();
 			return (__RESULT_SUCCESS);
 		default:
 			state = begstate + 11;
@@ -7808,9 +7616,7 @@ int test_case_4_2_1_top(int child)
 
 int test_case_4_2_1_bot(int child)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -7819,6 +7625,8 @@ int test_case_4_2_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7844,12 +7652,7 @@ asynchronous T_LISTEN event."
 
 int test_case_4_2_2_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_CONNECT) == __RESULT_SUCCESS)
 		goto failure;
@@ -7885,10 +7688,10 @@ int test_case_4_2_2_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state = begstate + 1;
-	start_tt(500);
 	state = begstate + 2;
 	for (;;) {
-		switch (get_event(child)) {
+		expect(child, LONG_WAIT, __TEST_CONN_REQ);
+		switch (last_event) {
 		case __TEST_CONN_REQ:
 			if (state != begstate + 2)
 				goto failure;
@@ -7936,12 +7739,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_3_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
@@ -7979,6 +7777,8 @@ int test_case_4_3_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8029,6 +7829,8 @@ int test_case_4_4_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8083,9 +7885,7 @@ int test_case_4_4_2_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8137,6 +7937,8 @@ int test_case_4_4_3_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8191,9 +7993,7 @@ int test_case_4_4_4_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8220,12 +8020,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_4_5_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		goto failure;
@@ -8253,6 +8048,8 @@ int test_case_4_4_5_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8277,12 +8074,7 @@ asynchronous T_ORDREL event."
 
 int test_case_4_4_6_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SND) == __RESULT_SUCCESS)
 		goto failure;
@@ -8313,9 +8105,7 @@ int test_case_4_4_6_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8342,12 +8132,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_4_7_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		goto failure;
@@ -8375,6 +8160,8 @@ int test_case_4_4_7_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8399,12 +8186,7 @@ asynchronous T_ORDREL event."
 
 int test_case_4_4_8_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDV) == __RESULT_SUCCESS)
 		goto failure;
@@ -8435,9 +8217,7 @@ int test_case_4_4_8_bot(int child)
 	if (do_signal(child, __TEST_ORDREL_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_ORDREL_REQ)
+	if (expect(child, LONG_WAIT, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -8473,12 +8253,7 @@ int test_case_4_5_1_top(int child)
 	if (last_t_errno != TNODATA)
 		goto failure;
 	state++;
-	start_tt(300);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVCONNECT) == __RESULT_SUCCESS)
 		goto failure;
@@ -8502,22 +8277,19 @@ int test_case_4_5_1_top(int child)
 
 int test_case_4_5_1_bot(int child)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -8543,12 +8315,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_6_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVREL) == __RESULT_SUCCESS)
 		goto failure;
@@ -8576,6 +8343,8 @@ int test_case_4_6_1_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8600,12 +8369,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_6_2_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVRELDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8633,6 +8397,8 @@ int test_case_4_6_2_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8657,12 +8423,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_6_3_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDREL) == __RESULT_SUCCESS)
 		goto failure;
@@ -8690,6 +8451,8 @@ int test_case_4_6_3_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8714,12 +8477,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_6_4_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDRELDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8747,6 +8505,8 @@ int test_case_4_6_4_bot(int child)
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8771,12 +8531,7 @@ asynchronous T_UDERR event."
 
 int test_case_4_7_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVUDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8803,6 +8558,8 @@ int test_case_4_7_1_bot(int child)
 	if (do_signal(child, __TEST_UDERROR_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -8827,12 +8584,7 @@ asynchronous T_UDERR event."
 
 int test_case_4_7_2_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_RCVVUDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8883,12 +8635,7 @@ asynchronous T_UDERR event."
 
 int test_case_4_7_3_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDUDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8939,12 +8686,7 @@ asynchronous T_UDERR event."
 
 int test_case_4_7_4_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDVUDATA) == __RESULT_SUCCESS)
 		goto failure;
@@ -8995,12 +8737,7 @@ asynchronous T_LISTEN event."
 
 int test_case_4_8_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
 		goto failure;
@@ -9035,9 +8772,7 @@ int test_case_4_8_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -9067,12 +8802,7 @@ asynchronous T_DATA event."
 
 int test_case_4_8_2_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
 		goto failure;
@@ -9124,12 +8854,7 @@ asynchronous T_UDERR event."
 
 int test_case_4_8_3_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
 		goto failure;
@@ -9180,12 +8905,7 @@ asynchronous T_DISCONNECT event."
 
 int test_case_4_9_1_top(int child)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_SNDDIS) == __RESULT_SUCCESS)
 		goto failure;
@@ -9212,6 +8932,8 @@ int test_case_4_9_1_bot(int child)
 	test_data = "Disconnect indication test data.";
 	if (do_signal(child, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -9999,9 +9721,7 @@ int test_case_5_2_x_top(int child, int function)
 
 int test_case_5_2_x_bot(int child, int function)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10750,9 +10470,7 @@ int test_case_5_3_x_top(int child, int function)
 
 int test_case_5_3_x_bot(int child, int function)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
+	if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11492,12 +11210,7 @@ in response to the t_accept library call."
 
 int test_case_6_1_x_top(int child, int terror, int error)
 {
-	start_tt(200);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	if (do_signal(child, __TEST_T_LISTEN) != __RESULT_SUCCESS)
 		goto failure;
@@ -11529,9 +11242,7 @@ int test_case_6_1_x_bot(int child, int terror, int error)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_CONN_RES)
+	if (expect(child, LONG_WAIT, __TEST_CONN_RES) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -11539,13 +11250,13 @@ int test_case_6_1_x_bot(int child, int terror, int error)
 	if (do_signal(child, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, LONGER_WAIT << 1);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -11892,9 +11603,7 @@ int test_case_6_2_x_top(int child, int terror, int error)
 
 int test_case_6_2_x_bot(int child, int terror, int error)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -12087,9 +11796,7 @@ int test_case_6_3_x_top(int child, int terror, int error)
 
 int test_case_6_3_x_bot(int child, int terror, int error)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -12336,9 +12043,7 @@ int test_case_6_4_x_top(int child, int terror, int error)
 
 int test_case_6_4_x_bot(int child, int terror, int error)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_OPTMGMT_REQ)
+	if (expect(child, LONG_WAIT, __TEST_OPTMGMT_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -12531,9 +12236,7 @@ int test_case_6_5_x_top(int child, int terror, int error)
 
 int test_case_6_5_x_bot(int child, int terror, int error)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -12683,8 +12386,6 @@ in response to the t_unbind library call."
 
 int test_case_6_6_x_top(int child, int terror, int error)
 {
-	start_tt(500);
-	state++;
 	if (do_signal(child, __TEST_T_UNBIND) == __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -12701,9 +12402,7 @@ int test_case_6_6_x_top(int child, int terror, int error)
 
 int test_case_6_6_x_bot(int child, int terror, int error)
 {
-	start_tt(500);
-	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
+	if (expect(child, LONG_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_t_errno = terror;
@@ -12818,13 +12517,13 @@ int test_case_7_1_1_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -12979,14 +12678,14 @@ int test_case_7_3_1_top(int child)
 
 int test_case_7_3_1_bot(int child)
 {
-	if (get_event(child) != __TEST_BIND_REQ)
+	if (expect(child, LONG_WAIT, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_UNBIND_REQ)
+	if (expect(child, LONG_WAIT, __TEST_UNBIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -13129,13 +12828,13 @@ int test_case_7_3_4_bot(int child)
 	if (do_signal(child, __TEST_CONN_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -13444,13 +13143,13 @@ int test_case_7_6_1_top(int child)
 
 int test_case_7_6_1_bot(int child)
 {
-	if (get_event(child) != __TEST_CONN_REQ)
+	if (expect(child, LONG_WAIT, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (get_event(child) != __TEST_DISCON_REQ)
+	if (expect(child, LONG_WAIT, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (do_signal(child, __TEST_OK_ACK) != __RESULT_SUCCESS)
@@ -14198,8 +13897,6 @@ the t_snd library call."
 
 int test_case_7_13_1_top(int child)
 {
-	start_tt(5000);
-	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14213,12 +13910,7 @@ int test_case_7_13_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	start_tt(6000);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14227,21 +13919,17 @@ int test_case_7_13_1_top(int child)
 
 int test_case_7_13_1_bot(int child)
 {
-	start_tt(5000);
-	state++;
 	for (;;) {
-		switch (get_event(child)) {
+		state++;
+		expect(child, LONGER_WAIT << 2, __TEST_DATA_REQ);
+		switch (last_event) {
 		case __TEST_DATA_REQ:
-		case __EVENT_NO_MSG:
 			show_data = 0;
-			state++;
 			continue;
-		case __EVENT_TIMEOUT:
-			state++;
+		case __EVENT_NO_MSG:
 			show_data = 1;
 			break;
 		default:
-			state++;
 			show_data = 1;
 			goto failure;
 		}
@@ -14342,8 +14030,6 @@ the t_sndv library call."
 
 int test_case_7_14_1_top(int child)
 {
-	start_tt(5000);
-	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14357,12 +14043,7 @@ int test_case_7_14_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	start_tt(6000);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14371,21 +14052,17 @@ int test_case_7_14_1_top(int child)
 
 int test_case_7_14_1_bot(int child)
 {
-	start_tt(5000);
-	state++;
 	for (;;) {
-		switch (get_event(child)) {
+		state++;
+		expect(child, LONGER_WAIT << 2, __TEST_DATA_REQ);
+		switch (last_event) {
 		case __TEST_DATA_REQ:
-		case __EVENT_NO_MSG:
 			show_data = 0;
-			state++;
 			continue;
-		case __EVENT_TIMEOUT:
-			state++;
+		case __EVENT_NO_MSG:
 			show_data = 1;
 			break;
 		default:
-			state++;
 			show_data = 1;
 			goto failure;
 		}
@@ -14486,8 +14163,6 @@ the t_sndudata library call."
 
 int test_case_7_15_1_top(int child)
 {
-	start_tt(5000);
-	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14501,12 +14176,7 @@ int test_case_7_15_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	start_tt(6000);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14515,21 +14185,17 @@ int test_case_7_15_1_top(int child)
 
 int test_case_7_15_1_bot(int child)
 {
-	start_tt(5000);
-	state++;
 	for (;;) {
-		switch (get_event(child)) {
+		state++;
+		expect(child, LONGER_WAIT << 2, __TEST_UNITDATA_REQ);
+		switch (last_event) {
 		case __TEST_UNITDATA_REQ:
-		case __EVENT_NO_MSG:
 			show_data = 0;
-			state++;
 			continue;
-		case __EVENT_TIMEOUT:
-			state++;
+		case __EVENT_NO_MSG:
 			show_data = 1;
 			break;
 		default:
-			state++;
 			show_data = 1;
 			goto failure;
 		}
@@ -14630,8 +14296,6 @@ the t_sndvudata library call."
 
 int test_case_7_16_1_top(int child)
 {
-	start_tt(5000);
-	state++;
 	if (do_signal(child, __TEST_O_NONBLOCK) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14645,12 +14309,7 @@ int test_case_7_16_1_top(int child)
 	if (last_t_errno != TFLOW)
 		goto failure;
 	state++;
-	start_tt(6000);
-	state++;
-	pause();
-	state++;
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, (LONGER_WAIT << 2) + LONG_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -14659,21 +14318,17 @@ int test_case_7_16_1_top(int child)
 
 int test_case_7_16_1_bot(int child)
 {
-	start_tt(5000);
-	state++;
 	for (;;) {
-		switch (get_event(child)) {
+		state++;
+		expect(child, LONGER_WAIT << 2, __TEST_UNITDATA_REQ);
+		switch (last_event) {
 		case __TEST_UNITDATA_REQ:
-		case __EVENT_NO_MSG:
 			show_data = 0;
-			state++;
 			continue;
-		case __EVENT_TIMEOUT:
-			state++;
+		case __EVENT_NO_MSG:
 			show_data = 1;
 			break;
 		default:
-			state++;
 			show_data = 1;
 			goto failure;
 		}
@@ -14774,8 +14429,6 @@ the t_sync library call."
 
 int test_case_7_17_1_top(int child)
 {
-	start_tt(1000);
-	state++;
 	if (do_signal(child, __TEST_PUSH) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -14798,9 +14451,7 @@ int test_case_7_17_1_top(int child)
 
 int test_case_7_17_1_bot(int child)
 {
-	start_tt(200);
-	state++;
-	if (get_event(child) != __TEST_CAPABILITY_REQ)
+	if (expect(child, NORMAL_WAIT, __TEST_CAPABILITY_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	last_tstate = TS_WACK_BREQ;
@@ -14831,7 +14482,7 @@ This test case tests positive test cases for the t_rcv library call."
 
 int test_case_8_1_1_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -14851,9 +14502,7 @@ int test_case_8_1_1_top(int child)
 int test_case_8_1_1_bot(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
@@ -14887,7 +14536,7 @@ This test case tests positive test cases for the t_rcv library call."
 
 int test_case_8_1_2_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -14907,9 +14556,7 @@ int test_case_8_1_2_top(int child)
 int test_case_8_1_2_bot(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
@@ -14942,7 +14589,7 @@ This test case tests positive test cases for the t_rcv library call."
 
 int test_case_8_1_3_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -14963,9 +14610,7 @@ int test_case_8_1_3_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
@@ -14974,9 +14619,7 @@ int test_case_8_1_3_bot(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -14984,9 +14627,7 @@ int test_case_8_1_3_bot(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -15020,7 +14661,7 @@ This test case tests positive test cases for the t_rcv library call."
 int test_case_8_1_4_top(int child)
 {
 	test_bufsize = 12;
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15044,9 +14685,7 @@ int test_case_8_1_4_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
@@ -15055,9 +14694,7 @@ int test_case_8_1_4_bot(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -15065,9 +14702,7 @@ int test_case_8_1_4_bot(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -15100,7 +14735,7 @@ This test case tests positive test cases for the t_rcvv library call."
 
 int test_case_8_2_1_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15120,9 +14755,7 @@ int test_case_8_2_1_top(int child)
 int test_case_8_2_1_bot(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
@@ -15156,7 +14789,7 @@ This test case tests positive test cases for the t_rcvv library call."
 
 int test_case_8_2_2_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15176,9 +14809,7 @@ int test_case_8_2_2_top(int child)
 int test_case_8_2_2_bot(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
@@ -15211,7 +14842,7 @@ This test case tests positive test cases for the t_rcvv library call."
 
 int test_case_8_2_3_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVV)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15232,9 +14863,7 @@ int test_case_8_2_3_bot(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		MORE_flag = (state < endstate) ? 1 : 0;
 		test_data = "Normal test data.";
@@ -15243,9 +14872,7 @@ int test_case_8_2_3_bot(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 1;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -15253,9 +14880,7 @@ int test_case_8_2_3_bot(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			MORE_flag = 0;
 			if (do_signal(child, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 				MORE_flag = 0;
@@ -15288,7 +14913,7 @@ This test case tests positive test cases for the t_rcvudata library call."
 
 int test_case_8_3_1_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVUDATA)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15308,9 +14933,7 @@ int test_case_8_3_1_top(int child)
 int test_case_8_3_1_bot(int child)
 {
 	int endstate = state + 20;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
@@ -15341,7 +14964,7 @@ This test case tests positive test cases for the t_rcvudata library call."
 int test_case_8_3_2_top(int child)
 {
 	test_rcvudata.udata.maxlen = 12;
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVUDATA)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15364,9 +14987,7 @@ int test_case_8_3_2_top(int child)
 int test_case_8_3_2_bot(int child)
 {
 	int endstate = state + 20;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
@@ -15396,7 +15017,7 @@ This test case tests positive test cases for the t_rcvvudata library call."
 
 int test_case_8_4_1_top(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (do_signal(child, __TEST_T_RCVVUDATA)) {
 		case __RESULT_SUCCESS:
 			continue;
@@ -15416,9 +15037,7 @@ int test_case_8_4_1_top(int child)
 int test_case_8_4_1_bot(int child)
 {
 	int endstate = state + 20;
-	start_tt(200);
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate; state++) {
 		test_data = "Unit test data.";
 		if (do_signal(child, __TEST_UNITDATA_IND) != __RESULT_SUCCESS)
@@ -15449,10 +15068,7 @@ This test case tests positive test cases for the t_snd library call."
 int test_case_8_5_1_top(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = (state < endstate) ? T_MORE : 0;
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
@@ -15461,10 +15077,7 @@ int test_case_8_5_1_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15473,19 +15086,11 @@ int test_case_8_5_1_top(int child)
 
 int test_case_8_5_1_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
-		switch (get_event(child)) {
-		case __TEST_DATA_REQ:
-		case __TEST_EXDATA_REQ:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		default:
+	int endstate = state + 19;
+	for (; state < endstate + 1; state++) {
+		if (expect(child, LONG_WAIT, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
-		}
-		break;
 	}
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15510,10 +15115,7 @@ This test case tests positive test cases for the t_snd library call."
 int test_case_8_5_2_top(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0) | T_EXPEDITED;
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
@@ -15522,10 +15124,7 @@ int test_case_8_5_2_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15534,19 +15133,11 @@ int test_case_8_5_2_top(int child)
 
 int test_case_8_5_2_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
-		switch (get_event(child)) {
-		case __TEST_DATA_REQ:
-		case __TEST_EXDATA_REQ:
-			continue;
-		case __EVENT_TIMEOUT:
-			break;
-		default:
+	int endstate = state + 19;
+	for (; state < endstate + 1; state++) {
+		if (expect(child, LONG_WAIT, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
-		}
-		break;
 	}
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -15572,10 +15163,7 @@ int test_case_8_5_3_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
@@ -15583,10 +15171,7 @@ int test_case_8_5_3_top(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15594,10 +15179,7 @@ int test_case_8_5_3_top(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15606,10 +15188,7 @@ int test_case_8_5_3_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15618,7 +15197,7 @@ int test_case_8_5_3_top(int child)
 
 int test_case_8_5_3_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_DATA_REQ:
 		case __TEST_EXDATA_REQ:
@@ -15656,10 +15235,7 @@ int test_case_8_5_4_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
@@ -15667,10 +15243,7 @@ int test_case_8_5_4_top(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15678,10 +15251,7 @@ int test_case_8_5_4_top(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SND) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15690,10 +15260,7 @@ int test_case_8_5_4_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15702,7 +15269,7 @@ int test_case_8_5_4_top(int child)
 
 int test_case_8_5_4_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_DATA_REQ:
 		case __TEST_EXDATA_REQ:
@@ -15739,10 +15306,7 @@ This test case tests positive test cases for the t_sndv library call."
 int test_case_8_6_1_top(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = (state < endstate) ? T_MORE : 0;
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
@@ -15751,10 +15315,7 @@ int test_case_8_6_1_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15763,7 +15324,7 @@ int test_case_8_6_1_top(int child)
 
 int test_case_8_6_1_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_DATA_REQ:
 		case __TEST_EXDATA_REQ:
@@ -15800,10 +15361,7 @@ This test case tests positive test cases for the t_sndv library call."
 int test_case_8_6_2_top(int child)
 {
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0) | T_EXPEDITED;
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
@@ -15812,10 +15370,7 @@ int test_case_8_6_2_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15824,7 +15379,7 @@ int test_case_8_6_2_top(int child)
 
 int test_case_8_6_2_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_DATA_REQ:
 		case __TEST_EXDATA_REQ:
@@ -15862,10 +15417,7 @@ int test_case_8_6_3_top(int child)
 {
 	int begstate = state;
 	int endstate = state + 19;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate + 1; state++) {
 		test_sndflags = ((state < endstate) ? T_MORE : 0);
 		if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
@@ -15873,10 +15425,7 @@ int test_case_8_6_3_top(int child)
 			goto failure;
 		}
 		if (state == begstate + 10) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_MORE | T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15884,10 +15433,7 @@ int test_case_8_6_3_top(int child)
 			}
 		}
 		if (state == begstate + 15) {
-			start_tt(200);
-			pause();
-			if (get_event(child) != __EVENT_TIMEOUT)
-				goto failure;
+			test_msleep(child, NORMAL_WAIT);
 			test_sndflags = T_EXPEDITED;
 			if (do_signal(child, __TEST_T_SNDV) != __RESULT_SUCCESS) {
 				test_sndflags = 0;
@@ -15896,10 +15442,7 @@ int test_case_8_6_3_top(int child)
 		}
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15908,7 +15451,7 @@ int test_case_8_6_3_top(int child)
 
 int test_case_8_6_3_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_DATA_REQ:
 		case __TEST_EXDATA_REQ:
@@ -15945,19 +15488,13 @@ This test case tests positive test cases for the t_sndudata library call."
 int test_case_8_7_1_top(int child)
 {
 	int endstate = state + 20;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate; state++) {
 		if (do_signal(child, __TEST_T_SNDUDATA) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -15966,7 +15503,7 @@ int test_case_8_7_1_top(int child)
 
 int test_case_8_7_1_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_UNITDATA_REQ:
 			continue;
@@ -16002,19 +15539,13 @@ This test case tests positive test cases for the t_sndvudata library call."
 int test_case_8_8_1_top(int child)
 {
 	int endstate = state + 20;
-	start_tt(200);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, NORMAL_WAIT);
 	for (; state < endstate; state++) {
 		if (do_signal(child, __TEST_T_SNDVUDATA) != __RESULT_SUCCESS)
 			goto failure;
 	}
 	state++;
-	start_tt(1000);
-	pause();
-	if (get_event(child) != __EVENT_TIMEOUT)
-		goto failure;
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -16023,7 +15554,7 @@ int test_case_8_8_1_top(int child)
 
 int test_case_8_8_1_bot(int child)
 {
-	for (start_tt(500);; start_tt(500), state++) {
+	for (start_tt(LONG_WAIT);; start_tt(LONG_WAIT), state++) {
 		switch (get_event(child)) {
 		case __TEST_UNITDATA_REQ:
 			continue;
@@ -16144,7 +15675,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	if (start_tt(10000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
