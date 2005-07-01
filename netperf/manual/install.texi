@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.1 2005/05/30 08:44:01 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.2 2005/07/01 07:29:37 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/05/30 08:44:01 $ by $Author: brian $
+@c Last Modified $Date: 2005/07/01 07:29:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,8 +64,10 @@
 * Building::			Building the package
 * Installing::			Installing the package
 * Removing::			Removing the package
-* Loading::			Loading the package
 @end menu
+@ignore
+* Loading::			Loading the package
+@end ignore
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -291,6 +293,7 @@ Other subpackages created by @cite{strsctp-0.9.2-1.src.rpm} may be necessary to
 by able to recompile @cite{netperf-openss7-2.3}.
 @end table
 
+@ignore
 @subsubheading Kernel-Dependent RPM
 Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM releases.
 Packages are provided for popular released @cite{RedHat} kernels.  Packages
@@ -369,6 +372,7 @@ which it was compiled.  This particular package applies to @file{streams}
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 @end table
+@end ignore
 
 @subsubheading Configuration and Installation
 To configure, build and install the binary RPM, @xref{Configuring the Binary
@@ -486,6 +490,7 @@ STREAMS-specific library, it is a STREAMS-Dependent package.  Use the
 @file{@value{PACKAGE}-streams-util} package if you have streams installed.
 @end table
 
+@ignore
 @subsubheading Kernel-Dependent DEB
 Kernel-Dependent DEB are dependent on specific Linux Kernel Binary DEB releases.
 Packages are provided for popular released @cite{RedHat} kernels.  Packages
@@ -564,6 +569,7 @@ which it was compiled.  This particular package applies to @file{streams}
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.}
 @end table
+@end ignore
 
 @subsubheading Configuration and Installation
 To configure, build and install the Debian DEB, @xref{Configuring the Debian
@@ -809,6 +815,7 @@ This allows some degree of customization.  Relocations that are available on the
 binary RPM are as follows:
 
 @table @file
+@ignore
 @item @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @cindex @value{PACKAGE}-LiS-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @itemx @value{PACKAGE}-streams-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
@@ -832,6 +839,7 @@ version of the @value{PACKAGE} package.@footnote{Note that the @samp{_kversion}
 of @samp{@value{_kversion}} is only an example.  Also, note that the @samp{info}
 subpackage is only applicable to the 2.4 kernel series.}
 @end table
+@end ignore
 
 @item @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
 @cindex @value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm
@@ -1828,15 +1836,23 @@ are provided on the @command{rpm} command line.  For example:
 @example
 @cartouche
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
+@ignore
   --define "_kversion @value{_kversion}" \ 
+@end ignore
   --with lis -- @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end cartouche
 @end example
 
 @noindent
-will rebuild binary RPM for the @samp{@value{_kversion}} kernel for the
+will rebuild binary RPM
+@ignore
+for the @samp{@value{_kversion}} kernel
+@end ignore
+for the
 @samp{athlon} architecture against the @cite{LiS} STREAMS package.
+@ignore
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+@end ignore
 
 @subsubheading Installation
 
@@ -1876,7 +1892,9 @@ For example:
 @cartouche
 % BUILD_DEBOPTIONS='
         --with-lis
+@ignore
         --with-k-release=@value{_kversion}
+@end ignore
         --host=athlon-debian-linux-gnu'
   dpkg-buildpackage -v \
   @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
@@ -1884,9 +1902,15 @@ For example:
 @end example
 
 @noindent
-will rebuild binary DEB for the @samp{@value{_kversion}} kernel for the
+will rebuild binary DEB
+@ignore
+for the @samp{@value{_kversion}} kernel
+@end ignore
+for the
 @samp{athlon} architecture against the @cite{LiS} STREAMS package.
+@ignore
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+@end ignore
 
 @subsubheading Installation
 
@@ -2317,6 +2341,7 @@ the Tar Ball}) except the final installation and then perform the steps above.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
+@ignore
 @node Loading
 @section Loading
 @cindex loading
@@ -2400,4 +2425,4 @@ necessary to hand-edit a @file{.spec} and @file{rc.4} file to load the modules
 at boot time.@footnote{At some time I expect to create an
 @samp{install-nexusware} target that will make the necessary modifications to
 the @file{.spec} and @file{rc.4} files automatically.}
-
+@end ignore

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/25 07:03:46 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,13 +59,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/25 07:03:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 07:29:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
- Revision 0.9.2.15  2005/06/25 07:03:46  brian
- - updated streams tests program
+ Revision 0.9.2.16  2005/07/01 07:29:32  brian
+ - updates for LE2005 build
+
+ Revision 0.9.2.11  2005/07/01 07:29:32  brian
+ - updates for LE2005 build
 
  Revision 0.9.2.10  2005/06/25 07:03:46  brian
  - updated streams tests program
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/25 07:03:46 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/06/25 07:03:46 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -188,6 +191,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500		// 100
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
+#define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 
 char cbuf[BUFSIZE];
@@ -217,7 +222,7 @@ struct timeval when;
  *  -------------------------------------------------------------------------
  */
 enum {
-	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__EVENT_EOF = -7, __EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
@@ -337,7 +342,7 @@ static int check_time(const char *t, long i, long lo, long hi)
 		return __RESULT_FAILURE;
 }
 
-static int time_event(int event)
+static int time_event(int child, int event)
 {
 	if (verbose > 4) {
 		float t, m;
@@ -350,7 +355,7 @@ static int time_event(int event)
 		m = m / 1000000;
 		t += m;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                   <%d>\n", t, state);
+		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -378,6 +383,7 @@ static int timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -397,11 +403,14 @@ static int start_tt(long duration)
 	timer_timeout = 0;
 	return __RESULT_SUCCESS;
 }
+
+#if 0
 static int start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
 	return start_tt(sdur);
 }
+#endif
 
 static int stop_tt(void)
 {
@@ -691,6 +700,8 @@ char *errno_string(long err)
 const char *event_string(int event)
 {
 	switch (event) {
+	case __EVENT_EOF:
+		return ("END OF FILE");
 	case __EVENT_NO_MSG:
 		return ("NO MESSAGE");
 	case __EVENT_TIMEOUT:
@@ -1253,7 +1264,6 @@ void print_float_state(int child, const char *msgs[], float time)
 void print_mwaiting(int child, struct timespec *time)
 {
 	static const char *msgs[] = {
-		"                    |                                |  |                    \n",
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
 		"  / / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
 		"    / / / / / / / / | / / Waiting %8.4f seconds / |/ |                    [%d:%03d]\n",
@@ -1267,7 +1277,6 @@ void print_mwaiting(int child, struct timespec *time)
 		print_float_state(child, msgs, delay);
 	}
 }
-
 
 
 /*
@@ -1456,7 +1465,6 @@ int test_readv(int child, const struct iovec *iov, int count)
 }
 
 
-
 int test_nonblock(int child)
 {
 	long flags;
@@ -1590,7 +1598,7 @@ static int stream_start(int child, int index)
 #if 0
 		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
-		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
+		if (test_ioctl(0, I_PUSH, (intptr_t) "dummymod") != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 #endif
 		return __RESULT_SUCCESS;
@@ -2686,6 +2694,7 @@ struct test_stream test_2_19_1 = { &preamble_0, &test_case_2_19_1, &postamble_0 
 #define test_case_2_19_1_stream_2 (NULL)
 
 #define tgrp_case_2_19_2 test_group_2
+#define numb_case_2_19_2 "2.19.2"
 #define name_case_2_19_2 "Perform streamio I_SWROPT - SNDZERO."
 #define sref_case_2_19_2 "(none)"
 #define desc_case_2_19_2 "\
@@ -3997,7 +4006,8 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	start_tt(5000);
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
 		case 00:	/* we are the child */
@@ -4041,6 +4051,7 @@ int test_run(struct test_stream *stream[])
 	} else
 		status[0] = __RESULT_SUCCESS;
 	for (; children > 0; children--) {
+	      waitagain:
 		if ((this_child = wait(&this_status)) > 0) {
 			if (WIFEXITED(this_status)) {
 				if (this_child == child[0]) {
@@ -4139,27 +4150,18 @@ int test_run(struct test_stream *stream[])
 			if (timer_timeout) {
 				timer_timeout = 0;
 				print_timeout(3);
-				last_event = __EVENT_TIMEOUT;
 			}
-			if (child[0]) {
+			if (child[0])
 				kill(child[0], SIGKILL);
-				status[0] = __RESULT_INCONCLUSIVE;
-				child[0] = 0;
-			}
-			if (child[1]) {
+			if (child[1])
 				kill(child[1], SIGKILL);
-				status[1] = __RESULT_INCONCLUSIVE;
-				child[1] = 0;
-			}
-			if (child[2]) {
+			if (child[2])
 				kill(child[2], SIGKILL);
-				status[2] = __RESULT_INCONCLUSIVE;
-				child[2] = 0;
-			}
-			break;
+			goto waitagain;
 		}
 	}
-	stop_tt();
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto inconclusive;
 	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
 	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
@@ -4168,6 +4170,7 @@ int test_run(struct test_stream *stream[])
 		return (__RESULT_FAILURE);
 	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
+      inconclusive:
 	return (__RESULT_INCONCLUSIVE);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 07:29:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $"
 
-static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/05/15 04:08:15 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -404,9 +403,8 @@ void freeb(mblk_t *mp)
 		if (!mb->b_datap)
 			mdbblock_free(mb);
 	}
-	/* if the message block refers to the associated data block then we have already freed the
-	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
-	   unused */
+	/* if the message block refers to the associated data block then we have already freed the mdbblock above when
+	   necessary; otherwise the entire mdbblock can go if the datab is also unused */
 	if (db != (dp = mb_to_db(mp)) && !db_ref(dp))
 		mdbblock_free(mp);
 	return;
@@ -562,11 +560,11 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 	struct mdbblock *md;
 	if (!mp || len < -1)
 		goto error;
-	/* There actually is a way on 2.4 and 2.6 kernels to determine if the memory is suitable
-	   for DMA if it was allocated with kmalloc, but that's for later, and only if necessary.
-	   If you need ISA DMA memory, please use esballoc. */
+	/* There actually is a way on 2.4 and 2.6 kernels to determine if the memory is suitable for DMA if it was
+	   allocated with kmalloc, but that's for later, and only if necessary. If you need ISA DMA memory, please use
+	   esballoc. */
 	if (!len || ((blen = mp->b_wptr - mp->b_rptr) >= len && len >= 0
-		     && !((ulong)(mp->b_rptr) & (L1_CACHE_BYTES - 1))))
+		     && !((ulong) (mp->b_rptr) & (L1_CACHE_BYTES - 1))))
 		return (1);	/* success */
 	size = 0;
 	type = mp->b_datap->db_type;
@@ -619,8 +617,7 @@ int pullupmsg(mblk_t *mp, ssize_t len)
 			mdbblock_free(mb);
 	}
 	for (mpp = &mp->b_cont; (bp = *mpp);) {
-		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0 &&
-		    bp->b_datap->db_type != type)
+		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0 && bp->b_datap->db_type != type)
 			break;
 		if (size >= blen) {	/* use whole block (even if zero) */
 			bcopy(bp->b_rptr, mp->b_wptr, blen);
@@ -830,8 +827,8 @@ static int __bcanput(queue_t *q, unsigned char band)
 		/* find first queue with service procedure or no q_next pointer */
 		while ((q = q_next) && !q->q_qinfo->qi_srvp && (q_next = q->q_next)) ;
 		qrlock(q, &flags);
-		/* bands are sorted in decending priority so that we can quit the search early for
-		   higher priority bands */
+		/* bands are sorted in decending priority so that we can quit the search early for higher priority
+		   bands */
 		for (qb = q->q_bandp; qb && (qb->qb_band > band); qb = qb->qb_next) ;
 		if (qb && qb->qb_band == band && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 			set_bit(QB_WANTW_BIT, &qb->qb_flag);
@@ -1041,8 +1038,8 @@ static int __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 			default:
 				swerr();
 			case FLUSHALL:
-				/* This is faster.  For flushall, we link the qband chain onto the
-				   free list and null out qband counts and markers. */
+				/* This is faster.  For flushall, we link the qband chain onto the free list and null
+				   out qband counts and markers. */
 				if ((**mppp = qb->qb_first)) {
 					/* link around entire band */
 					if (qb->qb_first->b_prev)
@@ -1126,8 +1123,8 @@ void flushband(queue_t *q, int band, int flag)
 	qwunlock(q, &flags);
 	if (backenable)
 		qbackenable(q);
-	/* we want to free messages with the locks off so that other CPUs can process this queue
-	   and we don't block interrupts too long */
+	/* we want to free messages with the locks off so that other CPUs can process this queue and we don't block
+	   interrupts too long */
 	mb();
 	freechain(mp, mpp);
 }
@@ -1261,8 +1258,7 @@ static struct qband *__get_qband(queue_t *q, unsigned char band)
 {
 	struct qband *qb, *qp, **qbp;
 	/* find insertion point for band */
-	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band;
-	     qp = *qbp, qbp = &(*qbp)->qb_next) ;
+	for (qp = NULL, qbp = &q->q_bandp; *qbp && (*qbp)->qb_band > band; qp = *qbp, qbp = &(*qbp)->qb_next) ;
 	if (!(qb = *qbp) || qb->qb_band < band) {
 		/* not found, create one */
 		if ((qb = allocqb())) {
@@ -1302,8 +1298,7 @@ static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	} else {
 		if (emp->b_datap->db_type >= QPCTL || emp->b_band < nmp->b_band)
 			goto out_of_order;
-		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL
-		    && emp->b_prev->b_band > nmp->b_band)
+		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL && emp->b_prev->b_band > nmp->b_band)
 			goto out_of_order;
 		enable = q->q_first ? 0 : 1;	/* on empty queue */
 		if (unlikely(nmp->b_band)) {
@@ -1582,13 +1577,11 @@ int putbq(queue_t *q, mblk_t *mp)
 	default:
 		never();
 	case 0:		/* failure */
-		/* This should never happen, because it takes a qband structure allocation failure
-		   to get here, and since we are putting the message back on the queue, there
-		   should already be a qband structure.  Unless, however, putbq() is just used to
-		   insert messages ahead of others rather than really putting them back.
-		   Nevertheless, a way to avoid this error is to always ensure that a qband
-		   structure exists (e.g., with strqset) before calling putbq on a band for the
-		   first time. */
+		/* This should never happen, because it takes a qband structure allocation failure to get here, and
+		   since we are putting the message back on the queue, there should already be a qband structure.
+		   Unless, however, putbq() is just used to insert messages ahead of others rather than really putting
+		   them back. Nevertheless, a way to avoid this error is to always ensure that a qband structure exists 
+		   (e.g., with strqset) before calling putbq on a band for the first time. */
 		return (0);
 	}
 }
@@ -1763,10 +1756,9 @@ int putq(queue_t *q, mblk_t *mp)
 	default:
 		never();
 	case 0:		/* failure */
-		/* This can happen and it is bad.  We use the return value to putq but it is
-		   typically ignored by the module.  One way to ensure that this never happens is
-		   to call strqset() for the band before calling putq on the band for the first
-		   time. (See also putbq()) */
+		/* This can happen and it is bad.  We use the return value to putq but it is typically ignored by the
+		   module.  One way to ensure that this never happens is to call strqset() for the band before calling
+		   putq on the band for the first time. (See also putbq()) */
 		return (0);
 	}
 }
@@ -1817,20 +1809,17 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 				getmajor(*devp), getmajor(odev)));
 			err = -ENOENT;
 			if (!(cdev = cdrv_get(getmajor(*devp)))) {
-				printd(("%s: could not find new major %hu\n", __FUNCTION__,
-					getmajor(*devp)));
+				printd(("%s: could not find new major %hu\n", __FUNCTION__, getmajor(*devp)));
 				goto enoent;
 			}
 			printd(("%s: %s: got driver\n", __FUNCTION__, cdev->d_name));
 			err = -ENOENT;
 			if (!(st = cdev->d_str)) {
-				pswerr(("%s: device has no streamtab, should not happen\n",
-					__FUNCTION__));
+				pswerr(("%s: device has no streamtab, should not happen\n", __FUNCTION__));
 				goto put_noent;
 			}
 			if ((err = setsq(q, (struct fmodsw *) cdev, 0)) < 0) {
-				printd(("%s: could not set queues to new streamtab\n",
-					__FUNCTION__));
+				printd(("%s: could not set queues to new streamtab\n", __FUNCTION__));
 				goto put_noent;
 			}
 			printd(("%s: %s: putting driver\n", __FUNCTION__, cdev->d_name));
@@ -2240,8 +2229,8 @@ void rmvq(queue_t *q, mblk_t *mp)
 	int backenable;
 	q = mp->b_queue;
 	ensure(q, return);
-	/* We ignore the queue pointer provided by the user because we know which queue the message 
-	   belongs to (if any). */
+	/* We ignore the queue pointer provided by the user because we know which queue the message belongs to (if
+	   any). */
 	qwlock(q, &flags);
 	backenable = __rmvq(q, mp);
 	qwunlock(q, &flags);
@@ -2555,23 +2544,17 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 	spin_lock_irqsave(&str_err_lock, flags);
 	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
 	if (flag & SL_FATAL) {
-		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	} else if (flag & SL_ERROR) {
-		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	} else if (flag & SL_WARN) {
-		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	} else if (flag & SL_NOTE) {
-		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	} else if (flag & SL_CONSOLE) {
-		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	} else {		/* SL_TRACE */
-		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n",
-		       (int) level, (int) mid, (int) sid, str_err_buf);
+		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
 	}
 	spin_unlock_irqrestore(&str_err_lock, flags);
 	va_end(args);

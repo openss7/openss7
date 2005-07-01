@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/06/29 04:21:15 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:30:28 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/29 04:21:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 07:30:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.38  2005/07/01 07:30:28  brian
+ - minor correction
+
  Revision 0.9.2.37  2005/06/29 04:21:15  brian
  - further upgrades of test suites
 
@@ -210,9 +213,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/06/29 04:21:15 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:30:28 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/06/29 04:21:15 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:30:28 $";
 
 /*
  *  Simple test program for INET streams.
@@ -314,6 +317,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define LONG_WAIT	 500	// 5000		// 500
 #define LONGER_WAIT	1000	// 10000	// 5000
 #define INFINITE_WAIT	-1UL
+#define TEST_DURATION	20000
 
 
 char cbuf[BUFSIZE];
@@ -4405,7 +4409,7 @@ void test_msleep(int child, unsigned long m)
  */
 static int preamble_0(int child)
 {
-	if (start_tt(20000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto failure;
 	return (__RESULT_SUCCESS);
       failure:
@@ -16773,9 +16777,6 @@ int test_case_2_2(int child, struct sockaddr_in *addr, socklen_t len)
 	test_alen = len;
 	test_data = msg;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (start_tt(20000) != __RESULT_SUCCESS)
 		goto failure;
 	for (;;) {
 		state++;
@@ -33565,7 +33566,7 @@ int test_run(struct test_stream *stream[])
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
-	if (start_tt(10000) != __RESULT_SUCCESS)
+	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {

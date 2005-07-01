@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: irixddi.h,v 0.9.2.4 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: irixddi.h,v 0.9.2.5 2005/07/01 07:29:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 07:29:31 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIXDDI_H__
 #define __SYS_IRIXDDI_H__
 
-#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/01 07:29:31 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -81,15 +81,8 @@ __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
 	return vcmn_err(err_lvl, fmt, args);
 }
 
-__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
-__IRIX_EXTERN_INLINE void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
-{
-	va_list args;
-	va_start(args, fmt);
-	icmn_err(err_lvl, fmt, args);
-	va_end(args);
-	return;
-}
+/* gcc 3.4.3 can't handle inlining with variable argument list */
+extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
 
 #elif defined(_IRIX_SOURCE)
 #warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"
