@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/01 20:51:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/02 11:23:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/01 20:51:04 $ by $Author: brian $
+# Last Modified $Date: 2005/07/02 11:23:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -160,6 +160,7 @@ mac_compat_pages = \
 	man9/mi_close_detached.9 \
 	man9/mi_copy_done.9 \
 	man9/mi_copyin.9 \
+	man9/mi_copyin_n.9 \
 	man9/mi_copyout.9 \
 	man9/mi_copyout_alloc.9 \
 	man9/mi_copy_set_rval.9 \
@@ -192,6 +193,27 @@ mi_compat_pages = \
 	man9/mi_zalloc.9 \
 	man9/mi_zalloc_sleep.9 \
 	man9/mi_free.9
+
+sun_compat_pages = \
+	man9/DB_BASE.9 \
+	man9/DB_LIM.9 \
+	man9/DB_REF.9 \
+	man9/DB_TYPE.9 \
+	man9/MBLKL.9 \
+	man9/MBLKSIZE.9 \
+	man9/MBLKHEAD.9 \
+	man9/MBLKTAIL.9 \
+	man9/MBLKIN.9 \
+	man9/merror.9 \
+	man9/mioc2ack.9 \
+	man9/miocack.9 \
+	man9/miocnak.9 \
+	man9/mexchange.9 \
+	man9/mexpandb.9 \
+	man9/miocpullup.9 \
+	man9/mcopymsg.9 \
+	man9/mcopyin.9 \
+	man9/mcopyout.9
 
 man_MANS = \
 	man1/strchg.1 \
@@ -914,6 +936,8 @@ man_MANS += $(mac_compat_pages)
 
 man_MANS += $(mi_compat_pages)
 
+man_MANS += $(sun_compat_pages)
+
 dist_noinst_lis_deprec_pages = \
 	man9/lisdeprec.9.man \
 	man9/lis_add_timer.9.man \
@@ -1017,6 +1041,7 @@ dist_noinst_mac_compat_pages = \
 	man9/mi_close_detached.9.man \
 	man9/mi_copy_done.9.man \
 	man9/mi_copyin.9.man \
+	man9/mi_copyin_n.9.man \
 	man9/mi_copyout.9.man \
 	man9/mi_copyout_alloc.9.man \
 	man9/mi_copy_set_rval.9.man \
@@ -1049,6 +1074,27 @@ dist_noinst_mi_compat_pages = \
 	man9/mi_zalloc.9.man \
 	man9/mi_zalloc_sleep.9.man \
 	man9/mi_free.9.man
+
+dist_noinst_sun_compat_pages = \
+	man9/DB_BASE.9.man \
+	man9/DB_LIM.9.man \
+	man9/DB_REF.9.man \
+	man9/DB_TYPE.9.man \
+	man9/MBLKL.9.man \
+	man9/MBLKSIZE.9.man \
+	man9/MBLKHEAD.9.man \
+	man9/MBLKTAIL.9.man \
+	man9/MBLKIN.9.man \
+	man9/merror.9.man \
+	man9/mioc2ack.9.man \
+	man9/miocack.9.man \
+	man9/miocnak.9.man \
+	man9/mexchange.9.man \
+	man9/mexpandb.9.man \
+	man9/miocpullup.9.man \
+	man9/mcopymsg.9.man \
+	man9/mcopyin.9.man \
+	man9/mcopyout.9.man
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
@@ -1770,6 +1816,8 @@ dist_noinst_MANS += $(dist_noinst_lis_deprec_pages)
 dist_noinst_MANS += $(dist_noinst_mac_compat_pages)
 
 dist_noinst_MANS += $(dist_noinst_mi_compat_pages)
+
+dist_noinst_MANS += $(dist_noinst_sun_compat_pages)
 
 ## PKG_BUILD_INDEP
 endif
