@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: macddi.h,v 0.9.2.2 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: macddi.h,v 0.9.2.3 2005/07/01 20:16:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:16:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MACDDI_H__
 #define __SYS_MACDDI_H__
 
-#ident "@(#) $RCSfile: macddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: macddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,11 +74,41 @@
 #define dev_t __streams_dev_t
 #endif
 
-#if !defined _AIX_SOURCE
+#if !defined _MI_SOURCE
+extern void mi_timer(mblk_t *mp, unsigned long msec);
+extern mblk_t *mi_timer_alloc(queue_t *q, size_t size);
+extern void mi_timer_free(mblk_t *mp);
+extern int mi_timer_valid(mblk_t *mp);
+#endif
+extern int mi_timer_cancel(mblk_t *mp); /* also called mi_timer_stop */
+extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp); /* also mi_timer_move */
+
+extern queue_t *mi_allocq(struct streamtab *st);
+
+extern mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error);
+extern mblk_t *mi_reallocb(mblk_t *mp, size_t size);
+
+#if !defined _MI_SOURCE
+extern uint8_t *mi_offset_param(mblk_t *mp, long offset, long len);
+extern uint8_t *mi_offset_paramc(mblk_t *mp, long offset, long len);
+
+extern int mi_set_sth_hiwat(queue_t *q, size_t size);
+extern int mi_set_sth_lowat(queue_t *q, size_t size);
+extern int mi_set_sth_maxblk(queue_t *q , size_t size);
+extern int mi_set_sth_wroff(queue_t *q, size_t size);
+
+extern int mi_sprintf(caddr_t buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+#endif
+
+extern caddr_t mi_open_detached(caddr_t *mi_list, size_t size, dev_t *devp);
+#if !defined _AIX_SOURCE && !defined _MI_SOURCE
 extern int mi_open_comm(caddr_t *mi_list, size_t size, queue_t *q, dev_t *dev, int flag, int sflag, cred_t *credp);
 extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
 extern caddr_t mi_next_ptr(caddr_t strptr);
 extern caddr_t mi_prev_ptr(caddr_t strptr);
+#endif
+
+#if !defined _AIX_SOURCE
 __MAC_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 {
 	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
@@ -89,15 +119,20 @@ __MAC_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 }
 #endif
 
-extern mblk_t *mi_timer_alloc(queue_t *q, size_t size);
-extern void mi_timer(mblk_t *mp, unsigned long msec);
-extern void mi_timer_cancel(mblk_t *mp);
-extern void mi_timer_free(mblk_t *mp);
-extern int mi_timer_valid(mblk_t *mp);
-
 extern void mi_detach(queue_t *q, caddr_t ptr);
 extern void mi_close_detached(caddr_t *mi_list, caddr_t strptr);
-extern void mi_open_detached(caddr_t *mi_list, size_t size, dev_t *devp);
+
+#if !defined _MI_SOURCE
+extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
+extern void mi_copyout(queue_t *q, mblk_t *mp);
+extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free);
+extern void mi_copy_done(queue_t *q, mblk_t *mp, int err);
+#endif
+extern void mi_copy_set_rval(mblk_t *mp, int rval);
+#if !defined _MI_SOURCE
+extern int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp);
+#endif
+
 
 #elif defined(_MAC_SOURCE)
 #warning "_MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC"

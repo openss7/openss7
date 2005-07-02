@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,13 +46,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:16:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mpscompat.c,v $
+ Revision 0.9.2.1  2005/07/01 20:16:30  brian
+ - added and updated manpages for some Mentat compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $";
+static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -70,7 +76,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
  *  modules that don't use them.
  */
 
-#define __MAC_EXTERN_INLINE inline
+#define __MI_EXTERN_INLINE inline
 
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
@@ -98,7 +104,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _MAC_SOURCE
+#define _MI_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
@@ -112,201 +118,218 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 #include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"
 
-#define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $"
-#define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
-#define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MACCOMP_LICENSE		"GPL"
-#define MACCOMP_BANNER		MACCOMP_DESCRIP		"\n" \
-				MACCOMP_COPYRIGHT	"\n" \
-				MACCOMP_REVISION	"\n" \
-				MACCOMP_DEVICE		"\n" \
-				MACCOMP_CONTACT		"\n"
-#define MACCOMP_SPLASH		MACCOMP_DEVICE		" - " \
-				MACCOMP_REVISION	"\n"
+#define MICOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MICOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define MICOMP_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $"
+#define MICOMP_DEVICE		"Mentat Compatibility"
+#define MICOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define MICOMP_LICENSE		"GPL"
+#define MICOMP_BANNER		MICOMP_DESCRIP		"\n" \
+				MICOMP_COPYRIGHT	"\n" \
+				MICOMP_REVISION	"\n" \
+				MICOMP_DEVICE		"\n" \
+				MICOMP_CONTACT		"\n"
+#define MICOMP_SPLASH		MICOMP_DEVICE		" - " \
+				MICOMP_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
-MODULE_AUTHOR(MACCOMP_CONTACT);
-MODULE_DESCRIPTION(MACCOMP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MACCOMP_DEVICE);
-MODULE_LICENSE(MACCOMP_LICENSE);
+#ifdef CONFIG_STREAMS_COMPAT_MI_MODULE
+MODULE_AUTHOR(MICOMP_CONTACT);
+MODULE_DESCRIPTION(MICOMP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MICOMP_DEVICE);
+MODULE_LICENSE(MICOMP_LICENSE);
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-maccompat");
+MODULE_ALIAS("streams-micompat");
 #endif
 #endif
 
+struct mi_comm {
+	struct mi_comm **mi_prev;	/* must be first */
+	struct mi_comm **mi_head;
+	struct mi_comm *mi_next;
+	union {
+		dev_t dev;		/* device number (or NODEV for modules) */
+		int index;		/* link index */
+	} mi_u;
+	size_t mi_size;			/* size of this structure plus private data */
+	char mi_priv[0];		/* followed by private data */
+};
+#define mi_dev mi_u.dev
+#define mi_index mi_u.index
+
 /*
- *  Note that mi_bufcall, mi_close_comm, mi_next_ptr, mi_open_comm and
- *  mi_prev_ptr are in aixcompat.
- */
-/*
- *  ALLOCBI
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
+_MI_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
+EXPORT_SYMBOL(mi_alloc);
+
 /*
- *  ESBALLOCA
+ *  MI_ALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
+_MI_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
+EXPORT_SYMBOL(mi_alloc_sleep);
+
 /*
- *  MPNOTIFY
+ *  MI_ZALLOC
  *  -------------------------------------------------------------------------
  */
+_MI_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
+EXPORT_SYMBOL(mi_alloc);
+
 /*
- *  PUTHERE
+ *  MI_ZALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
+_MI_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
+EXPORT_SYMBOL(mi_alloc_sleep);
+
 /*
- *  MI_ALLOCQ
+ *  MI_FREE
  *  -------------------------------------------------------------------------
  */
+_MI_EXTERN_INLINE void mi_free(void *ptr);
+EXPORT_SYMBOL(mi_free);
+
 /*
- *  MI_BCMP
+ *  MI_OPEN_ALLOC
  *  -------------------------------------------------------------------------
  */
+caddr_t mi_open_alloc(size_t size)
+{
+	return kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP);
+}
+EXPORT_SYMBOL(mi_open_alloc);
+
 /*
- *  MI_BUFCALL
+ *  MI_OPEN_ALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
-/*
- *  MI_CLOSE_COMM
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_CLOSE_DETACHED
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_COPY_CASE
- *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
- */
-/*
- *  MI_COPY_DONE
- *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
- */
+caddr_t mi_open_alloc_sleep(size_t size)
+{
+	return kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP);
+}
+EXPORT_SYMBOL(mi_open_alloc_sleep);
+
+#define MI_COPY_IN			1
+#define MI_COPY_OUT			2
+#define MI_COPY_CASE(_dir, _cnt)	(((cnt)<<2|dir))
+#define MI_COPY_DIRECTION(_mp)		(*(int *)&(_mp)->b_cont->b_next)
+#define MI_COPY_COUNT(_mp)		(*(int *)&(_mp)->b_cont->b_prev)
+#define MI_COPY_STATE(_mp)		MI_COPY_CASE(MI_COPY_DIRECTION(_mp), MI_COPY_COUNT(_mp))
 /*
  *  MI_COPYIN
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
  */
-extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
-/*
- *  MI_COPYOUT
- *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
- */
-extern void mi_copyout(queue_t *q, mblk_t *mp);
+void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
+{
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	if (ioc->iocblk.ioc_count == TRANSPARENT) {
+		/* for transparent ioctl perform a copy in */
+		mp->b_datap->db_type = M_COPYIN;
+		ioc->copyreq.cq_private = xchg(&mp->b_cont, NULL);
+		ioc->copyreq.cq_size = len;
+		ioc->copyreq.cq_flag = 0;
+		ioc->copyreq.cq_addr = mp->b_cont->b_rptr;
+		MI_COPY_DIRECTION(mp) = MI_COPY_IN;
+		MI_COPY_COUNT(mp) = 1;
+		qreply(q, mp);
+		return;
+	} else {
+		mblk_t *db;
+		if ((db = allocb(0, BPRI_MED))) {
+			/* for a non-transparent ioctl the first copyin is already performed for
+			   us, fake out an M_IOCDATA response. */
+			mp->b_datap->db_type = M_IOCDATA;
+			ioc->copyresp.cp_private = db;
+			db = xchg(&mp->b_cont, db);
+			MI_COPY_DIRECTION(mp) = MI_COPY_IN;
+			MI_COPY_COUNT(mp) = 1;
+			db = xchg(&mp->b_cont, db);
+			putq(q, mp);
+			return;
+		}
+		mp->b_datap->db_type = M_IOCNAK;
+		ioc->iocblk.ioc_error = ENOSTR;
+		ioc->iocblk.ioc_count = 0;
+		if (mp->b_cont)
+			freemsg(xchg(&mp->b_cont, NULL));
+		qreply(q, mp);
+		return;
+	}
+}
+EXPORT_SYMBOL(mi_copyin);
+
 /*
  *  MI_COPYOUT_ALLOC
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
  */
-extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error);
+mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
+{
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	mblk_t *db;
+	if (mp->b_datap->db_type == M_IOCTL) {
+		if (ioc->iocblk.ioc_count != TRANSPARENT) {
+			mblk_t *bp;
+			if (!(bp = allocb(0, BPRI_MED))) {
+				if (free_on_eror) {
+					mp->b_datap->db_type = M_IOCNAK;
+					ioc->iocblk.ioc_error = ENOSTR;
+					ioc->ioc_count = 0;
+					if (mp->b_cont)
+						freemsg(xchg(&mp->b_cont, 0));
+					qreply(q, mp);
+				}
+				return (bp);
+			}
+			bp->b_cont = xchg(&mp->b_cont, bp);
+		}
+		mp->b_datap->db_type = M_IOCDATA;
+		ioc->copyresp.cp_rval = 0;
+		MI_COPY_COUNT(mp) = 0;
+		MI_COPY_DIRECTION(mp) = MI_COPY_OUT;
+	}
+	if (!(db = allocb(len, BRPI_MED))) {
+		if (free_on_error)
+			mi_copy_done(q, mp, ENOSTR);
+		return (db);
+	}
+	linkb(mp, db);
+	db->b_next = (mblk_t *) uaddr;
+	return (db);
+}
+EXPORT_SYMBOL(mi_copyout_alloc);
+
 /*
- *  MI_COPY_SET_RVAL
- *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
- */
-/*
- *  MI_COPY_STATE
- *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
- */
-/*
- *  MI_DETACH
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_FREEQ
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_NEXT_PTR
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_OFFSET_PARAM
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_OFFSET_PARAMC
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_OPEN_COMM
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_OPEN_DETACHED
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_PREV_PTR
+ *  MI_COPYOUT
  *  -------------------------------------------------------------------------
  */
+void mi_copyout(queue_t *q, mblk_t *mp)
+{
+}
+EXPORT_SYMBOL(mi_copyout);
+
 /*
- *  MI_REALLOCB
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
+
 /*
- *  MI_RESUE_PROTO
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
+
 /*
- *  MI_SET_STH_HIWAT
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
+
 /*
- *  MI_SET_STH_LOWAT
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
+
 /*
- *  MI_SET_STH_MAXBLK
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_SET_STH_WROFF
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_SPRINTF
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER_ALLOC
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER_CANCEL
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER_FREE
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER_Q_SWITCH
- *  -------------------------------------------------------------------------
- */
-/*
- *  MI_TIMER_VALID
- *  -------------------------------------------------------------------------
- */
-/*
- *  MPS_BECOME_WRITER
- *  -------------------------------------------------------------------------
- */
-/*
- *  MPS_INTR_DISABLE
- *  -------------------------------------------------------------------------
- */
-/*
- *  MPS_INTR_ENABLE
+ *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */

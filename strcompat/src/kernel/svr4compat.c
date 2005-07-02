@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -121,7 +121,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/15 04:08:15 $"
+#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -160,7 +160,7 @@ void MPSTR_QRELE(queue_t *q, long s)
 EXPORT_SYMBOL(MPSTR_QRELE);	/* svr4ddi.h */
 long MPSTR_STPLOCK(struct stdata *stp)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 	swlock(stp, &flags);
 	return (flags);
 }

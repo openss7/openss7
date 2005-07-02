@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $"
 
 static char const ident[] =
-    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: autopush.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/01 20:17:37 $";
 
 /* 
  *  autopush(8)
@@ -466,7 +466,7 @@ autopush_fil(char *filename)
 		char *str, *token, *tmp = NULL;
 		int tokenind;
 		int major = -1, minor = -1, lastminor = -1;
-		unsigned char devname[FMNAMESZ + 1] = "";
+		char devname[FMNAMESZ + 1] = "";
 		for (str = line, tokenind = 0, sap.sap_npush = 0;
 		     tokenind < MAXAPUSH + 3
 		     && (token = strtok_r(str, " \t\f\n\r\v", &tmp)) != NULL;
@@ -566,8 +566,8 @@ int
 main(int argc, char **argv)
 {
 	int c, val;
-	unsigned char filename[256] = "";
-	unsigned char devname[FMNAMESZ + 1] = "";
+	char filename[256] = "";
+	char devname[FMNAMESZ + 1] = "";
 	int major = -1;
 	int minor = -1;
 	int lastminor = -1;

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copy_set_rval.9.man,v 0.9.2.2 2005/05/14 08:34:26 brian Exp $
+.\" @(#) $Id: mi_copy_set_rval.9.man,v 0.9.2.3 2005/07/01 20:16:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/01 20:16:37 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -94,13 +94,40 @@ sort-adjacent-labels
 .PP
 .TP
 .I mp
+a pointer to the message block that contains the
+.BR M_IOCTL (9)
+or
+.BR M_IOCDATA (9)
+message being processed.  This is the message that was passed to the write-side put or service
+procedure within which
+.BR mi_copy_set_rval ()
+is invoked.
 .TP
 .I rval
+the return value to set.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .BR mi_copy_set_rval ()
+is one of a set of helper functions that support transparent input-output controls (see
+.BR ioctl (2)
+and
+.BR streamio (9))
+that includes
+.BR mi_copyin (9),
+.BR mi_copyout (9),
+.BR mi_copyout_alloc (9),
+.BR mi_copy_done (9),
+.BR MI_COPY_CASE (9),
+.BR mi_copy_set_rval (9)
+and
+.BR mi_copy_state (9).
+.PP
+.BR mi_copy_set_rval ()
+sets the return value from the
+.BR ioctl (2)
+call.
 .\"
 .\"
 .SH USAGE

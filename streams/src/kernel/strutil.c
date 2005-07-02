@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 07:29:32 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/01 07:29:32 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1137,7 +1137,7 @@ EXPORT_SYMBOL(flushband);
  */
 unsigned long freezestr(queue_t *q)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 	hwlock(q, &flags);
 	qwlock(q, NULL);
 	return ((q->q_iflags = flags));
@@ -1885,7 +1885,7 @@ EXPORT_SYMBOL_GPL(qclose);
  */
 void qdelete(queue_t *q)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 	struct queinfo *qu = (typeof(qu)) q;
 	struct stdata *sd = qu->qu_str;
 	queue_t *rq = (q + 0);
@@ -1952,7 +1952,7 @@ void qinsert(queue_t *brq, queue_t *irq)
 	queue_t *iwq = irq + 1;
 	struct queinfo *bqu = (typeof(bqu)) brq;
 	queue_t *bwq = brq + 1;
-	unsigned long flags;
+	unsigned long flags = 0;
 	ptrace(("%s: half insert of queue pair under stream head\n", __FUNCTION__));
 	hwlock(brq, &flags);
 	iqu->qu_str = sd_get(bqu->qu_str);
@@ -2000,7 +2000,7 @@ EXPORT_SYMBOL_GPL(qopen);
  */
 void qprocsoff(queue_t *q)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
@@ -2049,7 +2049,7 @@ EXPORT_SYMBOL(qprocsoff);
  */
 void qprocson(queue_t *q)
 {
-	unsigned long flags;
+	unsigned long flags = 0;
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);

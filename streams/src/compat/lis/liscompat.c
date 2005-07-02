@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:21 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:21 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -117,7 +117,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:14 $"
+#define LISCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:21 $"
 #define LISCOMP_DEVICE		"LiS 2.16 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1004,12 +1004,14 @@ int lis_osif_pci_dac_dma_supported(struct pci_dev *hwdev, u64 mask)
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_dma_supported);
+#if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 int lis_osif_pci_dac_set_dma_mask(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_dac_set_dma_mask(hwdev, mask));
 }
 
 EXPORT_SYMBOL_GPL(lis_osif_pci_dac_set_dma_mask);
+#endif
 int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)
 {
 	return WARN(pci_dma_supported(hwdev, mask));

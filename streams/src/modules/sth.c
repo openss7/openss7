@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/05/15 04:08:15 $"
+#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -179,6 +179,9 @@ struct streamtab str_info = {
 };
 
 #define stri_lookup(__f) ((__f)->private_data)
+
+#undef verify_area
+#define verify_area(__x,__y,__z) (access_ok((__x),(__y),(__z)) ? 0 : -EFAULT)
 
 /* 
  *  -------------------------------------------------------------------------

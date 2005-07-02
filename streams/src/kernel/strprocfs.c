@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/05/14 08:34:42 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/05/14 08:34:42 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/01 20:17:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1363,7 +1363,7 @@ static int get_streams_apinfo_list(char *page, char **start, off_t offset, int l
 }
 #endif
 
-static struct proc_dir_entry *proc_str = NULL;
+struct proc_dir_entry *proc_str = NULL;
 
 #endif				/* CONFIG_PROC_FS */
 

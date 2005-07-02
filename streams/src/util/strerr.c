@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -413,7 +413,11 @@ void strerr_enter(int argc, char *argv[])
 			/* parent exits */
 			exit(0);
 		}
-		chdir("/");	/* release current directory */
+		/* release current directory */
+		if (chdir("/") < 0) {
+			perror(__FUNCTION__);
+			exit(2);
+		}
 		umask(0);	/* clear file creation mask */
 		/* rearrange file streams */
 		fclose(stdin);

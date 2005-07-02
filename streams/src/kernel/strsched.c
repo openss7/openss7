@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 19:40:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/05/15 19:40:08 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1763,7 +1763,7 @@ static inline void doevents(struct strthread *t)
 				if (q)
 					hwlock(q, &flags);
 				if (se->x.w.q1) {
-					unsigned long flags;
+					unsigned long flags = 0;
 					hwlock(se->x.w.q1, &flags);
 					se->x.w.q1->q_next = se->x.w.q2;
 					hwunlock(se->x.w.q1, &flags);
@@ -1771,7 +1771,7 @@ static inline void doevents(struct strthread *t)
 					qput(&se->x.w.q2);
 				}
 				if (se->x.w.q3) {
-					unsigned long flags;
+					unsigned long flags = 0;
 					hwlock(se->x.w.q3, &flags);
 					se->x.w.q3->q_next = se->x.w.q4;
 					hwunlock(se->x.w.q3, &flags);

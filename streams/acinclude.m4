@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.74 $) $Date: 2005/05/13 03:54:29 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/07/01 20:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:29 $ by $Author: brian $
+# Last Modified $Date: 2005/07/01 20:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -914,7 +914,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pcibios_read_config_word pcibios_write_config_byte \
 			pcibios_write_config_dword pcibios_write_config_word \
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
-			pci_dac_dma_sync_single_for_device \
+			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			read_trylock write_trylock \

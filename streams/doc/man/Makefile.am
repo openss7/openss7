@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/05/20 04:27:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/01 20:51:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/20 04:27:56 $ by $Author: brian $
+# Last Modified $Date: 2005/07/01 20:51:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -186,6 +186,13 @@ mac_compat_pages = \
 	man9/mps_intr_disable.9 \
 	man9/mps_intr_enable.9
 
+mi_compat_pages = \
+	man9/mi_alloc.9 \
+	man9/mi_alloc_sleep.9 \
+	man9/mi_zalloc.9 \
+	man9/mi_zalloc_sleep.9 \
+	man9/mi_free.9
+
 man_MANS = \
 	man1/strchg.1 \
 	man1/strconf.1 \
@@ -239,6 +246,18 @@ man_MANS = \
 	man8/strload.8 \
 	man8/strsetup.8 \
 	man8/strvf.8 \
+	man8/test-clone.8 \
+	man8/test-connld.8 \
+	man8/test-echo.8 \
+	man8/test-fifo.8 \
+	man8/test-log.8 \
+	man8/test-nsdev.8 \
+	man8/test-nuls.8 \
+	man8/test-pipe.8 \
+	man8/test-pipemod.8 \
+	man8/test-sad.8 \
+	man8/test-sc.8 \
+	man8/test-streams.8 \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
 	man9/allocb_physreq.9 \
@@ -893,6 +912,8 @@ man_MANS += $(lis_deprec_pages)
 
 man_MANS += $(mac_compat_pages)
 
+man_MANS += $(mi_compat_pages)
+
 dist_noinst_lis_deprec_pages = \
 	man9/lisdeprec.9.man \
 	man9/lis_add_timer.9.man \
@@ -1022,6 +1043,12 @@ dist_noinst_mac_compat_pages = \
 	man9/mps_intr_disable.9.man \
 	man9/mps_intr_enable.9.man
 
+dist_noinst_mi_compat_pages = \
+	man9/mi_alloc.9.man \
+	man9/mi_alloc_sleep.9.man \
+	man9/mi_zalloc.9.man \
+	man9/mi_zalloc_sleep.9.man \
+	man9/mi_free.9.man
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
@@ -1076,6 +1103,18 @@ dist_noinst_MANS = \
 	man8/strload.8.man \
 	man8/strsetup.8.man \
 	man8/strvf.8.man \
+	man8/test-clone.8.man \
+	man8/test-connld.8.man \
+	man8/test-echo.8.man \
+	man8/test-fifo.8.man \
+	man8/test-log.8.man \
+	man8/test-nsdev.8.man \
+	man8/test-nuls.8.man \
+	man8/test-pipe.8.man \
+	man8/test-pipemod.8.man \
+	man8/test-sad.8.man \
+	man8/test-sc.8.man \
+	man8/test-streams.8.man \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
 	man9/allocb_physreq.9.man \
@@ -1729,6 +1768,8 @@ dist_noinst_MANS = \
 dist_noinst_MANS += $(dist_noinst_lis_deprec_pages)
 
 dist_noinst_MANS += $(dist_noinst_mac_compat_pages)
+
+dist_noinst_MANS += $(dist_noinst_mi_compat_pages)
 
 ## PKG_BUILD_INDEP
 endif
