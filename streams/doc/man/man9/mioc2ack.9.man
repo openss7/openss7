@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: miocack.9.man,v 0.9.2.2 2005/07/02 11:23:35 brian Exp $
+.\" @(#) $Id: mioc2ack.9.man,v 0.9.2.1 2005/07/02 11:23:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -71,12 +71,12 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH MIOCACK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.TH MIOC2ACK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
 .\"
 .\"
 .SH NAME
-.B miocack
-\- generate a \fISTREAMS\fR \fBM_IOCACK\fR(9) reply upstream
+.B mioc2ack
+\- acknowledge a \fISTREAMS\fR \fBioct\fR(2) call with data
 .\"
 .\"
 .SH SYNOPSIS
@@ -87,16 +87,11 @@ sort-adjacent-labels
 .br
 .B #include <sys/strsun.h>
 .HP
-void \fBmiocack\fR(queue_t *\fIq\fR, mblk_t *\fImp\fR, int \fIcount\fR, int \fIrval\fR);
+void \fBmioc2ack\fR(mblk_t *\fImp\fR, mblk_t *\fIdb\fR, size_t \fIcount\fR, int \fIrval\fR);
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP \w'count\ \ 'u
-.I q
-the write-side queue pointer passed to the write-side queue put or service procedure from which
-.BR miocack ()
-is called.
 .TP
 .I mp
 a pointer to a
@@ -106,8 +101,16 @@ or
 message block from the input output control operation to be processed, normally passed into the
 write-side queue put or service procedure.
 .TP
+.I db
+a pointer to a message block containing
 .I count
-the count of the number of bytes of data contained in the attached message block.
+bytes of data to be attached to the message, or,
+.BR NULL ,
+if the message block representing the data is already attached to the message block passed in as
+.IR mp .
+.TP
+.I count
+the count of the number of bytes of data contained in the attached or passed in message block.
 .TP
 .I rval
 the return value to return from the
@@ -117,7 +120,7 @@ call.
 .\"
 .SH DESCRIPTION
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 transforms the passed in
 .BR M_IOCTL (9)
 or
@@ -126,18 +129,26 @@ message block,
 .IR mp ,
 into a
 .BR M_IOCACK (9)
-message block to be passed upstream by the caller.
-The count and return value set in the resulting
+message block to be passed upstream by the caller.  Also,
+.BR mioc2ack ()
+optionally attaches a message block,
+.IR db ,
+containing data to be attached to the message.  The count and return value set in the
+resulting
 .BR M_IOCACK (9)
 message will be set to
 .IR count " and " rval .
-.BR miocack ()
-replies to the read-side queue before returning.
+.PP
+.BR mioc2ack ()
+only transforms the passed in message block to a valid
+.BR M_IOCACK (9)
+message: it is the responsibility of the caller to place the message on the appropriate queue after
+the function returns.
 .\"
 .\"
 .SH USAGE
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 is used in processing of
 .BR M_IOCTL (9)
 and
@@ -149,30 +160,37 @@ processing in a
 module or driver write-side queue put or service procedures.  It is used to acknolwedge the
 completion of a
 .BR ioctl (2)
-operation and return a value.
+operation and return a value with data attached to the
+.BR M_IOCACK (9)
+message block.
+.PP
+It is not normal in the
+.B Linux Fast-STREAMS
+implementation to even need to pass a
+.BR M_IOCACK (9)
+message with data back to the stream head.  Typically, the message would not include data and the
+.BR miocack (9)
+function could be used in its stead.
 .\"
 .\"
 .SH RETURN
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 returns
 .BR void .
-The passed in message block,
-.IR mp ,
-is passed upstream and the caller must reliquish its reference to the message block.
 .\"
 .\"
 .SH ERRORS
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 always succeeds; however, when passed an invalid pointer or argument,
-.BR miocack ()
+.BR mioc2ack ()
 has indeterminate results and could destabilize the kernel or cause immediate or delayed panic.
 .\"
 .\"
 .SH CONTEXT
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 can be called from any context; however, it is normally called from a
 .I STREAMS
 module or driver write-side put or service procedure.
@@ -180,10 +198,10 @@ module or driver write-side put or service procedure.
 .\"
 .SH MP-STREAMS
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
-in message block.  This is normally the case when
-.BR miocack ()
+in message blocks.  This is normally the case when
+.BR mioc2ack ()
 is called from a
 .I STREAMS
 module or driver write-side put or service procedure with a message block that was passed to those
@@ -192,7 +210,7 @@ procedures.
 .\"
 .SH NOTICES
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 is a
 .IR Solaris \(rg-specific
 function:
@@ -208,15 +226,11 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
-.BR miocack ()
-is implemented by adjusting the necessary data structures and then passing the resulting message
-block upstream using
-.BR qreply (9).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR mioc2ack (9),
+.BR miocack (9),
 .BR miocnak (9),
 .BR mcopyin (9),
 .BR mcopyout (9),
@@ -227,18 +241,18 @@ block upstream using
 .\"
 .SH BUGS
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 is compatible with
 .IR Solaris \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.BR miocack ()
+.BR mioc2ack ()
 is a
 .IR Solaris \(rg-specific
 function that should not be used by portable
@@ -249,7 +263,7 @@ standard
 .I STREAMS
 utilities in its stead.
 .IP \(em
-.BR miocack ()
+.BR mioc2ack ()
 is provided for source level compatibility with
 .IR Solaris \(rg
 for the purpose of porting
@@ -265,14 +279,14 @@ differ from that of
 .IR Solaris \(rg,
 binaries are incompatible.
 .IP \(em
-.BR miocack ()
+.BR mioc2ack ()
 only provides functionality comparable to
 .IR Solaris \(rg
 for use by
 .I STREAMS
 drivers and modules.
 Any and all functionality provided by
-.BR miocack ()
+.BR mioc2ack ()
 in support of
 .RI non- STREAMS
 devices are not supported.
@@ -295,7 +309,7 @@ soldoc
 .\"
 .SH HISTORY
 .PP
-.BR miocack ()
+.BR mioc2ack ()
 first appeared in
 .IR Solaris \(rg
 2.5.

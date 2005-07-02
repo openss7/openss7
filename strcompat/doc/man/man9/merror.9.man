@@ -1,0 +1,307 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: merror.9.man,v 0.9.2.2 2005/07/02 11:23:35 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/02 11:23:35 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MERROR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B merror
+\- pass a \fISTREAMS\fR \fBM_ERROR\fR message upstream
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/strsun.h>
+.HP
+void \fBmerror\fR(queue_t *\fIq\fR, mblk_t *\fImp\fR, int \fIerror\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'error\ \ 'u
+.I q
+the write-side queue pointer passed to the write-side queue put or service procedure from which
+.BR merror ()
+is called.
+.TP
+.I mp
+a message pointer to a message block to be reused to generate a
+.BR M_ERROR (9)
+message upstream.
+.TP
+.I error
+the error number to place in the generated
+.BR M_ERROR (9)
+message.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR merror ()
+is a
+.IR Solaris \(rg
+helper function that can be used to generate a
+.BR M_ERROR (9)
+message upstream.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR merror ()
+is normally called from a
+.I STREAMS
+module or driver write-side put or service procedure to generate a
+.BR M_ERROR (9)
+message upstream ot error out a stream.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR merror ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR merror ()
+always succeeds; however, if passed an invalid pointer or argument,
+.BR merror ()
+could destabilize the kernel or result in a kernel panic.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+The following example is a write-side queue put or service procedure processing fragment:
+.PP
+.nf
+\fC\s-1
+switch (mp->b_datap->db_type) {
+ ...
+case M_PROTO:
+{
+    union T_primitives *p = (typeof(p)) mp->b_rptr;
+    switch (p->type) {
+    ...
+    case T_DISCON_REQ:
+        merror(q, mp, EPROTO);
+        return 0;
+    ...
+    }
+}
+ ...
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR merror ()
+can be called from any non-interrupt context, but is normally called from a
+.I STREAMS
+module or driver write-side put or service procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR merror ()
+is MP-safe; however, the caller is responsible for ensuring exclusive access to the passed in
+message block.  This is normally the case when
+.BR merror ()
+is called from a
+.I STREAMS
+module or driver write-side put or service procedure and the passed in message pointer is that which
+was passed into the procedure.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR merror ()
+is a
+.IR Solaris \(rg-specific
+function:
+.B _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_SUN
+or
+.B CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+For the sake of speed,
+.BR merror ()
+does not check whether the passed in message block was allocated using
+.BR esballoc (9).
+.BR merror ()
+must not be passed such a message block.  Message blocks passed to
+.BR merror ()
+should be normal message blocks allocated with
+.BR allocb (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mexchange (9),
+.BR mexpandb (9),
+.BR suncompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR merror ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR merror ()
+is compatible with
+.IR Solaris \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR merror ()
+is a
+.IR Solaris \(rg-specific
+function that should not be used by portable
+.I STREAMS
+drivers and modules.
+Direct allocation and manipulation of the message blocks using standard
+.I STREAMS
+utility functions should be performed in its stead.
+.IP \(em
+.BR merror ()
+is provided for source level compatibility with
+.IR Solaris \(rg
+for the purpose of porting
+.IR Solaris \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR Solaris \(rg,
+binaries are incompatible.
+.IP \(em
+.BR merror ()
+only provides functionality comparable to
+.IR Solaris \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR merror ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR suncompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Solaris \(rg
+documentation.
+.[
+soldoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR merror ()
+first appeared in
+.IR Solaris \(rg
+2.5.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
