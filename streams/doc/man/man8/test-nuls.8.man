@@ -1,0 +1,444 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: test-nuls.8.man,v 0.9.2.1 2005/07/01 20:51:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Unauthorized distribution or duplication is prohibited.
+.\"
+.\" This software and related documentation is protected by copyright and
+.\" distributed under licenses restricting its use, copying, distribution
+.\" and decompilation.  No part of this software or related documentation
+.\" may be reproduced in any form by any means without the prior written
+.\" authorization of the copyright holder, and licensors, if any.
+.\"
+.\" The recipient of this document, by its retention and use, warrants that
+.\" the recipient will protect this information and keep it confidential,
+.\" and will not disclose the information contained in this document
+.\" without the written permission of its owner.
+.\"
+.\" The author reserves the right to revise this software and documentation
+.\" for any reason, including but not limited to, conformity with standards
+.\" promulgated by various agencies, utilization of advances in the state
+.\" of the technical arts, or the reflection of changes in the design of any
+.\" techniques, or procedures embodied, described, or referred to herein.
+.\" The author is under no obligation to provide any feature listed herein.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" As an exception to the above, this software may be distributed under the
+.\" GNU General Public License (GPL) Version 2 or later, so long as the
+.\" software is distributed with, and only used for the testing of, OpenSS7
+.\" modules, drivers, and libraries.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/01 20:51:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: test-nuls.8.man,v $
+.\" Revision 0.9.2.1  2005/07/01 20:51:07  brian
+.\" - added test suite executable manual pages
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TEST-CLONE 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-nuls
+\- a test suite executable for the nuls(4) STREAMS driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBtest-nuls\fR [\fIoptions\fR]
+[{\fB-o\fR|\fB--onetest\fR} [\fITESTCASE\fR]]
+[{\fB-t\fR|\fB--tests\fR} [\fIRANGE\fR]]
+.PD 0
+.HP 12
+\fBtest-nuls\fR [\fIoptions\fR]
+{\fB-l\fR|\fB--list\fR} [\fIRANGE\fR]
+.HP 12
+\fBtest-nuls\fR {\fB-h\fR|\fB--help\fR}
+.HP 12
+\fBtest-nuls\fR {\fB-V\fR|\fB--version\fR}
+.HP 12
+\fBtest-nuls\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B test-nuls
+is a test stuite executable for the
+.BR nuls (4)
+.I STREAMS
+driver.
+The purpose of the
+.B test-nuls
+test suite executable is to provide a means for development, diagnostic, regression and validation
+testing of the
+.BR nuls (4)
+driver.
+The
+.I @PACKAGE_TITLE@
+package also provides an
+.B autotest
+based test suite that uses the
+.B test-nuls
+test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
+regression or validation testing.
+See the
+.I @PACKAGE_TITLE@ Installation and Reference Manual
+for more information on how to invoke the
+.B autotest
+test suite.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B test-nuls
+options fall into several categories as detailed in the subsections below.  If
+.B test-nuls
+is executed without any options, it will execute all available test cases and report the progress
+and results of each test case.
+.SS Command Options
+.PP
+These command options determine whether test cases are run or whether an informative function is
+performed instead.  If none of these command options are specified, then it is assumed that all test
+cases are to be executed.  Options
+.BR --list ", " --help ", " --version " and " --copying
+will override the
+.BR --onetest " and " --tests
+options.
+.TP
+\fB-o\fR, \fB--onetest\fR [\fITESTCASE\fR]
+Specifies a single test case to run.
+.I TESTCASE
+is the individual test case number.  This option may be repeated and is accumulative: that is, each
+test case added with an occurrence of this option will be added to the other test cases selected with
+.B --onetest
+or with
+.BR --tests .
+.TP
+\fB-t\fR, \fB--tests\fR [\fIRANGE\fR]
+Specifies a range of test cases to run.
+.I RANGE
+specifies the range of test cases and will match all test cases that have this string as an initial
+substring of the test case number.  If
+.I RANGE
+is not specified, then all test cases are selected.
+.TP
+\fB-l\fR, \fB--list\fR [\fIRANGE\fR]
+When this option is encountered,
+print a list of test cases to
+.I stdout
+and exit.
+When a
+.I RANGE
+of test cases is specified, only the specified range of tests will be listed.  When a
+.I RANGE
+is not specified, all test cases will be listed.
+When used in combination with
+.B --verbose
+this option will print more or less information about each test case.
+Note that all options specified following this option are ignored.
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than test case command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.SS Test Case Options
+.PP
+The following options are only applicable if a test case command option is in effect.
+That is, these options are only effective if test cases are being executed and are used to modify
+the manner in which test cases are executed or test case results reported.
+.TP
+\fB-d\fR, \fB--device\fR \fIDEVICE\fR
+Specifies the device name to open for the tests.  Because this test program uses pipes, this option
+is ineffective.
+.TP
+\fB-e\fR, \fB--exit\fR
+Specifies that the first test case run that is not successful will cause all remaining test cases to
+be skipped and the return code will reflect the result of the failed test case.
+This option is useful in conjunction with option
+.B --onetest
+in that if a single test is being run, the return code will reflect the result of the test case.
+This is used by the
+.B @PACKAGE@-@VERSION@
+test suite to run individual tests under
+.BR autotest .
+.TP
+\fB-f\fR, \fB--fast\fR [\fISCALE\fR]
+When this option is present, test cases are run faster by the integer scaling factor
+.IR SCALE .
+If
+.I SCALE
+is not provided, then the default scale factor is
+.BR 50 .
+This has the effect of scaling timers both in the implementation under test as well as in the test
+suite.  If the scale factor,
+.IR SCALE ,
+is too large, test cases may fail that would otherwise pass.  This option is useful for long test
+suite runs that would otherwise take an inordinate amount of time to execute.  Timers can be scaled
+for development, diagnostic or regression testing, however, for full validation testing this option
+should not be used.
+.TP
+\fB-s\fR, \fB--summary\fR
+Print a test case summary with each test case result at the end of the test suite run.  The default
+if this option is not present is to not print a summary.
+.TP
+\fB-m\fR, \fB--messages\fR
+Indicates whether messages, in hexadecimal, should be included in the test case output.  This is
+independent of any
+.B --verbose
+setting.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B test-nuls
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+The following return codes are generated under the following conditions:
+.IP 0 4
+Execution was successful.
+One test case was selected for execution and that test case succeeded or was not applicable (i.e.
+unsupported).
+This exit code is interpreted by
+.B autotest
+as a
+.I PASS
+condition.
+.IP 1
+One test case was selected for execution and that test case failed or was inconclusive.
+More than one test case was selected and abort on failure was specified using the
+.B --exit
+option, and a test case in the selected test cases failed or was inconclusive.
+This exit code is interpreted by
+.B autotest
+as a
+.IR FAIL " or " XFAIL
+condition.
+.IP 2
+An invalid parameter was provided.
+Test case execution was specified with options
+.BR --onetest " or " --tests ,
+or listing of test cases was specified with option
+.BR --list ,
+but no test case was selected by these options.
+More than one test case was selected for execution and a check of the test suite setup failed.
+This exit code is interpreted by
+.B autotest
+as a
+.IR FAIL " or " XFAIL
+condition.
+.IP 77
+One test case was selected for execution and that test case was skipped.
+This exit code is interpreted by
+.B autotest
+as a
+.I SKIPPED
+condition.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-nuls
+is normally invoked from the
+.B @PACKAGE@-@VERSION@
+test suite.
+.\"
+.\"
+.SH EXAMPLES
+.TP
+\f(CB\)test-nuls\f(CR\) --list 0.1\fR
+Generates a list of all test cases
+provided by the
+.B test-nuls
+executable
+with numbers starting with the initial substring of
+.BR 0.1 .
+.TP
+\f(CB\)test-nuls\f(CR\) -vv --list\fR
+Generates a verbose listing of all test cases
+provided by the
+.B test-nuls
+executable.
+.TP
+\f(CB\)test-nuls\f(CR\) --verbose=5 --onetest 0.1\fR
+Verbosely executes test case
+.BR 0.1 ,
+and provides a diagnostic return code.
+.TP
+\f(CB\)test-nuls\f(CR\) --fast --quiet --exit\fR
+Executes all test cases with a timer scaling factor of
+.B 50
+with normal output suppressed and exiting on the first failed or inconclusive test case result.
+.\"
+.\"
+.SH MODULES
+.PP
+.BR timod (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/@PACKAGE@/test-nuls
+contains the
+.B test-nuls
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR nuls (4),
+.IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-nuls
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B test-nuls
+test suite, when run using
+.BR autotest ,
+is compatible with the POSIX 1003.3 conformance test methodology, with the following mapping of test
+results:
+.PP
+.RS
+.TS
+tab(:);
+lb|lb|lb
+l|l|l.
+_
+POSIX 1003.3:test-nuls\fR[\fB_thr\fR]:autotest
+_
+PASS:PASS(0):PASS
+FAIL:FAIL(1):FAIL
+XFAIL:FAIL(1):XFAIL
+UNSUPPORTED:NOT APPLICABLE(0):PASS
+UNRESOLVED:INCONCLUSIVE(1):FAIL or XFAIL
+UNTESTED:SKIPPED(77):SKIPPED
+_
+.TE
+.RE
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B test-nuls
+tests conformance of the
+.BR nuls (4)
+module to the specifications listed on the
+.BR nuls (4)
+manual page.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-nuls
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
