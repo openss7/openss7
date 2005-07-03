@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.1 2005/07/01 20:16:37 brian Exp $
+.\" @(#) $Id: mi_alloc.9.man,v 0.9.2.2 2005/07/03 17:40:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/01 20:16:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -81,11 +81,11 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.B #define _MI_SOURCE
+.B #define _MPS_SOURCE
 .br
 .B #include <sys/ddi.h>
 .br
-.B #include <sys/middi.h>
+.B #include <sys/mpsddi.h>
 .HP
 \fBvoid *mi_alloc(size_t \fIsize\fB, uint \fIpriority\fB);\fR
 .PD 0
@@ -316,9 +316,9 @@ represented by the passed in pointer.
 and
 .BR mi_free ()
 are
-.IR Mentat -specific
+.IR MPS \(rg-specific
 functions:
-.B _MI_SOURCE
+.B _MPS_SOURCE
 must be defined before including DDI/DKI include files to expose these symbols.
 .B Linux Fast-STREAMS
 must also have been compiled with
@@ -450,7 +450,7 @@ have no known bugs.
 and
 .BR mi_free ()
 are compatible with
-.I Mentat
+.IR MPS \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR mi_alloc (),
@@ -460,7 +460,7 @@ with the following portability considerations:
 and
 .BR mi_free ()
 are
-.IR Mentat -specific
+.IR MPS \(rg-specific
 functions and should not be used by portable
 .I STREAMS
 drivers and modules.
@@ -478,9 +478,9 @@ functions should be used in their stead.
 and
 .BR mi_free ()
 are provided for source level compatibility with
-.I Mentat
+.IR MPS \(rg
 for the purpose of porting
-.I Mentat
+.IR MPS \(rg
 drivers to
 .BR Linux .
 Because internal structures and definitions for
@@ -489,7 +489,7 @@ Because internal structures and definitions for
 lfs
 .]
 differ from that of
-.IR Mentat ,
+.IR MPS \(rg,
 binaries are incompatible.
 .IP \(em
 .BR mi_alloc (),
@@ -499,7 +499,7 @@ binaries are incompatible.
 and
 .BR mi_free ()
 only provide functionality comparable to
-.I Mentat
+.IR MPS \(rg
 for use by
 .I STREAMS
 drivers and modules.
@@ -523,7 +523,7 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
-.IR Mentat
+.IR MPS \(rg
 DDI documentation.
 .\"
 .\"
@@ -536,14 +536,17 @@ DDI documentation.
 and
 .BR mi_free ()
 first appeared in
-.IR Mentat .
+.IR MPS \(rg.
 .BR mi_alloc (),
 .BR mi_alloc_sleep (),
 .BR mi_zalloc (),
 .BR mi_zalloc_sleep ()
 and
 .BR mi_free ()
-are Mentat, Inc. functions that go all the way back to the Mentat OSF/1 implementation.
+are Mentat, Inc. functions that go all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementation.
 .\"
 .\"
 .[

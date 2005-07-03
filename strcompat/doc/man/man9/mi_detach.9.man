@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_detach.9.man,v 0.9.2.3 2005/05/14 08:34:26 brian Exp $
+.\" @(#) $Id: mi_detach.9.man,v 0.9.2.4 2005/07/03 17:40:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:26 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -87,7 +87,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/macddi.h>
 .HP
-.BI void mi_detach(queue_t *" q ", char *" ptr );
+.BI "void mi_detach(queue_t *" q ", caddr_t " ptr ");
 .\"
 .\"
 .SH ARGUMENTS

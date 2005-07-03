@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/03 17:41:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/03 17:41:15 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/03 17:41:15 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -115,7 +115,7 @@ static char const ident[] =
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/15 04:08:14 $"
+#define AIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/03 17:41:15 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -137,162 +137,11 @@ MODULE_ALIAS("streams-aixcompat");
 #endif
 #endif
 
-struct mi_comm {
-	struct mi_comm **mi_prev;	/* must be first */
-	struct mi_comm **mi_head;
-	struct mi_comm *mi_next;
-	union {
-		dev_t dev;		/* device number (or NODEV for modules) */
-		int index;		/* link index */
-	} mi_u;
-	size_t mi_size;			/* size of this structure plus private data */
-	char mi_priv[0];		/* followed by private data */
-};
-#define mi_dev mi_u.dev
-#define mi_index mi_u.index
-
 /* 
- *  MI_BUFCALL
+ *  MI_OPEN_COMM, MI_CLOSE_COMM, MI_NEXT_PTR, MI_PREV_PTR and MI_BUFCALL
  *  -------------------------------------------------------------------------
+ *  implemented in mspcompat.c
  */
-__AIX_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority);
-EXPORT_SYMBOL(mi_bufcall);
-
-static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
-/* 
- *  MI_OPEN_COMM
- *  -------------------------------------------------------------------------
- */
-int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *devp, int flag, int sflag,
-		 cred_t *credp)
-{
-	struct mi_comm *mi, **mip = (struct mi_comm **) mi_list;
-	major_t cmajor = getmajor(*devp);
-	minor_t cminor = getminor(*devp);
-	if (q->q_ptr != NULL)
-		return (0);	/* already open */
-	if (sflag == MODOPEN) {
-		if (!WR(q)->q_next)
-			return (EIO);
-	} else {
-		if (WR(q)->q_next && SAMESTR(q))
-			return (EIO);
-	}
-	if ((mi = kmem_alloc(sizeof(*mi) + size, KM_NOSLEEP)))	/* we could probably sleep */
-		return (EAGAIN);
-	bzero(mi, sizeof(*mi) + size);
-	spin_lock(&mi_list_lock);
-	switch (sflag) {
-	case CLONEOPEN:
-		/* first clone minor (above 5 per AIX docs), but the caller can start wherever they 
-		   want above that */
-		if (cminor <= 5)
-			cminor = 5 + 1;
-		/* fall through */
-	default:
-	case DRVOPEN:
-	{
-		major_t dmajor = cmajor;
-		for (; *(mip) && (dmajor = getmajor((*mip - 1)->mi_dev)) < cmajor;
-		     mip = &(*mip - 1)->mi_next) ;
-		for (; *(mip) && dmajor == getmajor((*mip - 1)->mi_dev) &&
-		     getminor(makedevice(0, cminor)) != 0; mip = &(*mip - 1)->mi_next, cminor++) {
-			minor_t dminor = getminor((*mip - 1)->mi_dev);
-			if (cminor < dminor)
-				break;
-			if (cminor == dminor)
-				if (sflag != CLONEOPEN) {
-					spin_unlock(&mi_list_lock);
-					kmem_free(mi, sizeof(*mi) + size);
-					return (ENXIO);
-				}
-		}
-		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
-			spin_unlock(&mi_list_lock);
-			kmem_free(mi, sizeof(*mi) + size);
-			return (EAGAIN);
-		}
-		mi->mi_dev = makedevice(cmajor, cminor);
-		break;
-	}
-	case MODOPEN:
-	{
-		/* just push modules on list with no device */
-#ifdef NODEV
-		mi->mi_dev = NODEV;
-#else
-		mi->mi_dev = 0;
-#endif
-		break;
-	}
-	}
-	mi->mi_size = sizeof(*mi) + size;
-	if ((mi->mi_next = *mip))
-		mi->mi_next->mi_prev = &mi;
-	mi->mi_prev = mip;
-	*mip = mi + 1;
-	mi->mi_head = (struct mi_comm **) mi_list;
-	q->q_ptr = OTHERQ(q)->q_ptr = mi + 1;
-	spin_unlock(&mi_list_lock);
-	return (0);
-}
-
-EXPORT_SYMBOL(mi_open_comm);	/* aixddi.h */
-
-/* 
- *  MI_CLOSE_COMM
- *  -------------------------------------------------------------------------
- */
-int mi_close_comm(caddr_t *mi_list, queue_t *q)
-{
-	spin_lock(&mi_list_lock);
-	if (q->q_ptr) {
-		struct mi_comm *mi = ((struct mi_comm *) q->q_ptr) - 1;
-		if (mi->mi_head == (struct mi_comm **) mi_list) {
-			size_t size = mi->mi_size;
-			/* found it */
-			if ((*mi->mi_prev = mi->mi_next))
-				mi->mi_next->mi_prev = mi->mi_prev;
-			mi->mi_next = NULL;
-			mi->mi_prev = &mi->mi_next;
-			mi->mi_head = NULL;
-			mi->mi_size = 0;
-			q->q_ptr = OTHERQ(q)->q_ptr = NULL;
-			kmem_free(mi, size);
-		}
-	}
-	spin_unlock(&mi_list_lock);
-	return (0);
-}
-
-EXPORT_SYMBOL(mi_close_comm);	/* aixddi.h */
-
-/* 
- *  MI_NEXT_PTR
- *  -------------------------------------------------------------------------
- */
-caddr_t mi_next_ptr(caddr_t priv)
-{
-	struct mi_comm *mi = ((struct mi_comm *) priv) - 1;
-	return ((caddr_t) mi->mi_next);
-}
-
-EXPORT_SYMBOL(mi_next_ptr);	/* aixddi.h */
-
-/* 
- *  MI_PREV_PTR
- *  -------------------------------------------------------------------------
- *  Linux Fast-STREAMS embellishment.
- */
-caddr_t mi_prev_ptr(caddr_t priv)
-{
-	struct mi_comm *mi = ((struct mi_comm *) priv) - 1;
-	if (mi && mi->mi_prev != mi->mi_head)
-		return ((caddr_t) (((struct mi_comm *) mi->mi_prev) + 1));
-	return (NULL);
-}
-
-EXPORT_SYMBOL(mi_prev_ptr);	/* aixddi.h */
 
 /* 
  *  WANTIO

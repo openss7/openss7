@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.4 2005/05/14 08:34:24 brian Exp $
+.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.5 2005/07/03 17:40:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -787,7 +787,8 @@ Functions with name starting with
 are probably
 .I Mentat, Inc.
 functions that goes all the way back to the
-.I Mentat OSF/1
+.RI pre- OSF/1
+.I Mentat
 implementation.
 .\"
 .\"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: osfcompat.9.man,v 0.9.2.3 2005/05/14 08:34:27 brian Exp $
+.\" @(#) $Id: osfcompat.9.man,v 0.9.2.4 2005/07/03 17:40:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -543,11 +543,10 @@ first appeared in
 .IR OSF/1 \(rg.
 Functions with name starting with
 .I mi_
-are probably
-.I Mentat, Inc.
-functions that goes all the way back to the
-.I Mentat OSF/1
-implementation.
+are probably Mentat, Inc. functions that goe all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
 .\"
 .\"
 .[

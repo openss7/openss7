@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:24 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -114,7 +114,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/01 20:17:24 $"
+#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"
@@ -179,40 +179,40 @@ MODULE_ALIAS("streams-maccompat");
 /*
  *  MI_COPY_CASE
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 /*
  *  MI_COPY_DONE
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 /*
  *  MI_COPYIN
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
 /*
  *  MI_COPYOUT
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 extern void mi_copyout(queue_t *q, mblk_t *mp);
 /*
  *  MI_COPYOUT_ALLOC
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error);
 /*
  *  MI_COPY_SET_RVAL
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 /*
  *  MI_COPY_STATE
  *  -------------------------------------------------------------------------
- *  implemented in the micompat module, just a declaration here
+ *  implemented in the mpscompat module, just a declaration here
  */
 /*
  *  MI_DETACH

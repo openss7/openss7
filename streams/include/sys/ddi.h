@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.18 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.19 2005/07/03 17:41:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/03 17:41:12 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -335,6 +335,14 @@ __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #include <sys/svr4ddi.h>
 #elif !defined(EXPORT_SYMTAB)
 #warning _SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4
+#endif
+#endif
+
+#ifdef _MPS_SOURCE
+#if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
+#include <sys/mpsddi.h>
+#elif !defined(EXPORT_SYMTAB)
+#warning _MPS_SOURCE defined but not CONFIG_STREAMS_COMPAT_MPS
 #endif
 #endif
 

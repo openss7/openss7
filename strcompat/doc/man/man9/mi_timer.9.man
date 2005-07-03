@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_timer.9.man,v 0.9.2.2 2005/05/14 08:34:27 brian Exp $
+.\" @(#) $Id: mi_timer.9.man,v 0.9.2.3 2005/07/03 17:40:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:15 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -248,7 +248,10 @@ macspg
 first appeared in
 .IR MacOT \(rg.
 .BR mi_timer ()
-is probably a Mentat, Inc. function that goes all the way back to the Mentat OSF/1 implementation.
+is probably a Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
 .\"
 .\"
 .[

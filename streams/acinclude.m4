@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.75 $) $Date: 2005/07/01 20:17:18 $
+# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/07/03 17:41:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/01 20:17:18 $ by $Author: brian $
+# Last Modified $Date: 2005/07/03 17:41:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -488,6 +488,12 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_compat_svr4="$enableval"],
 	    [enable_compat_svr4='module'])
+    AC_ARG_ENABLE([compat-mps],
+	AS_HELP_STRING([--enable-compat-mps],
+	    [enable source compatibility with MPS variants.
+	    @<:@default=moudle@:>@]),
+	    [enable_compat_mps="$enableval"],
+	    [enable_compat_mps='module'])
     AC_ARG_ENABLE([compat-sol8],
 	AS_HELP_STRING([--enable-compat-sol8],
 	    [enable source compatibility with Solaris 8 variants.
@@ -546,6 +552,11 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	if test :$lfs_compat_svr4 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_svr4='yes'
 	fi])
+    AC_CACHE_CHECK([for STREAMS MPS(R) compatibility], [lfs_compat_mps], [dnl
+	lfs_compat_mps="${enable_compat_mps:-module}"
+	if test :$lfs_compat_mps = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    lfs_compat_mps='yes'
+	fi])
     AC_CACHE_CHECK([for STREAMS Solaris(R) 8 compatibility], [lfs_compat_sol8], [dnl
 	case ${enable_compat_sol8:-module} in
 	    (yes) lfs_compat_svr4=yes ;;
@@ -569,6 +580,10 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    (yes) lfs_compat_svr4=yes ;;
 	    (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
 	esac
+	case ${enable_compat_osf:-module} in
+	    (yes) lfs_compat_mps=yes ;;
+	    (module) if test :$lfs_compat_mps != :yes ; then lfs_compat_mps=module ; fi ;;
+	esac
 	lfs_compat_osf="${enable_compat_osf:-module}"
 	if test :$lfs_compat_osf = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_osf='yes'
@@ -578,6 +593,10 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    (yes) lfs_compat_svr4=yes ;;
 	    (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
 	esac
+	case ${enable_compat_aix:-module} in
+	    (yes) lfs_compat_mps=yes ;;
+	    (module) if test :$lfs_compat_mps != :yes ; then lfs_compat_mps=module ; fi ;;
+	esac
 	lfs_compat_aix="${enable_compat_aix:-module}"
 	if test :$lfs_compat_aix = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_aix='yes'
@@ -586,6 +605,10 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	case ${enable_compat_hpux:-module} in
 	    (yes) lfs_compat_svr4=yes ;;
 	    (module) if test :$lfs_compat_svr4 != :yes ; then lfs_compat_svr4=module ; fi ;;
+	esac
+	case ${enable_compat_hpux:-module} in
+	    (yes) lfs_compat_mps=yes ;;
+	    (module) if test :$lfs_compat_mps != :yes ; then lfs_compat_mps=module ; fi ;;
 	esac
 	lfs_compat_hpux="${enable_compat_hpux:-module}"
 	if test :$lfs_compat_hpux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -606,6 +629,10 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    lfs_compat_lis='yes'
 	fi])
     AC_CACHE_CHECK([for STREAMS MacOT compatibility], [lfs_compat_mac], [dnl
+	case ${enable_compat_mac:-module} in
+	    (yes) lfs_compat_mps=yes ;;
+	    (module) if test :$lfs_compat_mps != :yes ; then lfs_compat_mps=module ; fi ;;
+	esac
 	lfs_compat_mac="${enable_compat_mac:-module}"
 	if test :$lfs_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    lfs_compat_mac='yes'
@@ -648,6 +675,26 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
 	    modules written for UNIX(R) SVR 4.2 MP will require porting in more respects.  This
 	    symbol determines whether compatibility will be compiled as a loadable module to Linux
 	    Fast-STREAMS.])
+	    ;;
+    esac
+    case ${lfs_compat_mps:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MPS], [], [When defined, Linux Fast STREAMS
+	    will attempt to be as compatible as possible (without replicating any bugs) with the
+	    Mentat Portable STREAMS documentation so that STREAMS drivers and modules written for
+	    Mentat Portable STREAMS will compile with Linux Fast STREAMS.  When undefined, STREAMS
+	    drivers and modules written for Mentat Portable STREAMS will require porting in more
+	    respects.  This symbol determines whether compatibility will be compiled and linkable
+	    with Linux Fast-STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MPS_MODULE], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the Mentat Portable STREAMS documentation so that STREAMS drivers and modules written
+	    for Mentat Portable STREAMS will compile with Linux Fast STREAMS.  When undefined,
+	    STREAMS drivers and modules written for Mentat Portable STREAMS will require porting in
+	    more respects.  This symbol determines whether compatibility will be compiled as a
+	    loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
     case ${lfs_compat_sol8:-module} in
@@ -800,6 +847,8 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${lfs_compat_svr3:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${lfs_compat_svr4:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${lfs_compat_svr4:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS],		[test :${lfs_compat_mps:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE],	[test :${lfs_compat_mps:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${lfs_compat_sol8:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE],	[test :${lfs_compat_sol8:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7],		[test :${lfs_compat_uw7:-module} = :yes])

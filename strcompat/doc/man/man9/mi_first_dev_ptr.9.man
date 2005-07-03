@@ -1,0 +1,399 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: mi_first_dev_ptr.9.man,v 0.9.2.1 2005/07/03 17:40:14 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH MI_FIRST_DEV_PTR 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_first_dev_ptr
+\- find the first \fISTREAMS\fR device private structure pointer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+caddr_t \fBmi_first_dev_ptr\fR(caddr_t *\fIhead\fR);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I head
+a pointer to the statically allocated
+.B caddr_t
+pointer that was used to add instances to the list with convenience functions such as
+.BR mi_open_comm (9).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_first_dev_ptr ()
+is a
+.IR MPS \(rg-specific
+convenience function that assists without housekeeping during
+.I STREAMS
+module or driver open, link, close or unlink operations.
+The
+.IR MPS \(rg
+convenience functions, including
+.BR mi_open_comm (9)
+and
+.BR mi_close_comm (9),
+maintain a list of
+.I STREAMS
+module or driver instances in a list global to the module or driver.
+Both pushable module instances as well as device driver instances can be maintained in the same list.
+.PP
+Pushable module instances are those instances that were added to the list with
+.I sflag
+equal to
+.B MODOPEN
+on a call to
+.BR mi_open_comm (9).
+Device driver instances are those instances that we added to the list with
+.I sflag
+equal to
+.BR CLONEOPEN " or " DRVOPEN
+on a call to
+.BR mi_open_comm (9).
+.PP
+When both pushable module instances and device driver instances are maintained by the
+.I STREAMS
+driver in the same list,
+.BR mi_first_dev_ptr ()
+can be used to find the first device driver instance in the list.
+.BR mi_next_dev_ptr (9)
+can then be used to iterate through the device driver instances in the list.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_first_dev_ptr ()
+is used when the caller wishes to iterate through only the device driver instances on a
+.I STREAMS
+module or driver global instance list.
+.BR mi_first_dev_ptr ()
+is passed the same statically allocated
+.I head
+pointer that was passed to functions such as
+.BR mi_open_comm (9)
+that added instances to the list.
+.BR mi_first_dev_ptr ()
+returns
+.B NULL
+if there is no device driver instance on the list, or returns a pointer to the private structure of
+the first device instance on the list.
+It is then possible to iterate throught the device instances on the list by passing the pointer
+returned by
+.BR mi_first_dev_ptr ()
+to
+.BR mi_next_dev_ptr (9)
+to obtain the next device driver instance on the list, or
+.B NULL
+if there is no subsequent device driver instance, and so on.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_first_dev_ptr ()
+succeeds, it returns a pointer to the private instance data
+.RI ( q->q_ptr )
+associated with first device driver instance on the global list;
+when it fails, it returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_first_dev_ptr ()
+is always successful.  However, when passed an invalid pointer or a pointer to an invalid structure,
+.BR mi_first_dev_ptr ()
+might destabilize the kernel or cause an immediate or delayed kernel panic.
+.\"
+.\"
+.SH ERRORS
+.PP
+Following is an example of the use of
+.BR mi_first_dev_ptr ()
+and
+.BR mi_next_dev_ptr ()
+used to find a specific device instance on the instance list.
+.RS 0.25i
+.nf
+\fC\s-1
+typedef struct priv {
+    ulong some_flag;
+} priv_t;
+
+static caddr_t xxx_head = NULL;
+
+int
+xxx_open(queue_t *q, dev_t *devp, int flag,
+         int sflag, cred_t *crp)
+{
+    return mi_open_comm(&xxx_head, sizeof(priv_t),
+                        q, devp, flag, sflag, crp);
+}
+
+int
+xxx_close(queue_t *q, int oflag, cred_t *crp)
+{
+    return mi_close_comm(&xxx_head, q);
+}
+
+int
+xxx_exit(void)
+{
+    caddr_t p;
+    for (p = mi_first_dev_ptr(&xxx_head);
+         p; p = mi_next_dev_ptr(p)) {
+        priv_t *priv = (priv_t *) p;
+        if (p->some_flag)
+            do_some_thing(priv);
+        kill_with_prejudice(priv);
+    }
+}
+
+module_exit(xxx_exit);
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_first_dev_ptr ()
+can be called from any context, but is normally called from within a
+.I STREAMS
+driver open, close, put or service procedure.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_first_dev_ptr ()
+is not MP-safe; no protection is afforded to the list entry.  An iterator taken in this fashion can
+be invalidated without the caller's knowledge.  It is the responsibility of the caller to protect
+the validity of the instance while it is in use.  While there are some utilities in
+.B Linux Fast-STREAMS
+that can provide assistance; there is little mention of their use in the
+.IR MPS \(rg
+documentation.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_first_dev_ptr ()
+is a
+.IR MPS \(rg-specific
+function:
+.B _MPS_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_MPS
+or
+.B CONFIG_STREAMS_COMPAT_MPS_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.B Linux Fast-STREAMS
+implementation of these functions maintain the module instances and the driver instances in the same
+global list; however, list elements are sorted with respect to their device driver numbers.  Modules
+are added to the list with a zero
+.RB ( 0 )
+major device number and the next available minor device number.  This places module instances ahead
+of device driver instances in the list.
+.BR mi_first_dev_ptr ()
+simply iterates down the list looking for the first instance with a non-zero major device number and
+that is the first device driver instance in the list.
+.PP
+The
+.IR MPS \(rg
+open and close convenience functions can also be used when a stream is linked under (open) or
+unlinked from (close) a multiplexing driver.  These instances should use the linkid as the device
+number and should be maintained in a global (ilink) list separate from the primary (open) list.
+Because multiplexing driver links lists use an arbitrary linkid,
+.BR mi_first_dev_ptr ()
+will not work on those lists.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_open_comm (9),
+.BR mi_close_comm (9),
+.BR mi_first_ptr (9),
+.BR mi_next_dev_ptr (9),
+.BR mpscompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_first_dev_ptr ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_first_dev_ptr ()
+is compatible with
+.IR MPS \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Very little documentation exists on the proper use of
+.BR mi_first_dev_ptr ()
+and
+.BR mi_next_dev_ptr (9).
+If the user really wishes to keep module instances and driver instances, they should be kept in
+separate global open lists and the better documented
+.BR mi_first_ptr (9)
+and
+.BR mi_next_ptr (9)
+used instead.
+.IP \(em
+.BR mi_first_dev_ptr ()
+is an
+.IR MPS \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+Standard
+.I STREAMS
+and system utility functions should be used in its stead.
+.IP \(em
+.BR mi_first_dev_ptr ()
+is provided for source level compatibility with
+.IR MPS \(rg
+for the purpose of porting
+.IR MPS \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR MPS \(rg,
+binaries are incompatible.
+.IP \(em
+.BR mi_first_dev_ptr ()
+only provides functionality comparable to
+.IR MPS \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR mi_first_dev_ptr ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR mpscompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MPS \(rg
+DDI documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_first_dev_ptr ()
+first appeared in
+.IR MPS \(rg.
+.BR mi_first_dev_ptr ()
+is a Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

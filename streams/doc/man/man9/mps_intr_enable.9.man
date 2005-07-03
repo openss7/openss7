@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mps_intr_enable.9.man,v 0.9.2.2 2005/05/14 08:34:27 brian Exp $
+.\" @(#) $Id: mps_intr_enable.9.man,v 0.9.2.3 2005/07/03 17:40:16 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:16 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -236,7 +236,10 @@ macspg
 first appeared in
 .IR MacOT \(rg.
 .BR mps_intr_enable ()
-is probably a Mentat, Inc. function that goes all the way back to the Mentat OSF/1 implementation.
+is probably a Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
 .\"
 .\"
 .[

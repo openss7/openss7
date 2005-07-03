@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/01 20:17:30 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -535,7 +535,7 @@ static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct modinfo *mi_alloc(struct fmodsw *fmod)
+struct modinfo *modi_alloc(struct fmodsw *fmod)
 {
 	struct modinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
@@ -556,7 +556,7 @@ struct modinfo *mi_alloc(struct fmodsw *fmod)
 	}
 	return (mi);
 }
-struct modinfo *mi_get(struct modinfo *mi)
+struct modinfo *modi_get(struct modinfo *mi)
 {
 	if (mi) {
 		if (atomic_read(&mi->mi_refs) < 1)
@@ -565,7 +565,7 @@ struct modinfo *mi_get(struct modinfo *mi)
 	}
 	return (mi);
 }
-void mi_put(struct modinfo *mi)
+void modi_put(struct modinfo *mi)
 {
 	if (mi) {
 		if (atomic_dec_and_test(&mi->mi_refs)) {

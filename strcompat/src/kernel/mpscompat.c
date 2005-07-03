@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:16:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.2  2005/07/03 17:41:27  brian
+ - separated out MPS compatibility module
+
  Revision 0.9.2.1  2005/07/01 20:16:30  brian
  - added and updated manpages for some Mentat compatibility
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $"
 
-static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $";
+static char const ident[] =
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -76,7 +80,7 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.
  *  modules that don't use them.
  */
 
-#define __MI_EXTERN_INLINE inline
+#define __MPS_EXTERN_INLINE inline
 
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
@@ -104,12 +108,13 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
 
-#define _MI_SOURCE
+#define _MPS_SOURCE
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#include <sys/mpsddi.h>
 
 #include "sys/config.h"
 #include "src/kernel/strsched.h"
@@ -118,30 +123,72 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.
 #include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"
 
-#define MICOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MICOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MICOMP_REVISION		"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/01 20:16:30 $"
-#define MICOMP_DEVICE		"Mentat Compatibility"
-#define MICOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MICOMP_LICENSE		"GPL"
-#define MICOMP_BANNER		MICOMP_DESCRIP		"\n" \
-				MICOMP_COPYRIGHT	"\n" \
-				MICOMP_REVISION	"\n" \
-				MICOMP_DEVICE		"\n" \
-				MICOMP_CONTACT		"\n"
-#define MICOMP_SPLASH		MICOMP_DEVICE		" - " \
-				MICOMP_REVISION	"\n"
+#define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define MPSCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $"
+#define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
+#define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define MPSCOMP_LICENSE		"GPL"
+#define MPSCOMP_BANNER		MPSCOMP_DESCRIP		"\n" \
+				MPSCOMP_COPYRIGHT	"\n" \
+				MPSCOMP_REVISION	"\n" \
+				MPSCOMP_DEVICE		"\n" \
+				MPSCOMP_CONTACT		"\n"
+#define MPSCOMP_SPLASH		MPSCOMP_DEVICE		" - " \
+				MPSCOMP_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_COMPAT_MI_MODULE
-MODULE_AUTHOR(MICOMP_CONTACT);
-MODULE_DESCRIPTION(MICOMP_DESCRIP);
-MODULE_SUPPORTED_DEVICE(MICOMP_DEVICE);
-MODULE_LICENSE(MICOMP_LICENSE);
+#ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
+MODULE_AUTHOR(MPSCOMP_CONTACT);
+MODULE_DESCRIPTION(MPSCOMP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(MPSCOMP_DEVICE);
+MODULE_LICENSE(MPSCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-micompat");
 #endif
 #endif
 
+/*
+ *  MI_ALLOC
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
+EXPORT_SYMBOL(mi_alloc);	/* mpsddi.h */
+
+/*
+ *  MI_ALLOC_SLEEP
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
+EXPORT_SYMBOL(mi_alloc_sleep);	/* mpsddi.h */
+
+/*
+ *  MI_ZALLOC
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
+EXPORT_SYMBOL(mi_zalloc);	/* mpsddi.h */
+
+/*
+ *  MI_ZALLOC_SLEEP
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
+EXPORT_SYMBOL(mi_zalloc_sleep);	/* mpsddi.h */
+
+/*
+ *  MI_FREE
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void mi_free(void *ptr);
+EXPORT_SYMBOL(mi_free);		/* mpsddi.h */
+
+/*
+ *  =========================================================================
+ *
+ *  Module or driver open and close helper functions.
+ *
+ *  =========================================================================
+ */
 struct mi_comm {
 	struct mi_comm **mi_prev;	/* must be first */
 	struct mi_comm **mi_head;
@@ -157,49 +204,20 @@ struct mi_comm {
 #define mi_index mi_u.index
 
 /*
- *  MI_ALLOC
- *  -------------------------------------------------------------------------
- */
-_MI_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
-EXPORT_SYMBOL(mi_alloc);
-
-/*
- *  MI_ALLOC_SLEEP
- *  -------------------------------------------------------------------------
- */
-_MI_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
-EXPORT_SYMBOL(mi_alloc_sleep);
-
-/*
- *  MI_ZALLOC
- *  -------------------------------------------------------------------------
- */
-_MI_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
-EXPORT_SYMBOL(mi_alloc);
-
-/*
- *  MI_ZALLOC_SLEEP
- *  -------------------------------------------------------------------------
- */
-_MI_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
-EXPORT_SYMBOL(mi_alloc_sleep);
-
-/*
- *  MI_FREE
- *  -------------------------------------------------------------------------
- */
-_MI_EXTERN_INLINE void mi_free(void *ptr);
-EXPORT_SYMBOL(mi_free);
-
-/*
  *  MI_OPEN_ALLOC
  *  -------------------------------------------------------------------------
  */
 caddr_t mi_open_alloc(size_t size)
 {
-	return kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP);
+	struct mi_comm *mi;
+	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP))) {
+		mi->mi_size = size;
+		return ((caddr_t)(mi + 1));
+	}
+	return (NULL);
 }
-EXPORT_SYMBOL(mi_open_alloc);
+
+EXPORT_SYMBOL(mi_open_alloc);	/* mpsddi.h */
 
 /*
  *  MI_OPEN_ALLOC_SLEEP
@@ -207,16 +225,280 @@ EXPORT_SYMBOL(mi_open_alloc);
  */
 caddr_t mi_open_alloc_sleep(size_t size)
 {
-	return kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP);
+	struct mi_comm *mi;
+	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP))) {
+		mi->mi_size = size;
+		return ((caddr_t)(mi + 1));
+	}
+	return (NULL);
 }
-EXPORT_SYMBOL(mi_open_alloc_sleep);
+
+EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mpsddi.h */
+
+/*
+ * MI_FIRST_PTR
+ * -------------------------------------------------------------------------
+ * OpenSolaris uses a head structure, we don't, primarily because the
+ * documentation for mi_open_comm for both AIX and MacOT says that we use a
+ * "static pointer" initialized to NULL.
+ */
+caddr_t mi_first_ptr(caddr_t *mi_head)
+{
+	struct mi_comm *mi = *(struct mi_comm **)mi_head;
+	return mi ? ((caddr_t)(mi + 1)) : NULL;
+}
+
+EXPORT_SYMBOL(mi_first_ptr);	/* mpsddi.h */
+
+/*
+ *  MI_FIRST_DEV_PTR
+ *  -------------------------------------------------------------------------
+ *  OpenSolaris tracks modules and drivers on the same list.  We don't,
+ *  primarily because AIX and MacOT don't document it that way.  If you have a
+ *  STREAMS driver that can also be pushed as a module, use two separate lists.
+ */
+caddr_t mi_first_dev_ptr(caddr_t *mi_head)
+{
+	struct mi_comm *mi = *(struct mi_comm **) mi_head;
+	for (; mi && getmajor(mi->mi_dev) != 0 ; mi = mi->mi_next) ;
+	return mi ? ((caddr_t)(mi + 1)) : NULL;
+}
+EXPORT_SYMBOL(mi_first_dev_ptr);	/* mpsddi.h */
+
+/*
+ *  MI_NEXT_PTR
+ *  -------------------------------------------------------------------------
+ */
+caddr_t mi_next_ptr(caddr_t ptr)
+{
+	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1)->mi_next : NULL;
+	return mi ? ((caddr_t) (mi + 1)) : NULL;
+}
+EXPORT_SYMBOL(mi_next_ptr);	/* mpsddi.h, aixddi.h */
+
+/*
+ *  MI_NEXT_DEV_PTR
+ *  -------------------------------------------------------------------------
+ *  OpenSolaris tracks modules and drivers on the same list.  We don't,
+ *  primarily because AIX and MacOT don't document it that way.  If you have a
+ *  STREAMS driver that can also be pushed as a module, use two separate lists.
+ */
+caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
+{
+	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+	for (mi = mi ? mi->mi_next : NULL; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
+	return mi ? ((caddr_t) (mi + 1)) : NULL;
+}
+
+EXPORT_SYMBOL(mi_next_dev_ptr);	/* mpsddi.h */
+
+/* 
+ *  MI_PREV_PTR
+ *  -------------------------------------------------------------------------
+ *  Linux Fast-STREAMS embellishment.
+ */
+caddr_t mi_prev_ptr(caddr_t ptr)
+{
+	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+	if (mi && mi->mi_prev != &mi->mi_next && mi->mi_prev != mi->mi_head)
+		return ((caddr_t) (((struct mi_comm *) mi->mi_prev) + 1));
+	return (NULL);
+}
+EXPORT_SYMBOL(mi_prev_ptr);	/* mpsddi.h, aixddi.h */
+
+static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
+
+/*
+ *  MI_OPEN_LINK
+ *  -------------------------------------------------------------------------
+ */
+int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
+{
+	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1, **mip = (struct mi_comm **) mi_head;
+	major_t cmajor = devp ? getmajor(*devp) : 0;
+	minor_t cminor = devp ? getminor(*devp) : 0;
+	spin_lock(&mi_list_lock);
+	switch (sflag) {
+	case CLONEOPEN:
+		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
+		   caller can start wherever they want above that */
+#define MI_OPEN_COMM_CLONE_MINOR 10
+		if (cminor <= MI_OPEN_COMM_CLONE_MINOR)
+			cminor = MI_OPEN_COMM_CLONE_MINOR + 1;
+		/* fall through */
+	default:
+	case DRVOPEN:
+	{
+		major_t dmajor = cmajor;
+		for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor; mip = &(*mip)->mi_next) ;
+		for (; *mip && dmajor == getmajor((*mip)->mi_dev) && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
+			minor_t dminor = getminor((*mip)->mi_dev);
+			if (cminor < dminor)
+				break;
+			if (cminor == dminor)
+				if (sflag != CLONEOPEN) {
+					spin_unlock(&mi_list_lock);
+					return (ENXIO);
+				}
+		}
+		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
+			spin_unlock(&mi_list_lock);
+			return (EAGAIN);
+		}
+		mi->mi_dev = makedevice(cmajor, cminor);
+		break;
+	}
+	case MODOPEN:
+	{
+		/* just push modules on list with no device */
+#ifdef NODEV
+		mi->mi_dev = NODEV;
+#else
+		mi->mi_dev = 0;
+#endif
+		break;
+	}
+	}
+	if ((mi->mi_next = *mip))
+		mi->mi_next->mi_prev = &mi;
+	mi->mi_prev = mip;
+	*mip = mi;
+	mi->mi_head = (struct mi_comm **) mi_head;
+	spin_unlock(&mi_list_lock);
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_open_link);	/* mpsddi.h */
+
+/*
+ *  MI_OPEN_DETACHED
+ *  -------------------------------------------------------------------------
+ */
+caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
+EXPORT_SYMBOL(mi_open_detached);	/* mpsddi.h */
+
+/*
+ *  MI_ATTACH
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void mi_attach(queue_t *q, caddr_t ptr);
+EXPORT_SYMBOL(mi_attach);	/* mpsddi.h, macddi.h */
+
+/* 
+ *  MI_OPEN_COMM
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, uint size, queue_t *q, dev_t *devp, int flag,
+		int sflag, cred_t *credp);
+EXPORT_SYMBOL(mi_open_comm);	/* mpsddi.h, aixddi.h */
+
+/*
+ *  MI_CLOSE_UNLINK
+ *  -------------------------------------------------------------------------
+ */
+void mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
+{
+	if (ptr) {
+		struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+		spin_lock(&mi_list_lock);
+		if (mi_head == NULL || mi->mi_head == (struct mi_comm **) mi_head) {
+			if ((*mi->mi_prev = mi->mi_next))
+				mi->mi_next->mi_prev = mi->mi_prev;
+			mi->mi_next = NULL;
+			mi->mi_prev = &mi->mi_next;
+			mi->mi_head = NULL;
+		}
+		spin_unlock(&mi_list_lock);
+	}
+}
+
+EXPORT_SYMBOL(mi_close_unlink);	/* mpsddi.h */
+
+/*
+ *  MI_CLOSE_FREE
+ *  -------------------------------------------------------------------------
+ */
+void mi_close_free(caddr_t ptr)
+{
+	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	if (ptr && mi->mi_head == NULL && mi->mi_next == NULL)
+		kmem_free(mi, mi->mi_size);
+}
+
+EXPORT_SYMBOL(mi_close_free);	/* mpsddi.h */
+
+/*
+ *  MI_DETACH
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void mi_detach(queue_t *q, caddr_t ptr);
+EXPORT_SYMBOL(mi_detach);	/* mpsddi.h */
+
+/*
+ *  MI_CLOSE_DETACHED
+ *  -------------------------------------------------------------------------
+ */
+__MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr);
+EXPORT_SYMBOL(mi_close_detached);	/* mpsddi.h */
+
+/* 
+ *  MI_CLOSE_COMM
+ *  -------------------------------------------------------------------------
+ */
+int mi_close_comm(caddr_t *mi_head, queue_t *q);
+EXPORT_SYMBOL(mi_close_comm);	/* mpsddi.h, aixddi.h */
+
+struct mi_iocblk {
+	caddr_t mi_uaddr;
+	short mi_dir;
+	short mi_cnt;
+};
 
 #define MI_COPY_IN			1
 #define MI_COPY_OUT			2
-#define MI_COPY_CASE(_dir, _cnt)	(((cnt)<<2|dir))
+#define MI_COPY_CASE(_dir, _cnt)	(((_cnt)<<2|_dir))
+
+#if 0
 #define MI_COPY_DIRECTION(_mp)		(*(int *)&(_mp)->b_cont->b_next)
 #define MI_COPY_COUNT(_mp)		(*(int *)&(_mp)->b_cont->b_prev)
+#else
+#define MI_COPY_DIRECTION(_mp)		(((struct mi_iocblk *)(_mp)->b_cont->b_rptr)->mi_dir)
+#define MI_COPY_COUNT(_mp)		(((struct mi_iocblk *)(_mp)->b_cont->b_rptr)->mi_cnt)
+#define MI_COPY_UADDR(_mp)		(((struct mi_iocblk *)(_mp)->b_cont->b_rptr)->mi_uaddr)
+#endif
+
 #define MI_COPY_STATE(_mp)		MI_COPY_CASE(MI_COPY_DIRECTION(_mp), MI_COPY_COUNT(_mp))
+
+/*
+ *  MI_COPY_DONE
+ *  -------------------------------------------------------------------------
+ */
+void mi_copy_done(queue_t *q, mblk_t *mp, int err)
+{
+	union ioctypes *ioc;
+	ensure(mp, return);
+	ensure(q && mp->b_wptr >= mp->b_rptr + sizeof(*ioc), goto error);
+	ioc = (typeof(ioc)) mp->b_rptr;
+	switch (mp->b_datap->db_type) {
+	case M_IOCDATA:
+		if (ioc->copyresp.cp_private)
+			freemsg(xchg(&ioc->copyresp.cp_private, NULL));
+		break;
+	case M_IOCTL:
+		break;
+	default:
+		swerr();
+		freemsg(mp);
+		break;
+	}
+	mp->b_datap->db_type = err ? M_IOCNAK : M_IOCACK;
+	ioc->iocblk.ioc_error = (err < 0) ? -err : err;
+	ioc->iocblk.ioc_rval = err ? -1 : ioc->iocblk.ioc_rval;
+	qreply(q, mp);
+}
+
+EXPORT_SYMBOL(mi_copy_done);	/* mpsddi.h */
+
 /*
  *  MI_COPYIN
  *  -------------------------------------------------------------------------
@@ -224,41 +506,99 @@ EXPORT_SYMBOL(mi_open_alloc_sleep);
 void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
-	if (ioc->iocblk.ioc_count == TRANSPARENT) {
-		/* for transparent ioctl perform a copy in */
-		mp->b_datap->db_type = M_COPYIN;
-		ioc->copyreq.cq_private = xchg(&mp->b_cont, NULL);
-		ioc->copyreq.cq_size = len;
-		ioc->copyreq.cq_flag = 0;
-		ioc->copyreq.cq_addr = mp->b_cont->b_rptr;
-		MI_COPY_DIRECTION(mp) = MI_COPY_IN;
-		MI_COPY_COUNT(mp) = 1;
-		qreply(q, mp);
-		return;
-	} else {
-		mblk_t *db;
-		if ((db = allocb(0, BPRI_MED))) {
+	struct mi_iocblk *mip;
+	mblk_t *bp;
+	int err = EPROTO;
+	switch (mp->b_datap->db_type) {
+	case M_IOCTL:
+		if (ioc->iocblk.ioc_count == TRANSPARENT) {
+			/* for transparent ioctl perform a copy in */
+			if ((bp = xchg(&mp->b_cont, NULL))) {
+				mip = (typeof(mip)) bp->b_rptr;
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_private = bp;
+				ioc->copyreq.cq_size = len;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_addr = mip->mi_uaddr;
+				mip->mi_cnt = 1;
+				mip->mi_dir = MI_COPY_IN;
+				if (mp->b_cont)
+					freemsg(xchg(&mp->b_cont, NULL));
+				qreply(q, mp);
+				return;
+			}
+		} else {
 			/* for a non-transparent ioctl the first copyin is already performed for
 			   us, fake out an M_IOCDATA response. */
-			mp->b_datap->db_type = M_IOCDATA;
-			ioc->copyresp.cp_private = db;
-			db = xchg(&mp->b_cont, db);
-			MI_COPY_DIRECTION(mp) = MI_COPY_IN;
-			MI_COPY_COUNT(mp) = 1;
-			db = xchg(&mp->b_cont, db);
-			putq(q, mp);
+			if ((bp = allocb(sizeof(*mip), BPRI_MED))) {
+				mip = (typeof(mip)) bp->b_rptr;
+				mp->b_datap->db_type = M_IOCDATA;
+				ioc->copyresp.cp_private = bp;
+				mip->mi_cnt = 1;
+				mip->mi_dir = MI_COPY_IN;
+				putq(q, mp);
+				return;
+			}
+			err = ENOSR;
+		}
+		break;
+	case M_IOCDATA:
+		/* for a subsequent M_IOCDATA, we should already have our private message block
+		   stacked up against the private pointer */
+		if ((bp = xchg(&ioc->copyresp.cp_private, NULL))) {
+			mip = (typeof(mip)) bp->b_rptr;
+			mp->b_datap->db_type = M_COPYIN;
+			ioc->copyreq.cq_private = bp;
+			ioc->copyreq.cq_size = len;
+			ioc->copyreq.cq_flag = 0;
+			ioc->copyreq.cq_addr = uaddr;
+			mip->mi_uaddr = uaddr;
+			mip->mi_cnt += 1;
+			mip->mi_dir = MI_COPY_IN;
+			if (mp->b_cont)
+				freemsg(xchg(&mp->b_cont, NULL));
+			qreply(q, mp);
 			return;
 		}
-		mp->b_datap->db_type = M_IOCNAK;
-		ioc->iocblk.ioc_error = ENOSTR;
-		ioc->iocblk.ioc_count = 0;
-		if (mp->b_cont)
-			freemsg(xchg(&mp->b_cont, NULL));
-		qreply(q, mp);
-		return;
+		break;
 	}
+	mi_copy_done(q, mp, err);
 }
-EXPORT_SYMBOL(mi_copyin);
+
+EXPORT_SYMBOL(mi_copyin);	/* mpsddi.h */
+
+/*
+ *  MI_COPYIN_N
+ *  -------------------------------------------------------------------------
+ */
+void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
+{
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	struct mi_iocblk *mip;
+	mblk_t *bp;
+	int err = EPROTO;
+	if (mp->b_datap->db_type == M_IOCDATA) {
+		if ((bp = ioc->copyresp.cp_private)) {
+			mip = (typeof(mip)) mp->b_rptr;
+			if (mip->mi_dir == MI_COPY_IN) {
+				mp->b_datap->db_type = M_COPYIN;
+				ioc->copyreq.cq_private = bp;
+				ioc->copyreq.cq_size = len;
+				ioc->copyreq.cq_flag = 0;
+				ioc->copyreq.cq_addr = mip->mi_uaddr + offset;
+				mip->mi_cnt++;
+				mip->mi_dir = MI_COPY_IN;
+				if (mp->b_cont)
+					freemsg(xchg(&mp->b_cont, NULL));
+				qreply(q, mp);
+				return;
+			}
+		}
+	}
+	mi_copy_done(q, mp, err);
+}
+
+EXPORT_SYMBOL(mi_copyin_n);	/* mpsddi.h */
 
 /*
  *  MI_COPYOUT_ALLOC
@@ -267,38 +607,47 @@ EXPORT_SYMBOL(mi_copyin);
 mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
-	mblk_t *db;
-	if (mp->b_datap->db_type == M_IOCTL) {
-		if (ioc->iocblk.ioc_count != TRANSPARENT) {
-			mblk_t *bp;
-			if (!(bp = allocb(0, BPRI_MED))) {
-				if (free_on_eror) {
-					mp->b_datap->db_type = M_IOCNAK;
-					ioc->iocblk.ioc_error = ENOSTR;
-					ioc->ioc_count = 0;
-					if (mp->b_cont)
-						freemsg(xchg(&mp->b_cont, 0));
-					qreply(q, mp);
-				}
-				return (bp);
-			}
-			bp->b_cont = xchg(&mp->b_cont, bp);
+	struct mi_iocblk *mip;
+	mblk_t *db, *bp;
+	switch (mp->b_datap->db_type) {
+	case M_IOCTL:
+		if (ioc->iocblk.ioc_count == TRANSPARENT) {
+			bp = xchg(&mp->b_cont, NULL);
+		} else
+			bp = allocb(sizeof(*mip), BPRI_MED);
+		if (!bp) {
+			if (free_on_error)
+				mi_copy_done(q, mp, ENOSR);
+			return (bp);
 		}
-		mp->b_datap->db_type = M_IOCDATA;
+		bp->b_wptr = bp->b_rptr + sizeof(*mip);
+		mip = (typeof(mip)) bp->b_rptr;
+		if (ioc->iocblk.ioc_count == TRANSPARENT && !uaddr)
+			uaddr = mip->mi_uaddr;
+		mip->mi_cnt = 0;
+		mip->mi_dir = MI_COPY_OUT;
+		mp->b_datap->db_type = M_IOCDATA;	/* for next pass */
+		ioc->copyresp.cp_private = bp;
 		ioc->copyresp.cp_rval = 0;
-		MI_COPY_COUNT(mp) = 0;
-		MI_COPY_DIRECTION(mp) = MI_COPY_OUT;
-	}
-	if (!(db = allocb(len, BRPI_MED))) {
-		if (free_on_error)
-			mi_copy_done(q, mp, ENOSTR);
+		if (mp->b_cont)
+			freemsg(xchg(&mp->b_cont, NULL));
+		/* fall through */
+	case M_IOCDATA:
+		if (!(db = allocb(len, BPRI_MED))) {
+			if (free_on_error)
+				mi_copy_done(q, mp, ENOSR);
+			return (db);
+		}
+		linkb(ioc->copyresp.cp_private, db);
+		db->b_next = (mblk_t *) uaddr;
 		return (db);
 	}
-	linkb(mp, db);
-	db->b_next = (mblk_t *) uaddr;
-	return (db);
+	if (free_on_error)
+		mi_copy_done(q, mp, EFAULT);
+	return (NULL);
 }
-EXPORT_SYMBOL(mi_copyout_alloc);
+
+EXPORT_SYMBOL(mi_copyout_alloc);	/* mpsddi.h */
 
 /*
  *  MI_COPYOUT
@@ -306,13 +655,64 @@ EXPORT_SYMBOL(mi_copyout_alloc);
  */
 void mi_copyout(queue_t *q, mblk_t *mp)
 {
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	struct mi_iocblk *mip;
+	mblk_t *bp, *db;
+	if (mp->b_datap->db_type != M_IOCDATA || !mp->b_cont || !(bp = ioc->copyresp.cp_private))
+		return mi_copy_done(q, mp, EPROTO);
+	if (ioc->copyresp.cp_rval || !(db = bp->b_cont))
+		return mi_copy_done(q, mp, (int) (intptr_t) ioc->copyresp.cp_rval);
+	bp->b_cont = xchg(&db->b_cont, NULL);
+	mip = (typeof(mip)) bp->b_rptr;
+	mp->b_datap->db_type = M_COPYOUT;
+	ioc->copyreq.cq_private = bp;
+	ioc->copyreq.cq_size = (db->b_wptr > db->b_rptr) ? db->b_wptr - db->b_rptr : 0;
+	ioc->copyreq.cq_flag = 0;
+	ioc->copyreq.cq_addr = (caddr_t) xchg(&db->b_next, NULL);
+	mip->mi_cnt = (mip->mi_dir == MI_COPY_IN) ? 1 : mip->mi_cnt + 1;
+	mip->mi_dir = MI_COPY_OUT;
+	if (mp->b_cont)
+		freemsg(xchg(&mp->b_cont, NULL));
+	mp->b_cont = db;
+	qreply(q, mp);
 }
-EXPORT_SYMBOL(mi_copyout);
+
+EXPORT_SYMBOL(mi_copyout);	/* mpsddi.h */
 
 /*
- *  MI_ALLOC
+ *  MI_COPY_STATE
  *  -------------------------------------------------------------------------
  */
+int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
+{
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	struct mi_iocblk *mip;
+	mblk_t *bp, *db = NULL;
+	int err = EPROTO;
+	if (mp->b_datap->db_type != M_IOCDATA || !(db = mp->b_cont)
+	    || !(bp = ioc->copyresp.cp_private))
+		goto error;
+	if ((err = (int) (intptr_t) ioc->copyresp.cp_rval))
+		goto error;
+	switch (mp->b_datap->db_type) {
+	case M_IOCDATA:
+		err = ENOMEM;
+		if (!pullupmsg(db, -1))
+			goto error;
+		mip = (typeof(mip)) bp->b_rptr;
+		if (mip->mi_dir == MI_COPY_IN)
+			*mpp = db;
+		return MI_COPY_CASE(mip->mi_dir, mip->mi_cnt);
+	case M_IOCTL:
+		err = EPROTO;
+		goto error;
+	}
+      error:
+	mi_copy_done(q, mp, err);
+	return (-1);
+}
+
+EXPORT_SYMBOL(mi_copy_state);	/* mpsddi.h */
 
 /*
  *  MI_ALLOC

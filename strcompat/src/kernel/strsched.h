@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/03 17:41:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:32 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -95,9 +95,9 @@ extern struct devinfo *di_get(struct devinfo *di);
 extern void di_put(struct devinfo *di);
 
 /* ctors and dtors for modinfo */
-extern struct modinfo *mi_alloc(struct fmodsw *fmod);
-extern struct modinfo *mi_get(struct modinfo *mi);
-extern void mi_put(struct modinfo *mi);
+extern struct modinfo *modi_alloc(struct fmodsw *fmod);
+extern struct modinfo *modi_get(struct modinfo *mi);
+extern void modi_put(struct modinfo *mi);
 
 /* ctors and dtors for linkblk */
 extern struct linkblk *alloclk(void);

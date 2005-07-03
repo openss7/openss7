@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.3 2005/07/01 20:16:37 brian Exp $
+.\" @(#) $Id: mi_copyin.9.man,v 0.9.2.4 2005/07/03 17:40:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/01 20:16:37 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -186,11 +186,18 @@ for examples of the usage of
 .SH CONTEXT
 .PP
 .BR mi_copyin ()
-can be called from
+can be called from any context; however, it is normally called from the
+.I STREAMS
+module or driver write-side queue put or service procedure.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR mi_copyin ()
+is MP-safe; however, it is the responsibility of the caller to ensure exclusive access to the passed
+in message blocks.  This is normally the case when the function is called from the
+.I STREAMS
+module or driver write-side queue put or service procedure.
 .\"
 .\"
 .SH NOTICES
@@ -211,6 +218,25 @@ defined.
 .\"
 .SH IMPLEMENTATION
 .PP
+.B mi_copyin ()
+is implemented by directly manipulating the
+.BR iocblk (9),
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures contained in the message block.  Private state information and accumulated data is
+chained off of the
+.IR cq_private " and " cp_private
+members of the
+.BR copyreq (9)
+and
+.BR copyresp (9)
+structures.
+Because of this, it is important that once one of these helper functions is used to begin an
+.BR M_IOCTL (9)
+sequence, that the remaining help functions be used also, instead of directly manipulating the
+structures.  Messages and their contained structures should be passed to the helper functions
+without being manipulated in any way by the caller.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -239,6 +265,17 @@ is compatible with
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .IP \(em
+.BR mi_copyin ()
+is not bug for bug compatible with
+.IR Solaris \(rg.
+.IR OpenSolaris \(rg
+has the bug that its implementation of 
+.BR mi_copyin ()
+will only work correctly on the initial
+.BR M_IOCTL (9)
+message and will fail if used on subsequent
+.BR M_IOCDATA (9)
+messages.
 .IP \(em
 .BR mi_copyin ()
 is an

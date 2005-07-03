@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2005/05/28 04:42:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/07/03 17:41:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:42:54 $ by $Author: brian $
+# Last Modified $Date: 2005/07/03 17:41:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -162,6 +162,9 @@ libLfS_streams_a_SOURCES	+= src/compat/svr3/svr3compat.c
 endif
 if CONFIG_STREAMS_COMPAT_SVR4
 libLfS_streams_a_SOURCES	+= src/compat/svr4/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+libLfS_streams_a_SOURCES	+= src/compat/mps/mpscompat.c
 endif
 if CONFIG_STREAMS_COMPAT_SUN
 libLfS_streams_a_SOURCES	+= src/compat/sun/suncompat.c
@@ -313,6 +316,9 @@ libLfS_compat_a_SOURCES		+= src/compat/svr3/svr3compat.c
 endif
 if CONFIG_STREAMS_COMPAT_SVR4_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/svr4/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+libLfS_compat_a_SOURCES		+= src/compat/mps/mpscompat.c
 endif
 if CONFIG_STREAMS_COMPAT_SUN_MODULE
 libLfS_compat_a_SOURCES		+= src/compat/sun/suncompat.c
@@ -617,6 +623,7 @@ EXPORT_SRCFILES			= \
 				src/compat/irix/irixcompat.c \
 				src/compat/lis/liscompat.c \
 				src/compat/mac/maccompat.c \
+				src/compat/mps/mpscompat.c \
 				src/compat/osf/osfcompat.c \
 				src/compat/sun/suncompat.c \
 				src/compat/svr3/svr3compat.c \
@@ -641,6 +648,7 @@ EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/irixcompat.ver \
 				$(PKGINCL)/versions/liscompat.ver \
 				$(PKGINCL)/versions/maccompat.ver \
+				$(PKGINCL)/versions/mpscompat.ver \
 				$(PKGINCL)/versions/osfcompat.ver \
 				$(PKGINCL)/versions/suncompat.ver \
 				$(PKGINCL)/versions/svr3compat.ver \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:39 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/03 17:41:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:39 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:39 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -110,6 +110,7 @@ static char const ident[] =
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
+#include <sys/strsun.h>
 
 #include "sys/config.h"
 #include "src/kernel/strsched.h"
@@ -120,7 +121,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:39 $"
+#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -488,6 +489,55 @@ extern int ddi_umem_lock(void);
 extern int ddi_umem_unlock(void);
 extern int ddi_unmap_regs(void);
 #endif
+
+/*
+ *  Solaris helper functions from sys/strsun.h
+ */
+__SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp);
+EXPORT_SYMBOL(DB_BASE);
+__SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp);
+EXPORT_SYMBOL(DB_LIM);
+__SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp);
+EXPORT_SYMBOL(DB_REF);
+__SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp);
+EXPORT_SYMBOL(DB_TYPE);
+__SUN_EXTERN_INLINE long MBLKL(mblk_t *mp);
+EXPORT_SYMBOL(MBLKL);
+__SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp);
+EXPORT_SYMBOL(MBLKSIZE);
+__SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp);
+EXPORT_SYMBOL(MBLKHEAD);
+__SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp);
+EXPORT_SYMBOL(MBLKTAIL);
+__SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len);
+EXPORT_SYMBOL(MBLKIN);
+__SUN_EXTERN_INLINE long OFFSET(void *p, void *base);
+EXPORT_SYMBOL(OFFSET);
+__SUN_EXTERN_INLINE void merror(queue_t *q, mblk_t *mp, int error);
+EXPORT_SYMBOL(merror);
+__SUN_EXTERN_INLINE void mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval);
+EXPORT_SYMBOL(mioc2ack);
+__SUN_EXTERN_INLINE void miocack(queue_t *q, mblk_t *mp, int count, int rval);
+EXPORT_SYMBOL(miocack);
+__SUN_EXTERN_INLINE void miocnak(queue_t *q, mblk_t *mp, int count, int error);
+EXPORT_SYMBOL(miocnak);
+__SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int type, uint32_t primtype);
+EXPORT_SYMBOL(mexchange);
+__SUN_EXTERN_INLINE mblk_t *mexpandb(mblk_t *mp, int i1, int i2);
+EXPORT_SYMBOL(mexpandb);
+__SUN_EXTERN_INLINE int miocpullup(mblk_t *mp, size_t len);
+EXPORT_SYMBOL(miocpullup);
+#if 0
+/* contained in the base package */
+__SUN_EXTERN_INLINE size_t msgsize(mblk_t *mp);
+EXPORT_SYMBOL(msgsize);
+#endif
+__SUN_EXTERN_INLINE void mcopymsg(mblk_t *mp, unsigned char *buf);
+EXPORT_SYMBOL(mcopymsg);
+__SUN_EXTERN_INLINE void mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr);
+EXPORT_SYMBOL(mcopyin);
+__SUN_EXTERN_INLINE void mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp);
+EXPORT_SYMBOL(mcopyout);
 
 /* 
  *  Configuration
