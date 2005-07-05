@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/04 19:57:40 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/05 04:42:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:40 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 04:42:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -415,6 +415,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [dnl
 	if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
 	then
+	    # First thing to do is to take user specified director(ies)
 	    streams_cv_lfs_includes="$with_lfs"
 	fi
 	streams_what="sys/stream.h"
