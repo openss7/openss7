@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/13 03:54:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:07:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/13 03:54:28 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:07:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -145,6 +145,22 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		[with_STREAMS='yes'])
     if test :${with_STREAMS:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([streams])
+    fi
+    AC_ARG_WITH([STRCOMPAT],
+		AS_HELP_STRING([--without-STRCOMPAT],
+			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
+		[with_STRCOMPAT="$withval"],
+		[with_STRCOMPAT='yes'])
+    if test :${with_STRCOMPAT:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strcompat])
+    fi
+    AC_ARG_WITH([STRUTIL],
+		AS_HELP_STRING([--without-STRUTIL],
+			       [do not include STRUTIL in master pack @<:@included@:>@]),
+		[with_STRUTIL="$withval"],
+		[with_STRUTIL='yes'])
+    if test :${with_STRUTIL:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([strutil])
     fi
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],

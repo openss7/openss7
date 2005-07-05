@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/06/29 08:08:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/04 20:18:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:08:06 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:18:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,24 +66,20 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= \
-				  test-inet_raw \
+EXTRA_PROGRAMS			+= test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp \
 				  test-inet_sctp
 
-libexec_PROGRAMS		= \
-				  test-inet_raw \
+libexec_PROGRAMS		= test-inet_raw \
 				  test-inet_udp \
 				  test-inet_tcp
 
 if WITH_OPENSS7_SCTP
-libexec_PROGRAMS		+= \
-				  test-inet_sctp
+libexec_PROGRAMS		+= test-inet_sctp
 endif
 
-sbin_PROGRAMS			= \
-				  @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -230,8 +226,8 @@ mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
 nodist_libINETmods_a_SOURCES	= $(mods_source_FILES)
 
-libINETmods_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
+libINETmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libINETmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libINETmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 EXTRA_KERNEL_MODULES		+=
@@ -273,9 +269,11 @@ KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			= $(STREAMS_MODMAP)
 
 if WITH_KO_MODULES
+## WITH_KO_MODULES
 kpre				= streams_
 else
 kpre				= streams-
+## WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -303,7 +301,8 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols
@@ -321,7 +320,7 @@ INET_RMDEV			= scripts/inet_rmdev
 if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 ## these go with the utilities package
-dist_sbin_SCRIPTS = $(INET_MKDEV) $(INET_RMDEV)
+dist_sbin_SCRIPTS 		= $(INET_MKDEV) $(INET_RMDEV)
 endif
 endif
 
@@ -374,24 +373,20 @@ if INSTALL_INITSCRIPTS
 if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= \
-				src/util/init/strinet.sh
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
-dist_initrd_SCRIPTS		= \
-				src/util/init/strinet
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= \
-				src/util/sysconfig/strinet.conf
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
-dist_config_DATA		= \
-				src/util/sysconfig/strinet
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif
@@ -430,23 +425,23 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
-MAINTAINERCLEANFILES	+= \
-			$(top_srcdir)/aclocal.m4 \
-			$(top_srcdir)/config.h.in \
-			$(top_srcdir)/configure \
-			$(top_srcdir)/COPYING \
-			$(top_srcdir)/INSTALL \
-			$(top_srcdir)/scripts/compile \
-			$(top_srcdir)/scripts/config.guess \
-			$(top_srcdir)/scripts/config.sub \
-			$(top_srcdir)/scripts/depcomp \
-			$(top_srcdir)/scripts/install-sh \
-			$(top_srcdir)/scripts/ltmain.sh \
-			$(top_srcdir)/scripts/missing \
-			$(top_srcdir)/scripts/texinfo.tex
+MAINTAINERCLEANFILES		+= \
+				  $(top_srcdir)/aclocal.m4 \
+				  $(top_srcdir)/config.h.in \
+				  $(top_srcdir)/configure \
+				  $(top_srcdir)/COPYING \
+				  $(top_srcdir)/INSTALL \
+				  $(top_srcdir)/scripts/compile \
+				  $(top_srcdir)/scripts/config.guess \
+				  $(top_srcdir)/scripts/config.sub \
+				  $(top_srcdir)/scripts/depcomp \
+				  $(top_srcdir)/scripts/install-sh \
+				  $(top_srcdir)/scripts/ltmain.sh \
+				  $(top_srcdir)/scripts/missing \
+				  $(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

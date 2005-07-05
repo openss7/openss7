@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.6 $) $Date: 2005/04/12 22:45:14 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.8 $) $Date: 2005/06/30 04:38:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/04/12 22:45:14 $ by $Author: brian $
+ Last Modified $Date: 2005/06/30 04:38:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.6 $) $Date: 2005/04/12 22:45:14 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.8 $) $Date: 2005/06/30 04:38:34 $"
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*
@@ -134,14 +134,16 @@ EXPORT_SYMBOL_GPL(lis_atomic_inc);
 EXPORT_SYMBOL_GPL(lis_atomic_read);
 EXPORT_SYMBOL_GPL(lis_atomic_set);
 EXPORT_SYMBOL_GPL(lis_atomic_sub);
+EXPORT_SYMBOL_GPL(lis_backenable);
 EXPORT_SYMBOL_GPL(lis_backq);
 EXPORT_SYMBOL_GPL(lis_backq_fcn);
 EXPORT_SYMBOL_GPL(lis_bcanput);
 EXPORT_SYMBOL_GPL(lis_bcanputnext);
-EXPORT_SYMBOL_GPL(lis_bcanputnext_anyband);
+EXPORT_SYMBOL_GPL(lis_bcanput_anyband);
 EXPORT_SYMBOL_GPL(lis_bufcall);
 EXPORT_SYMBOL_GPL(lis_clone_major);
 EXPORT_SYMBOL_GPL(lis_cmn_err);
+EXPORT_SYMBOL_GPL(lis_vcmn_err);
 EXPORT_SYMBOL_GPL(lis_copyb);
 EXPORT_SYMBOL_GPL(lis_copyin);
 EXPORT_SYMBOL_GPL(lis_copymsg);
@@ -159,7 +161,9 @@ EXPORT_SYMBOL_GPL(lis_enable_irq);
 EXPORT_SYMBOL_GPL(lis_esballoc);
 EXPORT_SYMBOL_GPL(lis_esbbcall);
 EXPORT_SYMBOL_GPL(lis_flushband);
+EXPORT_SYMBOL_GPL(lis_findmod);
 EXPORT_SYMBOL_GPL(lis_flushq);
+EXPORT_SYMBOL_GPL(lis_fmod_sw);
 EXPORT_SYMBOL_GPL(lis_free);
 EXPORT_SYMBOL_GPL(lis_freeb);
 EXPORT_SYMBOL_GPL(lis_free_dma);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/04/12 22:45:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:21 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -55,7 +55,7 @@
  * Author          : Francisco J. Ballesteros, David Grothe
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: cmn_err.h,v 1.2 1996/01/27 00:39:48 dave Exp $
+ * RCS Id          : $Id: cmn_err.h,v 1.1.1.2.4.3 2005/04/12 22:45:21 brian Exp $
  *
  * Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
@@ -64,7 +64,7 @@
 #ifndef _CMD_ERR_H
 #define _CMD_ERR_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/04/12 22:45:21 $"
 
 #include <sys/LiS/genconf.h>
 
@@ -76,8 +76,10 @@
 #ifdef __KERNEL__
 
 void    lis_cmn_err_init(void) ;	/* not exported */
-void	lis_cmn_err(int err_lvl, char *fmt, ...) _RP __attribute__ ((format(printf, 2, 3)));
+void	lis_vcmn_err(int err_lvl, const char *fmt, va_list args) _RP;
+void	lis_cmn_err(int err_lvl, const char *fmt, ...) _RP __attribute__ ((format(printf, 2, 3)));
 #define	cmn_err		lis_cmn_err
+#define vcmn_err	lis_vcmn_err
 
 #endif				/* __KERNEL__ */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.4  2005/07/04 20:14:30  brian
+ - fixed spelling of CVS keyword
+
+ Revision 0.9.2.3  2005/07/04 19:29:16  brian
+ - first cut at streams compatibility package
+
  Revision 0.9.2.2  2005/07/03 17:41:27  brian
  - separated out MPS compatibility module
 
@@ -59,15 +65,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -82,6 +90,7 @@ static char const ident[] =
 
 #define __MPS_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -107,25 +116,40 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _MPS_SOURCE
+
+#include "os7/compat.h"
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
-#include <sys/mpsddi.h>
+#endif
 
-#include "sys/config.h"
+#if LIS
+#include <sys/mpsddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"
+#else
+#if 0
+#include "include/sys/strdebug.h"
+#endif
+#endif
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:27 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"

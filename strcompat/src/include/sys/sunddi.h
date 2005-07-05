@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.8 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.9 2005/07/04 19:29:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 19:29:12 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -85,12 +85,18 @@ __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
 
 __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
 {
+#if LFS
 	unfreezestr(q, -1UL);
+#endif
+#if LIS
+	unfreezestr(q);
+#endif
 }
 
 #undef unfreezestr
 #define unfreezestr unfreezestr_SUN
 
+#if LFS
 /**
  *  qbufcall:	- schedule a buffer callout
  *  @q:		queue used for synchronization
@@ -128,17 +134,22 @@ __SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid)
 {
 	unbufcall(bcid);
 }
+#endif
 
 __SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid)
 {
 	return untimeout(toid);
 }
 
+#if LFS
+/* LiS already defines this */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
 {
 	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
 }
+#endif
 
+#if LFS
 /**
  *  qwriter:	- deferred call to a callback function.
  *  @qp:	a pointer to the RD() queue of a queue pair
@@ -162,6 +173,7 @@ __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t 
 		return;
 	// never();
 }
+#endif
 
 __SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
 {
@@ -187,10 +199,12 @@ __SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
 	return (mp);
 }
 
+#if LFS
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void)
 {
 	return (current_creds);
 }
+#endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void)
 {
 	return (jiffies);

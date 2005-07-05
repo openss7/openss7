@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:38 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 20:14:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:38 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 20:14:29 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:38 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 20:14:29 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,6 +75,7 @@ static char const ident[] =
 
 #define __HPUX_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -98,23 +101,35 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _HPUX_SOURCE
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
 
-#include "sys/config.h"
+#include "os7/compat.h"
+
+#if LIS
+#include <sys/hpuxddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strsad.h"
+#endif
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:38 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 20:14:29 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -154,8 +169,10 @@ lock_t *get_sleep_lock(caddr_t event)
 }
 EXPORT_SYMBOL(get_sleep_lock);	/* hpuxddi.h */
 
+#if LFS
 __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
 EXPORT_SYMBOL(streams_put);	/* hpuxddi.h */
+#endif
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static

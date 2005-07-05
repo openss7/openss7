@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hpuxddi.h,v 0.9.2.9 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: hpuxddi.h,v 0.9.2.10 2005/07/04 20:21:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:21:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUXDDI_H__
 #define __SYS_HPUXDDI_H__
 
-#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/04 20:21:58 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -98,6 +98,7 @@ typedef void (*streams_put_t) (void *, mblk_t *);
  *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
  *  guaranteed to be executed within the STREAMS scheduler.
  */
+#define SE_STRPUT	5
 __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 {
 	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,

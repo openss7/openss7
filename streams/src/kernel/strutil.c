@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:30 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1401,9 +1401,9 @@ static void _put(queue_t *q, mblk_t *mp)
 {
 	struct syncq *isq;
 	unsigned long flags;
-#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+//#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
-#endif
+//#endif
 	if (!(isq = q->q_syncq))
 		__put(q, mp);
 	else {
@@ -2526,6 +2526,11 @@ int strqset(queue_t *q, qfields_t what, unsigned char band, long val)
 EXPORT_SYMBOL(strqset);
 
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+
+typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
+vstrlog_t vstrlog_hook = NULL;
+EXPORT_SYMBOL_GPL(vstrlog_hook);
+
 /**
  *  strlog:	- log a STREAMS message
  *  @mid:	module id
@@ -2537,28 +2542,40 @@ static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
  */
 int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
-	unsigned long flags;
-	static char str_err_buf[1024];
+	int result;
 	va_list args;
 	va_start(args, fmt);
-	spin_lock_irqsave(&str_err_lock, flags);
-	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
-	if (flag & SL_FATAL) {
-		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
-	} else if (flag & SL_ERROR) {
-		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
-	} else if (flag & SL_WARN) {
-		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
-	} else if (flag & SL_NOTE) {
-		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
-	} else if (flag & SL_CONSOLE) {
-		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
-	} else {		/* SL_TRACE */
-		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid, (int) sid, str_err_buf);
+	if (vstrlog_hook != NULL)
+		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
+	else {
+		unsigned long flags;
+		static char str_err_buf[1024];
+		spin_lock_irqsave(&str_err_lock, flags);
+		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
+		if (flag & SL_FATAL) {
+			printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		} else if (flag & SL_ERROR) {
+			printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		} else if (flag & SL_WARN) {
+			printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		} else if (flag & SL_NOTE) {
+			printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		} else if (flag & SL_CONSOLE) {
+			printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		} else {	/* SL_TRACE */
+			printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+			       (int) sid, str_err_buf);
+		}
+		spin_unlock_irqrestore(&str_err_lock, flags);
+		result = 1;
 	}
-	spin_unlock_irqrestore(&str_err_lock, flags);
 	va_end(args);
-	return (1);
+	return (result);
 }
 
 EXPORT_SYMBOL(strlog);
@@ -2623,9 +2640,9 @@ void vcmn_err(int err_lvl, const char *fmt, va_list args)
 	return;
 }
 
-#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+//#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(vcmn_err);
-#endif
+//#endif
 
 /**
  *  cmn_err:	- print a command error

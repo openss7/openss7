@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2005/07/03 17:41:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2005/07/04 20:23:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/03 17:41:05 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:23:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,8 +58,10 @@ include am/openss7.am
 dist_sysconf_DATA =
 
 if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 bin_PROGRAMS			= \
 				strchg \
@@ -114,6 +116,7 @@ lib_LTLIBRARIES			= libstreams.la
 endif
 
 if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
 
 noinst_LIBRARIES		= \
 				libLfS-specfs.a \
@@ -361,10 +364,10 @@ streams.o: stamp-verobjs
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
-endif
 ## RPM_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
+endif
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -390,9 +393,11 @@ KMODCONF_EXT			= $(PACKAGE_LCNAME)
 KERNEL_MODMAPS			=
 
 if WITH_KO_MODULES
+## WITH_KO_MODULES
 kpre				= streams_
 else
 kpre				= streams-
+## WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -413,8 +418,10 @@ endif
 include am/libraries.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
 
 libstreams_la_SOURCES		= \
 				lib/libc/fattach.c \
@@ -618,18 +625,6 @@ AUTOCONFIG_H			= include/sys/config.h
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
-				src/compat/aix/aixcompat.c \
-				src/compat/hpux/hpuxcompat.c \
-				src/compat/irix/irixcompat.c \
-				src/compat/lis/liscompat.c \
-				src/compat/mac/maccompat.c \
-				src/compat/mps/mpscompat.c \
-				src/compat/osf/osfcompat.c \
-				src/compat/sun/suncompat.c \
-				src/compat/svr3/svr3compat.c \
-				src/compat/svr4/svr4compat.c \
-				src/compat/uw7/uw7compat.c \
-				src/drivers/clone.c \
 				src/kernel/strattach.c \
 				src/kernel/strlookup.c \
 				src/kernel/strpipe.c \
@@ -639,22 +634,88 @@ EXPORT_SRCFILES			= \
 				src/kernel/strspecfs.c \
 				src/kernel/strsysctl.c \
 				src/kernel/strutil.c \
-				src/kernel/strsyms.c \
-				src/modules/sth.c
+				src/kernel/strsyms.c
+
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_SRCFILES			+= src/compat/svr3/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_SRCFILES			+= src/compat/svr4/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_SRCFILES			+= src/compat/mps/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_SRCFILES			+= src/compat/sun/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_SRCFILES			+= src/compat/uw7/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_SRCFILES			+= src/compat/osf/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_SRCFILES			+= src/compat/aix/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_SRCFILES			+= src/compat/hpux/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_SRCFILES			+= src/compat/irix/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_SRCFILES			+= src/compat/lis/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_SRCFILES			+= src/compat/mac/maccompat.c
+endif
+if CONFIG_STREAMS_STH
+EXPORT_SRCFILES			+= src/modules/sth.c
+endif
+if CONFIG_STREAMS_CLONE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_SRCFILES			+= src/compat/svr3/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_SRCFILES			+= src/compat/svr4/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_SRCFILES			+= src/compat/mps/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_SRCFILES			+= src/compat/sun/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_SRCFILES			+= src/compat/uw7/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_SRCFILES			+= src/compat/osf/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_SRCFILES			+= src/compat/aix/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_SRCFILES			+= src/compat/hpux/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_SRCFILES			+= src/compat/irix/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SRCFILES			+= src/compat/lis/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_SRCFILES			+= src/compat/mac/maccompat.c
+endif
+if CONFIG_STREAMS_STH_MODULE
+EXPORT_SRCFILES			+= src/modules/sth.c
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_SRCFILES			+= src/drivers/clone.c
+endif
 
 EXPORT_VERFILES			= \
-				$(PKGINCL)/versions/aixcompat.ver \
-				$(PKGINCL)/versions/hpuxcompat.ver \
-				$(PKGINCL)/versions/irixcompat.ver \
-				$(PKGINCL)/versions/liscompat.ver \
-				$(PKGINCL)/versions/maccompat.ver \
-				$(PKGINCL)/versions/mpscompat.ver \
-				$(PKGINCL)/versions/osfcompat.ver \
-				$(PKGINCL)/versions/suncompat.ver \
-				$(PKGINCL)/versions/svr3compat.ver \
-				$(PKGINCL)/versions/svr4compat.ver \
-				$(PKGINCL)/versions/uw7compat.ver \
-				$(PKGINCL)/versions/clone.ver \
 				$(PKGINCL)/versions/strattach.ver \
 				$(PKGINCL)/versions/strlookup.ver \
 				$(PKGINCL)/versions/strpipe.ver \
@@ -664,8 +725,86 @@ EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/strspecfs.ver \
 				$(PKGINCL)/versions/strsysctl.ver \
 				$(PKGINCL)/versions/strutil.ver \
-				$(PKGINCL)/versions/strsyms.ver \
-				$(PKGINCL)/versions/sth.ver
+				$(PKGINCL)/versions/strsyms.ver
+
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_STH
+EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
+if CONFIG_STREAMS_CLONE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_STH_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
+endif
+if CONFIG_STREAMS_CLONE_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
+endif
 
 GENKSYMS_CPPFLAGS		= \
 				-I./src/compat -I$(srcdir)/src/compat \
@@ -685,6 +824,7 @@ include am/genksyms.am
 include am/strconf.am
 
 if RPM_BUILD_USER
+## RPM_BUILD_USER
 
 SUBDIRS = include doc tests
 
@@ -752,8 +892,8 @@ include am/archive.am
 ##
 ## Rules for making rpms
 ##
-AM_RPMFLAGS 			= --define "_kversion $(kversion)"
-AM_SRPMFLAGS 			= $(AM_RPMFLAGS)
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			= $(AM_RPMFLAGS)
 
 include am/rpm.am
 

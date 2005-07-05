@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: kmem_free.9.man,v 1.1.4.4 2005/04/08 22:40:47 brian Exp $
+.\" @(#) $Id: kmem_free.9.man,v 1.1.4.5 2005/07/04 20:26:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/08 22:40:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 20:26:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -193,6 +193,9 @@ argument, instead of
 Current versions ignore the
 .I size
 argument altogether.
+This can often cause a compiler warning for and unused variable.  Always cast your size variable to
+.RB ( void )
+to stop compiler warnings.
 .\"
 .\"
 .SH COMPATIBILITY

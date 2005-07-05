@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_attach.9.man,v 0.9.2.3 2005/07/03 17:40:14 brian Exp $
+.\" @(#) $Id: mi_attach.9.man,v 0.9.2.4 2005/07/04 19:28:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 19:28:46 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so streams.macros
+.so strcompat.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database streams.refs
+database strcompat.refs
 accumulate
 move-punctuation
 abbreviate A

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.15 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.16 2005/07/04 19:29:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:09 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -161,7 +161,19 @@ typedef int tid_t;
 #define SPLSTR(__pl) ({ (__pl) = splstr(); (void)0; })
 #define SPLX(__pl) splx(__pl)
 #else				/* LFS */
+#if 0
 typedef lis_flags_t pl_t;
+#endif
 #endif				/* LFS */
+
+#if LIS
+#undef db_frtnp
+#define db_frtnp frtnp
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+#endif
 
 #endif				/* __LOCAL_COMPAT_H__ */

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/03 17:40:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/04 20:20:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/03 17:40:07 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:20:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -486,6 +486,7 @@ osf_compat_pages = \
 	man9/osfcompat.9
 
 sun_compat_pages = \
+	man9/suncompat.9 \
 	man9/DB_BASE.9 \
 	man9/DB_LIM.9 \
 	man9/DB_REF.9 \
@@ -1419,6 +1420,7 @@ dist_noinst_osf_compat_pages = \
 	man9/osfcompat.9.man
 
 dist_noinst_sun_compat_pages = \
+	man9/suncompat.9.man \
 	man9/DB_BASE.9.man \
 	man9/DB_LIM.9.man \
 	man9/DB_REF.9.man \

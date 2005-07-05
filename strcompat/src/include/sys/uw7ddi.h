@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.8 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.9 2005/07/04 19:29:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 19:29:13 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -113,7 +113,10 @@ typedef struct {
 	unsigned char sg_format;
 } scgth_t;
 
+#if LFS
+/* already defined by LiS */
 extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
+#endif
 extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
 extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
 extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);

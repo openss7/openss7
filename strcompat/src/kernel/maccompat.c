@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:30 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:30 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,6 +74,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define __MAC_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -97,24 +100,36 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _MAC_SOURCE
+
+#include "os7/compat.h"
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
 
-#include "sys/config.h"
+#if LIS
+#include <sys/macddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"
+#endif
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/03 17:41:19 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:30 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

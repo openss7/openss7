@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/05/15 04:08:15 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/05/15 04:08:15 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/05/15 04:08:15 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -84,6 +84,7 @@ static char const ident[] =
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 
+#if 0
 #if defined(CONFIG_STREAMS_COMPAT_SVR4)||defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 #define _SVR4_SOURCE
 #endif
@@ -107,6 +108,7 @@ static char const ident[] =
 #endif
 #if defined(CONFIG_STREAMS_COMPAT_MAC)||defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
 #define _MAC_SOURCE
+#endif
 #endif
 
 #undef STR
@@ -268,13 +270,13 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(cdev_count);	/* strreg.h */
 #endif
 
-#if	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
+//#if	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
 //EXPORT_SYMBOL_GPL(fmod_str);	/* strreg.h */
-#endif
+//#endif
 
-#if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
+//#if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
 //EXPORT_SYMBOL_GPL(strthreads);/* strsched.h */
-#endif
+//#endif
 
 //EXPORT_SYMBOL_GPL(cdrv_get);	/* strreg.h */
 //EXPORT_SYMBOL_GPL(cdrv_put);	/* strreg.h */
@@ -289,9 +291,9 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(qpop);	/* stream.h */
 //EXPORT_SYMBOL_GPL(qpush);	/* stream.h */
 
-#if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) || \
-	defined(CONFIG_STREAMS_FIFO_MODULE) || \
-	defined(CONFIG_STREAMS_PIPE_MODULE)
+//#if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) ||
+//	defined(CONFIG_STREAMS_FIFO_MODULE) ||
+//	defined(CONFIG_STREAMS_PIPE_MODULE)
 //EXPORT_SYMBOL_GPL(allocstr);	/* strsched.h */
 //EXPORT_SYMBOL_GPL(autopush);	/* sth.h */
 //EXPORT_SYMBOL_GPL(freestr);	/* strsched.h */
@@ -312,7 +314,7 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL_GPL(strwritev);	/* sth.h */
 //EXPORT_SYMBOL_GPL(strgetpmsg);/* sth.h */
 //EXPORT_SYMBOL_GPL(strputpmsg);/* sth.h */
-#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
+//#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 //EXPORT_SYMBOL_GPL(apush_get);	/* strconf.h */
 //EXPORT_SYMBOL_GPL(apush_set);	/* strconf.h */
 //EXPORT_SYMBOL_GPL(apush_vml);	/* strconf.h */
@@ -331,5 +333,5 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 #ifdef HAVE_KERNEL_PIPE_SUPPORT
 //EXPORT_SYMBOL_GPL(do_spipe);	/* strspecfs.h */
 #endif
-#endif
-#endif
+//#endif
+//#endif

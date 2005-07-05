@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: maccompat.9.man,v 0.9.2.3 2005/07/03 17:40:14 brian Exp $
+.\" @(#) $Id: maccompat.9.man,v 0.9.2.4 2005/07/04 20:20:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:14 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 20:20:14 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -88,14 +88,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
-.BR streams-maccompat.o ,
+.IR streams-maccompat.o ,
 that provides compatibility functions that smooth porting of drivers from the
 .I Mac OpenTransport 1.5r2
 .I STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -106,18 +106,18 @@ Many of the functions that are provided by
 are also provided by the core
 .B streams.o
 kernel module of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .IR MacOT \(rg-specific
 functions are provided by the
-.B streams-maccompat.o
+.I streams-maccompat.o
 compatibility kernel module.
 .\"
 .\"
 .SS "Core Functions"
 .PP
 Functions that are already available in
-.BR Linux Fast STREAMS
+.B @PACKAGE_TITLE@
 are as follows:
 .HP
 .PD 0
@@ -284,28 +284,27 @@ thaw the state of a stream queue
 unlink a message block from a \fISTREAMS\fP message
 .PD
 .\"
-.SS "Specific Functions"
+.SS "\fIMPS\fP\fR\(rg\fP Functions"
 .PP
-Functions that are available in the
-.B Linux Fast-STREAMS
-.I MacOT \(rg
+.IR MacOT \(rg
+exposes a number of symbols from the underlying Mentat
+.IR MPS \(rg
+implementation that are also documented in the
+.IR MacOT \(rg
+documentation.
+.I STREAMS
+functions that are available to
+.IR MacOT \(rg
+in the
+.B @PACKAGE_TITLE@
+.IR MPS \(rg
 compatibility module,
-.BR streams-maccompat.o ,
+.IR streams-mpscompat ,
 are as follows:
-.HP
-.BR allocbi (9)\ \-\ \c
-.PD 0
-.HP
-.BR esballoca (9)\ \-\ \c
-.HP
-.BR mpnotify (9)\ \-\ \c
-assign notification callback to a \fISTREAMS\fR message
-.HP
-.BR puthere (9)\ \-\ \c
-invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
 .HP
 .BR mi_allocq (9)\ \-\ \c
 allocate a \fISTREAMS\fP queue pair
+.PD 0
 .HP
 .BR mi_bcmp (9)\ \-\ \c
 compare byte strings
@@ -384,6 +383,27 @@ deallocate a \fISTREAMS\fR queue pair
 .BR mi_timer_q_switch (9)\ \-\ \c
 .HP
 .BR mi_timer_valid (9)\ \-\ \c
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B @PACKAGE_TITLE@
+.IR MacOT \(rg
+compatibility module,
+.IR streams-maccompat.o ,
+are as follows:
+.HP
+.BR allocbi (9)\ \-\ \c
+.PD 0
+.HP
+.BR esballoca (9)\ \-\ \c
+.HP
+.BR mpnotify (9)\ \-\ \c
+assign notification callback to a \fISTREAMS\fR message
+.HP
+.BR puthere (9)\ \-\ \c
+invoke the put procedure for a \fISTREAMS\fP module or driver with a \fISTREAMS\fP message
 .HP
 .BR mps_become_writer (9)\ \-\ \c
 .HP
@@ -392,8 +412,19 @@ deallocate a \fISTREAMS\fR queue pair
 .BR mps_intr_enable (9)\ \-\ \c
 .PD
 .\"
-.SS "Transport Functions"
+.SS "\fIMPS\fP\fR\(rg\fP Transport Functions"
 .PP
+.IR MacOT \(rg
+exposes a number of symbols from the underlying Mentat
+.IR MPS \(rg
+TCP/IP implementation that are also documented in the
+.IR MacOT \(rg
+documentation.
+These transport functions are
+.B not
+part of the
+.B @PACKAGE_TITLE@
+package:
 .HP
 .BR mi_tpi_ack_alloc (9)\ \-\ \c
 .PD 0
@@ -463,7 +494,7 @@ symbols.
 To use
 .IR MacOT \(rg-specific
 functions,
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_MAC
 or
@@ -474,7 +505,7 @@ When compiled with
 defined,
 .IR MacOT \(rg
 compatibility will become part of the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .B streams.o
 kernel module.
 When compiled with
@@ -482,7 +513,7 @@ When compiled with
 defined,
 .IR MacOT \(rg
 compatibility will be placed in a separate
-.B streams-maccompat.o
+.I streams-maccompat.o
 kernel module that will demand load when any
 .I STREAMS
 driver or module that uses the
@@ -638,8 +669,11 @@ These functions are compatible with
 .IR MacOT \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR MacOT \(rg-specific
-functions should not be used by portable
+Neither
+.IR MacOT \(rg-specific,
+nor
+.IR MPS \(rg,
+functions should be used by portable
 .I STREAMS
 drivers and modules.
 The more common
@@ -654,7 +688,7 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
 lfs
 .]
@@ -695,15 +729,17 @@ macspg
 .PP
 Most of these functions
 first appeared in
-.IR MacOT \(rg.
-Functions with name starting with
+.IR MacOT \(rg;
+except functions with a name starting with
+.IR mi_ .
+Those starting with
 .I mi_
-are probably
-.I Mentat, Inc.
-functions that goes all the way back to the
+are
+.IR MPS \(rg
+functions dating back to
 .RI pre- OSF/1
-.I Mentat
-implementation.
+.I STREAMS
+implementations.
 .\"
 .\"
 .[

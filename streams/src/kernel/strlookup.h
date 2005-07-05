@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlookup.h,v 0.9.2.6 2005/05/14 08:34:41 brian Exp $
+ @(#) $Id: strlookup.h,v 0.9.2.7 2005/07/04 20:22:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -70,11 +70,11 @@ extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
 extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
 extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 
-#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE \
- || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+//#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+// || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 extern struct fmodsw *fmod_str(const struct streamtab *str);
 extern struct cdevsw *cdev_str(const struct streamtab *str);
-#endif
+//#endif
 
 /* initialization for specfs */
 extern int strlookup_init(void);

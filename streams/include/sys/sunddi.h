@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.13 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.14 2005/07/04 20:21:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:21:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/04 20:21:58 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -153,6 +153,7 @@ __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
  *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
  *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
  */
+#define SE_WRITER	6
 __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp),
 				 int perimeter)
 {

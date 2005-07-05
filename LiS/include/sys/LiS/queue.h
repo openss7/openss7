@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: queue.h,v 1.1.1.5.4.2 2005/04/12 22:45:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/04/12 22:45:25 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.h,v 1.9 1996/01/27 00:40:28 dave Exp $
+ * RCS Id          : $Id: queue.h,v 1.1.1.5.4.2 2005/04/12 22:45:25 brian Exp $
  * Purpose         : here you have utilites to handle str queues.
  * ----------------______________________________________________
  *
@@ -69,7 +69,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: queue.h,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:25 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -356,6 +356,13 @@ extern queue_t * lis_backq_fcn(queue_t *q, char *f,int l)_RP;
 extern queue_t * lis_backq(queue_t *q)_RP;
 #endif				/* __KERNEL__ */
 
+/* lis_backenable - enable back queue if QWANTW is set, i.e.
+ *	if a back queue is full.
+ */
+#ifdef __KERNEL__
+extern void lis_backenable(queue_t *q);
+#endif				/* __KERNEL__ */
+
 /* lis_getq - get message from head of queue
  *
  */
@@ -579,14 +586,14 @@ extern int lis_bcanput(queue_t *q, unsigned char band)_RP;
 extern int lis_bcanputnext(queue_t *q, unsigned char band)_RP;
 
 /*  -------------------------------------------------------------------  */
-/* lis_bcanputnext_anyband - search the stream starting from the queue after q
+/* lis_bcanput_anyband - search the stream starting from the queue q
  *	until a service routine is found.  Return true if there is some
  *	non-zero qband in that queue that can be written into.
  *
  * returns STR_OK if msg can be put(), STR_ERR (0) if not.
  *
  */
-extern int lis_bcanputnext_anyband(queue_t *q)_RP;
+extern int lis_bcanput_anyband(queue_t *q)_RP;
 
 /*  -------------------------------------------------------------------  */
 /* lis_qcountstrm - return the accumulated q_count fields of all the

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mpsddi.h,v 0.9.2.1 2005/07/03 17:41:12 brian Exp $
+ @(#) $Id: mpsddi.h,v 0.9.2.2 2005/07/04 19:29:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpsddi.h,v $
+ Revision 0.9.2.2  2005/07/04 19:29:12  brian
+ - first cut at streams compatibility package
+
  Revision 0.9.2.1  2005/07/03 17:41:12  brian
  - separated out MPS compatibility module
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_MPSDDI_H__
 #define __SYS_MPSDDI_H__
 
-#ident "@(#) $RCSfile: mpsddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mpsddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -120,6 +123,7 @@ __MPS_EXTERN_INLINE void mi_free(void *ptr)
 	size_t *sp;
 	if ((sp = ptr)) {
 		size_t size = *sp--;
+		(void) size; /* LiS ignores size */
 		kmem_free(sp, size);
 	}
 }
@@ -203,6 +207,7 @@ extern int mi_timer_cancel(mblk_t *mp); /* also called mi_timer_stop */
 extern void mi_timer_move(queue_t *q, mblk_t *mp);	/* also mi_timer_q_switch */
 extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp); /* also mi_timer_move */
 
+#if LFS
 /*
  *  Buffer call helper function.
  */
@@ -214,6 +219,7 @@ __MPS_EXTERN_INLINE void mi_bufcall(queue_t *q, int size, int priority)
 	if (__bufcall(q, size, priority, (void (*)) (long) qenable, (long) q) == 0)
 		qenable(q);
 }
+#endif
 
 /*
  *  Message block allocation helper functions.

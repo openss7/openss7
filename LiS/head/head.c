@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.4 $) $Date: 2005/06/02 09:58:31 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.5 $) $Date: 2005/06/23 10:54:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/02 09:58:31 $ by $Author: brian $
+ Last Modified $Date: 2005/06/23 10:54:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.4 $) $Date: 2005/06/02 09:58:31 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.5 $) $Date: 2005/06/23 10:54:07 $"
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.4 2005/06/02 09:58:31 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.5 2005/06/23 10:54:07 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *
@@ -3614,7 +3614,7 @@ int	_RP lis_strwsrv(queue_t *q)
 	 * on the queue for sending (or writing) priority data downstream."
 	 */
 	if (F_ISSET(hd->sd_sigflags,S_WRBAND)
-	    && lis_bcanputnext_anyband(q)
+	    && lis_bcanput_anyband(q->q_next)
 	   )
 	{
 	    CP(hd,0) ;
@@ -7704,7 +7704,7 @@ unsigned lis_poll_bits(stdata_t *hd)
     if (lis_bcanputnext(hd->sd_wq, 0))
 	revents |= (POLLWRNORM | POLLOUT) ;	/* can write band 0 data */
 
-    if (lis_bcanputnext_anyband(hd->sd_wq->q_next))
+    if (lis_bcanput_anyband(hd->sd_wq->q_next))
 	revents |= POLLWRBAND ;			/* can write band > 0 */
 
 rtn_point:

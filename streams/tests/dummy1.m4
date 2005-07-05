@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 23:59:23 $
+# @(#) $RCSfile: dummy1.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:07:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -61,11 +61,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 23:59:23 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:07:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: dummy1.m4,v $
+# Revision 0.9.2.4  2005/07/04 20:07:52  brian
+# - fixed spelling of CVS keyword
+#
 # Revision 0.9.2.3  2005/05/14 23:59:23  brian
 # - getting autotest up and running
 #

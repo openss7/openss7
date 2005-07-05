@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.6 2005/07/03 17:41:11 brian Exp $
+ @(#) $Id: aixddi.h,v 0.9.2.7 2005/07/04 19:29:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AXIDDI_H__
 #define __SYS_AXIDDI_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/03 17:41:11 $"
+#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/04 19:29:12 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -81,6 +81,7 @@ extern caddr_t mi_next_ptr(caddr_t strptr);
 extern caddr_t mi_prev_ptr(caddr_t strptr);
 extern void mi_bufcall(queue_t *q, int size, int priority);
 
+#if LFS
 extern int wantio(queue_t *q, struct wantio *w);
 
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
@@ -91,6 +92,7 @@ __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 	}
 	return (0);
 }
+#endif
 
 #elif defined(_AIX_SOURCE)
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"

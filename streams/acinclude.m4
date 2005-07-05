@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSFile$ $Name:  $($Revision: 0.9.2.76 $) $Date: 2005/07/03 17:41:06 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2005/07/04 20:07:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/03 17:41:06 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:07:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -479,69 +479,69 @@ AC_DEFUN([_LFS_SETUP_COMPAT], [dnl
     AC_ARG_ENABLE([compat-svr3],
 	AS_HELP_STRING([--enable-compat-svr3],
 	    [enable source compatibility with SVR 4.2 MP variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	    [enable_compat_svr3="$enableval"],
-	    [enable_compat_svr3='module'])
+	    [enable_compat_svr3='no'])
     AC_ARG_ENABLE([compat-svr4],
 	AS_HELP_STRING([--enable-compat-svr4],
 	    [enable source compatibility with SVR 4.2 MP variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	    [enable_compat_svr4="$enableval"],
-	    [enable_compat_svr4='module'])
+	    [enable_compat_svr4='no'])
     AC_ARG_ENABLE([compat-mps],
 	AS_HELP_STRING([--enable-compat-mps],
 	    [enable source compatibility with MPS variants.
 	    @<:@default=moudle@:>@]),
 	    [enable_compat_mps="$enableval"],
-	    [enable_compat_mps='module'])
+	    [enable_compat_mps='no'])
     AC_ARG_ENABLE([compat-sol8],
 	AS_HELP_STRING([--enable-compat-sol8],
 	    [enable source compatibility with Solaris 8 variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_sol8="$enableval"],
-	[enable_compat_sol8='module'])
+	[enable_compat_sol8='no'])
     AC_ARG_ENABLE([compat-uw7],
 	AS_HELP_STRING([--enable-compat-uw7],
 	    [enable source compatibility with UnixWare 7 variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_uw7="$enableval"],
-	[enable_compat_uw7='module'])
+	[enable_compat_uw7='no'])
     AC_ARG_ENABLE([compat-osf],
 	AS_HELP_STRING([--enable-compat-osf],
 	    [enable source compatibility with OSF/1.2 variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_osf="$enableval"],
-	[enable_compat_osf='module'])
+	[enable_compat_osf='no'])
     AC_ARG_ENABLE([compat-aix],
 	AS_HELP_STRING([--enable-compat-aix],
 	    [enable source compatibility with AIX 4 variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_aix="$enableval"],
-	[enable_compat_aix='module'])
+	[enable_compat_aix='no'])
     AC_ARG_ENABLE([compat-hpux],
 	AS_HELP_STRING([--enable-compat-hpux],
 	    [enable source compatibility with HPUX variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_hpux="$enableval"],
-	[enable_compat_hpux='module'])
+	[enable_compat_hpux='no'])
     AC_ARG_ENABLE([compat-irix],
 	AS_HELP_STRING([--enable-compat-irix],
 	    [enable source compatibility with IRIX variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_irix="$enableval"],
-	[enable_compat_irix='module'])
+	[enable_compat_irix='no'])
     AC_ARG_ENABLE([compat-lis],
 	AS_HELP_STRING([--enable-compat-lis],
 	    [enable source compatibility with LiS variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_lis="$enableval"],
-	[enable_compat_lis='module'])
+	[enable_compat_lis='no'])
     AC_ARG_ENABLE([compat-mac],
 	AS_HELP_STRING([--enable-compat-mac],
 	    [enable source compatibility with MacOT variants.
-	    @<:@default=module@:>@]),
+	    @<:@default=no@:>@]),
 	[enable_compat_mac="$enableval"],
-	[enable_compat_mac='module'])
+	[enable_compat_mac='no'])
     AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 3.2 compatibility], [lfs_compat_svr3], [dnl
 	lfs_compat_svr3="${enable_compat_svr3:-module}"
 	if test :$lfs_compat_svr3 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then

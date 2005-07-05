@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:07:51 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/01 20:17:33 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

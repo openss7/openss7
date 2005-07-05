@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/07/04 19:29:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/04 19:29:12 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -873,7 +873,7 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #endif
 
 #else				/* CONFIG_STREAMS_COMPAT_LIS */
-#ifdef _LIS_SOURCE
+#if defined(_LIS_SOURCE) && !defined(LIS)
 #warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
 #endif
 #endif				/* CONFIG_STREAMS_COMPAT_LIS */

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 1.1.2.1 2005/06/24 11:07:51 brian Exp $
+@c @(#) $Id: testsuite.texi,v 1.1.2.2 2005/07/04 20:26:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,13 +54,12 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/06/24 11:07:51 $ by $Author: brian $
+@c Last Modified $Date: 2005/07/04 20:26:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @menu
 * Test Suites::			Test Suites for the package
-* Running Test Suites::		Running Test Suites in the package
 * Problem Reports::		Problem Reports for the package
 * Known Bugs::			Known Bugs in the package
 @end menu
@@ -72,12 +71,51 @@
 @section Test Suites
 @cindex test suites
 
+@menu
+* Pre-installation Checks::	Tests performed before installation.
+* Post-installation Checks::	Tests performed after installation.
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Pre-installation Checks
+@subsection Pre-installation Checks
+@cindex pre-installation checks
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Post-installation Checks
+@subsection Post-installation Checks
+@cindex post-installation checks
+
+@menu
+* Running Test Suites::		Running Test Suites in the package
+@end menu
+
+Most OpenSS7 packages ship with a combatibility and conformance test suite built using the
+@samp{autotest} capabilities of @samp{autoconf 2.59}.  These test suites act as a wrapper for the
+compatibility and conformance test programs that a shipped with the package.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Running Test Suites
-@section Running Test Suites
+@subsubsection Running Test Suites
 @cindex test suites, running
+
+There are several ways of invoking the conformance test suites:
+
+@enumerate
+@item The test suites can be run after installation of the package by invoking the @samp{make
+installcheck} target.  Some packages require that root privileges be acquired before invoking the
+package.
+@item The test suites can be run from the distribution subdirectory after installation of the
+package by invoking the @samp{testsuite} shell script directly.
+@item The test suites can be run standalone from the @samp{libexec} (@value{_libexecdir}) installation
+directory by invoking the @samp{testsuite} shell script directly.
+@end enumerate
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

@@ -1,0 +1,469 @@
+#!/usr/bin/make -f
+## =============================================================================
+## 
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:28:28 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; either version 2 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2005/07/04 19:28:28 $ by $Author: brian $
+##
+## =============================================================================
+
+PACKAGE = @PACKAGE@
+PACKAGE_LCNAME = @PACKAGE_LCNAME@
+VERSION = @VERSION@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
+PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
+PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+debbuilddir = @debbuilddir@
+mytmpdir = /var/tmp/$(PACKAGE)-$(VERSION)
+
+rootdir = @rootdir@
+kversion = @kversion@
+krelease = @krelease@
+kmoduledir = @kmoduledir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+sbindir = @sbindir@
+sysconfdir = @sysconfdir@
+datadir = @datadir@
+includedir = @includedir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localstatedir = @localstatedir@
+sharedstatedir = @sharedstatedir@
+mandir = @mandir@
+infodir = @infodir@
+oldincludedir = @oldincludedir@
+
+configdir = @configdir@
+initrddir = @initrddir@
+modutildir = @modutildir@
+
+pkgdatadir = $(datadir)/$(PACKAGE)
+pkglibdir = $(libdir)/$(PACKAGE)
+pkgincludedir = $(includedir)/$(PACKAGE)
+
+export DEB_HOST_ARCH
+export DH_VERBOSE = 1
+export DH_COMPAT = 4
+export DH_OPTIONS =
+export BUILD_CFGOPTIONS = '--with-lfs --without-lis'
+
+name = $(PACKAGE)
+
+srcdir=@srcdir@
+kernel_version=@kversion@
+kernel_number=$(shell echo $(kversion) | sed -e s',-.*$,,')
+kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
+core_name = core-$(kversion)-$(krelease)
+info_name = info-$(kversion)-$(krelease)
+epoch = @PACKAGE_RPMEPOCH@
+majbase = @STRCONF_MAJBASE@
+makedev = @STRCONF_MAKEDEV@
+base = @PACKAGE_LCNAME@
+title = @PACKAGE_TITLE@
+stitle = @PACKAGE_SHORTTITLE@
+
+modules = streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-solcompat streams-suxcompat streams-sux compat streams-svr3compat streams-svr4compat streams-uw7compat streams-uxpcompat
+preloads =
+libraries =
+tools = strcompat_mknod
+infofiles = $(name)
+initfiles = 
+
+@WITH_KO_MODULES_TRUE@with_ko_modules = 1
+@WITH_KO_MODULES_FALSE@with_ko_modules = 0
+
+have_init_files = 0
+have_libraries = 0
+have_preloads = 0
+
+pkg_lis_control_files	=
+pkg_lis_scripts_files	=
+pkg_lfs_control_files	=
+pkg_lfs_scripts_files	=
+pkg_control_files	=
+pkg_scripts_files	=
+
+##debian/$(PACKAGE_LCNAME)-streams-lib.preinst #
+##debian/$(PACKAGE_LCNAME)-lis-lib.preinst #
+debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
+debian/$(PACKAGE_LCNAME)-streams-$(core_name).postinst \
+debian/$(PACKAGE_LCNAME)-streams-$(core_name).prerm \
+debian/$(PACKAGE_LCNAME)-streams-$(core_name).postrm \
+debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
+debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
+debian/$(PACKAGE_LCNAME)-lis-$(core_name).prerm \
+debian/$(PACKAGE_LCNAME)-lis-$(core_name).postrm:
+	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
+	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+		echo "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; \
+	}
+
+pkg_lfs_scripts_files	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
+			   debian/$(PACKAGE_LCNAME)-streams-$(core_name).postinst \
+			   debian/$(PACKAGE_LCNAME)-streams-$(core_name).prerm \
+			   debian/$(PACKAGE_LCNAME)-streams-$(core_name).postrm
+
+pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).install
+
+debian/$(PACKAGE_LCNAME)-streams-$(core_name).install:
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_lis_scripts_files	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
+			   debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
+			   debian/$(PACKAGE_LCNAME)-lis-$(core_name).prerm \
+			   debian/$(PACKAGE_LCNAME)-lis-$(core_name).postrm
+
+pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).install
+
+debian/$(PACKAGE_LCNAME)-lis-$(core_name).install:
+	( echo '$(mytmpdir)$(kmoduledir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+##pkg_lfs_scripts_files	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
+##
+##pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-lib.install
+##
+##debian/$(PACKAGE_LCNAME)-streams-lib.install:
+##	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+##	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+##	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+##
+##pkg_lis_scripts_files	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
+##
+##pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
+##
+##debian/$(PACKAGE_LCNAME)-lis-lib.install:
+##	( echo '$(mytmpdir)$(libdir)/*.so*' ; \
+##	  echo '$(mytmpdir)$(libdir)/*.la' ) \
+##	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+##
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.docs
+
+debian/$(PACKAGE_LCNAME)-doc.docs:
+	( echo "AUTHORS" ; \
+	  echo "ChangeLog" ; \
+	  echo "COPYING" ; \
+	  echo "INSTALL" ; \
+	  echo "NEWS" ; \
+	  echo "README" ; \
+	  echo "THANKS" ; \
+	  echo "doc/manual" ; \
+	  echo "doc/specs" ; \
+	  echo "LSM" ; \
+	  echo "$(PACKAGE)-$(VERSION).lsm" ) > $@
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.manpages
+
+debian/$(PACKAGE_LCNAME)-doc.manpages:
+	( find $(mytmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
+
+@COOKED_MANPAGES_FALSE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.install
+
+debian/$(PACKAGE_LCNAME)-doc.install:
+	( echo '$(mytmpdir)$(mandir)/*.refs' ; \
+	  echo '$(mytmpdir)$(mandir)/*.macros' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-doc.info
+
+debian/$(PACKAGE_LCNAME)-doc.info:
+	( find $(mytmpdir)$(infodir) -type f -name '*.info*' ) > $@
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-devel.install
+
+debian/$(PACKAGE_LCNAME)-devel.install:
+	( echo '$(mytmpdir)$(pkgincludedir)/*.h' ; \
+	  echo '$(mytmpdir)$(pkgincludedir)/sys/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+#pkg_control_files	+= debian/$(PACKAGE_LCNAME)-source.install
+
+#debian/$(PACKAGE_LCNAME)-source.install:
+#	( echo '$(mytmpdir)/usr/src/*' ) \
+#	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_lfs_control_files	+= debian/$(PACKAGE_LCNAME)-streams-util.install
+
+debian/$(PACKAGE_LCNAME)-streams-util.install:
+	( echo '$(mytmpdir)$(bindir)/*' ; \
+	  echo '$(mytmpdir)$(sbindir)/*' ; \
+	  echo '$(mytmpdir)$(libexecdir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_lis_control_files	+= debian/$(PACKAGE_LCNAME)-lis-util.install
+
+debian/$(PACKAGE_LCNAME)-lis-util.install:
+	( echo '$(mytmpdir)$(bindir)/*' ; \
+	  echo '$(mytmpdir)$(sbindir)/*' ; \
+	  echo '$(mytmpdir)$(libexecdir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+@INSTALL_INITSCRIPTS_TRUE@pkg_control_files	+= debian/$(PACKAGE_LCNAME)-init.install
+
+debian/$(PACKAGE_LCNAME)-init.install:
+	( echo '$(mytmpdir)$(configdir)/*' ; \
+	  echo '$(mytmpdir)$(initrddir)/*' ) \
+	| sed -r -e 's,^($(mytmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,/,' > $@
+
+pkg_control_files	+= debian/$(PACKAGE_LCNAME)-init.modules
+
+debian/$(PACKAGE_LCNAME)-init.modules:
+	( echo 'prune modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'if -f /lib/modules/`uname -r`/modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'include /lib/modules/`uname -r`/modules.$(PACKAGE_LCNAME)' ; \
+	  echo 'endif' ) > $@
+
+##@INSTALL_INITSCRIPTS_TRUE@pkg_scripts_files	+= debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh
+##
+##debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh:
+##	cp -f -- $(srcdir)/src/util/init/streams.sh $@
+##
+cache_file=$(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
+csite_file=$(debbuilddir)/$(DEB_HOST_ARCH)-config.site
+mpost_file=$(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	[ ! -f Makefile ] || $(MAKE) -f Makefile mostlyclean
+	./configure \
+		CC='$(CC)' \
+		CFLAGS='$(CFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
+		CPPFLAGS='$(CPPFLAGS)' \
+		CPP='$(CPP)' \
+		CXX='$(CXX)' \
+		CXXFLAGS='$(CXXFLAGS)' \
+		CXXCPP='$(CXXCPP)' \
+		CONFIG_SITE="$(csite_file)" \
+		MODPOST_CACHE="$(mpost_file)" \
+		--cache-file="$(cache_file)" \
+		--host="$(DEB_HOST_GNU_ARCH)" \
+		--prefix=$(prefix) \
+		--exec_prefix=$(exec_prefix) \
+		--bindir=$(bindir) \
+		--sbindir=$(sbindir) \
+		--sysconfdir=$(sysconfdir) \
+		--datadir=$(datadir) \
+		--includedir=$(includedir) \
+		--libdir=$(libdir) \
+		--libexecdir=$(libexecdir) \
+		--localstatedir=$(localstatedir) \
+		--sharedstatedir=$(sharedstatedir) \
+		--mandir=$(mandir) \
+		--infodir=$(infodir) \
+		--disable-maintainer-mode \
+		--disable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=$(kversion) \
+		--with-k-modules=$(kmoduledir) \
+		--with-base-major=$(majbase) \
+		$(PACKAGE_DEBOPTIONS) \
+		$(BUILD_CFGOPTIONS) \
+		|| { rm -f $(cache_file) ; exit 1 ; }
+	$(MAKE) -f Makefile
+	$(MAKE) -f Makefile check
+	chmod +x debian/rules
+	touch build-stamp
+
+clean:
+	dh_testdir -v
+	dh_testroot -v
+	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
+	rm -fr $(mytmpdir)
+	rm -f build-stamp
+	rm -f $(pkg_control_files) $(pkg_scripts_files)
+	dh_clean -v
+
+install: DH_OPTIONS =
+install: build
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_control_files) $(pkg_scripts_files)
+	dh_install -v
+
+build-lis: build-lis-stamp
+build-lis-stamp:
+	rm -f build-lfs-stamp build-stamp
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules build
+	touch build-lis-stamp
+
+install-lis: DH_OPTIONS =
+install-lis: build-lis
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_lis_control_files) $(pkg_lis_scripts_files)
+	dh_install -v
+
+build-lfs: build-lfs-stamp
+build-lfs-stamp:
+	rm -f build-lis-stamp build-stamp
+	[ ! -f Makefile ] || $(MAKE) -f Makefile clean
+	$(MAKE) $(AM_MAKEFLAGS) -f debian/rules build
+	touch build-lfs-stamp
+
+install-lfs: DH_OPTIONS =
+install-lfs: build-lfs
+	dh_testdir -v
+	dh_testroot -v
+	dh_clean -v -k
+	dh_installdirs -v
+	$(MAKE) -f Makefile DESTDIR=$(mytmpdir) install
+	$(MAKE) -f debian/rules $(pkg_lfs_control_files) $(pkg_lfs_scripts_files)
+	dh_install -v
+
+binary-common:
+	dh_testdir -v
+	dh_testroot -v
+	dh_installmodules -v
+	dh_installchangelogs -v
+	dh_installdocs -v -A debian/README.Debian debian/TODO.Debian
+	dh_installdebconf -v
+	dh_installinit -v --init-script=@PACKAGE_LCNAME@.sh
+	dh_installinfo -v
+	dh_installman -v
+	dh_strip -v
+	dh_link -v
+	dh_compress -v
+	dh_fixperms -v
+	dh_makeshlibs -v
+	dh_installdeb -v
+	dh_shlibdeps -v
+	dh_gencontrol -v
+	dh_md5sums -v
+	dh_builddeb -v
+
+# Build architecture-independent files here.
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture-dependent files here.
+binary-arch:
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --with-lis "*) targ=binary-lis ;; \
+		(*" --with-lfs "*) targ=binary-lfs ;; \
+		(*)		   targ=binary-nos ;; \
+	esac ; \
+	echo "$(MAKE) -f debian/rules $$targ" ; \
+	$(MAKE) -f debian/rules $$targ
+
+binary:
+	$(MAKE) -f debian/rules binary-indep
+	$(MAKE) -f debian/rules binary-arch
+
+binary-lis: build-lis install-lis
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util binary-common
+
+binary-lfs: build-lfs install-lfs
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util binary-common
+
+binary-nos: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
+
+binary-%: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$* binary-common
+
+get-orig-source:
+	wget http://www.openss7.org/$(PACKAGE)-$(VERSION).tar.bz
+
+.PHONY: build clean binary-indep binary-arch binary install binary-lis binary-lfs
+
+# =============================================================================
+# $Log: rules.in,v $
+# Revision 0.9.2.1  2005/07/04 19:28:28  brian
+# - first cut at streams compatibility package
+#
+# Revision 0.9.2.12  2005/03/29 17:18:21  brian
+# - Updated lsms and added LSM to distribution.
+#
+# Revision 0.9.2.11  2005/03/28 11:05:55  brian
+# - export deb host arch
+#
+# Revision 0.9.2.10  2005/03/28 07:41:38  brian
+# - correct multiple streams targets
+#
+# Revision 0.9.2.9  2005/03/27 12:24:23  brian
+# - slimmer build of lis and lfs components
+#
+# Revision 0.9.2.8  2005/03/26 04:06:24  brian
+# - corrections to multiple targets
+#
+# Revision 0.9.2.7  2005/03/24 14:05:28  brian
+# - improved master build
+#
+# Revision 0.9.2.6  2005/03/24 02:09:16  brian
+# - improved debian build
+#
+# Revision 0.9.2.5  2005/03/22 12:42:13  brian
+# - good debian builds with dependencies
+#
+# Revision 0.9.2.4  2005/03/22 02:28:45  brian
+# - a workable set of debian rules
+#
+# Revision 0.9.2.3  2005/03/21 11:50:36  brian
+# - updating debian packaging
+#
+# =============================================================================
+# vim: ft=make

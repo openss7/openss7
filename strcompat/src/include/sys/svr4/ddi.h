@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/05/30 00:17:16 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/07/04 19:29:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/30 00:17:16 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/30 00:17:16 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/04 19:29:13 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -120,6 +120,7 @@ extern pl_t spl7(void);
 #define splhi	    spl7
 
 typedef int processorid_t;
+#if LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor)
 {
 	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
@@ -130,6 +131,7 @@ __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long tic
 	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu);
 	return __timeout(NULL, timo_fcn, arg, ticks, pl, smp_processor_id());
 }
+#endif
 
 __SVR4_EXTERN_INLINE major_t getemajor(dev_t dev)
 {

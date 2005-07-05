@@ -8,10 +8,11 @@ Description:		The @PACKAGE@ package includes kernel modules, SVR 4.2
 			programs, daemons, and development environment for the
 			development and execution of X/Open Network Services
 			(XNS) protocol stack components and applications for the
-			SVR 4.2 STREAMS environment.  This distribution is only
-			currently applicable to Linux 2.4 kernels and was
-			targetted at ix86 and ppc architectures, but should
-			build and install for other architectures as well.
+			SVR 4.2 STREAMS environment.
+			This distribution is only currently applicable to Linux
+			2.4 and 2.6 kernels and was targetted at ix86 and ppc
+			architectures, but should build and install for other
+			architectures as well.
 Keywords:		XNS, CDI, DLPI, NPI, DL
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)

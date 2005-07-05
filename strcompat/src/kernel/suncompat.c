@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,6 +75,7 @@ static char const ident[] =
 
 #define __SUN_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -102,26 +105,37 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _SUN_SOURCE
+
+#include "os7/compat.h"
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
+
+#if LIS
 #include <sys/sunddi.h>
+#endif
 #include <sys/strsun.h>
 
-#include "sys/config.h"
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strreg.h"
 #include "src/kernel/strsad.h"
+#endif
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/03 17:41:30 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -148,6 +162,7 @@ EXPORT_SYMBOL(freezestr_SUN);
 __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
 EXPORT_SYMBOL(unfreezestr_SUN);
 
+#if LFS
 /**
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
@@ -170,7 +185,9 @@ void qwait(queue_t *rq)
 }
 
 EXPORT_SYMBOL(qwait);		/* sunddi.h */
+#endif
 
+#if LFS
 /**
  *  qwait_sig: - wait for a procedure on a queue pair or signal
  *  @rq:    a pointer to the read queue of the queue pair
@@ -197,21 +214,35 @@ int qwait_sig(queue_t *rq)
 }
 
 EXPORT_SYMBOL(qwait_sig);	/* sunddi.h */
+#endif
 
+#if LIS
+/* LIS forgets to typedef these */
+typedef int bcid_t;
+typedef int bufcall_id_t;
+#endif
+
+#if LFS
 __SUN_EXTERN_INLINE bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg);
 EXPORT_SYMBOL(qbufcall);	/* sunddi.h */
 __SUN_EXTERN_INLINE timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
 EXPORT_SYMBOL(qtimeout);	/* sunddi.h */
 __SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid);
 EXPORT_SYMBOL(qunbufcall);	/* sunddi.h */
+#endif
 __SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid);
 EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
+#if LFS
+/* LIS already has queclass defined */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
 EXPORT_SYMBOL(queclass);	/* sunddi.h */
+#endif
+#if LFS
 __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 EXPORT_SYMBOL(qwriter);		/* sunddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
 EXPORT_SYMBOL(ddi_get_cred);	/* sunddi.h */
+#endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
 EXPORT_SYMBOL(ddi_get_lbolt);	/* sunddi.h */
 __SUN_EXTERN_INLINE pid_t ddi_get_pid(void);
@@ -555,6 +586,7 @@ EXPORT_SYMBOL(nochpoll);	/* strconf.h */
 __SUN_EXTERN_INLINE int ddi_prop_op(void);
 EXPORT_SYMBOL(ddi_prop_op);
 
+#if LFS
 int mod_install(struct modlinkage *ml)
 {
 	/* FIXME: this is our register function, write it! */
@@ -650,6 +682,7 @@ int mod_remove(struct modlinkage *ml)
 }
 
 EXPORT_SYMBOL(mod_remove);	/* strconf.h */
+#endif
 int mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */

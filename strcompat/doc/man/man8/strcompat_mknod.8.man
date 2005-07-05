@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strcompat_mknod.8.man,v 0.9.2.5 2005/05/14 08:34:15 brian Exp $
+.\" @(#) $Id: strcompat_mknod.8.man,v 0.9.2.6 2005/07/04 19:28:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:15 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 19:28:38 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so streams.macros
+.so strcompat.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database streams.refs
+database strcompat.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -71,33 +71,33 @@ sort-adjacent-labels
 .R2
 .\"
 .\"
-.TH STREAMS_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH STRCOMPAT_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B streams_mknod
+.B strcompat_mknod
 \- create or remove \fISTREAMS\fR device nodes
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstreams_mknod\fR [\fIoptions\fR]
+\fBstrcompat_mknod\fR [\fIoptions\fR]
 .PD 0
 .HP 12
-\fBstreams_mknod\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR}
+\fBstrcompat_mknod\fR [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR}
 .HP 12
-\fBstreams_mknod\fR {\fB-h\fR|\fB--help\fR}
+\fBstrcompat_mknod\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBstreams_mknod\fR {\fB-V\fR|\fB--version\fR}
+\fBstrcompat_mknod\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBstreams_mknod\fR {\fB-C\fR|\fB--copying\fR}
+\fBstrcompat_mknod\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B streams_mknod
+.B strcompat_mknod
 is a small utility program that can be used to create or remove primary
 .I STREAMS
 device nodes.
@@ -154,11 +154,11 @@ option suppresses the printing of diagnostic messages to
 .\"
 .SH NOTICES
 .PP
-.B streams_mknod
+.B strcompat_mknod
 is created when the
 .I STREAMS
 package is configured.  A version of
-.B streams_mknod
+.B strcompat_mknod
 from one version of the
 .I STREAMS
 package release might be incompatible with that of another version.
@@ -173,7 +173,7 @@ primary device nodes:
 .RS
 .nf
 \fC\s-1\
-#> streams_mknod
+#> strcompat_mknod
 \s+1\fP
 .fi
 .RE
@@ -185,7 +185,7 @@ primary device nodes:
 .RS
 .nf
 \fC\s-1\
-#> streams_mknod -r
+#> strcompat_mknod -r
 \s+1\fP
 .fi
 .RE
@@ -193,7 +193,7 @@ primary device nodes:
 .\"
 .SH DEVICES
 .PP
-.B streams_mknod
+.B strcompat_mknod
 creates or removes the following devices:
 .TP
 .B /dev/clone
@@ -247,9 +247,9 @@ device.
 .SH FILES
 .PP
 .TP
-.B /usr/sbin/streams_mknod
+.B /usr/sbin/strcompat_mknod
 contains the
-.B streams_mknod
+.B strcompat_mknod
 command.
 .\"
 .\"
@@ -271,17 +271,17 @@ command.
 .\"
 .SH BUGS
 .PP
-.B streams_mknod
+.B strcompat_mknod
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
-.B streams_mknod
+.B strcompat_mknod
 is an
 .IR LiS -specific
 command.
-.B streams_mknod
+.B strcompat_mknod
 is provided for compatibility with
 .I LiS
 with the following portability considerations:
@@ -308,7 +308,7 @@ LiS
 .\"
 .SH HISTORY
 .PP
-.B streams_mknod
+.B strcompat_mknod
 first appeared in
 .IR LiS .
 .[

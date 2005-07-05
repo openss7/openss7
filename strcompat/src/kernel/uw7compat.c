@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,6 +75,7 @@ static char const ident[] =
 
 #define __UW7_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -98,23 +101,35 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _UW7_SOURCE
+
+#include "os7/compat.h"
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
 
-#include "sys/config.h"
+#if LIS
+#include <sys/uw7ddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strsad.h"
+#endif
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:34:40 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -138,6 +153,7 @@ MODULE_ALIAS("streams-uw7compat");
 
 
 /* don't use these - these are fakes */
+#if LFS
 /**
  *  allocb_physreq:	- allocate a message block with physical requirements
  *  @size:		number of bytes to allocate
@@ -158,6 +174,7 @@ mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(allocb_physreq);	/* uw7ddi.h */
+#endif
 mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
 {
 	if (prp->phys_align > 8)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: aixcompat.9.man,v 0.9.2.7 2005/07/03 17:40:13 brian Exp $
+.\" @(#) $Id: aixcompat.9.man,v 0.9.2.8 2005/07/04 20:20:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:13 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 20:20:13 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -88,14 +88,14 @@ sort-adjacent-labels
 .\"
 .SH OVERVIEW
 .PP
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 provides a compatibility module,
-.BR streams-aixcompat
+.I streams-aixcompat
 that provides compatibility functions that smooth porting of drivers from the
 .I AIX 5L Version 5.1
 .I STREAMS
 environment to
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 The functions provided by this compatibility module are described here.
 .\"
 .\"
@@ -106,11 +106,11 @@ Many of the functions that are provided by
 are also provided by the core
 .I streams
 kernel module of
-.BR "Linux Fast-STREAMS" .
+.BR "@PACKAGE_TITLE@" .
 Other
 .IR AIX \(rg-specific
 functions are provided by the
-.B streams-aixcompat
+.I streams-aixcompat
 compatibility kernel module.
 .\"
 .\"
@@ -209,7 +209,7 @@ time in seconds since epoch
 .PP
 .I STREAMS
 functions that are already available in
-.B Linux Fast STREAMS
+.B @PACKAGE_TITLE@
 (in the core
 .I streams
 kernel module) are as follows:
@@ -364,7 +364,7 @@ return the write queue of a \fISTREAMS\fP queue pair
 .PD
 .\"
 .\"
-.SS "\fIMPS\fP Functions"
+.SS "\fIMPS\fP\fR\(rg\fP Functions"
 .PP
 .IR AIX \(rg
 exposes a number of symbols from the underlying Mentat
@@ -372,16 +372,14 @@ exposes a number of symbols from the underlying Mentat
 implementation that are also documented in the
 .IR AIX \(rg
 documentation.
-Unfortunately the prototypes for these functions under
-.IR MacOT \(rg
-are not the same as
-.IR AIX \(rg.
 .I STREAMS
-functions that are available in the
-.B Linux Fast-STREAMS
+functions that are available to
 .IR AIX \(rg
+in the
+.B @PACKAGE_TITLE@
+.IR MPS \(rg
 compatibility module,
-.BR streams-aixcompat ,
+.IR streams-mpscompat ,
 are as follows:
 .HP
 .BR mi_bufcall (9)\ \-\ \c
@@ -406,10 +404,10 @@ reliable alternative to \fBbufcall\fP(9)
 .PP
 .I STREAMS
 functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR AIX \(rg
 compatibility module,
-.BR streams-aixcompat ,
+.IR streams-aixcompat ,
 are as follows:
 .HP
 .BR wantio (9)\ \-\ \c
@@ -424,10 +422,10 @@ provide a filter of wanted message for a \fISTREAMS\fP module
 .SS "\fISTREAMS\fP Configuration and Registration Functions"
 .PP
 Module and driver configuration functions that are available in the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .IR AIX \(rg
 compatibility module,
-.BR streams-aixcompat ,
+.IR streams-aixcompat ,
 are as follows:
 .HP
 .BR str_install (9)\ \-\ \c
@@ -496,6 +494,12 @@ thaw the state of a stream queue
 .PD
 .PP
 Lack of these functions can make Multiprocessor (MP) support problematic.
+Ported
+.IR AIX \(rg
+.I STREAMS
+modules and drivers should always be loaded under
+.B @PACKAGE_TITLE@
+with multiprocessing disabled for safety.
 .\"
 .\"
 .SH NOTICES
@@ -507,7 +511,7 @@ symbols.
 To use
 .IR AIX \(rg-specific
 functions,
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 must also have been compiled with
 .B CONFIG_STREAMS_COMPAT_AIX
 or
@@ -518,7 +522,7 @@ When compiled with
 defined,
 .IR AIX \(rg
 compatibility will become part of the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .I streams
 kernel module.
 When compiled with
@@ -526,18 +530,27 @@ When compiled with
 defined,
 .IR AIX \(rg
 compatibility will be placed in a separate
-.B streams-aixcompat
+.I streams-aixcompat
 kernel module that will demand load when any
 .I STREAMS
 driver or module that uses the
 .IR AIX \(rg-specific
 functions loads.
+.PP
+.IR MPS \(rg
+functions used by
+.IR AIX \(rg
+are only be available from the
+.I streams-mpscompat
+compatibility module.  See
+.BR mpscompat (9)
+for more information on this module.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
 Core functions are implemented within the
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 framework.
 .IR AIX \(rg-specific
 functions are implemented as described in the separate manual pages describing each facility.
@@ -625,8 +638,11 @@ These functions are compatible with
 .IR AIX \(rg
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IR AIX \(rg-specific
-functions should not be used by portable
+Neither
+.IR AIX \(rg-specific,
+nor
+.IR MPS \(rg,
+functions should be used by portable
 .I STREAMS
 drivers and modules.
 The more common
@@ -641,7 +657,7 @@ for the purpose of porting
 drivers to
 .BR Linux .
 Because internal structures and definitions for
-.B Linux Fast-STREAMS
+.B @PACKAGE_TITLE@
 .[
 lfs
 .]
@@ -682,15 +698,17 @@ aixspg
 .PP
 Most of these functions
 first appeared in
-.IR AIX \(rg.
-Functions with name starting with
+.IR AIX \(rg;
+except functions with a name starting with
+.IR mi_ .
+Those starting with
 .I mi_
-are probably
-.I Mentat, Inc.
-functions that goes all the way back to the
+are
+.IR MPS \(rg
+functions dating back to
 .RI pre- OSF/1
-.I Mentat
-implementation.
+.I STREAMS
+implementations.
 .\"
 .\"
 .[

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.19 2005/07/03 17:41:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.20 2005/07/04 20:21:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:21:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/03 17:41:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/04 20:21:58 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -130,6 +130,7 @@ __EXTERN_INLINE int copyout(const void *from, void *to, size_t len)
 	return (0);
 }
 
+/* FIXME: There are faster ways to do these... */
 __EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz)
 {
 	return ((hz * 1000000) / HZ);

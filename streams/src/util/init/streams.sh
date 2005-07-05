@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/04 20:23:10 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -16,6 +16,8 @@ desc="the STREAMS subsystem"
 [ -e /proc/modules ] || exit 0
 
 # Specify defaults
+
+STREAMS_MODULES="streams streams-clone streams-sth"
 
 # Source config file
 for file in $config ; do
@@ -36,7 +38,7 @@ build_options() {
 
 start() {
     echo -n "Loading STREAMS kernel modules: "
-    for module in streams streams-clone streams-sth ; do
+    for module in $STREAMS_MODULES ; do
 	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	    echo -n "$module "
 	    modprobe -k -q -- $module $redir
@@ -99,7 +101,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/03/24 02:11:04 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/04 20:23:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -145,7 +147,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/03/24 02:11:04 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:23:10 $ by $Author: brian $
 #
 # =============================================================================
 

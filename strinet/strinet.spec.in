@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2005/06/25 07:01:49 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/07/04 20:18:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/25 07:01:49 $ by $Author: brian $
+# Last Modified $Date: 2005/07/04 20:18:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -90,9 +90,9 @@
 %global modules     streams-inet
 #global preloads    
 #global libraries   
-%global tools       strinet_mknod test-inet_raw test-inet_udp test-inet_tcp
-%global infofiles   %{name}
-%global initfiles   strinet
+%global tools       %{base}_mknod test-inet_raw test-inet_udp test-inet_tcp
+%global infofiles   %{base}
+%global initfiles   %{base}
 
 %{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -1542,9 +1542,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.83  2005/06/25 07:01:49  brian
-# - more efficient dependency checking
+# Revision 0.9.2.84  2005/07/04 20:18:13  brian
+# - stylistic adjustments
 #
+
+* Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.83  2005/06/25 07:01:49  brian
+- more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.82  2005/06/24 13:40:42  brian

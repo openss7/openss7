@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mpscompat.9.man,v 0.9.2.1 2005/07/03 17:40:16 brian Exp $
+.\" @(#) $Id: mpscompat.9.man,v 0.9.2.2 2005/07/04 19:28:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,20 +53,23 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/03 17:40:16 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 19:28:48 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mpscompat.9.man,v $
+.\" Revision 0.9.2.2  2005/07/04 19:28:48  brian
+.\" - first cut at streams compatibility package
+.\"
 .\" Revision 0.9.2.1  2005/07/03 17:40:16  brian
 .\" - updating MPS documentation
 .\"
 .\" =========================================================================
-.so streams.macros
+.so strcompat.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database streams.refs
+database strcompat.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -388,3 +391,9 @@ are Mentat, Inc. functions that goe all the way back to the
 .RI pre- OSF/1
 .I Mentat
 implementations.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

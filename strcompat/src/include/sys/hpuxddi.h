@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: hpuxddi.h,v 0.9.2.3 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: hpuxddi.h,v 0.9.2.4 2005/07/04 19:29:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUXDDI_H__
 #define __SYS_HPUXDDI_H__
 
-#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: hpuxddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 19:29:12 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -77,6 +77,7 @@
 
 extern lock_t *get_sleep_lock(caddr_t event);
 
+#if LFS
 typedef void (*streams_put_t) (void *, mblk_t *);
 /**
  *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
@@ -106,6 +107,7 @@ __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp
 		return;
 	// never();
 }
+#endif
 
 #elif defined(_HPUX_SOURCE)
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"

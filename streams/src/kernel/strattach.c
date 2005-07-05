@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:41 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:22:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:41 $"
+#ident "@(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:22:38 $"
 
 static char const ident[] =
-    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/05/14 08:34:41 $";
+    "$RCSfile: strattach.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/04 20:22:38 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -187,9 +187,9 @@ long do_fattach(const struct file *file, const char *file_name)
       out:
 	return err;
 }
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+//#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(do_fattach);
-#endif
+//#endif
 
 long do_fdetach(const char *file_name)
 {
@@ -229,9 +229,9 @@ long do_fdetach(const char *file_name)
       out:
 	return err;
 }
-#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+//#if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL_GPL(do_fdetach);
-#endif
+//#endif
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */
 

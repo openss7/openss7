@@ -1,1 +1,1 @@
-.so man9/qenable.9.man
+.so man9/liscompat.9.man

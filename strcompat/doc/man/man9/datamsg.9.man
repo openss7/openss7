@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: datamsg.9.man,v 0.9.2.10 2005/05/14 08:34:22 brian Exp $
+.\" @(#) $Id: datamsg.9.man,v 0.9.2.11 2005/07/04 19:28:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,14 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:22 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/04 19:28:43 $ by $Author: brian $
 .\"
 .\" =========================================================================
-.so streams.macros
+.so strcompat.macros
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
 no-default-database
-database streams.refs
+database strcompat.refs
 accumulate
 move-punctuation
 abbreviate A
@@ -99,7 +99,7 @@ tests the passed in
 .I type
 to see if the type is a data message type.  Data message types include the
 following:
-.TP \w'M_PCPROTO(9)\(em 'u
+.TP \w'M_PCPROTO(9)\(em\ 'u
 .BR M_DATA (9)
 The message type is a data message type.
 .PD 0

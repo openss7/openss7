@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,6 +75,7 @@ static char const ident[] =
 
 #define __SVR4_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -105,23 +108,39 @@ static char const ident[] =
 #endif
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _SVR4_SOURCE
+
+#include "os7/compat.h"
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
 
-#include "sys/config.h"
+#if LIS
+#include <sys/svr4ddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strsad.h"
+#else
+#if 0
+#include "include/sys/strdebug.h"
+#endif
+#endif
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/01 20:17:27 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -143,6 +162,7 @@ MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
 
+#if LFS
 /* don't use these functions, they are way too dangerous */
 long MPSTR_QLOCK(queue_t *q)
 {
@@ -172,6 +192,7 @@ void MPSTR_STPRELE(struct stdata *stp, long s)
 }
 
 EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4ddi.h */
+#endif
 
 static pl_t current_spl[NR_CPUS] __cacheline_aligned;
 
@@ -183,10 +204,12 @@ pl_t spl0(void)
 	return (old_level);
 }
 
+#if LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
 EXPORT_SYMBOL(dtimeout);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
 EXPORT_SYMBOL(itimeout);	/* svr4ddi.h */
+#endif
 
 EXPORT_SYMBOL(spl0);		/* svr4ddi.h */
 
@@ -297,6 +320,7 @@ EXPORT_SYMBOL(getemajor);	/* uw7ddi.h */
 __SVR4_EXTERN_INLINE minor_t geteminor(dev_t dev);
 EXPORT_SYMBOL(geteminor);	/* uw7ddi.h */
 
+#if LFS
 int etoimajor(major_t emajor)
 {
 	struct cdevsw *cdev;
@@ -342,7 +366,7 @@ int itoemajor(major_t imajor, int prevemaj)
 }
 
 EXPORT_SYMBOL(itoemajor);	/* uw7ddi.h */
-
+#endif
 
 //__SVR4_EXTERN_INLINE pl_t LOCK(lock_t * lockp, pl_t pl);
 //EXPORT_SYMBOL(LOCK);          /* svr4ddi.h */

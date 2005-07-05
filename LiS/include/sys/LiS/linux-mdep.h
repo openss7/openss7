@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: linux-mdep.h,v 1.1.1.7.4.4 2005/04/12 22:45:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/04/12 22:45:25 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.5 2003/08/18 14:07:57 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.4 2005/04/12 22:45:25 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -71,7 +71,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.4 $) $Date: 2005/04/12 22:45:25 $"
 
 #ifdef __KERNEL__
 #include <linux/config.h>
@@ -291,12 +291,29 @@ extern long lis_milli_to_ticks(long milli_sec)  _RP;
 typedef int     o_uid_t;
 typedef int     o_gid_t;
 typedef unsigned   char uchar;
+
+#if 0
 typedef struct cred {
 	uid_t	cr_uid;			/* effective user id */
 	gid_t	cr_gid;			/* effective group id */
 	uid_t	cr_ruid;		/* real user id */
 	gid_t	cr_rgid;		/* real group id */
 } cred_t;
+#else
+/* same layout as task_struct */
+#define current_creds ((cred_t *)(&current->uid))
+typedef struct cred {
+	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
+	gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
+#ifdef NGROUPS
+	int cr_ngroups;
+	gid_t cr_groups[NGROUPS];
+#endif
+#ifdef NGROUPS_SMALL
+	struct group_info *cr_group_info;
+#endif
+} cred_t;
+#endif
 
 
 #ifdef __KERNEL__

@@ -1,0 +1,542 @@
+# =============================================================================
+# 
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:47:23 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/07/04 19:47:23 $ by $Author: brian $
+#
+# =============================================================================
+
+##
+## General rules
+##
+include am/openss7.am
+
+lib_LTLIBRARIES			=
+
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+if RPM_BUILD_USER
+## RPM_BUILD_USER
+
+EXTRA_PROGRAMS			+= 
+
+libexec_PROGRAMS		= 
+
+
+sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+
+@PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
+@PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+@PACKAGE_TARNAME@_mknod_LDADD		=
+@PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+@PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+## xxx_SOURCES			=
+## xxx_LDADD			= $(STREAMS_LDADD)
+## xxx_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+## xxx_CFLAGS			= $(USER_CFLAGS)
+
+## RPM_BUILD_USER
+endif
+
+if RPM_BUILD_KERNEL
+## RPM_BUILD_KERNEL
+
+ADDON_LIBS			= 
+ADDON_MODS			= 
+ADDON_OBJS			= 
+
+noinst_LIBRARIES		= libCOMPATlink.a libCOMPATmods.a $(ADDON_LIBS)
+EXTRA_LIBRARIES			+= 
+
+EXTRA_libCOMPATlink_a_SOURCES 	= \
+				  src/kernel/svr3compat.c \
+				  src/kernel/svr4compat.c \
+				  src/kernel/mpscompat.c \
+				  src/kernel/suncompat.c \
+				  src/kernel/uw7compat.c \
+				  src/kernel/osfcompat.c \
+				  src/kernel/aixcompat.c \
+				  src/kernel/hpuxcompat.c \
+				  src/kernel/irixcompat.c \
+				  src/kernel/liscompat.c \
+				  src/kernel/lfscompat.c \
+				  src/kernel/maccompat.c
+
+libCOMPATlink_a_SOURCES		= \
+				  src/include/os7/allocb.h \
+				  src/include/os7/bufpool.h \
+				  src/include/os7/bufq.h \
+				  src/include/os7/compat.h \
+				  src/include/os7/debug.h \
+				  src/include/os7/lock.h \
+				  src/include/os7/priv.h \
+				  src/include/os7/queue.h \
+				  src/include/os7/timer.h
+
+if CONFIG_STREAMS_COMPAT_SVR3
+libCOMPATlink_a_SOURCES		+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+libCOMPATlink_a_SOURCES		+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+libCOMPATlink_a_SOURCES		+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+libCOMPATlink_a_SOURCES		+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+libCOMPATlink_a_SOURCES		+= src/kernel/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+libCOMPATlink_a_SOURCES		+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+libCOMPATlink_a_SOURCES		+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+libCOMPATlink_a_SOURCES		+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+libCOMPATlink_a_SOURCES		+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+libCOMPATlink_a_SOURCES		+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LFS
+libCOMPATlink_a_SOURCES		+= src/kernel/lfscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+libCOMPATlink_a_SOURCES		+= src/kernel/maccompat.c
+endif
+
+libCOMPATlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libCOMPATlink_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATlink_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libTUILlink_a_OBJECTS):	$(libCOMPATlink_a_DEPENDENCIES)
+
+EXTRA_libCOMPATmods_a_SOURCES	= \
+				src/kernel/svr3compat.c \
+				src/kernel/svr4compat.c \
+				src/kernel/mpscompat.c \
+				src/kernel/suncompat.c \
+				src/kernel/uw7compat.c \
+				src/kernel/osfcompat.c \
+				src/kernel/aixcompat.c \
+				src/kernel/hpuxcompat.c \
+				src/kernel/irixcompat.c \
+				src/kernel/liscompat.c \
+				src/kernel/lfscompat.c \
+				src/kernel/maccompat.c
+
+libCOMPATmods_a_SOURCES		= \
+				src/include/os7/allocb.h \
+				src/include/os7/bufpool.h \
+				src/include/os7/bufq.h \
+				src/include/os7/compat.h \
+				src/include/os7/debug.h \
+				src/include/os7/lock.h \
+				src/include/os7/priv.h \
+				src/include/os7/queue.h \
+				src/include/os7/timer.h
+
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LFS_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/lfscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/maccompat.c
+endif
+
+libCOMPATmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
+libCOMPATmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libCOMPATmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+EXTRA_KERNEL_MODULES		+=
+
+## RPM_BUILD_KERNEL
+endif
+
+## PKG_BUILD_ARCH
+endif
+
+EXTRA_DIST			+=
+
+EXTRA_TEX			+= \
+				scripts/texinfo.cnf \
+				scripts/texi/args.texi.in \
+				scripts/texi/fdl.texi \
+				scripts/texi/gpl.texi \
+				scripts/texi/install.texi \
+				scripts/texi/lesser.texi
+
+EXTRA_DIST			+= $(EXTRA_TEX)
+dist_noinst_SCRIPTS		+= configure.nexusware
+EXTRA_SCRIPTS			+= configure.nexusware
+
+##
+## Rules for building kernel objects
+##
+KERNEL_OBJECTS			= $(libCOMPATlink_a_OBJECTS) $(libCOMPATmods_a_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libCOMPATmods_a_OBJECTS) $(ADDON_MODS)
+KERNEL_PRELOADS			=
+KERNEL_MODCONF			= $(STRCONF_CONFMOD)
+KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
+KMODCONF_EXT			= $(PACKAGE_LCNAME)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+
+if WITH_KO_MODULES
+## WITH_KO_MODULES
+kpre				= streams_
+else
+kpre				= streams-
+## WITH_KO_MODULES
+endif
+
+include am/kernel.am
+
+if WITH_KO_MODULES
+else
+if PKG_BUILD_INDEP
+if RPM_BUILD_USER
+dist_modutil_DATA		= \
+				src/util/modutils/@PACKAGE_LCNAME@
+endif
+endif
+endif
+
+##
+## Rules for building libraries
+##
+##include am/libraries.am
+##
+##AUTOCONFIG_H			= $(PKGINCL)/config.h
+##
+##EXTRA_DIST			+= $(AUTOCONFIG_H).in
+##
+EXPORT_SRCFILES			=
+
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_SRCFILES			+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_SRCFILES			+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_SRCFILES			+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_SRCFILES			+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LFS
+EXPORT_SRCFILES			+= src/kernel/lfscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_SRCFILES			+= src/kernel/maccompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_SRCFILES			+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_SRCFILES			+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_SRCFILES			+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_SRCFILES			+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_SRCFILES			+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_SRCFILES			+= src/kernel/uw7compat.c
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_SRCFILES			+= src/kernel/aixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_SRCFILES			+= src/kernel/hpuxcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_SRCFILES			+= src/kernel/irixcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_SRCFILES			+= src/kernel/liscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_LFS_MODULE
+EXPORT_SRCFILES			+= src/kernel/lfscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_SRCFILES			+= src/kernel/maccompat.c
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_SRCFILES			+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_SRCFILES			+= src/kernel/osfcompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_SRCFILES			+= src/kernel/suncompat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_SRCFILES			+= src/kernel/svr3compat.c
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_SRCFILES			+= src/kernel/svr4compat.c
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_SRCFILES			+= src/kernel/uw7compat.c
+endif
+
+EXPORT_VERFILES			=
+
+if CONFIG_STREAMS_COMPAT_AIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LFS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/lfscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR3
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_LFS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/lfscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
+endif
+
+GENKSYMS_CPPFLAGS		= \
+				  -I./src/kernel -I$(srcdir)/src/kernel \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+##
+## Rules for generating versioned kernel symbols
+##
+include am/genksyms.am
+
+##
+## Rules for generating STREAMS configuration
+##
+include am/strconf.am
+
+if RPM_BUILD_USER
+## RPM_BUILD_USER
+
+SUBDIRS = src doc tests
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
+
+if WITH_RCSD_DIRECTORY
+## WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@.sh
+
+## WITH_RCSD_DIRECTORY
+else
+## ! WITH_RCSD_DIRECTORY
+
+dist_initrd_SCRIPTS		= src/util/init/@PACKAGE_LCNAME@
+
+## ! WITH_RCSD_DIRECTORY
+endif
+
+dist_sysconf_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@.conf
+
+dist_config_DATA		= src/util/sysconfig/@PACKAGE_LCNAME@
+
+## INSTALL_INITSCRIPTS
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## RPM_BUILD_USER
+endif
+
+##
+## Rules for init scripts
+##
+include am/init.am
+
+##
+## Rules for lsms
+##
+include am/lsm.am
+
+##
+## Rules for archives
+##
+include am/archive.am
+
+##
+## Rules for making rpms
+##
+AM_RPMFLAGS			= --define "_kversion $(kversion)"
+AM_SRPMFLAGS			= $(AM_RPMFLAGS)
+
+include am/rpm.am
+
+##
+## Rules for making deb packages
+##
+include am/deb.am
+
+EXTRA_DIST			+= \
+				  debian/README.Debian \
+				  debian/TODO.Debian
+
+MAINTAINERCLEANFILES		+= \
+				  $(top_srcdir)/aclocal.m4 \
+				  $(top_srcdir)/config.h.in \
+				  $(top_srcdir)/configure \
+				  $(top_srcdir)/COPYING \
+				  $(top_srcdir)/INSTALL \
+				  $(top_srcdir)/scripts/compile \
+				  $(top_srcdir)/scripts/config.guess \
+				  $(top_srcdir)/scripts/config.sub \
+				  $(top_srcdir)/scripts/depcomp \
+				  $(top_srcdir)/scripts/install-sh \
+				  $(top_srcdir)/scripts/ltmain.sh \
+				  $(top_srcdir)/scripts/missing \
+				  $(top_srcdir)/scripts/texinfo.tex
+
+# vim: ft=automake

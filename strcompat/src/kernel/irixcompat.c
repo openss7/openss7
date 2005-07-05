@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/01 07:29:31 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 07:29:31 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:14:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/01 07:29:31 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:29 $"
 
 static char const ident[] =
-    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/01 07:29:31 $";
+    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:29 $";
 
+#if 0
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
 #include <linux/init.h>
+#endif
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,6 +75,7 @@ static char const ident[] =
 
 #define __IRIX_EXTERN_INLINE inline
 
+#if 0
 #include <linux/kernel.h>	/* for vsprintf and friends */
 #include <linux/vmalloc.h>	/* for vmalloc */
 #ifdef CONFIG_PCI
@@ -98,23 +101,35 @@ static char const ident[] =
 #include <asm/atomic.h>		/* for atomic functions */
 #include <linux/poll.h>		/* for poll_table */
 #include <linux/string.h>
+#endif
 
 #define _IRIX_SOURCE
+
+#if 0
 #include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
 #include <sys/stream.h>
 #include <sys/strconf.h>
 #include <sys/strsubr.h>
 #include <sys/ddi.h>
+#endif
 
-#include "sys/config.h"
+#include "os7/compat.h"
+
+#if LIS
+#include <sys/irixddi.h>
+#endif
+
+#if LFS
+//#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
-#include "src/modules/sth.h"
+//#include "src/modules/sth.h"
 #include "src/kernel/strsad.h"
+#endif
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSFile$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/01 07:29:31 $"
+#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/04 20:14:29 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"
@@ -157,6 +172,7 @@ void __exit irixcomp_exit(void)
 	return;
 }
 
+#if LFS
 __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args);
 EXPORT_SYMBOL(icmn_err);	/* irixddi.h */
 /* gcc 3.4.3 can't handle inlining with variable argument list */
@@ -170,6 +186,7 @@ extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args 
 	return;
 }
 EXPORT_SYMBOL(cmn_err_tag);	/* irixddi.h */
+#endif
 
 #ifdef CONFIG_STREAMS_COMPAT_IRIX_MODULE
 module_init(irixcomp_init);

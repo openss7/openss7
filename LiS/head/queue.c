@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:45:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.2 $) $Date: 2005/04/12 22:45:01 $"
 
 /*                               -*- Mode: C -*- 
  * queue.c --- streams statistics
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.c,v 1.9 1996/01/24 19:01:26 dave Exp $
+ * RCS Id          : $Id: queue.c,v 1.1.1.5.4.2 2005/04/12 22:45:01 brian Exp $
  * Purpose         : provide some queue for LiS
  * ----------------______________________________________________
  *
@@ -896,7 +896,7 @@ lis_backq(queue_t *q)
  *
  *	Caller has NOT acquired the queue isr lock.
  */
-static void 
+void 
 lis_backenable(queue_t *q)
 {
     lis_flags_t	 psw ;
@@ -1638,7 +1638,6 @@ lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
 	|| type == M_DATA
 	|| type == M_PROTO
 	|| type == M_PCPROTO
-	|| type == M_DELAY
 	|| (mp = lis_allocb(0, BPRI_HI, file_name, line_nr)) == NULL
        )
     	   return 0;
@@ -2153,7 +2152,7 @@ lis_bcanputnext(queue_t *q, unsigned char band)
 }/*lis_bcanputnext*/
 
 /*  -------------------------------------------------------------------  */
-/* lis_bcanputnext_anyband - search the stream starting from q->q_next
+/* lis_bcanput_anyband - search the stream starting from q
  *	until a service	routine is found, if any, and test the found queue
  *	for flow control on any non-zero band.  This is for the S_WRBAND
  *	option processing.
@@ -2163,14 +2162,13 @@ lis_bcanputnext(queue_t *q, unsigned char band)
  *	pretty useless to me.  -- DMG
  */
 int  _RP
-lis_bcanputnext_anyband(queue_t *q)
+lis_bcanput_anyband(queue_t *q)
 {
     lis_flags_t   psw;
     struct qband *qp ;
-    queue_t	 *oq ;			/* original (next) queue */
+    queue_t	 *oq ;			/* original queue */
 
-    if (   !LIS_CHECK_Q_MAGIC(q)
-	|| (q = q->q_next) == NULL
+    if (   q == NULL
 	|| !LIS_CHECK_Q_MAGIC(q)
        )
 	return 0;			/* sanity check */

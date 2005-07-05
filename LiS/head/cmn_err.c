@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/04/12 22:44:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2005/04/12 22:44:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: cmn_err.c,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/04/12 22:44:59 $"
 
 /************************************************************************
 *                           cmn_err                                     *
@@ -127,10 +127,8 @@ void	lis_cmn_err_init(void)
     lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock") ;
 }
 
-__attribute__ ((format(printf, 2, 3)))
-void	_RP lis_cmn_err(int err_lvl, char *fmt, ...)
+void	_RP lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
-    va_list	 args;
     lis_flags_t  psw;
     char	*p ;
 
@@ -160,9 +158,7 @@ void	_RP lis_cmn_err(int err_lvl, char *fmt, ...)
 
     for (p = buf; *p; p++) ;		/* find end of string */
 
-    va_start (args, fmt);
     vsprintf (p, fmt, args);
-    va_end (args);
 
 #if defined(SOLARIS_STYLE_CMN_ERR)	/* config option */
     if (err_lvl != CE_CONT)
@@ -179,5 +175,16 @@ void	_RP lis_cmn_err(int err_lvl, char *fmt, ...)
 	printk("%s", buf) ;
 
     lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw) ;
+
+} /* lis_cmn_err */
+
+__attribute__ ((format(printf, 2, 3)))
+void	_RP lis_cmn_err(int err_lvl, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	lis_vcmn_err(err_lvl, fmt, args);
+	va_end(args);
+	return;
 
 } /* lis_cmn_err */

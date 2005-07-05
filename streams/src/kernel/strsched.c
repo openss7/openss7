@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:32 $ by $Author: brian $
+ Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/03 17:41:32 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -1084,11 +1084,11 @@ int sefree(struct strevent *se)
 }
 EXPORT_SYMBOL(sefree);
 
-#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
-    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE && \
-    !defined CONFIG_STREAMS_COMPAT_MAC_MODULE
-STATIC INLINE
-#endif
+//#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE &&
+//    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE &&
+//    !defined CONFIG_STREAMS_COMPAT_MAC_MODULE
+//STATIC INLINE
+//#endif
 /*
  *  __bufcall:	- generate a buffer callback
  *  @q:		queue against which to synchronize callback
@@ -1117,11 +1117,11 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 	}
 	return (bcid);
 }
-#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE || \
-    defined CONFIG_STREAMS_COMPAT_AIX_MODULE || \
-    defined CONFIG_STREAMS_COMPAT_MAC_MODULE
+//#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
+//    defined CONFIG_STREAMS_COMPAT_AIX_MODULE ||
+//    defined CONFIG_STREAMS_COMPAT_MAC_MODULE
 EXPORT_SYMBOL_GPL(__bufcall);
-#endif
+//#endif
 
 /**
  *  bufcall:	- schedule a buffer callout
@@ -1173,10 +1173,10 @@ static void timeout_function(unsigned long arg)
 #endif
 }
 
-#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE && \
-    !defined CONFIG_STREAMS_COMPAT_UW7_MODULE
-STATIC INLINE
-#endif
+//#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE &&
+//    !defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+//STATIC INLINE
+//#endif
 toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
 			int cpu)
 {
@@ -1197,10 +1197,10 @@ toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsi
 	}
 	return (toid);
 }
-#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE || \
-    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+//#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
+//    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
 EXPORT_SYMBOL_GPL(__timeout);
-#endif
+//#endif
 
 /**
  *  timeout:	- issue a timeout callback
@@ -1344,8 +1344,8 @@ int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 }
 EXPORT_SYMBOL(unweldq);
 
-#if defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) || \
-    defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
+//#if defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) ||
+//    defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /*
  *  defer_func:	- defer a STREAMS procedure call
  *  @func:	function call to defer
@@ -1376,7 +1376,7 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 	return (ENOMEM);
 }
 EXPORT_SYMBOL_GPL(defer_func);
-#endif
+//#endif
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
