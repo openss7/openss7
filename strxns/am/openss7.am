@@ -1,53 +1,53 @@
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2005/06/24 13:27:11 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/07/06 11:11:03 $
+#
+#! -----------------------------------------------------------------------------
+#!
+#! Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+#! Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#!
+#! All Rights Reserved.
+#!
+#! This program is free software; you can redistribute it and/or modify it under
+#! the terms of the GNU General Public License as published by the Free Software
+#! Foundation; either version 2 of the License, or (at your option) any later
+#! version.
+#!
+#! This program is distributed in the hope that it will be useful, but WITHOUT
+#! ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#! FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#! details.
+#!
+#! You should have received a copy of the GNU General Public License along with
+#! this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+#! Ave, Cambridge, MA 02139, USA.
+#!
+#! -----------------------------------------------------------------------------
+#!
+#! U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+#! behalf of the U.S. Government ("Government"), the following provisions apply
+#! to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+#! is classified as "Commercial Computer Software" under paragraph 252.227-7014
+#! of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+#! successor regulations) and the Government is acquiring only the license rights
+#! granted herein (the license rights customarily provided to non-Government
+#! users).  If the Software is supplied to any unit or agency of the Government
+#! other than DoD, it is classified as "Restricted Computer Software" and the
+#! Government's rights in the Software are defined in paragraph 52.227-19 of the
+#! Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+#! the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+#! (or any successor regulations).
+#!
+#! -----------------------------------------------------------------------------
+#!
+#! Commercial licensing and support of this software is available from OpenSS7
+#! Corporation at a fee.  See http://www.openss7.com/
+#!
+#! -----------------------------------------------------------------------------
 ##
-## -----------------------------------------------------------------------------
-##
-## Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
-## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
-##
-## All Rights Reserved.
-##
-## This program is free software; you can redistribute it and/or modify it under
-## the terms of the GNU General Public License as published by the Free Software
-## Foundation; either version 2 of the License, or (at your option) any later
-## version.
-##
-## This program is distributed in the hope that it will be useful, but WITHOUT
-## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-## details.
-##
-## You should have received a copy of the GNU General Public License along with
-## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-## Ave, Cambridge, MA 02139, USA.
-##
-## -----------------------------------------------------------------------------
-##
-## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-## behalf of the U.S. Government ("Government"), the following provisions apply
-## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-## is classified as "Commercial Computer Software" under paragraph 252.227-7014
-## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-## successor regulations) and the Government is acquiring only the license rights
-## granted herein (the license rights customarily provided to non-Government
-## users).  If the Software is supplied to any unit or agency of the Government
-## other than DoD, it is classified as "Restricted Computer Software" and the
-## Government's rights in the Software are defined in paragraph 52.227-19 of the
-## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-## (or any successor regulations).
-##
-## -----------------------------------------------------------------------------
-##
-## Commercial licensing and support of this software is available from OpenSS7
-## Corporation at a fee.  See http://www.openss7.com/
-##
-## -----------------------------------------------------------------------------
-##
-## Last Modified $Date: 2005/06/24 13:27:11 $ by $Author: brian $
+## Last Modified $Date: 2005/07/06 11:11:03 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -143,8 +143,6 @@ release-clean-am: release-clean-local
 		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
 		rm -f -- $(RELEASECLEANFILES) ; \
 	fi
-
-release-clean: release-clean-recursive release-clean-am
 
 MY_PHONY	+= release $(RELEASE)
 MY_PHONY	+= release-sign $(RELEASE_SIGN)
@@ -252,6 +250,21 @@ TESTS			=
 TESTS_ENVIRONMENT	= 
 endif
 
+MY_RECURSIVE_TARGETS	+= check-clean-recursive
+
+#! check-clean:
+#!     This target removes log files left behind by the `check' target.  By
+#!     default, the check scripts append to log files in the top level build
+#!     directory.  This target can be used to clean out those log files before
+#!     the next run.
+#!
+check-clean: check-clean-recursive
+
+check-clean-am:
+	rm -f -- check_*.log
+
+MY_PHONY	+= check-clean check-clean-am
+
 MY_RECURSIVE_TARGETS	+= txt-recursive sgml-recursive
 
 txt: txt-recursive
@@ -353,17 +366,77 @@ installcheck-local: $(INSTALLCHECK_LOCAL)
 
 distcheck-hook: $(DISTCHECK_HOOK)
 
+#!
+#! Release Targets:
+#! ----------------
+#!
+#! The following are targets used to generate complete releases into the package
+#! distribution directory.  These are good for unattended and NFS builds, which
+#! is what I use them for.  Also, when building from atop multiple packages,
+#! these targets also recurse down through each package.
+#!
+#! release:
+#!     Build all of the things necessary to generate a release.  On an rpm
+#!     system this is the distribution archives, the source rpm, and the
+#!     architecture dependent and architecture independent binary rpms.  All
+#!     items are placed in the package distribution directory that can be
+#!     specified with the `--with-pkg-distdir=DIR' option to `configure'.
+#!
+#! forced-release:
+#!     The release target will not regenerate any files that already exist in
+#!     the package distribution directory.  This forced target will.
+#!
 release: $(RELEASE)
 
+#! release-sign:
+#!     You will be prompted for a password, unless to specify it to make with
+#!     the GNUPGPASS variable.  For unattended or non-interactive builds with
+#!     signing, you can do that as: 'make GNUPGPASS=mypasswd release-sign'
+#!
+#! forced-release-sign:
+#!     The release-sign target will not regenerate any files that already exist
+#!     in the package distribution directory.  This forced target will.
+#!
 release-sign: $(RELEASE_SIGN)
 
-##
-# Some logging targets for the head makefile targets.
-##
+#! release-clean:
+#!     This target will remove all distribution files for the current package
+#!     from the package distribution directory.
+#!
+release-clean: release-clean-recursive release-clean-am
 
-LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log rpms.log \
-		  sign.log rebuild.log resign.log uninstall.log
+##
+## Some logging targets for the head makefile targets.
+##
+LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
+		  rpms.log sign.log rebuild.log resign.log uninstall.log release.log \
+		  release-sign.log srpm.log
 
+#!
+#! Logging targets:
+#! ----------------
+#!
+#! For convenience, to log the output of a number of targets to a file, log
+#! targets are defined.  The log file itself is used as the target to make, but
+#! make invokes the target minus a .log suffix.  So, for example, to log the
+#! results of target 'foo', invoke the target 'foo.log'.  The only target that
+#! this does not apply to is 'compile.log'.  When you invoke the target
+#! 'compile.log' a simple 'make' is invoked and logged to the file
+#! 'compile.log'.  The 'foo.log' rule applies to all other targets.  This does
+#! not work for all targets, just a selected few.  Following are the logging
+#! targets:
+#!
+#! First the common ones:
+#!
+#! 	compile.log, check.log, install.log, installcheck.log, uninstall.log
+#!
+#! and the maintainer mode ones:
+#!
+#! 	dist.log, distcheck.log, srpm.log, rpms.log, sign.log, rebuild.log,
+#! 	resign.log, release.log, release-sign.log
+#!
+#! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
+#!
 $(LOGGING_TARGETS): FORCE
 	@$(ECHO) "Making $@ in `pwd`"
 	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'` ; \
@@ -386,4 +459,4 @@ SUFFIXES = $(MY_SUFFIXES)
 ##
 .PHONY: $(MY_PHONY)
 
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
