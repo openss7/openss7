@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/02 03:05:12 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/06 03:28:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/02 03:05:12 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 03:28:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/02 03:05:12 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/06 03:28:49 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1069,9 +1069,15 @@ function process_command()
 	test :"$sysfile" != : && command_info "sysfile= \`$sysfile'"
 	write_sysfile
     fi
-    if test :$cache_dirty = :yes -a :"$cachefile" != : ; then
-	command_info "writing cache file $cachefile"
-	write_cache >"$cachefile"
+    if test :"$cachefile" != : ; then
+	if test :$cache_dirty = :yes ; then
+	    command_info "writing cache file $cachefile"
+	    write_cache >"$cachefile"
+	elif test ! -f "$cachefile" ; then
+	    command_info "creating cache file $cachefile"
+	    echo /dev/null >"$cachefile"
+	    touch "$cachefile"
+	fi
     fi
 }
 

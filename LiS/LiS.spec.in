@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.32 $) $Date: 2005/06/25 07:01:47 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.33 $) $Date: 2005/07/06 04:14:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/25 07:01:47 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 04:14:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1252,7 +1252,7 @@ if [ $arg = 1 ] ; then : # fresh install
             # Unfortunately davem starting copying our install procedure, so we need to root out all
             # kinds of things from the modules.conf file, all prune statements, any if include
             # statements
-            for suffix in %name LiS lis streams STREAMS strxns strxnet strinet strsctp strss7 ; do
+            for suffix in %name LiS lis streams STREAMS strcompat strutil strxns strxnet strinet strsctp strss7 ; do
                 # This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
                 if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
                     sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'            $conf_new > $conf_tmp
@@ -1559,9 +1559,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.32  2005/06/25 07:01:47  brian
-# - more efficient dependency checking
+# Revision 1.1.6.33  2005/07/06 04:14:25  brian
+# - added requirement for strcompat package
 #
+
+* Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.32  2005/06/25 07:01:47  brian
+- more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.31  2005/06/24 13:40:40  brian

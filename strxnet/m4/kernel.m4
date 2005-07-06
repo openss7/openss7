@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2005/07/06 03:42:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 03:42:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -466,38 +466,40 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 	    (centos|whitebox|redhat)
 		case "${kversion}" in
 		    # redhat boot kernels
-		    (*BOOT)	    linux_cv_k_boot=BOOT	;;
-		    (*smp)	    linux_cv_k_boot=smp		;;
-		    (*bigmem)	    linux_cv_k_boot=bigmem	;;
-		    (*hugemem)	    linux_cv_k_boot=hugemem	;;
-		    (*debug)	    linux_cv_k_boot=debug	;;
-		    (*enterprise)   linux_cv_k_boot=enterprise	;;
-		    (*secure)	    linux_cv_k_boot=secure	;;
-		    (*)		    linux_cv_k_boot=		;;
+		    (*BOOT)	    linux_cv_k_boot=BOOT	 ;;
+		    (*smp)	    linux_cv_k_boot=smp		 ;;
+		    (*bigmem)	    linux_cv_k_boot=bigmem	 ;;
+		    (*hugemem)	    linux_cv_k_boot=hugemem	 ;;
+		    (*debug)	    linux_cv_k_boot=debug	 ;;
+		    (*enterprise)   linux_cv_k_boot=enterprise	 ;;
+		    (*secure)	    linux_cv_k_boot=secure	 ;;
+		    (*)		    linux_cv_k_boot=		 ;;
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$//`
 		;;
 	    (mandrake)
 		case "${kversion}" in
 		    # mandrake boot kernels
-		    (*smp)	    linux_cv_k_boot=smp		;;
-		    (*enterprise)   linux_cv_k_boot=enterprise	;;
-		    (*secure)	    linux_cv_k_boot=secure	;;
-		    (*i686-up-4GB)  linux_cv_k_boot=i686-up-4GB	;;
-		    (*maximum)	    linux_cv_k_boot=maximum	;; # FIXME
-		    (*p3-smp-64GB)  linux_cv_k_boot=p3-smp-64GB	;;
-		    (*)		    linux_cv_k_boot=		;;
+		    (*smp)	    linux_cv_k_boot=smp		 ;;
+		    (*enterprise)   linux_cv_k_boot=enterprise	 ;;
+		    (*secure)	    linux_cv_k_boot=secure	 ;;
+		    (*i686-up-4GB)  linux_cv_k_boot=i686-up-4GB	 ;;
+		    (*maximum)	    linux_cv_k_boot=maximum	 ;; # FIXME
+		    (*p3-smp-64GB)  linux_cv_k_boot=p3-smp-64GB	 ;;
+		    (*i586-up-1GB)  linux_cv_k_boot=i586-up-1GB	 ;;
+		    (*i686-up-64GB) linux_cv_k_boot=i686-up-64GB ;;
+		    (*)		    linux_cv_k_boot=		 ;;
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$//`
 		;;
 	    (suse)
 		case "${kversion}" in
 		    # suse boot kernels
-		    (*-default)	    linux_cv_k_boot=default	;;
-		    (*-smp)	    linux_cv_k_boot=smp		;;
-		    (*-bigsmp)	    linux_cv_k_boot=bigsmp	;;
-		    (*-debug)	    linux_cv_k_boot=debug	;;
-		    (*)		    linux_cv_k_boot=		;;
+		    (*-default)	    linux_cv_k_boot=default	 ;;
+		    (*-smp)	    linux_cv_k_boot=smp		 ;;
+		    (*-bigsmp)	    linux_cv_k_boot=bigsmp	 ;;
+		    (*-debug)	    linux_cv_k_boot=debug	 ;;
+		    (*)		    linux_cv_k_boot=		 ;;
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/-$linux_cv_k_boot$//`
 		;;
@@ -513,12 +515,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		linux_cv_k_base="$kversion"
 	esac
 	kbase="$linux_cv_k_base"
-	if test ":$linux_cv_k_boot" != :no
-	then
-	    kboot="${linux_cv_k_boot:-UP}"
-	else
-	    kboot=
-	fi
+dnl 	if test ":$linux_cv_k_boot" != :no
+dnl 	then
+dnl 	    kboot="${linux_cv_k_boot:-UP}"
+dnl 	else
+dnl 	    kboot=
+dnl 	fi
 dnl 	if test :"$linux_cv_k_boot" != :no
 dnl 	then
 dnl dnl	    not all combinations are valid
@@ -646,39 +648,41 @@ dnl 	fi
     then
 	AC_DEFINE_UNQUOTED([__BOOT_KERNEL_H_], [], [Define for RedHat/Mandrake kernel.])
 	case "$linux_cv_k_boot" in
-	    (BOOT)	  AC_DEFINE([__BOOT_KERNEL_BOOT],	 [1], [Define for RedHat BOOT kernel.])			;;
-	    (smp)	  AC_DEFINE([__BOOT_KERNEL_SMP],	 [1], [Define for RedHat/Mandrake SMP kernel.])		;;
-	    (bigmem)	  AC_DEFINE([__BOOT_KERNEL_BIGMEM],	 [1], [Define for RedHat BIGMEM kernel.])		;;
-	    (hugemem)	  AC_DEFINE([__BOOT_KERNEL_HUGEMEM],	 [1], [Define for RedHat HUGEMEM kernel.])		;;
-	    (debug)	  AC_DEFINE([__BOOT_KERNEL_DEBUG],	 [1], [Define for RedHat DEBUG kernel.])		;;
-	    (enterprise)  AC_DEFINE([__BOOT_KERNEL_ENTERPRISE],  [1], [Define for RedHat/Mandrake ENTERPRISE kernel.])	;;
-	    (secure)	  AC_DEFINE([__BOOT_KERNEL_SECURE],	 [1], [Define for RedHat/Mandrake SECURE kernel.])	;;
-	    (i686-up-4GB) AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB], [1], [Define for Mandrake I686_UP_4GB kernel.])	;;
-	    (maximum)	  AC_DEFINE([__BOOT_KERNEL_MAXIMUM],     [1], [Define for Mandrake MAXIMUM kernel.])		;;
-	    (p3-smp-64GB) AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB], [1], [Define for Mandrake P3_SMP_64GB  kernel.])	;;
-	    (UP)	  AC_DEFINE([__BOOT_KERNEL_UP],		 [1], [Define for RedHat/Mandrake UP kernel.])		;;
+	    (BOOT)	   AC_DEFINE([__BOOT_KERNEL_BOOT],	   [1], [Define for RedHat BOOT kernel.])		 ;;
+	    (smp)	   AC_DEFINE([__BOOT_KERNEL_SMP],	   [1], [Define for RedHat/Mandrake SMP kernel.])	 ;;
+	    (bigmem)	   AC_DEFINE([__BOOT_KERNEL_BIGMEM],	   [1], [Define for RedHat BIGMEM kernel.])		 ;;
+	    (hugemem)	   AC_DEFINE([__BOOT_KERNEL_HUGEMEM],	   [1], [Define for RedHat HUGEMEM kernel.])		 ;;
+	    (debug)	   AC_DEFINE([__BOOT_KERNEL_DEBUG],	   [1], [Define for RedHat DEBUG kernel.])		 ;;
+	    (enterprise)   AC_DEFINE([__BOOT_KERNEL_ENTERPRISE],   [1], [Define for RedHat/Mandrake ENTERPRISE kernel.]) ;;
+	    (secure)	   AC_DEFINE([__BOOT_KERNEL_SECURE],	   [1], [Define for RedHat/Mandrake SECURE kernel.])	 ;;
+	    (i686-up-4GB)  AC_DEFINE([__BOOT_KERNEL_I686_UP_4GB],  [1], [Define for Mandrake I686_UP_4GB kernel.])	 ;;
+	    (maximum)	   AC_DEFINE([__BOOT_KERNEL_MAXIMUM],      [1], [Define for Mandrake MAXIMUM kernel.])		 ;;
+	    (p3-smp-64GB)  AC_DEFINE([__BOOT_KERNEL_P3_SMP_64GB],  [1], [Define for Mandrake P3_SMP_64GB kernel.])	 ;;
+	    (i568-up-1GB)  AC_DEFINE([__BOOT_KERNEL_I586_UP_1GB],  [1], [Define for Mandrake I586_UP_1GB kernel.])	 ;;
+	    (i686-up-64GB) AC_DEFINE([__BOOT_KERNEL_I686_UP_64GB], [1], [Define for Mandrake I686_UP_64GB kernel.])	 ;;
+	    (UP)	   AC_DEFINE([__BOOT_KERNEL_UP],	   [1], [Define for RedHat/Mandrake UP kernel.])	 ;;
 	esac
 	case "$linux_cv_k_boot" in
-	    (enterprise)  case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	;;
-	    (i686-up-4GB) case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	;;
-	    (maximum)	  case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	;;
-	    (p3-smp-64GB) case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	;;
+	    (enterprise)   case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	 ;;
+	    (i686-up-4GB)  case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	 ;;
+	    (maximum)	   case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	 ;;
+	    (p3-smp-64GB)  case "$target_vendor" in (mandrake) case "$kmarch" in (i586|k6) kmarch=i686 ;; esac ;; esac	 ;;
 	esac
 	case "$kmarch" in
-	    (alpha*)	  AC_DEFINE([__MODULE_KERNEL_alpha],	[1], [Define for alpha RedHat/Mandrake kernel.])	;;
-	    (athlon)	  AC_DEFINE([__MODULE_KERNEL_athlon],	[1], [Define for athlon RedHat/Mandrake kernel.])	;;
-	    (i586)	  AC_DEFINE([__MODULE_KERNEL_i586],	[1], [Define for i586 RedHat/Mandrake kernel.])		;;
-	    (i686)	  AC_DEFINE([__MODULE_KERNEL_i686],	[1], [Define for i686 RedHat/Mandrake kernel.])		;;
-	    (i?86)	  AC_DEFINE([__MODULE_KERNEL_i386],	[1], [Define for i386 RedHat/Mandrake kernel.])		;;
-	    (ia32e)	  AC_DEFINE([__MODULE_KERNEL_ia32e],	[1], [Define for ia32e RedHat/Mandrake kernel.])	;;
-	    (ia64)	  AC_DEFINE([__MODULE_KERNEL_ia64],	[1], [Define for ia64 RedHat/Mandrake kernel.])		;;
-	    (powerpc64*)  AC_DEFINE([__MODULE_KERNEL_ppc64],	[1], [Define for ppc64 RedHat/Mandrake kernel.])	;;
-	    (powerpc*)	  AC_DEFINE([__MODULE_KERNEL_ppc],	[1], [Define for ppc RedHat/Mandrake kernel.])		;;
-	    (s390x)	  AC_DEFINE([__MODULE_KERNEL_s390x],	[1], [Define for s390x RedHat/Mandrake kernel.])	;;
-	    (s390)	  AC_DEFINE([__MODULE_KERNEL_s390],	[1], [Define for s390 RedHat/Mandrake kernel.])		;;
-	    (x86_64)	  AC_DEFINE([__MODULE_KERNEL_x86_64],	[1], [Define for x86_64 RedHat/Mandrake kernel.])	;;
-	    (sparc64*)	  AC_DEFINE([__MODULE_KERNEL_sparc64],	[1], [Define for sparc64 RedHat/Mandrake kernel.])	;;
-	    (sparc*)	  AC_DEFINE([__MODULE_KERNEL_sparc],	[1], [Define for sparc RedHat/Mandrake kernel.])	;;
+	    (alpha*)	   AC_DEFINE([__MODULE_KERNEL_alpha],	  [1], [Define for alpha RedHat/Mandrake kernel.])	 ;;
+	    (athlon)	   AC_DEFINE([__MODULE_KERNEL_athlon],	  [1], [Define for athlon RedHat/Mandrake kernel.])	 ;;
+	    (i586)	   AC_DEFINE([__MODULE_KERNEL_i586],	  [1], [Define for i586 RedHat/Mandrake kernel.])	 ;;
+	    (i686)	   AC_DEFINE([__MODULE_KERNEL_i686],	  [1], [Define for i686 RedHat/Mandrake kernel.])	 ;;
+	    (i?86)	   AC_DEFINE([__MODULE_KERNEL_i386],	  [1], [Define for i386 RedHat/Mandrake kernel.])	 ;;
+	    (ia32e)	   AC_DEFINE([__MODULE_KERNEL_ia32e],	  [1], [Define for ia32e RedHat/Mandrake kernel.])	 ;;
+	    (ia64)	   AC_DEFINE([__MODULE_KERNEL_ia64],	  [1], [Define for ia64 RedHat/Mandrake kernel.])	 ;;
+	    (powerpc64*)   AC_DEFINE([__MODULE_KERNEL_ppc64],	  [1], [Define for ppc64 RedHat/Mandrake kernel.])	 ;;
+	    (powerpc*)	   AC_DEFINE([__MODULE_KERNEL_ppc],	  [1], [Define for ppc RedHat/Mandrake kernel.])	 ;;
+	    (s390x)	   AC_DEFINE([__MODULE_KERNEL_s390x],	  [1], [Define for s390x RedHat/Mandrake kernel.])	 ;;
+	    (s390)	   AC_DEFINE([__MODULE_KERNEL_s390],	  [1], [Define for s390 RedHat/Mandrake kernel.])	 ;;
+	    (x86_64)	   AC_DEFINE([__MODULE_KERNEL_x86_64],	  [1], [Define for x86_64 RedHat/Mandrake kernel.])	 ;;
+	    (sparc64*)	   AC_DEFINE([__MODULE_KERNEL_sparc64],	  [1], [Define for sparc64 RedHat/Mandrake kernel.])	 ;;
+	    (sparc*)	   AC_DEFINE([__MODULE_KERNEL_sparc],	  [1], [Define for sparc RedHat/Mandrake kernel.])	 ;;
 	esac
 	kboot="$linux_cv_k_boot"
     fi
