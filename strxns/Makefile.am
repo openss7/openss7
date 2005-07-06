@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/05 22:46:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/06 11:22:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:46:14 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 11:22:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,6 +54,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Help
+##
+include am/help.am
 
 lib_LTLIBRARIES			=
 
@@ -374,4 +379,4 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

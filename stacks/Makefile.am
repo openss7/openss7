@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/05 22:45:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2005/07/06 11:21:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:45:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 11:21:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,6 +54,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Help
+##
+include am/help.am
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -1100,4 +1105,4 @@ MAINTAINERCLEANFILES	+= \
 			$(top_srcdir)/scripts/missing \
 			$(top_srcdir)/scripts/texinfo.tex
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

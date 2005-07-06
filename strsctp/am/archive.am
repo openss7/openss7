@@ -1,7 +1,7 @@
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/04/02 03:22:42 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/06 11:11:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,10 +47,23 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/04/02 03:22:42 $ by $Author: brian $
+## Last Modified $Date: 2005/07/06 11:11:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
+#!
+#! Release Archive Targets:
+#! ------------------------
+#!
+#! The following targets are used to generate and clean distribution archive and
+#! signature files.  Whereas the `dist' target affects archives in the top build
+#! directory, the release-archive targets affects archives in the package
+#! distribution directory, `@PACKAGE_DISTDIR@'.
+#!
+#! You can change the directory to which packages are distributed by using the
+#! --with-pkg-distdir=DIR option to 'configure'.  The default directory is the
+#! top build directory `@abs_builddir@'.
+#!
 ##
 # This one rule is always included.  This is because even though debian/rules.in is set as
 # executable, config.status does not make an executable debian/rules.  This is a sad problem with
@@ -110,6 +123,25 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2::
 $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist
 
+#! release-archives:
+#!     This target creates the distribution archive files if they have not
+#!     already been created.  This not only runs the `dist' target, but also
+#!     copies the files to the distribution directory, which in this case is
+#!     @PACKAGE_DISTDIR@.
+#!
+#!     The files generated are named:
+#!         @PACKAGE@-@VERSION@.tar.gz and @PACKAGE@-@VERSION@.tar.bz2
+#!
+#!     You can change this distribution directory with the --with-pkg-distdir
+#!     option to 'configure'.  See './configure --help' for more details on
+#!     options.
+#!
+##
+# Triggers make dist and signing if necessary.
+##
+release-archives: \
+    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
+    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 ##
 # This is a suffix rule for signing anything.  First we check if the signature file exists and has
 # a correct signature.  If it does, we merely touch the signature file.  Otherwise we use gpg to
@@ -138,13 +170,21 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 
-##
-# Triggers make dist and signing if necessary.
-##
-release-archives: \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 
+#! release-sign-archives:
+#!     This target is like `release-archives', except that it also signs the
+#!     archives using a GPG detached signature.  You will be prompted for a
+#!     password unless you pass the GNUPGPASS variable to make.  For automated
+#!     or unattended builds, pass the GNUPGPASS variable like so:
+#!
+#!         make GNUPGPASS=mypasswd release-sign-archives
+#!
+#!     Signature files will be named:
+#!         @PACKAGE@-@VERSION@.tar.gz.asc and @PACKAGE@-@VERSION@.tar.bz2.asc
+#!
+#!     These files will be moved to the package distribution directory
+#!     @PACKAGE_DISTDIR@ with the plaintext archives.
+#!
 release-sign-archives: \
     $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
     $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc
@@ -160,6 +200,10 @@ DISTCLEAN_LOCAL		+= distclean-archives
 
 DISTCLEANFILES		+= $(DIST_ARCHIVES)
 
+#! release-clean-archives:
+#!     This target will clean the release archives and signature files from the
+#!     package distribution directory @PACKAGE_DISTDIR@.
+#!
 release-clean-archives: distclean-archives
 
 RELEASE_CLEAN_LOCAL	+= release-clean-archives
@@ -175,4 +219,4 @@ endif
 EXTRA_DIST		+= .pkgrelease \
 			   .pkgepoch
 
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

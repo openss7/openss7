@@ -57,6 +57,11 @@ SUBDIRS = compat doc include src
 ##
 include am/openss7.am
 
+##
+## Help
+##
+include am/help.am
+
 AM_CPPFLAGS = @STRIP_BEGIN@ \
 	      -I$(top_srcdir)/include \
 	      @STRIP_END@
@@ -90,4 +95,4 @@ EXTRA_DIST		+= \
 			debian/README.Debian \
 			debian/TODO.Debian
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

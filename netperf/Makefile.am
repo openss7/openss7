@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.33 $) $Date: 2005/06/29 08:06:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.34 $) $Date: 2005/07/06 11:21:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:06:46 $ by $Author: brian $
+# Last Modified $Date: 2005/07/06 11:21:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,6 +54,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Help
+##
+include am/help.am
 
 
 if PKG_BUILD_ARCH
@@ -247,4 +252,4 @@ EXTRA_DIST		+= \
 			debian/README.Debian \
 			debian/TODO.Debian
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

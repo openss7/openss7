@@ -1,7 +1,7 @@
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2005/05/29 09:42:53 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2005/07/06 11:11:03 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/29 09:42:53 $ by $Author: brian $
+## Last Modified $Date: 2005/07/06 11:11:03 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -179,6 +179,18 @@ RPMXOPTS		=
 RPMTARGET		= $(target)
 
 
+#!
+#! RPM Build Targets:
+#! ------------------
+#!
+#! On rpm systems, or systems sporting rpm packaging tools, the following i
+#! targets are used to generate rpm release packages.  The epoch and release
+#! number can be controlled by the contents of the .rpmepoch and .rpmrelease
+#! files, or with the --with-rpm-epoch=EPOCH and --with-rpm-release=RELEASE
+#! options to 'configure'.  See 'configure --help' for more information on
+#! options.  We always use release number 1.  You can use release numbers
+#! above 1.
+#!
 $(redhat_tar_file)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
@@ -222,6 +234,10 @@ $(redhat_src_file): $(redhat_source_files)
 	$(MAKE) $(AM_MAKEFLAGS) -- $(redhat_directories)
 	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
 
+#! srpm:
+#!     This target generates the source rpm for the package (without signing the
+#!     source rpm).  The source rpm will be named: @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.srpm
+#!
 srpm: $(redhat_src_file)
 
 ##
@@ -252,6 +268,18 @@ lfs-rpm:
 noa-rpm:
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' AM_RPMBOPTS='--define "_without_arch --without-arch"' RPMTARGET='noarch' each-rpm || :
 
+#! rpms:
+#!     This target is responsible for generating all of the package binary rpms
+#!     for the architecture.  The binary rpms will be named:
+#!
+#!         @PACKAGE@-*-@VERSION@-@PACKAGE_RPMRELEASE@.*.rpm
+#!
+#!     where the stars indicate the subpackage and the architecture.  Both the
+#!     architecture specific subpackages (binary objects) and the architecture
+#!     independent (.noarch) subpackages will be built unless the the former was
+#!     disabled with the option `--disable-arch', or the later with the option
+#!     `--disable-indep', passed to `configure'.
+#!
 rpms: lis-rpm lfs-rpm one-rpm noa-rpm
 
 # Another sneaky trick
@@ -261,6 +289,13 @@ all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-noa-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 
+#! sign srpm-sign:
+#!     These two targets are the same.  When invoked, they will add a signature
+#!     to the source rpm file, provided that the file does not already have a
+#!     signature.  You will be prompted for a password if a signature is
+#!     required.  Automated or unattended builds can be acheived by using
+#!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
+#!
 sign srpm-sign: $(redhat_src_file)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
@@ -272,6 +307,13 @@ sign srpm-sign: $(redhat_src_file)
 #   --without popt syntax, so we have to expand them to --defines.
 ##
 
+#! rebuild:
+#!     This target accepts searches out a list of kernel names from the
+#!     @DESTDIR@/lib/modules directory and builds rpms for those kernels and for
+#!     each of a set of architectures given in the AM_RPMTARGETS variable to
+#!     make.  This is convenience target for building a group of rpms on a given
+#!     build machine.
+#!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
 	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.4\.*' | sort -r ) 2>/dev/null`" ; \
@@ -290,6 +332,13 @@ rebuild:
 	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :
 
+#! resign:
+#!     This target will search out and sign, with a GPG signature, the source
+#!     rpm, and all of the binary rpms for this package that can be found in the
+#!     package distribution directory.  This target will prompt for a GPG
+#!     password.  Automated or unattended builts can be acheived with the
+#!     `emake' expect script loccated here: `@abs_srcdir@/scripts/emake'.
+#!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
 	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
@@ -372,4 +421,4 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 			   .rpmrelease \
 			   .rpmepoch
 
-## vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
