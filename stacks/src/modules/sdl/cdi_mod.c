@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:07 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:07 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:40 $"
 
-static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:07 $";
+static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:40 $";
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <sys/cdi.h>
 
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:07 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:40 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

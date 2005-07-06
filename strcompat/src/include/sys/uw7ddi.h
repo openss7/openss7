@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: uw7ddi.h,v 0.9.2.9 2005/07/04 19:29:13 brian Exp $
+ @(#) $Id: uw7ddi.h,v 0.9.2.10 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7DDI_H__
 #define __SYS_UW7DDI_H__
 
-#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 19:29:13 $"
+#ident "@(#) $RCSfile: uw7ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __UW7_EXTERN_INLINE
 #define __UW7_EXTERN_INLINE extern __inline__
 #endif				/* __UW7_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _UW7_SOURCE
 #warning "_UW7_SOURCE not defined but uw7ddi.h,v included"

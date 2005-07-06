@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:19 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:19 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:19 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -56,7 +56,7 @@ static char const ident[] =
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:31:19 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

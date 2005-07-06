@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $";
-
-#if 0
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/init.h>
-#endif
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -75,54 +68,9 @@ static char const ident[] =
 
 #define __SUN_EXTERN_INLINE inline
 
-#if 0
-#include <linux/kernel.h>	/* for vsprintf and friends */
-#include <linux/vmalloc.h>	/* for vmalloc */
-#ifdef CONFIG_PCI
-#include <linux/pci.h>		/* for many pci functions */
-#include <asm/pci.h>		/* for many pci functions */
-#endif
-#include <linux/ioport.h>	/* for check_region and friends */
-#include <asm/uaccess.h>	/* for verify_area and friends */
-#include <linux/timer.h>	/* for del_timer and friends */
-#include <asm/semaphore.h>	/* for semaphores */
-#include <linux/sched.h>	/* for kill_proc, jiffies and friends */
-#include <linux/kmod.h>		/* for request_module and friends */
-#include <linux/threads.h>	/* for NR_CPUS */
-#include <asm/dma.h>		/* for request_dma and friends */
-#include <linux/fs.h>		/* for filesystem related stuff */
-#include <linux/time.h>		/* for do_gettimeofday and friends */
-#include <asm/io.h>		/* for virt_to_page and friends */
-#include <linux/slab.h>		/* for kmalloc and friends */
-#include <linux/interrupt.h>	/* for in_interrupt() */
-#if HAVE_KINC_LINUX_HARDIRQ_H
-#include <linux/hardirq.h>	/* for in_irq() and friends */
-#endif
-#include <asm/irq.h>		/* for disable_irq */
-#include <asm/system.h>		/* for sti, cli */
-#include <asm/delay.h>		/* for udelay */
-#include <linux/spinlock.h>	/* for spinlock functions */
-#include <asm/atomic.h>		/* for atomic functions */
-#include <linux/poll.h>		/* for poll_table */
-#include <linux/string.h>
-#endif
-
 #define _SUN_SOURCE
 
 #include "os7/compat.h"
-
-#if 0
-#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-#endif
-
-#if LIS
-#include <sys/sunddi.h>
-#endif
-#include <sys/strsun.h>
 
 #if LFS
 //#include "sys/config.h"
@@ -135,7 +83,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/04 20:14:30 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -574,9 +522,6 @@ EXPORT_SYMBOL(mcopyout);
  *  Configuration
  */
 
-struct mod_ops mod_strmops = { MODREV_1, 0, };
-EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
-
 __SUN_EXTERN_INLINE int nodev(void);
 EXPORT_SYMBOL(nodev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nulldev(void);
@@ -585,6 +530,9 @@ __SUN_EXTERN_INLINE int nochpoll(void);
 EXPORT_SYMBOL(nochpoll);	/* strconf.h */
 __SUN_EXTERN_INLINE int ddi_prop_op(void);
 EXPORT_SYMBOL(ddi_prop_op);
+
+struct mod_ops mod_strmops = { MODREV_1, 0, };
+EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
 #if LFS
 int mod_install(struct modlinkage *ml)
@@ -682,13 +630,13 @@ int mod_remove(struct modlinkage *ml)
 }
 
 EXPORT_SYMBOL(mod_remove);	/* strconf.h */
-#endif
 int mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */
 }
 
 EXPORT_SYMBOL(mod_info);	/* strconf.h */
+#endif
 
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 static

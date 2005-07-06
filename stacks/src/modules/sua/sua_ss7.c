@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:12 $
+ @(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:55 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:12 $"
+#ident "@(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:55 $"
 
 static char const ident[] =
-    "$RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:12 $";
+    "$RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:55 $";
 
 #define __NO_VERSION__
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include "sua.h"
 #include "sua_data.h"

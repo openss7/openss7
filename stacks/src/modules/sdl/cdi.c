@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:07 $
+ @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:07 $"
+#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:40 $"
 
-static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:07 $";
+static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:40 $";
 
 #define __NO_VERSION__
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <sys/cdi.h>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.5  2005/07/05 22:46:05  brian
+ - change for strcompat package
+
  Revision 0.9.2.4  2005/07/04 20:14:30  brian
  - fixed spelling of CVS keyword
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:05 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:05 $";
 
 #if 0
 #include <linux/config.h>
@@ -118,6 +121,9 @@ static char const ident[] =
 #include <linux/string.h>
 #endif
 
+#ifdef LIS
+#define _LFS_SOURCE
+#endif
 #define _MPS_SOURCE
 
 #include "os7/compat.h"
@@ -130,9 +136,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 #endif
 
-#if LIS
 #include <sys/mpsddi.h>
-#endif
 
 #if LFS
 //#include "sys/config.h"
@@ -149,7 +153,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:14:30 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:05 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -236,7 +240,7 @@ caddr_t mi_open_alloc(size_t size)
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP))) {
 		mi->mi_size = size;
-		return ((caddr_t)(mi + 1));
+		return ((caddr_t) (mi + 1));
 	}
 	return (NULL);
 }
@@ -252,7 +256,7 @@ caddr_t mi_open_alloc_sleep(size_t size)
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP))) {
 		mi->mi_size = size;
-		return ((caddr_t)(mi + 1));
+		return ((caddr_t) (mi + 1));
 	}
 	return (NULL);
 }
@@ -268,8 +272,8 @@ EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mpsddi.h */
  */
 caddr_t mi_first_ptr(caddr_t *mi_head)
 {
-	struct mi_comm *mi = *(struct mi_comm **)mi_head;
-	return mi ? ((caddr_t)(mi + 1)) : NULL;
+	struct mi_comm *mi = *(struct mi_comm **) mi_head;
+	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
 EXPORT_SYMBOL(mi_first_ptr);	/* mpsddi.h */
@@ -284,9 +288,10 @@ EXPORT_SYMBOL(mi_first_ptr);	/* mpsddi.h */
 caddr_t mi_first_dev_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
-	for (; mi && getmajor(mi->mi_dev) != 0 ; mi = mi->mi_next) ;
-	return mi ? ((caddr_t)(mi + 1)) : NULL;
+	for (; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
+	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
+
 EXPORT_SYMBOL(mi_first_dev_ptr);	/* mpsddi.h */
 
 /*
@@ -298,6 +303,7 @@ caddr_t mi_next_ptr(caddr_t ptr)
 	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1)->mi_next : NULL;
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
+
 EXPORT_SYMBOL(mi_next_ptr);	/* mpsddi.h, aixddi.h */
 
 /*
@@ -328,6 +334,7 @@ caddr_t mi_prev_ptr(caddr_t ptr)
 		return ((caddr_t) (((struct mi_comm *) mi->mi_prev) + 1));
 	return (NULL);
 }
+
 EXPORT_SYMBOL(mi_prev_ptr);	/* mpsddi.h, aixddi.h */
 
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
@@ -354,8 +361,10 @@ int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
-		for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor; mip = &(*mip)->mi_next) ;
-		for (; *mip && dmajor == getmajor((*mip)->mi_dev) && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
+		for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor;
+		     mip = &(*mip)->mi_next) ;
+		for (; *mip && dmajor == getmajor((*mip)->mi_dev)
+		     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
 			minor_t dminor = getminor((*mip)->mi_dev);
 			if (cminor < dminor)
 				break;
@@ -413,7 +422,7 @@ EXPORT_SYMBOL(mi_attach);	/* mpsddi.h, macddi.h */
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, uint size, queue_t *q, dev_t *devp, int flag,
-		int sflag, cred_t *credp);
+				     int sflag, cred_t *credp);
 EXPORT_SYMBOL(mi_open_comm);	/* mpsddi.h, aixddi.h */
 
 /*
@@ -477,6 +486,14 @@ struct mi_iocblk {
 	short mi_dir;
 	short mi_cnt;
 };
+
+/*
+ *  =========================================================================
+ *
+ *  Copyin and copyout M_IOCTL helper functions.
+ *
+ *  =========================================================================
+ */
 
 #define MI_COPY_IN			1
 #define MI_COPY_OUT			2
@@ -739,21 +756,360 @@ int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 EXPORT_SYMBOL(mi_copy_state);	/* mpsddi.h */
 
 /*
- *  MI_ALLOC
- *  -------------------------------------------------------------------------
+ *  =========================================================================
+ *
+ *  Timeout helper functions
+ *
+ *  =========================================================================
  */
 
-/*
- *  MI_ALLOC
- *  -------------------------------------------------------------------------
- */
+#define TB_ZOMBIE	-2	/* tb is a zombie, waiting to be freed */
+#define TB_CANCELLED	-1	/* tb has been cancelled - but is still on queue */
+#define TB_IDLE		 0	/* tb is idle */
+#define TB_ACTIVE	 1	/* tb has timer actively running */
+#define TB_RESCHEDULED	 2	/* tb is being rescheduled */
+#define TB_TRANSIENT	 3	/* tb is in a transient state */
+
+typedef struct mi_timeb {
+	long tb_state;
+	toid_t tb_tid;
+	clock_t tb_time;
+	mblk_t *tb_mp;
+	queue_t *tb_q;
+} tblk_t;
+
+#undef mi_timer_alloc
+#undef mi_timer
+
+static void mi_timer_expiry(caddr_t data)
+{
+	tblk_t *tb = (typeof(tb)) data;
+	toid_t tid;
+	if ((tid = xchg(&tb->tb_tid, 0))) {
+		if (tb->tb_q && tb->tb_mp)
+			put(tb->tb_q, tb->tb_mp);
+		else
+			swerr();
+	}
+}
 
 /*
- *  MI_ALLOC
+ *  MacOT variety
+ */
+/*
+ *  MI_TIMER_ALLOC (MacOT variety)
  *  -------------------------------------------------------------------------
  */
+mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size)
+{
+	mblk_t *mp;
+	tblk_t *tb;
+	if ((mp = allocb(sizeof(*tb) + size, BPRI_HI))) {
+		mp->b_datap->db_type = M_PCSIG;
+		tb = (typeof(tb)) mp->b_rptr;
+		mp->b_rptr = (typeof(mp->b_rptr)) (tb + 1);
+		mp->b_wptr = mp->b_rptr + size;
+		tb->tb_state = TB_IDLE;
+		tb->tb_tid = (toid_t) (0);
+		tb->tb_time = (clock_t) (0);
+		tb->tb_mp = mp;
+		tb->tb_q = q;
+	}
+	return (mp);
+}
+
+EXPORT_SYMBOL(mi_timer_alloc_MAC);
 
 /*
- *  MI_ALLOC
+ *  MI_TIMER (MacOT variety)
  *  -------------------------------------------------------------------------
  */
+void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+void mi_timer_MAC(mblk_t *mp, clock_t msec)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	return mi_timer_SUN(tb->tb_q, mp, msec);
+}
+
+EXPORT_SYMBOL(mi_timer_MAC);
+
+/*
+ *  MI_TIMER_CANCEL (MacOT variety)
+ *  -------------------------------------------------------------------------
+ */
+int mi_timer_cancel(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	long state;
+	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+	case TB_ACTIVE:
+	{
+		toid_t tid;
+		if (!(tid = xchg(&tb->tb_tid, 0))) {
+			tb->tb_state = TB_CANCELLED;
+			return (-1);
+		}
+		untimeout(tid);
+		tb->tb_state = TB_IDLE;
+		return (0);
+	}
+	case TB_RESCHEDULED:
+		tb->tb_state = TB_CANCELLED;
+		return (-1);
+	case TB_CANCELLED:
+	case TB_TRANSIENT:
+	case TB_ZOMBIE:
+	case TB_IDLE:
+	default:
+		tb->tb_state = state;
+		swerr();
+		return (-1);
+	}
+}
+
+EXPORT_SYMBOL(mi_timer_cancel);
+
+/*
+ *  MI_TIMER_Q_SWITCH (MacOT variety)
+ *  -------------------------------------------------------------------------
+ */
+mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	tblk_t *t2 = (typeof(t2)) new_mp->b_datap->db_base;
+	if (!mi_timer_cancel(mp)) {
+		mi_timer_SUN(q, new_mp, drv_hztomsec(tb->tb_time - jiffies));
+	      return (new_mp);
+	}
+	tb->tb_state = TB_IDLE;
+	mi_timer_SUN(q, mp, drv_hztomsec(tb->tb_time - jiffies));
+	return (mp);
+}
+
+EXPORT_SYMBOL(mi_timer_q_switch);
+
+/*
+ *  OpenSolaris variety
+ */
+/*
+ *  MI_TIMER_ALLOC (OpenSolaris variety)
+ *  -------------------------------------------------------------------------
+ */
+mblk_t *mi_timer_alloc_SUN(size_t size)
+{
+	return mi_timer_alloc_MAC(NULL, size);
+}
+
+EXPORT_SYMBOL(mi_timer_alloc_SUN);
+
+/*
+ *  MI_TIMER (OpenSolaris variety)
+ *  -------------------------------------------------------------------------
+ */
+void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	if (msec >= 0) {
+		long state;
+		tb->tb_q = q;
+		switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+		case TB_ACTIVE:
+			/* tb has timer actively running */
+		{
+			toid_t tid;
+			if (!(tid = xchg(&tb->tb_tid, 0)))
+				goto reschedule;
+			untimeout(tid);
+		}
+			/* fall through */
+		case TB_IDLE:
+			/* tb is idle */
+			tb->tb_state = TB_ACTIVE;
+			tb->tb_time = jiffies + drv_msectohz(msec);
+			if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
+						   (caddr_t) tb, tb->tb_time - jiffies))) {
+				/* failed timeout allocation */
+				if (tb->tb_q) {
+					tb->tb_state = TB_RESCHEDULED;
+					put(tb->tb_q, mp);
+					break;
+				}
+				swerr();
+				tb->tb_state = TB_IDLE;
+				break;
+			}
+			break;
+		case TB_CANCELLED:
+			/* tb has been cancelled - but is still on queue */
+		      reschedule:
+			/* fall through */
+		case TB_RESCHEDULED:
+			/* tb is being rescheduled */
+			tb->tb_state = TB_RESCHEDULED;
+			tb->tb_time = jiffies + drv_msectohz(msec);
+			break;
+		case TB_TRANSIENT:
+			/* tb is in a transient state */
+		case TB_ZOMBIE:
+			/* tb is a zombie, waiting to be freed */
+		default:
+			tb->tb_state = state;
+			swerr();
+			break;
+		}
+	} else {
+		switch (msec) {
+		case ((clock_t) (-1)):
+			mi_timer_stop(mp);
+			break;
+		case ((clock_t) (-2)):
+			mi_timer_move(q, mp);
+			break;
+		default:
+			swerr();
+			break;
+		}
+	}
+}
+
+EXPORT_SYMBOL(mi_timer_SUN);
+
+/*
+ *  MI_TIMER_STOP (OpenSolaris variety)
+ *  -------------------------------------------------------------------------
+ */
+void mi_timer_stop(mblk_t *mp)
+{
+	mi_timer_cancel(mp);
+}
+
+EXPORT_SYMBOL(mi_timer_stop);
+
+/*
+ *  MI_TIMER_MOVE (OpenSolaris variety)
+ *  -------------------------------------------------------------------------
+ */
+void mi_timer_move(queue_t *q, mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	long state;
+	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+	case TB_ACTIVE:
+	{
+		toid_t tid;
+		if (!(tid = xchg(&tb->tb_tid, 0)))
+			goto dequeue;
+		untimeout(tid);
+		tb->tb_q = q;
+		if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
+					   (caddr_t) tb, tb->tb_time - jiffies))) {
+			/* failed timeout allocation */
+			if (q) {
+				tb->tb_state = TB_RESCHEDULED;
+				put(q, mp);
+			} else {
+				tb->tb_state = TB_IDLE;
+				swerr();
+			}
+		}
+		break;
+	}
+	default:
+	{
+		queue_t *oldq;
+	      dequeue:
+		/* double race breaker */
+		if ((oldq = xchg(&tb->tb_q, NULL))) {
+			/* did we make it to a queue */
+			if (mp->b_next || mp->b_prev) {
+				fixme(("too dangerous"));	/* FIXME: too dangerous */
+				rmvq(oldq, mp);
+			}
+		}
+		if ((tb->tb_q = q))
+			put(q, mp);
+		else
+			swerr();
+		break;
+	}
+	case TB_ZOMBIE:
+		swerr();
+		break;
+	case TB_IDLE:
+		tb->tb_q = q;
+		break;
+	}
+	tb->tb_state = state;
+}
+
+EXPORT_SYMBOL(mi_timer_move);
+
+/*
+ *  Common
+ */
+/*
+ *  MI_TIMER_VALID (Common)
+ *  -------------------------------------------------------------------------
+ */
+int mi_timer_valid(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	long state;
+	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+	case TB_ACTIVE:
+	default:
+		tb->tb_state = TB_IDLE;
+		return (1);
+	case TB_ZOMBIE:
+		freemsg(mp);
+		return (0);
+	case TB_CANCELLED:
+		tb->tb_state = TB_IDLE;
+		return (0);
+	case TB_RESCHEDULED:
+		tb->tb_state = TB_ACTIVE;
+		if (!(tb->tb_tid = timeout((timo_fcn_t *) mi_timer_expiry,
+					   (caddr_t) tb, tb->tb_time - jiffies))) {
+			/* failed timeout allocation */
+			tb->tb_state = TB_RESCHEDULED;
+			if (tb->tb_q) {
+				put(tb->tb_q, mp);
+				return (0);
+			}
+			swerr();
+			tb->tb_state = TB_IDLE;
+			return (1);
+		}
+		return (0);
+	}
+}
+
+EXPORT_SYMBOL(mi_timer_valid);
+
+/*
+ *  MI_TIMER_FREE (Common)
+ *  -------------------------------------------------------------------------
+ */
+void mi_timer_free(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	long state;
+	switch ((state = xchg(&tb->tb_state, TB_TRANSIENT))) {
+	case TB_ACTIVE:
+	{
+		toid_t tid;
+		if (!(tid = xchg(&tb->tb_tid, 0)))
+			goto zombie;
+		untimeout(tid);
+	}
+	case TB_IDLE:
+		break;
+	default:
+	      zombie:
+		tb->tb_state = TB_ZOMBIE;
+		return;
+	}
+	freemsg(mp);
+}
+
+EXPORT_SYMBOL(mi_timer_free);

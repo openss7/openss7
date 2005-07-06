@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/19 09:27:33 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/05 22:46:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/19 09:27:33 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.3  2005/07/05 22:46:14  brian
+ - change for strcompat package
+
  Revision 0.9.2.2  2005/06/19 09:27:33  brian
  - working up IP NPI driver
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/19 09:27:33 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/05 22:46:14 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/19 09:27:33 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/05 22:46:14 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook
@@ -76,7 +79,8 @@ static char const ident[] =
    uses the NPI (Network Provider Interface) API.
 */
 
-#include "os7/compat.h"
+#include <os7/compat.h>
+
 #include <linux/bitops.h>
 
 #include <linux/net.h>
@@ -92,7 +96,7 @@ static char const ident[] =
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/06/19 09:27:33 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/05 22:46:14 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"

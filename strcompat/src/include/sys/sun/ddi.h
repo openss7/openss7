@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.9 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.10 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/04 19:29:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __SUN_EXTERN_INLINE
 #define __SUN_EXTERN_INLINE extern __inline__
 #endif				/* __SUN_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _SUN_SOURCE
 #warning "_SUN_SOURCE not defined but $RCSfile: ddi.h,v $ included"
@@ -530,6 +528,17 @@ extern int ddi_umem_lock(void);
 extern int ddi_umem_unlock(void);
 extern int ddi_unmap_regs(void);
 #endif
+
+/* These are MPS definitions exposed by OpenSolaris, but implemented in mpscompat.c */
+extern mblk_t *mi_timer_alloc_SUN(size_t size);
+extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+extern void mi_timer_stop(mblk_t *mp);
+extern void mi_timer_move(queue_t *q, mblk_t *mp);
+extern int mi_timer_valid(mblk_t *mp);
+extern void mi_timer_free(mblk_t *mp);
+
+#define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
+#define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)
 
 #elif defined(_SUN_SOURCE)
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"

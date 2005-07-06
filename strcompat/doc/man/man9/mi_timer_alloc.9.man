@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: mi_timer_alloc.9.man,v 0.9.2.5 2005/07/04 19:28:47 brian Exp $
+.\" @(#) $Id: mi_timer_alloc.9.man,v 0.9.2.6 2005/07/05 22:46:04 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/04 19:28:47 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strcompat.macros
@@ -76,7 +76,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B mi_timer_alloc
-\-
+\- allocate and target a \fISTREAMS\fR timer message block
 .\"
 .\"
 .SH SYNOPSIS
@@ -87,7 +87,15 @@ sort-adjacent-labels
 .br
 .B #include <sys/macddi.h>
 .HP
-.BI "mblk_t *mi_timer_alloc(queue_t *" q ", size_t " size );
+mblk_t *\fBmi_timer_alloc\fR(queue_t *\fIq\fR, size_t \fIsize\fR);
+.PP
+.B #define _SUN_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/sunddi.h>
+.HP
+mblk_t *\fBmi_timer_alloc\fR(size_t \fIsize\fR);
 .\"
 .\"
 .SH ARGUMENTS

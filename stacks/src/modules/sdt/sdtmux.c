@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:08 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:08 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:41 $"
 
-static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:31:08 $";
+static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:41 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
@@ -63,7 +63,7 @@ static char const ident[] = "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.5
  *  monitoring, testing, management, statistics collection and event
  *  collection.
  */
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>

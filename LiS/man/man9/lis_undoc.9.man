@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.6 2005/04/08 22:40:48 brian Exp $
+.\" @(#) $Id: lis_undoc.9.man,v 1.1.4.7 2005/07/05 22:45:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/04/08 22:40:48 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/05 22:45:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so lis.macros
@@ -277,7 +277,21 @@ use the SVR 4.2 compatible
 .BR ATOMIC_INT_SUB (9)
 function.
 .TP
+.BR lis_backenable ,
+Internal LiS function exported only for use by the
+.I STREAMS
+Compatibility package,
+.BR strcompat .
+.TP
+.BR lis_bcanput_anyband ,
+Internal LiS function exported only for use by the
+.I STREAMS
+Compatibility package,
+.BR strcompat .
+.TP
 .BR lis_bcanputnext_anyband ,
+This symbol is deprecated and the name is changed to
+.BR lis_bcanput_anyband .
 .TP
 .BR lis_clone_major ,
 .TP
@@ -322,6 +336,12 @@ function.
 Do not use this function, use the linux kernel
 .BR enable_irq ()
 function instead.
+.TP
+.BR lis_findmod ,
+Internal LiS function exported only for use by the
+.I STREAMS
+Compatibility package,
+.BR strcompat .
 .TP
 .BR lis_free ,
 Do not use this function, use the
@@ -1337,6 +1357,12 @@ function.
 .BR lis_usecs ,
 .TP
 .BR lis_usectohz ,
+.TP
+.BR lis_vcmn_err ,
+Internal LiS function exported only for use by the
+.I STREAMS
+Compatibility package,
+.BR strcompat .
 .TP
 .BR lis_vfree ,
 Do not use this function, use the

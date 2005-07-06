@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/04 19:28:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/05 22:46:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:28:35 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,9 +63,11 @@ svr3_compat_pages = \
 
 svr4_compat_pages = \
 	man9/svr4compat.9 \
+	man9/dtimeout.9 \
 	man9/etoimajor.9 \
 	man9/getemajor.9 \
 	man9/geteminor.9 \
+	man9/itimeout.9 \
 	man9/itoemajor.9 \
 	man9/LOCK_ALLOC.9 \
 	man9/LOCK_DEALLOC.9 \
@@ -162,7 +164,11 @@ mps_compat_pages = \
 	man9/mi_strlog.9 \
 	man9/mi_strol.9 \
 	man9/mi_timer.9 \
+	man9/mi_timer_MAC.9 \
+	man9/mi_timer_SUN.9 \
 	man9/mi_timer_alloc.9 \
+	man9/mi_timer_alloc_MAC.9 \
+	man9/mi_timer_alloc_SUN.9 \
 	man9/mi_timer_cancel.9 \
 	man9/mi_timer_free.9 \
 	man9/mi_timer_move.9 \
@@ -627,9 +633,11 @@ dist_noinst_svr3_compat_pages = \
 
 dist_noinst_svr4_compat_pages = \
 	man9/svr4compat.9.man \
+	man9/dtimeout.9.man \
 	man9/etoimajor.9.man \
 	man9/getemajor.9.man \
 	man9/geteminor.9.man \
+	man9/itimeout.9.man \
 	man9/itoemajor.9.man \
 	man9/LOCK_ALLOC.9.man \
 	man9/LOCK_DEALLOC.9.man \
@@ -726,7 +734,11 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_strlog.9.man \
 	man9/mi_strol.9.man \
 	man9/mi_timer.9.man \
+	man9/mi_timer_MAC.9.man \
+	man9/mi_timer_SUN.9.man \
 	man9/mi_timer_alloc.9.man \
+	man9/mi_timer_alloc_MAC.9.man \
+	man9/mi_timer_alloc_SUN.9.man \
 	man9/mi_timer_cancel.9.man \
 	man9/mi_timer_free.9.man \
 	man9/mi_timer_move.9.man \

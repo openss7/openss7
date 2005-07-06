@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.1 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.2 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.2  2005/07/05 22:46:05  brian
+ - change for strcompat package
+
  Revision 0.9.2.1  2005/07/04 19:29:12  brian
  - first cut at streams compatibility package
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_LFSDDI_H__
 #define __SYS_LFSDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,9 +72,6 @@
 #endif				/* __LFS_EXTERN_INLINE */
 
 #include <linux/delay.h>	/* for udelay */
-
-#include <sys/strconf.h>
-#include <sys/strlog.h>
 
 #ifndef _LFS_SOURCE
 #warning "_LFS_SOURCE not defined but lfsddi.h,v included"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/01 07:29:31 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/07/05 22:46:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 07:29:31 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_IRIXDDI_H__
 #define __SYS_IRIXDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/01 07:29:31 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:46:04 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,9 +61,6 @@
 #ifndef __IRIX_EXTERN_INLINE
 #define __IRIX_EXTERN_INLINE extern __inline__
 #endif				/* __IRIX_EXTERN_INLINE */
-
-#include <sys/strconf.h>
-#include <sys/cmn_err.h>	/* for vcmn_err */
 
 #ifndef _IRIX_SOURCE
 #warning "_IRIX_SOURCE not defined but irixddi.h,v included"

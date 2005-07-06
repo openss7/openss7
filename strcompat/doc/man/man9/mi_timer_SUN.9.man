@@ -1,0 +1,1 @@
+.so man9/mi_timer.9.man

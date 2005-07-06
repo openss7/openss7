@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mpsddi.h,v 0.9.2.2 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: mpsddi.h,v 0.9.2.3 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpsddi.h,v $
+ Revision 0.9.2.3  2005/07/05 22:46:05  brian
+ - change for strcompat package
+
  Revision 0.9.2.2  2005/07/04 19:29:12  brian
  - first cut at streams compatibility package
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_MPSDDI_H__
 #define __SYS_MPSDDI_H__
 
-#ident "@(#) $RCSfile: mpsddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mpsddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -73,8 +76,6 @@
 #ifndef __MPS_EXTERN_INLINE
 #define __MPS_EXTERN_INLINE extern __inline__
 #endif				/* __AIX_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _MPS_SOURCE
 #warning "_MPS_SOURCE not defined but middi.h included"
@@ -198,14 +199,22 @@ __MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q)
 /*
  *  Timer helper functions.
  */
-extern void mi_timer(queue_t *q, mblk_t *mp, clock_t tim);
-extern mblk_t *mi_timer_alloc(queue_t *q, mblk_t *mp, clock_t tim);
-extern void mi_timer_free(mblk_t *mp);
+
+/* MacOT flavor */
+extern mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size);
+extern void mi_timer_MAC(mblk_t *mp, clock_t msec);
+extern int mi_timer_cancel(mblk_t *mp);
+extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp);
+
+/* OpenSolaris flavor */
+extern mblk_t *mi_timer_alloc_SUN(size_t size);
+extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+extern void mi_timer_stop(mblk_t *mp);
+extern void mi_timer_move(queue_t *q, mblk_t *mp);
+
+/* common */
 extern int mi_timer_valid(mblk_t *mp);
-extern void mi_timer_stop(mblk_t *mp);	/* also called mi_timer_cancel */
-extern int mi_timer_cancel(mblk_t *mp); /* also called mi_timer_stop */
-extern void mi_timer_move(queue_t *q, mblk_t *mp);	/* also mi_timer_q_switch */
-extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp); /* also mi_timer_move */
+extern void mi_timer_free(mblk_t *mp);
 
 #if LFS
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/05 22:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:14:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/05 22:46:05 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/05 22:46:05 $";
 
 #if 0
 #include <linux/config.h>
@@ -140,7 +140,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 20:14:30 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/05 22:46:05 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -387,9 +387,52 @@ __SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
 EXPORT_SYMBOL(RW_DEALLOC);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl);
 EXPORT_SYMBOL(RW_RDLOCK);	/* svr4ddi.h */
-__SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
+pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+#if CONFIG_SMP && HAVE_READ_TRYLOCK
+	if (read_trylock(lockp))
+		return (old_pl);
+#else
+#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+#if CONFIG_SMP
+	/* this will jam up sometimes */
+	if (!spin_is_locked(lockp)) {
+#endif
+		read_lock(lockp);
+		return (old_pl);
+#if CONFIG_SMP
+	}
+#endif
+#endif
+#endif
+	splx(old_pl);
+	return (invpl);
+}
 EXPORT_SYMBOL(RW_TRYRDLOCK);	/* svr4ddi.h */
-__SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
+pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
+{
+	pl_t old_pl = spl(pl);
+#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
+	if (write_trylock(lockp))
+		return (old_pl);
+#else
+#if CONFIG_SMP
+	/* this will jam up sometimes */
+	if (!spin_is_locked(lockp)) {
+#endif
+		write_lock(lockp);
+		return (old_pl);
+#if CONFIG_SMP
+	}
+#endif
+#endif
+	splx(old_pl);
+	return (invpl);
+}
 EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
 EXPORT_SYMBOL(RW_UNLOCK);	/* svr4ddi.h */
@@ -419,7 +462,20 @@ __SVR4_EXTERN_INLINE void SV_BROADCAST(sv_t * svp, int flags);
 EXPORT_SYMBOL(SV_BROADCAST);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 EXPORT_SYMBOL(SV_DEALLOC);	/* svr4ddi.h */
-__SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t * svp);
+#if ! ( HAVE___WAKE_UP_SYNC_ADDR || HAVE___WAKE_UP_SYNC_EXPORT )
+#undef	__wake_up_sync
+#define __wake_up_sync __wake_up
+#endif
+void SV_SIGNAL(sv_t * svp)
+{
+#ifdef HAVE___WAKE_UP_SYNC_ADDR
+#undef	__wake_up_sync
+	typeof(&__wake_up_sync) ___wake_up_sync = (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
+#define	__wake_up_sync ___wake_up_sync
+#endif
+	svp->sv_condv = 1;
+	wake_up_interruptible_sync(&svp->sv_waitq);
+}
 EXPORT_SYMBOL(SV_SIGNAL);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
 EXPORT_SYMBOL(SV_WAIT);		/* svr4ddi.h */

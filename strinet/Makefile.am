@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/04 20:18:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/05 22:46:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:18:13 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -120,17 +120,8 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
-nodist_EXTRA_libINETmods_a_SOURCES	= \
-				  src/drivers/inet.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+nodist_EXTRA_libINETmods_a_SOURCES = \
+				  src/drivers/inet.c
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
@@ -211,16 +202,7 @@ noinst_LIBRARIES		= libINETmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libINETmods_a_SOURCES	= \
-				  src/drivers/inet.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/inet.c
 
 mods_source_FILES		= $(nodist_EXTRA_libINETmods_a_SOURCES)
 
@@ -241,9 +223,7 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-inet_source_FILES		= $(mods_source_FILES)
-
-EXTRA_DIST			+= $(inet_source_FILES)
+EXTRA_DIST			+= $(mods_source_FILES)
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \
@@ -266,7 +246,7 @@ KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
 ## WITH_KO_MODULES
@@ -301,8 +281,7 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= \
-				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

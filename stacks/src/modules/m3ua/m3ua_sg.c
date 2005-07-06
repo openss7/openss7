@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.7 2005/05/10 18:05:52 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.8 2005/07/05 22:45:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2005/05/10 18:05:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.8  2005/07/05 22:45:32  brian
+ - change for strcompat package
+
  Revision 0.9.2.7  2005/05/10 18:05:52  brian
  - do not set clone flag cause symbol no longer exported
 
@@ -68,9 +71,9 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/10 18:05:52 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:45:32 $";
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <ss7/m3ua.h>
 #include <ss7/m3ua_ioctl.h>

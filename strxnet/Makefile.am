@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/05/28 04:43:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/05 22:46:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:43:15 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,16 +148,7 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
-				  src/modules/timod.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/modules/timod.c
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
@@ -261,16 +252,7 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libXNETmods_a_SOURCES = \
 				  src/modules/tirdwr.c \
-				  src/modules/timod.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/modules/timod.c
 
 mods_source_FILES		= $(nodist_EXTRA_libXNETmods_a_SOURCES)
 
@@ -316,7 +298,7 @@ KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
 kpre				= streams_

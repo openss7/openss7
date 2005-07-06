@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/05/28 04:43:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/05 22:46:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/28 04:43:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,9 +74,8 @@ EXTRA_PROGRAMS			+= \
 				  ldlconfig
 
 
-sbin_PROGRAMS			= \
-				  ldlconfig \
-				  @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod \
+				  ldlconfig
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -85,12 +84,12 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
-ldlconfig_LDADD			= $(STREAMS_LDADD)
+ldlconfig_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
-ldltest_LDADD			= $(STREAMS_LDADD)
+ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
@@ -109,16 +108,7 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/modules/ip_strm_mod.c \
-				  src/modules/ip_strm_mod.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/modules/ip_strm_mod.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
@@ -130,16 +120,7 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
-				  src/drivers/ldl.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/ldl.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
@@ -162,31 +143,31 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-libexec_PROGRAMS		= \
-				  ldltest
-
 EXTRA_PROGRAMS			+= \
 				  ldltest \
 				  ldlconfig
 
+libexec_PROGRAMS		= \
+				  ldltest
+
 
 sbin_PROGRAMS			= \
-				  ldlconfig \
-				  @PACKAGE_TARNAME@_mknod
+				  @PACKAGE_TARNAME@_mknod \
+				  ldlconfig
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-@PACKAGE_TARNAME@_mknod_LDADD		=
+@PACKAGE_TARNAME@_mknod_LDADD		= 
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
 ldlconfig_SOURCES		= src/util/ldlconfig.c
-ldlconfig_LDADD			= $(STREAMS_LDADD)
+ldlconfig_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldlconfig_CFLAGS		= $(USER_CFLAGS)
 
 ldltest_SOURCES			= src/test/ldltest.c
-ldltest_LDADD			= $(STREAMS_LDADD)
+ldltest_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 ldltest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 ldltest_CFLAGS			= $(USER_CFLAGS)
 
@@ -205,16 +186,7 @@ EXTRA_LIBRARIES			+=
 
 nodist_EXTRA_libXNSmods_a_SOURCES = \
 				  src/modules/ip_strm_mod.c \
-				  src/modules/ip_strm_mod.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/modules/ip_strm_mod.h
 
 mods_source_FILES		= $(nodist_EXTRA_libXNSmods_a_SOURCES)
 
@@ -226,16 +198,7 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/ip_to_dlpi.c \
-				  src/drivers/ldl.c \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/ldl.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libXNSdrvs_a_SOURCES)
 
@@ -279,12 +242,14 @@ KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
+## WITH_KO_MODULES
 kpre				= streams_
 else
 kpre				= streams-
+## WITH_KO_MODULES
 endif
 
 include am/kernel.am
@@ -307,7 +272,7 @@ endif
 ##AUTOCONFIG_H			= $(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
-
+##
 EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
@@ -390,23 +355,23 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
-MAINTAINERCLEANFILES	+= \
-			$(top_srcdir)/aclocal.m4 \
-			$(top_srcdir)/config.h.in \
-			$(top_srcdir)/configure \
-			$(top_srcdir)/COPYING \
-			$(top_srcdir)/INSTALL \
-			$(top_srcdir)/scripts/compile \
-			$(top_srcdir)/scripts/config.guess \
-			$(top_srcdir)/scripts/config.sub \
-			$(top_srcdir)/scripts/depcomp \
-			$(top_srcdir)/scripts/install-sh \
-			$(top_srcdir)/scripts/ltmain.sh \
-			$(top_srcdir)/scripts/missing \
-			$(top_srcdir)/scripts/texinfo.tex
+MAINTAINERCLEANFILES		+= \
+				  $(top_srcdir)/aclocal.m4 \
+				  $(top_srcdir)/config.h.in \
+				  $(top_srcdir)/configure \
+				  $(top_srcdir)/COPYING \
+				  $(top_srcdir)/INSTALL \
+				  $(top_srcdir)/scripts/compile \
+				  $(top_srcdir)/scripts/config.guess \
+				  $(top_srcdir)/scripts/config.sub \
+				  $(top_srcdir)/scripts/depcomp \
+				  $(top_srcdir)/scripts/install-sh \
+				  $(top_srcdir)/scripts/ltmain.sh \
+				  $(top_srcdir)/scripts/missing \
+				  $(top_srcdir)/scripts/texinfo.tex
 
 # vim: ft=automake

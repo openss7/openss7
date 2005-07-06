@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:31 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:31 $";
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:30:58 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:31 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

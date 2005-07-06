@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr3ddi.h,v 0.9.2.3 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: svr3ddi.h,v 0.9.2.4 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR3DDI_H__
 #define __SYS_SVR3DDI_H__
 
-#ident "@(#) $RCSfile: svr3ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: svr3ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __SVR3_EXTERN_INLINE
 #define __SVR3_EXTERN_INLINE extern __inline__
 #endif				/* __SVR3_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _SVR3_SOURCE
 #warning "_SVR3_SOURCE not defined but svr4ddi.h,v included"

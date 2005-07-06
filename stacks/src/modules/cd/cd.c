@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:30:50 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:30:50 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:21 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:30:50 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:21 $";
 
 #define EXPORT_SYMTAB
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <sys/cdi.h>
 #include <sys/cdi_hdlc.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:30:50 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:21 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/07/05 22:46:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUXDDI_H__
 #define __SYS_HPUXDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 19:29:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:04 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __HPUX_EXTERN_INLINE
 #define __HPUX_EXTERN_INLINE extern __inline__
 #endif				/* __HPUX_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _HPUX_SOURCE
 #warning "_HPUX_SOURCE not defined but hpuxddi.h,v included"

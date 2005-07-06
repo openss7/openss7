@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: osfddi.h,v 0.9.2.3 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: osfddi.h,v 0.9.2.4 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSFDDI_H__
 #define __SYS_OSFDDI_H__
 
-#ident "@(#) $RCSfile: osfddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: osfddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __OSF_EXTERN_INLINE
 #define __OSF_EXTERN_INLINE extern __inline__
 #endif				/* __OSF_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _OSF_SOURCE
 #warning "_OSF_SOURCE not defined but osfddi.h,v included"

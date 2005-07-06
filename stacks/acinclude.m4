@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/04 20:08:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/07/05 22:45:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:08:31 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:45:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,6 +66,7 @@ m4_include([m4/libraries.m4])
 m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
+m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
 
 # =============================================================================
@@ -105,6 +106,7 @@ AC_DEFUN([AC_SS7], [dnl
     _SS7_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
@@ -153,6 +155,7 @@ AC_DEFUN([_SS7_SETUP], [dnl
     _SS7_CONFIG_KERNEL
     _GENKSYMS
     _LINUX_STREAMS
+    _STRCOMP
     _XOPEN
 ])# _SS7_SETUP
 # =============================================================================

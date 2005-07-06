@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2005/06/23 10:43:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/05 22:46:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/23 10:43:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -162,29 +162,11 @@ sctp_source_FILES		= \
 				  src/drivers/sctp_n.h \
 				  src/drivers/sctp_output.h \
 				  src/drivers/sctp_route.h \
-				  src/drivers/sctp_t.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/sctp_t.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
 				  src/drivers/sctp_compat.h \
-				  src/drivers/sctp_hooks.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/sctp_hooks.h
 if WITH_HMAC_MD5
 ## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
@@ -348,29 +330,11 @@ sctp_source_FILES		= \
 				  src/drivers/sctp_n.h \
 				  src/drivers/sctp_output.h \
 				  src/drivers/sctp_route.h \
-				  src/drivers/sctp_t.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/sctp_t.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
 				  src/drivers/sctp_compat.h \
-				  src/drivers/sctp_hooks.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/drivers/sctp_hooks.h
 if WITH_HMAC_MD5
 ## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
@@ -460,7 +424,7 @@ KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
 kpre				= streams_

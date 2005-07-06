@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:31:21 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:01 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:31:21 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:01 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:31:21 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:01 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -56,7 +56,7 @@ static char const ident[] =
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2005/05/14 08:31:21 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:01 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

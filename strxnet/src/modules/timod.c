@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:28:30 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/05 22:46:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:28:30 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/05 22:46:13 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:28:30 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/05 22:46:13 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -65,7 +65,7 @@ static char const ident[] =
  *  library has superior syncrhonization across a fork() and provides a
  *  conforming t_sync() library call.
  */
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 /*
    These are for TPI definitions 
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/05/14 08:28:30 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/05 22:46:13 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

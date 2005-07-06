@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:29:19 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:12 $";
 
 #define __NO_VERSION__
 
@@ -165,9 +165,9 @@ typedef struct sctp_addr {
 #endif				/* sctp_addr_t */
 
 #ifndef LFS
-#include "os7/debug.h"
+#include <os7/debug.h>
 #endif
-#include "os7/bufq.h"
+#include <os7/bufq.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"

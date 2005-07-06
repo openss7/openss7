@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.7 $) $Date: 2005/06/29 08:05:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/07/05 22:45:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:05:51 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:45:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -156,10 +156,12 @@ man_MANS = \
 	man9/lis_atomic_read.9 \
 	man9/lis_atomic_set.9 \
 	man9/lis_atomic_sub.9 \
+	man9/lis_backenable.9 \
 	man9/lis_backq.9 \
 	man9/lis_backq_fcn.9 \
 	man9/lis_basename.9 \
 	man9/lis_bcanput.9 \
+	man9/lis_bcanput_anyband.9 \
 	man9/lis_bcanputnext.9 \
 	man9/lis_bcanputnext_anyband.9 \
 	man9/lis_bcopy.9 \
@@ -206,6 +208,7 @@ man_MANS = \
 	man9/lis_fdetach.9 \
 	man9/lis_fdetach_all.9 \
 	man9/lis_fdetach_stream.9 \
+	man9/lis_findmod.9 \
 	man9/lis_fifo_close_sync.9 \
 	man9/lis_fifo_open_sync.9 \
 	man9/lis_fifo_write_sync.9 \
@@ -509,6 +512,7 @@ man_MANS = \
 	man9/lis_usecs.9 \
 	man9/lis_usectohz.9 \
 	man9/lis_valid_mod_list.9 \
+	man9/lis_vcmn_err.9 \
 	man9/lis_version.9 \
 	man9/lis_vfree.9 \
 	man9/lis_virt_to_phys.9 \
@@ -682,10 +686,12 @@ dist_noinst_MANS = \
 	man9/lis_atomic_read.9.man \
 	man9/lis_atomic_set.9.man \
 	man9/lis_atomic_sub.9.man \
+	man9/lis_backenable.9.man \
 	man9/lis_backq.9.man \
 	man9/lis_backq_fcn.9.man \
 	man9/lis_basename.9.man \
 	man9/lis_bcanput.9.man \
+	man9/lis_bcanput_anyband.9.man \
 	man9/lis_bcanputnext.9.man \
 	man9/lis_bcanputnext_anyband.9.man \
 	man9/lis_bcopy.9.man \
@@ -732,6 +738,7 @@ dist_noinst_MANS = \
 	man9/lis_fdetach.9.man \
 	man9/lis_fdetach_all.9.man \
 	man9/lis_fdetach_stream.9.man \
+	man9/lis_findmod.9.man \
 	man9/lis_fifo_close_sync.9.man \
 	man9/lis_fifo_open_sync.9.man \
 	man9/lis_fifo_write_sync.9.man \
@@ -1035,6 +1042,7 @@ dist_noinst_MANS = \
 	man9/lis_usecs.9.man \
 	man9/lis_usectohz.9.man \
 	man9/lis_valid_mod_list.9.man \
+	man9/lis_vcmn_err.9.man \
 	man9/lis_version.9.man \
 	man9/lis_vfree.9.man \
 	man9/lis_virt_to_phys.9.man \

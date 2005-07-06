@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.5 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.7 2005/07/06 03:47:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/06 03:47:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRCONF_H__
 #define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/04 19:29:12 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/06 03:47:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,7 +74,7 @@
 #define __SUN_EXTERN_INLINE extern __inline__
 #endif				/* __EXTERN_INLINE */
 
-#if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
+#ifdef _AIX_SOURCE
 
 typedef struct {
 	char *sc_name;
@@ -102,15 +102,13 @@ extern int str_install_AIX(int cmd, strconf_t * conf);
 #define STR_64BIT	0x00002000	/* 64-bit capable */
 #define STR_NEWCLONING	0x00004000	/* Module does cloning without CLONEOPEN */
 
-#if defined(_AIX_SOURCE) && !defined(str_install)
+#ifndef str_install
 #define str_install(__cmd, __conf) str_install_AIX(__cmd, __conf)
 #endif
 
-#elif defined(_AIX_SOURCE)
-#warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
-#endif				/* CONFIG_STREAMS_COMPAT_AIX */
+#endif				/* _AIX_SOURCE */
 
-#if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
+#ifdef _OSF_SOURCE
 
 #if 0				/* we don't support the static configuration */
 
@@ -141,11 +139,9 @@ struct streamadm {
 extern dev_t strmod_add(dev_t dev, struct streamtab *str, struct streamadm *sa);
 extern int strmod_del(dev_t dev, struct streamtab *str, struct streamadm *sa);
 
-#elif defined(_OSF_SOURCE)
-#warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
-#endif				/* CONFIG_STREAMS_COMPAT_OSF */
+#endif				/* _OSF_SOURCE */
 
-#if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
+#ifdef _HPUX_SOURCE
 
 typedef struct stream_inst {
 	char *name;			/* name of driver or module */
@@ -159,13 +155,11 @@ typedef struct stream_inst {
 extern int str_install_HPUX(struct stream_inst *inst);
 extern int str_uninstall(struct stream_inst *inst);
 
-#if defined(_HPUX_SOURCE) && !defined(str_install)
+#ifndef str_install
 #define str_install(__inst) str_install_HPUX(__inst)
 #endif
 
-#elif defined(_HPUX_SOURCE)
-#warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
-#endif				/* CONFIG_STREAMS_COMPAT_HPUX */
+#endif				/* _HPUX_SOURCE */
 
 #define STR_IS_DEVICE   0x00000001	/* device */
 #define STR_IS_MODULE   0x00000002	/* module */
@@ -184,7 +178,7 @@ typedef enum {
 	SQLVL_NOP = 6,			/* no synchronization */
 } sqlvl_t;
 
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
+#ifdef _SUN_SOURCE
 
 #if 0
 struct cb_ops {
@@ -345,89 +339,18 @@ extern int mod_install(struct modlinkage *ml);
 extern int mod_remove(struct modlinkage *ml);
 extern int mod_info(struct modlinkage *ml, struct modinfo *mi);
 
-#elif defined(_SUN_SOURCE)
-#warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
-#endif
+#endif /* _SUN_SOURCE */
 
-#if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
+#if defined LIS
 extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
 			       const char *name);
 extern int lis_unregister_strdev(major_t major);
 extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
 extern int lis_unregister_strmod(struct streamtab *strtab);
-#elif defined(_LIS_SOURCE) && !defined(LIS)
-#warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
-#endif				/* CONFIG_STREAMS_COMPAT_LIS */
+#endif				/* _LIS_SOURCE */
 
-#if defined(CONFIG_STREAMS_COMPAT_LFS) || defined(CONFIG_STREAMS_COMPAT_LFS_MODULE)
-
-#undef fmodsw
-#define fmodsw lfs_fmodsw
-
-struct fmodsw {
-	struct list_head f_list;	/* list of all structures */
-	struct list_head f_hash;	/* list of module hashes in slot */
-	const char *f_name;		/* module name */
-	struct streamtab *f_str;	/* pointer to streamtab for module */
-	uint f_flag;			/* module flags */
-	uint f_modid;			/* module id */
-	atomic_t f_count;		/* open count */
-	int f_sqlvl;			/* q sychronization level */
-	struct syncq *f_syncq;		/* synchronization queue */
-	struct module *f_kmod;		/* kernel module */
-};
-
-struct cdevsw;
-
-struct devnode {
-	struct list_head n_list;	/* list of all nodes for this device */
-	struct list_head n_hash;	/* list of major hashes in slot */
-	const char *n_name;		/* node name */
-	struct streamtab *n_str;	/* streamtab for node */
-	uint n_flag;			/* node flags */
-	uint n_modid;			/* node module id */
-	atomic_t n_count;		/* open count */
-	int n_sqlvl;			/* q sychronization level */
-	struct syncq *n_syncq;		/* synchronization queue */
-	struct module *n_kmod;		/* kernel module */
-	/* above must match fmodsw */
-	int n_major;			/* node major device number */
-	struct inode *n_inode;		/* specfs inode */
-	mode_t n_mode;			/* inode mode */
-	/* above must match cdevsw */
-	int n_minor;			/* node minor device number */
-	struct cdevsw *n_dev;		/* character device */
-};
-#define N_MAJOR		0x01	/* major device node */
-
-struct file_operations;
-
-struct cdevsw {
-	struct list_head d_list;	/* list of all structures */
-	struct list_head d_hash;	/* list of module hashes in slot */
-	const char *d_name;		/* driver name */
-	struct streamtab *d_str;	/* pointer to streamtab for driver */
-	uint d_flag;			/* driver flags */
-	uint d_modid;			/* driver moidule id */
-	atomic_t d_count;		/* open count */
-	int d_sqlvl;			/* q sychronization level */
-	struct syncq *d_syncq;		/* synchronization queue */
-	struct module *d_kmod;		/* kernel module */
-	/* above must match fmodsw */
-	int d_major;			/* base major device number */
-	struct inode *d_inode;		/* specfs inode */
-	mode_t d_mode;			/* inode mode */
-	/* above must match devnode */
-	struct file_operations *d_fop;	/* file operations */
-	struct list_head d_majors;	/* major device nodes for this device */
-	struct list_head d_minors;	/* minor device nodes for this device */
-	struct list_head d_apush;	/* autopush list */
-	struct stdata *d_plinks;	/* permanent links for this device */
-	struct list_head d_stlist;	/* stream head list for this device */
-};
-
+#if defined LFS
 extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
-#undef register_strdev
 extern int register_strdev(struct cdevsw *cdev, major_t major);
 extern int register_strdrv(struct cdevsw *cdev);
 extern int register_strmod(struct fmodsw *fmod);
@@ -440,12 +363,10 @@ extern int autopush_add(struct strapush *sap);
 extern int autopush_del(struct strapush *sap);
 extern int autopush_vml(struct str_mlist *smp, int nmods);
 extern struct strapush *autopush_find(dev_t dev);
-#elif defined(_LFS_SOURCE)
-#warning "_LFS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LFS"
-#endif
 
 extern int apush_get(struct strapush *sap);
 extern int apush_set(struct strapush *sap);
 extern int apush_vml(struct str_list *slp);
+#endif
 
 #endif				/* __SYS_STRCONF_H__ */

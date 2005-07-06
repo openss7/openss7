@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/05 22:46:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:07:57 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,6 +66,7 @@ m4_include([m4/libraries.m4])
 m4_include([m4/autotest.m4])
 m4_include([m4/strconf.m4])
 m4_include([m4/streams.m4])
+m4_include([m4/strcomp.m4])
 m4_include([m4/xopen.m4])
 
 # =============================================================================
@@ -105,12 +106,13 @@ AC_DEFUN([AC_XNS], [dnl
     _XNS_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
 dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
 dnl fi
-    PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
+    PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
@@ -151,6 +153,7 @@ AC_DEFUN([_XNS_SETUP], [dnl
     _XNS_CONFIG_KERNEL
     _GENKSYMS
     _LINUX_STREAMS
+    _STRCOMP
     with_xns='yes'
     _XOPEN
 ])# _XNS_SETUP

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/07/04 19:29:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LISDDI_H__
 #define __SYS_LISDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/04 19:29:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -64,9 +64,8 @@
 
 #ifndef _LIS_SOURCE
 #warning "_LIS_SOURCE not defined but lisddi.h,v included"
+#define _LIS_SOURCE 1
 #endif
-
-#if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
 
 #include <linux/poll.h>
 #include <linux/interrupt.h>
@@ -871,11 +870,5 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #define lis_qreply(__q, __mp) lis_safe_qreply(__q, __mp, __FILE__, __LINE__)
 #define OTHER(__q) lis_OTHERQ(__q)
 #endif
-
-#else				/* CONFIG_STREAMS_COMPAT_LIS */
-#if defined(_LIS_SOURCE) && !defined(LIS)
-#warning "_LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS"
-#endif
-#endif				/* CONFIG_STREAMS_COMPAT_LIS */
 
 #endif				/* __SYS_LISDDI_H__ */

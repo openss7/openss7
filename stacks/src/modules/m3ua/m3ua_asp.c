@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:59 $
+ @(#) $RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:32 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:59 $"
+#ident "@(#) $RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:32 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:59 $";
+    "$RCSfile: m3ua_asp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:45:32 $";
 
 #define __NO_VERSION__
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include "../../include/ss7/mtp.h"
 #include "../mtp/mtp_prov.h"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.23 2005/05/14 08:34:18 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.24 2005/07/05 22:46:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:34:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/05 22:46:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1211,8 +1211,8 @@ flushband           :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 flushq              :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 freeb               :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 freemsg             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
-getadmin            :(9):yes:yes:yes:yes:yes: - : - : - :yes:yes: - \"4.0
-getmid              :(9):yes:yes:yes:yes:yes: - : - : - :yes:yes: - \"4.0
+getadmin            :(9):yes:yes:yes:yes:yes: - : - : - :yes:yes:lfs\"4.0
+getmid              :(9):yes:yes:yes:yes:yes: - : - : - :yes:yes:lfs\"4.0
 getq                :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
 insq                :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 linkb               :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
@@ -1233,7 +1233,7 @@ rmvb                :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0,3.1
 rmvq                :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 SAMESTR             :(9):yes: - :yes: - : - :yes:yes:yes:yes: - :yes\"4.0
 splstr              :(9):svr:yes:yes: - :yes:yes: - :yes:yes:yes:yes\"4.0
-strlog              :(9):yes:yes:yes:yes:yes:yes:yes: - :yes:yes: - \"4.0
+strlog              :(9):yes:yes:yes:yes:yes:yes:yes: - :yes:yes:lfs\"4.0
 strqget             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 strqset             :(9):yes: - :yes:yes:yes:yes:yes:yes:yes:yes:yes\"4.0
 testb               :(9):yes:yes:yes:yes:yes: - :yes: - :yes:yes:yes\"4.0
@@ -1319,7 +1319,7 @@ bcanputnext         :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 canputnext          :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 freezestr           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 msgpullup           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
-pcmsg               :(9):yes: - :yes: - : - :yes: - :yes:yes: - : - \"4mp
+pcmsg               :(9):yes: - :yes: - : - :yes: - :yes:yes: - :lfs\"4mp
 put                 :(9):yes: - :yes:yes: - : - :yes:yes:yes: - :yes\"4mp
 putnextctl1         :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 putnextctl          :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
@@ -1327,10 +1327,10 @@ qprocsoff           :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 qprocson            :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 unfreezestr         :(9):yes: - :yes:yes: - :yes:yes:yes:yes: - :yes\"4mp
 _
-MPSTR_QLOCK         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_QRELE         :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_STPLOCK       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
-MPSTR_STPRELE       :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4mp
+MPSTR_QLOCK         :(9):svr: - : - : - : - : - : - : - :yes: - :svr\"4mp
+MPSTR_QRELE         :(9):svr: - : - : - : - : - : - : - :yes: - :svr\"4mp
+MPSTR_STPLOCK       :(9):svr: - : - : - : - : - : - : - :yes: - :svr\"4mp
+MPSTR_STPRELE       :(9):svr: - : - : - : - : - : - : - :yes: - :svr\"4mp
 _
 .TE
 .PP
@@ -1385,21 +1385,21 @@ alloclk             :(9):yes: - : - : - : - : - : - : - : - : - : -
 allocq              :(9):yes: - : - :yes: - : - :yes: - : - : - :yes
 allocstr            :(9):yes: - : - : - : - : - :yes: - : - : - : - \"sunattheaders
 allstream           :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
-appq                :(9):yes: - : - : - : - : - : - : - : - : - :yes
-apush_get           :(9):yes: - : - : - : - : - : - : - : - : - :yes
-apush_set           :(9):yes: - : - : - : - : - : - : - : - : - :yes
-apush_vml           :(9):yes: - : - : - : - : - : - : - : - : - :yes
+appq                :(9):yes: - : - : - : - : - : - : - : - : - :lfs
+apush_get           :(9):yes: - : - : - : - : - : - : - : - : - :lfs
+apush_set           :(9):yes: - : - : - : - : - : - : - : - : - :lfs
+apush_vml           :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush            :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush_add        :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush_del        :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush_find       :(9):yes: - : - : - : - : - : - : - : - : - : - 
 autopush_vml        :(9):yes: - : - : - : - : - : - : - : - : - : - 
-bcanget             :(9):yes: - : - : - : - : - : - : - : - : - : - 
-canget              :(9):yes: - : - : - : - : - : - : - : - : - : - 
+bcanget             :(9):yes: - : - : - : - : - : - : - : - : - :lfs
+canget              :(9):yes: - : - : - : - : - : - : - : - : - :lfs
 defer_func          :(9):yes: - : - : - : - : - : - : - : - : - : - 
 di_alloc            :(9):yes: - : - : - : - : - : - : - : - : - : - 
 di_put              :(9):yes: - : - : - : - : - : - : - : - : - : - 
-enableq             :(9):yes: - : - : - : - : - : - : - : - : - : - 
+enableq             :(9):yes: - : - : - : - : - : - : - : - : - :lfs
 findlinks           :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
 freelk              :(9):yes: - : - : - : - : - : - : - : - : - : - 
 freeq               :(9):yes: - : - :yes: - : - :yes: - : - : - :yes
@@ -1408,15 +1408,15 @@ getendq             :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunatthead
 getf                :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
 isdatablk           :(9):yes: - : - : - : - : - : - : - : - : - :yes
 isdatamsg           :(9):yes: - : - : - : - : - : - : - : - : - :yes
-linkmsg             :(9):yes: - : - : - : - : - : - : - : - : - : - 
+linkmsg             :(9):yes: - : - : - : - : - : - : - : - : - :lfs
 msgsize             :(9):yes: - : - : - : - : - :yes: - : - : - :yes\"strsun.h
-putctl2             :(9):yes:yes:yes:yes: - : - : - : - : - : - : - 
-putnextctl2         :(9):yes: - :yes: - : - : - : - : - : - : - : - 
-qattach             :(9):yes: - : - : - : - : - : - : - : - : - :yes
-qclose              :(9):yes: - : - : - : - : - : - : - : - : - :yes
-qcountstrm          :(9):yes: - : - : - : - : - : - : - : - : - :yes
-qdetach             :(9):yes: - : - : - : - : - : - : - : - : - :yes
-qopen               :(9):yes: - : - : - : - : - : - : - : - : - :yes
+putctl2             :(9):yes:yes:yes:yes: - : - : - : - : - : - :lfs
+putnextctl2         :(9):yes: - :yes: - : - : - : - : - : - : - :lfs
+qattach             :(9):yes: - : - : - : - : - : - : - : - : - : - 
+qclose              :(9):yes: - : - : - : - : - : - : - : - : - : - 
+qcountstrm          :(9):yes: - : - : - : - : - : - : - : - : - : - 
+qdetach             :(9):yes: - : - : - : - : - : - : - : - : - : - 
+qopen               :(9):yes: - : - : - : - : - : - : - : - : - : - 
 qpop                :(9):yes: - : - : - : - : - : - : - : - : - : - 
 qpush               :(9):yes: - : - : - : - : - : - : - : - : - : - 
 queue_free          :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
@@ -1424,8 +1424,8 @@ sd_get              :(9):yes: - : - : - : - : - : - : - : - : - : -
 sd_put              :(9):yes: - : - : - : - : - : - : - : - : - : - 
 sealloc             :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
 sefree              :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
-setqsched           :(9):yes: - : - : - : - : - : - : - : - : - :yes
-setq                :(9):yes: - : - : - : - : - : - : - : - : - :yes
+setqsched           :(9):yes: - : - : - : - : - : - : - : - : - : - 
+setq                :(9):yes: - : - : - : - : - : - : - : - : - : - 
 stream_free         :(9): - : - : - : - : - : - :yes: - : - : - : - \"sunattheaders
 unweldq             :(9):yes:yes:yes: - :yes: - : - : - : - : - : - 
 weldq               :(9):yes:yes:yes: - :yes: - : - : - : - : - : - 
@@ -1433,53 +1433,53 @@ xmsgsize            :(9):yes: - : - : - : - : - : - : - : - : - :yes
 __bufcall           :(9):yes: - : - : - : - : - : - : - : - : - : - 
 __timeout           :(9):yes: - : - : - : - : - : - : - : - : - : - 
 _
-get_sleep_lock      :(9):hux: - :yes: - : - : - : - : - : - : - : - 
-streams_put         :(9):hux: - :yes: - : - : - : - : - : - : - : - 
-str_install_HPUX    :(9):hux: - :yes: - : - : - : - : - : - : - : - 
+get_sleep_lock      :(9):hux: - :yes: - : - : - : - : - : - : - :hux
+streams_put         :(9):hux: - :yes: - : - : - : - : - : - : - :hux
+str_install_HPUX    :(9):hux: - :yes: - : - : - : - : - : - : - :hux
 _
-allocbi             :(9):mac: - : - :yes:yes: - : - : - : - : - : - 
-esballoca           :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_allocq           :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_attach           :(9):mac: - : - : - : - : - : - : - : - : - : - 
-mi_bcmp             :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_bufcall          :(9):aix:yes: - :yes: - : - : - : - : - : - : - 
-mi_close_comm       :(9):aix:yes: - :yes: - : - : - : - : - : - : - 
-mi_close_detached   :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copyin           :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copyout          :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copyout_alloc    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copy_done        :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copy_set_rval    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_copy_state       :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_detach           :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_freeq            :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_next_ptr         :(9):aix:yes: - :yes: - : - : - : - : - : - : - 
-mi_offset_param     :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_offset_paramc    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_open_comm        :(9):aix:yes: - :yes: - : - : - : - : - : - : - 
-mi_open_detached    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_prev_ptr         :(9):aix: - : - : - : - : - : - : - : - : - : - 
-mi_reallocb         :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_reuse_proto      :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_set_sth_hiwat    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_set_sth_lowat    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_set_sth_maxblk   :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_set_sth_wroff    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_sprintf          :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer            :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer_alloc      :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer_cancel     :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer_free       :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer_q_switch   :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mi_timer_valid      :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mpnotify            :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mps_become_writer   :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mps_intr_disable    :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-mps_intr_enable     :(9):mac: - : - :yes: - : - : - : - : - : - : - 
-puthere             :(9):osf: - : - :yes:yes: - : - : - : - : - : - 
-streams_close_comm  :(9):osf: - : - : - :yes: - : - : - : - : - : - 
-streams_open_comm   :(9):osf: - : - : - :yes: - : - : - : - : - : - 
-streams_open_ocomm  :(9):osf: - : - : - :yes: - : - : - : - : - : - 
+allocbi             :(9):mac: - : - :yes:yes: - : - : - : - : - :mac
+esballoca           :(9):mac: - : - :yes: - : - : - : - : - : - :mac
+mi_allocq           :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_attach           :(9):mps: - : - : - : - : - : - : - : - : - :mps
+mi_bcmp             :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_bufcall          :(9):mps:yes: - :yes: - : - : - : - : - : - :mps
+mi_close_comm       :(9):mps:yes: - :yes: - : - : - : - : - : - :mps
+mi_close_detached   :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copyin           :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copyout          :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copyout_alloc    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copy_done        :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copy_set_rval    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_copy_state       :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_detach           :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_freeq            :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_next_ptr         :(9):mps:yes: - :yes: - : - : - : - : - : - :mps
+mi_offset_param     :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_offset_paramc    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_open_comm        :(9):mps:yes: - :yes: - : - : - : - : - : - :mps
+mi_open_detached    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_prev_ptr         :(9):mps: - : - : - : - : - : - : - : - : - :mps
+mi_reallocb         :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_reuse_proto      :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_set_sth_hiwat    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_set_sth_lowat    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_set_sth_maxblk   :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_set_sth_wroff    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_sprintf          :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer            :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer_alloc      :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer_cancel     :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer_free       :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer_q_switch   :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mi_timer_valid      :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mpnotify            :(9):mac: - : - :yes: - : - : - : - : - : - :mac
+mps_become_writer   :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mps_intr_disable    :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+mps_intr_enable     :(9):mps: - : - :yes: - : - : - : - : - : - :mps
+puthere             :(9):osf: - : - :yes:yes: - : - : - : - : - :osf
+streams_close_comm  :(9):osf: - : - : - :yes: - : - : - : - : - :osf
+streams_open_comm   :(9):osf: - : - : - :yes: - : - : - : - : - :osf
+streams_open_ocomm  :(9):osf: - : - : - :yes: - : - : - : - : - :osf
 strmod_add          :(9):osf: - : - : - :yes: - : - : - : - : - : - 
 strmod_del          :(9):osf: - : - : - :yes: - : - : - : - : - : - 
 str_install_AIX     :(9):aix:yes: - : - : - : - : - : - : - : - : - 
@@ -1627,11 +1627,11 @@ _
 Function/Macro      :Sec:LfS:AIX:HUX:MOT:OSF:SGI:Sun:SUX:UW7:UXP:LiS
 _
 cmpdev              :(9): - : - : - : - : - : - :yes: - : - :yes: - \"4.0\"sysmacros.h
-emajor              :(9):svr: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
-eminor              :(9):svr: - : - : - : - : - :yes: - :yes: - : - \"3.0\"sysmacros.h
-etoimajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
+emajor              :(9):svr: - : - : - : - : - :yes: - :yes: - :svr\"3.0\"sysmacros.h
+eminor              :(9):svr: - : - : - : - : - :yes: - :yes: - :svr\"3.0\"sysmacros.h
+etoimajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - :svr\"4.0\"ddi.h
 expdev              :(9): - : - : - : - : - : - :yes: - : - :yes: - \"4.0\"sysmacros.h
-itoemajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - : - \"4.0\"ddi.h
+itoemajor           :(9):svr: - : - : - : - :yes:yes: - :yes: - :svr\"4.0\"ddi.h
 major               :(9): - : - :yes: - :yes: - :yes:yes: - : - :yes\"3.0\"sysmacros.h
 makedev             :(9): - : - :yes: - :yes: - :yes: - : - :yes: - \"3.0\"sysmacros.h
 minor               :(9): - : - :yes: - :yes: - :yes:yes: - : - : - \"3.0\"sysmacros.h
@@ -1652,7 +1652,7 @@ lbcccccccccccc.
 _
 Function/Macro      :Sec:LfS:AIX:HUX:MOT:OSF:SGI:Sun:SUX:UW7:UXP:LiS
 _
-ASSERT              :(9):svr: - : - : - : - :yes:yes: - :yes: - : - \"4.0
+ASSERT              :(9):svr: - : - : - : - :yes:yes: - :yes: - :yes\"4.0
 bcopy               :(9):yes:yes:yes: - :yes:yes:yes:yes:yes:yes:yes\"4.0
 biodone             :(9): - : - : - : - :yes:yes:yes: - :yes: - : - \"4.0
 biowait             :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4.0
@@ -1730,21 +1730,21 @@ rmalloc             :(9): - : - : - : - :yes: - :yes: - :yes:yes: - \"4.0
 rmfree              :(9): - : - : - : - :yes: - :yes: - :yes:yes: - \"4.0
 rminit              :(9): - : - : - : - :yes: n : - : - :yes:yes: - \"4.0
 rmsetwant           :(9): - : - : - : - : - : n : - : - :yes: - : - \"4.0
-sleep               :(9):svr:yes:yes: - :yes:yes: - : - :yes:yes: - \"4.0
+sleep               :(9):svr:yes:yes: - :yes:yes: - : - :yes:yes:svr\"4.0
 spl0                :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:yes\"4.0
-spl1                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl2                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl3                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl4                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl5                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl6                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl7                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-spl                 :(9):svr: - :yes: - :yes: - : - :yes:yes:yes: - \"4.0
-splbase             :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes: - \"4.0
-spldisk             :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes: - \"4.0
-splhi               :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes: - \"4.0
-spltimeout          :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes: - \"4.0
-spltty              :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes: - \"4.0
+spl1                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl2                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl3                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl4                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl5                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl6                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl7                :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+spl                 :(9):svr: - :yes: - :yes: - : - :yes:yes:yes:svr\"4.0
+splbase             :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:svr\"4.0
+spldisk             :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:svr\"4.0
+splhi               :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:svr\"4.0
+spltimeout          :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:svr\"4.0
+spltty              :(9):svr: - :yes: - :yes:yes: - :yes:yes:yes:svr\"4.0
 splx                :(9):svr:yes:yes: - :yes:yes:yes:yes:yes:yes:yes\"4.0
 timeout             :(9):yes:yes:yes: - :yes:yes:yes:yes:yes:yes:yes\"4.0
 uiomove             :(9): - :yes: - : - :yes:yes:yes: - :yes: - : - \"4.0
@@ -1753,7 +1753,7 @@ ureadc              :(9): - :yes: - : - : - :yes:yes: - :yes: - : - \"4.0
 useracc             :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.0
 uwritec             :(9): - :yes: - : - : - :yes:yes: - :yes: - : - \"4.0
 vtop                :(9): - : - :yes: - :yes: n : - :yes:yes:yes: - \"4.0
-wakeup              :(9):svr: - :yes: - :yes:yes: - : - :yes:yes: - \"4.0
+wakeup              :(9):svr: - :yes: - :yes:yes: - : - :yes:yes:svr\"4.0
 _
 .TE
 .RE
@@ -1848,10 +1848,10 @@ iobitmapctl         :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 kmem_alloc_physcontig:(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 kmem_free_physcontig:(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 KS_HOLD0LOCKS       :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
-LOCK                :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-LOCK_ALLOC          :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-LOCK_DEALLOC        :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-LOCK_OWNED          :(9):svr: - : - : - : - : - : - : - :yes: - : - \"4.2mp
+LOCK                :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+LOCK_ALLOC          :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+LOCK_DEALLOC        :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+LOCK_OWNED          :(9):svr: - : - : - : - : - : - : - :yes: - :svr\"4.2mp
 met_ds_alloc_stats  :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 met_ds_dealloc_stats:(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 met_ds_dequeued     :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
@@ -1863,21 +1863,21 @@ physreq_alloc       :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 physreq_free        :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 physreq_prep        :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
 proc_valid          :(9): - : - : - : - : - : - : - : - :yes: - : - \"4.2mp
-RW_ALLOC            :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_DEALLOC          :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_RDLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_TRYRDLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_TRYWRLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_UNLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-RW_WRLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_ALLOC         :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_DEALLOC       :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_LOCK          :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_LOCKAVAIL     :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_LOCKOWNED     :(9):svr: - : - : - : - : n : - : - :yes: - : - \"4.2mp
-SLEEP_LOCK_SIG      :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_TRYLOCK       :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SLEEP_UNLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
+RW_ALLOC            :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_DEALLOC          :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_RDLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_TRYRDLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_TRYWRLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_UNLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+RW_WRLOCK           :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_ALLOC         :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_DEALLOC       :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_LOCK          :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_LOCKAVAIL     :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_LOCKOWNED     :(9):svr: - : - : - : - : n : - : - :yes: - :svr\"4.2mp
+SLEEP_LOCK_SIG      :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_TRYLOCK       :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SLEEP_UNLOCK        :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
 strcat              :(9):yes:yes: - : - : - :yes: - : - :yes: - :yes\"4.2mp
 strcmp              :(9):yes:yes: - : - :yes: - :yes: - :yes: - :yes\"4.2mp
 strcpy              :(9):yes:yes: - : - :yes:yes:yes: - :yes: - :yes\"4.2mp
@@ -1885,14 +1885,14 @@ strlen              :(9):yes:yes: - : - :yes:yes:yes: - :yes: - :yes\"4.2mp
 strncat             :(9):yes:yes: - : - : - : n : - : - :yes: - :yes\"4.2mp
 strncmp             :(9):yes:yes: - : - :yes:yes:yes: - :yes: - :yes\"4.2mp
 strncpy             :(9):yes:yes: - : - :yes:yes:yes: - :yes: - :yes\"4.2mp
-SV_ALLOC            :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-SV_BROADCAST        :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-SV_DEALLOC          :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-SV_SIGNAL           :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4.2mp
-SV_WAIT             :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-SV_WAIT_SIG         :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-TRYLOCK             :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
-UNLOCK              :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4.2mp
+SV_ALLOC            :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+SV_BROADCAST        :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+SV_DEALLOC          :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+SV_SIGNAL           :(9):svr: - : - : - : - :yes: - : - :yes: - :svr\"4.2mp
+SV_WAIT             :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+SV_WAIT_SIG         :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+TRYLOCK             :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
+UNLOCK              :(9):svr: - :yes: - : - :yes: - : - :yes: - :svr\"4.2mp
 _
 .TE
 .RE
@@ -1911,15 +1911,15 @@ _
 Function/Macro      :Sec:LfS:AIX:HUX:MOT:OSF:SGI:Sun:SUX:UW7:UXP:LiS
 _
 atoi                :(9): - :yes: - : - :yes: - : - : - : - : - : - 
-ATOMIC_INT_ADD      :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_ALLOC    :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_DEALLOC  :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_DECR     :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_INCR     :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_INIT     :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_READ     :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_SUB      :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
-ATOMIC_INT_WRITE    :(9):uw7: - : - : - : - : - : - : - :yes: - : - 
+ATOMIC_INT_ADD      :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_ALLOC    :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_DEALLOC  :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_DECR     :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_INCR     :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_INIT     :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_READ     :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_SUB      :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
+ATOMIC_INT_WRITE    :(9):uw7: - : - : - : - : - : - : - :yes: - :uw7
 copyinstr           :(9): - :yes: - : - :yes: - : - : - : - : - : - 
 copyoutstr          :(9): - : - : - : - :yes: - : - : - : - : - : - \"osf
 ddi_get_cred        :(9):sun: - : - : - : - : - :yes: - : - : - : - 
@@ -1941,7 +1941,7 @@ kmem_cache_create   :(9):yes: - : - : - : - : - :yes: - : - : - : -
 kmem_cache_destroy  :(9):yes: - : - : - : - : - :yes: - : - : - : - 
 kmem_cache_free     :(9):yes: - : - : - : - : - :yes: - : - : - : - 
 kmem_zalloc_node    :(9):yes: - : - : - : - :yes: - : - : - : - : - 
-lbolt               :(9):osf:yes:yes: - :yes: - :yes:yes:yes:yes: - 
+lbolt               :(9):osf:yes:yes: - :yes: - :yes:yes:yes:yes:osf
 MALLOC              :(9):osf: - : - : - :yes: - : - : - : - : - :yes
 memchr              :(9):yes:yes: - : - : - : - : - : - : - : - :yes
 memcmp              :(9):yes:yes: - : - : - : - : - : - : - : - :yes
@@ -1956,10 +1956,10 @@ nulldev             :(9):sun: - : - : - : - : - :yes: - : - : - : -
 numtos              :(9): - : - : - : - : - : - :yes: - :yes: - : - 
 panic               :(9): - :yes: - : - :yes: - : - : - : - : - : - 
 physio              :(9): - : - : - : - :yes: - :yes: - : - : - : - 
-printf_OSF          :(9):osf: - : - : - :yes: - : - :yes:yes: - : - 
-printf_UW7          :(9):uw7: - : - : - :yes: - : - :yes:yes: - : - 
-snprintf            :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-sprintf             :(9): - : - : - : - : - : - :yes: - : - : - :yes
+printf_OSF          :(9):osf: - : - : - :yes: - : - :yes:yes: - :osf
+printf_UW7          :(9):uw7: - : - : - :yes: - : - :yes:yes: - :uw7
+snprintf            :(9):yes: - : - : - : - : - :yes: - : - : - :yes\"sun
+sprintf             :(9):yes: - : - : - : - : - :yes: - : - : - :yes
 strchr              :(9):yes:yes: - : - : - : - :yes: - :yes: - :yes
 strnicmp            :(9):yes: - : - : - : - : - : - : - : - : - :yes
 strnlen             :(9):yes: - : - : - : - : - : - : - : - : - :yes
@@ -1977,12 +1977,12 @@ subyte              :(9): - :yes: - : - :yes:yes: - : - : - : - : -
 suser               :(9): - :yes: - : - :yes: - : - : - : - : - : - 
 suword              :(9): - :yes: - : - :yes:yes: - : - : - : - : - 
 swab                :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-time                :(9):osf:yes:yes: - :yes: - : - :yes: - :yes: - 
-uprintf             :(9):osf:yes: - : - :yes: - : - : - : - : - : - 
-va_arg              :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-va_copy             :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-va_end              :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
-va_start            :(9): - : - : - : - : - : - :yes: - : - : - : - \"sun
+time                :(9):osf:yes:yes: - :yes: - : - :yes: - :yes:osf
+uprintf             :(9):osf:yes: - : - :yes: - : - : - : - : - :osf
+va_arg              :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes: - \"sun
+va_copy             :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes: - \"sun
+va_end              :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes: - \"sun
+va_start            :(9):yes:yes:yes:yes:yes:yes:yes:yes:yes:yes: - \"sun
 vcmn_err            :(9):yes: - : - : - : - : - :yes: - : - : - : - 
 vsprintf            :(9): - : - : - : - : - : - :yes: - : - : - :yes
 _

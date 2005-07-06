@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr4ddi.h,v 0.9.2.10 2005/07/04 19:29:13 brian Exp $
+ @(#) $Id: svr4ddi.h,v 0.9.2.11 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/04 19:29:13 $"
+#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:46:05 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -62,13 +62,10 @@
 #define __SVR4_EXTERN_INLINE extern __inline__
 #endif				/* __SVR4_EXTERN_INLINE */
 
-#include <sys/strconf.h>
-
 #ifndef _SVR4_SOURCE
 #warning "_SVR4_SOURCE not defined but svr4ddi.h,v included"
+#define _SVR4_SOURCE 1
 #endif
-
-#if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
 
@@ -221,51 +218,8 @@ __SVR4_EXTERN_INLINE pl_t RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 	read_lock(lockp);
 	return (old_pl);
 }
-__SVR4_EXTERN_INLINE pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
-{
-	pl_t old_pl = spl(pl);
-#if CONFIG_SMP && HAVE_READ_TRYLOCK
-	if (read_trylock(lockp))
-		return (old_pl);
-#else
-#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
-	if (write_trylock(lockp))
-		return (old_pl);
-#else
-#if CONFIG_SMP
-	/* this will jam up sometimes */
-	if (!spin_is_locked(lockp)) {
-#endif
-		read_lock(lockp);
-		return (old_pl);
-#if CONFIG_SMP
-	}
-#endif
-#endif
-#endif
-	splx(old_pl);
-	return (invpl);
-}
-__SVR4_EXTERN_INLINE pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
-{
-	pl_t old_pl = spl(pl);
-#if CONFIG_SMP && HAVE_WRITE_TRYLOCK
-	if (write_trylock(lockp))
-		return (old_pl);
-#else
-#if CONFIG_SMP
-	/* this will jam up sometimes */
-	if (!spin_is_locked(lockp)) {
-#endif
-		write_lock(lockp);
-		return (old_pl);
-#if CONFIG_SMP
-	}
-#endif
-#endif
-	splx(old_pl);
-	return (invpl);
-}
+extern pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
+extern pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
 __SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl)
 {
 	read_unlock(lockp);
@@ -338,20 +292,7 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp)
 {
 	kmem_free(svp, sizeof(*svp));
 }
-#if ! ( HAVE___WAKE_UP_SYNC_ADDR || HAVE___WAKE_UP_SYNC_EXPORT )
-#undef	__wake_up_sync
-#define __wake_up_sync __wake_up
-#endif
-__SVR4_EXTERN_INLINE void SV_SIGNAL(sv_t * svp)
-{
-#ifdef HAVE___WAKE_UP_SYNC_ADDR
-#undef	__wake_up_sync
-	typeof(&__wake_up_sync) ___wake_up_sync = (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
-#define	__wake_up_sync ___wake_up_sync
-#endif
-	svp->sv_condv = 1;
-	wake_up_interruptible_sync(&svp->sv_waitq);
-}
+extern void SV_SIGNAL(sv_t * svp);
 __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
 {
 	DECLARE_WAITQUEUE(wait, current);
@@ -400,9 +341,5 @@ __SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 #define ASSERT(__exp) \
 do { if (!(__exp)) { panic("assertion failed: " #__exp ", file: " __FILE__ ", line: %d\n", __LINE__); } } while(0)
 #endif
-
-#elif defined(_SVR4_SOURCE)
-#warning "_SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4"
-#endif				/* CONFIG_STREAMS_COMPAT_SVR4 */
 
 #endif				/* __SYS_SVR4DDI_H__ */

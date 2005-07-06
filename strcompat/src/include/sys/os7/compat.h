@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.16 2005/07/04 19:29:09 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.17 2005/07/05 22:46:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 19:29:09 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
-
-#if defined LIS && !defined _LIS_SOURCE
-#define _LIS_SOURCE
-#endif
 
 /*
  *  Unfortunately this is necessary for older non-rpm LIS releases.
@@ -105,8 +101,8 @@ typedef void irqreturn_t;
 
 #ifdef LFS
 #include <sys/strsubr.h>
-#include <sys/strconf.h>
 #endif				/* LFS */
+#include <sys/strconf.h>
 
 #ifndef tid_t
 typedef int tid_t;
@@ -174,6 +170,46 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
+#endif
+
+/* pull in OS specific defines */
+
+#ifdef _SVR3_SOURCE
+#include <sys/svr3ddi.h>
+#endif
+#ifdef _SVR4_SOURCE
+#include <sys/svr4ddi.h>
+#endif
+#if defined LIS && defined _LFS_SOURCE
+#include <sys/lfsddi.h>
+#endif
+#if defined LFS && defined _LIS_SOURCE
+#include <sys/lisddi.h>
+#endif
+#ifdef _MPS_SOURCE
+#include <sys/mpsddi.h>
+#endif
+#ifdef _OSF_SOURCE
+#include <sys/osfddi.h>
+#endif
+#ifdef _AIX_SOURCE
+#include <sys/aixddi.h>
+#endif
+#ifdef _HPUX_SOURCE
+#include <sys/hpuxddi.h>
+#endif
+#ifdef _UW7_SOURCE
+#include <sys/uw7ddi.h>
+#endif
+#ifdef _SUN_SOURCE
+#include <sys/strsun.h>
+#include <sys/sunddi.h>
+#endif
+#ifdef _MAC_SOURCE
+#include <sys/macddi.h>
+#endif
+#ifdef _IRIX_SOURCE
+#include <sys/irixddi.h>
 #endif
 
 #endif				/* __LOCAL_COMPAT_H__ */

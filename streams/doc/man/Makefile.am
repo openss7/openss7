@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/04 20:20:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/05 22:46:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,28 +46,246 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:20:13 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-MANMACRO_PFX			= streams
+MANMACRO_PFX			= @PACKAGE_TARNAME@
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
+svr3_compat_pages = \
+	man9/emajor.9 \
+	man9/eminor.9
+
+svr4_compat_pages = \
+	man9/svr4compat.9 \
+	man9/dtimeout.9 \
+	man9/etoimajor.9 \
+	man9/getemajor.9 \
+	man9/geteminor.9 \
+	man9/itimeout.9 \
+	man9/itoemajor.9 \
+	man9/LOCK.9 \
+	man9/LOCK_ALLOC.9 \
+	man9/LOCK_DEALLOC.9 \
+	man9/LOCK_OWNED.9 \
+	man9/MPSTR_QLOCK.9 \
+	man9/MPSTR_QRELE.9 \
+	man9/MPSTR_STPLOCK.9 \
+	man9/MPSTR_STPRELE.9 \
+	man9/RW_ALLOC.9 \
+	man9/RW_DEALLOC.9 \
+	man9/RW_RDLOCK.9 \
+	man9/RW_TRYRDLOCK.9 \
+	man9/RW_TRYWRLOCK.9 \
+	man9/RW_UNLOCK.9 \
+	man9/RW_WRLOCK.9 \
+	man9/sleep.9 \
+	man9/SLEEP_ALLOC.9 \
+	man9/SLEEP_DEALLOC.9 \
+	man9/SLEEP_LOCK.9 \
+	man9/SLEEP_LOCKAVAIL.9 \
+	man9/SLEEP_LOCKOWNED.9 \
+	man9/SLEEP_LOCK_SIG.9 \
+	man9/SLEEP_TRYLOCK.9 \
+	man9/SLEEP_UNLOCK.9 \
+	man9/spl0.9 \
+	man9/spl1.9 \
+	man9/spl2.9 \
+	man9/spl3.9 \
+	man9/spl4.9 \
+	man9/spl5.9 \
+	man9/spl6.9 \
+	man9/spl7.9 \
+	man9/spl.9 \
+	man9/splx.9 \
+	man9/SV_ALLOC.9 \
+	man9/SV_BROADCAST.9 \
+	man9/SV_DEALLOC.9 \
+	man9/SV_SIGNAL.9 \
+	man9/SV_WAIT.9 \
+	man9/SV_WAIT_SIG.9 \
+	man9/TRYLOCK.9 \
+	man9/UNLOCK.9 \
+	man9/wakeup.9
+
+mps_compat_pages = \
+	man9/mpscompat.9 \
+	man9/mi_alloc.9 \
+	man9/mi_allocq.9 \
+	man9/mi_alloc_sleep.9 \
+	man9/mi_attach.9 \
+	man9/mi_bcmp.9 \
+	man9/mi_bufcall.9 \
+	man9/mi_close_comm.9 \
+	man9/mi_close_detached.9 \
+	man9/mi_close_free.9 \
+	man9/mi_close_unlink.9 \
+	man9/mi_copy_done.9 \
+	man9/mi_copyin.9 \
+	man9/mi_copyin_n.9 \
+	man9/mi_copyout.9 \
+	man9/mi_copyout_alloc.9 \
+	man9/mi_copy_set_rval.9 \
+	man9/mi_copy_state.9 \
+	man9/mi_detach.9 \
+	man9/mi_first_dev_ptr.9 \
+	man9/mi_first_ptr.9 \
+	man9/mi_free.9 \
+	man9/mi_freeq.9 \
+	man9/mi_mpprintf.9 \
+	man9/mi_mpprintf_nr.9 \
+	man9/mi_next_dev_ptr.9 \
+	man9/mi_next_ptr.9 \
+	man9/mi_offset_param.9 \
+	man9/mi_offset_paramc.9 \
+	man9/mi_open_alloc.9 \
+	man9/mi_open_alloc_sleep.9 \
+	man9/mi_open_comm.9 \
+	man9/mi_open_detached.9 \
+	man9/mi_open_link.9 \
+	man9/mi_prev_ptr.9 \
+	man9/mi_reallocb.9 \
+	man9/mi_reuse_proto.9 \
+	man9/mi_set_sth_copyopt.9 \
+	man9/mi_set_sth_hiwat.9 \
+	man9/mi_set_sth_lowat.9 \
+	man9/mi_set_sth_maxblk.9 \
+	man9/mi_set_sth_wroff.9 \
+	man9/mi_sprintf.9 \
+	man9/mi_sprintf_putc.9 \
+	man9/mi_strcmp.9 \
+	man9/mi_strlen.9 \
+	man9/mi_strlog.9 \
+	man9/mi_strol.9 \
+	man9/mi_timer.9 \
+	man9/mi_timer_MAC.9 \
+	man9/mi_timer_SUN.9 \
+	man9/mi_timer_alloc.9 \
+	man9/mi_timer_alloc_MAC.9 \
+	man9/mi_timer_alloc_SUN.9 \
+	man9/mi_timer_cancel.9 \
+	man9/mi_timer_free.9 \
+	man9/mi_timer_move.9 \
+	man9/mi_timer_q_switch.9 \
+	man9/mi_timer_stop.9 \
+	man9/mi_timer_valid.9 \
+	man9/mi_zalloc.9 \
+	man9/mi_zalloc_sleep.9 \
+	man9/mps_become_writer.9 \
+	man9/mps_intr_disable.9 \
+	man9/mps_intr_enable.9
+
+sun_compat_pages = \
+	man9/suncompat.9 \
+	man9/DB_BASE.9 \
+	man9/DB_LIM.9 \
+	man9/DB_REF.9 \
+	man9/DB_TYPE.9 \
+	man9/ddi_create_minor_node.9 \
+	man9/ddi_driver_major.9 \
+	man9/ddi_driver_name.9 \
+	man9/ddi_get_cred.9 \
+	man9/ddi_getiminor.9 \
+	man9/ddi_get_instance.9 \
+	man9/ddi_get_lbolt.9 \
+	man9/ddi_get_pid.9 \
+	man9/ddi_get_soft_state.9 \
+	man9/ddi_get_time.9 \
+	man9/ddi_prop_op.9 \
+	man9/ddi_remove_minor_node.9 \
+	man9/ddi_removing_power.9 \
+	man9/ddi_soft_state.9 \
+	man9/ddi_soft_state_fini.9 \
+	man9/ddi_soft_state_free.9 \
+	man9/ddi_soft_state_init.9 \
+	man9/ddi_soft_state_zalloc.9 \
+	man9/ddi_umem_alloc.9 \
+	man9/ddi_umem_free.9 \
+	man9/freezestr_SUN.9 \
+	man9/MBLKHEAD.9 \
+	man9/MBLKIN.9 \
+	man9/MBLKL.9 \
+	man9/MBLKSIZE.9 \
+	man9/MBLKTAIL.9 \
+	man9/mcopyin.9 \
+	man9/mcopymsg.9 \
+	man9/mcopyout.9 \
+	man9/merror.9 \
+	man9/mexchange.9 \
+	man9/mexpandb.9 \
+	man9/mioc2ack.9 \
+	man9/miocack.9 \
+	man9/miocnak.9 \
+	man9/miocpullup.9 \
+	man9/mod_info.9 \
+	man9/mod_install.9 \
+	man9/mod_remove.9 \
+	man9/mod_strmops.9 \
+	man9/msgb.9 \
+	man9/msgsize.9 \
+	man9/nochpoll.9 \
+	man9/nodev.9 \
+	man9/nulldev.9 \
+	man9/OFFSET.9 \
+	man9/qbufcall.9 \
+	man9/qtimeout.9 \
+	man9/queclass.9 \
+	man9/qunbufcall.9 \
+	man9/quntimeout.9 \
+	man9/qwait.9 \
+	man9/qwait_sig.9 \
+	man9/qwriter.9 \
+	man9/unfreezestr_SUN.9
+
+uw7_compat_pages = \
+	man9/uw7compat.9 \
+	man9/allocb_physreq.9 \
+	man9/ATOMIC_INT_ADD.9 \
+	man9/ATOMIC_INT_ALLOC.9 \
+	man9/ATOMIC_INT_DEALLOC.9 \
+	man9/ATOMIC_INT_DECR.9 \
+	man9/ATOMIC_INT_INCR.9 \
+	man9/ATOMIC_INT_INIT.9 \
+	man9/ATOMIC_INT_READ.9 \
+	man9/ATOMIC_INT_SUB.9 \
+	man9/ATOMIC_INT_WRITE.9 \
+	man9/msgphysreq.9 \
+	man9/msgpullup_physreq.9 \
+	man9/msgscgth.9 \
+	man9/printf_UW7.9
+
+osf_compat_pages = \
+	man9/osfcompat.9 \
+	man9/lbolt.9 \
+	man9/streams_close_comm.9 \
+	man9/streams_open_comm.9 \
+	man9/streams_open_ocomm.9 \
+	man9/time.9
+
 aix_compat_pages = \
-	man9/aixcompat.9
+	man9/aixcompat.9 \
+	man9/str_install_AIX.9 \
+	man9/wantio.9 \
+	man9/wantmsg.9
 
 hpux_compat_pages = \
-	man9/hpuxcompat.9
+	man9/hpuxcompat.9 \
+	man9/get_sleep_lock.9 \
+	man9/streams_put.9
 
 irix_compat_pages = \
-	man9/irixcompat.9
+	man9/irixcompat.9 \
+	man9/cmn_err_tag.9 \
+	man9/icmn_err.9
 
 lis_compat_pages = \
 	man9/liscompat.9 \
+	man9/lisdeprec.9 \
 	man9/LiS.9 \
 	man9/lis_adjmsg.9 \
 	man9/lis_alloc_atomic_fcn.9 \
@@ -320,7 +538,6 @@ lis_compat_pages = \
 	man9/lis_zmalloc.9
 
 lis_deprec_pages = \
-	man9/lisdeprec.9 \
 	man9/lis_add_timer.9 \
 	man9/lis_allocq.9 \
 	man9/lis_apushm.9 \
@@ -416,105 +633,10 @@ mac_compat_pages = \
 	man9/maccompat.9 \
 	man9/allocbi.9 \
 	man9/esballoca.9 \
-	man9/mpnotify.9 \
-	man9/mps_become_writer.9 \
-	man9/mps_intr_disable.9 \
-	man9/mps_intr_enable.9
-
-mps_compat_pages = \
-	man9/mpscompat.9 \
-	man9/mi_alloc.9 \
-	man9/mi_allocq.9 \
-	man9/mi_alloc_sleep.9 \
-	man9/mi_attach.9 \
-	man9/mi_bcmp.9 \
-	man9/mi_bufcall.9 \
-	man9/mi_close_comm.9 \
-	man9/mi_close_detached.9 \
-	man9/mi_close_free.9 \
-	man9/mi_close_unlink.9 \
-	man9/mi_copy_done.9 \
-	man9/mi_copyin.9 \
-	man9/mi_copyin_n.9 \
-	man9/mi_copyout.9 \
-	man9/mi_copyout_alloc.9 \
-	man9/mi_copy_set_rval.9 \
-	man9/mi_copy_state.9 \
-	man9/mi_detach.9 \
-	man9/mi_first_dev_ptr.9 \
-	man9/mi_first_ptr.9 \
-	man9/mi_free.9 \
-	man9/mi_freeq.9 \
-	man9/mi_mpprintf.9 \
-	man9/mi_mpprintf_nr.9 \
-	man9/mi_next_dev_ptr.9 \
-	man9/mi_next_ptr.9 \
-	man9/mi_offset_param.9 \
-	man9/mi_offset_paramc.9 \
-	man9/mi_open_alloc.9 \
-	man9/mi_open_alloc_sleep.9 \
-	man9/mi_open_comm.9 \
-	man9/mi_open_detached.9 \
-	man9/mi_open_link.9 \
-	man9/mi_prev_ptr.9 \
-	man9/mi_reallocb.9 \
-	man9/mi_reuse_proto.9 \
-	man9/mi_set_sth_copyopt.9 \
-	man9/mi_set_sth_hiwat.9 \
-	man9/mi_set_sth_lowat.9 \
-	man9/mi_set_sth_maxblk.9 \
-	man9/mi_set_sth_wroff.9 \
-	man9/mi_sprintf.9 \
-	man9/mi_sprintf_putc.9 \
-	man9/mi_strcmp.9 \
-	man9/mi_strlen.9 \
-	man9/mi_strlog.9 \
-	man9/mi_strol.9 \
-	man9/mi_timer.9 \
-	man9/mi_timer_alloc.9 \
-	man9/mi_timer_cancel.9 \
-	man9/mi_timer_free.9 \
-	man9/mi_timer_move.9 \
-	man9/mi_timer_q_switch.9 \
-	man9/mi_timer_stop.9 \
-	man9/mi_timer_valid.9 \
-	man9/mi_zalloc.9 \
-	man9/mi_zalloc_sleep.9
-
-
-osf_compat_pages = \
-	man9/osfcompat.9
-
-sun_compat_pages = \
-	man9/suncompat.9 \
-	man9/DB_BASE.9 \
-	man9/DB_LIM.9 \
-	man9/DB_REF.9 \
-	man9/DB_TYPE.9 \
-	man9/MBLKL.9 \
-	man9/MBLKSIZE.9 \
-	man9/MBLKHEAD.9 \
-	man9/MBLKTAIL.9 \
-	man9/MBLKIN.9 \
-	man9/merror.9 \
-	man9/mioc2ack.9 \
-	man9/miocack.9 \
-	man9/miocnak.9 \
-	man9/mexchange.9 \
-	man9/mexpandb.9 \
-	man9/miocpullup.9 \
-	man9/mcopymsg.9 \
-	man9/mcopyin.9 \
-	man9/mcopyout.9
+	man9/mpnotify.9
 
 sux_compat_pages = \
 	man9/suxcompat.9
-
-svr4_compat_pages = \
-	man9/svr4compat.9
-
-uw7_compat_pages = \
-	man9/uw7compat.9
 
 uxp_compat_pages = \
 	man9/uxpcompat.9
@@ -586,7 +708,6 @@ man_MANS = \
 	man8/test-streams.8 \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
-	man9/allocb_physreq.9 \
 	man9/alloclk.9 \
 	man9/alloc_proto.9 \
 	man9/allocq.9 \
@@ -595,15 +716,6 @@ man_MANS = \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
 	man9/apush_vml.9 \
-	man9/ATOMIC_INT_ADD.9 \
-	man9/ATOMIC_INT_ALLOC.9 \
-	man9/ATOMIC_INT_DEALLOC.9 \
-	man9/ATOMIC_INT_DECR.9 \
-	man9/ATOMIC_INT_INCR.9 \
-	man9/ATOMIC_INT_INIT.9 \
-	man9/ATOMIC_INT_READ.9 \
-	man9/ATOMIC_INT_SUB.9 \
-	man9/ATOMIC_INT_WRITE.9 \
 	man9/attach.9 \
 	man9/autopush.9 \
 	man9/autopush_add.9 \
@@ -655,7 +767,6 @@ man_MANS = \
 	man9/__cmin_search.9 \
 	man9/cminsw_list.9 \
 	man9/cmn_err.9 \
-	man9/cmn_err_tag.9 \
 	man9/copyb.9 \
 	man9/copyin.9 \
 	man9/copymsg.9 \
@@ -664,26 +775,6 @@ man_MANS = \
 	man9/datab.9 \
 	man9/datamsg.9 \
 	man9/DDI.9 \
-	man9/ddi_create_minor_node.9 \
-	man9/ddi_driver_major.9 \
-	man9/ddi_driver_name.9 \
-	man9/ddi_get_cred.9 \
-	man9/ddi_getiminor.9 \
-	man9/ddi_get_instance.9 \
-	man9/ddi_get_lbolt.9 \
-	man9/ddi_get_pid.9 \
-	man9/ddi_get_soft_state.9 \
-	man9/ddi_get_time.9 \
-	man9/ddi_prop_op.9 \
-	man9/ddi_remove_minor_node.9 \
-	man9/ddi_removing_power.9 \
-	man9/ddi_soft_state.9 \
-	man9/ddi_soft_state_fini.9 \
-	man9/ddi_soft_state_free.9 \
-	man9/ddi_soft_state_init.9 \
-	man9/ddi_soft_state_zalloc.9 \
-	man9/ddi_umem_alloc.9 \
-	man9/ddi_umem_free.9 \
 	man9/defer_func.9 \
 	man9/delay.9 \
 	man9/detach.9 \
@@ -699,16 +790,12 @@ man_MANS = \
 	man9/drv_priv.9 \
 	man9/drv_usectohz.9 \
 	man9/drv_usecwait.9 \
-	man9/dtimeout.9 \
 	man9/dupb.9 \
 	man9/dupmsg.9 \
-	man9/emajor.9 \
-	man9/eminor.9 \
 	man9/enableok.9 \
 	man9/enableq.9 \
 	man9/esballoc.9 \
 	man9/esbbcall.9 \
-	man9/etoimajor.9 \
 	man9/_fini.9 \
 	man9/flushband.9 \
 	man9/flushq.9 \
@@ -730,17 +817,12 @@ man_MANS = \
 	man9/freeq.9 \
 	man9/freestr.9 \
 	man9/freezestr.9 \
-	man9/freezestr_SUN.9 \
 	man9/getadmin.9 \
-	man9/getemajor.9 \
-	man9/geteminor.9 \
 	man9/getinfo.9 \
 	man9/getmajor.9 \
 	man9/getmid.9 \
 	man9/getminor.9 \
 	man9/getq.9 \
-	man9/get_sleep_lock.9 \
-	man9/icmn_err.9 \
 	man9/identify.9 \
 	man9/_info.9 \
 	man9/_init.9 \
@@ -749,22 +831,16 @@ man_MANS = \
 	man9/Intro.9 \
 	man9/isdatablk.9 \
 	man9/isdatamsg.9 \
-	man9/itimeout.9 \
-	man9/itoemajor.9 \
 	man9/kmem_alloc.9 \
 	man9/kmem_alloc_node.9 \
 	man9/kmem_free.9 \
 	man9/kmem_zalloc.9 \
 	man9/kmem_zalloc_node.9 \
-	man9/lbolt.9 \
 	man9/LfS.9 \
 	man9/lfs_register_strdev.9 \
 	man9/linkb.9 \
 	man9/linkmsg.9 \
 	man9/LOCK.9 \
-	man9/LOCK_ALLOC.9 \
-	man9/LOCK_DEALLOC.9 \
-	man9/LOCK_OWNED.9 \
 	man9/major.9 \
 	man9/makedev.9 \
 	man9/makedevice.9 \
@@ -774,30 +850,14 @@ man_MANS = \
 	man9/min.9 \
 	man9/minor.9 \
 	man9/mknod.9 \
-	man9/mod_info.9 \
-	man9/mod_install.9 \
-	man9/mod_remove.9 \
-	man9/mod_strmops.9 \
 	man9/module_info.9 \
 	man9/module_stat.9 \
 	man9/mount.9 \
 	man9/mp-streams.9 \
-	man9/MPSTR_QLOCK.9 \
-	man9/MPSTR_QRELE.9 \
-	man9/MPSTR_STPLOCK.9 \
-	man9/MPSTR_STPRELE.9 \
-	man9/msgb.9 \
 	man9/msgdsize.9 \
-	man9/msgphysreq.9 \
 	man9/msgpullup.9 \
-	man9/msgpullup_physreq.9 \
-	man9/msgscgth.9 \
-	man9/msgsize.9 \
-	man9/nochpoll.9 \
 	man9/nodesw_lock.9 \
-	man9/nodev.9 \
 	man9/noenable.9 \
-	man9/nulldev.9 \
 	man9/OTHER.9 \
 	man9/OTHERQ.9 \
 	man9/pcmsg.9 \
@@ -806,7 +866,6 @@ man_MANS = \
 	man9/pipe.9 \
 	man9/power.9 \
 	man9/printf.9 \
-	man9/printf_UW7.9 \
 	man9/probe.9 \
 	man9/pullupmsg.9 \
 	man9/put.9 \
@@ -822,7 +881,6 @@ man_MANS = \
 	man9/putq.9 \
 	man9/qattach.9 \
 	man9/qband.9 \
-	man9/qbufcall.9 \
 	man9/qclose.9 \
 	man9/qcountstrm.9 \
 	man9/qdetach.9 \
@@ -837,16 +895,9 @@ man_MANS = \
 	man9/qready.9 \
 	man9/qreply.9 \
 	man9/qsize.9 \
-	man9/qtimeout.9 \
-	man9/queclass.9 \
 	man9/queinfo.9 \
 	man9/queue.9 \
 	man9/queue_t.9 \
-	man9/qunbufcall.9 \
-	man9/quntimeout.9 \
-	man9/qwait.9 \
-	man9/qwait_sig.9 \
-	man9/qwriter.9 \
 	man9/RD.9 \
 	man9/register_clone.9 \
 	man9/register_cmajor.9 \
@@ -868,13 +919,6 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/rmwanted.9 \
-	man9/RW_ALLOC.9 \
-	man9/RW_DEALLOC.9 \
-	man9/RW_RDLOCK.9 \
-	man9/RW_TRYRDLOCK.9 \
-	man9/RW_TRYWRLOCK.9 \
-	man9/RW_UNLOCK.9 \
-	man9/RW_WRLOCK.9 \
 	man9/SAMESTR.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
@@ -882,47 +926,23 @@ man_MANS = \
 	man9/sefree.9 \
 	man9/setq.9 \
 	man9/setqsched.9 \
-	man9/sleep.9 \
-	man9/SLEEP_ALLOC.9 \
-	man9/SLEEP_DEALLOC.9 \
-	man9/SLEEP_LOCK.9 \
-	man9/SLEEP_LOCKAVAIL.9 \
-	man9/SLEEP_LOCKOWNED.9 \
-	man9/SLEEP_LOCK_SIG.9 \
-	man9/SLEEP_TRYLOCK.9 \
-	man9/SLEEP_UNLOCK.9 \
 	man9/__smod_search.9 \
 	man9/spec_dentry.9 \
 	man9/spec_open.9 \
 	man9/specfs_get.9 \
 	man9/specfs_put.9 \
 	man9/SPG.9 \
-	man9/spl0.9 \
-	man9/spl1.9 \
-	man9/spl2.9 \
-	man9/spl3.9 \
-	man9/spl4.9 \
-	man9/spl5.9 \
-	man9/spl6.9 \
-	man9/spl7.9 \
-	man9/spl.9 \
 	man9/splbase.9 \
 	man9/spldisk.9 \
 	man9/splhi.9 \
 	man9/splstr.9 \
 	man9/spltimeout.9 \
 	man9/spltty.9 \
-	man9/splx.9 \
 	man9/STREAMS.9 \
-	man9/streams_close_comm.9 \
 	man9/streams_get_sleep_lock.9 \
-	man9/streams_open_comm.9 \
-	man9/streams_open_ocomm.9 \
-	man9/streams_put.9 \
 	man9/streamtab.9 \
 	man9/strgetpmsg.9 \
 	man9/str_install.9 \
-	man9/str_install_AIX.9 \
 	man9/str_install_HPUX.9 \
 	man9/strioccall.9 \
 	man9/strlog.9 \
@@ -937,29 +957,19 @@ man_MANS = \
 	man9/strthreads.9 \
 	man9/str_uninstall.9 \
 	man9/strwsrv.9 \
-	man9/SV_ALLOC.9 \
-	man9/SV_BROADCAST.9 \
-	man9/SV_DEALLOC.9 \
-	man9/SV_SIGNAL.9 \
-	man9/SV_WAIT.9 \
-	man9/SV_WAIT_SIG.9 \
 	man9/sysctl_str_strctlsz.9 \
 	man9/sysctl_str_strmsgsz.9 \
 	man9/testb.9 \
-	man9/time.9 \
 	man9/__timeout.9 \
 	man9/timeout.9 \
-	man9/TRYLOCK.9 \
 	man9/udelay.9 \
 	man9/umount2.9 \
 	man9/umount.9 \
 	man9/unbufcall.9 \
 	man9/undoc.9 \
 	man9/unfreezestr.9 \
-	man9/unfreezestr_SUN.9 \
 	man9/unlink.9 \
 	man9/unlinkb.9 \
-	man9/UNLOCK.9 \
 	man9/unregister_clone.9 \
 	man9/unregister_cmajor.9 \
 	man9/unregister_inode.9 \
@@ -971,38 +981,310 @@ man_MANS = \
 	man9/unweldq.9 \
 	man9/vcmn_err.9 \
 	man9/vtop.9 \
-	man9/wakeup.9 \
-	man9/wantio.9 \
-	man9/wantmsg.9 \
 	man9/weldq.9 \
 	man9/WR.9 \
-	man9/xmsgsize.9
+	man9/xmsgsize.9 \
+	man9/vstrlog_hook.9
 
-man_MANS += $(aix_compat_pages)
-man_MANS += $(hpux_compat_pages)
-man_MANS += $(irix_compat_pages)
-man_MANS += $(lis_compat_pages)
-man_MANS += $(lis_deprec_pages)
-man_MANS += $(mac_compat_pages)
-man_MANS += $(mps_compat_pages)
-man_MANS += $(osf_compat_pages)
-man_MANS += $(sun_compat_pages)
-man_MANS += $(sux_compat_pages)
-man_MANS += $(svr4_compat_pages)
-man_MANS += $(uw7_compat_pages)
-man_MANS += $(uxp_compat_pages)
+if CONFIG_STREAMS_COMPAT_SVR3
+man_MANS		    += $(svr3_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+man_MANS		    += $(svr4_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+man_MANS		    += $(mps_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+man_MANS		    += $(sun_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+man_MANS		    += $(uw7_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+man_MANS		    += $(osf_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+man_MANS		    += $(aix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+man_MANS		    += $(hpux_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+man_MANS		    += $(irix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+man_MANS		    += $(lis_compat_pages)
+man_MANS		    += $(lis_deprec_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+man_MANS		    += $(mac_compat_pages)
+endif
+
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+man_MANS		    += $(svr3_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+man_MANS		    += $(svr4_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+man_MANS		    += $(mps_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+man_MANS		    += $(sun_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+man_MANS		    += $(uw7_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+man_MANS		    += $(osf_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+man_MANS		    += $(aix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+man_MANS		    += $(hpux_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+man_MANS		    += $(irix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+man_MANS		    += $(lis_compat_pages)
+man_MANS		    += $(lis_deprec_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+man_MANS		    += $(mac_compat_pages)
+endif
+
+dist_noinst_svr3_compat_pages = \
+	man9/emajor.9.man \
+	man9/eminor.9.man
+
+dist_noinst_svr4_compat_pages = \
+	man9/svr4compat.9.man \
+	man9/dtimeout.9.man \
+	man9/etoimajor.9.man \
+	man9/getemajor.9.man \
+	man9/geteminor.9.man \
+	man9/itimeout.9.man \
+	man9/itoemajor.9.man \
+	man9/LOCK.9.man \
+	man9/LOCK_ALLOC.9.man \
+	man9/LOCK_DEALLOC.9.man \
+	man9/LOCK_OWNED.9.man \
+	man9/MPSTR_QLOCK.9.man \
+	man9/MPSTR_QRELE.9.man \
+	man9/MPSTR_STPLOCK.9.man \
+	man9/MPSTR_STPRELE.9.man \
+	man9/RW_ALLOC.9.man \
+	man9/RW_DEALLOC.9.man \
+	man9/RW_RDLOCK.9.man \
+	man9/RW_TRYRDLOCK.9.man \
+	man9/RW_TRYWRLOCK.9.man \
+	man9/RW_UNLOCK.9.man \
+	man9/RW_WRLOCK.9.man \
+	man9/sleep.9.man \
+	man9/SLEEP_ALLOC.9.man \
+	man9/SLEEP_DEALLOC.9.man \
+	man9/SLEEP_LOCK.9.man \
+	man9/SLEEP_LOCKAVAIL.9.man \
+	man9/SLEEP_LOCKOWNED.9.man \
+	man9/SLEEP_LOCK_SIG.9.man \
+	man9/SLEEP_TRYLOCK.9.man \
+	man9/SLEEP_UNLOCK.9.man \
+	man9/spl0.9.man \
+	man9/spl1.9.man \
+	man9/spl2.9.man \
+	man9/spl3.9.man \
+	man9/spl4.9.man \
+	man9/spl5.9.man \
+	man9/spl6.9.man \
+	man9/spl7.9.man \
+	man9/spl.9.man \
+	man9/splx.9.man \
+	man9/SV_ALLOC.9.man \
+	man9/SV_BROADCAST.9.man \
+	man9/SV_DEALLOC.9.man \
+	man9/SV_SIGNAL.9.man \
+	man9/SV_WAIT.9.man \
+	man9/SV_WAIT_SIG.9.man \
+	man9/TRYLOCK.9.man \
+	man9/UNLOCK.9.man \
+	man9/wakeup.9.man
+
+dist_noinst_mps_compat_pages = \
+	man9/mpscompat.9.man \
+	man9/mi_alloc.9.man \
+	man9/mi_allocq.9.man \
+	man9/mi_alloc_sleep.9.man \
+	man9/mi_attach.9.man \
+	man9/mi_bcmp.9.man \
+	man9/mi_bufcall.9.man \
+	man9/mi_close_comm.9.man \
+	man9/mi_close_detached.9.man \
+	man9/mi_close_free.9.man \
+	man9/mi_close_unlink.9.man \
+	man9/mi_copy_done.9.man \
+	man9/mi_copyin.9.man \
+	man9/mi_copyin_n.9.man \
+	man9/mi_copyout.9.man \
+	man9/mi_copyout_alloc.9.man \
+	man9/mi_copy_set_rval.9.man \
+	man9/mi_copy_state.9.man \
+	man9/mi_detach.9.man \
+	man9/mi_first_dev_ptr.9.man \
+	man9/mi_first_ptr.9.man \
+	man9/mi_free.9.man \
+	man9/mi_freeq.9.man \
+	man9/mi_mpprintf.9.man \
+	man9/mi_mpprintf_nr.9.man \
+	man9/mi_next_dev_ptr.9.man \
+	man9/mi_next_ptr.9.man \
+	man9/mi_offset_param.9.man \
+	man9/mi_offset_paramc.9.man \
+	man9/mi_open_alloc.9.man \
+	man9/mi_open_alloc_sleep.9.man \
+	man9/mi_open_comm.9.man \
+	man9/mi_open_detached.9.man \
+	man9/mi_open_link.9.man \
+	man9/mi_prev_ptr.9.man \
+	man9/mi_reallocb.9.man \
+	man9/mi_reuse_proto.9.man \
+	man9/mi_set_sth_copyopt.9.man \
+	man9/mi_set_sth_hiwat.9.man \
+	man9/mi_set_sth_lowat.9.man \
+	man9/mi_set_sth_maxblk.9.man \
+	man9/mi_set_sth_wroff.9.man \
+	man9/mi_sprintf.9.man \
+	man9/mi_sprintf_putc.9.man \
+	man9/mi_strcmp.9.man \
+	man9/mi_strlen.9.man \
+	man9/mi_strlog.9.man \
+	man9/mi_strol.9.man \
+	man9/mi_timer.9.man \
+	man9/mi_timer_MAC.9.man \
+	man9/mi_timer_SUN.9.man \
+	man9/mi_timer_alloc.9.man \
+	man9/mi_timer_alloc_MAC.9.man \
+	man9/mi_timer_alloc_SUN.9.man \
+	man9/mi_timer_cancel.9.man \
+	man9/mi_timer_free.9.man \
+	man9/mi_timer_move.9.man \
+	man9/mi_timer_q_switch.9.man \
+	man9/mi_timer_stop.9.man \
+	man9/mi_timer_valid.9.man \
+	man9/mi_zalloc.9.man \
+	man9/mi_zalloc_sleep.9.man \
+	man9/mps_become_writer.9.man \
+	man9/mps_intr_disable.9.man \
+	man9/mps_intr_enable.9.man
+
+dist_noinst_sun_compat_pages = \
+	man9/suncompat.9.man \
+	man9/DB_BASE.9.man \
+	man9/DB_LIM.9.man \
+	man9/DB_REF.9.man \
+	man9/DB_TYPE.9.man \
+	man9/ddi_create_minor_node.9.man \
+	man9/ddi_driver_major.9.man \
+	man9/ddi_driver_name.9.man \
+	man9/ddi_get_cred.9.man \
+	man9/ddi_getiminor.9.man \
+	man9/ddi_get_instance.9.man \
+	man9/ddi_get_lbolt.9.man \
+	man9/ddi_get_pid.9.man \
+	man9/ddi_get_soft_state.9.man \
+	man9/ddi_get_time.9.man \
+	man9/ddi_prop_op.9.man \
+	man9/ddi_remove_minor_node.9.man \
+	man9/ddi_removing_power.9.man \
+	man9/ddi_soft_state.9.man \
+	man9/ddi_soft_state_fini.9.man \
+	man9/ddi_soft_state_free.9.man \
+	man9/ddi_soft_state_init.9.man \
+	man9/ddi_soft_state_zalloc.9.man \
+	man9/ddi_umem_alloc.9.man \
+	man9/ddi_umem_free.9.man \
+	man9/freezestr_SUN.9.man \
+	man9/MBLKHEAD.9.man \
+	man9/MBLKIN.9.man \
+	man9/MBLKL.9.man \
+	man9/MBLKSIZE.9.man \
+	man9/MBLKTAIL.9.man \
+	man9/mcopyin.9.man \
+	man9/mcopymsg.9.man \
+	man9/mcopyout.9.man \
+	man9/merror.9.man \
+	man9/mexchange.9.man \
+	man9/mexpandb.9.man \
+	man9/mioc2ack.9.man \
+	man9/miocack.9.man \
+	man9/miocnak.9.man \
+	man9/miocpullup.9.man \
+	man9/mod_info.9.man \
+	man9/mod_install.9.man \
+	man9/mod_remove.9.man \
+	man9/mod_strmops.9.man \
+	man9/msgb.9.man \
+	man9/msgsize.9.man \
+	man9/nochpoll.9.man \
+	man9/nodev.9.man \
+	man9/nulldev.9.man \
+	man9/OFFSET.9.man \
+	man9/qbufcall.9.man \
+	man9/qtimeout.9.man \
+	man9/queclass.9.man \
+	man9/qunbufcall.9.man \
+	man9/quntimeout.9.man \
+	man9/qwait.9.man \
+	man9/qwait_sig.9.man \
+	man9/qwriter.9.man \
+	man9/unfreezestr_SUN.9.man
+
+dist_noinst_uw7_compat_pages = \
+	man9/uw7compat.9.man \
+	man9/allocb_physreq.9.man \
+	man9/ATOMIC_INT_ADD.9.man \
+	man9/ATOMIC_INT_ALLOC.9.man \
+	man9/ATOMIC_INT_DEALLOC.9.man \
+	man9/ATOMIC_INT_DECR.9.man \
+	man9/ATOMIC_INT_INCR.9.man \
+	man9/ATOMIC_INT_INIT.9.man \
+	man9/ATOMIC_INT_READ.9.man \
+	man9/ATOMIC_INT_SUB.9.man \
+	man9/ATOMIC_INT_WRITE.9.man \
+	man9/msgphysreq.9.man \
+	man9/msgpullup_physreq.9.man \
+	man9/msgscgth.9.man \
+	man9/printf_UW7.9.man
+
+dist_noinst_osf_compat_pages = \
+	man9/osfcompat.9.man \
+	man9/lbolt.9.man \
+	man9/streams_close_comm.9.man \
+	man9/streams_open_comm.9.man \
+	man9/streams_open_ocomm.9.man \
+	man9/time.9.man
 
 dist_noinst_aix_compat_pages = \
-	man9/aixcompat.9.man
+	man9/aixcompat.9.man \
+	man9/str_install_AIX.9.man \
+	man9/wantio.9.man \
+	man9/wantmsg.9.man
 
 dist_noinst_hpux_compat_pages = \
-	man9/hpuxcompat.9.man
+	man9/hpuxcompat.9.man \
+	man9/get_sleep_lock.9.man \
+	man9/streams_put.9.man
 
 dist_noinst_irix_compat_pages = \
-	man9/irixcompat.9.man
+	man9/irixcompat.9.man \
+	man9/cmn_err_tag.9.man \
+	man9/icmn_err.9.man
 
 dist_noinst_lis_compat_pages = \
 	man9/liscompat.9.man \
+	man9/lisdeprec.9.man \
 	man9/LiS.9.man \
 	man9/lis_adjmsg.9.man \
 	man9/lis_alloc_atomic_fcn.9.man \
@@ -1255,7 +1537,6 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_zmalloc.9.man
 
 dist_noinst_lis_deprec_pages = \
-	man9/lisdeprec.9.man \
 	man9/lis_add_timer.9.man \
 	man9/lis_allocq.9.man \
 	man9/lis_apushm.9.man \
@@ -1351,107 +1632,14 @@ dist_noinst_mac_compat_pages = \
 	man9/maccompat.9.man \
 	man9/allocbi.9.man \
 	man9/esballoca.9.man \
-	man9/mpnotify.9.man \
-	man9/mps_become_writer.9.man \
-	man9/mps_intr_disable.9.man \
-	man9/mps_intr_enable.9.man
-
-dist_noinst_mps_compat_pages = \
-	man9/mpscompat.9.man \
-	man9/mi_alloc.9.man \
-	man9/mi_allocq.9.man \
-	man9/mi_alloc_sleep.9.man \
-	man9/mi_attach.9.man \
-	man9/mi_bcmp.9.man \
-	man9/mi_bufcall.9.man \
-	man9/mi_close_comm.9.man \
-	man9/mi_close_detached.9.man \
-	man9/mi_close_free.9.man \
-	man9/mi_close_unlink.9.man \
-	man9/mi_copy_done.9.man \
-	man9/mi_copyin.9.man \
-	man9/mi_copyin_n.9.man \
-	man9/mi_copyout.9.man \
-	man9/mi_copyout_alloc.9.man \
-	man9/mi_copy_set_rval.9.man \
-	man9/mi_copy_state.9.man \
-	man9/mi_detach.9.man \
-	man9/mi_first_dev_ptr.9.man \
-	man9/mi_first_ptr.9.man \
-	man9/mi_free.9.man \
-	man9/mi_freeq.9.man \
-	man9/mi_mpprintf.9.man \
-	man9/mi_mpprintf_nr.9.man \
-	man9/mi_next_dev_ptr.9.man \
-	man9/mi_next_ptr.9.man \
-	man9/mi_offset_param.9.man \
-	man9/mi_offset_paramc.9.man \
-	man9/mi_open_alloc.9.man \
-	man9/mi_open_alloc_sleep.9.man \
-	man9/mi_open_comm.9.man \
-	man9/mi_open_detached.9.man \
-	man9/mi_open_link.9.man \
-	man9/mi_prev_ptr.9.man \
-	man9/mi_reallocb.9.man \
-	man9/mi_reuse_proto.9.man \
-	man9/mi_set_sth_copyopt.9.man \
-	man9/mi_set_sth_hiwat.9.man \
-	man9/mi_set_sth_lowat.9.man \
-	man9/mi_set_sth_maxblk.9.man \
-	man9/mi_set_sth_wroff.9.man \
-	man9/mi_sprintf.9.man \
-	man9/mi_sprintf_putc.9.man \
-	man9/mi_strcmp.9.man \
-	man9/mi_strlen.9.man \
-	man9/mi_strlog.9.man \
-	man9/mi_strol.9.man \
-	man9/mi_timer.9.man \
-	man9/mi_timer_alloc.9.man \
-	man9/mi_timer_cancel.9.man \
-	man9/mi_timer_free.9.man \
-	man9/mi_timer_move.9.man \
-	man9/mi_timer_q_switch.9.man \
-	man9/mi_timer_stop.9.man \
-	man9/mi_timer_valid.9.man \
-	man9/mi_zalloc.9.man \
-	man9/mi_zalloc_sleep.9.man
-
-dist_noinst_osf_compat_pages = \
-	man9/osfcompat.9.man
-
-dist_noinst_sun_compat_pages = \
-	man9/suncompat.9.man \
-	man9/DB_BASE.9.man \
-	man9/DB_LIM.9.man \
-	man9/DB_REF.9.man \
-	man9/DB_TYPE.9.man \
-	man9/MBLKL.9.man \
-	man9/MBLKSIZE.9.man \
-	man9/MBLKHEAD.9.man \
-	man9/MBLKTAIL.9.man \
-	man9/MBLKIN.9.man \
-	man9/merror.9.man \
-	man9/mioc2ack.9.man \
-	man9/miocack.9.man \
-	man9/miocnak.9.man \
-	man9/mexchange.9.man \
-	man9/mexpandb.9.man \
-	man9/miocpullup.9.man \
-	man9/mcopymsg.9.man \
-	man9/mcopyin.9.man \
-	man9/mcopyout.9.man
+	man9/mpnotify.9.man
 
 dist_noinst_sux_compat_pages = \
 	man9/suxcompat.9.man
 
-dist_noinst_svr4_compat_pages = \
-	man9/svr4compat.9.man
-
-dist_noinst_uw7_compat_pages = \
-	man9/uw7compat.9.man
-
 dist_noinst_uxp_compat_pages = \
 	man9/uxpcompat.9.man
+
 
 dist_noinst_MANS = \
 	man1/strchg.1.man \
@@ -1520,7 +1708,6 @@ dist_noinst_MANS = \
 	man8/test-streams.8.man \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
-	man9/allocb_physreq.9.man \
 	man9/alloclk.9.man \
 	man9/alloc_proto.9.man \
 	man9/allocq.9.man \
@@ -1529,15 +1716,6 @@ dist_noinst_MANS = \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
 	man9/apush_vml.9.man \
-	man9/ATOMIC_INT_ADD.9.man \
-	man9/ATOMIC_INT_ALLOC.9.man \
-	man9/ATOMIC_INT_DEALLOC.9.man \
-	man9/ATOMIC_INT_DECR.9.man \
-	man9/ATOMIC_INT_INCR.9.man \
-	man9/ATOMIC_INT_INIT.9.man \
-	man9/ATOMIC_INT_READ.9.man \
-	man9/ATOMIC_INT_SUB.9.man \
-	man9/ATOMIC_INT_WRITE.9.man \
 	man9/attach.9.man \
 	man9/autopush.9.man \
 	man9/autopush_add.9.man \
@@ -1589,7 +1767,6 @@ dist_noinst_MANS = \
 	man9/__cmin_search.9.man \
 	man9/cminsw_list.9.man \
 	man9/cmn_err.9.man \
-	man9/cmn_err_tag.9.man \
 	man9/copyb.9.man \
 	man9/copyin.9.man \
 	man9/copymsg.9.man \
@@ -1598,26 +1775,6 @@ dist_noinst_MANS = \
 	man9/datab.9.man \
 	man9/datamsg.9.man \
 	man9/DDI.9.man \
-	man9/ddi_create_minor_node.9.man \
-	man9/ddi_driver_major.9.man \
-	man9/ddi_driver_name.9.man \
-	man9/ddi_get_cred.9.man \
-	man9/ddi_getiminor.9.man \
-	man9/ddi_get_instance.9.man \
-	man9/ddi_get_lbolt.9.man \
-	man9/ddi_get_pid.9.man \
-	man9/ddi_get_soft_state.9.man \
-	man9/ddi_get_time.9.man \
-	man9/ddi_prop_op.9.man \
-	man9/ddi_remove_minor_node.9.man \
-	man9/ddi_removing_power.9.man \
-	man9/ddi_soft_state.9.man \
-	man9/ddi_soft_state_fini.9.man \
-	man9/ddi_soft_state_free.9.man \
-	man9/ddi_soft_state_init.9.man \
-	man9/ddi_soft_state_zalloc.9.man \
-	man9/ddi_umem_alloc.9.man \
-	man9/ddi_umem_free.9.man \
 	man9/defer_func.9.man \
 	man9/delay.9.man \
 	man9/detach.9.man \
@@ -1633,16 +1790,12 @@ dist_noinst_MANS = \
 	man9/drv_priv.9.man \
 	man9/drv_usectohz.9.man \
 	man9/drv_usecwait.9.man \
-	man9/dtimeout.9.man \
 	man9/dupb.9.man \
 	man9/dupmsg.9.man \
-	man9/emajor.9.man \
-	man9/eminor.9.man \
 	man9/enableok.9.man \
 	man9/enableq.9.man \
 	man9/esballoc.9.man \
 	man9/esbbcall.9.man \
-	man9/etoimajor.9.man \
 	man9/_fini.9.man \
 	man9/flushband.9.man \
 	man9/flushq.9.man \
@@ -1664,17 +1817,12 @@ dist_noinst_MANS = \
 	man9/freeq.9.man \
 	man9/freestr.9.man \
 	man9/freezestr.9.man \
-	man9/freezestr_SUN.9.man \
 	man9/getadmin.9.man \
-	man9/getemajor.9.man \
-	man9/geteminor.9.man \
 	man9/getinfo.9.man \
 	man9/getmajor.9.man \
 	man9/getmid.9.man \
 	man9/getminor.9.man \
 	man9/getq.9.man \
-	man9/get_sleep_lock.9.man \
-	man9/icmn_err.9.man \
 	man9/identify.9.man \
 	man9/_info.9.man \
 	man9/_init.9.man \
@@ -1683,22 +1831,16 @@ dist_noinst_MANS = \
 	man9/Intro.9.man \
 	man9/isdatablk.9.man \
 	man9/isdatamsg.9.man \
-	man9/itimeout.9.man \
-	man9/itoemajor.9.man \
 	man9/kmem_alloc.9.man \
 	man9/kmem_alloc_node.9.man \
 	man9/kmem_free.9.man \
 	man9/kmem_zalloc.9.man \
 	man9/kmem_zalloc_node.9.man \
-	man9/lbolt.9.man \
 	man9/LfS.9.man \
 	man9/lfs_register_strdev.9.man \
 	man9/linkb.9.man \
 	man9/linkmsg.9.man \
 	man9/LOCK.9.man \
-	man9/LOCK_ALLOC.9.man \
-	man9/LOCK_DEALLOC.9.man \
-	man9/LOCK_OWNED.9.man \
 	man9/major.9.man \
 	man9/makedev.9.man \
 	man9/makedevice.9.man \
@@ -1708,30 +1850,14 @@ dist_noinst_MANS = \
 	man9/min.9.man \
 	man9/minor.9.man \
 	man9/mknod.9.man \
-	man9/mod_info.9.man \
-	man9/mod_install.9.man \
-	man9/mod_remove.9.man \
-	man9/mod_strmops.9.man \
 	man9/module_info.9.man \
 	man9/module_stat.9.man \
 	man9/mount.9.man \
 	man9/mp-streams.9.man \
-	man9/MPSTR_QLOCK.9.man \
-	man9/MPSTR_QRELE.9.man \
-	man9/MPSTR_STPLOCK.9.man \
-	man9/MPSTR_STPRELE.9.man \
-	man9/msgb.9.man \
 	man9/msgdsize.9.man \
-	man9/msgphysreq.9.man \
 	man9/msgpullup.9.man \
-	man9/msgpullup_physreq.9.man \
-	man9/msgscgth.9.man \
-	man9/msgsize.9.man \
-	man9/nochpoll.9.man \
 	man9/nodesw_lock.9.man \
-	man9/nodev.9.man \
 	man9/noenable.9.man \
-	man9/nulldev.9.man \
 	man9/OTHER.9.man \
 	man9/OTHERQ.9.man \
 	man9/pcmsg.9.man \
@@ -1740,7 +1866,6 @@ dist_noinst_MANS = \
 	man9/pipe.9.man \
 	man9/power.9.man \
 	man9/printf.9.man \
-	man9/printf_UW7.9.man \
 	man9/probe.9.man \
 	man9/pullupmsg.9.man \
 	man9/put.9.man \
@@ -1756,7 +1881,6 @@ dist_noinst_MANS = \
 	man9/putq.9.man \
 	man9/qattach.9.man \
 	man9/qband.9.man \
-	man9/qbufcall.9.man \
 	man9/qclose.9.man \
 	man9/qcountstrm.9.man \
 	man9/qdetach.9.man \
@@ -1771,16 +1895,9 @@ dist_noinst_MANS = \
 	man9/qready.9.man \
 	man9/qreply.9.man \
 	man9/qsize.9.man \
-	man9/qtimeout.9.man \
-	man9/queclass.9.man \
 	man9/queinfo.9.man \
 	man9/queue.9.man \
 	man9/queue_t.9.man \
-	man9/qunbufcall.9.man \
-	man9/quntimeout.9.man \
-	man9/qwait.9.man \
-	man9/qwait_sig.9.man \
-	man9/qwriter.9.man \
 	man9/RD.9.man \
 	man9/register_clone.9.man \
 	man9/register_cmajor.9.man \
@@ -1802,13 +1919,6 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/rmwanted.9.man \
-	man9/RW_ALLOC.9.man \
-	man9/RW_DEALLOC.9.man \
-	man9/RW_RDLOCK.9.man \
-	man9/RW_TRYRDLOCK.9.man \
-	man9/RW_TRYWRLOCK.9.man \
-	man9/RW_UNLOCK.9.man \
-	man9/RW_WRLOCK.9.man \
 	man9/SAMESTR.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
@@ -1816,47 +1926,23 @@ dist_noinst_MANS = \
 	man9/sefree.9.man \
 	man9/setq.9.man \
 	man9/setqsched.9.man \
-	man9/sleep.9.man \
-	man9/SLEEP_ALLOC.9.man \
-	man9/SLEEP_DEALLOC.9.man \
-	man9/SLEEP_LOCK.9.man \
-	man9/SLEEP_LOCKAVAIL.9.man \
-	man9/SLEEP_LOCKOWNED.9.man \
-	man9/SLEEP_LOCK_SIG.9.man \
-	man9/SLEEP_TRYLOCK.9.man \
-	man9/SLEEP_UNLOCK.9.man \
 	man9/__smod_search.9.man \
 	man9/spec_dentry.9.man \
 	man9/spec_open.9.man \
 	man9/specfs_get.9.man \
 	man9/specfs_put.9.man \
 	man9/SPG.9.man \
-	man9/spl0.9.man \
-	man9/spl1.9.man \
-	man9/spl2.9.man \
-	man9/spl3.9.man \
-	man9/spl4.9.man \
-	man9/spl5.9.man \
-	man9/spl6.9.man \
-	man9/spl7.9.man \
-	man9/spl.9.man \
 	man9/splbase.9.man \
 	man9/spldisk.9.man \
 	man9/splhi.9.man \
 	man9/splstr.9.man \
 	man9/spltimeout.9.man \
 	man9/spltty.9.man \
-	man9/splx.9.man \
 	man9/STREAMS.9.man \
-	man9/streams_close_comm.9.man \
 	man9/streams_get_sleep_lock.9.man \
-	man9/streams_open_comm.9.man \
-	man9/streams_open_ocomm.9.man \
-	man9/streams_put.9.man \
 	man9/streamtab.9.man \
 	man9/strgetpmsg.9.man \
 	man9/str_install.9.man \
-	man9/str_install_AIX.9.man \
 	man9/str_install_HPUX.9.man \
 	man9/strioccall.9.man \
 	man9/strlog.9.man \
@@ -1871,29 +1957,19 @@ dist_noinst_MANS = \
 	man9/strthreads.9.man \
 	man9/str_uninstall.9.man \
 	man9/strwsrv.9.man \
-	man9/SV_ALLOC.9.man \
-	man9/SV_BROADCAST.9.man \
-	man9/SV_DEALLOC.9.man \
-	man9/SV_SIGNAL.9.man \
-	man9/SV_WAIT.9.man \
-	man9/SV_WAIT_SIG.9.man \
 	man9/sysctl_str_strctlsz.9.man \
 	man9/sysctl_str_strmsgsz.9.man \
 	man9/testb.9.man \
-	man9/time.9.man \
 	man9/__timeout.9.man \
 	man9/timeout.9.man \
-	man9/TRYLOCK.9.man \
 	man9/udelay.9.man \
 	man9/umount2.9.man \
 	man9/umount.9.man \
 	man9/unbufcall.9.man \
 	man9/undoc.9.man \
 	man9/unfreezestr.9.man \
-	man9/unfreezestr_SUN.9.man \
 	man9/unlink.9.man \
 	man9/unlinkb.9.man \
-	man9/UNLOCK.9.man \
 	man9/unregister_clone.9.man \
 	man9/unregister_cmajor.9.man \
 	man9/unregister_inode.9.man \
@@ -1905,26 +1981,80 @@ dist_noinst_MANS = \
 	man9/unweldq.9.man \
 	man9/vcmn_err.9.man \
 	man9/vtop.9.man \
-	man9/wakeup.9.man \
-	man9/wantio.9.man \
-	man9/wantmsg.9.man \
 	man9/weldq.9.man \
 	man9/WR.9.man \
-	man9/xmsgsize.9.man
+	man9/xmsgsize.9.man \
+	man9/vstrlog_hook.9.man
 
-dist_noinst_MANS += $(dist_noinst_aix_compat_pages)
-dist_noinst_MANS += $(dist_noinst_hpux_compat_pages)
-dist_noinst_MANS += $(dist_noinst_irix_compat_pages)
-dist_noinst_MANS += $(dist_noinst_lis_compat_pages)
-dist_noinst_MANS += $(dist_noinst_lis_deprec_pages)
-dist_noinst_MANS += $(dist_noinst_mac_compat_pages)
-dist_noinst_MANS += $(dist_noinst_mps_compat_pages)
-dist_noinst_MANS += $(dist_noinst_osf_compat_pages)
-dist_noinst_MANS += $(dist_noinst_sun_compat_pages)
-dist_noinst_MANS += $(dist_noinst_sux_compat_pages)
-dist_noinst_MANS += $(dist_noinst_svr4_compat_pages)
-dist_noinst_MANS += $(dist_noinst_uw7_compat_pages)
-dist_noinst_MANS += $(dist_noinst_uxp_compat_pages)
+if CONFIG_STREAMS_COMPAT_SVR3
+dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SVR4
+dist_noinst_MANS	    += $(dist_noinst_svr4_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MPS
+dist_noinst_MANS	    += $(dist_noinst_mps_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SUN
+dist_noinst_MANS	    += $(dist_noinst_sun_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_UW7
+dist_noinst_MANS	    += $(dist_noinst_uw7_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_OSF
+dist_noinst_MANS	    += $(dist_noinst_osf_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_AIX
+dist_noinst_MANS	    += $(dist_noinst_aix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_HPUX
+dist_noinst_MANS	    += $(dist_noinst_hpux_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_IRIX
+dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_LIS
+dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
+dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MAC
+dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
+endif
+
+if CONFIG_STREAMS_COMPAT_SVR3_MODULE
+dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SVR4_MODULE
+dist_noinst_MANS	    += $(dist_noinst_svr4_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MPS_MODULE
+dist_noinst_MANS	    += $(dist_noinst_mps_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_SUN_MODULE
+dist_noinst_MANS	    += $(dist_noinst_sun_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_UW7_MODULE
+dist_noinst_MANS	    += $(dist_noinst_uw7_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_OSF_MODULE
+dist_noinst_MANS	    += $(dist_noinst_osf_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_AIX_MODULE
+dist_noinst_MANS	    += $(dist_noinst_aix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_HPUX_MODULE
+dist_noinst_MANS	    += $(dist_noinst_hpux_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_IRIX_MODULE
+dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
+endif
+if CONFIG_STREAMS_COMPAT_LIS_MODULE
+dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
+dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
+endif
+if CONFIG_STREAMS_COMPAT_MAC_MODULE
+dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
+endif
 
 ## PKG_BUILD_INDEP
 endif

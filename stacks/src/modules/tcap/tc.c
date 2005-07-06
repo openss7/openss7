@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:13 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:13 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:57 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:31:13 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:57 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -66,7 +66,7 @@ static char const ident[] =
  *  management.
  */
 
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #define TC_DESCRIP	"TC STREAMS MULTIPLEXING DRIVER."
 #define TC_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."

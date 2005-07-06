@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.8 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.9 2005/07/05 22:46:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DKI_H__
 #define __SYS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:46:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -83,7 +83,7 @@ typedef struct cred {
 #endif
 } cred_t;
 
-#ifdef CONFIG_STREAMS_COMPAT_LIS
+#if 0
 /* for LiS binary compatibility */
 typedef struct lis_cred {
 	uid_t cr_uid;			/* effective user id */

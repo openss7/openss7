@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2005/06/23 10:43:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2005/07/05 22:45:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/23 10:43:20 $ by $Author: brian $
+# Last Modified $Date: 2005/07/05 22:45:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -235,15 +235,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/x400pfw.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
-				  src/include/os7/compat.h \
 				  config.h strconf.h
 
 mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
@@ -537,15 +528,6 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/x400p-ss7/x400pfw.h \
 				  src/modules/lm/lm.h \
 				  src/modules/cd/cd.h \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h \
 				  config.h strconf.h
 
 if WITH_LIS
@@ -916,7 +898,7 @@ KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
 KMODCONF_EXT			= $(PACKAGE_LCNAME)
-KERNEL_MODMAPS			= $(STREAMS_MODMAP)
+KERNEL_MODMAPS			= $(STREAMS_MODMAP) $(STRCOMP_MODMAP)
 
 if WITH_KO_MODULES
 kpre				= streams_

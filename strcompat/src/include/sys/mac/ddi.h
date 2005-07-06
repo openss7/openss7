@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/07/03 17:41:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/07/05 22:46:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_MACDDI_H__
 #define __SYS_MACDDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -61,8 +61,6 @@
 #ifndef __MAC_EXTERN_INLINE
 #define __MAC_EXTERN_INLINE extern __inline__
 #endif				/* __AIX_EXTERN_INLINE */
-
-#include <sys/strconf.h>
 
 #ifndef _MAC_SOURCE
 #warning "_MAC_SOURCE not defined but macddi.h included"
@@ -75,12 +73,15 @@
 #endif
 
 /* These are MPS definitions exposed by MacOT, but implemented in mpscompat.c */
-extern void mi_timer(mblk_t *mp, unsigned long msec);
-extern mblk_t *mi_timer_alloc(queue_t *q, size_t size);
-extern void mi_timer_free(mblk_t *mp);
+extern mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size);
+extern void mi_timer_MAC(mblk_t *mp, clock_t msec);
+extern int mi_timer_cancel(mblk_t *mp);
+extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp);
 extern int mi_timer_valid(mblk_t *mp);
-extern int mi_timer_cancel(mblk_t *mp); /* also called mi_timer_stop */
-extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp); /* also mi_timer_move */
+extern void mi_timer_free(mblk_t *mp);
+
+#define mi_timer_alloc(_q,_size)	mi_timer_alloc_MAC(_q,_size)
+#define mi_timer(_mp,_msec)		mi_timer_MAC(_mp,_msec)
 
 extern queue_t *mi_allocq(struct streamtab *st);
 

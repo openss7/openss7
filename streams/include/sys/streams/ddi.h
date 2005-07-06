@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.20 2005/07/04 20:21:58 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.21 2005/07/05 22:46:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:21:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/04 20:21:58 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/05 22:46:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -319,96 +319,6 @@ __EXTERN_INLINE void uiomove(void);	/* see uw7ddi.h */
 __EXTERN_INLINE void ureadc(void);	/* see uw7ddi.h */
 __EXTERN_INLINE void useracc(void);	/* see uw7ddi.h */
 __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
-#endif
-
-/* pull in OS specific defines */
-
-#ifdef _SVR3_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_SVR3) || defined(CONFIG_STREAMS_COMPAT_SVR3_MODULE)
-#include <sys/svr3ddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3
-#endif
-#endif
-
-#ifdef _SVR4_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_SVR4) || defined(CONFIG_STREAMS_COMPAT_SVR4_MODULE)
-#include <sys/svr4ddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _SVR4_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR4
-#endif
-#endif
-
-#ifdef _MPS_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
-#include <sys/mpsddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _MPS_SOURCE defined but not CONFIG_STREAMS_COMPAT_MPS
-#endif
-#endif
-
-#ifdef _OSF_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-#include <sys/osfddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF
-#endif
-#endif
-
-#ifdef _AIX_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-#include <sys/aixddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX
-#endif
-#endif
-
-#ifdef _HPUX_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
-#include <sys/hpuxddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX
-#endif
-#endif
-
-#ifdef _UW7_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-#include <sys/uw7ddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7
-#endif
-#endif
-
-#ifdef _SUN_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-#include <sys/sunddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN
-#endif
-#endif
-
-#ifdef _LIS_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
-#include <sys/lisddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _LIS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LIS
-#endif
-#endif
-
-#ifdef _MAC_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_MAC) || defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
-#include <sys/macddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC
-#endif
-#endif
-
-#ifdef _IRIX_SOURCE
-#if defined(CONFIG_STREAMS_COMPAT_IRIX) || defined(CONFIG_STREAMS_COMPAT_IRIX_MODULE)
-#include <sys/irixddi.h>
-#elif !defined(EXPORT_SYMTAB)
-#warning _IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX
-#endif
 #endif
 
 #endif				/* __SYS_DDI_H__ */

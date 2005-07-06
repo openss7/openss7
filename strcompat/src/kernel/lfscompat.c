@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/04 20:14:29 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:14:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/06 03:47:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.4  2005/07/06 03:47:46  brian
+ - minor corrections
+
+ Revision 0.9.2.3  2005/07/05 22:46:05  brian
+ - change for strcompat package
+
  Revision 0.9.2.2  2005/07/04 20:14:29  brian
  - fixed spelling of CVS keyword
 
@@ -59,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/04 20:14:29 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/04 20:14:29 $";
+static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -93,11 +99,11 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 #endif
 
 #include <linux/version.h>
-#include <linux/compile.h>
+#include <linux/compiler.h>
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/04 20:14:29 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -246,7 +252,11 @@ int drv_getparm(const unsigned int parm, void *value_p)
 		return (-1);
 #endif
 	case HW_PROVIDER:
+#ifdef UTS_VERSION
 		*(char **) value_p = "Linux " UTS_RELEASE " " UTS_VERSION;
+#else
+		*(char **) value_p = "Linux " UTS_RELEASE;
+#endif
 		return (0);
 	default:
 	case DRV_MAXBIOSIZE:
@@ -324,6 +334,9 @@ EXPORT_SYMBOL(putnextctl1);
 __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
 EXPORT_SYMBOL(putnextctl2);
 
+#if 0
+/* I want to boot this out to strutil package anyway... */
+
 /*
  *  This is a default implemenation for strlog(9).  We print directly to the log
  *  files.  That is not good: we want to filter things out.  A proper log driver
@@ -375,6 +388,7 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 }
 
 EXPORT_SYMBOL(strlog);
+#endif
 
 
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE

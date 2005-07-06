@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:53 $ by $Author: brian $
+ Last Modified $Date: 2005/07/05 22:45:24 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:24 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:24 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -68,7 +68,7 @@ static char const ident[] =
  *  accessed by LAPD and LAPF modules that are subsequently pushed under IDSN
  *  and Frame Relay drivers.
  */
-#include "os7/compat.h"
+#include <os7/compat.h>
 
 #include <sys/cdi.h>
 #include <sys/cdi_hdlc.h>
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:30:53 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:24 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
