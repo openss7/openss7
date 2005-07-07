@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:45:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/07 05:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:45:19 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 05:12:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,22 +88,33 @@ AC_DEFUN([AC_OS7], [dnl
     USER_CFLAGS="$CFLAGS"
     USER_LDFLAGS="$LDFLAGS"
     _OS7_SETUP
-    OS7_INCLUDES="-imacros ./config.h"
-    OS7_INCLUDES="${OS7_INCLUDES} -I./src/include -I${srcdir}/src/include"
+    PKG_INCLUDES="-imacros ./config.h"
+    PKG_INCLUDES='-imacros $(top_builddir)/config.h'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros $(top_builddir)/$(STRCONF_CONFIG)'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
+    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+    fi
+dnl PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
     AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
     AC_MSG_NOTICE([final user    LDFLAGS   = $USER_LDFLAGS])
-    AC_MSG_NOTICE([final user    INCLUDES  = $OS7_INCLUDES])
+    AC_MSG_NOTICE([final user    INCLUDES  = $PKG_INCLUDES])
     AC_MSG_NOTICE([final kernel  MODFLAGS  = $KERNEL_MODFLAGS])
     AC_MSG_NOTICE([final kernel  NOVERSION = $KERNEL_NOVERSION])
     AC_MSG_NOTICE([final kernel  CPPFLAGS  = $KERNEL_CPPFLAGS])
     AC_MSG_NOTICE([final kernel  CFLAGS    = $KERNEL_CFLAGS])
     AC_MSG_NOTICE([final kernel  LDFLAGS   = $KERNEL_LDFLAGS])
-    AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+dnl AC_MSG_NOTICE([final streams CPPFLAGS  = $STREAMS_CPPFLAGS])
+dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([USER_CPPFLAGS])dnl
     AC_SUBST([USER_CFLAGS])dnl
     AC_SUBST([USER_LDFLAGS])dnl
-    AC_SUBST([OS7_INCLUDES])dnl
+    AC_SUBST([PKG_INCLUDES])dnl
+    AC_SUBST([PKG_MODFLAGS])dnl
+    PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
     CFLAGS=
     _OS7_OUTPUT

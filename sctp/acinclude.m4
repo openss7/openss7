@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/04 20:08:45 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 05:13:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:08:45 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 05:13:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,6 +121,9 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([USER_LDFLAGS])dnl
     AC_SUBST([PKG_INCLUDES])dnl
     AC_SUBST([PKG_MODFLAGS])dnl
+    PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
     CFLAGS=
     _SCTP_OUTPUT dnl
