@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/06 11:34:54 $
+# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 20:09:58 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:34:54 $ by $Author: brian $
+## Last Modified $Date: 2005/07/06 20:09:58 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -213,5 +213,6 @@ README-make: Makefile
 	@grep '^#!' Makefile | sed -e 's|^#!||' > $@
 
 EXTRA_DIST += README-make
+CLEANFILES += README-make
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
