@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2005/07/06 11:11:02 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2005/07/07 11:33:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:11:02 $ by $Author: brian $
+## Last Modified $Date: 2005/07/07 11:33:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -663,7 +663,9 @@ dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
 TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
-			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)'
+			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   mandir='$(mandir)'
 CLEANFILES		+= check_modules.log
 DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS

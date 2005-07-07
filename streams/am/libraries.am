@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/06 11:11:03 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/07 11:33:56 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:11:03 $ by $Author: brian $
+## Last Modified $Date: 2005/07/07 11:33:56 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -125,7 +125,9 @@ POST_UNINSTALL_AM	+= postun-libraries
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS 	+= $(top_srcdir)/scripts/check_libs
-TESTS_ENVIRONMENT 	+= lib_LTLIBRARIES='$(lib_LTLIBRARIES)'
+TESTS_ENVIRONMENT 	+= lib_LTLIBRARIES='$(lib_LTLIBRARIES)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   mandir='$(mandir)'
 CLEANFILES		+= check_libs.log
 DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS
