@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2005/07/05 04:42:32 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 04:42:32 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,6 +85,7 @@ dnl
     AC_SUBST([STREAMS_LDADD])
     AC_SUBST([STREAMS_MODMAP])
     AC_SUBST([STREAMS_SYMVER])
+    AC_SUBST([STREAMS_MANPATH])
 ])# _LINUX_STREAMS
 # =============================================================================
 
@@ -281,12 +282,13 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    do
 		if test -d $streams_dir -a -r $streams_dir/$streams_what 
 		then
-		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
-		    streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -314,6 +316,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    streams_cv_lis_ldadd="-lLiS"
 		    streams_cv_lis_modmap=
 		    streams_cv_lis_symver=
+		    streams_cv_lis_manpath=
 		    break
 		fi
 	    done
@@ -428,12 +431,13 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    do
 		if test -d $streams_dir -a -r $streams_dir/$streams_what 
 		then
-		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lfs_includes="$streams_dir $streams_bld"
-		    streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -461,6 +465,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    streams_cv_lfs_ldadd="-lstreams"
 		    streams_cv_lfs_modmap=
 		    streams_cv_lfs_symver=
+		    streams_cv_lfs_manpath=
 		    break
 		fi
 	    done
@@ -658,6 +663,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     STREAMS_LDADD="$streams_cv_lis_ldadd"
     STREAMS_MODMAP="$streams_cv_lis_modmap"
     STREAMS_SYMVER="$streams_cv_lis_symver"
+    STREAMS_MANPATH="$streams_cv_lis_manpath"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =============================================================================
@@ -676,6 +682,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     STREAMS_LDADD="$streams_cv_lfs_ldadd"
     STREAMS_MODMAP="$streams_cv_lfs_modmap"
     STREAMS_SYMVER="$streams_cv_lfs_symver"
+    STREAMS_MANPATH="$streams_cv_lfs_manpath"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [1], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [1], [Linux Fast-STREAMS has this type.])

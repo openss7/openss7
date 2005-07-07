@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/05 06:42:21 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 06:42:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,6 +79,7 @@ dnl
     AC_SUBST([STRCOMP_LDADD])
     AC_SUBST([STRCOMP_MODMAP])
     AC_SUBST([STRCOMP_SYMVER])
+    AC_SUBST([STRCOMP_MANPATH])
 ])# _STRCOMP
 # =============================================================================
 
@@ -140,12 +141,13 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    do
 		if test -d $strcomp_dir -a -r $strcomp_dir/$strcomp_what
 		then
-		    strcomp_bld=`echo $strcomp_dir | sed -e "s|^$srcdir/|$strcomp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    strcomp_bld=`echo $strcomp_dir | sed -e "s|^$srcdir/|$strcomp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    strcomp_dir=`(cd $strcomp_dir; pwd)`
 		    strcomp_cv_includes="$strcomp_dir $strcomp_bld"
 		    strcomp_cv_ldadd=
-		    strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
-		    strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -209,6 +211,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    strcomp_cv_ldadd=
 		    strcomp_cv_modmap=
 		    strcomp_cv_symver=
+		    strcomp_cv_manpath=
 		    break
 		fi
 	    done
@@ -349,6 +352,7 @@ AC_DEFUN([_STRCOMP_DEFINES], [dnl
     STRCOMP_LDADD="$strcomp_cv_ldadd"
     STRCOMP_MODMAP="$strcomp_cv_modmap"
     STRCOMP_SYMVER="$strcomp_cv_symver"
+    STRCOMP_MANPATH="$strcomp_cv_manpath"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STRCOMP_SYMVER:+${MODPOST_INPUTS:+ }${STRCOMP_SYMVER}}"
 ])# _STRCOMP_DEFINES
 # =============================================================================

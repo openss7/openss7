@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/04 19:57:40 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:40 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,6 +65,7 @@ AC_DEFUN([_SCTP], [dnl
     _SCTP_SETUP
     _SCTP_OPENSS7
     AC_SUBST([SCTP_CPPFLAGS])
+    AC_SUBST([SCTP_MANPATH])
 ])# _SCTP
 # =============================================================================
 
@@ -109,9 +110,10 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    do
 		if test -d $sctp_dir -a -r $sctp_dir/$sctp_what
 		then
-		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    sctp_dir=`(cd $sctp_dir; pwd)`
 		    sctp_cv_includes="$sctp_dir $sctp_bld"
+		    sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -168,6 +170,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    for sctp_dir in $sctp_search_path ; do
 		if test -d "$sctp_dir" -a -r "$sctp_dir/$sctp_what" ; then
 		    sctp_cv_includes="$sctp_dir"
+		    sctp_cv_manpath=
 		    break
 		fi
 	    done
@@ -206,6 +209,7 @@ AC_DEFUN([_SCTP_DEFINES], [dnl
     for sctp_include in $sctp_cv_includes ; do
 	SCTP_CPPFLAGS="${SCTP_CPPFLAGS}${SCTP_CPPFLAGS:+ }-I${sctp_include}"
     done
+    SCTP_MANPATH="$sctp_cv_manpath"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strsctp for
 	that matter.

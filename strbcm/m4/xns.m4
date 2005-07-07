@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/05 04:42:32 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 04:42:32 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,6 +64,7 @@ AC_DEFUN([_XNS], [dnl
     _XNS_OPTIONS
     _XNS_SETUP
     AC_SUBST([XNS_CPPFLAGS])
+    AC_SUBST([XNS_MANPATH])
 ])# _XNS
 # =============================================================================
 
@@ -115,9 +116,10 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    do
 		if test -d $xns_dir -a -r $xns_dir/$xns_what
 		then
-		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xns_dir=`(cd $xns_dir; pwd)`
 		    xns_cv_includes="$xns_dir $xns_bld"
+		    xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -177,6 +179,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    for xns_dir in $xns_search_path ; do
 		if test -d "$xns_dir" -a -r "$xns_dir/$xns_what" ; then
 		    xns_cv_includes="$xns_dir"
+		    xns_cv_manpath=
 		    break
 		fi
 	    done
@@ -215,6 +218,7 @@ AC_DEFUN([_XNS_DEFINES], [dnl
     for xns_include in $xns_cv_includes ; do
 	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
     done
+    XNS_MANPATH="$xns_cv_manpath"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxns for
 	that matter.

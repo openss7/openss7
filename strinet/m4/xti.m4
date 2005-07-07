@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 19:57:41 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +61,7 @@ AC_DEFUN([_XTI], [dnl
     _XTI_SETUP
     AC_SUBST([XTI_CPPFLAGS])
     AC_SUBST([XTI_LDADD])
+    AC_SUBST([XTI_MANPATH])
 ])# _XTI
 # =============================================================================
 
@@ -112,10 +113,11 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    do
 		if test -d $xti_dir -a -r $xti_dir/$xti_what 
 		then
-		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xti_dir=`(cd $xti_dir; pwd)`
 		    xti_cv_includes="$xti_dir $xti_bld"
-		    xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    xti_cv_manpath=`echo "$xti_bld/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -178,6 +180,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		then
 		    xti_cv_includes="$xti_dir"
 		    xti_cv_ldadd="-lxnet"
+		    xti_cv_manpath=
 		    break
 		fi
 	    done
@@ -225,6 +228,7 @@ AC_DEFUN([_XTI_DEFINES], [dnl
 	that matter.
     ])
     XTI_LDADD="$xti_cv_ldadd"
+    XTI_MANPATH="$xti_cv_manpath"
 ])# _XTI_DEFINES
 # =============================================================================
 

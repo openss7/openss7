@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/04 19:57:39 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/07 04:12:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 19:57:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,6 +65,7 @@ AC_DEFUN([_INET], [dnl
     _INET_OPTIONS
     _INET_SETUP
     AC_SUBST([INET_CPPFLAGS])
+    AC_SUBST([INET_MANPATH])
 ])# _INET
 # =============================================================================
 
@@ -109,9 +110,10 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    do
 		if test -d $inet_dir -a -r $inet_dir/$inet_what
 		then
-		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
+		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    inet_dir=`(cd $inet_dir; pwd)`
 		    inet_cv_includes="$inet_dir $inet_bld"
+		    inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
@@ -159,6 +161,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    for inet_dir in $inet_search_path ; do
 		if test -d "$inet_dir" -a -r "$inet_dir/$inet_what" ; then
 		    inet_cv_includes="$inet_dir"
+		    inet_cv_manpath=
 		    break
 		fi
 	    done
@@ -197,6 +200,7 @@ AC_DEFUN([_INET_DEFINES], [dnl
     for inet_include in $inet_cv_includes ; do
 	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-I${inet_include}"
     done
+    INET_MANPATH="$inet_cv_manpath"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strinet for
 	that matter.
