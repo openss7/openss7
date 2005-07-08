@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/07 20:28:27 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/08 13:14:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:27 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 13:14:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -166,7 +166,7 @@
 %if %{BUILD_lfs}
 %global _STREAMS LfS
 %global _streams streams
-%global _strvers 0.7a
+%global _strvers @LFS_VERSION@
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
@@ -174,7 +174,7 @@
 %if %{BUILD_lis}
 %global _STREAMS LiS
 %global _streams LiS
-%global _strvers 0:2.18.1
+%global _strvers @LIS_VERSION@
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
@@ -1836,12 +1836,17 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.36  2005/07/07 20:28:27  brian
-# - changes for release
+# Revision 0.9.2.37  2005/07/08 13:14:23  brian
+# - corrections to versioning
 #
-# Revision 0.9.2.35  2005/06/25 07:01:47  brian
-# - more efficient dependency checking
-#
+
+* Thu Jul  7 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.36  2005/07/07 20:28:27  brian
+- changes for release
+
+* Sat Jun 25 2005 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.35  2005/06/25 07:01:47  brian
+- more efficient dependency checking
 
 * Fri Jun 24 2005 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.34  2005/06/24 13:40:40  brian

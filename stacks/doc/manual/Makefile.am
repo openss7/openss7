@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/06/24 13:38:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/08 13:15:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/24 13:38:59 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 13:15:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,8 @@ EXTRA_info_TEXINFOS	= \
 			  texi/gpl.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \
-			  texi/lesser.texi
+			  texi/lesser.texi \
+			  $(top_builddir)/scripts/texi/funding.texi
 
 include ../../am/info.am
 

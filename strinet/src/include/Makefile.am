@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:28:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/08 12:17:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:28:52 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:17:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,7 +79,8 @@ nobase_pkginclude_HEADERS = \
 	$(xnet_headers) \
 	$(sctp_headers)
 
-nobase_nodist_pkginclude_HEADERS = 
+nobase_nodist_pkginclude_HEADERS = \
+	sys/strinet/version.h
 #	sys/strinet/modversions.h
 
 ## PKG_BUILD_ARCH

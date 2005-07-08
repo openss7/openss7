@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/07 05:13:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/08 12:18:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 05:13:01 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:18:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,7 +98,8 @@ AC_DEFUN([AC_SS7], [dnl
 		     debian/strss7-lib.preinst
 		     debian/strss7-source.preinst
 		     debian/strss7-util.preinst
-		     src/util/modutils/strss7])
+		     src/util/modutils/strss7
+		     src/include/sys/strss7/version.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/08 12:17:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:30:43 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:17:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -213,6 +213,10 @@ nobase_pkginclude_HEADERS = \
 #	os7/priv.h
 #	os7/queue.h
 #	os7/timer.h
+
+nobase_nodist_pkginclude_HEADERS = \
+	sys/strss7/version.h
+#	sys/strss7/modversions.h
 
 ## PKG_BUILD_ARCH
 endif

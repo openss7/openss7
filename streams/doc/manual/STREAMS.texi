@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.21 2005/06/24 13:38:59 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.22 2005/07/08 13:16:11 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/06/24 13:38:59 $ by $Author: brian $
+% Last Modified $Date: 2005/07/08 13:16:11 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -255,30 +255,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 @unnumbered Acknowledgements
 @cindex credits
 
-@menu
-* Sponsors::			Sponsors
-* Contributors::		Contributors
-@end menu
-
-@node Sponsors
-@section Sponsors
-@cindex sponsors
-
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
-
-@itemize
-@item OpenSS7 Corporation
-@end itemize
-
-@node Contributors
-@section Contributors
-@cindex contributors
-
-The primary contributor to the @value{PACKAGE_TITLE} package is @email{bidulock@@openss7.org, Brian
-F. G. Bidulock}.
-@ignore
-The following is a list of significant contributors to the project:
-@end ignore
+@include texi/funding.texi
 
 @node Introduction
 @chapter Introduction
@@ -301,12 +278,13 @@ schedule of the @value{PACKAGE_TITLE} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License}
-(@pxref{GNU General Public License}).  Please note, however, that there are different licensing terms for the manual
-pages and some of the documentation (derived from X/Open publications and other sources).  Consult
-the permission notices contained in the documentation for more information.  This document, is
-released under the @cite{GNU Free Documentation License} (@pxref{Documentation License}) with all
-sections invariant.
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from X/Open publications and other sources).
+Consult the permission notices contained in the documentation for more information.
+
+This document, is released under the @cite{GNU Free Documentation License} (@pxref{Documentation
+License}) with all sections invariant.
 
 @node Overview
 @section Overview

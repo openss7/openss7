@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 1.1.2.3 2005/07/01 07:29:37 brian Exp $
+% @(#) $Id: netperf.texi,v 1.1.2.4 2005/07/08 13:15:37 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/01 07:29:37 $ by $Author: brian $
+% Last Modified $Date: 2005/07/08 13:15:37 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -337,6 +337,10 @@ Indices
 @unnumbered Acknowledgments
 @cindex credits
 
+@include texi/funding.texi
+
+@ignore
+
 As with most open source projects, this project would not have been possible without the valiant
 efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
 Community}.
@@ -388,6 +392,8 @@ of significant contributors to the project:
 @item Gurol Akman
 @item Others
 @end itemize
+
+@end ignore
 
 @node Introduction
 @chapter Introduction

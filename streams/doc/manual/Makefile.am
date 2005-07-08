@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/24 13:38:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/08 13:16:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/24 13:38:59 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 13:16:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,8 @@ EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
-			  texi/lesser.texi
+			  texi/lesser.texi \
+			  $(top_builddir)/scripts/texi/funding.texi
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

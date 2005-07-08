@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.8 2005/05/14 08:28:28 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.9 2005/07/08 13:16:22 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/05/14 08:28:28 $ by $Author: brian $
+% Last Modified $Date: 2005/07/08 13:16:22 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -273,6 +273,9 @@ XTI Header File Reference
 @unnumbered Acknowledgements
 @cindex credits
 
+@include texi/funding.texi
+
+@ignore
 @menu
 * Sponsors::                    Sponsors of the XTI Library
 * Contributors::                People who contributed to development of the XTI Library
@@ -294,6 +297,7 @@ Additional funding for The OpenSS7 Project was provided by:
 
 The primary contributor to the OpenSS7 XTI Library is Brian F. G. Bidulock.
 
+@end ignore
 
 @node Introduction, Reference, Acknowledgements, Top
 @chapter Introduction to the XTI Library
@@ -571,7 +575,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.8 $); $Date: 2005/05/14 08:28:28 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.9 $); $Date: 2005/07/08 13:16:22 $.
 
 @subsubheading AUTHOR
 @format
@@ -735,7 +739,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.8 $); $Date: 2005/05/14 08:28:28 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.9 $); $Date: 2005/07/08 13:16:22 $.
 @end flushleft
 @end format
 

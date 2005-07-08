@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: strcompat.texi,v 0.9.2.1 2005/07/04 19:28:53 brian Exp $
+% @(#) $Id: strcompat.texi,v 0.9.2.2 2005/07/08 13:15:59 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/07/04 19:28:53 $ by $Author: brian $
+% Last Modified $Date: 2005/07/08 13:15:59 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -206,6 +206,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Acknowledgments::		Sponsors and Contributors
 
 * Introduction::		Introduction to the package
+* Objective::			Objective of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -276,56 +277,7 @@ Indices
 @unnumbered Acknowledgments
 @cindex credits
 
-As with most open source projects, this project would not have been possible without the valiant
-efforts and productive software of the @cite{Free Software Foundation} and the @cite{Linux Kernel
-Community}.
-
-@menu
-* Sponsors::			Sponsors
-* Contributors::		Contributors
-@end menu
-
-@node Sponsors
-@unnumberedsec Sponsors
-@cindex sponsors
-
-Funding for completion of the @value{PACKAGE_TITLE} package was provided in part by:
-
-@itemize
-@item OpenSS7 Corporation
-@end itemize
-
-@noindent
-Additional funding for The OpenSS7 Project was provided by:
-
-@itemize
-@item OpenSS7 Corporation
-@item Lockheed Martin
-@item Performance Technologies
-@item Motorola
-@item HOB International
-@item Comverse
-@item Sonus Networks
-@item France Telecom
-@end itemize
-
-@node Contributors
-@unnumberedsec Contributors
-@cindex contributors
-
-The primary contributor to the OpenSS7 @value{PACKAGE_TITLE} package is
-@email{bidulock@@openss7.org, Brian F. G. Bidulock}.  The following is a list
-of significant contributors to the project:
-
-@itemize
-@item Per Berquist
-@item John Boyd
-@item Chuck Winters
-@item Peter Courtney
-@item Tom Chandler
-@item Gurol Akman
-@item Others
-@end itemize
+@include texi/funding.texi
 
 @node Introduction
 @chapter Introduction
@@ -347,20 +299,13 @@ future development schedule of the @value{PACKAGE_TITLE} package.
 @section Notice
 @cindex notice
 
-This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
-@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and modules previously
-part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About This Manual, LiS, Linux STREAMS (LiS)
-Installation and Reference Manual}.}.  In stark contrast to many other software packages released by
-@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code mostly developed by
-other parties.
-@cindex licensing
-
 This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).
-Please note, however, that there are different licensing terms for the manual pages and some of the
-documentation (derived from X/Open publications and other sources).  Consult the permission notices
-contained in the documentation for more information.  This document is released under the @cite{GNU
-Free Documentation License} (@pxref{FDL}) with all sections invariant.
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from X/Open publications and other sources).
+Consult the permission notices contained in the documentation for more information.
+
+This document is released under the @cite{GNU Free Documentation License} (@pxref{FDL}) with all
+sections invariant.
 
 @node Overview
 @section Overview
@@ -378,6 +323,7 @@ This document is organized (loosely) into several sections as follows:
 @ifnottex
 @menu
   Introduction::		This introduction
+* Objective::			Objective of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -389,6 +335,8 @@ This document is organized (loosely) into several sections as follows:
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
 @item @ref{Conformance}.
@@ -409,6 +357,119 @@ This document is organized (loosely) into several sections as follows:
 
 This manual uses @cite{texinfo} typographic conventions.
 
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Objective
+@chapter Objective
+@cindex objective
+
+@menu
+* Rationale::
+@end menu
+
+The @cite{@value{PACKAGE_TITLE}} package is intended to provide maximum compatibility between
+@cite{Linux STREAMS (LiS)} or @cite{Linux Fast-STREAMS (LfS)} and other @dfn{STREAMS} implementations on
+major UNIX operating systems, for the purpose of porting existing @dfn{STREAMS} modules and drivers from
+those operating system to @dfn{Linux}.
+
+Also, the @cite{@value{PACKAGE_TITLE}} package aims to provide compatibility between @cite{Linux
+STREAMS (LiS)} and @cite{Linux Fast-STREAMS} to ease the porting of @dfn{STREAMS} modules and drivers from
+@cite{LiS} to @cite{Linux Fast-STREAMS} with minimal effort.
+
+To meet that objective, @cite{@value{PACKAGE_TITLE}} aims to support the @dfn{STREAMS} DDI/DKI and
+registration functions of the following @dfn{STREAMS} implementations:
+
+@sp 1
+@itemize
+@item UNIX System V Release 3.2
+@item UNIX System V Release 4 MP
+@item UNIX System V Release 4.0 MP
+@item UNIX System V Release 4.2 MP
+@item Mentat Portable Streams (MPS)
+@item Linux STREAMS LiS 2.16
+@item Linux STREAMS LiS 2.18
+@item Linux Fast-STREAMS 0.7a.3
+@item AIX 5L Version 5.1 Portable STREAMS Environment (PSE)
+@item HP-UX 11.0i v2 STREAMS/UX
+@item OSF/1.2 - Digital UNIX STREAMS
+@item UnixWare 7.1.3 (OpenUnix 8) STREAMS
+@item Solaris 9/SunOS 5.9 (OpenSolaris) STREAMS
+@item Mac OS 9 OpenTransport 1.5r2
+@item IRIX 6.5.17 STREAMS
+@item SUPER-UX Release 9.2
+@item UXP/V V10L10 STREAMS V10
+@end itemize
+
+@sp 1
+Because it is not necessary to have all of these compatibility modules loaded at a given time, and
+to reduce the footprint of the resulting kernel modules, the @cite{@value{PACKAGE_TITLE}} package
+implements these compatiblity modules as separate demand loadable @dfn{Linux} kernel modules.
+
+The @cite{@value{PACKAGE_TITLE}} package contains compatibility modules that were originally part of
+the @cite{Linux Fast-STREAMS} package.  They have been separated into an package independent from
+@cite{Linux Fast-STREAMS} for the purpose of provide some of the same capabilities to @cite{Linux
+STREAMS (LiS)} in advance of production releases of @cite{Linux Fast-STREAMS}.
+
+@page
+@node Rationale
+@section Rationale
+@cindex rationale
+
+The @cite{@value{PACKAGE_TITLE}} package is designed and implemented to be compatible with as many
+@cite{SVR 4.2 MP} based implementations of @dfn{STREAMS}a s possible.  This is done for several
+reasons:
+
+@enumerate
+@item Porting legacy drivers to @dfn{Linux}:
+
+Many legacy @dfn{STREAMS} drivers have been written and developed for @cite{SVR 4.2 MP} or
+@dfn{UNIX} systems based on @cite{SVR 4.2 MP}.  Remaining compatible with as many implementations as
+possible permits these legacy drivers to be easily ported from their native @dfn{UNIX} variant to
+the @cite{Linux Fast-STREAMS} environment, thus quickly porting these legacy drivers to @dfn{Linux}.
+
+@item Leverage of knowledge base:
+
+Many developers are familiar with one or another of the mainstream @dfn{UNIX} implementations of
+@cite{SVR 4.2 MP STREAMS}.  By remaining as compatibile as possible with all these implementations
+of @dfn{STREAMS} permits knowledge and expertise in the @dfn{UNIX} variant of @dfn{STREAMS} to be
+transferred and applied to @cite{Linux Fast-STREAMS} on @dfn{Linux}.
+
+@item Reverse portability:
+
+Because it is compatible as possible with other @dfn{STREAMS} implementations, @dfn{STREAMS} drivers
+and modules developed on @cite{Linux Fast-STREAMS} can easily be ported to other implementations if
+a set of compatiblity and portability guidelines are followed.  This allows @dfn{STREAMS} driver and
+modules developed on the @dfn{Linux} operating system to be used on branded @dfn{UNIX} systems with
+minimal porting and modification.
+
+@item Multiple baselines:
+
+Because the source code developed for @cite{Linux Fast-STREAMS} can remain quite close to that for
+other maintstream @dfn{UNIX} implementations of @cite{SVR 4.2 MP STREAMS}, it is possible to have
+multiple baselines for different architectures in the same source code files.  This eases the
+maintenance of @dfn{STREAMS} drivers and modules across @cite{Linux Fast-STREAMS} and other
+@dfn{UNIX} systems.
+
+@item Standardization:
+
+By being as compatible as possible with many @dfn{STREAMS} implementations as possible, @cite{Linux
+Fast-STREAMS} implements an ipso facto standard.  Unfortunately, the @url{http://www.opengroup.org/,
+OpenGroup} and @cite{POSIX} have been very lacking in the standardization of internal kernel
+interfaces such as @dfn{STREAMS}.  Maximum compatibility moves close to providing a standard for
+such interfaces.
+
+@item Licensing and Technology Binding
+
+By implementing an ipso facto standard, independent @dfn{STREAMS} drivers and modules written to the
+technical interface avoid being impinged upon by the GNU Public License under which @cite{Linux
+STREAMS} and @cite{Linux Fast-STREAMS} are distributed.
+
+@end enumerate
+
+
+
+@c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Reference
@@ -439,12 +500,172 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
+The @cite{@value{PACKAGE_TITLE}} package only includes drivers for the purpose of providing examples
+of the use of the utility functions included in the package, as well as to provide loadable drivers
+for the purpose of test suite execution.  If you are not interested in test suite execution, these
+drivers can be removed.
+
+@dfn{STREAMS} drivers included in the package are as follows:
+
+@table @file
+@item streams_aixdrv.ko
+@pgindex streams_aixdrv.ko
+an example driver for testing
+@cite{AIX 5L Version 5.1 Portable STREAMS Environment (PSE)}
+compatibility.
+@item streams_hpuxdrv.ko
+@pgindex streams_hpuxdrv.ko
+an example driver for testing
+@cite{HP-UX 11.0i v2 STREAMS/UX}
+compatibility.
+@item streams_irixdrv.ko
+@pgindex streams_irixdrv.ko
+an example driver for testing
+@cite{IRIX 6.5.17 STREAMS}
+compatibility.
+@item streams_lfsdrv.ko
+@pgindex streams_lfsdrv.ko
+an example driver for testing
+@cite{Linux Fast-STREAMS 0.7a.3}
+compatibility.
+@item streams_lisdrv.ko
+@pgindex streams_lisdrv.ko
+an example driver for testing
+@cite{Linux STREAMS LiS 2.16 and LiS 2.18}
+compatibility.
+@item streams_macdrv.ko
+@pgindex streams_macdrv.ko
+an example driver for testing
+@cite{Mac OS 9 OpenTransport 1.5r2}
+compatibility.
+@item streams_mpsdrv.ko
+@pgindex streams_mpsdrv.ko
+an example driver for testing
+@cite{Mentat Portable Streams (MPS)}
+compatibility.
+@item streams_osfdrv.ko
+@pgindex streams_osfdrv.ko
+an example driver for testing
+@cite{OSF/1.2 - Digital UNIX STREAMS}
+compatibility.
+@item streams_sundrv.ko
+@pgindex streams_sundrv.ko
+an example driver for testing
+@cite{Solaris 9/SunOS 5.9 (OpenSolaris) STREAMS}
+compatibility.
+@item streams_suxdrv.ko
+@pgindex streams_suxdrv.ko
+an example driver for testing
+@cite{SUPER-UX Release 9.2}
+compatibility.
+@item streams_svr3drv.ko
+@pgindex streams_svr3drv.ko
+an example driver for testing
+@cite{UNIX System V Release 3.2}
+compatibility.
+@item streams_svr4drv.ko
+@pgindex streams_svr4drv.ko
+an example driver for testing
+@cite{UNIX System V Release 4.2 MP}
+compatibility.
+@item streams_uw7drv.ko
+@pgindex streams_uw7drv.ko
+an example driver for testing
+@cite{UnixWare 7.1.3 (OpenUnix 8) STREAMS}
+compatibility.
+@item streams_uxpdrv.ko
+@pgindex streams_uxpdrv.ko
+an example driver for testing
+@cite{UXP/V V10L10 STREAMS V10}
+compatibility.
+@end table
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Modules
 @section Modules
 @cindex modules
+
+The @cite{@value{PACKAGE_TITLE}} package only includes modules for the purpose of providing examples
+of the use of the utility functions included in the package, as well as to provide loadable modules
+for the purpose of test suite execution.  If you are not interested in test suite execution, these
+modules can be removed.
+
+@dfn{STREAMS} modules included in the package are as follows:
+
+@table @file
+@item streams_aixmod.ko
+@pgindex streams_aixmod.ko
+an example module for testing
+@cite{AIX 5L Version 5.1 Portable STREAMS Environment (PSE)}
+compatibility.
+@item streams_hpuxmod.ko
+@pgindex streams_hpuxmod.ko
+an example module for testing
+@cite{HP-UX 11.0i v2 STREAMS/UX}
+compatibility.
+@item streams_irixmod.ko
+@pgindex streams_irixmod.ko
+an example module for testing
+@cite{IRIX 6.5.17 STREAMS}
+compatibility.
+@item streams_lfsmod.ko
+@pgindex streams_lfsmod.ko
+an example module for testing
+@cite{Linux Fast-STREAMS 0.7a.3}
+compatibility.
+@item streams_lismod.ko
+@pgindex streams_lismod.ko
+an example module for testing
+@cite{Linux STREAMS LiS 2.16 and LiS 2.18}
+compatibility.
+@item streams_macmod.ko
+@pgindex streams_macmod.ko
+an example module for testing
+@cite{Mac OS 9 OpenTransport 1.5r2}
+compatibility.
+@item streams_mpsmod.ko
+@pgindex streams_mpsmod.ko
+an example module for testing
+@cite{Mentat Portable Streams (MPS)}
+compatibility.
+@item streams_osfmod.ko
+@pgindex streams_osfmod.ko
+an example module for testing
+@cite{OSF/1.2 - Digital UNIX STREAMS}
+compatibility.
+@item streams_sunmod.ko
+@pgindex streams_sunmod.ko
+an example module for testing
+@cite{Solaris 9/SunOS 5.9 (OpenSolaris) STREAMS}
+compatibility.
+@item streams_suxmod.ko
+@pgindex streams_suxmod.ko
+an example module for testing
+@cite{SUPER-UX Release 9.2}
+compatibility.
+@item streams_svr3mod.ko
+@pgindex streams_svr3mod.ko
+an example module for testing
+@cite{UNIX System V Release 3.2}
+compatibility.
+@item streams_svr4mod.ko
+@pgindex streams_svr4mod.ko
+an example module for testing
+@cite{UNIX System V Release 4.2 MP}
+compatibility.
+@item streams_uw7mod.ko
+@pgindex streams_uw7mod.ko
+an example module for testing
+@cite{UnixWare 7.1.3 (OpenUnix 8) STREAMS}
+compatibility.
+@item streams_uxpmod.ko
+@pgindex streams_uxpmod.ko
+an example module for testing
+@cite{UXP/V V10L10 STREAMS V10}
+compatibility.
+@end table
 
 
 @c ----------------------------------------------------------------------------
@@ -453,6 +674,146 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Utilities
 @section Utilities
 @cindex utilities
+
+@menu
+* AIX Utilities::
+* HP-UX Utilities::
+* IRIX Utilities::
+* LfS Utilities::
+* LiS Utilities::
+* MacOT Utilities::
+* MPS Utilities::
+* OSF Utilities::
+* Solaris Utilities::
+* SUPER-UX Utilities::
+* SVR3 Utilities::
+* SVR4 Utilities::
+* UnixWare Utilities::
+* UXP/V Utilities::
+@end menu
+
+The @cite{@value{PACKAGE_TITLE}} package does not provide any system utilities of its own.  For a
+set of sytem utilities that are compatible across the same wide range of operating systems, use the
+@cite{OpenSS7 STREAMS Utilities} package.
+
+What the @cite{@value{PACKAGE_TITLE}} package does provide is a set of kernel modules that provide
+compatibility utilities to the STREAMS module or driver developer.  These kernel modules are as
+follows:
+
+@table @file
+@item streams_aixcompat.ko
+@pgindex streams_aixcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{AIX 5L Version 5.1 Portable STREAMS Environment (PSE)}
+compatibility.
+@item streams_hpuxcompat.ko
+@pgindex streams_hpuxcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{HP-UX 11.0i v2 STREAMS/UX}
+compatibility.
+@item streams_irixcompat.ko
+@pgindex streams_irixcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{IRIX 6.5.17 STREAMS}
+compatibility.
+@item streams_lfscompat.ko
+@pgindex streams_lfscompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{Linux Fast-STREAMS 0.7a.3}
+compatibility.
+@item streams_liscompat.ko
+@pgindex streams_liscompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{Linux STREAMS LiS 2.16 and LiS 2.18}
+compatibility.
+@item streams_maccompat.ko
+@pgindex streams_maccompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{Mac OS 9 OpenTransport 1.5r2}
+compatibility.
+@item streams_mpscompat.ko
+@pgindex streams_mpscompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{Mentat Portable Streams (MPS)}
+compatibility.
+@item streams_osfcompat.ko
+@pgindex streams_osfcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{OSF/1.2 - Digital UNIX STREAMS}
+compatibility.
+@item streams_suncompat.ko
+@pgindex streams_suncompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{Solaris 9/SunOS 5.9 (OpenSolaris) STREAMS}
+compatibility.
+@item streams_suxcompat.ko
+@pgindex streams_suxcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{SUPER-UX Release 9.2}
+compatibility.
+@item streams_svr3compat.ko
+@pgindex streams_svr3compat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{UNIX System V Release 3.2}
+compatibility.
+@item streams_svr4compat.ko
+@pgindex streams_svr4compat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{UNIX System V Release 4.2 MP}
+compatibility.
+@item streams_uw7compat.ko
+@pgindex streams_uw7compat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{UnixWare 7.1.3 (OpenUnix 8) STREAMS}
+compatibility.
+@item streams_uxpcompat.ko
+@pgindex streams_uxpcompat.ko
+@dfn{STREAMS} module writer utilities for
+@cite{UXP/V V10L10 STREAMS V10}
+compatibility.
+@end table
+
+@node AIX Utilities
+@subsection AIX Utilities
+
+@node HP-UX Utilities
+@subsection HP-UX Utilities
+
+@node IRIX Utilities
+@subsection IRIX Utilities
+
+@node LfS Utilities
+@subsection LfS Utilities
+
+@node LiS Utilities
+@subsection LiS Utilities
+
+@node MacOT Utilities
+@subsection MacOT Utilities
+
+@node MPS Utilities
+@subsection MPS Utilities
+
+@node OSF Utilities
+@subsection OSF Utilities
+
+@node Solaris Utilities
+@subsection Solaris Utilities
+
+@node SUPER-UX Utilities
+@subsection SUPER-UX Utilities
+
+@node SVR3 Utilities
+@subsection SVR3 Utilities
+
+@node SVR4 Utilities
+@subsection SVR4 Utilities
+
+@node UnixWare Utilities
+@subsection UnixWare Utilities
+
+@node UXP/V Utilities
+@subsection UXP/V Utilities
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -467,6 +828,861 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Conformance
 @chapter Conformance
 @cindex conformance
+
+@menu
+* STREAMS Compatibility::
+* Porting::
+@end menu
+
+@node STREAMS Compatibility
+@section STREAMS Compatibility
+@cindex compatibility
+
+@menu
+* SVR 3.2 Compatibility::
+* SVR 4.2 Compatibility::
+* MPS Compatibility::
+* AIX Compatibility::
+* HP-UX Compatibility::
+* IRIX Compatibility::
+* LfS Compatibility::
+* LiS Compatibility::
+* MacOT Compatibility::
+* OSF/1 Compatibility::
+* Solaris Compatibility::
+* SUX Compatibility::
+* UnixWare Compatibility::
+* UXP Compatibility::
+@end menu
+
+@cite{@value{PACKAGE_TITLE}} provides some degree of compatibility with other @dfn{STREAMS}
+implementation as follows:
+
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SVR 4.2 ES/MP}
+to ease portability and common comprehension,
+@pxref{SVR 4.2 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{AIX 5L Version 5.1}
+to ease portability and common comprehension,
+@pxref{AIX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{HP-UX 11.0i v2}
+to ease portability and common comprehension,
+@pxref{HP-UX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{OSF/1 1.2/Digital UNIX}
+to ease portability and common comprehension,
+@pxref{OSF/1 Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+to ease portability and common comprehension,
+@pxref{UnixWare Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{Solaris 9/SunOS 5.9}
+to ease portability and common comprehension,
+@pxref{Solaris Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{SUPER-UX}
+to ease portability and common comprehension,
+@pxref{SUX Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{UXP/V}
+to ease portability and common comprehension,
+@pxref{UXP Compatibility, , , SPG, STREAMS Programmer's Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides some degree of operational compatibility with
+@cite{LiS 2.16}
+to ease portability and common comprehension,
+@pxref{LiS Compatibility, , , SPG, STREAMS Programmer's Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, SPG, STREAMS Programmer's Guide}.
+
+@node SVR 3.2 Compatibility
+@subsection SVR 3.2 Compatibility
+@cindex SVR 3.2 compatibility
+@cindex compatibility SVR 3.2
+
+@menu
+* UNIX System V Release 3.2 Functions::
+@end menu
+
+Almost all of the @cite{SVR 3.2} functions have been continued into @cite{SVR 4}, with the exception
+of some backwards compatibility functions.  These functions are implemented in the @cite{UNIX System
+V Release 3.2 Compatibility Module}, @file{streams_svr3compat.ko}.  There are implemented in a
+separate module, because it is very unlikely that they will be used.  This module can be suppressed
+at configuration time.
+
+@multitable @columnfractions 0.20 0.80
+@item @command{cmpdev(9)} @tab --
+@item @command{emajor(9)} @tab -- get the external major number from a device number
+@item @command{eminor(9)} @tab -- get the external minor number from a device number
+@item @command{etoimajor(9)} @tab -- convert an external major number to an internal one
+@item @command{expdev(9)} @tab --
+@item @command{itoemajor(9)} @tab -- convert an internal major number to an external one
+@item @command{major(9)} @tab -- get the major number from a device number
+@item @command{makedev(9)} @tab -- make a device number from a major and minor number
+@item @command{minor(9)} @tab -- get the minor number from a device number
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item Only @cite{Solaris} and @cite{UXP/V} implement the @command{cmpdev(9)} and @command{expdev(9)}
+functions.
+
+@item The @cite{@value{PACKAGE_TITLE}} package does not support
+@command{cmddev(9)},
+@command{expdev(9)},
+@command{major(9)},
+@command{minor(9)} or
+@command{makedev(9)}
+functions.
+The
+@command{emajor(9)},
+@command{eminor(9)},
+@command{etoimajor(9)} and
+@command{itoemajor(9)}
+functions are implemented as part of the @cite{UNIX System V Release 3.2 Compatibiltiy Module},
+@file{streams_svr3compat.ko}.
+
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node UNIX System V Release 3.2 Functions
+@subsubsection UNIX System V Release 3.2 Functions
+
+@node SVR 4.2 Compatibility
+@subsection SVR 4.2 Compatibility
+@cindex SVR 4.2 compatibility
+@cindex compatibility SVR 4.2
+
+@menu
+* UNIX System V Release 4 STREAMS Functions::
+* UNIX System V Release 4 MP STREAMS Functions::
+* UNIX System V Release 4.0 DDI/DKI Functions::
+* UNIX System V Release 4.0 MP DDI/DKI Functions::
+* UNIX System V Release 4.2 DDI/DKI Functions::
+* UNIX System V Release 4.2 MP DDI/DKI Functions::
+@end menu
+
+@node UNIX System V Release 4 STREAMS Functions::
+@subsubsection UNIX System V Release 4 STREAMS Functions::
+
+Following are the @cite{UNIX System V Release 4.0 STREAMS} functions and their documented support in
+the various implementations with which this package is compatible.  The @cite{Linux Fast-STREAMS}
+package implements all of these functions in the core @file{streams.ko} kernel module.
+
+@multitable @columnfractions 0.20 0.80
+@item @command{adjmsg(9)} @tab -- trim a STREAMS message block
+@item @command{allocb(9)} @tab -- allocate a STREAMS message block
+@item @command{backq(9)} @tab -- find the previous STREAMS queue
+@item @command{bcanput(9)} @tab -- test a STREAMS queue for band flow control
+@item @command{bufcall(9)} @tab -- create a buffer callback
+@item @command{canenable(9)} @tab -- check if a queue can be enabled by @command{putq(9)}
+@item @command{canput(9)} @tab -- test a STREAMS queue for flow control
+@item @command{copyb(9)} @tab -- copy a STREAMS message block
+@item @command{copymsg(9)} @tab -- copy a STREAMS message block chain
+@item @command{datamsg(9)} @tab -- test if a STREAMS message block is a data message
+@item @command{dupb(9)} @tab -- duplicate a STREAMS message block
+@item @command{dupmsg(9)} @tab -- duplicate a STREAMS message block chain
+@item @command{enableok(9)} @tab -- permit STREAMS queue enabling with @command{putq(9)}
+@item @command{esballoc(9)} @tab -- allocate a STREAMS message block with external buffer
+@item @command{esbbcall(9)} @tab -- create an external buffer callback
+@item @command{flushband(9)} @tab -- flush a STREAMS queue band
+@item @command{flushq(9)} @tab -- flush a STREAMS queue
+@item @command{freeb(9)} @tab -- free a STREAMS message block
+@item @command{freemsg(9)} @tab -- free a STREAMS message block chain
+@item @command{getadmin(9)} @tab -- get a STREAMS module administrative function pointer
+@item @command{getmid(9)} @tab -- get a STREAMS module id
+@item @command{getq(9)} @tab -- get a message from a STREAMS queue
+@item @command{insq(9)} @tab -- insert a message into a STREAMS queue
+@item @command{linkb(9)} @tab -- chain a STREAMS message block onto another
+@item @command{msgdsize(9)} @tab -- calcuate data size of a STREAMS message chain
+@item @command{noenable(9)} @tab -- prohibit STREAMS queue enabling on @command{putq(9)}
+@item @command{OTHERQ(9)} @tab -- find the other STREAMS queue in a queue pair
+@item @command{pullupmsg(9)} @tab -- pull up a STREAMS message chain into a single message block
+@item @command{putbq(9)} @tab -- put a STREAMS message back on a queue
+@item @command{putctl1(9)} @tab -- put a 1 byte control message to a STREAMS queue
+@item @command{putctl(9)} @tab -- put a control message to a STREAMS queue
+@item @command{putnext(9)} @tab -- pass a message to the next STREAMS queue
+@item @command{putq(9)} @tab -- put a message on a STREAMS queue
+@item @command{qenable(9)} @tab -- enable a STREAMS queue
+@item @command{qreply(9)} @tab -- reply with a message to a STREAMS queue
+@item @command{qsize(9)} @tab -- count the messages on a STREAMS queue
+@item @command{RD(9)} @tab -- find the read queue of a STREAMS queue pair
+@item @command{rmvb(9)} @tab -- remove a message block from a STREAMS message chain
+@item @command{rmvq(9)} @tab -- remove a message from a STREAMS queue
+@item @command{SAMESTR(9)} @tab -- test if STREAMS queues belong to the same stream
+@item @command{splstr(9)} @tab -- set software priority level for STREAMS
+@item @command{strlog(9)} @tab -- log to the STREAMS logger
+@item @command{strqget(9)} @tab -- get attributes of the STREAMS stream head
+@item @command{strqset(9)} @tab -- set attributes of the STREAMS stream head
+@item @command{testb(9)} @tab -- test if a STREAMS message block can be allocated
+@item @command{unbufcall(9)} @tab -- cancel a STREAMS buffer callback
+@item @command{unlinkb(9)} @tab -- remove a message block from a STREAMS message chain
+@item @command{WR(9)} @tab -- find the write queue of a STREAMS queue pair
+@end multitable
+
+@subsubheading Notes:
+
+@itemize --
+@item @command{canenable(9)} is really an @cite{SVR 3.2} compatibility function that should not be
+used with @cite{SVR 4} @dfn{STREAMS} programs.
+
+@item For the most part, the @cite{UNIX System V Release 4.0 STREAMS} functions are universally
+implemented.  Exceptions to this include @command{backq(9)}, which appears to be an oversight on the
+part of @cite{SUPER-UX} documentation; @command{esbbcall(9)}, that can be emulated by calling
+@command{bufcall(9)} with a size of zero; @command{getadmin(9)}, @command{getmid(9)} and
+@command{strlog(9)}, which seems to be more of a @cite{Solaris} and @cite{LiS} problem;
+@command{SAMESTR(9)}, which is only useful on systems with @dfn{STREAMS} support for pipes and
+FIFOs.
+
+@item @cite{LiS} always misses what @cite{Solaris} misses.  That is probably not a coincidence.
+
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+Because all of these functions are supported by the core @cite{Linux Fast-STREAMS} package, and all
+but @command{getadmin(9)}, @command{getmid(9)} and @command{strlog(9)} are supported by the core
+@cite{Linux STREAMS (LiS)} package, these functions are not provided in the @cite{SVR 4.2
+Compatibility Module}, @file{streams_svr4compat.ko}.  The three functions missing from @cite{LiS}
+are implemented in the @cite{Linux Fast-STREAMS Compatibility Module}, @file{streams_lfscompat.ko},
+that is only built and installed against @cite{LiS}.
+
+@node UNIX System V Release 4 MP STREAMS Functions
+@subsubsection UNIX System V Release 4 MP STREAMS Functions
+
+@cite{UNIX System V Release 4.0 Multiprocessor (MP) STREAMS} fuctions and their documented support
+in the various implementations with which this package is compatible.  @cite{Linux Fast-STREAMS}
+implements most of these functions in the core @file{streams.ko} kernel module.  The
+@command{MPSTR_*} locking functions are part of the @cite{SVR 4.2 MP} compatibility module,
+@file{streams_svr4compat.ko} because they only have documented support in @cite{UnixWare}.
+
+@multitable @columnfractions 0.30 0.70
+@item @command{bcanputnext(9)} @tab -- test band flow control from the next STREAMS queue
+@item @command{canputnext(9)} @tab -- test flow control from the next STREAMS queue
+@item @command{freezestr(9)} @tab -- acquire exclusive access to a STREAMS queue
+@item @command{msgpullup(9)} @tab -- pull up bytes in a message into a new message block
+@item @command{pcmsg(9)} @tab -- test a message type for priority
+@item @command{put(9)} @tab -- put a message on a STREAMS queue (invoking its put procedure)
+@item @command{putnextctl1(9)} @tab -- put a 1 byte control message to the next STREAMS queue
+@item @command{putnextctl(9)} @tab -- put a control message to the next STREAMS queue
+@item @command{qprocsoff(9)} @tab -- disable STREAMS queue procedures
+@item @command{qprocson(9)} @tab -- enable STREAMS queue procedures
+@item @command{unfreezestr(9)} @tab -- release exclusive access from a STREAMS queue
+@item @command{MPSTR_QLOCK(9)} @tab -- lock a STREAMS queue for exclusive access
+@item @command{MPSTR_QRELE(9)} @tab -- unlock a STREAMS queue from exclusive access
+@item @command{MPSTR_STPLOCK(9)} @tab -- lock a STREAMS stream head for exclusive access
+@item @command{MPSTR_STPRELE(9)} @tab -- unlock a STREAMS stream head from exclusive access
+@end multitable
+
+@subsubheading Notes:
+
+@itemize --
+@item Although they are @dfn{STREAMS} functions, nobody other than @cite{UnixWare} mentions the
+@command{MPSTR_*} functions, so they are placed in the @cite{SVR 4.2 MP} compatibility module,
+@file{streams_svr4compat}.
+
+@item The @command{pcmsg(9)} function seems to have been missed by a number of implementations.
+
+@item @cite{LiS} always misses what @cite{Solaris} misses.  That is probably not a coincidence.
+
+@item @cite{Lis} did not have anything resembling a proper @command{qprocson(9)} or
+@command{qprocsoff(9)} implementation until recently.  @cite{LiS} did not have any
+@command{freezestr(9)} or @command{unfreezestr(9)} implementation until recently.  Neither
+implementations are fully functional or in accordance with @dfn{STREAMS} documentation, making them
+almost unusable.
+
+@item @cite{AIX}, @cite{OSF/1} and @cite{UXP/V} do not document any of these functions, which is
+bad: these are the MP functions for @dfn{STREAMS}.
+@end itemize
+
+@node UNIX System V Release 4.0 DDI/DKI Functions
+@subsubsection UNIX System V Release 4.0 DDI/DKI Functions
+
+@multitable @columnfractions 0.30 0.70
+@item @command{ASSERT(9)} @tab --
+@item @command{bcopy(9)} @tab --
+@item @command{biodone(9)} @tab --
+@item @command{biowait(9)} @tab --
+@item @command{bp_mapin(9)} @tab --
+@item @command{bp_mapout(9)} @tab --
+@item @command{brelse(9)} @tab --
+@item @command{btop(9)} @tab --
+@item @command{btopr(9)} @tab --
+@item @command{bzero(9)} @tab --
+@item @command{clrbuf(9)} @tab --
+@item @command{cmn_err(9)} @tab --
+@item @command{copyin(9)} @tab --
+@item @command{copyout(9)} @tab --
+@item @command{delay(9)} @tab --
+@item @command{dma_disable(9)} @tab --
+@item @command{dma_enable(9)} @tab --
+@item @command{dma_free_buf(9)} @tab --
+@item @command{dma_free_cb(9)} @tab --
+@item @command{dma_get_best_mode(9)} @tab --
+@item @command{dma_get_buf(9)} @tab --
+@item @command{dma_get_cb(9)} @tab --
+@item @command{dma_pageio(9)} @tab --
+@item @command{dma_prog(9)} @tab --
+@item @command{dma_stop(9)} @tab --
+@item @command{dma_swsetup(9)} @tab --
+@item @command{dma_swstart(9)} @tab --
+@item @command{drv_getparm(9)} @tab --
+@item @command{drv_hztousec(9)} @tab --
+@item @command{drv_priv(9)} @tab --
+@item @command{drv_setparm(9)} @tab --
+@item @command{drv_usectohz(9)} @tab --
+@item @command{drv_usecwait(9)} @tab --
+@item @command{freerbuf(9)} @tab --
+@item @command{geteblk(9)} @tab --
+@item @command{getemajor(9)} @tab --
+@item @command{geteminor(9)} @tab --
+@item @command{geterror(9)} @tab --
+@item @command{getmajor(9)} @tab --
+@item @command{getminor(9)} @tab --
+@item @command{getrbuf(9)} @tab --
+@item @command{hat_getkpfnum(9)} @tab --
+@item @command{hat_getppfnum(9)} @tab --
+@item @command{inb(9)} @tab --
+@item @command{inl(9)} @tab --
+@item @command{inw(9)} @tab --
+@item @command{kmem_alloc(9)} @tab --
+@item @command{kmem_fast_alloc(9)} @tab --
+@item @command{kmem_free(9)} @tab --
+@item @command{kmem_zalloc(9)} @tab --
+@item @command{makedevice(9)} @tab --
+@item @command{max(9)} @tab --
+@item @command{min(9)} @tab --
+@item @command{ngeteblk(9)} @tab --
+@item @command{outb(9)} @tab --
+@item @command{outl(9)} @tab --
+@item @command{outw(9)} @tab --
+@item @command{page_numtopp(9)} @tab --
+@item @command{page_pptonum(9)} @tab --
+@item @command{physiock(9)} @tab --
+@item @command{physmap(9)} @tab --
+@item @command{physmap_free(9)} @tab --
+@item @command{pollwakeup(9)} @tab --
+@item @command{pptophys(9)} @tab --
+@item @command{psignal(9)} @tab --
+@item @command{ptob(9)} @tab --
+@item @command{rdam_filter(9)} @tab --
+@item @command{repinsb(9)} @tab --
+@item @command{repinsd(9)} @tab --
+@item @command{repinsw(9)} @tab --
+@item @command{repoutsb(9)} @tab --
+@item @command{repoutsd(9)} @tab --
+@item @command{repoutsw(9)} @tab --
+@item @command{rmalloc(9)} @tab --
+@item @command{rmfree(9)} @tab --
+@item @command{rmsetwant(9)} @tab --
+@item @command{sleep(9)} @tab --
+@item @command{spl0(9)} @tab --
+@item @command{spl1(9)} @tab --
+@item @command{spl2(9)} @tab --
+@item @command{spl3(9)} @tab --
+@item @command{spl4(9)} @tab --
+@item @command{spl5(9)} @tab --
+@item @command{spl6(9)} @tab --
+@item @command{spl7(9)} @tab --
+@item @command{spl(9)} @tab --
+@item @command{splbase(9)} @tab --
+@item @command{spldisk(9)} @tab --
+@item @command{splhi(9)} @tab --
+@item @command{spltimeout(9)} @tab --
+@item @command{spltty(9)} @tab --
+@item @command{splx(9)} @tab --
+@item @command{timeout(9)} @tab --
+@item @command{uiomove(9)} @tab --
+@item @command{untimeout(9)} @tab --
+@item @command{ureadc(9)} @tab --
+@item @command{useracc(9)} @tab --
+@item @command{uwritec(9)} @tab --
+@item @command{vtop(9)} @tab --
+@item @command{wakeup(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node UNIX System V Release 4.0 MP DDI/DKI Functions
+@subsubsection UNIX System V Release 4.0 MP DDI/DKI Functions
+
+@multitable @columnfractions 0.30 0.70
+@item @command{dtimeout(9)} @tab --
+@item @command{itimeout(9)} @tab --
+@item @command{rmallocmap(9)} @tab --
+@item @command{rmalloc_wait(9)} @tab --
+@item @command{rmfreemap(9)} @tab --
+@item @command{bioerror(9)} @tab --
+@item @command{getnextpg(9)} @tab --
+@item @command{kvtoppid(9)} @tab --
+@item @command{phalloc(9)} @tab --
+@item @command{phfree(9)} @tab --
+@item @command{phystoppid(9)} @tab --
+@item @command{proc_ref(9)} @tab --
+@item @command{proc_signal(9)} @tab --
+@item @command{proc_unref(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node UNIX System V Release 4.2 DDI/DKI Functions
+@subsubsection UNIX System V Release 4.2 DDI/DKI Functions
+
+@multitable @columnfractions 0.30 0.70
+@item @command{drv_gethardware(9)} @tab --
+@item @command{mod_drvattach(9)} @tab --
+@item @command{mod_drvdetach(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node UNIX System V Release 4.2 MP DDI/DKI Functions
+@subsubsection UNIX System V Release 4.2 MP DDI/DKI Functions
+
+@multitable @columnfractions 0.30 0.70
+@item @command{bcb_alloc(9)} @tab --
+@item @command{bcb_free(9)} @tab --
+@item @command{bcmp(9)} @tab --
+@item @command{buf_breakup(9)} @tab --
+@item @command{cm_addval(9)} @tab --
+@item @command{cm_AT_putconf(9)} @tab --
+@item @command{cm_delval(9)} @tab --
+@item @command{cm_devconfig_size(9)} @tab --
+@item @command{cm_getbrdkey(9)} @tab --
+@item @command{cm_getnbrd(9)} @tab --
+@item @command{cm_getval(9)} @tab --
+@item @command{cm_getversion(9)} @tab --
+@item @command{cm_intr_attach(9)} @tab --
+@item @command{cm_intr_detach(9)} @tab --
+@item @command{cm_read_devconfig(9)} @tab --
+@item @command{cm_write_devconfig(9)} @tab --
+@item @command{dma_cascade(9)} @tab --
+@item @command{dma_physreq(9)} @tab --
+@item @command{drv_mmap(9)} @tab --
+@item @command{drv_munmap(9)} @tab --
+@item @command{getpl(9)} @tab --
+@item @command{iobitmapctl(9)} @tab --
+@item @command{kmem_alloc_physcontig(9)} @tab --
+@item @command{kmem_free_physcontig(9)} @tab --
+@item @command{KS_HOLDLOCKS(9)} @tab --
+@item @command{LOCK(9)} @tab --
+@item @command{LOCK_ALLOC(9)} @tab --
+@item @command{LOCK_DEALLOC(9)} @tab --
+@item @command{LOCK_OWNED(9)} @tab --
+@item @command{met_ds_alloc_stats(9)} @tab --
+@item @command{met_ds_dealloc_stats(9)} @tab --
+@item @command{met_ds_dequeued(9)} @tab --
+@item @command{met_ds_hist_stats(9)} @tab --
+@item @command{met_ds_iodone(9)} @tab --
+@item @command{met_ds_queued(9)} @tab --
+@item @command{ovbcopy(9)} @tab --
+@item @command{physreq_alloc(9)} @tab --
+@item @command{physreq_free(9)} @tab --
+@item @command{physreq_prep(9)} @tab --
+@item @command{proc_valid(9)} @tab --
+@item @command{RW_ALLOC(9)} @tab --
+@item @command{RW_DEALLOC(9)} @tab --
+@item @command{RW_RDLOCK(9)} @tab --
+@item @command{RW_TRYRDLOCK(9)} @tab --
+@item @command{RW_TRYWRLOCK(9)} @tab --
+@item @command{RW_UNLOCK(9)} @tab --
+@item @command{RW_WRLOCK(9)} @tab --
+@item @command{SLEEP_ALLOC(9)} @tab --
+@item @command{SLEEP_DEALLOC(9)} @tab --
+@item @command{SLEEP_LOCK(9)} @tab --
+@item @command{SLEEP_LOCKAVAIL(9)} @tab --
+@item @command{SLEEP_LOCKOWNED(9)} @tab --
+@item @command{SLEEP_LOCK_SIG(9)} @tab --
+@item @command{SLEEP_TRYLOCK(9)} @tab --
+@item @command{SLEEP_UNLOCK(9)} @tab --
+@item @command{strcat(9)} @tab --
+@item @command{strcmp(9)} @tab --
+@item @command{strcpy(9)} @tab --
+@item @command{strlen(9)} @tab --
+@item @command{strncat(9)} @tab --
+@item @command{strncmp(9)} @tab --
+@item @command{strncpy(9)} @tab --
+@item @command{SV_ALLOC(9)} @tab --
+@item @command{SV_BROADCAST(9)} @tab --
+@item @command{SV_DEALLOC(9)} @tab --
+@item @command{SV_SIGNAL(9)} @tab --
+@item @command{SV_WAIT(9)} @tab --
+@item @command{SV_WAIT_SIG(9)} @tab --
+@item @command{TRYLOCK(9)} @tab --
+@item @command{UNLOCK(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node MPS Compatibility
+@subsection MPS Compatibility
+@cindex MPS compatibility
+@cindex compatibility MPS
+
+@menu
+* Mentat Portable Streams (MPS) Utility Functions::
+@end menu
+
+@node Mentat Portable Streams (MPS) Utility Functions
+@subsubsection Mentat Portable Streams (MPS) Utility Functions
+
+The @cite{Mentat Portable Streams (MPS)} utility functions are important because they exist on many
+@cite{UNIX} systems.  @cite{AIX}, @cite{HP-UX}, @cite{OSF/1.2} and @cite{Mac OpenTransport} are
+based on @cite{MPS}.  Almost all variants use the @cite{Mentat} TCP/IP implementations, and
+therefore have implementations of many of these functions internally if not exposed.  @cite{AIX},
+@cite{OSF/1.2} and especially @cite{Mac OpenTransport} expose and document most (if not all) of
+these functions.   The @cite{@value{PACKAGE_TITLE}} package supports all of these functions.
+
+@multitable @columnfractions 0.30 0.70
+@item @command{mi_alloc(9)} @tab --
+@item @command{mi_allocq(9)} @tab --
+@item @command{mi_alloc_sleep(9)} @tab --
+@item @command{mi_attach(9)} @tab --
+@item @command{mi_bcmp(9)} @tab --
+@item @command{mi_bufcall(9)} @tab --
+@item @command{mi_close_comm(9)} @tab --
+@item @command{mi_close_detached(9)} @tab --
+@item @command{mi_close_free(9)} @tab --
+@item @command{mi_close_unlink(9)} @tab --
+@item @command{mi_copy_done(9)} @tab --
+@item @command{mi_copyin(9)} @tab --
+@item @command{mi_copyin_n(9)} @tab --
+@item @command{mi_copyout(9)} @tab --
+@item @command{mi_copyout_alloc(9)} @tab --
+@item @command{mi_copy_set_rval(9)} @tab --
+@item @command{mi_copy_state(9)} @tab --
+@item @command{mi_detach(9)} @tab --
+@item @command{mi_first_dev_ptr(9)} @tab --
+@item @command{mi_first_ptr(9)} @tab --
+@item @command{mi_free(9)} @tab --
+@item @command{mi_freeq(9)} @tab --
+@item @command{mi_mpprintf(9)} @tab --
+@item @command{mi_mpprintf_nr(9)} @tab --
+@item @command{mi_next_dev_ptr(9)} @tab --
+@item @command{mi_next_ptr(9)} @tab --
+@item @command{mi_offset_param(9)} @tab --
+@item @command{mi_offset_paramc(9)} @tab --
+@item @command{mi_open_alloc(9)} @tab --
+@item @command{mi_open_alloc_sleep(9)} @tab --
+@item @command{mi_open_comm(9)} @tab --
+@item @command{mi_open_detached(9)} @tab --
+@item @command{mi_open_link(9)} @tab --
+@item @command{mi_prev_ptr(9)} @tab --
+@item @command{mi_reallocb(9)} @tab --
+@item @command{mi_reuse_proto(9)} @tab --
+@item @command{mi_set_sth_copyopt(9)} @tab --
+@item @command{mi_set_sth_hiwat(9)} @tab --
+@item @command{mi_set_sth_lowat(9)} @tab --
+@item @command{mi_set_sth_maxblk(9)} @tab --
+@item @command{mi_set_sth_wroff(9)} @tab --
+@item @command{mi_sprintf(9)} @tab --
+@item @command{mi_sprintf_putc(9)} @tab --
+@item @command{mi_strcmp(9)} @tab --
+@item @command{mi_strlen(9)} @tab --
+@item @command{mi_strlog(9)} @tab --
+@item @command{mi_strol(9)} @tab --
+@item @command{mi_timer(9)} @tab --
+@item @command{mi_timer_alloc(9)} @tab --
+@item @command{mi_timer_cancel(9)} @tab --
+@item @command{mi_timer_free(9)} @tab --
+@item @command{mi_timer_move(9)} @tab --
+@item @command{mi_timer_q_switch(9)} @tab --
+@item @command{mi_timer_stop(9)} @tab --
+@item @command{mi_timer_valid(9)} @tab --
+@item @command{mi_zalloc(9)} @tab --
+@item @command{mi_zalloc_sleep(9)} @tab --
+@item @command{mps_become_writer(9)} @tab --
+@item @command{mps_intr_disable(9)} @tab --
+@item @command{mps_intr_enable(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+
+@itemize --
+@item @cite{Mac OpenTransport} documents almost all of these functions.  The internal
+implementations of some @dfn{UNIX} variants differ from the @cite{Mac OpenTransport} documentation
+in name and prototype.
+
+@item For the functions that are exposed by various implementations and their exact names and
+prototypes, see the individual variant sections.
+
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node AIX Compatibility
+@subsection AIX Compatibility
+@cindex AIX compatibility
+@cindex compatibility AIX
+
+@menu
+* AIX 5L Version 5.1 Portable STREAMS Environment (PSE) STREAMS Functions::
+@end menu
+
+@node AIX 5L Version 5.1 Portable STREAMS Environment (PSE) STREAMS Functions
+@subsubsection AIX 5L Version 5.1 Portable STREAMS Environment (PSE) STREAMS Functions
+
+@multitable @columnfractions 0.30 0.70
+@item @command{mi_bufcall(9)} @tab --
+@item @command{mi_close_comm(9)} @tab --
+@item @command{mi_next_ptr(9)} @tab --
+@item @command{mi_open_comm(9)} @tab --
+@item @command{putctl2(9)} @tab --
+@item @command{splstr(9)} @tab --
+@item @command{splx(9)} @tab --
+@item @command{str_install(9)} @tab --
+@item @command{unweldq(9)} @tab --
+@item @command{wantio(9)} @tab --
+@item @command{wantmsg(9)} @tab --
+@item @command{weldq(9)} @tab --
+@end multitable
+
+@subsubheading Notes:
+@itemize --
+@item For specific compatibility notes, see the individual manual pages for these functions.
+@end itemize
+
+@node HP-UX Compatibility
+@subsection HP-UX Compatibility
+@cindex HP-UX compatibility
+@cindex compatibility HP-UX
+
+@node IRIX Compatibility
+@subsection IRIX Compatibility
+@cindex IRIX compatibility
+@cindex compatibility IRIX
+
+@node LfS Compatibility
+@subsection LfS Compatibility
+@cindex LfS compatibility
+@cindex compatibility LfS
+
+@node LiS Compatibility
+@subsection LiS Compatibility
+@cindex LiS compatibility
+@cindex compatibility LiS
+
+@node MacOT Compatibility
+@subsection MacOT Compatibility
+@cindex MacOT compatibility
+@cindex compatibility MacOT
+
+@node OSF/1 Compatibility
+@subsection OSF/1 Compatibility
+@cindex OSF/1 compatibility
+@cindex compatibility OSF/1
+
+@node Solaris Compatibility
+@subsection Solaris Compatibility
+@cindex Solaris compatibility
+@cindex compatibility Solaris
+
+@node SUX Compatibility
+@subsection SUX Compatibility
+@cindex SUX compatibility
+@cindex compatibility SUX
+
+@node UnixWare Compatibility
+@subsection UnixWare Compatibility
+@cindex UnixWare compatibility
+@cindex compatibility UnixWare
+
+@node UXP Compatibility
+@subsection UXP Compatibility
+@cindex UXP compatibility
+@cindex compatibility UXP
+
+
+@node Porting
+@section Porting
+@cindex porting
+
+@menu
+* SVR 3.2 Porting::
+* SVR 4.2 Porting::
+* MPS Porting::
+* AIX Porting::
+* HP-UX Porting::
+* IRIX Porting::
+* LfS Porting::
+* LiS Porting::
+* MacOT Porting::
+* OSF/1 Porting::
+* Solaris Porting::
+* SUX Porting::
+* UnixWare Porting::
+* UXP Porting::
+@end menu
+
+@table @cite
+@item --- SVR 4.2 ES/MP
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SVR 4.2 ES/MP}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- AIX 5L Version 5.1
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{AIX 5L Version 5.1}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- HP-UX 11.0i v2
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{HP-UX 11.0i v2}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- OSF/1 1.2/Digital UNIX/True 64
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{OSF/1 1.2/Digital UNIX/True 64}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UnixWare 7.1.3 (OpenUnix 8)
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UnixWare 7.1.3 (OpenUnix 8)}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- Solaris 9/SunOS 5.9
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{Solaris 9/SunOS 5.9}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- SUPER-UX
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{SUPER-UX}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- UXP/V
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{UXP/V}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
+
+@item --- LiS-2.16.18
+@cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
+@cite{LiS-2.16.18}
+and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
+Portability considerations are mantained in a separate manual:
+@pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
+@end table
+
+For additional details,
+@pxref{Top, , About This Manual, proting, Linux Fast-STREAMS Porting Guide}.
+
+@node SVR 3.2 Porting
+@subsection SVR 3.2 Porting
+@cindex SVR 3.2 porting
+@cindex porting from SVR 3.2
+
+@node SVR 4.2 Porting
+@subsection SVR 4.2 Porting
+@cindex SVR 4.2 porting
+@cindex porting from SVR 4.2
+
+@node MPS Porting
+@subsection MPS Porting
+@cindex MPS porting
+@cindex porting from MPS
+
+@node AIX Porting
+@subsection AIX Porting
+@cindex AIX porting
+@cindex porting from AIX
+
+@node HP-UX Porting
+@subsection HP-UX Porting
+@cindex HP-UX porting
+@cindex porting from HP-UX
+
+@node IRIX Porting
+@subsection IRIX Porting
+@cindex IRIX porting
+@cindex porting from IRIX
+
+@node LfS Porting
+@subsection LfS Porting
+@cindex LfS porting
+@cindex porting from LfS
+
+@node LiS Porting
+@subsection LiS Porting
+@cindex LiS porting
+@cindex porting from LiS
+
+@node MacOT Porting
+@subsection MacOT Porting
+@cindex MacOT porting
+@cindex porting from MacOT
+
+@node OSF/1 Porting
+@subsection OSF/1 Porting
+@cindex OSF/1 porting
+@cindex porting from OSF/1
+
+@node Solaris Porting
+@subsection Solaris Porting
+@cindex Solaris porting
+@cindex porting from Solaris
+
+@node SUX Porting
+@subsection SUX Porting
+@cindex SUX porting
+@cindex porting from SUX
+
+@node UnixWare Porting
+@subsection UnixWare Porting
+@cindex UnixWare porting
+@cindex porting from UnixWare
+
+@node UXP Porting
+@subsection UXP Porting
+@cindex UXP porting
+@cindex porting from UXP
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

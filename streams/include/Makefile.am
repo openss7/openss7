@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/05 22:46:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/08 12:17:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:17:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -145,7 +145,8 @@ if CONFIG_STREAMS_COMPAT_UW7_MODULE
 nobase_pkginclude_HEADERS	+= sys/uw7ddi.h
 endif
 
-nobase_nodist_pkginclude_HEADERS =
+nobase_nodist_pkginclude_HEADERS = \
+	sys/streams/version.h
 
 ## PKG_BUILD_ARCH
 endif

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/07 04:12:55 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/08 12:03:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,10 +48,9 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
 #
 # =============================================================================
-
 
 # =============================================================================
 # _INET
@@ -65,20 +64,24 @@ AC_DEFUN([_INET], [dnl
     _INET_OPTIONS
     _INET_SETUP
     AC_SUBST([INET_CPPFLAGS])
+dnl AC_SUBST([INET_LDADD])
     AC_SUBST([INET_MANPATH])
+    AC_SUBST([INET_VERSION])
 ])# _INET
 # =============================================================================
 
 # =============================================================================
-# 
+# _INET_OPTIONS
+# -----------------------------------------------------------------------------
+# allow the user to specify the header file location
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_OPTIONS], [dnl
     AC_ARG_WITH([inet],
-	AC_HELP_STRING([--with-inet=HEADERS],
-	    [specify the INET header file directory.
-	    @<:@default=$INCLUDEDIR/strinet@:>@]),
-	[with_inet="$withval"],
-	[with_inet=''])
+		AC_HELP_STRING([--with-inet=HEADERS],
+			       [specify the INET header file directory.
+				@<:@default=$INCLUDEDIR/strinet@:>@]),
+		[with_inet="$withval"],
+		[with_inet=''])
 ])# _INET_OPTIONS
 # =============================================================================
 
@@ -96,9 +99,11 @@ AC_DEFUN([_INET_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS INET header files.  The package
-    # normally requires INET header files to compile.
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS INET header
+    # files (or both) to compile.
     AC_CACHE_CHECK([for inet include directory], [inet_cv_includes], [dnl
 	if test ":${with_inet:-no}" != :no -a :"${with_inet:-no}" != :yes ;  then
+	    # First thing to do is to take user specified director(ies)
 	    inet_cv_includes="$with_inet"
 	fi
 	inet_what="sys/xti_inet.h"
@@ -106,13 +111,17 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    inet_here=`pwd`
-	    for inet_dir in $srcdir/strinet*/src/include $srcdir/../strinet*/src/include
+	    for inet_dir in \
+		$srcdir/strinet*/src/include \
+		$srcdir/../strinet*/src/include \
+		../_build/$srcdir/../../strinet*/src/include \
+		../_build/$srcdir/../../../strinet*/src/include
 	    do
-		if test -d $inet_dir -a -r $inet_dir/$inet_what
-		then
+		if test -d $inet_dir -a -r $inet_dir/$inet_what ; then
 		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    inet_dir=`(cd $inet_dir; pwd)`
 		    inet_cv_includes="$inet_dir $inet_bld"
+dnl		    inet_cv_ldadd=`echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
@@ -125,33 +134,33 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		${DESTDIR}${rootdir}/usr/include/strinet
 		${DESTDIR}${rootdir}/usr/local/include/strinet
 		${DESTDIR}${rootdir}/usr/src/strinet/src/include
-		${DESTDIR}${oldincludedir}/strinet
-		${DESTDIR}/usr/include/strinet
-		${DESTDIR}/usr/local/include/strinet
-		${DESTDIR}/usr/src/strinet/src/include
 		${DESTDIR}${includedir}/strxnet
 		${DESTDIR}${rootdir}${oldincludedir}/strxnet
 		${DESTDIR}${rootdir}/usr/include/strxnet
 		${DESTDIR}${rootdir}/usr/local/include/strxnet
 		${DESTDIR}${rootdir}/usr/src/strxnet/src/include
-		${DESTDIR}${oldincludedir}/strxnet
-		${DESTDIR}/usr/include/strxnet
-		${DESTDIR}/usr/local/include/strxnet
-		${DESTDIR}/usr/src/strxnet/src/include
 		${DESTDIR}${includedir}/streams
 		${DESTDIR}${rootdir}${oldincludedir}/streams
 		${DESTDIR}${rootdir}/usr/include/streams
 		${DESTDIR}${rootdir}/usr/local/include/streams
 		${DESTDIR}${rootdir}/usr/src/streams/src/include
-		${DESTDIR}${oldincludedir}/streams
-		${DESTDIR}/usr/include/streams
-		${DESTDIR}/usr/local/include/streams
-		${DESTDIR}/usr/src/streams/include
 		${DESTDIR}${includedir}/LiS
 		${DESTDIR}${rootdir}${oldincludedir}/LiS
 		${DESTDIR}${rootdir}/usr/include/LiS
 		${DESTDIR}${rootdir}/usr/local/include/LiS
 		${DESTDIR}${rootdir}/usr/src/LiS/include
+		${DESTDIR}${oldincludedir}/strinet
+		${DESTDIR}/usr/include/strinet
+		${DESTDIR}/usr/local/include/strinet
+		${DESTDIR}/usr/src/strinet/src/include
+		${DESTDIR}${oldincludedir}/strxnet
+		${DESTDIR}/usr/include/strxnet
+		${DESTDIR}/usr/local/include/strxnet
+		${DESTDIR}/usr/src/strxnet/src/include
+		${DESTDIR}${oldincludedir}/streams
+		${DESTDIR}/usr/include/streams
+		${DESTDIR}/usr/local/include/streams
+		${DESTDIR}/usr/src/streams/include
 		${DESTDIR}${oldincludedir}/LiS
 		${DESTDIR}/usr/include/LiS
 		${DESTDIR}/usr/local/include/LiS
@@ -190,6 +199,30 @@ dnl properly, so we use defines.
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-inet'"
 	fi
     fi
+    AC_CACHE_CHECK([for inet version], [inet_cv_version], [dnl
+	inet_what="sys/strinet/version.h"
+	inet_file=
+	if test -n "$inet_cv_includes" ; then
+	    for inet_dir in $inet_cv_includes ; do
+		# old place for version
+		if test -f "$inet_dir/$inet_what" ; then
+		    inet_file="$inet_dir/$inet_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
+			inet_file="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${inet_file:-no} != :no ; then
+	    inet_cv_version=`grep '#define.*\<STRINET_VERSION\>' $inet_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
 ])# _INET_CHECK_HEADERS
 # =============================================================================
 
@@ -200,7 +233,9 @@ AC_DEFUN([_INET_DEFINES], [dnl
     for inet_include in $inet_cv_includes ; do
 	INET_CPPFLAGS="${INET_CPPFLAGS}${INET_CPPFLAGS:+ }-I${inet_include}"
     done
+dnl INET_LDADD="$inet_cv_ldadd"
     INET_MANPATH="$inet_cv_manpath"
+    INET_VERSION="$inet_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strinet for
 	that matter.

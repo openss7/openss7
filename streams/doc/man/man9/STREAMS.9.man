@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.25 2005/07/07 20:29:36 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.26 2005/07/08 13:16:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/07 20:29:36 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/08 13:16:06 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -1825,9 +1825,9 @@ Function/Macro      :Sec:LfS:AIX:HUX:MOT:OSF:SGI:Sun:SUX:UW7:UXP:LiS
 _
 dtimeout            :(9):svr: - : - : - : - :yes: - : - :yes: - : - \"4mp
 itimeout            :(9):svr: - :yes: - : - :yes: - : - :yes: - : - \"4mp
-rmallocmap          :(9): - : - : - : - : - : - :yes: - :yes: - : - \"4mp
-rmalloc_wait        :(9): - : - : - : - : - : - :yes: - :yes: - : - \"4mp
-rmfreemap           :(9): - : - : - : - : - : - :yes: - :yes: - : - \"4mp
+rmallocmap          :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4mp
+rmalloc_wait        :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4mp
+rmfreemap           :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4mp
 _
 bioerror            :(9): - : - : - : - : - :yes:yes: - :yes: - : - \"4mp
 getnextpg           :(9): - : - : - : - : - :yes: - : - :yes: - : - \"4mp

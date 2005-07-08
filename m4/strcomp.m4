@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/07 04:12:55 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/08 12:15:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:15:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,6 +80,7 @@ dnl
     AC_SUBST([STRCOMP_MODMAP])
     AC_SUBST([STRCOMP_SYMVER])
     AC_SUBST([STRCOMP_MANPATH])
+    AC_SUBST([STRCOMP_VERSION])
 ])# _STRCOMP
 # =============================================================================
 
@@ -100,16 +101,13 @@ AC_DEFUN([_STRCOMP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_SETUP], [dnl
     _STRCOMP_CHECK_HEADERS
-    for strcomp_include in $strcomp_cv_includes
-    do
+    for strcomp_include in $strcomp_cv_includes ; do
 	STRCOMP_CPPFLAGS="${STRCOMP_CPPFLAGS}${STRCOMP_CPPFLAGS:+ }-I${strcomp_include}"
     done
-    if test :"${strcomp_cv_config:-no}" != :no
-    then
+    if test :"${strcomp_cv_config:-no}" != :no ; then
 	STRCOMP_CPPFLAGS="${STRCOMP_CPPFLAGS}${STRCOMP_CPPFLAGS:+ }-include ${strcomp_cv_config}"
     fi
-    if test :"${strcomp_cv_modversions:-no}" != :no
-    then
+    if test :"${strcomp_cv_modversions:-no}" != :no ; then
 	STRCOMP_MODFLAGS="${STRCOMP_MODFLAGS}${STRCOMP_MODFLAGS:+ }-include ${strcomp_cv_modversions}"
     fi
 ])# _STRCOMP_SETUP
@@ -122,14 +120,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS Compatibility header files.  The
     # package normally requires compatibility header files to compile.
     AC_CACHE_CHECK([for compat include directory], [strcomp_cv_includes], [dnl
-	if test :"${with_compat:-no}" != :no -a :"${with_compat:-no}" != :yes
-	then
+	if test :"${with_compat:-no}" != :no -a :"${with_compat:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    strcomp_cv_includes="$with_compat"
 	fi
 	strcomp_what="os7/compat.h"
-	if test ":${strcomp_cv_includes:-no}" = :no
-	then
+	if test ":${strcomp_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    strcomp_here=`pwd`
@@ -139,8 +135,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		../_build/$srcdir/../../strcompat*/src/include \
 		../_build/$srcdir/../../../strcompat*/src/include
 	    do
-		if test -d $strcomp_dir -a -r $strcomp_dir/$strcomp_what
-		then
+		if test -d $strcomp_dir -a -r $strcomp_dir/$strcomp_what ; then
 		    strcomp_bld=`echo $strcomp_dir | sed -e "s|^$srcdir/|$strcomp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    strcomp_dir=`(cd $strcomp_dir; pwd)`
 		    strcomp_cv_includes="$strcomp_dir $strcomp_bld"
@@ -152,8 +147,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		fi
 	    done
 	fi
-	if test ":${strcomp_cv_includes:-no}" = :no
-	then
+	if test ":${strcomp_cv_includes:-no}" = :no ; then
 	    # Compat header files are normally found in the strcompat package now.
 	    # They used to be part of the compatibility add-on package and even older
 	    # versions are part of the LfS release packages.
@@ -217,8 +211,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    done
 	fi
     ])
-    if test :"${strcomp_cv_includes:-no}" = :no
-    then
+    if test :"${strcomp_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS compat include directories.  If you
@@ -233,22 +226,17 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     strcomp_what="sys/config.h"
     AC_CACHE_CHECK([for streams lfs $strcomp_what], [strcomp_cv_config], [dnl
 	strcomp_cv_config=no
-	if test -n "$strcomp_cv_includes"
-	then
-	    for strcomp_dir in $strcomp_cv_includes
-	    do
+	if test -n "$strcomp_cv_includes" ; then
+	    for strcomp_dir in $strcomp_cv_includes ; do
 		# old place for config
-		if test -f "$strcomp_dir/$strcomp_what" 
-		then
+		if test -f "$strcomp_dir/$strcomp_what" ; then
 		    strcomp_cv_config="$strcomp_dir/$strcomp_what"
 		    break
 		fi
 		# new place for config
-		if test -n $linux_cv_k_release 
-		then
+		if test -n $linux_cv_k_release ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" 
-		    then
+		    if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
 			strcomp_cv_config="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" 
 			break
 		    fi
@@ -256,28 +244,46 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    done
 	fi
     ])
+    AC_CACHE_CHECK([for strcompat version], [strcomp_cv_version], [dnl
+	strcomp_what="sys/strcompat/version.h"
+	strcomp_file=
+	if test -n "$strcomp_cv_includes" ; then
+	    for strcomp_dir in $strcomp_cv_includes ; do
+		# old place for version
+		if test -f "$strcomp_dir/$strcomp_what" ; then
+		    strcomp_file="$strcomp_dir/$strcomp_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
+			strcomp_file="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" 
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${strcomp_file:-no} != :no ; then
+	    strcomp_cv_version=`grep '#define.*\<STRCOMPAT_VERSION\>' $strcomp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
     strcomp_what="sys/strcompat/modversions.h"
     AC_CACHE_CHECK([for strcompat $strcomp_what], [strcomp_cv_modversions], [dnl
 	strcomp_cv_modversions='no'
 dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume normal objects
-	if test :"${linux_cv_k_ko_modules:-no}" = :no
-	then
-	    if test -n "$strcomp_cv_includes"
-	    then
-		for strcomp_dir in $strcomp_cv_includes
-		do
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$strcomp_cv_includes" ; then
+		for strcomp_dir in $strcomp_cv_includes ; do
 		    # old place for modversions
-		    if test -f "$strcomp_dir/$strcomp_what" 
-		    then
+		    if test -f "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_modversions="$strcomp_dir/$strcomp_what"
 			break
 		    fi
 		    # new place for modversions
-		    if test -n $linux_cv_k_release 
-		    then
+		    if test -n $linux_cv_k_release ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-			if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" 
-			then
+			if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
 			    strcomp_cv_includes="$strcomp_dir/$linux_cv_k_release/$target_cpu $strcomp_cv_includes"
 			    strcomp_cv_modversions="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what"
 			    break
@@ -342,8 +348,7 @@ AC_DEFUN([_STRCOMP_OUTPUT], [dnl
 # _STRCOMP_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_DEFINES], [dnl
-    if test :"${strcomp_cv_modversions:-no}" != :no 
-    then
+    if test :"${strcomp_cv_modversions:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_STRCOMP_MODVERSIONS_H], [1], [Define when
 	    the STREAMS compatibiltiy release supports module versions such as
 	    the OpenSS7 autoconf releases.])
@@ -353,6 +358,7 @@ AC_DEFUN([_STRCOMP_DEFINES], [dnl
     STRCOMP_MODMAP="$strcomp_cv_modmap"
     STRCOMP_SYMVER="$strcomp_cv_symver"
     STRCOMP_MANPATH="$strcomp_cv_manpath"
+    STRCOMP_VERSION="$strcomp_cv_version"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STRCOMP_SYMVER:+${MODPOST_INPUTS:+ }${STRCOMP_SYMVER}}"
 ])# _STRCOMP_DEFINES
 # =============================================================================

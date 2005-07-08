@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/07 04:12:55 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/08 12:03:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
 #
 # =============================================================================
 
 # =============================================================================
 # _XTI
+# -----------------------------------------------------------------------------
+# Check for the existence of XTI header files, particularly sys/tpi.h.  TPI
+# headers files are required for building the TPI interface for SCTP.  Without
+# TPI header files, the TPI interface to SCTP will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
@@ -62,17 +66,20 @@ AC_DEFUN([_XTI], [dnl
     AC_SUBST([XTI_CPPFLAGS])
     AC_SUBST([XTI_LDADD])
     AC_SUBST([XTI_MANPATH])
+    AC_SUBST([XTI_VERSION])
 ])# _XTI
 # =============================================================================
 
 # =============================================================================
 # _XTI_OPTIONS
 # -----------------------------------------------------------------------------
+# allow the user to specify the header file location
+# -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_OPTIONS], [dnl
     AC_ARG_WITH([xti],
 		AC_HELP_STRING([--with-xti=HEADERS],
 			       [specify the XTI header file directory.
-			       @<:@default=$INCLUDEDIR/xti@:>@]),
+				@<:@default=$INCLUDEDIR/xti@:>@]),
 		[with_xti="$withval"],
 		[with_xti=''])
 ])# _XTI_OPTIONS
@@ -95,13 +102,12 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
     # normally requires either Linux STREAMS or Linux Fast-STREAMS XTI header
     # files (or both) to compile.
     AC_CACHE_CHECK([for xti include directory], [xti_cv_includes], [dnl
-	if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes 
-	then
+	if test :"${with_xti:-no}" != :no -a :"${with_xti:-no}" != :yes ; then
+	    # First thing to do is to take user specified director(ies)
 	    xti_cv_includes="$with_xti"
 	fi
 	xti_what="xti.h"
-	if test ":${xti_cv_includes:-no}" = :no 
-	then
+	if test ":${xti_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    xti_here=`pwd`
@@ -111,8 +117,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		../_build/$srcdir/../../strxnet*/src/include \
 		../_build/$srcdir/../../../strxnet*/src/include
 	    do
-		if test -d $xti_dir -a -r $xti_dir/$xti_what 
-		then
+		if test -d $xti_dir -a -r $xti_dir/$xti_what ; then
 		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xti_dir=`(cd $xti_dir; pwd)`
 		    xti_cv_includes="$xti_dir $xti_bld"
@@ -122,8 +127,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		fi
 	    done
 	fi
-	if test ":${xti_cv_includes:-no}" = :no 
-	then
+	if test ":${xti_cv_includes:-no}" = :no ; then
 	    case "$streams_cv_package" in
 		LiS)
 		    # Some of our oldest RPM releases of LiS put the xti header files into their own
@@ -174,10 +178,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    ;;
 	    esac
 	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    for xti_dir in $xti_search_path 
-	    do
-		if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" 
-		then
+	    for xti_dir in $xti_search_path ; do
+		if test -d "$xti_dir" -a -r "$xti_dir/$xti_what" ; then
 		    xti_cv_includes="$xti_dir"
 		    xti_cv_ldadd="-lxnet"
 		    xti_cv_manpath=
@@ -190,8 +192,7 @@ dnl Older rpms (particularly those used by SuSE) rpms are too stupid to handle
 dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
 dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
 dnl properly, so we use defines.
-    if test :"${xti_cv_includes:-no}" = :no 
-    then
+    if test :"${xti_cv_includes:-no}" = :no ; then
 	if test :"$with_xti" = :no ; then
 	    AC_MSG_ERROR([
 *** 
@@ -200,18 +201,40 @@ dnl properly, so we use defines.
 *** XTI include directories with option --with-xti to configure and try again.
 *** ])
 	fi
-	if test -z "$with_xti" 
-	then
+	if test -z "$with_xti" ; then
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_xti --with-xti\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-xti'"
 	fi
     else
-	if test -z "$with_xti" 
-	then
+	if test -z "$with_xti" ; then
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_xti --without-xti\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xti'"
 	fi
     fi
+    AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
+	xti_what="sys/strxnet/version.h"
+	xti_file=
+	if test -n "$xti_cv_includes" ; then
+	    for xti_dir in $xti_cv_includes ; do
+		# old place for version
+		if test -f "$xti_dir/$xti_what" ; then
+		    xti_file="$xti_dir/$xti_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
+			xti_file="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${xti_file:-no} != :no ; then
+	    xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
 ])# _XTI_CHECK_HEADERS
 # =============================================================================
 
@@ -219,16 +242,16 @@ dnl properly, so we use defines.
 # _XTI_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI_DEFINES], [dnl
-    for xti_include in $xti_cv_includes 
-    do
+    for xti_include in $xti_cv_includes ; do
 	XTI_CPPFLAGS="${XTI_CPPFLAGS}${XTI_CPPFLAGS:+ }-I${xti_include}"
     done
+    XTI_LDADD="$xti_cv_ldadd"
+    XTI_MANPATH="$xti_cv_manpath"
+    XTI_VERSION="$xti_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxnet for
 	that matter.
     ])
-    XTI_LDADD="$xti_cv_ldadd"
-    XTI_MANPATH="$xti_cv_manpath"
 ])# _XTI_DEFINES
 # =============================================================================
 

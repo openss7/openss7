@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/07 05:13:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/08 12:19:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 05:13:03 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:19:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,7 +98,8 @@ AC_DEFUN([AC_XNS], [dnl
 		     debian/strxns-lib.preinst
 		     debian/strxns-source.preinst
 		     debian/strxns-util.preinst
-		     src/util/modutils/strxns])
+		     src/util/modutils/strxns
+		     src/include/sys/strxns/version.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

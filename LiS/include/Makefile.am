@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2005/07/07 20:28:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2005/07/08 12:17:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:37 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:17:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,7 +113,8 @@ nobase_pkginclude_HEADERS = \
 	sys/strport.h
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/LiS/genconf.h
+	sys/LiS/genconf.h \
+	sys/LiS/version.h
 
 ## PKG_BUILD_ARCH
 endif

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: porting.texi,v 0.9.2.15 2005/05/14 08:34:34 brian Exp $
+% @(#) $Id: porting.texi,v 0.9.2.16 2005/07/08 13:16:11 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2005/05/14 08:34:34 $ by $Author: brian $
+% Last Modified $Date: 2005/07/08 13:16:11 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -218,17 +218,13 @@ Development
 
 @c --------------------------------------------------------------------------
 
-@iftex
 @node Acknowledgements
 @unnumbered Acknowledgements
 @cindex credits
-@end iftex
-@ifnottex
-@node Acknowledgements
-@unnumbered Acknowledgements
-@cindex credits
-@end ifnottex
 
+@include texi/funding.texi
+
+@ignore
 @menu
 * Sponsors::                    Sponsors of Linux Fast-STREAMS
 * Contributors::                Contributors to Linux Fast-STREAMS
@@ -260,6 +256,7 @@ The primary contributor to Linux Fast-STREAMS is Brian F. G. Bidulock.
 
 This manual documents how to develop and port STREAMS drivers and modules for
 Linux Fast-STREAMS.
+@end ignore
 
 @node Introduction
 @section Introduction

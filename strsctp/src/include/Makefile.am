@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:29:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/08 12:23:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:29:19 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:23:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,8 +63,9 @@ nobase_pkginclude_HEADERS = \
 	ss7/sctpi.h \
 	ss7/sctpi_ioctl.h
 
-nobase_nodist_pkginclude_HEADERS = 
-#	sys/strxnet/modversions.h
+nobase_nodist_pkginclude_HEADERS = \
+	sys/strsctp/version.h
+#	sys/strsctp/modversions.h
 
 ## PKG_BUILD_ARCH
 endif

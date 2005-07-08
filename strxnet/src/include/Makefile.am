@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:28:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/08 12:18:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:28:28 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:18:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -129,7 +129,8 @@ dist_noinst_HEADERS = \
 	$(sctp_headers) \
 	$(sock_headers)
 
-nobase_nodist_pkginclude_HEADERS = 
+nobase_nodist_pkginclude_HEADERS = \
+	sys/strxnet/version.h
 #	sys/strxnet/modversions.h
 
 ## PKG_BUILD_ARCH

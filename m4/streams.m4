@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2005/07/07 04:12:55 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2005/07/08 12:56:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:56:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,6 +86,7 @@ dnl
     AC_SUBST([STREAMS_MODMAP])
     AC_SUBST([STREAMS_SYMVER])
     AC_SUBST([STREAMS_MANPATH])
+    AC_SUBST([STREAMS_VERSION])
 ])# _LINUX_STREAMS
 # =============================================================================
 
@@ -110,75 +111,69 @@ AC_DEFUN([_LINUX_STREAMS_OPTIONS], [dnl
 # _LINUX_STREAMS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
-    if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no
-    then
+    if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
 	_LINUX_STREAMS_LIS_CHECK_HEADERS
     fi
-    if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
-    then
+    if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
 	_LINUX_STREAMS_LFS_CHECK_HEADERS
     fi
     AC_CACHE_CHECK([for streams include directory], [streams_cv_includes], [dnl
-	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no 
-	then
-	    if test :"${streams_cv_lis_includes:-no}" != :no 
-	    then
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" != :no ; then
 		streams_cv_includes="$streams_cv_lis_includes"
 	    fi
 	fi
-	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
-	then
-	    if test :"${streams_cv_lfs_includes:-no}" != :no 
-	    then
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no ; then
 		streams_cv_includes="$streams_cv_lfs_includes"
 	    fi
 	fi
     ])
     AC_CACHE_CHECK([for streams include config file], [streams_cv_config], [dnl
-	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no 
-	then
-	    if test :"${streams_cv_lis_includes:-no}" != :no 
-	    then
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" != :no ; then
 		streams_cv_config="$streams_cv_lis_config"
 	    fi
 	fi
-	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
-	then
-	    if test :"${streams_cv_lfs_includes:-no}" != :no 
-	    then
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no ; then
 		streams_cv_config="$streams_cv_lfs_config"
 	    fi
 	fi
     ])
     AC_CACHE_CHECK([for streams include modversions file], [streams_cv_modversions], [dnl
-	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no 
-	then
-	    if test :"${streams_cv_lis_includes:-no}" != :no 
-	    then
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" != :no ; then
 		streams_cv_modversions="$streams_cv_lis_modversions"
 	    fi
 	fi
-	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
-	then
-	    if test :"${streams_cv_lfs_includes:-no}" != :no 
-	    then
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no ; then
 		streams_cv_modversions="$streams_cv_lfs_modversions"
 	    fi
 	fi
     ])
     AC_CACHE_CHECK([for streams package], [streams_cv_package], [dnl
-	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no 
-	then
-	    if test :"${streams_cv_lis_includes:-no}" != :no 
-	    then
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" != :no ; then
 		streams_cv_package="LiS"
 	    fi
 	fi
-	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no 
-	then
-	    if test :"${streams_cv_lfs_includes:-no}" != :no 
-	    then
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no ; then
 		streams_cv_package="LfS"
+	    fi
+	fi
+    ])
+    AC_CACHE_CHECK([for streams version], [streams_cv_version], [dnl
+	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	    if test :"${streams_cv_lis_includes:-no}" != :no ; then
+		streams_cv_version="$streams_cv_lis_version"
+	    fi
+	fi
+	if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
+	    if test :"${streams_cv_lfs_includes:-no}" != :no ; then
+		streams_cv_version="$streams_cv_lfs_version"
 	    fi
 	fi
     ])
@@ -208,8 +203,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 	    AC_MSG_RESULT([--with-lfs])
 	    ;;
 	*)
-	    if test :"${with_lis:-no}" != :no 
-	    then
+	    if test :"${with_lis:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
 *** Linux GCOM STREAMS was specified with the --with-lis flag, however,
@@ -219,8 +213,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 *** argument to option --with-lis to configure and try again.
 *** ])
 	    fi
-	    if test :"${with_lfs:-no}" != :no 
-	    then
+	    if test :"${with_lfs:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
 *** Linux Fast STREAMS was specified with the --with-lfs flag, however,
@@ -240,16 +233,13 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 *** ])
 	    ;;
     esac
-    for streams_include in $streams_cv_includes 
-    do
+    for streams_include in $streams_cv_includes ; do
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
     done
-    if test :"${streams_cv_config:-no}" != :no
-    then
+    if test :"${streams_cv_config:-no}" != :no ; then
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-include ${streams_cv_config}"
     fi
-    if test :"${streams_cv_modversions:-no}" != :no
-    then
+    if test :"${streams_cv_modversions:-no}" != :no ; then
 	STREAMS_MODFLAGS="${STREAMS_MODFLAGS}${STREAMS_MODFLAGS:+ }-include ${streams_cv_modversions}"
     fi
     AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_lis_includes:-no}" != :no])
@@ -264,13 +254,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS header files.  The package normally requires either
     # Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
     AC_CACHE_CHECK([for streams lis include directory], [streams_cv_lis_includes], [dnl
-	if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes 
-	then
+	if test :"${with_lis:-no}" != :no -a :"${with_lis:-no}" != :yes ; then
 	    streams_cv_lis_includes="$with_lis"
 	fi
 	streams_what="sys/stream.h"
-	if test ":${streams_cv_lis_includes:-no}" = :no 
-	then
+	if test ":${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
@@ -280,8 +268,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		../_build/$srcdir/../../LiS*/include ../_build/$srcdir/../../lis*/include \
 		../_build/$srcdir/../../../LiS*/include ../_build/$srcdir/../../../lis*/include
 	    do
-		if test -d $streams_dir -a -r $streams_dir/$streams_what 
-		then
+		if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
 		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
@@ -293,8 +280,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		fi
 	    done
 	fi
-	if test ":${streams_cv_lis_includes:-no}" = :no 
-	then
+	if test ":${streams_cv_lis_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
 	    streams_cv_lis_includes=
 	    eval "streams_search_path=\"
@@ -308,10 +294,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/local/include/LiS
 		${DESTDIR}/usr/src/LiS/include\""
 	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    for streams_dir in $streams_search_path 
-	    do
-		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
-		then
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what" ; then
 		    streams_cv_lis_includes="$streams_dir"
 		    streams_cv_lis_ldadd="-lLiS"
 		    streams_cv_lis_modmap=
@@ -322,8 +306,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    done
 	fi
     ])
-    if test :"${streams_cv_lis_includes:-no}" = :no 
-    then
+    if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 
 *** Configure could not find the LiS STREAMS include directories.  If you
@@ -338,22 +321,17 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
     streams_what="sys/LiS/config.h"
     AC_CACHE_CHECK([for streams lis $streams_what], [streams_cv_lis_config], [dnl
 	streams_cv_lis_config=no
-	if test -n "$streams_cv_lis_includes"
-	then
-	    for streams_dir in $streams_cv_lis_includes
-	    do
+	if test -n "$streams_cv_lis_includes" ; then
+	    for streams_dir in $streams_cv_lis_includes ; do
 		# old place for config
-		if test -f "$streams_dir/$streams_what" 
-		then
+		if test -f "$streams_dir/$streams_what" ; then
 		    streams_cv_lis_config="$streams_dir/$streams_what"
 		    break
 		fi
 		# new place for config
-		if test -n $linux_cv_k_release 
-		then
+		if test -n $linux_cv_k_release ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
-		    then
+		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_cv_lis_config="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			break
 		    fi
@@ -361,28 +339,48 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    done
 	fi
     ])
+    AC_CACHE_CHECK([for streams lis version], [streams_cv_lis_version], [dnl
+	streams_what="sys/LiS/version.h"
+	streams_file=
+	if test -n "$streams_cv_lis_includes" ; then
+	    for streams_dir in $streams_cv_lis_includes ; do
+		# old place for version
+		if test -f "$streams_dir/$streams_what" ; then
+		    streams_file="$streams_dir/$streams_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
+			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${streams_file:-no} != :no ; then
+	    streams_cv_lis_version=`grep '#define.*\<LIS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
+    LIS_VERSION="${streams_cv_lis_version:-0:2.18.1}"
+    AC_SUBST([LIS_VERSION])
     streams_what="sys/LiS/modversions.h"
     AC_CACHE_CHECK([for streams lis $streams_what], [streams_cv_lis_modversions], [dnl
 	streams_cv_lis_modversions='no'
 dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume normal objects
-	if test :"${linux_cv_k_ko_modules:-no}" = :no
-	then
-	    if test -n "$streams_cv_lis_includes"
-	    then
-		for streams_dir in $streams_cv_lis_includes
-		do
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$streams_cv_lis_includes" ; then
+		for streams_dir in $streams_cv_lis_includes ; do
 		    # old place for modversions
-		    if test -f "$streams_dir/$streams_what" 
-		    then
+		    if test -f "$streams_dir/$streams_what" ; then
 			streams_cv_lis_modversions="$streams_dir/$streams_what"
 			break
 		    fi
 		    # new place for modversions
-		    if test -n $linux_cv_k_release 
-		    then
+		    if test -n $linux_cv_k_release ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
-			then
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			    streams_cv_lis_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lis_includes"
 			    streams_cv_lis_modversions="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			    break
@@ -394,12 +392,9 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
     ])
     AC_CACHE_CHECK([for streams lis sys/LiS/module.h], [streams_cv_lis_module], [dnl
 	streams_cv_lis_module='no'
-	if test -n "$streams_cv_lis_includes"
-	then
-	    for streams_dir in $streams_cv_lis_includes
-	    do
-		if test -f "$streams_dir/sys/LiS/module.h" 
-		then
+	if test -n "$streams_cv_lis_includes" ; then
+	    for streams_dir in $streams_cv_lis_includes ; do
+		if test -f "$streams_dir/sys/LiS/module.h" ; then
 		    streams_cv_lis_module='yes'
 		    break
 		fi
@@ -416,21 +411,17 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux Fast-STREAMS header files.  The package normally requires
     # either Linux STREAMS or Linux Fast-STREAMS header files (or both) to compile.
     AC_CACHE_CHECK([for streams lfs include directory], [streams_cv_lfs_includes], [dnl
-	if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes
-	then
+	if test :"${with_lfs:-no}" != :no -a :"${with_lfs:-no}" != :yes ; then
 	    # First thing to do is to take user specified director(ies)
 	    streams_cv_lfs_includes="$with_lfs"
 	fi
 	streams_what="sys/stream.h"
-	if test ":${streams_cv_lfs_includes:-no}" = :no 
-	then
+	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
 	    streams_here=`pwd`
-	    for streams_dir in $srcdir/streams*/include $srcdir/../streams*/include
-	    do
-		if test -d $streams_dir -a -r $streams_dir/$streams_what 
-		then
+	    for streams_dir in $srcdir/streams*/include $srcdir/../streams*/include ; do
+		if test -d $streams_dir -a -r $streams_dir/$streams_what ; then
 		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    streams_dir=`(cd $streams_dir; pwd)`
 		    streams_cv_lfs_includes="$streams_dir $streams_bld"
@@ -442,8 +433,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		fi
 	    done
 	fi
-	if test ":${streams_cv_lfs_includes:-no}" = :no 
-	then
+	if test ":${streams_cv_lfs_includes:-no}" = :no ; then
 	    # note if linux kernel macros have not run this reduces
 	    streams_cv_lfs_includes=
 	    eval "streams_search_path=\"
@@ -457,10 +447,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/local/include/streams
 		${DESTDIR}/usr/src/streams/include\""
 	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    for streams_dir in $streams_search_path 
-	    do
-		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what"
-		then
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" -a -r "$streams_dir/$streams_what" ; then
 		    streams_cv_lfs_includes="$streams_dir"
 		    streams_cv_lfs_ldadd="-lstreams"
 		    streams_cv_lfs_modmap=
@@ -471,8 +459,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    done
 	fi
     ])
-    if test :"${streams_cv_lfs_includes:-no}" = :no
-    then
+    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	AC_MSG_WARN([
 *** 
 *** Configure could not find the LfS STREAMS include directories.  If you
@@ -487,22 +474,17 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
     streams_what="sys/config.h"
     AC_CACHE_CHECK([for streams lfs $streams_what], [streams_cv_lfs_config], [dnl
 	streams_cv_lfs_config=no
-	if test -n "$streams_cv_lfs_includes"
-	then
-	    for streams_dir in $streams_cv_lfs_includes
-	    do
+	if test -n "$streams_cv_lfs_includes" ; then
+	    for streams_dir in $streams_cv_lfs_includes ; do
 		# old place for config
-		if test -f "$streams_dir/$streams_what" 
-		then
+		if test -f "$streams_dir/$streams_what" ; then
 		    streams_cv_lfs_config="$streams_dir/$streams_what"
 		    break
 		fi
 		# new place for config
-		if test -n $linux_cv_k_release 
-		then
+		if test -n $linux_cv_k_release ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
-		    then
+		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			streams_cv_lfs_config="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
 			break
 		    fi
@@ -510,28 +492,48 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    done
 	fi
     ])
+    AC_CACHE_CHECK([for streams lfs version], [streams_cv_lfs_version], [dnl
+	streams_what="sys/streams/version.h"
+	streams_file=
+	if test -n "$streams_cv_lfs_includes" ; then
+	    for streams_dir in $streams_cv_lfs_includes ; do
+		# old place for version
+		if test -f "$streams_dir/$streams_what" ; then
+		    streams_file="$streams_dir/$streams_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
+			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${streams_file:-no} != :no ; then
+	    streams_cv_lfs_version=`grep '#define.*\<STREAMS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
+    LFS_VERSION="${streams_cv_lfs_version:-0:0.7a.3}"
+    AC_SUBST([LFS_VERSION])
     streams_what="sys/streams/modversions.h"
     AC_CACHE_CHECK([for streams lfs $streams_what], [streams_cv_lfs_modversions], [dnl
 	streams_cv_lfs_modversions='no'
 dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we assume normal objects
-	if test :"${linux_cv_k_ko_modules:-no}" = :no
-	then
-	    if test -n "$streams_cv_lfs_includes"
-	    then
-		for streams_dir in $streams_cv_lfs_includes
-		do
+	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
+	    if test -n "$streams_cv_lfs_includes" ; then
+		for streams_dir in $streams_cv_lfs_includes ; do
 		    # old place for modversions
-		    if test -f "$streams_dir/$streams_what" 
-		    then
+		    if test -f "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_modversions="$streams_dir/$streams_what"
 			break
 		    fi
 		    # new place for modversions
-		    if test -n $linux_cv_k_release 
-		    then
+		    if test -n $linux_cv_k_release ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
-			then
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
 			    streams_cv_lfs_includes="$streams_dir/$linux_cv_k_release/$target_cpu $streams_cv_lfs_includes"
 			    streams_cv_lfs_modversions="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what"
 			    break
@@ -580,14 +582,12 @@ AC_DEFUN([_LINUX_STREAMS_OUTPUT], [dnl
 # _LINUX_STREAMS_LIS_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
-    if test :"${streams_cv_lis_modversions:-no}" != :no 
-    then
+    if test :"${streams_cv_lis_modversions:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODVERSIONS_H], [1], [Define when the
 	    LiS release supports module versions such as the OpenSS7 autoconf
 	    release of LiS.])
     fi
-    if test :"${streams_cv_lis_module:-no}" != :no 
-    then
+    if test :"${streams_cv_lis_module:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_LIS_MODULE_H], [1], [Define when the LiS
 	    release provides its own module.h file such as 2.17 GCOM LiS
 	    releases.])
@@ -664,6 +664,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
     STREAMS_MODMAP="$streams_cv_lis_modmap"
     STREAMS_SYMVER="$streams_cv_lis_symver"
     STREAMS_MANPATH="$streams_cv_lis_manpath"
+    STREAMS_VERSION="$streams_cv_lis_version"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =============================================================================
@@ -672,8 +673,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 # _LINUX_STREAMS_LFS_DEFINES
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
-    if test :"${streams_cv_lfs_modversions:-no}" != :no 
-    then
+    if test :"${streams_cv_lfs_modversions:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_STREAMS_MODVERSIONS_H], [1], [Define when
 	    the Linux Fast-STREAMS release supports module versions such as
 	    the OpenSS7 autoconf releases.])
@@ -683,6 +683,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     STREAMS_MODMAP="$streams_cv_lfs_modmap"
     STREAMS_SYMVER="$streams_cv_lfs_symver"
     STREAMS_MANPATH="$streams_cv_lfs_manpath"
+    STREAMS_VERSION="$streams_cv_lfs_version"
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [1], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [1], [Linux Fast-STREAMS has this type.])

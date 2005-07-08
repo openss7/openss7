@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/07 04:12:55 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/08 12:03:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 04:12:55 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:03:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,9 @@ AC_DEFUN([_XNS], [dnl
     _XNS_OPTIONS
     _XNS_SETUP
     AC_SUBST([XNS_CPPFLAGS])
+dnl AC_SUBST([XNS_LDADD])
     AC_SUBST([XNS_MANPATH])
+    AC_SUBST([XNS_VERSION])
 ])# _XNS
 # =============================================================================
 
@@ -97,7 +99,8 @@ AC_DEFUN([_XNS_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
     # Test for the existence of Linux STREAMS XNS header files.  The package
-    # normally requires XNS header files to compile.
+    # normally requires either Linux STREAMS or Linux Fast-STREAMS XNS header
+    # files (or both) to compile.
     AC_CACHE_CHECK([for xns include directory], [xns_cv_includes], [dnl
 	if test ":${with_xns:-no}" != :no -a :"${with_xns:-no}" != :yes ;  then
 	    # First thing to do is to take user specified director(ies)
@@ -114,48 +117,65 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		../_build/$srcdir/../../strxns*/src/include \
 		../_build/$srcdir/../../../strxns*/src/include
 	    do
-		if test -d $xns_dir -a -r $xns_dir/$xns_what
-		then
+		if test -d $xns_dir -a -r $xns_dir/$xns_what ; then
 		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xns_dir=`(cd $xns_dir; pwd)`
 		    xns_cv_includes="$xns_dir $xns_bld"
+dnl		    xns_cv_ldadd=`echo "$xns_bld/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g;'`
 		    break
 		fi
 	    done
 	fi
 	if test ":${xns_cv_includes:-no}" = :no ; then
-	    # XNS header files are normally found in the strxns package now.
-	    # They used to be part of the strxnet add-on package and even older
-	    # versions are part of the LiS or LfS release packages.
-	    eval "xns_search_path=\"
-		${DESTDIR}${includedir}/strxns
-		${DESTDIR}${rootdir}${oldincludedir}/strxns
-		${DESTDIR}${rootdir}/usr/include/strxns
-		${DESTDIR}${rootdir}/usr/local/include/strxns
-		${DESTDIR}${rootdir}/usr/src/strxns/src/include
-		${DESTDIR}${includedir}/strxnet
-		${DESTDIR}${rootdir}${oldincludedir}/strxnet
-		${DESTDIR}${rootdir}/usr/include/strxnet
-		${DESTDIR}${rootdir}/usr/local/include/strxnet
-		${DESTDIR}${rootdir}/usr/src/strxnet/src/include
-		${DESTDIR}${oldincludedir}/strxns
-		${DESTDIR}/usr/include/strxns
-		${DESTDIR}/usr/local/include/strxns
-		${DESTDIR}/usr/src/strxns/src/include
-		${DESTDIR}${oldincludedir}/strxnet
-		${DESTDIR}/usr/include/strxnet
-		${DESTDIR}/usr/local/include/strxnet
-		${DESTDIR}/usr/src/strxnet/src/include\""
 	    case "$streams_cv_package" in
 		LiS)
-		    # XNS header files used to be part of the LiS package.
-		    eval "xns_search_path=\"$xns_search_path
+		    # Some of our oldest RPM releases of LiS put the xns header files into their own
+		    # subdirectory (/usr/include/xti).  The old version places them in with the LiS
+		    # header files.  The current version has them separate as part of the strxns
+		    # package.  This tests whether we need additional -I/usr/include/xti in the
+		    # streams include line.  This check can be dropped when the older RPM releases
+		    # of LiS fall out of favor.
+		    eval "xns_search_path=\"
+			${DESTDIR}${includedir}/strxns
+			${DESTDIR}${rootdir}${oldincludedir}/strxns
+			${DESTDIR}${rootdir}/usr/include/strxns
+			${DESTDIR}${rootdir}/usr/local/include/strxns
+			${DESTDIR}${rootdir}/usr/src/strxns/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
+			${DESTDIR}${includedir}/LiS/xti
+			${DESTDIR}${rootdir}${oldincludedir}/LiS/xti
+			${DESTDIR}${rootdir}/usr/include/LiS/xti
+			${DESTDIR}${rootdir}/usr/local/include/LiS/xti
+			${DESTDIR}${rootdir}/usr/src/LiS/include/xti
+			${DESTDIR}${includedir}/xti
+			${DESTDIR}${rootdir}${oldincludedir}/xti
+			${DESTDIR}${rootdir}/usr/include/xti
+			${DESTDIR}${rootdir}/usr/local/include/xti
 			${DESTDIR}${includedir}/LiS
 			${DESTDIR}${rootdir}${oldincludedir}/LiS
 			${DESTDIR}${rootdir}/usr/include/LiS
 			${DESTDIR}${rootdir}/usr/local/include/LiS
 			${DESTDIR}${rootdir}/usr/src/LiS/include
+			${DESTDIR}${oldincludedir}/strxns
+			${DESTDIR}/usr/include/strxns
+			${DESTDIR}/usr/local/include/strxns
+			${DESTDIR}/usr/src/strxns/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include
+			${DESTDIR}${oldincludedir}/LiS/xti
+			${DESTDIR}/usr/include/LiS/xti
+			${DESTDIR}/usr/local/include/LiS/xti
+			${DESTDIR}/usr/src/LiS/include/xti
+			${DESTDIR}${oldincludedir}/xti
+			${DESTDIR}/usr/include/xti
+			${DESTDIR}/usr/local/include/xti
 			${DESTDIR}${oldincludedir}/LiS
 			${DESTDIR}/usr/include/LiS
 			${DESTDIR}/usr/local/include/LiS
@@ -163,12 +183,30 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    ;;
 		LfS)
 		    # XNS header files used to be part of the LfS package.
-		    eval "xns_search_path=\"$xns_search_path
+		    eval "xns_search_path=\"
+			${DESTDIR}${includedir}/strxns
+			${DESTDIR}${rootdir}${oldincludedir}/strxns
+			${DESTDIR}${rootdir}/usr/include/strxns
+			${DESTDIR}${rootdir}/usr/local/include/strxns
+			${DESTDIR}${rootdir}/usr/src/strxns/src/include
+			${DESTDIR}${includedir}/strxnet
+			${DESTDIR}${rootdir}${oldincludedir}/strxnet
+			${DESTDIR}${rootdir}/usr/include/strxnet
+			${DESTDIR}${rootdir}/usr/local/include/strxnet
+			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
 			${DESTDIR}${includedir}/streams
 			${DESTDIR}${rootdir}${oldincludedir}/streams
 			${DESTDIR}${rootdir}/usr/include/streams
 			${DESTDIR}${rootdir}/usr/local/include/streams
 			${DESTDIR}${rootdir}/usr/src/streams/include
+			${DESTDIR}${oldincludedir}/strxns
+			${DESTDIR}/usr/include/strxns
+			${DESTDIR}/usr/local/include/strxns
+			${DESTDIR}/usr/src/strxns/src/include
+			${DESTDIR}${oldincludedir}/strxnet
+			${DESTDIR}/usr/include/strxnet
+			${DESTDIR}/usr/local/include/strxnet
+			${DESTDIR}/usr/src/strxnet/src/include
 			${DESTDIR}${oldincludedir}/streams
 			${DESTDIR}/usr/include/streams
 			${DESTDIR}/usr/local/include/streams
@@ -179,6 +217,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    for xns_dir in $xns_search_path ; do
 		if test -d "$xns_dir" -a -r "$xns_dir/$xns_what" ; then
 		    xns_cv_includes="$xns_dir"
+dnl		    xns_cv_ldadd="-lxns"
 		    xns_cv_manpath=
 		    break
 		fi
@@ -192,7 +231,7 @@ dnl properly, so we use defines.
     if test :"${xns_cv_includes:-no}" = :no ; then :
 	if test :"$with_xns" = :no ; then
 	    AC_MSG_ERROR([
-***
+*** 
 *** Could not find XNS include directories.  This package requires the
 *** presence of XNS include directories to compile.  Specify the location of
 *** XNS include directories with option --with-xns to configure and try again.
@@ -208,6 +247,30 @@ dnl properly, so we use defines.
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-xns'"
 	fi
     fi
+    AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
+	xns_what="sys/strxns/version.h"
+	xns_file=
+	if test -n "$xns_cv_includes" ; then
+	    for xns_dir in $xns_cv_includes ; do
+		# old place for version
+		if test -f "$xns_dir/$xns_what" ; then
+		    xns_file="$xns_dir/$xns_what"
+		    break
+		fi
+		# new place for version
+		if test -n $linux_cv_k_release ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+		    if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
+			xns_file="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			break
+		    fi
+		fi
+	    done
+	fi
+	if test :${xns_file:-no} != :no ; then
+	    xns_cv_version=`grep '#define.*\<STRXNS_VERSION\>' $xns_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	fi
+    ])
 ])# _XNS_CHECK_HEADERS
 # =============================================================================
 
@@ -218,7 +281,9 @@ AC_DEFUN([_XNS_DEFINES], [dnl
     for xns_include in $xns_cv_includes ; do
 	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-I${xns_include}"
     done
+dnl XNS_LDADD="$xns_cv_ldadd"
     XNS_MANPATH="$xns_cv_manpath"
+    XNS_VERSION="$xns_cv_version"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxns for
 	that matter.

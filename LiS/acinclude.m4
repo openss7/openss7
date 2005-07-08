@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.28 $) $Date: 2005/07/07 05:12:59 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.29 $) $Date: 2005/07/08 12:18:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 05:12:59 $ by $Author: brian $
+# Last Modified $Date: 2005/07/08 12:18:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -95,7 +95,8 @@ AC_DEFUN([AC_LIS], [dnl
 		     debian/lis-lib.preinst
 		     debian/lis-source.preinst
 		     debian/lis-util.preinst
-		     util/modutils/lis])
+		     util/modutils/lis
+		     include/sys/LiS/version.h])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
@@ -127,7 +128,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     AC_SUBST([PKG_INCLUDES])dnl
     AC_SUBST([PKG_MODFLAGS])dnl
     PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
-    PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
+    PKG_MANPATH='$(top_builddir)/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
     CFLAGS=
