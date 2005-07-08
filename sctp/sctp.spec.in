@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2005/06/25 07:01:48 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2005/07/07 20:28:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/25 07:01:48 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1012,6 +1012,7 @@ fi
 #doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
 %doc LSM %{name}-%{version}.lsm
+%doc README-make
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -1337,8 +1338,11 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.63  2005/06/25 07:01:48  brian
-# - more efficient dependency checking
+# Revision 0.9.2.64  2005/07/07 20:28:45  brian
+# - changes for release
+#
+# Revision 1.64  2005/07/07 20:28:45  brian
+# - changes for release
 #
 # Revision 1.63  2005/06/25 07:01:48  brian
 # - more efficient dependency checking

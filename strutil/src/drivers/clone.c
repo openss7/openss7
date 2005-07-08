@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:36 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:36 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:36 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:36 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -319,7 +319,7 @@ int register_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_clone);
+EXPORT_SYMBOL(register_clone);
 
 int unregister_clone(struct cdevsw *cdev)
 {
@@ -335,7 +335,7 @@ int unregister_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_clone);
+EXPORT_SYMBOL(unregister_clone);
 
 /* 
  *  -------------------------------------------------------------------------

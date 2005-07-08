@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:22:39 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -427,14 +427,14 @@ __EXTERN_INLINE void freemsg(mblk_t *mp);
  *  @dp:	data block to test
  */
 __EXTERN_INLINE int isdatablk(dblk_t * dp);
-//EXPORT_SYMBOL_GPL(isdatablk);
+//EXPORT_SYMBOL(isdatablk);
 
 /**
  *  isdatamsg:	- test a message block for data type
  *  @mp:	message block to test
  */
 __EXTERN_INLINE int isdatamsg(mblk_t *mp);
-//EXPORT_SYMBOL_GPL(isdatamsg);
+//EXPORT_SYMBOL(isdatamsg);
 
 /**
  *  pcmsg:	- data block type for priority
@@ -457,7 +457,7 @@ __EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
  *  @mp2:	message to link
  */
 __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-//EXPORT_SYMBOL_GPL(linkmsg);
+//EXPORT_SYMBOL(linkmsg);
 
 /**
  *  msgdsize:	- calculate size of data in message
@@ -541,7 +541,7 @@ EXPORT_SYMBOL(msgpullup);
  *  @mp:	message for which to calculate size
  */
 __EXTERN_INLINE size_t msgsize(mblk_t *mp);
-//EXPORT_SYMBOL_GPL(msgsize);
+//EXPORT_SYMBOL(msgsize);
 
 /**
  *  pullupmsg:	- pull up bytes into first data block in message
@@ -678,7 +678,7 @@ __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
 __EXTERN_INLINE size_t xmsgsize(mblk_t *mp);
-//EXPORT_SYMBOL_GPL(xmsgsize);
+//EXPORT_SYMBOL(xmsgsize);
 
 static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
 /**
@@ -710,7 +710,7 @@ int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	}
 }
 
-EXPORT_SYMBOL_GPL(appq);
+EXPORT_SYMBOL(appq);
 
 /**
  *  backq:	- find the queue upstream from this one
@@ -792,7 +792,7 @@ int bcanget(queue_t *q, int band)
 	return (result);
 }
 
-EXPORT_SYMBOL_GPL(bcanget);
+EXPORT_SYMBOL(bcanget);
 
 /*
  *  __bcanputany:
@@ -943,7 +943,7 @@ int canget(queue_t *q)
 	return (result & 1);
 }
 
-EXPORT_SYMBOL_GPL(canget);
+EXPORT_SYMBOL(canget);
 
 /*
  *  __canput:
@@ -1848,7 +1848,7 @@ int qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int 
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(qattach);
+EXPORT_SYMBOL(qattach);
 
 /**
  *  qclose:	- invoke a queue pair's qi_qclose entry point
@@ -1866,7 +1866,7 @@ int qclose(queue_t *q, int oflag, cred_t *crp)
 	return (result);
 }
 
-EXPORT_SYMBOL_GPL(qclose);
+EXPORT_SYMBOL(qclose);
 
 /**
  *  qdelete:	- delete a queue pair from a stream
@@ -1929,7 +1929,7 @@ int qdetach(queue_t *q, int flags, cred_t *crp)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(qdetach);
+EXPORT_SYMBOL(qdetach);
 
 /**
  *  qinsert:	- insert a queue pair below another in a stream
@@ -1981,7 +1981,7 @@ int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (-ENOPKG);
 }
 
-EXPORT_SYMBOL_GPL(qopen);
+EXPORT_SYMBOL(qopen);
 
 /**
  *  qprocsoff:	- turn off qi_putp and qi_srvp procedures for a queue pair
@@ -2100,7 +2100,7 @@ int qpop(struct stdata *sd, int oflag, cred_t *crp)
 	return (-EPERM);
 }
 
-EXPORT_SYMBOL_GPL(qpop);
+EXPORT_SYMBOL(qpop);
 
 /**
  *  qpush:	- push a module onto a stream
@@ -2132,7 +2132,7 @@ int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *c
 	return (-ENOSR);
 }
 
-EXPORT_SYMBOL_GPL(qpush);
+EXPORT_SYMBOL(qpush);
 
 /**
  *  qreply:	- reply with a message
@@ -2167,7 +2167,7 @@ ssize_t qcountstrm(queue_t *q)
 	return (count);
 }
 
-EXPORT_SYMBOL_GPL(qcountstrm);
+EXPORT_SYMBOL(qcountstrm);
 
 /**
  *  RD:		- find read queue from write queu
@@ -2286,7 +2286,7 @@ void setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	qwunlock(rq, &flags);
 }
 
-EXPORT_SYMBOL_GPL(setq);
+EXPORT_SYMBOL(setq);
 
 struct syncq syncq_global;
 
@@ -2529,7 +2529,7 @@ static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 vstrlog_t vstrlog_hook = NULL;
-EXPORT_SYMBOL_GPL(vstrlog_hook);
+EXPORT_SYMBOL(vstrlog_hook);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -2641,7 +2641,7 @@ void vcmn_err(int err_lvl, const char *fmt, va_list args)
 }
 
 //#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(vcmn_err);
+EXPORT_SYMBOL(vcmn_err);
 //#endif
 
 /**

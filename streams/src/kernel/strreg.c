@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/14 08:34:42 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/14 08:34:42 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/05/14 08:34:42 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:46 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -150,7 +150,7 @@ int register_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strmod);
+EXPORT_SYMBOL(register_strmod);
 
 /**
  *  unregister_strmod:
@@ -179,7 +179,7 @@ int unregister_strmod(struct fmodsw *fmod)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strmod);
+EXPORT_SYMBOL(unregister_strmod);
 
 /**
  *  register_strdrv: - register STREAMS driver
@@ -253,7 +253,7 @@ int register_strdrv(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strdrv);
+EXPORT_SYMBOL(register_strdrv);
 
 /**
  *  unregister_strdrv:
@@ -299,7 +299,7 @@ int unregister_strdrv(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strdrv);
+EXPORT_SYMBOL(unregister_strdrv);
 
 /*
  *  register_xinode: - register a character device inode
@@ -483,7 +483,7 @@ int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_cmajor);
+EXPORT_SYMBOL(register_cmajor);
 
 int unregister_cmajor(struct cdevsw *cdev, major_t major)
 {
@@ -510,7 +510,7 @@ int unregister_cmajor(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_cmajor);
+EXPORT_SYMBOL(unregister_cmajor);
 
 /**
  *  register_strnod: - register a minor device node
@@ -598,7 +598,7 @@ int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strnod);
+EXPORT_SYMBOL(register_strnod);
 
 /**
  *  unregister_strnod: - unregister a minor device node
@@ -648,7 +648,7 @@ int unregister_strnod(struct cdevsw *cdev, minor_t minor)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strnod);
+EXPORT_SYMBOL(unregister_strnod);
 
 /*
  *  -------------------------------------------------------------------------
@@ -778,7 +778,7 @@ struct dentry *spec_dentry(dev_t dev, int *sflagp)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(spec_dentry);
+EXPORT_SYMBOL(spec_dentry);
 #endif
 
 /**
@@ -826,5 +826,5 @@ int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag)
 }
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE
-EXPORT_SYMBOL_GPL(spec_open);
+EXPORT_SYMBOL(spec_open);
 #endif

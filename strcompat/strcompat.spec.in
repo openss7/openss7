@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/06 04:14:32 $
+# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/07 20:28:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 04:14:32 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1103,6 +1103,7 @@ fi
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
 #doc doc/specs doc/projects doc/drafts
 %doc LSM %{name}-%{version}.lsm
+%doc README-make
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -1540,6 +1541,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strcompat.spec.in,v $
+# Revision 0.9.2.3  2005/07/07 20:28:51  brian
+# - changes for release
+#
 # Revision 0.9.2.2  2005/07/06 04:14:32  brian
 # - added requirement for strcompat package
 #

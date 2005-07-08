@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/04 20:22:39 $
+ @(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/07 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/04 20:22:39 $"
+#ident "@(#) $RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/07 20:29:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/04 20:22:39 $";
+    "$RCSfile: strsad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/07 20:29:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -139,7 +139,7 @@ struct strapush *autopush_find(dev_t dev)
 	return ((struct strapush *) api);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL_GPL(autopush_find);
+EXPORT_SYMBOL(autopush_find);
 #endif
 
 int autopush_add(struct strapush *sap)
@@ -188,7 +188,7 @@ int autopush_add(struct strapush *sap)
 	return (err);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL_GPL(autopush_add);
+EXPORT_SYMBOL(autopush_add);
 #endif
 
 int autopush_del(struct strapush *sap)
@@ -216,7 +216,7 @@ int autopush_del(struct strapush *sap)
 	return (err);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL_GPL(autopush_del);
+EXPORT_SYMBOL(autopush_del);
 #endif
 
 int autopush_vml(struct str_mlist *smp, int nmods)
@@ -240,7 +240,7 @@ int autopush_vml(struct str_mlist *smp, int nmods)
 	return (-EINVAL);
 }
 #if defined CONFIG_STREAMS_SAD_MODULE
-EXPORT_SYMBOL_GPL(autopush_vml);
+EXPORT_SYMBOL(autopush_vml);
 #endif
 
 //#if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
@@ -259,7 +259,7 @@ int apush_set(struct strapush *sap)
 	return (-EINVAL);
 }
 //#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(apush_set);
+EXPORT_SYMBOL(apush_set);
 //#endif
 //#endif
 
@@ -291,7 +291,7 @@ int apush_get(struct strapush *sap)
 	return (-ENODEV);
 }
 //#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(apush_get);	/* strconf.h  LiS specific */
+EXPORT_SYMBOL(apush_get);	/* strconf.h  LiS specific */
 //#endif
 //#endif
 
@@ -301,7 +301,7 @@ int apush_vml(struct str_list *slp)
 	return autopush_vml(slp->sl_modlist, slp->sl_nmods);
 }
 //#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(apush_vml);
+EXPORT_SYMBOL(apush_vml);
 //#endif
 //#endif
 
@@ -359,5 +359,5 @@ int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int
     defined CONFIG_STREAMS_FIFO_MODULE || \
     defined CONFIG_STREAMS_PIPE_MODULE || \
     defined CONFIG_STREAMS_SOCK_MODULE
-EXPORT_SYMBOL_GPL(autopush);
+EXPORT_SYMBOL(autopush);
 #endif

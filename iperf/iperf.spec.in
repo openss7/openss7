@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.42 $) $Date: 2005/06/25 07:01:47 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 1.1.2.43 $) $Date: 2005/07/07 20:28:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/25 07:01:47 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -628,6 +628,7 @@ fi
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS
 %doc LICENSE
 %doc LSM %{name}-%{version}.lsm
+%doc README-make
 #%{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -678,6 +679,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
+# Revision 1.1.2.43  2005/07/07 20:28:40  brian
+# - changes for release
+#
 # Revision 1.1.2.42  2005/06/25 07:01:47  brian
 # - more efficient dependency checking
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.35 $) $Date: 2005/06/25 07:01:48 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 1.1.2.36 $) $Date: 2005/07/07 20:28:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/25 07:01:48 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -585,6 +585,7 @@ fi
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS manual
 %doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
 %doc LSM %{name}-%{version}.lsm
+%doc README-make
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -635,6 +636,9 @@ to create and distribute this rpm.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 1.1.2.36  2005/07/07 20:28:43  brian
+# - changes for release
+#
 # Revision 1.1.2.35  2005/06/25 07:01:48  brian
 # - more efficient dependency checking
 #

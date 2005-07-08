@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $
+ @(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/07 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $"
+#ident "@(#) $RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/07 20:29:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/04 20:22:39 $";
+    "$RCSfile: strsyms.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/07 20:29:47 $";
 
 //#define __NO_VERSION__
 //#define EXPORT_SYMTAB
@@ -212,25 +212,25 @@ EXPORT_SYMBOL(kmem_zalloc);	/* kmem.h */
 EXPORT_SYMBOL(kmem_alloc_node);	/* kmem.h */
 EXPORT_SYMBOL(kmem_zalloc_node);	/* kmem.h */
 
-//EXPORT_SYMBOL_GPL(allocq);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(bcanget);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(canget);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(freeq);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(qattach);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(qclose);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(qdetach);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(qopen);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(setq);	/* stream.h LfS (internal) */
-//EXPORT_SYMBOL_GPL(setqsched);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(allocq);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(bcanget);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(canget);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(freeq);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(qattach);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(qclose);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(qdetach);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(qopen);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(setq);	/* stream.h LfS (internal) */
+//EXPORT_SYMBOL(setqsched);	/* stream.h LfS (internal) */
 
-//EXPORT_SYMBOL_GPL(appq);	/* stream.h LiS */
-EXPORT_SYMBOL_GPL(esbbcall);	/* stream.h LiS */
-EXPORT_SYMBOL_GPL(isdatablk);	/* stream.h LiS */
-EXPORT_SYMBOL_GPL(isdatamsg);	/* stream.h LiS */
-EXPORT_SYMBOL_GPL(linkmsg);	/* stream.h LfS */
-EXPORT_SYMBOL_GPL(msgsize);	/* stream.h LiS */
-//EXPORT_SYMBOL_GPL(qcountstrm);/* stream.h LiS */
-EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
+//EXPORT_SYMBOL(appq);	/* stream.h LiS */
+EXPORT_SYMBOL(esbbcall);	/* stream.h LiS */
+EXPORT_SYMBOL(isdatablk);	/* stream.h LiS */
+EXPORT_SYMBOL(isdatamsg);	/* stream.h LiS */
+EXPORT_SYMBOL(linkmsg);	/* stream.h LfS */
+EXPORT_SYMBOL(msgsize);	/* stream.h LiS */
+//EXPORT_SYMBOL(qcountstrm);/* stream.h LiS */
+EXPORT_SYMBOL(xmsgsize);	/* stream.h LiS */
 
 #ifdef _AIX_SOURCE
 //EXPORT_SYMBOL(mi_bufcall);	/* aixddi.h */
@@ -243,95 +243,95 @@ EXPORT_SYMBOL_GPL(xmsgsize);	/* stream.h LiS */
 //EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
 #endif
 
-//EXPORT_SYMBOL_GPL(register_cmajor);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(register_strdev);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(register_strdrv);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(register_strmod);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_cmajor);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_strdev);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_strdrv);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(unregister_strmod);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(autopush_add);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(autopush_del);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(autopush_vml);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(autopush_find);	/* strconf.h */
+//EXPORT_SYMBOL(register_cmajor);	/* strconf.h */
+//EXPORT_SYMBOL(register_strdev);	/* strconf.h */
+//EXPORT_SYMBOL(register_strdrv);	/* strconf.h */
+//EXPORT_SYMBOL(register_strmod);	/* strconf.h */
+//EXPORT_SYMBOL(unregister_cmajor);	/* strconf.h */
+//EXPORT_SYMBOL(unregister_strdev);	/* strconf.h */
+//EXPORT_SYMBOL(unregister_strdrv);	/* strconf.h */
+//EXPORT_SYMBOL(unregister_strmod);	/* strconf.h */
+//EXPORT_SYMBOL(autopush_add);	/* strconf.h */
+//EXPORT_SYMBOL(autopush_del);	/* strconf.h */
+//EXPORT_SYMBOL(autopush_vml);	/* strconf.h */
+//EXPORT_SYMBOL(autopush_find);	/* strconf.h */
 
-//EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* strsysctl.h */
-//EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);	/* strsysctl.h */
+//EXPORT_SYMBOL(sysctl_str_strmsgsz);	/* strsysctl.h */
+//EXPORT_SYMBOL(sysctl_str_strctlsz);	/* strsysctl.h */
 
-//EXPORT_SYMBOL_GPL(specfs_mnt);/* strspecfs.h */
-//EXPORT_SYMBOL_GPL(spec_open);	/* strspecfs.h */
+//EXPORT_SYMBOL(specfs_mnt);/* strspecfs.h */
+//EXPORT_SYMBOL(spec_open);	/* strspecfs.h */
 
 #if	defined(CONFIG_STREAMS_NSDEV_MODULE) || \
 	defined(CONFIG_STREAMS_SC_MODULE)
-//EXPORT_SYMBOL_GPL(fmodsw_list);	/* strreg.h */
-//EXPORT_SYMBOL_GPL(cdevsw_list);	/* strreg.h */
-//EXPORT_SYMBOL_GPL(fmod_count);	/* strreg.h */
-//EXPORT_SYMBOL_GPL(cdev_count);	/* strreg.h */
+//EXPORT_SYMBOL(fmodsw_list);	/* strreg.h */
+//EXPORT_SYMBOL(cdevsw_list);	/* strreg.h */
+//EXPORT_SYMBOL(fmod_count);	/* strreg.h */
+//EXPORT_SYMBOL(cdev_count);	/* strreg.h */
 #endif
 
 //#if	defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-//EXPORT_SYMBOL_GPL(fmod_str);	/* strreg.h */
+//EXPORT_SYMBOL(fmod_str);	/* strreg.h */
 //#endif
 
 //#if	defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
-//EXPORT_SYMBOL_GPL(strthreads);/* strsched.h */
+//EXPORT_SYMBOL(strthreads);/* strsched.h */
 //#endif
 
-//EXPORT_SYMBOL_GPL(cdrv_get);	/* strreg.h */
-//EXPORT_SYMBOL_GPL(cdrv_put);	/* strreg.h */
+//EXPORT_SYMBOL(cdrv_get);	/* strreg.h */
+//EXPORT_SYMBOL(cdrv_put);	/* strreg.h */
 
-//EXPORT_SYMBOL_GPL(ap_alloc);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(ap_get);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(ap_put);	/* strsched.h */
+//EXPORT_SYMBOL(ap_alloc);	/* strsched.h */
+//EXPORT_SYMBOL(ap_get);	/* strsched.h */
+//EXPORT_SYMBOL(ap_put);	/* strsched.h */
 
-//EXPORT_SYMBOL_GPL(alloclk);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(freelk);	/* strsched.h */
+//EXPORT_SYMBOL(alloclk);	/* strsched.h */
+//EXPORT_SYMBOL(freelk);	/* strsched.h */
 
-//EXPORT_SYMBOL_GPL(qpop);	/* stream.h */
-//EXPORT_SYMBOL_GPL(qpush);	/* stream.h */
+//EXPORT_SYMBOL(qpop);	/* stream.h */
+//EXPORT_SYMBOL(qpush);	/* stream.h */
 
 //#if	defined(CONFIG_STREAMS_COMPAT_LIS_MODULE) ||
 //	defined(CONFIG_STREAMS_FIFO_MODULE) ||
 //	defined(CONFIG_STREAMS_PIPE_MODULE)
-//EXPORT_SYMBOL_GPL(allocstr);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(autopush);	/* sth.h */
-//EXPORT_SYMBOL_GPL(freestr);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(sd_get);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(sd_put);	/* strsched.h */
-//EXPORT_SYMBOL_GPL(strclose);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strfasync);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strflush);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strioctl);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strllseek);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strmmap);	/* sth.h */
-//EXPORT_SYMBOL_GPL(stropen);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strpoll);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strread);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strreadv);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strsendpage);/* sth.h */
-//EXPORT_SYMBOL_GPL(strwrite);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strwritev);	/* sth.h */
-//EXPORT_SYMBOL_GPL(strgetpmsg);/* sth.h */
-//EXPORT_SYMBOL_GPL(strputpmsg);/* sth.h */
+//EXPORT_SYMBOL(allocstr);	/* strsched.h */
+//EXPORT_SYMBOL(autopush);	/* sth.h */
+//EXPORT_SYMBOL(freestr);	/* strsched.h */
+//EXPORT_SYMBOL(sd_get);	/* strsched.h */
+//EXPORT_SYMBOL(sd_put);	/* strsched.h */
+//EXPORT_SYMBOL(strclose);	/* sth.h */
+//EXPORT_SYMBOL(strfasync);	/* sth.h */
+//EXPORT_SYMBOL(strflush);	/* sth.h */
+//EXPORT_SYMBOL(strioctl);	/* sth.h */
+//EXPORT_SYMBOL(strllseek);	/* sth.h */
+//EXPORT_SYMBOL(strmmap);	/* sth.h */
+//EXPORT_SYMBOL(stropen);	/* sth.h */
+//EXPORT_SYMBOL(strpoll);	/* sth.h */
+//EXPORT_SYMBOL(strread);	/* sth.h */
+//EXPORT_SYMBOL(strreadv);	/* sth.h */
+//EXPORT_SYMBOL(strsendpage);/* sth.h */
+//EXPORT_SYMBOL(strwrite);	/* sth.h */
+//EXPORT_SYMBOL(strwritev);	/* sth.h */
+//EXPORT_SYMBOL(strgetpmsg);/* sth.h */
+//EXPORT_SYMBOL(strputpmsg);/* sth.h */
 //#ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
-//EXPORT_SYMBOL_GPL(apush_get);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(apush_set);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(apush_vml);	/* strconf.h */
-//EXPORT_SYMBOL_GPL(sdev_get);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(sdev_put);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(cdev_find);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(fmod_get);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(fmod_put);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(fmod_find);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(cmin_find);	/* strsubr.h, strreg.c */
-//EXPORT_SYMBOL_GPL(vcmn_err);	/* cmn_err.h */
+//EXPORT_SYMBOL(apush_get);	/* strconf.h */
+//EXPORT_SYMBOL(apush_set);	/* strconf.h */
+//EXPORT_SYMBOL(apush_vml);	/* strconf.h */
+//EXPORT_SYMBOL(sdev_get);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(sdev_put);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(cdev_find);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(fmod_get);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(fmod_put);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(fmod_find);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(cmin_find);	/* strsubr.h, strreg.c */
+//EXPORT_SYMBOL(vcmn_err);	/* cmn_err.h */
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
-//EXPORT_SYMBOL_GPL(do_fattach);/* strattach.h */
-//EXPORT_SYMBOL_GPL(do_fdetach);/* strattach.h */
+//EXPORT_SYMBOL(do_fattach);/* strattach.h */
+//EXPORT_SYMBOL(do_fdetach);/* strattach.h */
 #endif
 #ifdef HAVE_KERNEL_PIPE_SUPPORT
-//EXPORT_SYMBOL_GPL(do_spipe);	/* strspecfs.h */
+//EXPORT_SYMBOL(do_spipe);	/* strspecfs.h */
 #endif
 //#endif
 //#endif

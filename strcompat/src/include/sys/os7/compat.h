@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.17 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.18 2005/07/07 20:29:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:07 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -58,6 +58,7 @@
 #ifdef LINUX
 #include <linux/config.h>
 #include <linux/version.h>
+#include <linux/compiler.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #endif				/* LINUX */
@@ -170,6 +171,9 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
+/* LIS forgets to typedef these */
+typedef int bcid_t;
+typedef int bufcall_id_t;
 #endif
 
 /* pull in OS specific defines */

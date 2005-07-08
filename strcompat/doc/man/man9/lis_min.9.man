@@ -1,0 +1,1 @@
+.so man9/min.9.man

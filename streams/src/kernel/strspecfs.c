@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/04 20:07:47 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/04 20:07:47 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/04 20:07:47 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/04 20:07:47 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/07 20:29:47 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1443,7 +1443,7 @@ struct vfsmount *specfs_get(void)
 		ptrace(("%s: mount count is now %d\n", __FUNCTION__, atomic_read(&specfs_mnt->mnt_count)));
 	return (mntget(specfs_mnt));
 }
-EXPORT_SYMBOL_GPL(specfs_get);
+EXPORT_SYMBOL(specfs_get);
 
 #if ! HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
@@ -1463,7 +1463,7 @@ void specfs_put(void)
 		spin_unlock(&specfs_lock);
 	}
 }
-EXPORT_SYMBOL_GPL(specfs_put);
+EXPORT_SYMBOL(specfs_put);
 
 /**
  *  strspecfs_init: - initialize the shadow special filesystem

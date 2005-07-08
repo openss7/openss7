@@ -1,1 +1,1 @@
-.so man9/undoc.9.man
+.so man9/svr4compat.9.man

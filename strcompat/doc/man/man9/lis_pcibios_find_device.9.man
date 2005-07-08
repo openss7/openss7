@@ -1,0 +1,1 @@
+.so man9/liscompat.9.man

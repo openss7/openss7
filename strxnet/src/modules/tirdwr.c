@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/05 22:46:13 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/07 20:30:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:30:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/05 22:46:13 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/07 20:30:17 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/05 22:46:13 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/07 20:30:17 $";
 
 #include <os7/compat.h>
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/05 22:46:13 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/07 20:30:17 $"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -160,16 +160,6 @@ static struct streamtab tirdwrinfo = {
  *
  *  =========================================================================
  */
-/*
-   LiS does not define these... 
- */
-#if !defined(HAVE_BCID_T)
-typedef int bcid_t;
-#endif
-#if !defined(HAVE_BUFCALL_ID_T)
-typedef int bufcall_id_t;
-#endif
-
 typedef struct tirdwr {
 	queue_t *rq;			/* module read queue */
 	queue_t *wq;			/* module write queue */

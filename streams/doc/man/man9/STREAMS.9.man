@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: STREAMS.9.man,v 0.9.2.24 2005/07/05 22:46:06 brian Exp $
+.\" @(#) $Id: STREAMS.9.man,v 0.9.2.25 2005/07/07 20:29:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/05 22:46:06 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/07 20:29:36 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so streams.macros
@@ -819,6 +819,14 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .PP
 .PD 0
 .HP
+.BR DB_BASE "(9)\ \-\ 
+.HP
+.BR DB_LIM "(9)\ \-\ 
+.HP
+.BR DB_REF "(9)\ \-\ 
+.HP
+.BR DB_TYPE "(9)\ \-\ 
+.HP
 .BR ddi_create_minor_node "(9)\ \-\ 
 .HP
 .BR ddi_driver_major "(9)\ \-\ 
@@ -857,17 +865,59 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .HP
 .BR ddi_umem_free "(9)\ \-\ 
 .HP
+.BR freezestr "(9)\ \-\ 
+.HP
+.BR MBLKHEAD "(9)\ \-\ 
+.HP
+.BR MBLKIN "(9)\ \-\ 
+.HP
+.BR MBLKL "(9)\ \-\ 
+.HP
+.BR MBLKSIZE "(9)\ \-\ 
+.HP
+.BR MBLKTAIL "(9)\ \-\ 
+.HP
+.BR mcopyin "(9)\ \-\ 
+.HP
+.BR mcopymsg "(9)\ \-\ 
+.HP
+.BR mcopyout "(9)\ \-\ 
+.HP
+.BR merror "(9)\ \-\ 
+.HP
+.BR mexchange "(9)\ \-\ 
+.HP
+.BR mexpandb "(9)\ \-\ 
+.HP
+.BR mioc2ack "(9)\ \-\ 
+.HP
+.BR miocack "(9)\ \-\ 
+.HP
+.BR miocnak "(9)\ \-\ 
+.HP
+.BR miocpullup "(9)\ \-\ 
+.HP
 .BR mod_info "(9)\ \-\ 
 .HP
 .BR mod_install "(9)\ \-\ 
 .HP
 .BR mod_remove "(9)\ \-\ 
 .HP
+.BR mod_strmops "(9)\ \-\ 
+.HP
+.BR nochpoll "(9)\ \-\ 
+.HP
+.BR nodev "(9)\ \-\ 
+.HP
+.BR nulldev "(9)\ \-\ 
+.HP
+.BR OFFSET "(9)\ \-\ 
+.HP
 .BR qbufcall "(9)\ \-\ 
 .HP
-.BR queclass "(9)\ \-\ return the class of a message
-.HP
 .BR qtimeout "(9)\ \-\ 
+.HP
+.BR queclass "(9)\ \-\ return the class of a message
 .HP
 .BR qunbufcall "(9)\ \-\ 
 .HP
@@ -878,6 +928,8 @@ release \fISTREAMS\fP stream head locked by \fBMPSTR_STPLOCK\fP(9)
 .BR qwait_sig "(9)\ \-\ wait for a queue procedure to execute or signal
 .HP
 .BR qwriter "(9)\ \-\ 
+.HP
+.BR unfreezestr "(9)\ \-\ 
 .PD
 .PP
 .SS "MacOT 1.5r2 Compatibility Functions"

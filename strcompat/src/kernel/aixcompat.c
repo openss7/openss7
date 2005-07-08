@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/04 20:14:29 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:14:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/04 20:14:29 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/04 20:14:29 $";
-
-#if 0
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>	/* for MOD_DEC_USE_COUNT etc */
-#include <linux/init.h>
-#endif
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -75,49 +68,9 @@ static char const ident[] =
 
 #define __AIX_EXTERN_INLINE inline
 
-#if 0
-#include <linux/kernel.h>	/* for vsprintf and friends */
-#include <linux/vmalloc.h>	/* for vmalloc */
-#ifdef CONFIG_PCI
-#include <linux/pci.h>		/* for many pci functions */
-#include <asm/pci.h>		/* for many pci functions */
-#endif
-#include <linux/ioport.h>	/* for check_region and friends */
-#include <asm/uaccess.h>	/* for verify_area and friends */
-#include <linux/timer.h>	/* for del_timer and friends */
-#include <asm/semaphore.h>	/* for semaphores */
-#include <linux/sched.h>	/* for kill_proc, jiffies and friends */
-#include <linux/kmod.h>		/* for request_module and friends */
-#include <linux/threads.h>	/* for NR_CPUS */
-#include <asm/dma.h>		/* for request_dma and friends */
-#include <linux/fs.h>		/* for filesystem related stuff */
-#include <linux/time.h>		/* for do_gettimeofday and friends */
-#include <asm/io.h>		/* for virt_to_page and friends */
-#include <linux/slab.h>		/* for kmalloc and friends */
-#include <asm/irq.h>		/* for disable_irq */
-#include <asm/system.h>		/* for sti, cli */
-#include <asm/delay.h>		/* for udelay */
-#include <linux/spinlock.h>	/* for spinlock functions */
-#include <asm/atomic.h>		/* for atomic functions */
-#include <linux/poll.h>		/* for poll_table */
-#include <linux/string.h>
-#endif
-
 #define _AIX_SOURCE
 
-#if 0
-#include <sys/kmem.h>		/* for SVR4 style kmalloc functions */
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-#endif
-
 #include "os7/compat.h"
-
-#if LIS
-#include <sys/aixddi.h>
-#endif
 
 #if LFS
 //#include "sys/config.h"
@@ -125,12 +78,12 @@ static char const ident[] =
 #include "src/kernel/strutil.h"
 //#include "src/modules/sth.h"
 #include "src/kernel/strreg.h"
-#include "src/kernel/strsad.h"
+//#include "src/kernel/strsad.h"
 #endif
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/04 20:14:29 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"

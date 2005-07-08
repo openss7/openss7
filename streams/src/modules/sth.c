@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:51 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:53 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/04 20:07:51 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2815,7 +2815,7 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 }
 
 #if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(strputpmsg);
+EXPORT_SYMBOL(strputpmsg);
 #endif
 
 /**
@@ -2955,7 +2955,7 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 }
 
 #if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(strgetpmsg);
+EXPORT_SYMBOL(strgetpmsg);
 #endif
 
 /* 
@@ -3258,7 +3258,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 };
 
 #if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SYMBOL_GPL(strm_f_ops);
+EXPORT_SYMBOL(strm_f_ops);
 #endif
 
 /* 
@@ -3285,7 +3285,7 @@ int strwsrv(queue_t *q)
 }
 
 #if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
-EXPORT_SYMBOL_GPL(strwsrv);
+EXPORT_SYMBOL(strwsrv);
 #endif
 
 /* 
@@ -3565,7 +3565,7 @@ int strrput(queue_t *q, mblk_t *mp)
 }
 
 #if defined CONFIG_STREAMS_FIFO_MODULE || defined CONFIG_STREAMS_PIPE_MODULE
-EXPORT_SYMBOL_GPL(strrput);
+EXPORT_SYMBOL(strrput);
 #endif
 
 /* 
@@ -3775,7 +3775,7 @@ int register_strdev(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL_GPL(register_strdev);
+EXPORT_SYMBOL(register_strdev);
 
 /**
  *  unregister_strdev: - unregister previously registered STREAMS device
@@ -3814,7 +3814,7 @@ int unregister_strdev(struct cdevsw *cdev, major_t major)
 	return unregister_cmajor(cdev, major);
 }
 
-EXPORT_SYMBOL_GPL(unregister_strdev);
+EXPORT_SYMBOL(unregister_strdev);
 
 /* 
  *  -------------------------------------------------------------------------

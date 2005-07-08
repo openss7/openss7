@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/05 22:46:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/07 20:29:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:29:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -102,6 +102,12 @@ svr4_compat_pages = \
 	man9/spl6.9 \
 	man9/spl7.9 \
 	man9/spl.9 \
+	man9/splbase.9 \
+	man9/spldisk.9 \
+	man9/splhi.9 \
+	man9/splstr.9 \
+	man9/spltimeout.9 \
+	man9/spltty.9 \
 	man9/splx.9 \
 	man9/SV_ALLOC.9 \
 	man9/SV_BROADCAST.9 \
@@ -226,8 +232,6 @@ sun_compat_pages = \
 	man9/mod_install.9 \
 	man9/mod_remove.9 \
 	man9/mod_strmops.9 \
-	man9/msgb.9 \
-	man9/msgsize.9 \
 	man9/nochpoll.9 \
 	man9/nodev.9 \
 	man9/nulldev.9 \
@@ -257,14 +261,18 @@ uw7_compat_pages = \
 	man9/msgphysreq.9 \
 	man9/msgpullup_physreq.9 \
 	man9/msgscgth.9 \
-	man9/printf_UW7.9
+	man9/printf_UW7.9 \
+	man9/strioccall.9
 
 osf_compat_pages = \
 	man9/osfcompat.9 \
 	man9/lbolt.9 \
+	man9/puthere.9 \
 	man9/streams_close_comm.9 \
 	man9/streams_open_comm.9 \
 	man9/streams_open_ocomm.9 \
+	man9/strmod_add.9 \
+	man9/strmod_del.9 \
 	man9/time.9
 
 aix_compat_pages = \
@@ -276,6 +284,10 @@ aix_compat_pages = \
 hpux_compat_pages = \
 	man9/hpuxcompat.9 \
 	man9/get_sleep_lock.9 \
+	man9/mpsleep.9 \
+	man9/str_install_HPUX.9 \
+	man9/streams_get_sleep_lock.9 \
+	man9/streams_mpsleep.9 \
 	man9/streams_put.9
 
 irix_compat_pages = \
@@ -629,6 +641,41 @@ lis_deprec_pages = \
 	man9/lis_umount2.9 \
 	man9/lis_valid_mod_list.9
 
+lfs_compat_pages = \
+	man9/lfscompat.9 \
+	man9/appq.9 \
+	man9/apush_get.9 \
+	man9/apush_set.9 \
+	man9/bcanget.9 \
+	man9/canget.9 \
+	man9/copyin.9 \
+	man9/copyout.9 \
+	man9/ctlmsg.9 \
+	man9/datamsg.9 \
+	man9/delay.9 \
+	man9/drv_getparm.9 \
+	man9/drv_hztomsec.9 \
+	man9/drv_hztousec.9 \
+	man9/drv_msectohz.9 \
+	man9/drv_priv.9 \
+	man9/drv_usectohz.9 \
+	man9/drv_usecwait.9 \
+	man9/enableq.9 \
+	man9/getadmin.9 \
+	man9/getmid.9 \
+	man9/isdatablk.9 \
+	man9/isdatamsg.9 \
+	man9/linkmsg.9 \
+	man9/pcmsg.9 \
+	man9/putctl.9 \
+	man9/putctl1.9 \
+	man9/putctl2.9 \
+	man9/putnextctl.9 \
+	man9/putnextctl1.9 \
+	man9/putnextctl2.9 \
+	man9/strlog.9 \
+	man9/vstrlog_hook.9
+
 mac_compat_pages = \
 	man9/maccompat.9 \
 	man9/allocbi.9 \
@@ -840,7 +887,6 @@ man_MANS = \
 	man9/lfs_register_strdev.9 \
 	man9/linkb.9 \
 	man9/linkmsg.9 \
-	man9/LOCK.9 \
 	man9/major.9 \
 	man9/makedev.9 \
 	man9/makedevice.9 \
@@ -854,8 +900,10 @@ man_MANS = \
 	man9/module_stat.9 \
 	man9/mount.9 \
 	man9/mp-streams.9 \
+	man9/msgb.9 \
 	man9/msgdsize.9 \
 	man9/msgpullup.9 \
+	man9/msgsize.9 \
 	man9/nodesw_lock.9 \
 	man9/noenable.9 \
 	man9/OTHER.9 \
@@ -873,7 +921,6 @@ man_MANS = \
 	man9/putctl1.9 \
 	man9/putctl2.9 \
 	man9/putctl.9 \
-	man9/puthere.9 \
 	man9/putnext.9 \
 	man9/putnextctl1.9 \
 	man9/putnextctl2.9 \
@@ -932,23 +979,12 @@ man_MANS = \
 	man9/specfs_get.9 \
 	man9/specfs_put.9 \
 	man9/SPG.9 \
-	man9/splbase.9 \
-	man9/spldisk.9 \
-	man9/splhi.9 \
-	man9/splstr.9 \
-	man9/spltimeout.9 \
-	man9/spltty.9 \
 	man9/STREAMS.9 \
-	man9/streams_get_sleep_lock.9 \
 	man9/streamtab.9 \
 	man9/strgetpmsg.9 \
 	man9/str_install.9 \
-	man9/str_install_HPUX.9 \
-	man9/strioccall.9 \
 	man9/strlog.9 \
 	man9/strm_f_ops.9 \
-	man9/strmod_add.9 \
-	man9/strmod_del.9 \
 	man9/strputpmsg.9 \
 	man9/strqget.9 \
 	man9/strqset.9 \
@@ -1017,6 +1053,9 @@ if CONFIG_STREAMS_COMPAT_LIS
 man_MANS		    += $(lis_compat_pages)
 man_MANS		    += $(lis_deprec_pages)
 endif
+##if CONFIG_STREAMS_COMPAT_LFS
+##man_MANS		    += $(lfs_compat_pages)
+##endif
 if CONFIG_STREAMS_COMPAT_MAC
 man_MANS		    += $(mac_compat_pages)
 endif
@@ -1052,6 +1091,9 @@ if CONFIG_STREAMS_COMPAT_LIS_MODULE
 man_MANS		    += $(lis_compat_pages)
 man_MANS		    += $(lis_deprec_pages)
 endif
+##if CONFIG_STREAMS_COMPAT_LFS_MODULE
+##man_MANS		    += $(lfs_compat_pages)
+##endif
 if CONFIG_STREAMS_COMPAT_MAC_MODULE
 man_MANS		    += $(mac_compat_pages)
 endif
@@ -1101,6 +1143,12 @@ dist_noinst_svr4_compat_pages = \
 	man9/spl6.9.man \
 	man9/spl7.9.man \
 	man9/spl.9.man \
+	man9/splbase.9.man \
+	man9/spldisk.9.man \
+	man9/splhi.9.man \
+	man9/splstr.9.man \
+	man9/spltimeout.9.man \
+	man9/spltty.9.man \
 	man9/splx.9.man \
 	man9/SV_ALLOC.9.man \
 	man9/SV_BROADCAST.9.man \
@@ -1225,8 +1273,6 @@ dist_noinst_sun_compat_pages = \
 	man9/mod_install.9.man \
 	man9/mod_remove.9.man \
 	man9/mod_strmops.9.man \
-	man9/msgb.9.man \
-	man9/msgsize.9.man \
 	man9/nochpoll.9.man \
 	man9/nodev.9.man \
 	man9/nulldev.9.man \
@@ -1256,14 +1302,18 @@ dist_noinst_uw7_compat_pages = \
 	man9/msgphysreq.9.man \
 	man9/msgpullup_physreq.9.man \
 	man9/msgscgth.9.man \
-	man9/printf_UW7.9.man
+	man9/printf_UW7.9.man \
+	man9/strioccall.9.man
 
 dist_noinst_osf_compat_pages = \
 	man9/osfcompat.9.man \
 	man9/lbolt.9.man \
+	man9/puthere.9.man \
 	man9/streams_close_comm.9.man \
 	man9/streams_open_comm.9.man \
 	man9/streams_open_ocomm.9.man \
+	man9/strmod_add.9.man \
+	man9/strmod_del.9.man \
 	man9/time.9.man
 
 dist_noinst_aix_compat_pages = \
@@ -1275,6 +1325,10 @@ dist_noinst_aix_compat_pages = \
 dist_noinst_hpux_compat_pages = \
 	man9/hpuxcompat.9.man \
 	man9/get_sleep_lock.9.man \
+	man9/mpsleep.9.man \
+	man9/str_install_HPUX.9.man \
+	man9/streams_get_sleep_lock.9.man \
+	man9/streams_mpsleep.9.man \
 	man9/streams_put.9.man
 
 dist_noinst_irix_compat_pages = \
@@ -1628,6 +1682,41 @@ dist_noinst_lis_deprec_pages = \
 	man9/lis_umount2.9.man \
 	man9/lis_valid_mod_list.9.man
 
+dist_noinst_lfs_compat_pages = \
+	man9/lfscompat.9.man \
+	man9/appq.9.man \
+	man9/apush_get.9.man \
+	man9/apush_set.9.man \
+	man9/bcanget.9.man \
+	man9/canget.9.man \
+	man9/copyin.9.man \
+	man9/copyout.9.man \
+	man9/ctlmsg.9.man \
+	man9/datamsg.9.man \
+	man9/delay.9.man \
+	man9/drv_getparm.9.man \
+	man9/drv_hztomsec.9.man \
+	man9/drv_hztousec.9.man \
+	man9/drv_msectohz.9.man \
+	man9/drv_priv.9.man \
+	man9/drv_usectohz.9.man \
+	man9/drv_usecwait.9.man \
+	man9/enableq.9.man \
+	man9/getadmin.9.man \
+	man9/getmid.9.man \
+	man9/isdatablk.9.man \
+	man9/isdatamsg.9.man \
+	man9/linkmsg.9.man \
+	man9/pcmsg.9.man \
+	man9/putctl.9.man \
+	man9/putctl1.9.man \
+	man9/putctl2.9.man \
+	man9/putnextctl.9.man \
+	man9/putnextctl1.9.man \
+	man9/putnextctl2.9.man \
+	man9/strlog.9.man \
+	man9/vstrlog_hook.9.man
+
 dist_noinst_mac_compat_pages = \
 	man9/maccompat.9.man \
 	man9/allocbi.9.man \
@@ -1840,7 +1929,6 @@ dist_noinst_MANS = \
 	man9/lfs_register_strdev.9.man \
 	man9/linkb.9.man \
 	man9/linkmsg.9.man \
-	man9/LOCK.9.man \
 	man9/major.9.man \
 	man9/makedev.9.man \
 	man9/makedevice.9.man \
@@ -1854,8 +1942,10 @@ dist_noinst_MANS = \
 	man9/module_stat.9.man \
 	man9/mount.9.man \
 	man9/mp-streams.9.man \
+	man9/msgb.9.man \
 	man9/msgdsize.9.man \
 	man9/msgpullup.9.man \
+	man9/msgsize.9.man \
 	man9/nodesw_lock.9.man \
 	man9/noenable.9.man \
 	man9/OTHER.9.man \
@@ -1873,7 +1963,6 @@ dist_noinst_MANS = \
 	man9/putctl1.9.man \
 	man9/putctl2.9.man \
 	man9/putctl.9.man \
-	man9/puthere.9.man \
 	man9/putnext.9.man \
 	man9/putnextctl1.9.man \
 	man9/putnextctl2.9.man \
@@ -1932,23 +2021,12 @@ dist_noinst_MANS = \
 	man9/specfs_get.9.man \
 	man9/specfs_put.9.man \
 	man9/SPG.9.man \
-	man9/splbase.9.man \
-	man9/spldisk.9.man \
-	man9/splhi.9.man \
-	man9/splstr.9.man \
-	man9/spltimeout.9.man \
-	man9/spltty.9.man \
 	man9/STREAMS.9.man \
-	man9/streams_get_sleep_lock.9.man \
 	man9/streamtab.9.man \
 	man9/strgetpmsg.9.man \
 	man9/str_install.9.man \
-	man9/str_install_HPUX.9.man \
-	man9/strioccall.9.man \
 	man9/strlog.9.man \
 	man9/strm_f_ops.9.man \
-	man9/strmod_add.9.man \
-	man9/strmod_del.9.man \
 	man9/strputpmsg.9.man \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
@@ -2017,6 +2095,9 @@ if CONFIG_STREAMS_COMPAT_LIS
 dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
 dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
 endif
+##if CONFIG_STREAMS_COMPAT_LFS
+##dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)
+##endif
 if CONFIG_STREAMS_COMPAT_MAC
 dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
 endif
@@ -2052,9 +2133,13 @@ if CONFIG_STREAMS_COMPAT_LIS_MODULE
 dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
 dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
 endif
+##if CONFIG_STREAMS_COMPAT_LFS_MODULE
+##dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)
+##endif
 if CONFIG_STREAMS_COMPAT_MAC_MODULE
 dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
 endif
+
 
 ## PKG_BUILD_INDEP
 endif

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.33 $) $Date: 2005/07/06 04:14:25 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.34 $) $Date: 2005/07/07 20:28:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 04:14:25 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1123,6 +1123,7 @@ fi
 #doc ABOUT-NLS
 %doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS manual
 %doc LSM %{name}-%{version}.lsm
+%doc README-make
 %{_infodir}/*
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.refs
 @COOKED_MANPAGES_FALSE@%{_mandir}/%{base}.macros
@@ -1559,6 +1560,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.34  2005/07/07 20:28:31  brian
+# - changes for release
+#
 # Revision 1.1.6.33  2005/07/06 04:14:25  brian
 # - added requirement for strcompat package
 #

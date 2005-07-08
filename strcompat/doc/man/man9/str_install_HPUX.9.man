@@ -1,0 +1,397 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: str_install_HPUX.9.man,v 0.9.2.1 2005/07/07 20:26:03 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/07 20:26:03 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strcompat.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH STR_INSTALL 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B str_install, str_uninstall
+\- installs or uninstalls a \fISTREAMS\fR module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _HPUX_SOURCE
+.br
+.B #include <sys/streams.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+int \fBstr_install\fR(streams_info_t *\fIinst\fR)
+.HP
+int \fBstr_uninstall\fR(streams_info_t *\fIinst\fR)
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I inst
+A pointer to module information
+.B streams_info_t
+structure
+containing the
+.I STREAMS
+.BR streamtab (9)
+structure.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR str_install ()
+.PP
+.BR str_uninstall ()
+
+.PP
+The
+.B streams_info_t
+structure is formatted as follows:
+.nf
+\fC\s-1
+typedef struct stream_inst {
+    char *name;                         /* name of driver or module */
+    int inst_major;                     /* major number for driver (-1 dynamic or module) */
+    struct streamtab inst_str_tab;      /* current streamstabe entry */
+    unsigned int inst_flags;            /* flags, e.g. STR_SVR4_OPEN, STR_IS_MODULE */
+    int inst_sync_level;                /* sync level defined by stream.h */
+    char inst_sysc_info[FMNAMESZ + 1];  /* elsewhere sync param described in MP */
+} streams_info_t;
+\s+1\fP
+.fi
+.TP
+.I name
+The name of the driver or module.
+.TP
+.I inst_major
+Specifies the major device number for a
+.I STREAMS
+device.  If this field is coded
+.BR -1 ,
+then a device major will be automatically assigned.
+.TP
+.I inst_str_tab
+The current stream tab entry.
+.TP
+.I inst_flags
+Install flags.
+See
+.RI \(lq FLAGS \(rq,
+below.
+.TP
+.I inst_sync_level
+The
+.I STREAMS
+synchronization level.
+See
+.RI \(lq "SYNCHRONIZATION LEVELS" \(rq,
+below.
+.TP
+.I inst_sysc_info
+The
+.RI \(lq elsewhere \(rq
+synchronization parameter described in MP.
+.\"
+.SS "Install Flags"
+.PP
+This can be a bitwise or of the following:
+.TP
+.B STR_IS_DEVICE
+The
+.I STREAMS
+driver to install is a device.
+.TP
+.B STR_IS MODULE
+The
+.I STREAMS
+module to install is a module.
+.TP
+.B STR_TYPE_MASK
+Mask of
+.B STR_IS_DEVICE
+and
+.BR STR_IS_MODULE .
+.TP
+.B STR_SYSV4_OPEN
+V4 open signature and return.
+.TP
+.B STR_QSAFETY
+Module needs safe callback functions.
+.TP
+.B STR_IS_SECURE
+Module/device is secure.
+.\"
+.SS "Synchronization Levels"
+.PP
+The
+.I STREAMS
+synchronization level.
+as follows:
+.TP
+.B SQLVL_DEFAULT
+Default level of synchronization.
+Specifies that the module uses the default synchronization scheme.  This is
+the same as specifying
+.BR SQLVL_MODULE .
+.TP
+.B SQLVL_GLOBAL
+.I STREAMS
+scheduler level synchronization.
+Specifies that the module is run with global synchronization.  This means that
+only one
+.I STREAMS
+executive thread will be permitted to entry any module.  This makes the entire
+.I STREAMS
+executive single threaded and is useful primarily for debugging.  This is the
+same as
+.RI \(lq "Uniprocessor Emulation" \(rq
+on some systems, and reduces the
+.I STREAMS
+executive to running on a single processor at a time.
+.TP
+.B SQLVL_ELSEWHERE
+Module group level synchronization.
+Specifies that the module is run with synchronization within a group of
+modules.  Only one thread of execution will be within n the group of modules
+at a time.  The group is separately specified as a character string name.
+This permits a group of modules to run single threaded as though they are
+running on a single processor, without interfering with the concurrency of
+other modules outside the group.  This can be important for testing and for
+modules that implicitly share unprotected data structures.
+.TP
+.B SQLVL_MODULE
+Module level synchronization. (Default)
+Specifies that the module is run with synchronization at the module.  Only one
+thread of execution will be permitted within the module.  Where the module
+does not share data structures between modules, this has a similar effect to
+running on a UP system.  This is the default and works best for non-MP-safe
+modules written in accordance with
+.I STREAMS
+guidelines.
+.TP
+.B SQLVL_QUEUEPAIR
+Queue pair level synchronization.
+Specifies that the module is run with synchronization at the queue pair.  Only
+one thread will be permitted to enter a given queue's procedures within a
+given queue pair.  Where the read and write side of the queue pair share the
+same private structure
+.IR ( q->q_ptr ),
+this provides MP protection of the common data structure to all synchronous
+entry points without an external semaphore.
+.TP
+.B SQLVL_QUEUE
+Queue level synchronization.
+Specifies that the module is run with synchronization at the queue.  Only one
+thread will be permitted to enter a given queue's procedures, however, another
+thread will be permitted to enter the procedures of the other queue in the
+queue pair.  This is useful when the read and write side of a module are
+largely independent and do no require synchronization between sides of the
+queue pair.
+.TP
+.B SQLVL_NOP
+No synchronization.
+Specifies that the module is run without synchronization.  All synchronous
+module entry points, call-outs and callbacks become asynchronous.  It is the
+module's responsibility to provide synchronization or serialization as
+required.
+.PP
+For further details on synchronization, see
+.BR mp-streams (9).
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR str_install ()
+succeeds, it returns 
+.BR DDI_SUCCESS ;
+when it fails, it returns
+.BR DDI_FAILURE .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR str_install ()
+fails when 
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR str_install ()
+can be called from
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR str_install ()
+is a
+.IR HP-UX \(rg-specific
+function:
+.B _HPUX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_HPUX
+or
+.B CONFIG_STREAMS_COMPAT_HPUX_MODULE
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR str_install ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR str_install ()
+is compatible with
+.IR HP-UX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Synchronization flags and fields used by
+.BR str_install ()
+in the
+.B streams_info_t
+structure are compatible with
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.IP \(em
+.IP \(em
+.IP \(em
+.BR str_install ()
+is provided for source level compatibility with
+.IR HP-UX \(rg
+for the purpose of porting
+.IR HP-UX \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+differ from that of
+.IR HP-UX \(rg,
+binaries are incompatible.
+.IP \(em
+.BR str_install ()
+only provides functionality comparable to
+.IR HP-UX \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR str_install ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+DDI documentation.
+.[
+hpuxdoc
+.]
+.[
+hpuxspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR str_install ()
+first appeared in
+.IR HP-UX \(rg.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/07 20:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/06 03:47:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.5  2005/07/07 20:29:17  brian
+ - changes for release
+
  Revision 0.9.2.4  2005/07/06 03:47:46  brian
  - minor corrections
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/07 20:29:17 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $";
+static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/07 20:29:17 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -86,24 +89,19 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #include "os7/compat.h"
 
-#if LIS
-#include <sys/lfsddi.h>
-#endif
+#include <sys/strlog.h>
 
 #if LFS
 //#include "sys/config.h"
 #include "src/kernel/strsched.h"
 #include "src/kernel/strutil.h"
 //#include "src/modules/sth.h"
-#include "src/kernel/strsad.h"
+//#include "src/kernel/strsad.h"
 #endif
-
-#include <linux/version.h>
-#include <linux/compiler.h>
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/06 03:47:46 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/07 20:29:17 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -143,13 +141,13 @@ MODULE_ALIAS("streams-lfscompat");
 
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp);
-EXPORT_SYMBOL_GPL(appq);
+EXPORT_SYMBOL(appq);
 
 __LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
-EXPORT_SYMBOL_GPL(apush_get);
+EXPORT_SYMBOL(apush_get);
 
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
-EXPORT_SYMBOL_GPL(apush_set);
+EXPORT_SYMBOL(apush_set);
 
 int bcanget(queue_t *q, int band)
 {
@@ -174,7 +172,7 @@ int bcanget(queue_t *q, int band)
 	return (result);
 }
 
-EXPORT_SYMBOL_GPL(bcanget);
+EXPORT_SYMBOL(bcanget);
 
 int canget(queue_t *q)
 {
@@ -195,7 +193,7 @@ int canget(queue_t *q)
 	return (result & 1);
 }
 
-EXPORT_SYMBOL_GPL(canget);
+EXPORT_SYMBOL(canget);
 
 /* LiS 2.18.0 deprecated these for some reason... */
 __LFS_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
@@ -245,7 +243,7 @@ int drv_getparm(const unsigned int parm, void *value_p)
 		*(cred_t **) value_p = current_creds;
 		return (0);
 	case STRMSGSIZE:
-#if 0
+#if LFS
 		*(int *) value_p = sysctl_str_strmsgsz;
 		return (0);
 #else
@@ -290,7 +288,7 @@ __LFS_EXTERN_INLINE void delay(unsigned long ticks);
 EXPORT_SYMBOL(delay);
 
 __LFS_EXTERN_INLINE int enableq(queue_t *q);
-EXPORT_SYMBOL_GPL(enableq);
+EXPORT_SYMBOL(enableq);
 
 __LFS_EXTERN_INLINE qi_qadmin_t getadmin(modID_t modid);
 EXPORT_SYMBOL(getadmin);
@@ -299,7 +297,7 @@ __LFS_EXTERN_INLINE modID_t getmid(const char *name);
 EXPORT_SYMBOL(getmid);
 
 __LFS_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-EXPORT_SYMBOL_GPL(linkmsg);
+EXPORT_SYMBOL(linkmsg);
 
 __LFS_EXTERN_INLINE int pcmsg(unsigned char type);
 EXPORT_SYMBOL(pcmsg);
@@ -308,7 +306,7 @@ __LFS_EXTERN_INLINE int datamsg(unsigned char type);
 EXPORT_SYMBOL(datamsg);
 
 __LFS_EXTERN_INLINE int ctlmsg(unsigned char type);
-EXPORT_SYMBOL_GPL(ctlmsg);
+EXPORT_SYMBOL(ctlmsg);
 
 __LFS_EXTERN_INLINE int isdatablk(dblk_t *db);
 EXPORT_SYMBOL(isdatablk);
@@ -334,9 +332,6 @@ EXPORT_SYMBOL(putnextctl1);
 __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
 EXPORT_SYMBOL(putnextctl2);
 
-#if 0
-/* I want to boot this out to strutil package anyway... */
-
 /*
  *  This is a default implemenation for strlog(9).  We print directly to the log
  *  files.  That is not good: we want to filter things out.  A proper log driver
@@ -347,7 +342,7 @@ static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
 typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 vstrlog_t vstrlog_hook = NULL;
-EXPORT_SYMBOL_GPL(vstrlog_hook);
+EXPORT_SYMBOL(vstrlog_hook);
 
 int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
@@ -388,7 +383,6 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 }
 
 EXPORT_SYMBOL(strlog);
-#endif
 
 
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE

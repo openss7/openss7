@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:22:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/04 20:22:39 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -474,7 +474,7 @@ struct devinfo *di_alloc(struct cdevsw *cdev)
 	return (di);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(di_alloc);
+EXPORT_SYMBOL(di_alloc);
 #endif
 struct devinfo *di_get(struct devinfo *di)
 {
@@ -513,7 +513,7 @@ void di_put(struct devinfo *di)
 	swerr();
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(di_put);
+EXPORT_SYMBOL(di_put);
 #endif
 
 /* 
@@ -776,7 +776,7 @@ queue_t *allocq(void)
 	}
 	return (rq);
 }
-EXPORT_SYMBOL_GPL(allocq);
+EXPORT_SYMBOL(allocq);
 
 /*
  *  __freeq:	- free a queue pair
@@ -827,7 +827,7 @@ void freeq(queue_t *rq)
 	__freeq(rq);
 	freechain(mp, mpp);
 }
-EXPORT_SYMBOL_GPL(freeq);
+EXPORT_SYMBOL(freeq);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -875,7 +875,7 @@ struct linkblk *alloclk(void)
 	return (l);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(alloclk);
+EXPORT_SYMBOL(alloclk);
 #endif
 void freelk(struct linkblk *l)
 {
@@ -893,7 +893,7 @@ void freelk(struct linkblk *l)
 	kmem_cache_free(si->si_cache, li);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(freelk);
+EXPORT_SYMBOL(freelk);
 #endif
 
 /* 
@@ -1120,7 +1120,7 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 //#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
 //    defined CONFIG_STREAMS_COMPAT_AIX_MODULE ||
 //    defined CONFIG_STREAMS_COMPAT_MAC_MODULE
-EXPORT_SYMBOL_GPL(__bufcall);
+EXPORT_SYMBOL(__bufcall);
 //#endif
 
 /**
@@ -1143,7 +1143,7 @@ EXPORT_SYMBOL(bufcall);
  *  @arg:	a client argument to pass to the callback function
  */
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
-//EXPORT_SYMBOL_GPL(esbbcall);
+//EXPORT_SYMBOL(esbbcall);
 
 /**
  *  unbufcall:	- cancel a buffer callout
@@ -1199,7 +1199,7 @@ toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsi
 }
 //#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
 //    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
-EXPORT_SYMBOL_GPL(__timeout);
+EXPORT_SYMBOL(__timeout);
 //#endif
 
 /**
@@ -1375,7 +1375,7 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 	}
 	return (ENOMEM);
 }
-EXPORT_SYMBOL_GPL(defer_func);
+EXPORT_SYMBOL(defer_func);
 //#endif
 
 /* 
@@ -1962,7 +1962,7 @@ void inline setqsched(void)
 	if (!test_and_set_bit(qrunflag, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
 }
-EXPORT_SYMBOL_GPL(setqsched);
+EXPORT_SYMBOL(setqsched);
 
 /**
  *  qready:	- test if queue procedures are scheduled
@@ -1972,7 +1972,7 @@ int inline qready(void)
 	struct strthread *t = this_thread;
 	return (test_bit(qrunflag, &t->flags) != 0);
 }
-EXPORT_SYMBOL_GPL(qready);
+EXPORT_SYMBOL(qready);
 
 /**
  *  qschedule:	- schedule a queue for service
@@ -2179,7 +2179,7 @@ struct stdata *allocstr(void)
 	}
 	return (sd);
 }
-EXPORT_SYMBOL_GPL(allocstr);
+EXPORT_SYMBOL(allocstr);
 
 static void __freestr(struct stdata *sd)
 {
@@ -2203,7 +2203,7 @@ void freestr(struct stdata *sd)
 	/* FIXME: need to deallocate anything attached to the stream head */
 	sd_put(sd);
 }
-EXPORT_SYMBOL_GPL(freestr);
+EXPORT_SYMBOL(freestr);
 
 struct stdata *sd_get(struct stdata *sd)
 {
@@ -2217,7 +2217,7 @@ struct stdata *sd_get(struct stdata *sd)
 	return (sd);
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(sd_get);
+EXPORT_SYMBOL(sd_get);
 #endif
 void sd_put(struct stdata *sd)
 {
@@ -2236,7 +2236,7 @@ void sd_put(struct stdata *sd)
 	return;
 }
 #ifdef CONFIG_STREAMS_STH_MODULE
-EXPORT_SYMBOL_GPL(sd_put);
+EXPORT_SYMBOL(sd_put);
 #endif
 
 /* 

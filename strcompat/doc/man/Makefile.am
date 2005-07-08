@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/05 22:46:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/07 20:28:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:46:03 $ by $Author: brian $
+# Last Modified $Date: 2005/07/07 20:28:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,7 @@ svr4_compat_pages = \
 	man9/geteminor.9 \
 	man9/itimeout.9 \
 	man9/itoemajor.9 \
+	man9/LOCK.9 \
 	man9/LOCK_ALLOC.9 \
 	man9/LOCK_DEALLOC.9 \
 	man9/LOCK_OWNED.9 \
@@ -101,6 +102,12 @@ svr4_compat_pages = \
 	man9/spl6.9 \
 	man9/spl7.9 \
 	man9/spl.9 \
+	man9/splbase.9 \
+	man9/spldisk.9 \
+	man9/splhi.9 \
+	man9/splstr.9 \
+	man9/spltimeout.9 \
+	man9/spltty.9 \
 	man9/splx.9 \
 	man9/SV_ALLOC.9 \
 	man9/SV_BROADCAST.9 \
@@ -114,8 +121,6 @@ svr4_compat_pages = \
 
 mps_compat_pages = \
 	man9/mpscompat.9 \
-	man9/allocq.9 \
-	man9/freeq.9 \
 	man9/mi_alloc.9 \
 	man9/mi_allocq.9 \
 	man9/mi_alloc_sleep.9 \
@@ -179,26 +184,34 @@ mps_compat_pages = \
 	man9/mi_zalloc_sleep.9 \
 	man9/mps_become_writer.9 \
 	man9/mps_intr_disable.9 \
-	man9/mps_intr_enable.9 \
-	man9/put.9 \
-	man9/puthere.9
+	man9/mps_intr_enable.9
 
 sun_compat_pages = \
 	man9/suncompat.9 \
-	man9/datab.9 \
 	man9/DB_BASE.9 \
 	man9/DB_LIM.9 \
 	man9/DB_REF.9 \
 	man9/DB_TYPE.9 \
+	man9/ddi_create_minor_node.9 \
+	man9/ddi_driver_major.9 \
+	man9/ddi_driver_name.9 \
 	man9/ddi_get_cred.9 \
 	man9/ddi_getiminor.9 \
+	man9/ddi_get_instance.9 \
 	man9/ddi_get_lbolt.9 \
 	man9/ddi_get_pid.9 \
+	man9/ddi_get_soft_state.9 \
 	man9/ddi_get_time.9 \
 	man9/ddi_prop_op.9 \
+	man9/ddi_remove_minor_node.9 \
+	man9/ddi_removing_power.9 \
+	man9/ddi_soft_state.9 \
+	man9/ddi_soft_state_fini.9 \
+	man9/ddi_soft_state_free.9 \
+	man9/ddi_soft_state_init.9 \
+	man9/ddi_soft_state_zalloc.9 \
 	man9/ddi_umem_alloc.9 \
 	man9/ddi_umem_free.9 \
-	man9/freezestr.9 \
 	man9/freezestr_SUN.9 \
 	man9/MBLKHEAD.9 \
 	man9/MBLKIN.9 \
@@ -219,8 +232,6 @@ sun_compat_pages = \
 	man9/mod_install.9 \
 	man9/mod_remove.9 \
 	man9/mod_strmops.9 \
-	man9/msgb.9 \
-	man9/msgsize.9 \
 	man9/nochpoll.9 \
 	man9/nodev.9 \
 	man9/nulldev.9 \
@@ -233,7 +244,6 @@ sun_compat_pages = \
 	man9/qwait.9 \
 	man9/qwait_sig.9 \
 	man9/qwriter.9 \
-	man9/unfreezestr.9 \
 	man9/unfreezestr_SUN.9
 
 uw7_compat_pages = \
@@ -251,14 +261,18 @@ uw7_compat_pages = \
 	man9/msgphysreq.9 \
 	man9/msgpullup_physreq.9 \
 	man9/msgscgth.9 \
-	man9/printf_UW7.9
+	man9/printf_UW7.9 \
+	man9/strioccall.9
 
 osf_compat_pages = \
 	man9/osfcompat.9 \
 	man9/lbolt.9 \
+	man9/puthere.9 \
 	man9/streams_close_comm.9 \
 	man9/streams_open_comm.9 \
 	man9/streams_open_ocomm.9 \
+	man9/strmod_add.9 \
+	man9/strmod_del.9 \
 	man9/time.9
 
 aix_compat_pages = \
@@ -270,6 +284,10 @@ aix_compat_pages = \
 hpux_compat_pages = \
 	man9/hpuxcompat.9 \
 	man9/get_sleep_lock.9 \
+	man9/mpsleep.9 \
+	man9/str_install_HPUX.9 \
+	man9/streams_get_sleep_lock.9 \
+	man9/streams_mpsleep.9 \
 	man9/streams_put.9
 
 irix_compat_pages = \
@@ -280,6 +298,7 @@ irix_compat_pages = \
 lis_compat_pages = \
 	man9/liscompat.9 \
 	man9/lisdeprec.9 \
+	man9/LiS.9 \
 	man9/lis_adjmsg.9 \
 	man9/lis_alloc_atomic_fcn.9 \
 	man9/lis_allocb.9 \
@@ -327,6 +346,7 @@ lis_compat_pages = \
 	man9/lis_free_mem_fcn.9 \
 	man9/lis_freemsg.9 \
 	man9/lis_free_pages_fcn.9 \
+	man9/lis_freezestr.9 \
 	man9/lis_get_free_pages_atomic_fcn.9 \
 	man9/lis_get_free_pages_fcn.9 \
 	man9/lis_get_free_pages_kernel_fcn.9 \
@@ -335,6 +355,7 @@ lis_compat_pages = \
 	man9/lis_gettimeofday.9 \
 	man9/lis_hitime.9 \
 	man9/lis_insq.9 \
+	man9/lis_interruptible_sleep_on.9 \
 	man9/lis_ioremap.9 \
 	man9/lis_ioremap_nocache.9 \
 	man9/lis_iounmap.9 \
@@ -342,12 +363,14 @@ lis_compat_pages = \
 	man9/lis_kernel_down.9 \
 	man9/lis_kernel_up.9 \
 	man9/lis_kernel_version.9 \
-	man9/lis__kfree.9 \
-	man9/lis__kmalloc.9 \
+	man9/lis_kfree.9 \
+	man9/lis_kmalloc.9 \
 	man9/lis_linkb.9 \
 	man9/lis_major.9 \
 	man9/lis_malloc.9 \
+	man9/lis_max.9 \
 	man9/lis_milli_to_ticks.9 \
+	man9/lis_min.9 \
 	man9/lis_mknod.9 \
 	man9/lis_mount.9 \
 	man9/lis_msecs.9 \
@@ -361,14 +384,19 @@ lis_compat_pages = \
 	man9/lis_osif_do_settimeofday.9 \
 	man9/lis_osif_pci_alloc_consistent.9 \
 	man9/lis_osif_pci_dac_dma_supported.9 \
+	man9/lis_osif_pci_dac_dma_sync_single.9 \
 	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9 \
 	man9/lis_osif_pci_dac_dma_sync_single_for_device.9 \
 	man9/lis_osif_pci_dac_dma_to_offset.9 \
 	man9/lis_osif_pci_dac_dma_to_page.9 \
 	man9/lis_osif_pci_dac_page_to_dma.9 \
+	man9/lis_osif_pci_dac_set_dma_mask.9 \
 	man9/lis_osif_pci_disable_device.9 \
 	man9/lis_osif_pci_dma_supported.9 \
+	man9/lis_osif_pci_dma_sync_sg.9 \
+	man9/lis_osif_pci_dma_sync_single.9 \
 	man9/lis_osif_pci_enable_device.9 \
+	man9/lis_osif_pci_find_class.9 \
 	man9/lis_osif_pci_find_device.9 \
 	man9/lis_osif_pci_find_slot.9 \
 	man9/lis_osif_pci_free_consistent.9 \
@@ -391,8 +419,19 @@ lis_compat_pages = \
 	man9/lis_osif_sg_dma_address.9 \
 	man9/lis_osif_sg_dma_len.9 \
 	man9/lis_osif_sti.9 \
+	man9/lis_OTHER.9 \
 	man9/lis_own_spl.9 \
+	man9/lis_pcibios_find_class.9 \
+	man9/lis_pcibios_find_device.9 \
+	man9/lis_pcibios_init.9 \
+	man9/lis_pcibios_present.9 \
+	man9/lis_pcibios_read_config_byte.9 \
+	man9/lis_pcibios_read_config_dword.9 \
+	man9/lis_pcibios_read_config_word.9 \
 	man9/lis_pcibios_strerror.9 \
+	man9/lis_pcibios_write_config_byte.9 \
+	man9/lis_pcibios_write_config_dword.9 \
+	man9/lis_pcibios_write_config_word.9 \
 	man9/lis_pci_disable_device.9 \
 	man9/lis_pci_enable_device.9 \
 	man9/lis_pci_find_class.9 \
@@ -463,6 +502,7 @@ lis_compat_pages = \
 	man9/lis_sem_alloc.9 \
 	man9/lis_sem_destroy.9 \
 	man9/lis_sem_init.9 \
+	man9/lis_sleep_on.9 \
 	man9/lis_spin_is_locked_fcn.9 \
 	man9/lis_spin_lock_alloc_fcn.9 \
 	man9/lis_spin_lock_fcn.9 \
@@ -489,6 +529,7 @@ lis_compat_pages = \
 	man9/lis_timeout_fcn.9 \
 	man9/lis_udelay.9 \
 	man9/lis_unbufcall.9 \
+	man9/lis_unfreezestr.9 \
 	man9/lis_unlink.9 \
 	man9/lis_unlinkb.9 \
 	man9/lis_unregister_strdev.9 \
@@ -507,6 +548,98 @@ lis_compat_pages = \
 	man9/lis_wake_up_interruptible.9 \
 	man9/lis_xmsgsize.9 \
 	man9/lis_zmalloc.9
+
+lis_deprec_pages = \
+	man9/lis_add_timer.9 \
+	man9/lis_allocq.9 \
+	man9/lis_apushm.9 \
+	man9/lis_basename.9 \
+	man9/lis_bprintf.9 \
+	man9/lis_can_unload.9 \
+	man9/lis_check_guard.9 \
+	man9/lis_check_mem.9 \
+	man9/lis_check_mem_region.9 \
+	man9/lis_check_q_magic.9 \
+	man9/lis_check_region.9 \
+	man9/lis_check_umem.9 \
+	man9/lis_copyin.9 \
+	man9/lis_copyout.9 \
+	man9/lis_dec_mod_cnt_fcn.9 \
+	man9/lis_del_timer.9 \
+	man9/lis_dobufcall.9 \
+	man9/lis_doclose.9 \
+	man9/lis_enable_intr.9 \
+	man9/lis_fattach.9 \
+	man9/lis_fdetach.9 \
+	man9/lis_fdetach_all.9 \
+	man9/lis_fdetach_stream.9 \
+	man9/lis_fifo_close_sync.9 \
+	man9/lis_fifo_open_sync.9 \
+	man9/lis_fifo_write_sync.9 \
+	man9/lis_file_inode.9 \
+	man9/lis_file_str.9 \
+	man9/lis_find_strdev.9 \
+	man9/lis_flush_print_buffer.9 \
+	man9/lis_fmod_sw.9 \
+	man9/lis_freedb.9 \
+	man9/lis_free_passfp.9 \
+	man9/lis_freeq.9 \
+	man9/lis_fstr_sw.9 \
+	man9/lis_get_fifo.9 \
+	man9/lis_get_passfp.9 \
+	man9/lis_get_pipe.9 \
+	man9/lis_inc_mod_cnt_fcn.9 \
+	man9/lis_init_bufcall.9 \
+	man9/lis_in_syscall.9 \
+	man9/lis_ioc_fattach.9 \
+	man9/lis_ioc_fdetach.9 \
+	man9/lis_ioc_pipe.9 \
+	man9/lis__kfree.9 \
+	man9/lis_kill_pg.9 \
+	man9/lis_kill_proc.9 \
+	man9/lis__kmalloc.9 \
+	man9/lis_loadable_load.9 \
+	man9/lis_maj_min_name.9 \
+	man9/lis_mark_mem.9 \
+	man9/lis_max_mem.9 \
+	man9/lis_old_inode.9 \
+	man9/lis_open_cnt.9 \
+	man9/lis_pci_cleanup.9 \
+	man9/lis_pipe.9 \
+	man9/lis_poll_2_1.9 \
+	man9/lis_poll_bits.9 \
+	man9/lis_poll_events.9 \
+	man9/lis_poll_file.9 \
+	man9/lis_print_queues.9 \
+	man9/lis_print_spl_track.9 \
+	man9/lis_print_stream.9 \
+	man9/lis_qattach.9 \
+	man9/lis_qdetach.9 \
+	man9/lis_queuerun_cnts.9 \
+	man9/lis_queues_running.9 \
+	man9/lis_recvfd.9 \
+	man9/lis_release_mem_region.9 \
+	man9/lis_request_mem_region.9 \
+	man9/lis_runq_cnts.9 \
+	man9/lis_runq_req_cnt.9 \
+	man9/lis_sendfd.9 \
+	man9/lis_set_file_str.9 \
+	man9/lis_setq.9 \
+	man9/lis_setqsched.9 \
+	man9/lis_setqsched_cnts.9 \
+	man9/lis_setqsched_isr_cnts.9 \
+	man9/lis_stdata_cnt.9 \
+	man9/lis_strclose.9 \
+	man9/lis_strcount.9 \
+	man9/lis_strgetpmsg.9 \
+	man9/lis_strioctl.9 \
+	man9/lis_stropen.9 \
+	man9/lis_strputpmsg.9 \
+	man9/lis_strread.9 \
+	man9/lis_strstats.9 \
+	man9/lis_strwrite.9 \
+	man9/lis_umount2.9 \
+	man9/lis_valid_mod_list.9
 
 lfs_compat_pages = \
 	man9/lfscompat.9 \
@@ -549,9 +682,14 @@ mac_compat_pages = \
 	man9/esballoca.9 \
 	man9/mpnotify.9
 
+sux_compat_pages = \
+	man9/suxcompat.9
+
+uxp_compat_pages = \
+	man9/uxpcompat.9
+
 man_MANS = \
-	man8/strcompat_mknod.8 \
-	man9/undoc.9
+	man8/strcompat_mknod.8
 
 if CONFIG_STREAMS_COMPAT_SVR3
 man_MANS		    += $(svr3_compat_pages)
@@ -582,6 +720,7 @@ man_MANS		    += $(irix_compat_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 man_MANS		    += $(lis_compat_pages)
+man_MANS		    += $(lis_deprec_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LFS
 man_MANS		    += $(lfs_compat_pages)
@@ -619,6 +758,7 @@ man_MANS		    += $(irix_compat_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 man_MANS		    += $(lis_compat_pages)
+man_MANS		    += $(lis_deprec_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LFS_MODULE
 man_MANS		    += $(lfs_compat_pages)
@@ -639,6 +779,7 @@ dist_noinst_svr4_compat_pages = \
 	man9/geteminor.9.man \
 	man9/itimeout.9.man \
 	man9/itoemajor.9.man \
+	man9/LOCK.9.man \
 	man9/LOCK_ALLOC.9.man \
 	man9/LOCK_DEALLOC.9.man \
 	man9/LOCK_OWNED.9.man \
@@ -671,6 +812,12 @@ dist_noinst_svr4_compat_pages = \
 	man9/spl6.9.man \
 	man9/spl7.9.man \
 	man9/spl.9.man \
+	man9/splbase.9.man \
+	man9/spldisk.9.man \
+	man9/splhi.9.man \
+	man9/splstr.9.man \
+	man9/spltimeout.9.man \
+	man9/spltty.9.man \
 	man9/splx.9.man \
 	man9/SV_ALLOC.9.man \
 	man9/SV_BROADCAST.9.man \
@@ -684,8 +831,6 @@ dist_noinst_svr4_compat_pages = \
 
 dist_noinst_mps_compat_pages = \
 	man9/mpscompat.9.man \
-	man9/allocq.9.man \
-	man9/freeq.9.man \
 	man9/mi_alloc.9.man \
 	man9/mi_allocq.9.man \
 	man9/mi_alloc_sleep.9.man \
@@ -749,26 +894,34 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_zalloc_sleep.9.man \
 	man9/mps_become_writer.9.man \
 	man9/mps_intr_disable.9.man \
-	man9/mps_intr_enable.9.man \
-	man9/put.9.man \
-	man9/puthere.9.man
+	man9/mps_intr_enable.9.man
 
 dist_noinst_sun_compat_pages = \
 	man9/suncompat.9.man \
-	man9/datab.9.man \
 	man9/DB_BASE.9.man \
 	man9/DB_LIM.9.man \
 	man9/DB_REF.9.man \
 	man9/DB_TYPE.9.man \
+	man9/ddi_create_minor_node.9.man \
+	man9/ddi_driver_major.9.man \
+	man9/ddi_driver_name.9.man \
 	man9/ddi_get_cred.9.man \
 	man9/ddi_getiminor.9.man \
+	man9/ddi_get_instance.9.man \
 	man9/ddi_get_lbolt.9.man \
 	man9/ddi_get_pid.9.man \
+	man9/ddi_get_soft_state.9.man \
 	man9/ddi_get_time.9.man \
 	man9/ddi_prop_op.9.man \
+	man9/ddi_remove_minor_node.9.man \
+	man9/ddi_removing_power.9.man \
+	man9/ddi_soft_state.9.man \
+	man9/ddi_soft_state_fini.9.man \
+	man9/ddi_soft_state_free.9.man \
+	man9/ddi_soft_state_init.9.man \
+	man9/ddi_soft_state_zalloc.9.man \
 	man9/ddi_umem_alloc.9.man \
 	man9/ddi_umem_free.9.man \
-	man9/freezestr.9.man \
 	man9/freezestr_SUN.9.man \
 	man9/MBLKHEAD.9.man \
 	man9/MBLKIN.9.man \
@@ -789,8 +942,6 @@ dist_noinst_sun_compat_pages = \
 	man9/mod_install.9.man \
 	man9/mod_remove.9.man \
 	man9/mod_strmops.9.man \
-	man9/msgb.9.man \
-	man9/msgsize.9.man \
 	man9/nochpoll.9.man \
 	man9/nodev.9.man \
 	man9/nulldev.9.man \
@@ -803,7 +954,6 @@ dist_noinst_sun_compat_pages = \
 	man9/qwait.9.man \
 	man9/qwait_sig.9.man \
 	man9/qwriter.9.man \
-	man9/unfreezestr.9.man \
 	man9/unfreezestr_SUN.9.man
 
 dist_noinst_uw7_compat_pages = \
@@ -821,14 +971,18 @@ dist_noinst_uw7_compat_pages = \
 	man9/msgphysreq.9.man \
 	man9/msgpullup_physreq.9.man \
 	man9/msgscgth.9.man \
-	man9/printf_UW7.9.man
+	man9/printf_UW7.9.man \
+	man9/strioccall.9.man
 
 dist_noinst_osf_compat_pages = \
 	man9/osfcompat.9.man \
 	man9/lbolt.9.man \
+	man9/puthere.9.man \
 	man9/streams_close_comm.9.man \
 	man9/streams_open_comm.9.man \
 	man9/streams_open_ocomm.9.man \
+	man9/strmod_add.9.man \
+	man9/strmod_del.9.man \
 	man9/time.9.man
 
 dist_noinst_aix_compat_pages = \
@@ -840,6 +994,10 @@ dist_noinst_aix_compat_pages = \
 dist_noinst_hpux_compat_pages = \
 	man9/hpuxcompat.9.man \
 	man9/get_sleep_lock.9.man \
+	man9/mpsleep.9.man \
+	man9/str_install_HPUX.9.man \
+	man9/streams_get_sleep_lock.9.man \
+	man9/streams_mpsleep.9.man \
 	man9/streams_put.9.man
 
 dist_noinst_irix_compat_pages = \
@@ -850,6 +1008,7 @@ dist_noinst_irix_compat_pages = \
 dist_noinst_lis_compat_pages = \
 	man9/liscompat.9.man \
 	man9/lisdeprec.9.man \
+	man9/LiS.9.man \
 	man9/lis_adjmsg.9.man \
 	man9/lis_alloc_atomic_fcn.9.man \
 	man9/lis_allocb.9.man \
@@ -897,6 +1056,7 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_free_mem_fcn.9.man \
 	man9/lis_freemsg.9.man \
 	man9/lis_free_pages_fcn.9.man \
+	man9/lis_freezestr.9.man \
 	man9/lis_get_free_pages_atomic_fcn.9.man \
 	man9/lis_get_free_pages_fcn.9.man \
 	man9/lis_get_free_pages_kernel_fcn.9.man \
@@ -905,6 +1065,7 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_gettimeofday.9.man \
 	man9/lis_hitime.9.man \
 	man9/lis_insq.9.man \
+	man9/lis_interruptible_sleep_on.9.man \
 	man9/lis_ioremap.9.man \
 	man9/lis_ioremap_nocache.9.man \
 	man9/lis_iounmap.9.man \
@@ -912,12 +1073,14 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_kernel_down.9.man \
 	man9/lis_kernel_up.9.man \
 	man9/lis_kernel_version.9.man \
-	man9/lis__kfree.9.man \
-	man9/lis__kmalloc.9.man \
+	man9/lis_kfree.9.man \
+	man9/lis_kmalloc.9.man \
 	man9/lis_linkb.9.man \
 	man9/lis_major.9.man \
 	man9/lis_malloc.9.man \
+	man9/lis_max.9.man \
 	man9/lis_milli_to_ticks.9.man \
+	man9/lis_min.9.man \
 	man9/lis_mknod.9.man \
 	man9/lis_mount.9.man \
 	man9/lis_msecs.9.man \
@@ -931,14 +1094,19 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_osif_do_settimeofday.9.man \
 	man9/lis_osif_pci_alloc_consistent.9.man \
 	man9/lis_osif_pci_dac_dma_supported.9.man \
+	man9/lis_osif_pci_dac_dma_sync_single.9.man \
 	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9.man \
 	man9/lis_osif_pci_dac_dma_sync_single_for_device.9.man \
 	man9/lis_osif_pci_dac_dma_to_offset.9.man \
 	man9/lis_osif_pci_dac_dma_to_page.9.man \
 	man9/lis_osif_pci_dac_page_to_dma.9.man \
+	man9/lis_osif_pci_dac_set_dma_mask.9.man \
 	man9/lis_osif_pci_disable_device.9.man \
 	man9/lis_osif_pci_dma_supported.9.man \
+	man9/lis_osif_pci_dma_sync_sg.9.man \
+	man9/lis_osif_pci_dma_sync_single.9.man \
 	man9/lis_osif_pci_enable_device.9.man \
+	man9/lis_osif_pci_find_class.9.man \
 	man9/lis_osif_pci_find_device.9.man \
 	man9/lis_osif_pci_find_slot.9.man \
 	man9/lis_osif_pci_free_consistent.9.man \
@@ -961,8 +1129,19 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_osif_sg_dma_address.9.man \
 	man9/lis_osif_sg_dma_len.9.man \
 	man9/lis_osif_sti.9.man \
+	man9/lis_OTHER.9.man \
 	man9/lis_own_spl.9.man \
+	man9/lis_pcibios_find_class.9.man \
+	man9/lis_pcibios_find_device.9.man \
+	man9/lis_pcibios_init.9.man \
+	man9/lis_pcibios_present.9.man \
+	man9/lis_pcibios_read_config_byte.9.man \
+	man9/lis_pcibios_read_config_dword.9.man \
+	man9/lis_pcibios_read_config_word.9.man \
 	man9/lis_pcibios_strerror.9.man \
+	man9/lis_pcibios_write_config_byte.9.man \
+	man9/lis_pcibios_write_config_dword.9.man \
+	man9/lis_pcibios_write_config_word.9.man \
 	man9/lis_pci_disable_device.9.man \
 	man9/lis_pci_enable_device.9.man \
 	man9/lis_pci_find_class.9.man \
@@ -1033,6 +1212,7 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_sem_alloc.9.man \
 	man9/lis_sem_destroy.9.man \
 	man9/lis_sem_init.9.man \
+	man9/lis_sleep_on.9.man \
 	man9/lis_spin_is_locked_fcn.9.man \
 	man9/lis_spin_lock_alloc_fcn.9.man \
 	man9/lis_spin_lock_fcn.9.man \
@@ -1059,6 +1239,7 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_timeout_fcn.9.man \
 	man9/lis_udelay.9.man \
 	man9/lis_unbufcall.9.man \
+	man9/lis_unfreezestr.9.man \
 	man9/lis_unlink.9.man \
 	man9/lis_unlinkb.9.man \
 	man9/lis_unregister_strdev.9.man \
@@ -1077,6 +1258,98 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_wake_up_interruptible.9.man \
 	man9/lis_xmsgsize.9.man \
 	man9/lis_zmalloc.9.man
+
+dist_noinst_lis_deprec_pages = \
+	man9/lis_add_timer.9.man \
+	man9/lis_allocq.9.man \
+	man9/lis_apushm.9.man \
+	man9/lis_basename.9.man \
+	man9/lis_bprintf.9.man \
+	man9/lis_can_unload.9.man \
+	man9/lis_check_guard.9.man \
+	man9/lis_check_mem.9.man \
+	man9/lis_check_mem_region.9.man \
+	man9/lis_check_q_magic.9.man \
+	man9/lis_check_region.9.man \
+	man9/lis_check_umem.9.man \
+	man9/lis_copyin.9.man \
+	man9/lis_copyout.9.man \
+	man9/lis_dec_mod_cnt_fcn.9.man \
+	man9/lis_del_timer.9.man \
+	man9/lis_dobufcall.9.man \
+	man9/lis_doclose.9.man \
+	man9/lis_enable_intr.9.man \
+	man9/lis_fattach.9.man \
+	man9/lis_fdetach.9.man \
+	man9/lis_fdetach_all.9.man \
+	man9/lis_fdetach_stream.9.man \
+	man9/lis_fifo_close_sync.9.man \
+	man9/lis_fifo_open_sync.9.man \
+	man9/lis_fifo_write_sync.9.man \
+	man9/lis_file_inode.9.man \
+	man9/lis_file_str.9.man \
+	man9/lis_find_strdev.9.man \
+	man9/lis_flush_print_buffer.9.man \
+	man9/lis_fmod_sw.9.man \
+	man9/lis_freedb.9.man \
+	man9/lis_free_passfp.9.man \
+	man9/lis_freeq.9.man \
+	man9/lis_fstr_sw.9.man \
+	man9/lis_get_fifo.9.man \
+	man9/lis_get_passfp.9.man \
+	man9/lis_get_pipe.9.man \
+	man9/lis_inc_mod_cnt_fcn.9.man \
+	man9/lis_init_bufcall.9.man \
+	man9/lis_in_syscall.9.man \
+	man9/lis_ioc_fattach.9.man \
+	man9/lis_ioc_fdetach.9.man \
+	man9/lis_ioc_pipe.9.man \
+	man9/lis__kfree.9.man \
+	man9/lis_kill_pg.9.man \
+	man9/lis_kill_proc.9.man \
+	man9/lis__kmalloc.9.man \
+	man9/lis_loadable_load.9.man \
+	man9/lis_maj_min_name.9.man \
+	man9/lis_mark_mem.9.man \
+	man9/lis_max_mem.9.man \
+	man9/lis_old_inode.9.man \
+	man9/lis_open_cnt.9.man \
+	man9/lis_pci_cleanup.9.man \
+	man9/lis_pipe.9.man \
+	man9/lis_poll_2_1.9.man \
+	man9/lis_poll_bits.9.man \
+	man9/lis_poll_events.9.man \
+	man9/lis_poll_file.9.man \
+	man9/lis_print_queues.9.man \
+	man9/lis_print_spl_track.9.man \
+	man9/lis_print_stream.9.man \
+	man9/lis_qattach.9.man \
+	man9/lis_qdetach.9.man \
+	man9/lis_queuerun_cnts.9.man \
+	man9/lis_queues_running.9.man \
+	man9/lis_recvfd.9.man \
+	man9/lis_release_mem_region.9.man \
+	man9/lis_request_mem_region.9.man \
+	man9/lis_runq_cnts.9.man \
+	man9/lis_runq_req_cnt.9.man \
+	man9/lis_sendfd.9.man \
+	man9/lis_set_file_str.9.man \
+	man9/lis_setq.9.man \
+	man9/lis_setqsched.9.man \
+	man9/lis_setqsched_cnts.9.man \
+	man9/lis_setqsched_isr_cnts.9.man \
+	man9/lis_stdata_cnt.9.man \
+	man9/lis_strclose.9.man \
+	man9/lis_strcount.9.man \
+	man9/lis_strgetpmsg.9.man \
+	man9/lis_strioctl.9.man \
+	man9/lis_stropen.9.man \
+	man9/lis_strputpmsg.9.man \
+	man9/lis_strread.9.man \
+	man9/lis_strstats.9.man \
+	man9/lis_strwrite.9.man \
+	man9/lis_umount2.9.man \
+	man9/lis_valid_mod_list.9.man
 
 dist_noinst_lfs_compat_pages = \
 	man9/lfscompat.9.man \
@@ -1119,9 +1392,15 @@ dist_noinst_mac_compat_pages = \
 	man9/esballoca.9.man \
 	man9/mpnotify.9.man
 
-dist_noinst_MANS =  \
-	man8/strcompat_mknod.8.man \
-	man9/undoc.9.man
+dist_noinst_sux_compat_pages = \
+	man9/suxcompat.9.man
+
+dist_noinst_uxp_compat_pages = \
+	man9/uxpcompat.9.man
+
+
+dist_noinst_MANS = \
+	man8/strcompat_mknod.8.man
 
 if CONFIG_STREAMS_COMPAT_SVR3
 dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
@@ -1152,6 +1431,7 @@ dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
+dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LFS
 dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)
@@ -1189,6 +1469,7 @@ dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
+dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
 endif
 if CONFIG_STREAMS_COMPAT_LFS_MODULE
 dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)

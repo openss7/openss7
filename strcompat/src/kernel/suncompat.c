@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/07 20:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/07 20:29:17 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/07 20:29:17 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,12 +78,12 @@ static char const ident[] =
 #include "src/kernel/strutil.h"
 //#include "src/modules/sth.h"
 #include "src/kernel/strreg.h"
-#include "src/kernel/strsad.h"
+//#include "src/kernel/strsad.h"
 #endif
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/05 22:46:05 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/07 20:29:17 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -162,12 +162,6 @@ int qwait_sig(queue_t *rq)
 }
 
 EXPORT_SYMBOL(qwait_sig);	/* sunddi.h */
-#endif
-
-#if LIS
-/* LIS forgets to typedef these */
-typedef int bcid_t;
-typedef int bufcall_id_t;
 #endif
 
 #if LFS
