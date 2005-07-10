@@ -1,0 +1,237 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_headers,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/10 11:07:20 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2005/07/10 11:07:20 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+retval=0
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	if test :"${MAINTAINER_MODE:-no}" = :verbose ; then
+		echo "$me: S: $1"
+	fi
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	retval=1
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	test $retval -ne 0 || retval=77
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+#
+# Skip test if we have nothing to test
+#
+if test -z "$PKG_HEADERS"
+then
+	echo_d "nothing to check, skipping test" $LINENO
+	exit 77
+fi
+
+#
+# Find all the headers
+#
+headers=
+for f in $PKG_HEADERS ; do
+	if test -f ./$f ; then
+		headers="${headers:+$headers }./$f"
+	elif test -f ${srcdir}/$f ; then
+		headers="${headers:+$headers }${srcdir}/$f"
+	else
+		echo_d "file $f does not exist" $LINENO
+	fi
+done
+if test -z "$headers"
+then
+	echo_d "nothing to check, skipping test" $LINENO
+	exit 77
+fi
+
+echo_d "actual headers are:" $LINENO
+for header in $headers ; do
+	echo_d "$header" $LINENO
+done
+
+#
+# Create ctags output
+#
+rm -f ${top_builddir}/check_ctags.log
+
+echo "$headers" | xargs ctags -x > ${top_builddir}/check_ctags.log
+
+if test :"${MAINTAINER_MODE:-no}" != :no
+then
+	if test -n "$PKG_MANPATH" ; then
+		manpath="$PKG_MANPATH"
+	else
+		manpath="${top_builddir}/doc/man:${top_builddir}/man:${top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+	fi
+	searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+	sections="3 5 9"
+	on_error='echo_s'
+	for header in $headers ; do
+		base=`basename $header .h`
+		string="$base in sections $sections"
+		echo_t "testing for $string"
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$base.${n} man${n}/$base.h.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				if test -f $dir/$page* ; then
+					echo_s "manual page $dir/$page exists" $LINENO
+					found=yes
+					break
+				fi
+			done
+			if test :$found = :yes ; then
+				break
+			fi
+		done
+		if test :$found = :yes ; then
+			echo_s "found $page" $LINENO
+			echo "$page" >> ${top_builddir}/check_used.log
+		else
+			eval "$on_error \"cannot find \$string\" \$LINENO"
+		fi
+	done
+	while read -a tokens ; do
+		found=no
+		sections=
+		case ${tokens[0]} in
+		(_*)	on_error='echo_s' ; sections="3 9 7" ;;
+		(*)	case ${tokens[1]} in
+			(function)	on_error='echo_e' ; sections="3 9" ;;
+			(macro)		on_error='echo_s' ; sections="3 9 7" ;;
+			(variable)	on_error='echo_s' ; sections="3 9" ;;
+			(enumerate)	on_error='echo_s' ; sections="3 9 7" ;;
+			(enum)		on_error='echo_w' ; sections="3 9" ;;
+			(struct)	on_error='echo_w' ; sections="3 9 7" ;;
+			(union)		on_error='echo_w' ; sections="3 9 7" ;;
+			(typedef)	on_error='echo_w' ; sections="3 9" ;;
+			(member)	continue ;;
+			(*)		on_error='echo_s' ; sections="3 9 7" ;;
+			esac ;;
+		esac
+		string="${tokens[1]} ${tokens[0]} in sections $sections"
+		echo_t "testing for $string"
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/${tokens[0]}.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				if test -f $dir/$page* ; then
+					echo_s "manual page $dir/$page exists" $LINENO
+					found=yes
+					break
+				fi
+			done
+			if test :$found = :yes ; then
+				break
+			fi
+		done
+		if test :$found = :yes ; then
+			echo_s "found $page" $LINENO
+			echo "$page" >> ${top_builddir}/check_used.log
+		else
+			eval "$on_error \"cannot find \$string\" \$LINENO"
+		fi
+	done < ${top_builddir}/check_ctags.log
+fi
+
+if test $retval -eq 1
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+fi
+if test $retval -eq 77
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+fi
+
+exit $retval
