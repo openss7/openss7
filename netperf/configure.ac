@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2005/07/04 20:07:22 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2005/07/10 02:42:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:07:22 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 02:42:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,7 +110,7 @@ AC_CHECK_LIB([m], [main])
 dnl AC_CHECK_LIB([pthread], [pthread_create])
 dnl AC_CHECK_LIB([LiS], [putpmsg])
 dnl AC_CHECK_LIB([streams], [putpmsg])
-AC_CHECK_LIB([xnet], [t_open])
+dnl AC_CHECK_LIB([xnet], [t_open])
 AC_CHECK_LIB([socket], [socket])
 AC_CHECK_LIB([nsl], [main])
 AC_CHECK_LIB([elf], [main])
