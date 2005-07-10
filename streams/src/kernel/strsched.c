@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/09 21:55:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:55:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/09 21:55:19 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/07 20:29:47 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/09 21:55:19 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -473,6 +473,7 @@ struct devinfo *di_alloc(struct cdevsw *cdev)
 	}
 	return (di);
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(di_alloc);
 #endif
@@ -512,6 +513,7 @@ void di_put(struct devinfo *di)
 	}
 	swerr();
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(di_put);
 #endif
@@ -718,6 +720,7 @@ void flushq(queue_t *q, int flag)
 	   and we don't block interrupts too long */
 	freechain(mp, mpp);
 }
+
 EXPORT_SYMBOL(flushq);
 
 /* 
@@ -776,6 +779,7 @@ queue_t *allocq(void)
 	}
 	return (rq);
 }
+
 EXPORT_SYMBOL(allocq);
 
 /*
@@ -827,6 +831,7 @@ void freeq(queue_t *rq)
 	__freeq(rq);
 	freechain(mp, mpp);
 }
+
 EXPORT_SYMBOL(freeq);
 
 /* 
@@ -874,6 +879,7 @@ struct linkblk *alloclk(void)
 	}
 	return (l);
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(alloclk);
 #endif
@@ -892,6 +898,7 @@ void freelk(struct linkblk *l)
 	atomic_dec(&si->si_cnt);
 	kmem_cache_free(si->si_cache, li);
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(freelk);
 #endif
@@ -1071,6 +1078,7 @@ struct strevent *sealloc(void)
 {
 	return event_alloc(SE_STREAM, NULL);
 }
+
 EXPORT_SYMBOL(sealloc);
 
 /**
@@ -1082,13 +1090,9 @@ int sefree(struct strevent *se)
 	event_free(se);
 	return (0);
 }
+
 EXPORT_SYMBOL(sefree);
 
-//#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE &&
-//    !defined CONFIG_STREAMS_COMPAT_AIX_MODULE &&
-//    !defined CONFIG_STREAMS_COMPAT_MAC_MODULE
-//STATIC INLINE
-//#endif
 /*
  *  __bufcall:	- generate a buffer callback
  *  @q:		queue against which to synchronize callback
@@ -1101,8 +1105,7 @@ EXPORT_SYMBOL(sefree);
  *  invoked the buffer call.  This means that the callback function will not execute until after the
  *  caller exits or hits a pre-emption point.
  */
-bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long),
-			       long arg)
+bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg)
 {
 	bcid_t bcid = 0;
 	struct strevent *se;
@@ -1117,11 +1120,8 @@ bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long
 	}
 	return (bcid);
 }
-//#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_AIX_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_MAC_MODULE
+
 EXPORT_SYMBOL(__bufcall);
-//#endif
 
 /**
  *  bufcall:	- schedule a buffer callout
@@ -1134,6 +1134,7 @@ bcid_t bufcall(unsigned size, int priority, void (*function) (long), long arg)
 {
 	return __bufcall(queue_guess(NULL), size, priority, function, arg);
 }
+
 EXPORT_SYMBOL(bufcall);
 
 /**
@@ -1143,7 +1144,7 @@ EXPORT_SYMBOL(bufcall);
  *  @arg:	a client argument to pass to the callback function
  */
 __EXTERN_INLINE bcid_t esbbcall(int priority, void (*function) (long), long arg);
-//EXPORT_SYMBOL(esbbcall);
+EXPORT_SYMBOL(esbbcall);
 
 /**
  *  unbufcall:	- cancel a buffer callout
@@ -1156,6 +1157,7 @@ void unbufcall(bcid_t bcid)
 	if ((se = find_event(bcid)))
 		xchg(&se->x.b.func, NULL);
 }
+
 EXPORT_SYMBOL(unbufcall);
 
 static void timeout_function(unsigned long arg)
@@ -1173,12 +1175,8 @@ static void timeout_function(unsigned long arg)
 #endif
 }
 
-//#if !defined CONFIG_STREAMS_COMPAT_SUN_MODULE &&
-//    !defined CONFIG_STREAMS_COMPAT_UW7_MODULE
-//STATIC INLINE
-//#endif
 toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl,
-			int cpu)
+		 int cpu)
 {
 	toid_t toid = 0;
 	struct strevent *se;
@@ -1197,10 +1195,8 @@ toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsi
 	}
 	return (toid);
 }
-//#if defined CONFIG_STREAMS_COMPAT_SUN_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+
 EXPORT_SYMBOL(__timeout);
-//#endif
 
 /**
  *  timeout:	- issue a timeout callback
@@ -1214,6 +1210,7 @@ toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 {
 	return __timeout(queue_guess(NULL), timo_fcn, arg, ticks, 0, smp_processor_id());
 }
+
 EXPORT_SYMBOL(timeout);
 
 /**
@@ -1235,6 +1232,7 @@ clock_t untimeout(toid_t toid)
 	}
 	return (rem);
 }
+
 EXPORT_SYMBOL(untimeout);
 
 /*
@@ -1305,6 +1303,7 @@ int weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, w
 		set_bit(QWELDED_BIT, &q3->q_flag);
 	return __weldq(q1, q2, q3, q4, func, arg, protq, SE_WELDQ);
 }
+
 EXPORT_SYMBOL(weldq);
 
 /**
@@ -1342,10 +1341,9 @@ int unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func,
 		clear_bit(QWELDED_BIT, &q3->q_flag);
 	return __weldq(q1, NULL, q3, NULL, func, arg, protq, SE_UNWELDQ);
 }
+
 EXPORT_SYMBOL(unweldq);
 
-//#if defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE) ||
-//    defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 /*
  *  defer_func:	- defer a STREAMS procedure call
  *  @func:	function call to defer
@@ -1358,7 +1356,7 @@ EXPORT_SYMBOL(unweldq);
  *  Deferrable functions that use defer_func() are streams_put() and qwriter().
  */
 int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-		      int perim, int type)
+	       int perim, int type)
 {
 	struct strevent *se;
 	if ((se = event_alloc(type, q))) {
@@ -1375,8 +1373,8 @@ int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *ar
 	}
 	return (ENOMEM);
 }
+
 EXPORT_SYMBOL(defer_func);
-//#endif
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
@@ -1641,7 +1639,7 @@ static void sq_putp(struct strevent *se)
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
-//EXPORT_SYMBOL(kmem_alloc);
+EXPORT_SYMBOL(kmem_alloc);
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -1649,7 +1647,7 @@ __EXTERN_INLINE void *kmem_alloc(size_t size, int flags);
  *  @flags:	either %KM_SLEEP or %KM_NOSLEEP
  */
 __EXTERN_INLINE void *kmem_zalloc(size_t size, int flags);
-//EXPORT_SYMBOL(kmem_zalloc);
+EXPORT_SYMBOL(kmem_zalloc);
 
 /**
  *  kmem_free:	- free memory
@@ -1667,6 +1665,7 @@ void kmem_free(void *addr, size_t size)
 			raise_softirq(STREAMS_SOFTIRQ);
 	}
 }
+
 EXPORT_SYMBOL(kmem_free);
 
 /**
@@ -1676,7 +1675,7 @@ EXPORT_SYMBOL(kmem_free);
  *  @node:
  */
 __EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
-//EXPORT_SYMBOL(kmem_alloc_node);
+EXPORT_SYMBOL(kmem_alloc_node);
 
 /**
  *  kmem_zalloc: - allocate and zero memory
@@ -1685,7 +1684,7 @@ __EXTERN_INLINE void *kmem_alloc_node(size_t size, int flags, cnodeid_t node);
  *  @node:
  */
 __EXTERN_INLINE void *kmem_zalloc_node(size_t size, int flags, cnodeid_t node);
-//EXPORT_SYMBOL(kmem_zalloc_node);
+EXPORT_SYMBOL(kmem_zalloc_node);
 
 /* 
  *  -------------------------------------------------------------------------
@@ -1962,6 +1961,7 @@ void inline setqsched(void)
 	if (!test_and_set_bit(qrunflag, &t->flags))
 		raise_softirq(STREAMS_SOFTIRQ);
 }
+
 EXPORT_SYMBOL(setqsched);
 
 /**
@@ -1972,6 +1972,7 @@ int inline qready(void)
 	struct strthread *t = this_thread;
 	return (test_bit(qrunflag, &t->flags) != 0);
 }
+
 EXPORT_SYMBOL(qready);
 
 /**
@@ -2023,6 +2024,7 @@ int enableq(queue_t *q)
 	}
 	return (0);
 }
+
 EXPORT_SYMBOL(enableq);
 
 /**
@@ -2035,6 +2037,7 @@ void qenable(queue_t *q)
 {
 	(void) qschedule(q);
 }
+
 EXPORT_SYMBOL(qenable);
 
 /**
@@ -2042,14 +2045,14 @@ EXPORT_SYMBOL(qenable);
  *  @q:		queue to permit service procedure scheduling
  */
 __EXTERN_INLINE void enableok(queue_t *q);
-//EXPORT_SYMBOL(enableok);
+EXPORT_SYMBOL(enableok);
 
 /**
  *  noenable:	- defer scheduling of a queue service procedure
  *  @q:		queue to defer service procedure scheduling
  */
 __EXTERN_INLINE void noenable(queue_t *q);
-//EXPORT_SYMBOL(noenable);
+EXPORT_SYMBOL(noenable);
 
 /*
  *  freechains:	- free chains of message blocks
@@ -2148,10 +2151,10 @@ static void clear_shinfo(struct shinfo *sh)
 	sd->sd_wropt = 0;
 	sd->sd_eropt = RERRNORM | WERRNORM;
 	sd->sd_closetime = sysctl_str_cltime;
-//	sd->sd_rtime = sysctl_str_rtime;
+//      sd->sd_rtime = sysctl_str_rtime;
 	init_waitqueue_head(&sd->sd_waitq);
 	slockinit(sd);
-//	init_MUTEX(&sd->sd_mutex);
+//      init_MUTEX(&sd->sd_mutex);
 }
 static void shinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
@@ -2179,6 +2182,7 @@ struct stdata *allocstr(void)
 	}
 	return (sd);
 }
+
 EXPORT_SYMBOL(allocstr);
 
 static void __freestr(struct stdata *sd)
@@ -2203,6 +2207,7 @@ void freestr(struct stdata *sd)
 	/* FIXME: need to deallocate anything attached to the stream head */
 	sd_put(sd);
 }
+
 EXPORT_SYMBOL(freestr);
 
 struct stdata *sd_get(struct stdata *sd)
@@ -2216,6 +2221,7 @@ struct stdata *sd_get(struct stdata *sd)
 		swerr();
 	return (sd);
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(sd_get);
 #endif
@@ -2235,6 +2241,7 @@ void sd_put(struct stdata *sd)
 		swerr();
 	return;
 }
+
 #ifdef CONFIG_STREAMS_STH_MODULE
 EXPORT_SYMBOL(sd_put);
 #endif
@@ -2327,10 +2334,10 @@ static int str_init_caches(void)
 
 #ifndef open_softirq
 #ifdef HAVE_OPEN_SOFTIRQ_ADDR
-void
-open_softirq(int nr, void (*action)(struct softirq_action*), void *data)
+void open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
-	static void (*func)(int, void (*)(struct softirq_action*), void *) = (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
+	static void (*func) (int, void (*)(struct softirq_action *), void *) =
+	    (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
 	return func(nr, action, data);
 }
 #endif

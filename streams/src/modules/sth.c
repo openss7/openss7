@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:53 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:55:23 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:53 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2814,9 +2814,7 @@ int strputpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	return (err);
 }
 
-#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(strputpmsg);
-#endif
 
 /**
  *  strgetpmsg: - getpmsg file operation for a stream
@@ -2954,9 +2952,7 @@ int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int 
 	return (-EINVAL);
 }
 
-#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(strgetpmsg);
-#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -3257,9 +3253,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #endif
 };
 
-#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(strm_f_ops);
-#endif
 
 /* 
  *  -------------------------------------------------------------------------

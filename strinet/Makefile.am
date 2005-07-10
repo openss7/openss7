@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/06 11:22:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/09 21:48:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 11:22:08 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:48:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,7 +346,7 @@ UNINSTALL_HOOK += uninstall-inet-devices
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src doc tests
+SUBDIRS = src . tests doc
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:55:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/07 20:29:47 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -302,7 +302,7 @@ EXPORT_SYMBOL(copymsg);
  *  @type:	type to test
  */
 __EXTERN_INLINE int datamsg(unsigned char type);
-//EXPORT_SYMBOL(datamsg);
+EXPORT_SYMBOL(datamsg);
 
 /**
  *  dupb:	- duplicates a message block
@@ -420,28 +420,28 @@ EXPORT_SYMBOL(freeb);
  *  @mp:	the message to free
  */
 __EXTERN_INLINE void freemsg(mblk_t *mp);
-//EXPORT_SYMBOL(freemsg);
+EXPORT_SYMBOL(freemsg);
 
 /**
  *  isdatablk:	- test data block for data type
  *  @dp:	data block to test
  */
 __EXTERN_INLINE int isdatablk(dblk_t * dp);
-//EXPORT_SYMBOL(isdatablk);
+EXPORT_SYMBOL(isdatablk);
 
 /**
  *  isdatamsg:	- test a message block for data type
  *  @mp:	message block to test
  */
 __EXTERN_INLINE int isdatamsg(mblk_t *mp);
-//EXPORT_SYMBOL(isdatamsg);
+EXPORT_SYMBOL(isdatamsg);
 
 /**
  *  pcmsg:	- data block type for priority
  *  @type:	the type to check
  */
 __EXTERN_INLINE int pcmsg(unsigned char type);
-//EXPORT_SYMBOL(pcmsg);
+EXPORT_SYMBOL(pcmsg);
 
 /**
  *  linkb:	- link message block onto message
@@ -449,7 +449,7 @@ __EXTERN_INLINE int pcmsg(unsigned char type);
  *  @mp2:	message block to link
  */
 __EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
-//EXPORT_SYMBOL(linkb);
+EXPORT_SYMBOL(linkb);
 
 /**
  *  linkmsg:	- link messages
@@ -457,14 +457,14 @@ __EXTERN_INLINE void linkb(mblk_t *mp1, mblk_t *mp2);
  *  @mp2:	message to link
  */
 __EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
-//EXPORT_SYMBOL(linkmsg);
+EXPORT_SYMBOL(linkmsg);
 
 /**
  *  msgdsize:	- calculate size of data in message
  *  @mp:	message across which to calculate data bytes
  */
 __EXTERN_INLINE size_t msgdsize(mblk_t *mp);
-//EXPORT_SYMBOL(msgdsize);
+EXPORT_SYMBOL(msgdsize);
 
 /**
  *  msgpullup:	- pull up bytes into a message
@@ -541,7 +541,7 @@ EXPORT_SYMBOL(msgpullup);
  *  @mp:	message for which to calculate size
  */
 __EXTERN_INLINE size_t msgsize(mblk_t *mp);
-//EXPORT_SYMBOL(msgsize);
+EXPORT_SYMBOL(msgsize);
 
 /**
  *  pullupmsg:	- pull up bytes into first data block in message
@@ -651,7 +651,7 @@ EXPORT_SYMBOL(pullupmsg);
  *  @bp:    the block to remove
  */
 __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
-//EXPORT_SYMBOL(rmvb);
+EXPORT_SYMBOL(rmvb);
 
 /**
  *  testb:	- test allocate of a message block
@@ -659,14 +659,14 @@ __EXTERN_INLINE mblk_t *rmvb(mblk_t *mp, mblk_t *bp);
  *  @priority:	allocation priority to test
  */
 __EXTERN_INLINE int testb(size_t size, uint priority);
-//EXPORT_SYMBOL(testb);
+EXPORT_SYMBOL(testb);
 
 /**
  *  unlinkb:	- unlink first block of message
  *  @mp:	message to unlink
  */
 __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
-//EXPORT_SYMBOL(unlinkb);
+EXPORT_SYMBOL(unlinkb);
 
 /**
  *  xmsgsize:	- calculate size in message of same type as first data block
@@ -678,7 +678,7 @@ __EXTERN_INLINE mblk_t *unlinkb(mblk_t *mp);
  *  This implementation of xmsgsize does not span non-zero blocks of different types.
  */
 __EXTERN_INLINE size_t xmsgsize(mblk_t *mp);
-//EXPORT_SYMBOL(xmsgsize);
+EXPORT_SYMBOL(xmsgsize);
 
 static int __insq(queue_t *q, mblk_t *emp, mblk_t *nmp);
 /**
@@ -717,7 +717,7 @@ EXPORT_SYMBOL(appq);
  *  @q:		this queue
  */
 __EXTERN_INLINE queue_t *backq(queue_t *q);
-//EXPORT_SYMBOL(backq);
+EXPORT_SYMBOL(backq);
 
 /**
  *  qbackenable: - backenable a queue
@@ -908,7 +908,7 @@ EXPORT_SYMBOL(bcanputnext);
  *  @q:		queue to check
  */
 __EXTERN_INLINE int canenable(queue_t *q);
-//EXPORT_SYMBOL(canenable);
+EXPORT_SYMBOL(canenable);
 
 /*
  *  __canget:
@@ -1381,7 +1381,7 @@ EXPORT_SYMBOL(insq);
  *  @q:		one queue
  */
 __EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
-//EXPORT_SYMBOL(OTHERQ);
+EXPORT_SYMBOL(OTHERQ);
 
 /*
  *  __put:
@@ -1401,9 +1401,7 @@ static void _put(queue_t *q, mblk_t *mp)
 {
 	struct syncq *isq;
 	unsigned long flags;
-//#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
 	while (q->q_ftmsg && !(*q->q_ftmsg) (mp) && (q = q->q_next)) ;
-//#endif
 	if (!(isq = q->q_syncq))
 		__put(q, mp);
 	else {
@@ -1589,13 +1587,21 @@ int putbq(queue_t *q, mblk_t *mp)
 EXPORT_SYMBOL(putbq);
 
 /**
+ *  putctl:	- put a control message to a queue
+ *  @q:		the queue to put to
+ *  @type:	the message type
+ */
+__EXTERN_INLINE int putctl(queue_t *q, int type);
+EXPORT_SYMBOL(putctl);
+
+/**
  *  putctl1:	- put a 1-byte control message to a queue
  *  @q:		the queue to put to
  *  @type:	the message type
  *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
-//EXPORT_SYMBOL(putctl1);
+EXPORT_SYMBOL(putctl1);
 
 /**
  *  putctl2:	- put a 2-byte control message to a queue
@@ -1605,15 +1611,7 @@ __EXTERN_INLINE int putctl1(queue_t *q, int type, int param);
  *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putctl2(queue_t *q, int type, int param1, int param2);
-//EXPORT_SYMBOL(putctl2);
-
-/**
- *  putctl:	- put a control message to a queue
- *  @q:		the queue to put to
- *  @type:	the message type
- */
-__EXTERN_INLINE int putctl(queue_t *q, int type);
-//EXPORT_SYMBOL(putctl);
+EXPORT_SYMBOL(putctl2);
 
 /**
  *  putnextctl:	- put a control message to the queue after this one
@@ -1621,7 +1619,7 @@ __EXTERN_INLINE int putctl(queue_t *q, int type);
  *  @type:	the message type
  */
 __EXTERN_INLINE int putnextctl(queue_t *q, int type);
-//EXPORT_SYMBOL(putnextctl);
+EXPORT_SYMBOL(putnextctl);
 
 /**
  *  putnextctl1: - put a 1-byte control message to the queue after this one
@@ -1630,7 +1628,7 @@ __EXTERN_INLINE int putnextctl(queue_t *q, int type);
  *  @param:	the 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
-//EXPORT_SYMBOL(putnextctl1);
+EXPORT_SYMBOL(putnextctl1);
 
 /**
  *  putnextctl2: - put a 2-byte control message to the queue after this one
@@ -1640,7 +1638,7 @@ __EXTERN_INLINE int putnextctl1(queue_t *q, int type, int param);
  *  @param2:	the second 1 byte parameter
  */
 __EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2);
-//EXPORT_SYMBOL(putnextctl2);
+EXPORT_SYMBOL(putnextctl2);
 
 /*
  *  __putq:	- put a message block to a queue
@@ -2140,14 +2138,14 @@ EXPORT_SYMBOL(qpush);
  *  @mp:	message reply
  */
 __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp);
-//EXPORT_SYMBOL(qreply);
+EXPORT_SYMBOL(qreply);
 
 /**
  *  qsize:	- calculate number of messages on a queue
  *  @q:		queue to count messages
  */
 __EXTERN_INLINE ssize_t qsize(queue_t *q);
-//EXPORT_SYMBOL(qsize);
+EXPORT_SYMBOL(qsize);
 
 /**
  *  qcountstrm:	- count the numer of messages along a stream
@@ -2174,7 +2172,7 @@ EXPORT_SYMBOL(qcountstrm);
  *  @q:		write queue pointer
  */
 __EXTERN_INLINE queue_t *RD(queue_t *q);
-//EXPORT_SYMBOL(RD);
+EXPORT_SYMBOL(RD);
 
 /*
  *  __rmvq:
@@ -2245,7 +2243,7 @@ EXPORT_SYMBOL(rmvq);
  *  @q:		this queue
  */
 __EXTERN_INLINE int SAMESTR(queue_t *q);
-//EXPORT_SYMBOL(SAMESTR);
+EXPORT_SYMBOL(SAMESTR);
 
 /*
  *  __setq:
@@ -2599,7 +2597,7 @@ EXPORT_SYMBOL(unfreezestr);
  *  @q:		read queue pointer
  */
 __EXTERN_INLINE queue_t *WR(queue_t *q);
-//EXPORT_SYMBOL(WR);
+EXPORT_SYMBOL(WR);
 
 static spinlock_t cmn_err_lock = SPIN_LOCK_UNLOCKED;
 /*
@@ -2640,9 +2638,7 @@ void vcmn_err(int err_lvl, const char *fmt, va_list args)
 	return;
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(vcmn_err);
-//#endif
 
 /**
  *  cmn_err:	- print a command error
@@ -2662,40 +2658,41 @@ void cmn_err(int err_lvl, const char *fmt, ...)
 EXPORT_SYMBOL(cmn_err);
 
 __EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
-//EXPORT_SYMBOL(copyin);
+EXPORT_SYMBOL(copyin);
 
 __EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
-//EXPORT_SYMBOL(copyout);
+EXPORT_SYMBOL(copyout);
 
 __EXTERN_INLINE void delay(unsigned long ticks);
-//EXPORT_SYMBOL(delay);
+EXPORT_SYMBOL(delay);
 
 __EXTERN_INLINE int drv_getparm(const unsigned int parm, void *value_p);
-//EXPORT_SYMBOL(drv_getparm);
+EXPORT_SYMBOL(drv_getparm);
 
 __EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
-//EXPORT_SYMBOL(drv_hztomsec);
+EXPORT_SYMBOL(drv_hztomsec);
 
 __EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
-//EXPORT_SYMBOL(drv_hztousec);
+EXPORT_SYMBOL(drv_hztousec);
 
 __EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
-//EXPORT_SYMBOL(drv_msectohz);
+EXPORT_SYMBOL(drv_msectohz);
 
 __EXTERN_INLINE int drv_priv(cred_t *crp);
-//EXPORT_SYMBOL(drv_priv);
+EXPORT_SYMBOL(drv_priv);
 
 __EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
-//EXPORT_SYMBOL(drv_usectohz);
+EXPORT_SYMBOL(drv_usectohz);
 
 __EXTERN_INLINE void drv_usecwait(unsigned long usec);
-//EXPORT_SYMBOL(drv_usecwait);
+EXPORT_SYMBOL(drv_usecwait);
 
 __EXTERN_INLINE major_t getmajor(dev_t dev);
-//EXPORT_SYMBOL(getmajor);
+EXPORT_SYMBOL(getmajor);
 
 __EXTERN_INLINE minor_t getminor(dev_t dev);
-//EXPORT_SYMBOL(getminor);
+EXPORT_SYMBOL(getminor);
 
 __EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor);
-//EXPORT_SYMBOL(makedevice);
+EXPORT_SYMBOL(makedevice);
+

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/07 20:29:17 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/09 21:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/07 20:29:17 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/09 21:51:21 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/07 20:29:17 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/09 21:51:21 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -71,18 +71,9 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 
 #include "os7/compat.h"
 
-#if LFS
-//#include "sys/config.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strutil.h"
-//#include "src/modules/sth.h"
-#include "src/kernel/strreg.h"
-//#include "src/kernel/strsad.h"
-#endif
-
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/07 20:29:17 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/09 21:51:21 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

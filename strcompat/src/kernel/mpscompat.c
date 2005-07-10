@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.7  2005/07/09 21:51:21  brian
+ - remove dependency on LFS headers
+
  Revision 0.9.2.6  2005/07/07 20:29:17  brian
  - changes for release
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -98,22 +101,9 @@ static char const ident[] =
 
 #include <sys/mpsddi.h>
 
-#if LFS
-//#include "sys/config.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strutil.h"
-//#include "src/modules/sth.h"
-#include "src/kernel/strreg.h"
-//#include "src/kernel/strsad.h"
-#else
-#if 0
-#include "include/sys/strdebug.h"
-#endif
-#endif
-
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"

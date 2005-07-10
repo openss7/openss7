@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/07 20:28:54 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/09 21:50:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:28:54 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:50:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -248,7 +248,6 @@ sun_compat_pages = \
 
 uw7_compat_pages = \
 	man9/uw7compat.9 \
-	man9/allocb_physreq.9 \
 	man9/ATOMIC_INT_ADD.9 \
 	man9/ATOMIC_INT_ALLOC.9 \
 	man9/ATOMIC_INT_DEALLOC.9 \
@@ -263,6 +262,11 @@ uw7_compat_pages = \
 	man9/msgscgth.9 \
 	man9/printf_UW7.9 \
 	man9/strioccall.9
+
+if WITH_LFS
+uw7_compat_pages += \
+	man9/allocb_physreq.9
+endif
 
 osf_compat_pages = \
 	man9/osfcompat.9 \
@@ -643,7 +647,6 @@ lis_deprec_pages = \
 
 lfs_compat_pages = \
 	man9/lfscompat.9 \
-	man9/appq.9 \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
 	man9/bcanget.9 \
@@ -651,7 +654,6 @@ lfs_compat_pages = \
 	man9/copyin.9 \
 	man9/copyout.9 \
 	man9/ctlmsg.9 \
-	man9/datamsg.9 \
 	man9/delay.9 \
 	man9/drv_getparm.9 \
 	man9/drv_hztomsec.9 \
@@ -663,15 +665,9 @@ lfs_compat_pages = \
 	man9/enableq.9 \
 	man9/getadmin.9 \
 	man9/getmid.9 \
-	man9/isdatablk.9 \
-	man9/isdatamsg.9 \
 	man9/linkmsg.9 \
 	man9/pcmsg.9 \
-	man9/putctl.9 \
-	man9/putctl1.9 \
 	man9/putctl2.9 \
-	man9/putnextctl.9 \
-	man9/putnextctl1.9 \
 	man9/putnextctl2.9 \
 	man9/strlog.9 \
 	man9/vstrlog_hook.9
@@ -958,7 +954,6 @@ dist_noinst_sun_compat_pages = \
 
 dist_noinst_uw7_compat_pages = \
 	man9/uw7compat.9.man \
-	man9/allocb_physreq.9.man \
 	man9/ATOMIC_INT_ADD.9.man \
 	man9/ATOMIC_INT_ALLOC.9.man \
 	man9/ATOMIC_INT_DEALLOC.9.man \
@@ -973,6 +968,11 @@ dist_noinst_uw7_compat_pages = \
 	man9/msgscgth.9.man \
 	man9/printf_UW7.9.man \
 	man9/strioccall.9.man
+
+if WITH_LFS
+dist_noinst_uw7_compat_pages += \
+	man9/allocb_physreq.9.man
+endif
 
 dist_noinst_osf_compat_pages = \
 	man9/osfcompat.9.man \
@@ -1353,7 +1353,6 @@ dist_noinst_lis_deprec_pages = \
 
 dist_noinst_lfs_compat_pages = \
 	man9/lfscompat.9.man \
-	man9/appq.9.man \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
 	man9/bcanget.9.man \
@@ -1361,7 +1360,6 @@ dist_noinst_lfs_compat_pages = \
 	man9/copyin.9.man \
 	man9/copyout.9.man \
 	man9/ctlmsg.9.man \
-	man9/datamsg.9.man \
 	man9/delay.9.man \
 	man9/drv_getparm.9.man \
 	man9/drv_hztomsec.9.man \
@@ -1373,15 +1371,9 @@ dist_noinst_lfs_compat_pages = \
 	man9/enableq.9.man \
 	man9/getadmin.9.man \
 	man9/getmid.9.man \
-	man9/isdatablk.9.man \
-	man9/isdatamsg.9.man \
 	man9/linkmsg.9.man \
 	man9/pcmsg.9.man \
-	man9/putctl.9.man \
-	man9/putctl1.9.man \
 	man9/putctl2.9.man \
-	man9/putnextctl.9.man \
-	man9/putnextctl1.9.man \
 	man9/putnextctl2.9.man \
 	man9/strlog.9.man \
 	man9/vstrlog_hook.9.man

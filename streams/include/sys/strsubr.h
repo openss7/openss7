@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.23 2005/05/15 04:08:14 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.24 2005/07/09 21:54:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/15 04:08:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:54:14 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/05/15 04:08:14 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/09 21:54:14 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -548,6 +548,5 @@ extern minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor);
 /* from strreg.c */
 extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
 extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
-
 
 #endif				/* __SYS_STRSUBR_H__ */

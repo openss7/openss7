@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,18 +72,9 @@ static char const ident[] =
 
 #include "os7/compat.h"
 
-#if LFS
-//#include "sys/config.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strutil.h"
-//#include "src/modules/sth.h"
-#include "src/kernel/strreg.h"
-//#include "src/kernel/strsad.h"
-#endif
-
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/07 20:29:17 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -121,11 +112,11 @@ int wantio(queue_t *q, struct wantio *w)
 	queue_t *wq = WR(q);
 	struct stdata *sd = ((struct queinfo *) (wq - 1))->qu_str;
 	if (w) {
-		qget(wq);
+		// qget(wq);
 		xchg(&sd->sd_directio, w);
 	} else {
 		xchg(&sd->sd_directio, w);
-		qput(&wq);
+		// qput(&wq);
 	}
 	return (0);
 }

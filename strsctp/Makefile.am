@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/06 11:22:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/09 21:48:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 11:22:13 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:48:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -477,7 +477,7 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = src doc tests
+SUBDIRS = src . tests doc
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/08 12:17:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/09 21:54:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:17:47 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:54:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,74 +76,6 @@ nobase_pkginclude_HEADERS = \
 	sys/strlog.h \
 	sys/stropts.h \
 	sys/strsubr.h
-
-if CONFIG_STREAMS_COMPAT_AIX
-nobase_pkginclude_HEADERS	+= sys/aixddi.h
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-nobase_pkginclude_HEADERS	+= sys/hpuxddi.h
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-nobase_pkginclude_HEADERS	+= sys/irixddi.h
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-nobase_pkginclude_HEADERS	+= sys/lisddi.h
-endif
-if CONFIG_STREAMS_COMPAT_MAC
-nobase_pkginclude_HEADERS	+= sys/macddi.h
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-nobase_pkginclude_HEADERS	+= sys/mpsddi.h
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-nobase_pkginclude_HEADERS	+= sys/osfddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-nobase_pkginclude_HEADERS	+= sys/sunddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SVR3
-nobase_pkginclude_HEADERS	+= sys/svr3ddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-nobase_pkginclude_HEADERS	+= sys/svr4ddi.h
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-nobase_pkginclude_HEADERS	+= sys/uw7ddi.h
-endif
-
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-nobase_pkginclude_HEADERS	+= sys/aixddi.h
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-nobase_pkginclude_HEADERS	+= sys/hpuxddi.h
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-nobase_pkginclude_HEADERS	+= sys/irixddi.h
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-nobase_pkginclude_HEADERS	+= sys/lisddi.h
-endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-nobase_pkginclude_HEADERS	+= sys/macddi.h
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-nobase_pkginclude_HEADERS	+= sys/mpsddi.h
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-nobase_pkginclude_HEADERS	+= sys/osfddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-nobase_pkginclude_HEADERS	+= sys/sunddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-nobase_pkginclude_HEADERS	+= sys/svr3ddi.h
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-nobase_pkginclude_HEADERS	+= sys/svr4ddi.h
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-nobase_pkginclude_HEADERS	+= sys/uw7ddi.h
-endif
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/streams/version.h

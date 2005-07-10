@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/07 20:29:46 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:55:19 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/07 20:29:46 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $"
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/07 20:29:46 $";
+static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:55:19 $";
 
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -683,8 +683,6 @@ STATIC struct devnode *cmin_search(const struct cdevsw *cdev, const char *name)
 	return (cmin);
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
-// || defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 /**
  *  fmod_str:	- look up a fmod by streamtab
  *  @str:	streamtab to look up
@@ -704,10 +702,8 @@ struct fmodsw *fmod_str(const struct streamtab *str)
 	return (fmod);
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_AIX_MODULE
-// || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 EXPORT_SYMBOL(fmod_str);
-//#endif
+
 /**
  *  cdev_str:	- look up a cdev by streamtab
  *  @str:	streamtab to look up
@@ -727,11 +723,7 @@ struct cdevsw *cdev_str(const struct streamtab *str)
 	return (cdev);
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_AIX_MODULE
-// || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 EXPORT_SYMBOL(cdev_str);
-//#endif
-//#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -753,6 +745,8 @@ struct cdevsw *sdev_get(major_t major)
 	return cdev_lookup(major, !in_interrupt());
 }
 
+EXPORT_SYMBOL(sdev_get);
+
 /**
  *  sdev_put:	- put a reference to a STREAMS device
  *  @cdev:	STREAMS device structure pointer to put
@@ -765,14 +759,7 @@ void sdev_put(struct cdevsw *cdev)
 	}
 }
 
-//#if defined CONFIG_STREAMS_STH_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_AIX_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_LIS_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_UW7_MODULE ||
-//    defined CONFIG_STREAMS_CLONE_MODULE
-EXPORT_SYMBOL(sdev_get);
 EXPORT_SYMBOL(sdev_put);
-//#endif
 
 /**
  *  cdrv_get:	- get a reference to a STREAMS driver
@@ -783,10 +770,7 @@ struct cdevsw *cdrv_get(modID_t modid)
 	return cdrv_lookup(modid, !in_interrupt());
 }
 
-//#if defined CONFIG_STREAMS_STH_MODULE ||
-//    defined CONFIG_STREAMS_COMPAT_UW7_MODULE
 EXPORT_SYMBOL(cdrv_get);
-//#endif
 
 /**
  *  cdrv_put:	- put a reference to a STREAMS driver
@@ -828,9 +812,7 @@ void fmod_put(struct fmodsw *fmod)
 	}
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(fmod_put);
-//#endif
 
 /**
  *  cmaj_get: - get a reference to a major device node (devnode)
@@ -921,9 +903,7 @@ struct fmodsw *fmod_find(const char *name)
 	return fmod_search(name, !in_interrupt());
 }
 
-//#if defined CONFIG_STREAMS_COMPAT_LIS_MODULE
 EXPORT_SYMBOL(fmod_find);
-//#endif
 
 struct devnode *cmin_find(const struct cdevsw *cdev, const char *name)
 {

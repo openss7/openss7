@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $
+ @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $"
+#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
 
 static char const ident[] =
-    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $";
+    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,17 +72,9 @@ static char const ident[] =
 
 #include "os7/compat.h"
 
-#if LFS
-//#include "sys/config.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strutil.h"
-//#include "src/modules/sth.h"
-//#include "src/kernel/strsad.h"
-#endif
-
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/07 20:29:17 $"
+#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"

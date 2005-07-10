@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/07 20:29:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/09 22:23:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/07 20:29:24 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 22:23:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1022,82 +1022,6 @@ man_MANS = \
 	man9/xmsgsize.9 \
 	man9/vstrlog_hook.9
 
-if CONFIG_STREAMS_COMPAT_SVR3
-man_MANS		    += $(svr3_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-man_MANS		    += $(svr4_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-man_MANS		    += $(mps_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-man_MANS		    += $(sun_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-man_MANS		    += $(uw7_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-man_MANS		    += $(osf_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_AIX
-man_MANS		    += $(aix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-man_MANS		    += $(hpux_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-man_MANS		    += $(irix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-man_MANS		    += $(lis_compat_pages)
-man_MANS		    += $(lis_deprec_pages)
-endif
-##if CONFIG_STREAMS_COMPAT_LFS
-##man_MANS		    += $(lfs_compat_pages)
-##endif
-if CONFIG_STREAMS_COMPAT_MAC
-man_MANS		    += $(mac_compat_pages)
-endif
-
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-man_MANS		    += $(svr3_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-man_MANS		    += $(svr4_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-man_MANS		    += $(mps_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-man_MANS		    += $(sun_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-man_MANS		    += $(uw7_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-man_MANS		    += $(osf_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-man_MANS		    += $(aix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-man_MANS		    += $(hpux_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-man_MANS		    += $(irix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-man_MANS		    += $(lis_compat_pages)
-man_MANS		    += $(lis_deprec_pages)
-endif
-##if CONFIG_STREAMS_COMPAT_LFS_MODULE
-##man_MANS		    += $(lfs_compat_pages)
-##endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-man_MANS		    += $(mac_compat_pages)
-endif
-
 dist_noinst_svr3_compat_pages = \
 	man9/emajor.9.man \
 	man9/eminor.9.man
@@ -2063,82 +1987,6 @@ dist_noinst_MANS = \
 	man9/WR.9.man \
 	man9/xmsgsize.9.man \
 	man9/vstrlog_hook.9.man
-
-if CONFIG_STREAMS_COMPAT_SVR3
-dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-dist_noinst_MANS	    += $(dist_noinst_svr4_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-dist_noinst_MANS	    += $(dist_noinst_mps_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-dist_noinst_MANS	    += $(dist_noinst_sun_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-dist_noinst_MANS	    += $(dist_noinst_uw7_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-dist_noinst_MANS	    += $(dist_noinst_osf_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_AIX
-dist_noinst_MANS	    += $(dist_noinst_aix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-dist_noinst_MANS	    += $(dist_noinst_hpux_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
-dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
-endif
-##if CONFIG_STREAMS_COMPAT_LFS
-##dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)
-##endif
-if CONFIG_STREAMS_COMPAT_MAC
-dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
-endif
-
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-dist_noinst_MANS	    += $(dist_noinst_svr4_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-dist_noinst_MANS	    += $(dist_noinst_mps_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-dist_noinst_MANS	    += $(dist_noinst_sun_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-dist_noinst_MANS	    += $(dist_noinst_uw7_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-dist_noinst_MANS	    += $(dist_noinst_osf_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-dist_noinst_MANS	    += $(dist_noinst_aix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-dist_noinst_MANS	    += $(dist_noinst_hpux_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-dist_noinst_MANS	    += $(dist_noinst_irix_compat_pages)
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-dist_noinst_MANS	    += $(dist_noinst_lis_compat_pages)
-dist_noinst_MANS	    += $(dist_noinst_lis_deprec_pages)
-endif
-##if CONFIG_STREAMS_COMPAT_LFS_MODULE
-##dist_noinst_MANS	    += $(dist_noinst_lfs_compat_pages)
-##endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
-endif
 
 
 ## PKG_BUILD_INDEP

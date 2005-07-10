@@ -1,0 +1,6 @@
+strutil (0.9.2.1-0) experimental; urgency=low
+
+  * Initial stab at debian build system.
+
+ -- Brian Bidulock <bidulock@openss7.org>  Sun,  3 Jul 2005 14:32:46 -0600
+

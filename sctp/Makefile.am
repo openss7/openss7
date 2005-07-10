@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/06 11:21:51 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/09 21:48:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 11:21:51 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:48:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -291,7 +291,7 @@ include am/genksyms.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = include doc tests
+SUBDIRS = include . tests doc
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

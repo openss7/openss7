@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/07 20:29:17 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/09 21:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:17 $ by $Author: brian $
+ Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/07 20:29:17 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/09 21:51:21 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/07 20:29:17 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/09 21:51:21 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,21 +72,9 @@ static char const ident[] =
 
 #include "os7/compat.h"
 
-#if LFS
-//#include "sys/config.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strutil.h"
-//#include "src/modules/sth.h"
-//#include "src/kernel/strsad.h"
-#else
-#if 0
-#include "include/sys/strdebug.h"
-#endif
-#endif
-
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/07 20:29:17 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/09 21:51:21 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -108,37 +96,107 @@ MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
 
-#if LFS
 /* don't use these functions, they are way too dangerous */
+#undef MPSTR_QLOCK
 long MPSTR_QLOCK(queue_t *q)
 {
+#if LIS
+	lis_flags_t flags;
+	lis_rw_write_lock_irqsave(&q->q_isr_lock, &flags);
+#endif
+#if LFS
 	unsigned long flags;
-	qwlock(q, &flags);
+	local_irq_save(flags);
+	if (q->q_owner == current)
+		q->q_nest++;
+	else {
+		write_lock(&q->q_rwlock);
+		q->q_owner = current;
+		q->q_nest = 0;
+	}
+#endif
 	return (flags);
 }
 
 EXPORT_SYMBOL(MPSTR_QLOCK);	/* svr4ddi.h */
+
+#undef MPSTR_QRELE
 void MPSTR_QRELE(queue_t *q, long s)
 {
-	qwunlock(q, (unsigned long *) &s);
+#if LIS
+	lis_flags_t flags = s;
+	lis_rw_write_unlock_irqrestore(&q->q_isr_lock, &flags);
+	return;
+#endif
+#if LFS
+	if (q->q_owner == current) {
+		unsigned long flags = s;
+		if (q->q_nest > 0)
+			q->q_nest--;
+		else {
+			q->q_owner = NULL;
+			q->q_nest = 0;
+			write_unlock(&q->q_rwlock);
+		}
+		local_irq_restore(flags);
+		return;
+	}
+	swerr();
+#endif
 }
 
 EXPORT_SYMBOL(MPSTR_QRELE);	/* svr4ddi.h */
-long MPSTR_STPLOCK(struct stdata *stp)
+
+#undef MPSTR_STPLOCK
+long MPSTR_STPLOCK(struct stdata *sd)
 {
-	unsigned long flags = 0;
-	swlock(stp, &flags);
+#if LIS
+	lis_flags_t flags;
+	lis_spin_lock_irqsave(&sd->sd_lock, &flags);
 	return (flags);
+#endif
+#if LFS
+	unsigned long flags;
+	local_irq_save(flags);
+	if (sd->sd_owner == current)
+		sd->sd_nest++;
+	else {
+		write_lock(&sd->sd_qlock);
+		sd->sd_nest = 0;
+		sd->sd_owner = current;
+	}
+	return (flags);
+#endif
 }
 
 EXPORT_SYMBOL(MPSTR_STPLOCK);	/* svr4ddi.h */
-void MPSTR_STPRELE(struct stdata *stp, long s)
+
+#undef MPSTR_STPRELE
+void MPSTR_STPRELE(struct stdata *sd, long s)
 {
-	swunlock(stp, (unsigned long *) &s);
+#if LIS
+	lis_flags_t flags = s;
+	lis_spin_unlock_irqrestore(&sd->sd_lock, &flags);
+	return;
+#endif
+#if LFS
+	if (sd->sd_owner == current) {
+		unsigned long flags = s;
+		if (sd->sd_nest > 0)
+			sd->sd_nest--;
+		else {
+			sd->sd_owner = NULL;
+			sd->sd_nest = 0;
+			write_unlock(&sd->sd_qlock);
+		}
+		local_irq_restore(flags);
+		return;
+	}
+	swerr();
+#endif
 }
 
 EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4ddi.h */
-#endif
 
 static pl_t current_spl[NR_CPUS] __cacheline_aligned;
 
@@ -151,7 +209,8 @@ pl_t spl0(void)
 }
 
 #if LFS
-__SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl, processorid_t processor);
+__SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
+				     processorid_t processor);
 EXPORT_SYMBOL(dtimeout);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl);
 EXPORT_SYMBOL(itimeout);	/* svr4ddi.h */
@@ -327,7 +386,8 @@ __SVR4_EXTERN_INLINE void UNLOCK(lock_t * lockp, pl_t pl);
 EXPORT_SYMBOL(UNLOCK);		/* svr4ddi.h */
 __SVR4_EXTERN_INLINE int LOCK_OWNED(lock_t * lockp);
 EXPORT_SYMBOL(LOCK_OWNED);	/* svr4ddi.h */
-__SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag);
+__SVR4_EXTERN_INLINE rwlock_t *RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop,
+					int flag);
 EXPORT_SYMBOL(RW_ALLOC);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void RW_DEALLOC(rwlock_t *lockp);
 EXPORT_SYMBOL(RW_DEALLOC);	/* svr4ddi.h */
@@ -358,6 +418,7 @@ pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 	splx(old_pl);
 	return (invpl);
 }
+
 EXPORT_SYMBOL(RW_TRYRDLOCK);	/* svr4ddi.h */
 pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
@@ -379,6 +440,7 @@ pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 	splx(old_pl);
 	return (invpl);
 }
+
 EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
 EXPORT_SYMBOL(RW_UNLOCK);	/* svr4ddi.h */
@@ -416,12 +478,14 @@ void SV_SIGNAL(sv_t * svp)
 {
 #ifdef HAVE___WAKE_UP_SYNC_ADDR
 #undef	__wake_up_sync
-	typeof(&__wake_up_sync) ___wake_up_sync = (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
+	typeof(&__wake_up_sync) ___wake_up_sync =
+	    (typeof(___wake_up_sync)) HAVE___WAKE_UP_SYNC_ADDR;
 #define	__wake_up_sync ___wake_up_sync
 #endif
 	svp->sv_condv = 1;
 	wake_up_interruptible_sync(&svp->sv_waitq);
 }
+
 EXPORT_SYMBOL(SV_SIGNAL);	/* svr4ddi.h */
 __SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
 EXPORT_SYMBOL(SV_WAIT);		/* svr4ddi.h */
@@ -452,17 +516,18 @@ int ts_maxkmdpri = 39;
 #define PCATCH	    0x8000
 #define PNOSTOP	    0x4000
 
-
 int sleep(caddr_t event, pl_t pl)
 {
 	return 1;
 }
+
 EXPORT_SYMBOL(sleep);		/* svr4ddi.h */
 
 void wakeup(caddr_t event)
 {
 	return;
 }
+
 EXPORT_SYMBOL(wakeup);		/* svr4ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
@@ -477,6 +542,7 @@ int __init svr4comp_init(void)
 #endif
 	return (0);
 }
+
 #ifdef CONFIG_STREAMS_COMPAT_SVR4_MODULE
 static
 #endif

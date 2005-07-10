@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2005/07/06 11:22:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/07/10 02:41:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/06 11:22:01 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 02:41:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,8 +127,7 @@ noinst_LIBRARIES		= \
 				libLfS-specfs.a \
 				libLfS-streams.a \
 				libLfS-drivers.a \
-				libLfS-modules.a \
-				libLfS-compat.a
+				libLfS-modules.a
 
 libLfS_specfs_a_SOURCES		= \
 				src/kernel/strspecfs.c \
@@ -164,40 +163,6 @@ libLfS_streams_a_SOURCES		= \
 				src/kernel/strsad.c \
 				src/kernel/strsad.h \
 				src/kernel/strargs.h
-
-if CONFIG_STREAMS_COMPAT_SVR3
-libLfS_streams_a_SOURCES	+= src/compat/svr3/svr3compat.c
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-libLfS_streams_a_SOURCES	+= src/compat/svr4/svr4compat.c
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-libLfS_streams_a_SOURCES	+= src/compat/mps/mpscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-libLfS_streams_a_SOURCES	+= src/compat/sun/suncompat.c
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-libLfS_streams_a_SOURCES	+= src/compat/uw7/uw7compat.c
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-libLfS_streams_a_SOURCES	+= src/compat/osf/osfcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_AIX
-libLfS_streams_a_SOURCES	+= src/compat/aix/aixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-libLfS_streams_a_SOURCES	+= src/compat/hpux/hpuxcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-libLfS_streams_a_SOURCES	+= src/compat/irix/irixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-libLfS_streams_a_SOURCES	+= src/compat/lis/liscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_MAC
-libLfS_streams_a_SOURCES	+= src/compat/mac/maccompat.c
-endif
 
 if CONFIG_STREAMS_STH
 libLfS_streams_a_SOURCES	+= src/modules/sth.c src/modules/sth.h 
@@ -317,48 +282,6 @@ libLfS_modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libLfS_modules_a_OBJECTS): $(libLfS_modules_a_DEPENDENCIES)
 
-libLfS_compat_a_SOURCES		= 
-
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/svr3/svr3compat.c
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/svr4/svr4compat.c
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/mps/mpscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/sun/suncompat.c
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/uw7/uw7compat.c
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/osf/osfcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/aix/aixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/hpux/hpuxcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/irix/irixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/lis/liscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-libLfS_compat_a_SOURCES		+= src/compat/mac/maccompat.c
-endif
-
-libLfS_compat_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libLfS_compat_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
-libLfS_compat_a_CFLAGS		= $(KERNEL_CFLAGS)
-
-$(libLfS_compat_a_OBJECTS): $(libLfS_compat_a_DEPENDENCIES)
-
 specfs.o: stamp-verobjs
 	@list=`$(ECHO) " $(libLfS_specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO) "$(LD) -r -o $@ $$list" ; \
@@ -389,8 +312,8 @@ EXTRA_SCRIPTS			+= configure.nexusware
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
-KERNEL_MODULES			= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS) $(libLfS_compat_a_OBJECTS)
+KERNEL_OBJECTS			= $(libLfS_specfs_a_OBJECTS) $(libLfS_streams_a_OBJECTS) $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS)
+KERNEL_MODULES			= specfs.o streams.o $(libLfS_drivers_a_OBJECTS) $(libLfS_modules_a_OBJECTS)
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
@@ -639,86 +562,9 @@ EXPORT_SRCFILES			= \
 				src/kernel/strspecfs.c \
 				src/kernel/strsysctl.c \
 				src/kernel/strutil.c \
-				src/kernel/strsyms.c
-
-if CONFIG_STREAMS_COMPAT_SVR3
-EXPORT_SRCFILES			+= src/compat/svr3/svr3compat.c
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-EXPORT_SRCFILES			+= src/compat/svr4/svr4compat.c
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-EXPORT_SRCFILES			+= src/compat/mps/mpscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-EXPORT_SRCFILES			+= src/compat/sun/suncompat.c
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-EXPORT_SRCFILES			+= src/compat/uw7/uw7compat.c
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-EXPORT_SRCFILES			+= src/compat/osf/osfcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_AIX
-EXPORT_SRCFILES			+= src/compat/aix/aixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-EXPORT_SRCFILES			+= src/compat/hpux/hpuxcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-EXPORT_SRCFILES			+= src/compat/irix/irixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-EXPORT_SRCFILES			+= src/compat/lis/liscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_MAC
-EXPORT_SRCFILES			+= src/compat/mac/maccompat.c
-endif
-if CONFIG_STREAMS_STH
-EXPORT_SRCFILES			+= src/modules/sth.c
-endif
-if CONFIG_STREAMS_CLONE
-EXPORT_SRCFILES			+= src/drivers/clone.c
-endif
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-EXPORT_SRCFILES			+= src/compat/svr3/svr3compat.c
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-EXPORT_SRCFILES			+= src/compat/svr4/svr4compat.c
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-EXPORT_SRCFILES			+= src/compat/mps/mpscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-EXPORT_SRCFILES			+= src/compat/sun/suncompat.c
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-EXPORT_SRCFILES			+= src/compat/uw7/uw7compat.c
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-EXPORT_SRCFILES			+= src/compat/osf/osfcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-EXPORT_SRCFILES			+= src/compat/aix/aixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-EXPORT_SRCFILES			+= src/compat/hpux/hpuxcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-EXPORT_SRCFILES			+= src/compat/irix/irixcompat.c
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_SRCFILES			+= src/compat/lis/liscompat.c
-endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-EXPORT_SRCFILES			+= src/compat/mac/maccompat.c
-endif
-if CONFIG_STREAMS_STH_MODULE
-EXPORT_SRCFILES			+= src/modules/sth.c
-endif
-if CONFIG_STREAMS_CLONE_MODULE
-EXPORT_SRCFILES			+= src/drivers/clone.c
-endif
+				src/kernel/strsyms.c \
+				src/drivers/clone.c \
+				src/modules/sth.c
 
 EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/strattach.ver \
@@ -730,89 +576,11 @@ EXPORT_VERFILES			= \
 				$(PKGINCL)/versions/strspecfs.ver \
 				$(PKGINCL)/versions/strsysctl.ver \
 				$(PKGINCL)/versions/strutil.ver \
-				$(PKGINCL)/versions/strsyms.ver
-
-if CONFIG_STREAMS_COMPAT_SVR3
-EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_SVR4
-EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_MPS
-EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_SUN
-EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_UW7
-EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_OSF
-EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_AIX
-EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_HPUX
-EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_IRIX
-EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_LIS
-EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_MAC
-EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
-endif
-if CONFIG_STREAMS_STH
-EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
-endif
-if CONFIG_STREAMS_CLONE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
-endif
-if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/svr3compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/svr4compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_MPS_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_SUN_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/suncompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_UW7_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/uw7compat.ver
-endif
-if CONFIG_STREAMS_COMPAT_OSF_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_AIX_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/aixcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/hpuxcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/irixcompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_LIS_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/liscompat.ver
-endif
-if CONFIG_STREAMS_COMPAT_MAC_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
-endif
-if CONFIG_STREAMS_STH_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/sth.ver
-endif
-if CONFIG_STREAMS_CLONE_MODULE
-EXPORT_VERFILES			+= $(PKGINCL)/versions/clone.ver
-endif
+				$(PKGINCL)/versions/strsyms.ver \
+				$(PKGINCL)/versions/clone.ver \
+				$(PKGINCL)/versions/sth.ver
 
 GENKSYMS_CPPFLAGS		= \
-				-I./src/compat -I$(srcdir)/src/compat \
 				-I./src/kernel -I$(srcdir)/src/kernel \
 				-I./src/drivers -I$(srcdir)/src/drivers \
 				-I./src/modules -I$(srcdir)/src/modules \
@@ -831,7 +599,7 @@ include am/strconf.am
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-SUBDIRS = include doc tests
+SUBDIRS = include . tests doc
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP

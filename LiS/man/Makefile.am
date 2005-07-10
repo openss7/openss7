@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/07/05 22:45:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/07/09 21:56:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/05 22:45:20 $ by $Author: brian $
+# Last Modified $Date: 2005/07/09 21:56:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -542,6 +542,7 @@ man_MANS = \
 	man9/putnext.9 \
 	man9/putnextctl1.9 \
 	man9/putnextctl.9 \
+	man9/put.9 \
 	man9/putq.9 \
 	man9/qattach.9 \
 	man9/qclose.9 \
@@ -1072,6 +1073,7 @@ dist_noinst_MANS = \
 	man9/putnext.9.man \
 	man9/putnextctl1.9.man \
 	man9/putnextctl.9.man \
+	man9/put.9.man \
 	man9/putq.9.man \
 	man9/qattach.9.man \
 	man9/qclose.9.man \
