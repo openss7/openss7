@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:28:52 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/10 11:43:24 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/05/14 08:28:52 $ by $Author: brian $
+## Last Modified $Date: 2005/07/10 11:43:24 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -94,30 +94,30 @@ loadable inet
 ## to by symbolic links to the /dev/inet entries.  arp and rip
 ## are supposed to be symbolic links to udp
 ##
-#node	/dev/ip		     c	0666	inet		32
-#node	/dev/icmp	     c	0666	inet		33
-#node	/dev/ggp	     c	0666	inet		34
-#node	/dev/ipip	     c	0666	inet		35
-#node	/dev/tcp	     c	0666	inet		36
-#node	/dev/egp	     c	0666	inet		37
-#node	/dev/pup	     c	0666	inet		38
-#node	/dev/udp	     c	0666	inet		39
-#node	/dev/idp	     c	0666	inet		40
-#node	/dev/rawip	     c	0666	inet		41
-#node	/dev/arp	     c	0666	inet		39
-#node	/dev/rip	     c	0666	inet		39
-#node	/dev/inet/ip	     c	0666	inet		32
-#node	/dev/inet/icmp	     c	0666	inet		33
-#node	/dev/inet/ggp	     c	0666	inet		34
-#node	/dev/inet/ipip	     c	0666	inet		35
-#node	/dev/inet/tcp	     c	0666	inet		36
-#node	/dev/inet/egp	     c	0666	inet		37
-#node	/dev/inet/pup	     c	0666	inet		38
-#node	/dev/inet/udp	     c	0666	inet		39
-#node	/dev/inet/idp	     c	0666	inet		40
-#node	/dev/inet/rawip	     c	0666	inet		41
-#node	/dev/inet/arp	     c	0666	inet		39
-#node	/dev/inet/rip	     c	0666	inet		39
+node	/dev/ip		     c	0666	inet		32
+node	/dev/icmp	     c	0666	inet		33
+node	/dev/ggp	     c	0666	inet		34
+node	/dev/ipip	     c	0666	inet		35
+node	/dev/tcp	     c	0666	inet		36
+node	/dev/egp	     c	0666	inet		37
+node	/dev/pup	     c	0666	inet		38
+node	/dev/udp	     c	0666	inet		39
+node	/dev/idp	     c	0666	inet		40
+node	/dev/rawip	     c	0666	inet		41
+node	/dev/arp	     c	0666	inet		39
+node	/dev/rip	     c	0666	inet		39
+node	/dev/inet/ip	     c	0666	inet		32
+node	/dev/inet/icmp	     c	0666	inet		33
+node	/dev/inet/ggp	     c	0666	inet		34
+node	/dev/inet/ipip	     c	0666	inet		35
+node	/dev/inet/tcp	     c	0666	inet		36
+node	/dev/inet/egp	     c	0666	inet		37
+node	/dev/inet/pup	     c	0666	inet		38
+node	/dev/inet/udp	     c	0666	inet		39
+node	/dev/inet/idp	     c	0666	inet		40
+node	/dev/inet/rawip	     c	0666	inet		41
+node	/dev/inet/arp	     c	0666	inet		39
+node	/dev/inet/rip	     c	0666	inet		39
 node	/dev/ticots_ord	     c	0666	inet		42
 node	/dev/ticots	     c	0666	inet		43
 node	/dev/ticlts	     c	0666	inet		44

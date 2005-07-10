@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/09 22:23:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/10 11:43:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 22:23:13 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:43:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -707,12 +707,15 @@ man_MANS = \
 	man3/fattach.3 \
 	man3/fdetach.3 \
 	man3/isastream.3 \
+	man3/libstreams.3 \
 	man3/pipe.3 \
 	man3/s_pipe.3 \
 	man4/clone.4 \
 	man4/connld.4 \
 	man4/echo.4 \
 	man4/fifo.4s \
+	man4/log.4 \
+	man4/loop.4 \
 	man4/nsdev.4 \
 	man4/nuls.4 \
 	man4/pipe.4 \
@@ -722,6 +725,7 @@ man_MANS = \
 	man4/s_fifo.4 \
 	man4/sfx.4 \
 	man4/spx.4 \
+	man4/sth.4 \
 	man4/strlog.4 \
 	man5/autopush.5 \
 	man5/specfs.5 \
@@ -1673,12 +1677,15 @@ dist_noinst_MANS = \
 	man3/fattach.3.man \
 	man3/fdetach.3.man \
 	man3/isastream.3.man \
+	man3/libstreams.3.man \
 	man3/pipe.3.man \
 	man3/s_pipe.3.man \
 	man4/clone.4.man \
 	man4/connld.4.man \
 	man4/echo.4.man \
 	man4/fifo.4s.man \
+	man4/log.4.man \
+	man4/loop.4.man \
 	man4/nsdev.4.man \
 	man4/nuls.4.man \
 	man4/pipe.4.man \
@@ -1688,6 +1695,7 @@ dist_noinst_MANS = \
 	man4/s_fifo.4.man \
 	man4/sfx.4.man \
 	man4/spx.4.man \
+	man4/sth.4.man \
 	man4/strlog.4.man \
 	man5/autopush.5.man \
 	man5/specfs.5.man \

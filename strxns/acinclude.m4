@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/08 12:19:08 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/10 11:41:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:19:08 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:41:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -285,16 +285,16 @@ AC_DEFUN([_XNS_OUTPUT], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
-dnl strconf_cv_input='Config.master'
+    strconf_cv_input='Config.master'
     strconf_cv_majbase=245
     strconf_cv_config='strconf.h'
     strconf_cv_modconf='modconf.h'
-dnl strconf_cv_drvconf='drvconf.mk'
-dnl strconf_cv_confmod='conf.modules'
-dnl strconf_cv_makedev='devices.lst'
+    strconf_cv_drvconf='drvconf.mk'
+    strconf_cv_confmod='conf.modules'
+    strconf_cv_makedev='devices.lst'
     strconf_cv_mknodes="${PACKAGE_TARNAME}_mknod.c"
-    strconf_cv_strsetup='xnssetup.conf'
-    strconf_cv_strload='xnsload.conf'
+    strconf_cv_strsetup='strsetup.conf'
+    strconf_cv_strload='strload.conf'
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"

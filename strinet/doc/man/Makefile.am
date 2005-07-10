@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/06/29 08:08:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/10 11:43:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:08:31 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:43:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,25 +61,26 @@ man_MANS = \
 	man3/xti_ip.3 \
 	man3/xti_udp.3 \
 	man3/xti_tcp.3 \
+	man3/t_kpalive.3 \
+	man3/t_tcp_info.3 \
+	man4/arp.4 \
 	man4/egp.4 \
 	man4/ggp.4 \
 	man4/icmp.4 \
 	man4/idp.4 \
-	man4/ifnet.4 \
-	man4/INET.4 \
 	man4/inet.4 \
+	man4/INET.4 \
 	man4/ip.4 \
 	man4/ipip.4 \
 	man4/pup.4 \
 	man4/rawip.4 \
+	man4/rip.4 \
 	man4/tcp.4 \
-	man4/tcp_ioctl.4 \
 	man4/ticlts.4 \
 	man4/ticots.4 \
+	man4/ticots_ord.4 \
 	man4/ticotsord.4 \
 	man4/udp.4 \
-	man4/udp_ioctl.4 \
-	man4/xtios.4 \
 	man7/tpi_ip.7 \
 	man7/tpi_udp.7 \
 	man7/tpi_tcp.7 \
@@ -92,8 +93,15 @@ if WITH_OPENSS7_SCTP
 ## WITH_OPENSS7_SCTP
 man_MANS += \
 	man3/xti_sctp.3 \
+	man3/t_sctp_dest_status.3 \
+	man3/t_sctp_dest_status_t.3 \
+	man3/t_sctp_hb.3 \
+	man3/t_sctp_hb_t.3 \
+	man3/t_sctp_rto.3 \
+	man3/t_sctp_rto_t.3 \
+	man3/t_sctp_status.3 \
+	man3/t_sctp_status_t.3 \
 	man4/sctp.4 \
-	man4/sctp_ioctl.4 \
 	man7/tpi_sctp.7 \
 	man8/test-inet_sctp.8
 ## WITH_OPENSS7_SCTP
@@ -104,27 +112,35 @@ dist_noinst_MANS = \
 	man3/xti_udp.3.man \
 	man3/xti_tcp.3.man \
 	man3/xti_sctp.3.man \
+	man3/t_kpalive.3.man \
+	man3/t_sctp_dest_status.3.man \
+	man3/t_sctp_dest_status_t.3.man \
+	man3/t_sctp_hb.3.man \
+	man3/t_sctp_hb_t.3.man \
+	man3/t_sctp_rto.3.man \
+	man3/t_sctp_rto_t.3.man \
+	man3/t_sctp_status.3.man \
+	man3/t_sctp_status_t.3.man \
+	man3/t_tcp_info.3.man \
+	man4/arp.4.man \
 	man4/egp.4.man \
 	man4/ggp.4.man \
 	man4/icmp.4.man \
 	man4/idp.4.man \
-	man4/ifnet.4.man \
 	man4/inet.4.man \
 	man4/INET.4.man \
 	man4/ip.4.man \
 	man4/ipip.4.man \
 	man4/pup.4.man \
 	man4/rawip.4.man \
+	man4/rip.4.man \
 	man4/sctp.4.man \
-	man4/sctp_ioctl.4.man \
 	man4/tcp.4.man \
-	man4/tcp_ioctl.4.man \
 	man4/ticlts.4.man \
 	man4/ticots.4.man \
+	man4/ticots_ord.4.man \
 	man4/ticotsord.4.man \
 	man4/udp.4.man \
-	man4/udp_ioctl.4.man \
-	man4/xtios.4.man \
 	man7/tpi_ip.7.man \
 	man7/tpi_udp.7.man \
 	man7/tpi_tcp.7.man \

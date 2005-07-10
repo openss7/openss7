@@ -1,0 +1,1 @@
+.so man9/svr4compat.9.man

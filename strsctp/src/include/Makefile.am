@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/08 12:23:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/10 11:42:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:23:31 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:42:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,6 +66,17 @@ nobase_pkginclude_HEADERS = \
 nobase_nodist_pkginclude_HEADERS = \
 	sys/strsctp/version.h
 #	sys/strsctp/modversions.h
+
+if PERFORM_CHECKS
+## PERFORM_CHECKS
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
+TESTS_ENVIRONMENT	+= PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   mandir='$(mandir)'
+CLEANFILES		+= $(top_builddir)/check_headers.log
+DISTCLEANFILES		+= *.err *.out
+## PERFORM_CHECKS
+endif
 
 ## PKG_BUILD_ARCH
 endif

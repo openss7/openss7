@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/08 12:17:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/10 11:42:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:17:56 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:42:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,14 +76,36 @@ sctp_headers	= \
 
 nobase_pkginclude_HEADERS = \
 	$(tli_headers) \
-	$(xnet_headers) \
+	$(xnet_headers)
+
+if WITH_OPENSS7_SCTP
+## WITH_OPENSS7_SCTP
+nobase_pkginclude_HEADERS += \
 	$(sctp_headers)
+## WITH_OPENSS7_SCTP
+endif
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/strinet/version.h
 #	sys/strinet/modversions.h
 
+if PERFORM_CHECKS
+## PERFORM_CHECKS
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
+TESTS_ENVIRONMENT	+= PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   mandir='$(mandir)'
+CLEANFILES		+= $(top_builddir)/check_headers.log
+DISTCLEANFILES		+= *.err *.out
+## PERFORM_CHECKS
+endif
+
 ## PKG_BUILD_ARCH
 endif
+
+EXTRA_DIST  += \
+	$(tli_headers) \
+	$(xnet_headers) \
+	$(sctp_headers)
 
 # vim: ft=automake

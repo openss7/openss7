@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.29 $) $Date: 2005/07/08 12:18:35 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.30 $) $Date: 2005/07/10 11:40:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:18:35 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:40:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1429,7 +1429,7 @@ AC_DEFUN([_LIS_STRCONF], [dnl
     strconf_cv_confmod='conf.modules'
     strconf_cv_makedev='devices.lst'
     strconf_cv_mknodes='util/linux/strmakenodes.c'
-    strconf_cv_stsetup='strsetup.conf'
+    strconf_cv_strsetup='strsetup.conf'
     strconf_cv_strload='strload.conf'
     strconf_cv_package='LiS'
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"

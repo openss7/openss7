@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/09 21:50:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/10 11:43:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:50:52 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:43:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,7 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 svr3_compat_pages = \
+	man9/svr3compat.9 \
 	man9/emajor.9 \
 	man9/eminor.9
 
@@ -764,6 +765,7 @@ man_MANS		    += $(mac_compat_pages)
 endif
 
 dist_noinst_svr3_compat_pages = \
+	man9/svr3compat.9.man \
 	man9/emajor.9.man \
 	man9/eminor.9.man
 

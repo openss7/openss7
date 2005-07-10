@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/06/29 08:10:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/10 11:44:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/06/29 08:10:16 $ by $Author: brian $
+# Last Modified $Date: 2005/07/10 11:44:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,48 +122,7 @@ tli_man_MANS	= \
 	man7/T_UNITDATA_REQ.7 \
 	man7/T_unitdata_req.7
 
-xnet_man_MANS	= \
-	man3/t_accept.3 \
-	man3/t_addleaf.3 \
-	man3/t_alloc.3 \
-	man3/t_bind.3 \
-	man3/t_close.3 \
-	man3/t_connect.3 \
-	man3/t_errno.3 \
-	man3/t_error.3 \
-	man3/t_free.3 \
-	man3/t_getinfo.3 \
-	man3/t_getprotaddr.3 \
-	man3/t_getstate.3 \
-	man3/t_listen.3 \
-	man3/t_look.3 \
-	man3/t_open.3 \
-	man3/t_optmgmt.3 \
-	man3/t_rcv.3 \
-	man3/t_rcvconnect.3 \
-	man3/t_rcvdis.3 \
-	man3/t_rcvleafchange.3 \
-	man3/t_rcvrel.3 \
-	man3/t_rcvreldata.3 \
-	man3/t_rcvopt.3 \
-	man3/t_rcvudata.3 \
-	man3/t_rcvuderr.3 \
-	man3/t_rcvv.3 \
-	man3/t_rcvvudata.3 \
-	man3/t_removeleaf.3 \
-	man3/t_snd.3 \
-	man3/t_snddis.3 \
-	man3/t_sndopt.3 \
-	man3/t_sndrel.3 \
-	man3/t_sndreldata.3 \
-	man3/t_sndudata.3 \
-	man3/t_sndv.3 \
-	man3/t_sndvopt.3 \
-	man3/t_sndvudata.3 \
-	man3/t_strerror.3 \
-	man3/t_sync.3 \
-	man3/t_sysconf.3 \
-	man3/t_unbind.3 \
+xnet_hidden_symbols = \
 	man3/_t_errno.3 \
 	man3/_t_errstr.3 \
 	man3/__xnet_t_accept.3 \
@@ -244,7 +203,50 @@ xnet_man_MANS	= \
 	man3/__xnet_t_sndvudata_r.3 \
 	man3/__xnet_t_sync_r.3 \
 	man3/__xnet_t_unbind_r.3 \
-	man3/__xnet_t_peek.3 \
+	man3/__xnet_t_peek.3
+
+xnet_man_MANS	= \
+	man3/t_accept.3 \
+	man3/t_addleaf.3 \
+	man3/t_alloc.3 \
+	man3/t_bind.3 \
+	man3/t_close.3 \
+	man3/t_connect.3 \
+	man3/t_errno.3 \
+	man3/t_error.3 \
+	man3/t_free.3 \
+	man3/t_getinfo.3 \
+	man3/t_getprotaddr.3 \
+	man3/t_getstate.3 \
+	man3/t_listen.3 \
+	man3/t_look.3 \
+	man3/t_open.3 \
+	man3/t_optmgmt.3 \
+	man3/t_rcv.3 \
+	man3/t_rcvconnect.3 \
+	man3/t_rcvdis.3 \
+	man3/t_rcvleafchange.3 \
+	man3/t_rcvrel.3 \
+	man3/t_rcvreldata.3 \
+	man3/t_rcvopt.3 \
+	man3/t_rcvudata.3 \
+	man3/t_rcvuderr.3 \
+	man3/t_rcvv.3 \
+	man3/t_rcvvudata.3 \
+	man3/t_removeleaf.3 \
+	man3/t_snd.3 \
+	man3/t_snddis.3 \
+	man3/t_sndopt.3 \
+	man3/t_sndrel.3 \
+	man3/t_sndreldata.3 \
+	man3/t_sndudata.3 \
+	man3/t_sndv.3 \
+	man3/t_sndvopt.3 \
+	man3/t_sndvudata.3 \
+	man3/t_strerror.3 \
+	man3/t_sync.3 \
+	man3/t_sysconf.3 \
+	man3/t_unbind.3 \
 	man3/xnet.3 \
 	man3/xti.3 \
 	man8/strxnet_mknod.8\
@@ -355,48 +357,7 @@ tli_dist_noinst_MANS	= \
 	man7/T_UNITDATA_REQ.7.man \
 	man7/T_unitdata_req.7.man
 
-xnet_dist_noinst_MANS	= \
-	man3/t_accept.3.man \
-	man3/t_addleaf.3.man \
-	man3/t_alloc.3.man \
-	man3/t_bind.3.man \
-	man3/t_close.3.man \
-	man3/t_connect.3.man \
-	man3/t_errno.3.man \
-	man3/t_error.3.man \
-	man3/t_free.3.man \
-	man3/t_getinfo.3.man \
-	man3/t_getprotaddr.3.man \
-	man3/t_getstate.3.man \
-	man3/t_listen.3.man \
-	man3/t_look.3.man \
-	man3/t_open.3.man \
-	man3/t_optmgmt.3.man \
-	man3/t_rcv.3.man \
-	man3/t_rcvconnect.3.man \
-	man3/t_rcvdis.3.man \
-	man3/t_rcvleafchange.3.man \
-	man3/t_rcvrel.3.man \
-	man3/t_rcvreldata.3.man \
-	man3/t_rcvopt.3.man \
-	man3/t_rcvudata.3.man \
-	man3/t_rcvuderr.3.man \
-	man3/t_rcvv.3.man \
-	man3/t_rcvvudata.3.man \
-	man3/t_removeleaf.3.man \
-	man3/t_snd.3.man \
-	man3/t_snddis.3.man \
-	man3/t_sndopt.3.man \
-	man3/t_sndrel.3.man \
-	man3/t_sndreldata.3.man \
-	man3/t_sndudata.3.man \
-	man3/t_sndv.3.man \
-	man3/t_sndvopt.3.man \
-	man3/t_sndvudata.3.man \
-	man3/t_strerror.3.man \
-	man3/t_sync.3.man \
-	man3/t_sysconf.3.man \
-	man3/t_unbind.3.man \
+nodist_xnet_hidden_symbols = \
 	man3/_t_errno.3.man \
 	man3/_t_errstr.3.man \
 	man3/__xnet_t_accept.3.man \
@@ -477,7 +438,50 @@ xnet_dist_noinst_MANS	= \
 	man3/__xnet_t_sndvudata_r.3.man \
 	man3/__xnet_t_sync_r.3.man \
 	man3/__xnet_t_unbind_r.3.man \
-	man3/__xnet_t_peek.3.man \
+	man3/__xnet_t_peek.3.man
+
+xnet_dist_noinst_MANS	= \
+	man3/t_accept.3.man \
+	man3/t_addleaf.3.man \
+	man3/t_alloc.3.man \
+	man3/t_bind.3.man \
+	man3/t_close.3.man \
+	man3/t_connect.3.man \
+	man3/t_errno.3.man \
+	man3/t_error.3.man \
+	man3/t_free.3.man \
+	man3/t_getinfo.3.man \
+	man3/t_getprotaddr.3.man \
+	man3/t_getstate.3.man \
+	man3/t_listen.3.man \
+	man3/t_look.3.man \
+	man3/t_open.3.man \
+	man3/t_optmgmt.3.man \
+	man3/t_rcv.3.man \
+	man3/t_rcvconnect.3.man \
+	man3/t_rcvdis.3.man \
+	man3/t_rcvleafchange.3.man \
+	man3/t_rcvrel.3.man \
+	man3/t_rcvreldata.3.man \
+	man3/t_rcvopt.3.man \
+	man3/t_rcvudata.3.man \
+	man3/t_rcvuderr.3.man \
+	man3/t_rcvv.3.man \
+	man3/t_rcvvudata.3.man \
+	man3/t_removeleaf.3.man \
+	man3/t_snd.3.man \
+	man3/t_snddis.3.man \
+	man3/t_sndopt.3.man \
+	man3/t_sndrel.3.man \
+	man3/t_sndreldata.3.man \
+	man3/t_sndudata.3.man \
+	man3/t_sndv.3.man \
+	man3/t_sndvopt.3.man \
+	man3/t_sndvudata.3.man \
+	man3/t_strerror.3.man \
+	man3/t_sync.3.man \
+	man3/t_sysconf.3.man \
+	man3/t_unbind.3.man \
 	man3/xnet.3.man \
 	man3/xti.3.man \
 	man8/strxnet_mknod.8.man \

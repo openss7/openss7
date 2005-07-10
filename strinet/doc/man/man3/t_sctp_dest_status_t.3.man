@@ -1,0 +1,1 @@
+.so man3/t_sctp_dest_status.3.man
