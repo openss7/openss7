@@ -1,0 +1,1 @@
+.so man4/fifo.4s.man

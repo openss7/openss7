@@ -1,0 +1,231 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: ctlmsg.9.man,v 0.9.2.1 2005/07/11 07:13:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/11 07:13:13 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so streams.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH DATAMSG 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B ctlmsg
+\- tests a \fISTREAMS\fP message type for control
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int ctlmsg(int " type );
+.\"
+.\"
+.SH ARGUMENTS
+.TP
+.I type
+the type to test against a data message type.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR ctlmsg ()
+tests the passed in
+.I type
+to see if the type is a control message type.  Control message types include any message types other
+than following:
+.TP \w'M_PCPROTO(9)\(em\ 'u
+.BR M_DATA (9)
+The message type is a data message type.
+.PD 0
+.TP
+.BR M_PROTO (9)
+The message type is a protocol data message type.
+.TP
+.BR M_PCPROTO (9)
+The message type is a priority protocol data message type.
+.PD
+.PP
+If the passed in message
+.I type
+is not one of these message types,
+.BR ctlmsg ()
+returns true (1); otherwise,
+.BR ctlmsg ()
+returns false (0).
+.\"
+.\"
+.SH RETURN
+.PP
+.BR ctlmsg ()
+returns true (1) if the passed in message type is a control message type.
+.BR ctlmsg ()
+returns false (0) if the passed in message type is not a control message type.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR ctlmsg ()
+is always successful.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR ctlmsg ()
+can be called from any context, including user context, module procedures,
+callouts, callbacks, soft interrupts and interrupt service routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR ctlmsg ()
+is MP-safe.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR datamsg (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ctlmsg ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ctlmsg ()
+is source-level compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and implementations based on
+.IR "SVR 4" ,
+.[
+svr4dk
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR ctlmsg ()
+is widely supported.
+Portable
+.I STREAMS
+modules and drivers may use this function.
+.IP \(em
+.BR ctlmsg ()
+is implemented as an
+.B extern inline
+function.  LiS implements
+.BR ctlmsg ()
+as a C preprocessor macro,
+which is rather against its stated purpose of providing functional interfaces.
+.IP \(em
+Some older implementations of
+.IR "SunOS 4" \(rg
+did not include
+.BR M_DELAY (9)
+in the group.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 MP DDI/DKI" .
+.[
+usldk
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ctlmsg ()
+appeared as part of
+.IR "SVR 4.0 STREAMS" .
+.[
+svr4spg
+.]
+.PP
+.BR ctlmsg ()
+first appeared in
+.IR "SVR 3" .
+.[
+svr3spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

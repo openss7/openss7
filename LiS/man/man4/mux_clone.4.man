@@ -1,0 +1,1 @@
+.so man4/minimux.4.man

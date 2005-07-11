@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.21 2005/07/05 22:46:08 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.23 2005/07/11 12:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/05 22:46:08 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/11 12:42:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -71,7 +71,9 @@
 #include <linux/version.h>	/* for UTS_RELEASE */
 #include <asm/delay.h>		/* for udelay */
 #include <sys/dki.h>
+#if 0
 #include <sys/map.h>		/* for rm map definitions */
+#endif
 
 #ifndef dev_t
 #define dev_t __streams_dev_t
@@ -255,6 +257,10 @@ static __inline__ void bcopy(const void *from, void *to, size_t len)
 __EXTERN_INLINE void bzero(void *data, size_t len)
 {
 	memset(data, 0, len);
+}
+static __inline__ int bcmp(const void *s1, const void *s2, size_t len)
+{
+	return memcmp(s1,s2,len);
 }
 
 /* these are SVR 4 D3DK functions that need to be implemented yet */

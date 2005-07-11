@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:55:20 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 12:42:28 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:20 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -1963,6 +1963,8 @@ void qinsert(queue_t *brq, queue_t *irq)
 	hwunlock(brq, &flags);
 }
 
+EXPORT_SYMBOL(qinsert);
+
 /**
  *  qopen:	- call a module's qi_qopen entry point
  *  @q:		the read queue of the module queue pair to open
@@ -2525,7 +2527,6 @@ EXPORT_SYMBOL(strqset);
 
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
-typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
 vstrlog_t vstrlog_hook = NULL;
 EXPORT_SYMBOL(vstrlog_hook);
 
