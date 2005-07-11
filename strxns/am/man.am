@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/07 05:16:55 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/11 05:48:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/07 05:16:55 $ by $Author: brian $
+## Last Modified $Date: 2005/07/11 05:48:54 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -566,7 +566,10 @@ POST_UNINSTALL_AM	+= postun-manpages
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
-TESTS_ENVIRONMENT	+= MANS='$(MANS)' PKG_MANPATH='$(PKG_MANPATH)' mandir='$(mandir)'
+TESTS_ENVIRONMENT	+= MANS='$(MANS)' \
+			   MANS_UNUSED='$(MANS_UNUSED)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+		       	   mandir='$(mandir)'
 CLEANFILES		+= check_mans.log
 DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS
