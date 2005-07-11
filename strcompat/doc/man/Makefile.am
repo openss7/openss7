@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/10 11:43:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/11 13:31:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:43:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/11 13:31:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -686,7 +686,66 @@ uxp_compat_pages = \
 	man9/uxpcompat.9
 
 man_MANS = \
-	man8/strcompat_mknod.8
+	man8/strcompat_mknod.8 \
+	man9/alloc_proto.9 \
+	man9/bufq_append.9 \
+	man9/bufq_dequeue.9 \
+	man9/bufq_dequeue_tail.9 \
+	man9/bufq_freehead.9 \
+	man9/bufq_head.9 \
+	man9/bufq_init.9 \
+	man9/bufq_insert.9 \
+	man9/bufq_length.9 \
+	man9/bufq_lock.9 \
+	man9/bufq_purge.9 \
+	man9/bufq_queue.9 \
+	man9/bufq_queue_head.9 \
+	man9/bufq_resupply.9 \
+	man9/bufq_size.9 \
+	man9/bufq_splice_head.9 \
+	man9/bufq_splice_tail.9 \
+	man9/bufq_supply.9 \
+	man9/bufq_tail.9 \
+	man9/bufq_unlink.9 \
+	man9/bufq_unlock.9 \
+	man9/compat_undoc.9 \
+	man9/freechunks.9 \
+	man9/mkiocb.9 \
+	man9/ss7_allocb.9 \
+	man9/ss7_bufcall.9 \
+	man9/ss7_bufpool_init.9 \
+	man9/ss7_bufpool_release.9 \
+	man9/ss7_bufpool_reserve.9 \
+	man9/ss7_bufpool_term.9 \
+	man9/ss7_bufsrv.9 \
+	man9/ss7_copyb.9 \
+	man9/ss7_copymsg.9 \
+	man9/ss7_do_timeout.9 \
+	man9/ss7_dupb.9 \
+	man9/ss7_dupmsg.9 \
+	man9/ss7_esballoc.9 \
+	man9/ss7_esbbcall.9 \
+	man9/ss7_fast_allocb.9 \
+	man9/ss7_fast_allocb_bh.9 \
+	man9/ss7_fast_freeb.9 \
+	man9/ss7_fast_freeb_bh.9 \
+	man9/ss7_fast_freemsg.9 \
+	man9/ss7_fast_freemsg_bh.9 \
+	man9/ss7_iput.9 \
+	man9/ss7_isrv.9 \
+	man9/ss7_oput.9 \
+	man9/ss7_osrv.9 \
+	man9/ss7_pullupmsg.9 \
+	man9/ss7_putq.9 \
+	man9/ss7_r_flush.9 \
+	man9/ss7_srvq.9 \
+	man9/ss7_start_timer.9 \
+	man9/ss7_stop_timer.9 \
+	man9/ss7_trylockq.9 \
+	man9/ss7_unbufcall.9 \
+	man9/ss7_unlockq.9 \
+	man9/ss7_w_flush.9 \
+	man9/str_uninstall.9
 
 if CONFIG_STREAMS_COMPAT_SVR3
 man_MANS		    += $(svr3_compat_pages)
@@ -1394,7 +1453,66 @@ dist_noinst_uxp_compat_pages = \
 
 
 dist_noinst_MANS = \
-	man8/strcompat_mknod.8.man
+	man8/strcompat_mknod.8.man \
+	man9/alloc_proto.9.man \
+	man9/bufq_append.9.man \
+	man9/bufq_dequeue.9.man \
+	man9/bufq_dequeue_tail.9.man \
+	man9/bufq_freehead.9.man \
+	man9/bufq_head.9.man \
+	man9/bufq_init.9.man \
+	man9/bufq_insert.9.man \
+	man9/bufq_length.9.man \
+	man9/bufq_lock.9.man \
+	man9/bufq_purge.9.man \
+	man9/bufq_queue.9.man \
+	man9/bufq_queue_head.9.man \
+	man9/bufq_resupply.9.man \
+	man9/bufq_size.9.man \
+	man9/bufq_splice_head.9.man \
+	man9/bufq_splice_tail.9.man \
+	man9/bufq_supply.9.man \
+	man9/bufq_tail.9.man \
+	man9/bufq_unlink.9.man \
+	man9/bufq_unlock.9.man \
+	man9/compat_undoc.9.man \
+	man9/freechunks.9.man \
+	man9/mkiocb.9.man \
+	man9/ss7_allocb.9.man \
+	man9/ss7_bufcall.9.man \
+	man9/ss7_bufpool_init.9.man \
+	man9/ss7_bufpool_release.9.man \
+	man9/ss7_bufpool_reserve.9.man \
+	man9/ss7_bufpool_term.9.man \
+	man9/ss7_bufsrv.9.man \
+	man9/ss7_copyb.9.man \
+	man9/ss7_copymsg.9.man \
+	man9/ss7_do_timeout.9.man \
+	man9/ss7_dupb.9.man \
+	man9/ss7_dupmsg.9.man \
+	man9/ss7_esballoc.9.man \
+	man9/ss7_esbbcall.9.man \
+	man9/ss7_fast_allocb.9.man \
+	man9/ss7_fast_allocb_bh.9.man \
+	man9/ss7_fast_freeb.9.man \
+	man9/ss7_fast_freeb_bh.9.man \
+	man9/ss7_fast_freemsg.9.man \
+	man9/ss7_fast_freemsg_bh.9.man \
+	man9/ss7_iput.9.man \
+	man9/ss7_isrv.9.man \
+	man9/ss7_oput.9.man \
+	man9/ss7_osrv.9.man \
+	man9/ss7_pullupmsg.9.man \
+	man9/ss7_putq.9.man \
+	man9/ss7_r_flush.9.man \
+	man9/ss7_srvq.9.man \
+	man9/ss7_start_timer.9.man \
+	man9/ss7_stop_timer.9.man \
+	man9/ss7_trylockq.9.man \
+	man9/ss7_unbufcall.9.man \
+	man9/ss7_unlockq.9.man \
+	man9/ss7_w_flush.9.man \
+	man9/str_uninstall.9.man
 
 if CONFIG_STREAMS_COMPAT_SVR3
 dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)

@@ -67,17 +67,17 @@
 #include <sys/strport.h>
 #endif
 
-#ifdef QNX
+#if 0
 void *port_sbrk(int siz);
 void port_tok_free(char *ptr, int siz);
 
 #define	kmem_alloc(siz,wait_code)	port_sbrk((siz))
 #define	kmem_free(ptr,siz)		port_tok_free((ptr), (siz))
-#else
+#endif
+
 #define	kmem_alloc(siz,wait_code)	ALLOC(siz)
 #define	kmem_zalloc(siz,wait_code)	ZALLOC(siz)
 #define	kmem_free(ptr,siz)		FREE(ptr)
-#endif
 
 /*
  * Wait codes.  These are not used but are included for compatibility

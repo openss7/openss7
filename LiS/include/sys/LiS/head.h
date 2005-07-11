@@ -471,7 +471,6 @@ extern void lis_free_passfp(mblk_t *);
 /*
  *  these are needed by or associated with fdetach()
  */
-extern stdata_t *lookup_stdata(dev_t *, struct inode *, stdata_t *);
 extern int lis_doclose(struct inode *, struct file *f, stdata_t *, cred_t *);
 extern void lis_fdetach_stream(stdata_t *);
 

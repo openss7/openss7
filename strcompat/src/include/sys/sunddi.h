@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sunddi.h,v 0.9.2.10 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: sunddi.h,v 0.9.2.11 2005/07/11 13:31:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 13:31:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUNDDI_H__
 #define __SYS_SUNDDI_H__
 
-#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: sunddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/11 13:31:54 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -93,6 +93,11 @@ __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
 
 #undef unfreezestr
 #define unfreezestr unfreezestr_SUN
+
+#if LFS
+extern void qwait(queue_t *rq);
+extern int qwait_sig(queue_t *rq);
+#endif
 
 #if LFS
 /**

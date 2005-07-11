@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.7 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.8 2005/07/11 12:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2005  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -109,6 +109,12 @@ extern int fattach (int __fildes, __const char *__path) __THROW;
 
 /* Detach a name PATH from a STREAMS-based file descriptor.  */
 extern int fdetach (__const char *__path) __THROW;
+
+/* Create a one-way communication channel (pipe).
+   If successful, two file descriptors are stored in PIPEDES;
+   bytes written on PIPEDES[1] can be read from PIPEDES[0].
+   Returns 0 if successful, -1 if not.  */
+extern int pipe (int __pipedes[2]) __THROW;
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */

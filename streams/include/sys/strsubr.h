@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.24 2005/07/09 21:54:14 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.25 2005/07/11 12:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:54:14 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/09 21:54:14 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/11 12:42:27 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -548,5 +548,62 @@ extern minor_t cdev_minor(struct cdevsw *cdev, major_t major, minor_t minor);
 /* from strreg.c */
 extern int register_cmajor(struct cdevsw *cdev, major_t major, struct file_operations *fops);
 extern int unregister_cmajor(struct cdevsw *cdev, major_t major);
+
+/* other internals */
+extern int cdev_add(struct cdevsw *cdev, modID_t modid);
+extern void cdev_del(struct cdevsw *cdev);
+extern rwlock_t cdevsw_lock;
+extern void cmaj_add(struct devnode *cmaj, struct cdevsw *cdev, major_t major);
+extern void cmaj_del(struct devnode *cmaj, struct cdevsw *cdev);
+extern int cmin_add(struct devnode *cmin, struct cdevsw *cdev, minor_t minor);
+extern void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
+
+extern long do_fattach(const struct file *file, const char *file_name);
+extern long do_fdetach(const char *file_name);
+extern long do_spipe(int *fds);
+
+extern void fmod_add(struct fmodsw *fmod, modID_t modid);
+extern void fmod_del(struct fmodsw *fmod);
+extern rwlock_t fmodsw_lock;
+
+extern rwlock_t nodesw_lock;
+
+extern struct dentry *spec_dentry(dev_t dev, int *sflagp);
+extern int spec_open(struct inode *i, struct file *f, dev_t dev, int sflag);
+extern struct vfsmount *specfs_get(void);
+extern void specfs_put(void);
+
+extern struct linkblk *alloclk(void);
+extern void freelk(struct linkblk *l);
+
+extern struct stdata *allocstr(void);
+extern void freestr(struct stdata *sd);
+extern struct stdata *sd_get(struct stdata *sd);
+extern void sd_put(struct stdata *sd);
+
+extern int autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag, int sflag, cred_t *crp);
+
+extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg, int perim, int type);
+
+extern struct devinfo *di_alloc(struct cdevsw *cdev);
+extern void di_put(struct devinfo *di);
+
+extern struct strevent *sealloc(void);
+extern int sefree(struct strevent *se);
+
+extern int sysctl_str_strctlsz;
+
+typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
+extern vstrlog_t vstrlog_hook;
+
+extern int register_clone(struct cdevsw *cdev);
+extern int unregister_clone(struct cdevsw *cdev);
+
+extern int strgetpmsg(struct file *file, struct strbuf *ctlp, struct strbuf *datp, int *bandp, int *flagsp);
+extern int strputpmsg(struct file *, struct strbuf *, struct strbuf *, int, int);
+extern int strrput(queue_t *q, mblk_t *mp);
+extern int strwsrv(queue_t *q);
+
+extern struct file_operations strm_f_ops;
 
 #endif				/* __SYS_STRSUBR_H__ */

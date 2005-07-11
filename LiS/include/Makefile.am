@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.7 $) $Date: 2005/07/10 11:42:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.8 $) $Date: 2005/07/11 12:24:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:42:19 $ by $Author: brian $
+# Last Modified $Date: 2005/07/11 12:24:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,7 +66,6 @@ nobase_pkginclude_HEADERS = \
 	sys/kmem.h \
 	sys/LiS/buffcall.h \
 	sys/LiS/config.h \
-	sys/LiS/dos-mdep.h \
 	sys/LiS/errmsg.h \
 	sys/LiS/events.h \
 	sys/LiS/fifo.h \
@@ -87,19 +86,11 @@ nobase_pkginclude_HEADERS = \
 	sys/LiS/nullstrm.h \
 	sys/lispci.h \
 	sys/LiS/poll.h \
-	sys/LiS/port-mdep.h \
-	sys/LiS/qnxio.h \
-	sys/LiS/qnx-mdep.h \
 	sys/LiS/queue.h \
-	sys/LiS/sco-mdep.h \
 	sys/LiS/share.h \
 	sys/LiS/stats.h \
 	sys/LiS/strlog.h \
 	sys/LiS/strmdbg.h \
-	sys/LiS/sys54-mdep.h \
-	sys/LiS/user-cmn.h \
-	sys/LiS/user-mdep.h \
-	sys/LiS/usrio.h \
 	sys/LiS/wait.h \
 	sys/major.h \
 	sys/mkdev.h \

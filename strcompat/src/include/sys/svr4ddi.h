@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr4ddi.h,v 0.9.2.12 2005/07/09 21:52:41 brian Exp $
+ @(#) $Id: svr4ddi.h,v 0.9.2.13 2005/07/11 13:31:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:52:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 13:31:54 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4DDI_H__
 #define __SYS_SVR4DDI_H__
 
-#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/09 21:52:41 $"
+#ident "@(#) $RCSfile: svr4ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/11 13:31:54 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -345,6 +345,9 @@ __SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 	remove_wait_queue(&svp->sv_waitq, &wait);
 	return signal;
 }
+
+extern int sleep(caddr_t event, pl_t pl);
+extern void wakeup(caddr_t event);
 
 #ifdef DEBUG
 #ifdef ASSERT

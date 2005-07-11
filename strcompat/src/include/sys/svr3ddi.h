@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: svr3ddi.h,v 0.9.2.4 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: svr3ddi.h,v 0.9.2.5 2005/07/11 12:47:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/11 12:47:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR3DDI_H__
 #define __SYS_SVR3DDI_H__
 
-#ident "@(#) $RCSfile: svr3ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: svr3ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/11 12:47:59 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -79,6 +79,32 @@ __SVR3_EXTERN_INLINE minor_t eminor(dev_t dev)
 	return (MINOR(getminor(dev)));
 }
 
+__SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
+{
+	mblk_t *mp = NULL, *dp = NULL;
+	if (psize && !(mp = allocb(psize, bpri)))
+		goto enobufs;
+	if (dsize && !(dp = allocb(dsize, bpri)))
+		goto enobufs;
+	if (mp) {
+		mp->b_datap->db_type = type;
+		mp->b_wptr = mp->b_rptr + psize;
+		bzero(mp->b_rptr, psize);
+		mp->b_cont = dp;
+	}
+	if (dp) {
+		dp->b_datap->db_type = M_DATA;
+		dp->b_wptr = dp->b_rptr + dsize;
+		bzero(dp->b_rptr, dsize);
+	}
+	return (mp ? mp : dp);
+      enobufs:
+	if (mp)
+		freemsg(mp);
+	if (dp)
+		freemsg(dp);
+	return (NULL);
+}
 
 #elif defined(_SVR3_SOURCE)
 #warning "_SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3"

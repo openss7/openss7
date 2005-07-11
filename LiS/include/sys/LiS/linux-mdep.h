@@ -282,6 +282,13 @@ typedef unsigned int		lis_dev_t ;
 extern long lis_time_till(long target_time) _RP;
 extern long lis_target_time(long milli_sec) _RP;
 extern long lis_milli_to_ticks(long milli_sec)  _RP;
+
+extern char		lis_kernel_version[];
+extern char		lis_version[] ;
+extern char		lis_date[] ;
+extern char		*lis_stropts_file ;
+extern int              lis_num_cpus ;
+
 #endif				/* __KERNEL__ */
 
 /* some missing generic types 
@@ -1035,6 +1042,7 @@ lis_mntput_fcn(struct vfsmount *m,
 
 #ifdef __KERNEL__
 
+#if 0
 # if (   LINUX_VERSION_CODE >= KERNEL_VERSION(2,2,0)	\
       && LINUX_VERSION_CODE <  KERNEL_VERSION(2,2,18))	\
   ||							\
@@ -1056,6 +1064,7 @@ extern void	put_unused_fd(unsigned int fd) ;
 extern struct inode *igrab(struct inode *inode) ;
 
 # endif
+#endif
 
 /*
  * For convenience, define FATTACH_VIA_MOUNT if appropriate

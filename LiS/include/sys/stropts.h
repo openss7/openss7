@@ -231,12 +231,15 @@ int	putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags) ;
 int	fattach(int fd, const char *path) ;
 int	fdetach(const char *path) ;
 int	isastream(int fd) ;
+int     pipe(int fds[2]);
 
+#if 0
 #ifdef QNX
 #ifndef GCOM_OPEN
 #define open gcom_open
 #endif
 extern int gcom_open( const char *__path, int __oflag, ... );
+#endif
 #endif
 
 /*
