@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2005/07/06 11:11:03 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2005/07/12 10:23:55 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -47,7 +47,7 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/06 11:11:03 $ by $Author: brian $
+## Last Modified $Date: 2005/07/12 10:23:55 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -261,7 +261,7 @@ MY_RECURSIVE_TARGETS	+= check-clean-recursive
 check-clean: check-clean-recursive
 
 check-clean-am:
-	rm -f -- check_*.log
+	rm -f -- check_*.log check_*.err check_*.out
 
 MY_PHONY	+= check-clean check-clean-am
 
