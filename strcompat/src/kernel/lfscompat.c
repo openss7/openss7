@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.8  2005/07/12 13:54:45  brian
+ - changes for os7 compatibility and check pass
+
+ Revision 0.9.2.7  2005/07/12 08:42:42  brian
+ - changes for check pass
+
  Revision 0.9.2.6  2005/07/09 21:51:21  brian
  - remove dependency on LFS headers
 
@@ -71,9 +77,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/09 21:51:21 $";
+static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -90,13 +96,13 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define _LFS_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #include <sys/strlog.h>
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/09 21:51:21 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -335,50 +341,51 @@ EXPORT_SYMBOL(putnextctl2);
  */
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
-typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
-vstrlog_t vstrlog_hook = NULL;
-EXPORT_SYMBOL(vstrlog_hook);
+static int vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+{
+	unsigned long flags;
+	static char str_err_buf[1024];
+	spin_lock_irqsave(&str_err_lock, flags);
+	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
+	if (flag & SL_FATAL) {
+		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_ERROR) {
+		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_WARN) {
+		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_NOTE) {
+		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_CONSOLE) {
+		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else {		/* SL_TRACE */
+		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	}
+	spin_unlock_irqrestore(&str_err_lock, flags);
+	return (1);
+}
+
+vstrlog_t vstrlog = &vstrlog_default;
+EXPORT_SYMBOL(vstrlog);
 
 int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
-	int result;
-	va_list args;
-	va_start(args, fmt);
-	if (vstrlog_hook != NULL)
-		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
-	else {
-		unsigned long flags;
-		static char str_err_buf[1024];
-		spin_lock_irqsave(&str_err_lock, flags);
-		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
-		if (flag & SL_FATAL) {
-			printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_ERROR) {
-			printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_WARN) {
-			printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_NOTE) {
-			printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_CONSOLE) {
-			printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else {	/* SL_TRACE */
-			printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		}
-		spin_unlock_irqrestore(&str_err_lock, flags);
-		result = 1;
+	int result = 0;
+	if (vstrlog != NULL) {
+		va_list args;
+		va_start(args, fmt);
+		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
+		va_end(args);
 	}
-	va_end(args);
 	return (result);
 }
 
 EXPORT_SYMBOL(strlog);
-
 
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE
 static

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:45 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:45 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -70,11 +70,11 @@ static char const ident[] =
 
 #define _HPUX_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:45 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -98,25 +98,28 @@ MODULE_ALIAS("streams-hpuxcompat");
 
 static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
 /**
- *  get_sleep_lock: - acquire the global sleep lock
+ *  streams_get_sleep_lock: - acquire the global sleep lock
  *  @event:	the event which will be later passed to sleep
  *
- *  get_sleep_lock() provides access to a global spinlock_t that may be used
+ *  streams_get_sleep_lock() provides access to a global spinlock_t that may be used
  *  by all threads entering a wait queue to avoid race conditions between
  *  threads entering the wait queue.
  *
- *  Return Value:get_sleep_lock() returns a pointer to the global sleep lock.
+ *  Return Value:streams_get_sleep_lock() returns a pointer to the global sleep lock.
  */
-lock_t *get_sleep_lock(caddr_t event)
+lock_t *streams_get_sleep_lock(caddr_t event)
 {
 	(void) event;
 	return &sleep_lock;
 }
-EXPORT_SYMBOL(get_sleep_lock);	/* hpuxddi.h */
+EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
+
+lock_t *get_sleep_lock(caddr_t event) __attribute__((alias("streams_get_sleep_lock")));
+EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
 #if LFS
 __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
-EXPORT_SYMBOL(streams_put);	/* hpuxddi.h */
+EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 #endif
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE

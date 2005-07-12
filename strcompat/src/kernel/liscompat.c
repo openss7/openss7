@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -72,13 +72,13 @@ static char const ident[] =
 
 #define _LIS_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #include <asm/dma.h>		/* for request_dma and friends */
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/09 21:51:21 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -206,6 +206,8 @@ __LIS_EXTERN_INLINE void lis_freeb(mblk_t *bp);
 EXPORT_SYMBOL(lis_freeb);
 __LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp);
 EXPORT_SYMBOL(lis_freemsg);
+__LIS_EXTERN_INLINE void lis_freezestr(queue_t *q);
+EXPORT_SYMBOL(lis_freezestr);
 __LIS_EXTERN_INLINE mblk_t *lis_getq(queue_t *q);
 EXPORT_SYMBOL(lis_getq);
 #if LIS_DEPRECARTED_FUNCTIONS
@@ -216,6 +218,10 @@ __LIS_EXTERN_INLINE int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp);
 EXPORT_SYMBOL(lis_insq);
 __LIS_EXTERN_INLINE void lis_linkb(mblk_t *mp1, mblk_t *mp2);
 EXPORT_SYMBOL(lis_linkb);
+__LIS_EXTERN_INLINE int lis_max(int a, int b);
+EXPORT_SYMBOL(lis_max);
+__LIS_EXTERN_INLINE int lis_min(int a, int b);
+EXPORT_SYMBOL(lis_min);
 __LIS_EXTERN_INLINE int lis_msgdsize(mblk_t *mp);
 EXPORT_SYMBOL(lis_msgdsize);
 __LIS_EXTERN_INLINE mblk_t *lis_msgpullup(mblk_t *mp, int len);
@@ -290,6 +296,8 @@ __LIS_EXTERN_INLINE toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, lo
 EXPORT_SYMBOL(lis_timeout_fcn);
 __LIS_EXTERN_INLINE void lis_unbufcall(int bcid);
 EXPORT_SYMBOL(lis_unbufcall);
+__LIS_EXTERN_INLINE void lis_unfreezestr(queue_t *q);
+EXPORT_SYMBOL(lis_unfreezestr);
 __LIS_EXTERN_INLINE mblk_t *lis_unlinkb(mblk_t *mp);
 EXPORT_SYMBOL(lis_unlinkb);
 __LIS_EXTERN_INLINE toid_t lis_untimeout(toid_t id);

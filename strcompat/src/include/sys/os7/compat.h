@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.18 2005/07/07 20:29:07 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.20 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 
  All Rights Reserved.
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -94,16 +94,20 @@ typedef void irqreturn_t;
 #define MOD_DEC_USE_COUNT
 #endif
 
+#define _OS7_SOURCE
+
 #include <sys/stream.h>
+#ifdef LFS
+#include <sys/strsubr.h>
+#endif				/* LFS */
+
 #include <sys/cmn_err.h>
 #include <sys/kmem.h>
 #include <sys/dki.h>
 #include <sys/ddi.h>
 
-#ifdef LFS
-#include <sys/strsubr.h>
-#endif				/* LFS */
 #include <sys/strconf.h>
+#include <sys/strlog.h>
 
 #ifndef tid_t
 typedef int tid_t;
@@ -118,14 +122,6 @@ typedef int tid_t;
 #else
 #define NMINORS		((1UL<<8)-1)	/* be conservative for others */
 #endif
-
-#include "os7/debug.h"		/* generic debugging macros */
-#include "os7/bufq.h"		/* generic buffer queues */
-#include "os7/priv.h"		/* generic data structures */
-#include "os7/lock.h"		/* generic queue locking functions */
-#include "os7/queue.h"		/* generic put and srv routines */
-#include "os7/allocb.h"		/* generic buffer allocation routines */
-#include "os7/timer.h"		/* generic timer handling */
 
 #ifdef LISASSERT
 #undef LISASSERT
@@ -174,46 +170,6 @@ union ioctypes {
 /* LIS forgets to typedef these */
 typedef int bcid_t;
 typedef int bufcall_id_t;
-#endif
-
-/* pull in OS specific defines */
-
-#ifdef _SVR3_SOURCE
-#include <sys/svr3ddi.h>
-#endif
-#ifdef _SVR4_SOURCE
-#include <sys/svr4ddi.h>
-#endif
-#if defined LIS && defined _LFS_SOURCE
-#include <sys/lfsddi.h>
-#endif
-#if defined LFS && defined _LIS_SOURCE
-#include <sys/lisddi.h>
-#endif
-#ifdef _MPS_SOURCE
-#include <sys/mpsddi.h>
-#endif
-#ifdef _OSF_SOURCE
-#include <sys/osfddi.h>
-#endif
-#ifdef _AIX_SOURCE
-#include <sys/aixddi.h>
-#endif
-#ifdef _HPUX_SOURCE
-#include <sys/hpuxddi.h>
-#endif
-#ifdef _UW7_SOURCE
-#include <sys/uw7ddi.h>
-#endif
-#ifdef _SUN_SOURCE
-#include <sys/strsun.h>
-#include <sys/sunddi.h>
-#endif
-#ifdef _MAC_SOURCE
-#include <sys/macddi.h>
-#endif
-#ifdef _IRIX_SOURCE
-#include <sys/irixddi.h>
 #endif
 
 #endif				/* __LOCAL_COMPAT_H__ */

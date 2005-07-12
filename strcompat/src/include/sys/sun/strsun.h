@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.2 2005/07/03 17:41:12 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.4 2005/07/12 13:54:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/03 17:41:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _SYS_STRSUN_H
-#define _SYS_STRSUN_H
+#ifndef __SYS_SUN_STRSUN_H__
+#define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/03 17:41:12 $"
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/12 13:54:44 $"
+
+#ifndef _SYS_STRSUN_H
+#warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -153,7 +157,7 @@ __SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int t
 				      uint32_t primtype)
 {
 	if (unlikely(mp == NULL ||
-		     (size > FASTBUF && mp->b_datap->db_base - mp->b_datap->db_lim < size) ||
+		     (size > FASTBUF && mp->b_datap->db_lim - mp->b_datap->db_base < size) ||
 		     mp->b_datap->db_ref > 1 || mp->b_datap->db_frtnp != NULL)) {
 		/* can't reuse this message block (or no message block to begin with) */
 		if (mp)
@@ -263,4 +267,4 @@ __SUN_EXTERN_INLINE void mcopyout(mblk_t *mp, void *priv, size_t size, void *uad
 	mp->b_cont->b_wptr = mp->b_cont->b_rptr + size;
 }
 
-#endif				/* _SYS_STRSUN_H */
+#endif				/* __SYS_SUN_STRSUN_H__ */

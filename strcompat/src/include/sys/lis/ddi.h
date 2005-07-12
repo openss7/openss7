@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.12 2005/07/07 20:29:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_LISDDI_H__
-#define __SYS_LISDDI_H__
+#ifndef __SYS_LIS_DDI_H__
+#define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/07 20:29:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 13:54:42 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -71,7 +71,7 @@
 #endif				/* __LIS_EXTERN_INLINE */
 
 #ifndef _LIS_SOURCE
-#warning "_LIS_SOURCE not defined but lisddi.h,v included"
+#warning "_LIS_SOURCE not defined but LIS ddi.h included"
 #define _LIS_SOURCE 1
 #endif
 
@@ -249,6 +249,9 @@ extern void *lis_free_pages_fcn(void *ptr, char *file, int line) __depr;
 #if LIS_DEPRECARTED_FUNCTIONS
 extern void lis_free_passfp(mblk_t *mp) __depr;
 extern void lis_freedb(mblk_t *bp, int free_hdr) __depr;
+#endif
+extern void lis_freezestr(queue_t *q);
+#if LIS_DEPRECARTED_FUNCTIONS
 extern struct fmodsw *lis_fstr_sw __depr;
 extern int lis_get_fifo(struct file **f) __depr;
 #endif
@@ -644,6 +647,10 @@ __LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp)
 {
 	return freemsg(mp);
 }
+__LIS_EXTERN_INLINE void lis_freezestr(queue_t *q)
+{
+	return (void)freezestr(q);
+}
 #if LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE void lis_freeq(queue_t *q)
 {
@@ -663,6 +670,14 @@ __LIS_EXTERN_INLINE int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
 __LIS_EXTERN_INLINE void lis_linkb(mblk_t *mp1, mblk_t *mp2)
 {
 	return linkb(mp1, mp2);
+}
+__LIS_EXTERN_INLINE int lis_max(int a, int b)
+{
+	return max(a, b);
+}
+__LIS_EXTERN_INLINE int lis_min(int a, int b)
+{
+	return min(a, b);
 }
 __LIS_EXTERN_INLINE int lis_msgdsize(mblk_t *mp)
 {
@@ -806,6 +821,10 @@ __LIS_EXTERN_INLINE void lis_unbufcall(int bcid)
 {
 	unbufcall(bcid);
 }
+__LIS_EXTERN_INLINE void lis_unfreezestr(queue_t *q)
+{
+	unfreezestr(q, 5); /* note 5 is splstr */
+}
 __LIS_EXTERN_INLINE mblk_t *lis_unlinkb(mblk_t *mp)
 {
 	return unlinkb(mp);
@@ -873,7 +892,8 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #define lis_putmsg(__q, __mp) lis_safe_putmsg(__q, __mp, __FILE__, __LINE__)
 #define lis_putnext(__q, __mp) lis_safe_putnext(__q, __mp, __FILE__, __LINE__)
 #define lis_qreply(__q, __mp) lis_safe_qreply(__q, __mp, __FILE__, __LINE__)
+#define lis_OTHER(__q) lis_OTHERQ(__q)
 #define OTHER(__q) lis_OTHERQ(__q)
 #endif
 
-#endif				/* __SYS_LISDDI_H__ */
+#endif				/* __SYS_LIS_DDI_H__ */

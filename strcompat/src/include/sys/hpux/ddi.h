@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_HPUXDDI_H__
-#define __SYS_HPUXDDI_H__
+#ifndef __SYS_HPUX_DDI_H__
+#define __SYS_HPUX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/05 22:46:04 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 13:54:42 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __HPUX_EXTERN_INLINE */
 
 #ifndef _HPUX_SOURCE
-#warning "_HPUX_SOURCE not defined but hpuxddi.h,v included"
+#warning "_HPUX_SOURCE not defined but HPUX ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_HPUX) || defined(CONFIG_STREAMS_COMPAT_HPUX_MODULE)
@@ -71,9 +71,10 @@
 #ifndef _SVR4_SOURCE
 #define _SVR4_SOURCE
 #endif
-#include <sys/svr4ddi.h>	/* for lock_t */
+#include <sys/svr4/ddi.h>	/* for lock_t */
 
 extern lock_t *get_sleep_lock(caddr_t event);
+extern lock_t *streams_get_sleep_lock(caddr_t event);
 
 #if LFS
 typedef void (*streams_put_t) (void *, mblk_t *);
@@ -111,4 +112,4 @@ __HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"
 #endif				/* CONFIG_STREAMS_COMPAT_HPUX */
 
-#endif				/* __SYS_HPUXDDI_H__ */
+#endif				/* __SYS_HPUX_DDI_H__ */

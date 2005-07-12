@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.9  2005/07/12 13:54:46  brian
+ - changes for os7 compatibility and check pass
+
+ Revision 0.9.2.8  2005/07/12 08:42:42  brian
+ - changes for check pass
+
  Revision 0.9.2.7  2005/07/09 21:51:21  brian
  - remove dependency on LFS headers
 
@@ -74,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -97,13 +103,11 @@ static char const ident[] =
 #endif
 #define _MPS_SOURCE
 
-#include "os7/compat.h"
-
-#include <sys/mpsddi.h>
+#include "sys/os7/compat.h"
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/09 21:51:21 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -121,44 +125,51 @@ MODULE_DESCRIPTION(MPSCOMP_DESCRIP);
 MODULE_SUPPORTED_DEVICE(MPSCOMP_DEVICE);
 MODULE_LICENSE(MPSCOMP_LICENSE);
 #if defined MODULE_ALIAS
-MODULE_ALIAS("streams-micompat");
+MODULE_ALIAS("streams-mpscompat");
 #endif
 #endif
+
+/*
+ *  MI_BCMP
+ *  -------------------------------------------------------------------------
+ */
+int mi_bcmp(const void *s1, const void *s2, size_t len) __attribute__((alias("bcmp")));
+EXPORT_SYMBOL(mi_bcmp);
 
 /*
  *  MI_ALLOC
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
-EXPORT_SYMBOL(mi_alloc);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
 
 /*
  *  MI_ALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
-EXPORT_SYMBOL(mi_alloc_sleep);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
 
 /*
  *  MI_ZALLOC
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
-EXPORT_SYMBOL(mi_zalloc);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
 
 /*
  *  MI_ZALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
-EXPORT_SYMBOL(mi_zalloc_sleep);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
 
 /*
  *  MI_FREE
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_free(void *ptr);
-EXPORT_SYMBOL(mi_free);		/* mpsddi.h */
+EXPORT_SYMBOL(mi_free);		/* mps/ddi.h */
 
 /*
  *  =========================================================================
@@ -195,7 +206,7 @@ caddr_t mi_open_alloc(size_t size)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_open_alloc);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_open_alloc);	/* mps/ddi.h */
 
 /*
  *  MI_OPEN_ALLOC_SLEEP
@@ -211,7 +222,7 @@ caddr_t mi_open_alloc_sleep(size_t size)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
 
 /*
  * MI_FIRST_PTR
@@ -226,7 +237,7 @@ caddr_t mi_first_ptr(caddr_t *mi_head)
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
-EXPORT_SYMBOL(mi_first_ptr);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
 
 /*
  *  MI_FIRST_DEV_PTR
@@ -242,7 +253,7 @@ caddr_t mi_first_dev_ptr(caddr_t *mi_head)
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
-EXPORT_SYMBOL(mi_first_dev_ptr);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
 
 /*
  *  MI_NEXT_PTR
@@ -254,7 +265,7 @@ caddr_t mi_next_ptr(caddr_t ptr)
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
-EXPORT_SYMBOL(mi_next_ptr);	/* mpsddi.h, aixddi.h */
+EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
 
 /*
  *  MI_NEXT_DEV_PTR
@@ -270,7 +281,7 @@ caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 	return mi ? ((caddr_t) (mi + 1)) : NULL;
 }
 
-EXPORT_SYMBOL(mi_next_dev_ptr);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
 
 /* 
  *  MI_PREV_PTR
@@ -285,7 +296,7 @@ caddr_t mi_prev_ptr(caddr_t ptr)
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_prev_ptr);	/* mpsddi.h, aixddi.h */
+EXPORT_SYMBOL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
 
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 
@@ -351,21 +362,21 @@ int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag
 	return (0);
 }
 
-EXPORT_SYMBOL(mi_open_link);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_open_link);	/* mps/ddi.h */
 
 /*
  *  MI_OPEN_DETACHED
  *  -------------------------------------------------------------------------
  */
 caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
-EXPORT_SYMBOL(mi_open_detached);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
 
 /*
  *  MI_ATTACH
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_attach(queue_t *q, caddr_t ptr);
-EXPORT_SYMBOL(mi_attach);	/* mpsddi.h, macddi.h */
+EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
 
 /* 
  *  MI_OPEN_COMM
@@ -373,7 +384,7 @@ EXPORT_SYMBOL(mi_attach);	/* mpsddi.h, macddi.h */
  */
 __MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, uint size, queue_t *q, dev_t *devp, int flag,
 				     int sflag, cred_t *credp);
-EXPORT_SYMBOL(mi_open_comm);	/* mpsddi.h, aixddi.h */
+EXPORT_SYMBOL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 
 /*
  *  MI_CLOSE_UNLINK
@@ -395,7 +406,7 @@ void mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 	}
 }
 
-EXPORT_SYMBOL(mi_close_unlink);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
 
 /*
  *  MI_CLOSE_FREE
@@ -408,34 +419,82 @@ void mi_close_free(caddr_t ptr)
 		kmem_free(mi, mi->mi_size);
 }
 
-EXPORT_SYMBOL(mi_close_free);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
 
 /*
  *  MI_DETACH
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_detach(queue_t *q, caddr_t ptr);
-EXPORT_SYMBOL(mi_detach);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
 
 /*
  *  MI_CLOSE_DETACHED
  *  -------------------------------------------------------------------------
  */
 __MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr);
-EXPORT_SYMBOL(mi_close_detached);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
 
 /* 
  *  MI_CLOSE_COMM
  *  -------------------------------------------------------------------------
  */
 int mi_close_comm(caddr_t *mi_head, queue_t *q);
-EXPORT_SYMBOL(mi_close_comm);	/* mpsddi.h, aixddi.h */
+EXPORT_SYMBOL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
 
 struct mi_iocblk {
 	caddr_t mi_uaddr;
 	short mi_dir;
 	short mi_cnt;
 };
+
+/*
+ *  =========================================================================
+ *
+ *  Message block allocation helper functions.
+ *
+ *  =========================================================================
+ */
+
+
+mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
+{
+	if (unlikely(mp == NULL || (size > FASTBUF && mp->b_datap->db_lim - mp->b_rptr < size)
+		     || mp->b_datap->db_ref > 1 || mp->b_datap->db_frtnp != NULL)) {
+		/* can't reuse this message block (or no message block to begin with) */
+		if (mp && !keep_on_error)
+			freemsg(xchg(&mp, NULL));
+	} else
+		/* simply resize it - leave everything else intact */
+		mp->b_wptr = mp->b_rptr + size;
+	return (mp);
+}
+
+EXPORT_SYMBOL(mi_reuse_proto);
+
+mblk_t *mi_reallocb(mblk_t *mp, size_t size)
+{
+	if (unlikely(mp == NULL ||
+		     (size > FASTBUF && mp->b_datap->db_lim - mp->b_datap->db_base < size) ||
+		     mp->b_datap->db_ref > 1 || mp->b_datap->db_frtnp != NULL)) {
+		/* can't reuse this message block (or no message block to begin with) */
+		if (mp)
+			freemsg(xchg(&mp, NULL));
+		mp = allocb(size, BPRI_MED);
+	} else {
+		/* prepare existing message block for reuse as though just allocated */
+		mp->b_next = mp->b_prev = NULL;
+		if (mp->b_cont)
+			freemsg(xchg(&mp->b_cont, NULL));
+		mp->b_rptr = mp->b_wptr = mp->b_datap->db_base;
+		mp->b_band = 0;
+		mp->b_flag = 0;
+		mp->b_datap->db_type = M_DATA;
+	}
+	return (mp);
+}
+
+EXPORT_SYMBOL(mi_reallocb);
 
 /*
  *  =========================================================================
@@ -488,7 +547,7 @@ void mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	qreply(q, mp);
 }
 
-EXPORT_SYMBOL(mi_copy_done);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copy_done);	/* mps/ddi.h */
 
 /*
  *  MI_COPYIN
@@ -556,7 +615,7 @@ void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 	mi_copy_done(q, mp, err);
 }
 
-EXPORT_SYMBOL(mi_copyin);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copyin);	/* mps/ddi.h */
 
 /*
  *  MI_COPYIN_N
@@ -589,7 +648,7 @@ void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 	mi_copy_done(q, mp, err);
 }
 
-EXPORT_SYMBOL(mi_copyin_n);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copyin_n);	/* mps/ddi.h */
 
 /*
  *  MI_COPYOUT_ALLOC
@@ -638,7 +697,7 @@ mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int 
 	return (NULL);
 }
 
-EXPORT_SYMBOL(mi_copyout_alloc);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copyout_alloc);	/* mps/ddi.h */
 
 /*
  *  MI_COPYOUT
@@ -668,7 +727,7 @@ void mi_copyout(queue_t *q, mblk_t *mp)
 	qreply(q, mp);
 }
 
-EXPORT_SYMBOL(mi_copyout);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copyout);	/* mps/ddi.h */
 
 /*
  *  MI_COPY_STATE
@@ -703,7 +762,19 @@ int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 	return (-1);
 }
 
-EXPORT_SYMBOL(mi_copy_state);	/* mpsddi.h */
+EXPORT_SYMBOL(mi_copy_state);	/* mps/ddi.h */
+
+/*
+ *  MI_COPY_SET_RVAL
+ *  -------------------------------------------------------------------------
+ */
+void mi_copy_set_rval(mblk_t *mp, int rval)
+{
+	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	ioc->iocblk.ioc_rval = rval;
+}
+
+EXPORT_SYMBOL(mi_copy_set_rval);
 
 /*
  *  =========================================================================
@@ -1063,3 +1134,311 @@ void mi_timer_free(mblk_t *mp)
 }
 
 EXPORT_SYMBOL(mi_timer_free);
+
+queue_t *mi_allocq(struct streamtab *st)
+{
+#if LIS
+	return (NULL);
+#endif
+#if LFS
+	queue_t *q;
+	if ((q = allocq()))
+		setq(q, st->st_rdinit, st->st_wrinit);
+	return (q);
+#endif
+}
+
+EXPORT_SYMBOL(mi_allocq);
+
+void mi_freeq(queue_t *q)
+{
+#if LIS
+	lis_freeq(q);
+#endif
+#if LFS
+	freeq(q);
+#endif
+}
+
+EXPORT_SYMBOL(mi_freeq);
+
+int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
+{
+	int result = 0;
+	if (vstrlog != NULL) {
+		va_list args;
+		modID_t mid = q->q_qinfo->qi_minfo->mi_idnum;
+		minor_t sid = 0;	/* FIXME - should be minor devce number */
+		va_start(args, fmt);
+		result = vstrlog(mid, sid, level, flags, fmt, args);
+		va_end(args);
+	}
+	return (result);
+}
+
+EXPORT_SYMBOL(mi_strlog);
+
+
+
+/*
+ *  =========================================================================
+ *
+ *  Stream head helper functions
+ *
+ *  =========================================================================
+ */
+/*
+ *  MI_SET_STH_HIWAT
+ *  -------------------------------------------------------------------------
+ */
+int mi_set_sth_hiwat(queue_t *q, size_t size)
+{
+	struct stroptions *so;
+	mblk_t *mp;
+	assert(q == RD(q));
+	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
+		mp->b_datap->db_type = M_SETOPTS;
+		mp->b_wptr += sizeof(*so);
+		so = (typeof(so))mp->b_rptr;
+		so->so_flags = SO_HIWAT;
+		so->so_band = 0;
+		so->so_hiwat = size;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_set_sth_hiwat);
+
+/*
+ *  MI_SET_STH_LOWAT
+ *  -------------------------------------------------------------------------
+ */
+int mi_set_sth_lowat(queue_t *q, size_t size)
+{
+	struct stroptions *so;
+	mblk_t *mp;
+	assert(q == RD(q));
+	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
+		mp->b_datap->db_type = M_SETOPTS;
+		mp->b_wptr += sizeof(*so);
+		so = (typeof(so))mp->b_rptr;
+		so->so_flags = SO_LOWAT;
+		so->so_band = 0;
+		so->so_lowat = size;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_set_sth_lowat);
+
+/*
+ *  MI_SET_STH_MAXBLK
+ *  -------------------------------------------------------------------------
+ */
+int mi_set_sth_maxblk(queue_t *q, ssize_t size)
+{
+	struct stroptions *so;
+	mblk_t *mp;
+	assert(q == RD(q));
+	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
+		mp->b_datap->db_type = M_SETOPTS;
+		mp->b_wptr += sizeof(*so);
+		so = (typeof(so))mp->b_rptr;
+		so->so_flags = SO_MAXBLK;
+		so->so_maxblk = size;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_set_sth_maxblk);
+
+/*
+ *  MI_SET_STH_COPYOPT
+ *  -------------------------------------------------------------------------
+ */
+int mi_set_sth_copyopt(queue_t *q, int copyopt)
+{
+	struct stroptions *so;
+	mblk_t *mp;
+	assert(q == RD(q));
+	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
+		mp->b_datap->db_type = M_SETOPTS;
+		mp->b_wptr += sizeof(*so);
+		so = (typeof(so))mp->b_rptr;
+		so->so_flags = SO_COPYOPT;
+		so->so_copyopt = copyopt;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_set_sth_copyopt);
+
+/*
+ *  MI_SET_STH_WROFF
+ *  -------------------------------------------------------------------------
+ */
+int mi_set_sth_wroff(queue_t *q, size_t size)
+{
+	struct stroptions *so;
+	mblk_t *mp;
+	assert(q == RD(q));
+	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
+		mp->b_datap->db_type = M_SETOPTS;
+		mp->b_wptr += sizeof(*so);
+		so = (typeof(so))mp->b_rptr;
+		so->so_flags = SO_WROFF;
+		so->so_wroff = size;
+		putnext(q, mp);
+		return (1);
+	}
+	return (0);
+}
+
+EXPORT_SYMBOL(mi_set_sth_wroff);
+
+/*
+ *  =========================================================================
+ *
+ *  System wrapper functions
+ *
+ *  =========================================================================
+ */
+int mi_sprintf(char *buf, char *fmt, ...)
+{
+	int result;
+	va_list args;
+	va_start(args, fmt);
+	result = vsprintf(buf, fmt, args);
+	va_end(args);
+	return result;
+}
+
+EXPORT_SYMBOL(mi_sprintf);
+
+int mi_strcmp(const caddr_t cp1, const caddr_t cp2)
+{
+	return strcmp(cp1, cp2);
+}
+
+EXPORT_SYMBOL(mi_strcmp);
+
+int mi_strlen(const caddr_t str)
+{
+	return strlen(str);
+}
+
+EXPORT_SYMBOL(mi_strlen);
+
+long mi_strtol(const caddr_t str, caddr_t *ptr, int base)
+{
+	return simple_strtol(str, ptr, base);
+}
+
+EXPORT_SYMBOL(mi_strtol);
+
+/*
+ *  =========================================================================
+ *
+ *  Message block functions
+ *
+ *  =========================================================================
+ */
+/*
+ *  MI_OFFSET_PARAM
+ *  -------------------------------------------------------------------------
+ */
+uint8_t *mi_offset_param(mblk_t *mp, size_t offset, size_t len)
+{
+	if (mp || len == 0) {
+		size_t blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+		if (blen >= offset + len)
+			return (mp->b_rptr + offset);
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL(mi_offset_param);
+
+/*
+ *  MI_OFFSET_PARAMC
+ *  -------------------------------------------------------------------------
+ */
+uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
+{
+	uint8_t *result = NULL;
+	for (; mp; mp = mp->b_cont) {
+		if (isdatamsg(mp)) {
+			if ((result = mi_offset_param(mp, offset, len)))
+				break;
+			else {
+				size_t blen = mp->b_wptr > mp->b_rptr ? mp->b_wptr - mp->b_rptr : 0;
+				if (offset < blen)
+					/* spans blocks - should do a pullup */
+					break;
+				offset -= blen;
+			}
+		}
+	}
+	return (result);
+}
+
+EXPORT_SYMBOL(mi_offset_paramc);
+
+/*
+ *  =========================================================================
+ *
+ *  Some internal functions showing...
+ *
+ *  =========================================================================
+ */
+/*
+ *  MPS_BECOME_WRITER
+ *  -------------------------------------------------------------------------
+ */
+void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
+{
+#if LIS
+	lis_flags_t flags;
+	LIS_QISRLOCK(q, &flags);
+	(*proc) (q, mp);
+	LIS_QISRUNLOCK(q, &flags);
+#endif
+#if LFS
+	defer_func((void *) proc, q, mp, (void *) q, PERIM_INNER | PERIM_OUTER, SE_WRITER);
+#endif
+}
+
+EXPORT_SYMBOL(mps_become_writer);
+
+/*
+ *  MPS_INTR_DISABLE
+ *  -------------------------------------------------------------------------
+ */
+void mps_intr_disable(pl_t *plp)
+{
+	unsigned long flags = *plp;
+	local_irq_save(flags);
+	*plp = flags;
+}
+
+EXPORT_SYMBOL(mps_intr_disable);
+
+/*
+ *  MPS_INTR_ENABLE
+ *  -------------------------------------------------------------------------
+ */
+void mps_intr_enable(pl_t pl)
+{
+	unsigned long flags = pl;
+	local_irq_restore(flags);
+}
+
+EXPORT_SYMBOL(mps_intr_enable);

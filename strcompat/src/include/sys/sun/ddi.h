@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.11 2005/07/11 13:31:54 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.13 2005/07/12 13:54:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 13:31:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_SUNDDI_H__
-#define __SYS_SUNDDI_H__
+#ifndef __SYS_SUN_DDI_H__
+#define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/11 13:31:54 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:44 $"
+
+#ifndef __SYS_SUNDDI_H__
+#warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,13 +67,14 @@
 #endif				/* __SUN_EXTERN_INLINE */
 
 #ifndef _SUN_SOURCE
-#warning "_SUN_SOURCE not defined but $RCSfile: ddi.h,v $ included"
+#warning "_SUN_SOURCE not defined but SUN ddi.h included"
 #endif
 
 #define PERIM_INNER	1	/* Solaris used with qwriter() */
 #define PERIM_OUTER	2	/* Solaris used with qwriter() */
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
+
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
 
@@ -270,6 +275,21 @@ __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep)
 }
 
 #if 0
+int ddi_create_minor_node(dev_info_t *dip, char *name, int type, minor_t minor, char *node, int flag);
+void ddi_remove_minor_node(dev_info_t *dip, char *name);
+major_t ddi_driver_major(dev_info_t *dip);
+const char *ddi_driver_name(dev_info_t *dip);
+int ddi_get_instance(dev_info_t *dip);
+int ddi_get_soft_state(int yyy);
+int ddi_removing_power(int yyy);
+int ddi_soft_state(int yyy);
+int ddi_soft_state_fini(int yyy);
+int ddi_soft_state_free(int yyy);
+int ddi_soft_state_init(int yyy);
+int ddi_soft_state_zalloc(int yyy);
+#endif
+
+#if 0
 extern int ddi_add_intr(void);
 extern int ddi_add_softintr(void);
 extern int ddi_binding_name(void);
@@ -279,7 +299,6 @@ extern int ddi_check_acc_handle(void);
 extern int ddi_check_dma_handle(void);
 extern int ddi_copyin(void);
 extern int ddi_copyout(void);
-extern int ddi_create_minor_node(void);
 extern int ddi_dev_is_needed(void);
 extern int ddi_dev_is_sid(void);
 extern int ddi_dev_nintrs(void);
@@ -336,8 +355,6 @@ extern int ddi_dmae_getlim(void);
 extern int ddi_dmae_prog(void);
 extern int ddi_dmae_release(void);
 extern int ddi_dmae_stop(void);
-extern int ddi_driver_major(void);
-extern int ddi_driver_name(void);
 extern int ddi_enter_critical(void);
 extern int ddi_exit_critical(void);
 extern int ddi_ffs(void);
@@ -350,14 +367,12 @@ extern int ddi_get_cred(void);
 extern int ddi_get_devstate(void);
 extern int ddi_get_driver_private(void);
 extern int ddi_get_iblock_cookie(void);
-extern int ddi_get_instance(void);
 extern int ddi_get_kt_did(void);
 extern int ddi_get_lbolt(void);
 extern int ddi_get_name(void);
 extern int ddi_get_parent(void);
 extern int ddi_get_pid(void);
 extern int ddi_get_soft_iblock_cookie(void);
-extern int ddi_get_soft_state(void);
 extern int ddi_get_time(void);
 extern int ddi_getb(void);
 extern int ddi_getiminor(void);
@@ -496,9 +511,7 @@ extern int ddi_putw(void);
 extern int ddi_regs_map_free(void);
 extern int ddi_regs_map_setup(void);
 extern int ddi_remove_intr(void);
-extern int ddi_remove_minor_node(void);
 extern int ddi_remove_softintr(void);
-extern int ddi_removing_power(void);
 extern int ddi_rep_get16(void);
 extern int ddi_rep_get32(void);
 extern int ddi_rep_get64(void);
@@ -521,11 +534,6 @@ extern int ddi_segmap(void);
 extern int ddi_segmap_setup(void);
 extern int ddi_set_driver_private(void);
 extern int ddi_slaveonly(void);
-extern int ddi_soft_state(void);
-extern int ddi_soft_state_fini(void);
-extern int ddi_soft_state_free(void);
-extern int ddi_soft_state_init(void);
-extern int ddi_soft_state_zalloc(void);
 extern int ddi_trigger_softintr(void);
 extern int ddi_umem_alloc(void);
 extern int ddi_umem_free(void);
@@ -549,4 +557,4 @@ extern void mi_timer_free(mblk_t *mp);
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
 #endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
-#endif				/* __SYS_SUNDDI_H__ */
+#endif				/* __SYS_SUN_DDI_H__ */

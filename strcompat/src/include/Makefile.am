@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/10 11:42:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 13:54:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:42:28 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 13:54:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,93 +56,102 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS 	= \
-				  os7/allocb.h \
-				  os7/bufpool.h \
-				  os7/bufq.h \
-				  os7/compat.h \
-				  os7/debug.h \
-				  os7/lock.h \
-				  os7/priv.h \
-				  os7/queue.h \
-				  os7/timer.h \
+				  sys/ddi.h \
+				  sys/strconf.h \
+				  sys/stream.h \
 				  sys/strlog.h \
-				  sys/strconf.h
+				  sys/os7/allocb.h \
+				  sys/os7/bufpool.h \
+				  sys/os7/bufq.h \
+				  sys/os7/compat.h \
+				  sys/os7/debug.h \
+				  sys/os7/lock.h \
+				  sys/os7/priv.h \
+				  sys/os7/queue.h \
+				  sys/os7/timer.h
 
 if CONFIG_STREAMS_COMPAT_AIX
-nobase_pkginclude_HEADERS	+= sys/aixddi.h
+nobase_pkginclude_HEADERS	+= sys/aix/ddi.h sys/aix/strconf.h sys/aix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_HPUX
-nobase_pkginclude_HEADERS	+= sys/hpuxddi.h
+nobase_pkginclude_HEADERS	+= sys/hpux/ddi.h sys/hpux/strconf.h sys/hpux/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_IRIX
-nobase_pkginclude_HEADERS	+= sys/irixddi.h
+nobase_pkginclude_HEADERS	+= sys/irix/ddi.h sys/irix/strconf.h sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS
-nobase_pkginclude_HEADERS	+= sys/lfsddi.h
+nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS
-nobase_pkginclude_HEADERS	+= sys/lisddi.h
+nobase_pkginclude_HEADERS	+= sys/lis/ddi.h sys/lis/strconf.h sys/lis/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MAC
-nobase_pkginclude_HEADERS	+= sys/macddi.h
+nobase_pkginclude_HEADERS	+= sys/mac/ddi.h sys/mac/strconf.h sys/mac/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MPS
-nobase_pkginclude_HEADERS	+= sys/mpsddi.h
+nobase_pkginclude_HEADERS	+= sys/mps/ddi.h sys/mps/strconf.h sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OS7
+nobase_pkginclude_HEADERS	+= sys/os7/ddi.h sys/os7/strconf.h sys/os7/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_OSF
-nobase_pkginclude_HEADERS	+= sys/osfddi.h
+nobase_pkginclude_HEADERS	+= sys/osf/ddi.h sys/osf/strconf.h sys/osf/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SUN
-nobase_pkginclude_HEADERS	+= sys/sunddi.h sys/strsun.h
+nobase_pkginclude_HEADERS	+= sys/sunddi.h sys/strsun.h sys/sun/ddi.h sys/sun/strconf.h sys/sun/strsun.h sys/sun/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR3
-nobase_pkginclude_HEADERS	+= sys/svr3ddi.h
+nobase_pkginclude_HEADERS	+= sys/svr3/ddi.h sys/svr3/strconf.h sys/svr3/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR4
-nobase_pkginclude_HEADERS	+= sys/svr4ddi.h
+nobase_pkginclude_HEADERS	+= sys/svr4/ddi.h sys/svr4/strconf.h sys/svr4/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_UW7
-nobase_pkginclude_HEADERS	+= sys/uw7ddi.h
+nobase_pkginclude_HEADERS	+= sys/uw7/ddi.h sys/uw7/strconf.h sys/uw7/stream.h
 endif
 
 if CONFIG_STREAMS_COMPAT_AIX_MODULE
-nobase_pkginclude_HEADERS	+= sys/aixddi.h
+nobase_pkginclude_HEADERS	+= sys/aix/ddi.h sys/aix/strconf.h sys/aix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_HPUX_MODULE
-nobase_pkginclude_HEADERS	+= sys/hpuxddi.h
+nobase_pkginclude_HEADERS	+= sys/hpux/ddi.h sys/hpux/strconf.h sys/hpux/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_IRIX_MODULE
-nobase_pkginclude_HEADERS	+= sys/irixddi.h
+nobase_pkginclude_HEADERS	+= sys/irix/ddi.h sys/irix/strconf.h sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS_MODULE
-nobase_pkginclude_HEADERS	+= sys/lfsddi.h
+nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
-nobase_pkginclude_HEADERS	+= sys/lisddi.h
+nobase_pkginclude_HEADERS	+= sys/lis/ddi.h sys/lis/strconf.h sys/lis/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MAC_MODULE
-nobase_pkginclude_HEADERS	+= sys/macddi.h
+nobase_pkginclude_HEADERS	+= sys/mac/ddi.h sys/mac/strconf.h sys/mac/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MPS_MODULE
-nobase_pkginclude_HEADERS	+= sys/mpsddi.h
+nobase_pkginclude_HEADERS	+= sys/mps/ddi.h sys/mps/strconf.h sys/mps/stream.h
+endif
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+nobase_pkginclude_HEADERS	+= sys/os7/ddi.h sys/os7/strconf.h sys/os7/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_OSF_MODULE
-nobase_pkginclude_HEADERS	+= sys/osfddi.h
+nobase_pkginclude_HEADERS	+= sys/osf/ddi.h sys/osf/strconf.h sys/osf/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SUN_MODULE
-nobase_pkginclude_HEADERS	+= sys/sunddi.h sys/strsun.h
+nobase_pkginclude_HEADERS	+= sys/sunddi.h sys/strsun.h sys/sun/ddi.h sys/sun/strconf.h sys/sun/strsun.h sys/sun/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR3_MODULE
-nobase_pkginclude_HEADERS	+= sys/svr3ddi.h
+nobase_pkginclude_HEADERS	+= sys/svr3/ddi.h sys/svr3/strconf.h sys/svr3/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR4_MODULE
-nobase_pkginclude_HEADERS	+= sys/svr4ddi.h
+nobase_pkginclude_HEADERS	+= sys/svr4/ddi.h sys/svr4/strconf.h sys/svr4/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_UW7_MODULE
-nobase_pkginclude_HEADERS	+= sys/uw7ddi.h
+nobase_pkginclude_HEADERS	+= sys/uw7/ddi.h sys/uw7/strconf.h sys/uw7/stream.h
 endif
 
 nobase_nodist_pkginclude_HEADERS = \
+	sys/strcompat/config.h \
 	sys/strcompat/version.h
 #	sys/strcompat/modversions.h
 

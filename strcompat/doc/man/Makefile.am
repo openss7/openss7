@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/11 13:31:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/11 13:31:53 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 13:54:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -168,7 +168,7 @@ mps_compat_pages = \
 	man9/mi_strcmp.9 \
 	man9/mi_strlen.9 \
 	man9/mi_strlog.9 \
-	man9/mi_strol.9 \
+	man9/mi_strtol.9 \
 	man9/mi_timer.9 \
 	man9/mi_timer_MAC.9 \
 	man9/mi_timer_SUN.9 \
@@ -187,30 +187,32 @@ mps_compat_pages = \
 	man9/mps_intr_disable.9 \
 	man9/mps_intr_enable.9
 
-sun_compat_pages = \
-	man9/suncompat.9 \
-	man9/DB_BASE.9 \
-	man9/DB_LIM.9 \
-	man9/DB_REF.9 \
-	man9/DB_TYPE.9 \
+sun_unimpl_pages = \
 	man9/ddi_create_minor_node.9 \
 	man9/ddi_driver_major.9 \
 	man9/ddi_driver_name.9 \
-	man9/ddi_get_cred.9 \
-	man9/ddi_getiminor.9 \
 	man9/ddi_get_instance.9 \
-	man9/ddi_get_lbolt.9 \
-	man9/ddi_get_pid.9 \
 	man9/ddi_get_soft_state.9 \
-	man9/ddi_get_time.9 \
-	man9/ddi_prop_op.9 \
 	man9/ddi_remove_minor_node.9 \
 	man9/ddi_removing_power.9 \
 	man9/ddi_soft_state.9 \
 	man9/ddi_soft_state_fini.9 \
 	man9/ddi_soft_state_free.9 \
 	man9/ddi_soft_state_init.9 \
-	man9/ddi_soft_state_zalloc.9 \
+	man9/ddi_soft_state_zalloc.9
+
+sun_compat_pages = \
+	man9/suncompat.9 \
+	man9/DB_BASE.9 \
+	man9/DB_LIM.9 \
+	man9/DB_REF.9 \
+	man9/DB_TYPE.9 \
+	man9/ddi_get_cred.9 \
+	man9/ddi_getiminor.9 \
+	man9/ddi_get_lbolt.9 \
+	man9/ddi_get_pid.9 \
+	man9/ddi_get_time.9 \
+	man9/ddi_prop_op.9 \
 	man9/ddi_umem_alloc.9 \
 	man9/ddi_umem_free.9 \
 	man9/freezestr_SUN.9 \
@@ -245,7 +247,8 @@ sun_compat_pages = \
 	man9/qwait.9 \
 	man9/qwait_sig.9 \
 	man9/qwriter.9 \
-	man9/unfreezestr_SUN.9
+	man9/unfreezestr_SUN.9 \
+	$(sun_unimpl_pages)
 
 uw7_compat_pages = \
 	man9/uw7compat.9 \
@@ -286,14 +289,17 @@ aix_compat_pages = \
 	man9/wantio.9 \
 	man9/wantmsg.9
 
+hpux_unimpl_pages = \
+	man9/mpsleep.9 \
+	man9/streams_mpsleep.9
+
 hpux_compat_pages = \
 	man9/hpuxcompat.9 \
 	man9/get_sleep_lock.9 \
-	man9/mpsleep.9 \
 	man9/str_install_HPUX.9 \
 	man9/streams_get_sleep_lock.9 \
-	man9/streams_mpsleep.9 \
-	man9/streams_put.9
+	man9/streams_put.9 \
+	$(hpux_unimpl_pages)
 
 irix_compat_pages = \
 	man9/irixcompat.9 \
@@ -303,7 +309,6 @@ irix_compat_pages = \
 lis_compat_pages = \
 	man9/liscompat.9 \
 	man9/lisdeprec.9 \
-	man9/LiS.9 \
 	man9/lis_adjmsg.9 \
 	man9/lis_alloc_atomic_fcn.9 \
 	man9/lis_allocb.9 \
@@ -673,11 +678,14 @@ lfs_compat_pages = \
 	man9/strlog.9 \
 	man9/vstrlog_hook.9
 
-mac_compat_pages = \
-	man9/maccompat.9 \
+mac_unimpl_pages = \
 	man9/allocbi.9 \
 	man9/esballoca.9 \
 	man9/mpnotify.9
+
+mac_compat_pages = \
+	man9/maccompat.9 \
+	$(mac_unimpl_pages)
 
 sux_compat_pages = \
 	man9/suxcompat.9
@@ -685,9 +693,8 @@ sux_compat_pages = \
 uxp_compat_pages = \
 	man9/uxpcompat.9
 
-man_MANS = \
-	man8/strcompat_mknod.8 \
-	man9/alloc_proto.9 \
+os7_compat_pages = \
+	man9/os7compat.9 \
 	man9/bufq_append.9 \
 	man9/bufq_dequeue.9 \
 	man9/bufq_dequeue_tail.9 \
@@ -708,9 +715,7 @@ man_MANS = \
 	man9/bufq_tail.9 \
 	man9/bufq_unlink.9 \
 	man9/bufq_unlock.9 \
-	man9/compat_undoc.9 \
 	man9/freechunks.9 \
-	man9/mkiocb.9 \
 	man9/ss7_allocb.9 \
 	man9/ss7_bufcall.9 \
 	man9/ss7_bufpool_init.9 \
@@ -744,9 +749,18 @@ man_MANS = \
 	man9/ss7_trylockq.9 \
 	man9/ss7_unbufcall.9 \
 	man9/ss7_unlockq.9 \
-	man9/ss7_w_flush.9 \
+	man9/ss7_w_flush.9
+
+man_MANS = \
+	man8/strcompat_mknod.8 \
+	man9/alloc_proto.9 \
+	man9/compat_undoc.9 \
+	man9/mkiocb.9 \
 	man9/str_uninstall.9
 
+if CONFIG_STREAMS_COMPAT_OS7
+man_MANS		    += $(os7_compat_pages)
+endif
 if CONFIG_STREAMS_COMPAT_SVR3
 man_MANS		    += $(svr3_compat_pages)
 endif
@@ -785,6 +799,9 @@ if CONFIG_STREAMS_COMPAT_MAC
 man_MANS		    += $(mac_compat_pages)
 endif
 
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+man_MANS		    += $(os7_compat_pages)
+endif
 if CONFIG_STREAMS_COMPAT_SVR3_MODULE
 man_MANS		    += $(svr3_compat_pages)
 endif
@@ -934,7 +951,7 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_strcmp.9.man \
 	man9/mi_strlen.9.man \
 	man9/mi_strlog.9.man \
-	man9/mi_strol.9.man \
+	man9/mi_strtol.9.man \
 	man9/mi_timer.9.man \
 	man9/mi_timer_MAC.9.man \
 	man9/mi_timer_SUN.9.man \
@@ -953,30 +970,32 @@ dist_noinst_mps_compat_pages = \
 	man9/mps_intr_disable.9.man \
 	man9/mps_intr_enable.9.man
 
-dist_noinst_sun_compat_pages = \
-	man9/suncompat.9.man \
-	man9/DB_BASE.9.man \
-	man9/DB_LIM.9.man \
-	man9/DB_REF.9.man \
-	man9/DB_TYPE.9.man \
+dist_noinst_sun_unimpl_pages = \
 	man9/ddi_create_minor_node.9.man \
 	man9/ddi_driver_major.9.man \
 	man9/ddi_driver_name.9.man \
-	man9/ddi_get_cred.9.man \
-	man9/ddi_getiminor.9.man \
 	man9/ddi_get_instance.9.man \
-	man9/ddi_get_lbolt.9.man \
-	man9/ddi_get_pid.9.man \
 	man9/ddi_get_soft_state.9.man \
-	man9/ddi_get_time.9.man \
-	man9/ddi_prop_op.9.man \
 	man9/ddi_remove_minor_node.9.man \
 	man9/ddi_removing_power.9.man \
 	man9/ddi_soft_state.9.man \
 	man9/ddi_soft_state_fini.9.man \
 	man9/ddi_soft_state_free.9.man \
 	man9/ddi_soft_state_init.9.man \
-	man9/ddi_soft_state_zalloc.9.man \
+	man9/ddi_soft_state_zalloc.9.man
+
+dist_noinst_sun_compat_pages = \
+	man9/suncompat.9.man \
+	man9/DB_BASE.9.man \
+	man9/DB_LIM.9.man \
+	man9/DB_REF.9.man \
+	man9/DB_TYPE.9.man \
+	man9/ddi_get_cred.9.man \
+	man9/ddi_getiminor.9.man \
+	man9/ddi_get_lbolt.9.man \
+	man9/ddi_get_pid.9.man \
+	man9/ddi_get_time.9.man \
+	man9/ddi_prop_op.9.man \
 	man9/ddi_umem_alloc.9.man \
 	man9/ddi_umem_free.9.man \
 	man9/freezestr_SUN.9.man \
@@ -1011,7 +1030,8 @@ dist_noinst_sun_compat_pages = \
 	man9/qwait.9.man \
 	man9/qwait_sig.9.man \
 	man9/qwriter.9.man \
-	man9/unfreezestr_SUN.9.man
+	man9/unfreezestr_SUN.9.man \
+	$(dist_noinst_sun_unimpl_pages)
 
 dist_noinst_uw7_compat_pages = \
 	man9/uw7compat.9.man \
@@ -1052,14 +1072,17 @@ dist_noinst_aix_compat_pages = \
 	man9/wantio.9.man \
 	man9/wantmsg.9.man
 
+dist_noinst_hpux_unimpl_pages = \
+	man9/mpsleep.9.man \
+	man9/streams_mpsleep.9.man
+
 dist_noinst_hpux_compat_pages = \
 	man9/hpuxcompat.9.man \
 	man9/get_sleep_lock.9.man \
-	man9/mpsleep.9.man \
 	man9/str_install_HPUX.9.man \
 	man9/streams_get_sleep_lock.9.man \
-	man9/streams_mpsleep.9.man \
-	man9/streams_put.9.man
+	man9/streams_put.9.man \
+	$(dist_noinst_hpux_unimpl_pages)
 
 dist_noinst_irix_compat_pages = \
 	man9/irixcompat.9.man \
@@ -1069,7 +1092,6 @@ dist_noinst_irix_compat_pages = \
 dist_noinst_lis_compat_pages = \
 	man9/liscompat.9.man \
 	man9/lisdeprec.9.man \
-	man9/LiS.9.man \
 	man9/lis_adjmsg.9.man \
 	man9/lis_alloc_atomic_fcn.9.man \
 	man9/lis_allocb.9.man \
@@ -1439,11 +1461,14 @@ dist_noinst_lfs_compat_pages = \
 	man9/strlog.9.man \
 	man9/vstrlog_hook.9.man
 
-dist_noinst_mac_compat_pages = \
-	man9/maccompat.9.man \
+dist_noinst_mac_unimpl_pages = \
 	man9/allocbi.9.man \
 	man9/esballoca.9.man \
 	man9/mpnotify.9.man
+
+dist_noinst_mac_compat_pages = \
+	man9/maccompat.9.man \
+	$(dist_noinst_mac_unimpl_pages)
 
 dist_noinst_sux_compat_pages = \
 	man9/suxcompat.9.man
@@ -1451,10 +1476,8 @@ dist_noinst_sux_compat_pages = \
 dist_noinst_uxp_compat_pages = \
 	man9/uxpcompat.9.man
 
-
-dist_noinst_MANS = \
-	man8/strcompat_mknod.8.man \
-	man9/alloc_proto.9.man \
+dist_noinst_os7_compat_pages = \
+	man9/os7compat.9.man \
 	man9/bufq_append.9.man \
 	man9/bufq_dequeue.9.man \
 	man9/bufq_dequeue_tail.9.man \
@@ -1475,9 +1498,7 @@ dist_noinst_MANS = \
 	man9/bufq_tail.9.man \
 	man9/bufq_unlink.9.man \
 	man9/bufq_unlock.9.man \
-	man9/compat_undoc.9.man \
 	man9/freechunks.9.man \
-	man9/mkiocb.9.man \
 	man9/ss7_allocb.9.man \
 	man9/ss7_bufcall.9.man \
 	man9/ss7_bufpool_init.9.man \
@@ -1511,9 +1532,18 @@ dist_noinst_MANS = \
 	man9/ss7_trylockq.9.man \
 	man9/ss7_unbufcall.9.man \
 	man9/ss7_unlockq.9.man \
-	man9/ss7_w_flush.9.man \
+	man9/ss7_w_flush.9.man
+
+dist_noinst_MANS = \
+	man8/strcompat_mknod.8.man \
+	man9/alloc_proto.9.man \
+	man9/compat_undoc.9.man \
+	man9/mkiocb.9.man \
 	man9/str_uninstall.9.man
 
+if CONFIG_STREAMS_COMPAT_OS7
+dist_noinst_MANS	    += $(dist_noinst_os7_compat_pages)
+endif
 if CONFIG_STREAMS_COMPAT_SVR3
 dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
 endif
@@ -1552,6 +1582,9 @@ if CONFIG_STREAMS_COMPAT_MAC
 dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
 endif
 
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+dist_noinst_MANS	    += $(dist_noinst_os7_compat_pages)
+endif
 if CONFIG_STREAMS_COMPAT_SVR3_MODULE
 dist_noinst_MANS	    += $(dist_noinst_svr3_compat_pages)
 endif
@@ -1589,6 +1622,17 @@ endif
 if CONFIG_STREAMS_COMPAT_MAC_MODULE
 dist_noinst_MANS	    += $(dist_noinst_mac_compat_pages)
 endif
+
+##
+## These are either deprecated functions that have been removed, or are functions
+## that have not yet been implemented, but we want the documentation hanging
+## around to say so...
+##
+MANS_UNUSED = \
+	$(hpux_unimpl_pages) \
+	$(sun_unimpl_pages) \
+	$(mac_unimpl_pages) \
+	$(lis_deprec_pages)
 
 
 ## PKG_BUILD_INDEP

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.3 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.5  2005/07/12 13:54:43  brian
+ - changes for os7 compatibility and check pass
+
+ Revision 0.9.2.4  2005/07/12 08:42:42  brian
+ - changes for check pass
+
  Revision 0.9.2.3  2005/07/05 22:46:05  brian
  - change for strcompat package
 
@@ -64,10 +70,10 @@
 
  *****************************************************************************/
 
-#ifndef __SYS_MPSDDI_H__
-#define __SYS_MPSDDI_H__
+#ifndef __SYS_MPS_DDI_H__
+#define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -78,14 +84,21 @@
 #endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _MPS_SOURCE
-#warning "_MPS_SOURCE not defined but middi.h included"
+#warning "_MPS_SOURCE not defined but MPS ddi.h included"
 #endif
+
+#ifndef _SVR4_SOURCE
+#define _SVR4_SOURCE
+#endif
+#include <sys/svr4/ddi.h>	/* for pl_t */
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
 #ifndef dev_t
 #define dev_t __streams_dev_t
 #endif
+
+extern int mi_bcmp(const void *s1, const void *s2, size_t len);
 
 /*
  *  Memory allocation functions.
@@ -260,6 +273,7 @@ extern int mi_set_sth_wroff(queue_t *q, size_t size);
  *  STREAMS wrapper functions.
  */
 extern queue_t *mi_allocq(struct streamtab *st);
+extern void mi_freeq(queue_t *q);
 extern int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...) __attribute__((format(printf, 4, 5)));
 
 /*
@@ -272,14 +286,25 @@ extern int mi_mpprintf_nr(mblk_t *mp, char *fmt, ...) __attribute__ ((format(pri
 
 extern int mi_strcmp(const caddr_t cp1, const caddr_t cp2);
 extern int mi_strlen(const caddr_t str);
-extern long mi_strol(const caddr_t str, caddr_t *ptr, int base);
+extern long mi_strtol(const caddr_t str, caddr_t *ptr, int base);
 
+/*
+ *  Message block functions
+ */
 extern uint8_t *mi_offset_param(mblk_t *mp, size_t offset, size_t len);
 extern uint8_t *mi_offset_paramc(mblk_t *mp, size_t offset, size_t len);
+
+/*
+ *  Some internals showing.
+ */
+typedef void (*proc_ptr_t)(queue_t *, mblk_t *);
+extern void mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc);
+extern void mps_intr_disable(pl_t *plp);
+extern void mps_intr_enable(pl_t pl);
 
 
 #elif defined(_MPS_SOURCE)
 #warning "_MPS_SOURCE defined but not CONFIG_STREAMS_COMPAT_MPS"
 #endif
 
-#endif				/* __SYS_MPSDDI_H__ */
+#endif				/* __SYS_MPS_DDI_H__ */
