@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sad.h,v 0.9.2.9 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: sad.h,v 0.9.2.10 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,47 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SAD_H__
 #define __SYS_SAD_H__
 
-#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 14:06:21 $"
 
-#define SAD_IOC_MAGIC	'D'	/* Note: OSF/1 1.2 uses 'A' instead instead of 'D' */
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
 
-#define SAD_SAP		((SAD_IOC_MAGIC << 8) | 0x01)	/* set autopush */
-#define SAD_GAP		((SAD_IOC_MAGIC << 8) | 0x02)	/* get autopush */
-#define SAD_VML		((SAD_IOC_MAGIC << 8) | 0x03)	/* validate modules */
+#include <sys/streams/sad.h>
 
-#define SAD_SAP_SOL	((SAD_IOC_MAGIC << 8) | 0x17)	/* set autopush (anchor) */
-#define SAD_GAP_SOL	((SAD_IOC_MAGIC << 8) | 0x18)	/* get autopush (anchor) */
-
-#ifndef MAX_APUSH
-#define MAX_APUSH 8
-#endif
-
-#define MAXAPUSH MAX_APUSH
-
-struct strapush {
-	int sap_cmd;
-	long sap_major;
-	long sap_minor;
-	long sap_lastminor;
-	uint sap_npush;
-	char sap_list[MAXAPUSH][FMNAMESZ + 1];
-	/* Solaris adds sap_anchor which is the integer anchor position */
-	int sap_anchor;
-	/* This one is Linux Fast-STREAMS specific */
-	char sap_module[FMNAMESZ + 1];	/* This is mine. */
-};
-
-#define SAP_CLEAR	0x00	/* clear entry */
-#define SAP_ONE		0x01	/* add entry for one minor */
-#define SAP_RANGE	0x02	/* add entry for range of minors */
-#define SAP_ALL		0x03	/* add etnry for all minors */
-#define SAP_CLONE	0x04	/* mark clonable minor device */
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
 
 #endif				/* __SYS_SAD_H__ */

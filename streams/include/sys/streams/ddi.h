@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.23 2005/07/11 12:42:27 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.24 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_DDI_H__
-#define __SYS_DDI_H__ 1
+#ifndef __SYS_STREAMS_DDI_H__
+#define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/11 12:42:27 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_DDI_H__
+#warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -327,4 +331,4 @@ __EXTERN_INLINE void useracc(void);	/* see uw7ddi.h */
 __EXTERN_INLINE void uwritec(void);	/* see uw7ddi.h */
 #endif
 
-#endif				/* __SYS_DDI_H__ */
+#endif				/* __SYS_STREAMS_DDI_H__ */

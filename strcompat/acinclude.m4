@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/10 11:40:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 13:54:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:40:57 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 13:54:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -150,6 +150,12 @@ AC_DEFUN([_COMPAT_OPTIONS], [dnl
 # _COMPAT_SETUP_COMPAT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
+    AC_ARG_ENABLE([compat-os7],
+	AS_HELP_STRING([--enable-compat-os7],
+	    [enable source compatibility with OpenSS7 variants.
+	    @<:@default=module@:>@]),
+	    [enable_compat_os7="$enableval"],
+	    [enable_compat_os7='module'])
     AC_ARG_ENABLE([compat-svr3],
 	AS_HELP_STRING([--enable-compat-svr3],
 	    [enable source compatibility with SVR 4.2 MP variants.
@@ -222,6 +228,11 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	[enable_compat_mac="$enableval"],
 	[enable_compat_mac='module'])
+    AC_CACHE_CHECK([for STREAMS OpenSS7 compatibility], [compat_compat_os7], [dnl
+	compat_compat_os7="${enable_compat_os7:-module}"
+	if test :$compat_compat_os7 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    compat_compat_os7='yes'
+	fi])
     AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 3.2 compatibility], [compat_compat_svr3], [dnl
 	compat_compat_svr3="${enable_compat_svr3:-module}"
 	if test :$compat_compat_svr3 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -330,6 +341,24 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	if test :$compat_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    compat_compat_mac='yes'
 	fi])
+    case ${compat_compat_os7:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OS7], [], [When defined, Linux Fast STREAMS
+	    will attempt to be as compatible as possible (without replicating any bugs) with the
+	    OpenSS7 docs so that STREAMS drivers and modules written to OpenSS7 specs will compile
+	    with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written for
+	    OpenSS7 will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled and linkable with Linux Fast-STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OS7_MODULE], [], [When defined, Linux Fast
+	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
+	    the OpenSS7 docs so that STREAMS drivers and modules written to OpenSS7 specs will
+	    compile with Linux Fast STREAMS.  When undefined, STREAMS drivers and modules written
+	    for OpenSS7 will require porting in more respects.  This symbol determines whether
+	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
+	    ;;
+    esac
     case ${compat_compat_svr3:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR3], [], [When defined, Linux Fast STREAMS
@@ -554,6 +583,8 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7],		[test :${compat_compat_os7:-module} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE],	[test :${compat_compat_os7:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${compat_compat_svr3:-module} = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${compat_compat_svr3:-module} = :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${compat_compat_svr4:-module} = :yes])

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.8 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.9 2005/07/12 14:06:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STRLOG_H__
-#define __SYS_STRLOG_H__
+#ifndef __SYS_STREAMS_STRLOG_H__
+#define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 14:06:22 $"
+
+#ifndef __SYS_STRLOG_H__
+#warn "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
+#endif
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002
@@ -70,6 +74,9 @@
 
 extern int strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
     __attribute__ ((format(printf, 5, 6)));
+
+typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
+extern vstrlog_t vstrlog;
 
 struct trace_ids {
 	short ti_mid;
@@ -89,4 +96,4 @@ struct log_ctl {
 	int pri;			/* priority = (facility|level) except HPUX */
 };
 
-#endif				/* __SYS_STRLOG_H__ */
+#endif				/* __SYS_STREAMS_STRLOG_H__ */

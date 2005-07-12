@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -70,11 +70,11 @@ static char const ident[] =
 
 #define _OSF_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/09 21:51:21 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -236,6 +236,188 @@ int streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 }
 
 EXPORT_SYMBOL(streams_close_comm);
+
+#ifndef NODEV
+#define NODEV (makedevice(0, 0))
+#endif
+/*
+ *  STRMOD_ADD
+ *  -------------------------------------------------------------------------
+ */
+dev_t strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
+{
+#if LIS
+	switch (sa->sa_flags & STR_TYPE_MASK) {
+	case STR_IS_DEVICE:
+	{
+		major_t major = getmajor(dev);
+		minor_t minor = getminor(dev);
+		int result;
+		if ((result = lis_register_strdev(major, st, minor, sa->sa_name)) > 0) {
+			major = result;
+			dev = makedevice(major, minor);
+		} else {
+			dev = NODEV;
+		}
+		return (dev);
+	}
+	case STR_IS_MODULE:
+	{
+		modID_t modid;
+		int result;
+		if ((result = lis_register_strmod(st, sa->sa_name)) > 0) {
+			modid = result;
+			dev = makedevice(modid, 0);
+		} else {
+			dev = NODEV;
+		}
+		return (dev);
+	}
+	default:
+		return (NODEV);
+	}
+#endif
+#if LFS
+	switch (sa->sa_flags & STR_TYPE_MASK) {
+	case STR_IS_DEVICE:
+	{
+		struct cdevsw *cdev;
+		int err;
+		if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
+			return (NODEV);
+		cdev->d_name = sa->sa_name;
+		cdev->d_str = st;
+		/* build flags */
+		cdev->d_flag = 0;
+		if (sa->sa_flags & STR_QSAFETY) {
+			cdev->d_flag |= D_SAFE;
+		}
+		switch ((cdev->d_sqlvl = sa->sa_sync_level)) {
+		case SQLVL_NOP:
+			cdev->d_flag |= D_MP;
+			break;
+		case SQLVL_QUEUE:
+			cdev->d_flag |= D_MTPERQ;
+			break;
+		case SQLVL_QUEUEPAIR:
+			cdev->d_flag |= D_MTQPAIR;
+			break;
+		case SQLVL_MODULE:
+			cdev->d_flag |= D_MTPERMOD;
+			break;
+		case SQLVL_ELSEWHERE:
+			cdev->d_flag |= D_MTOUTPERIM;
+			break;
+		case SQLVL_GLOBAL:
+			/* can't really support this, but its only used for debug anyway */
+			cdev->d_flag &= ~D_MP;
+			break;
+		case SQLVL_DEFAULT:
+			cdev->d_flag |= D_MTPERMOD;
+			break;
+		}
+		if ((err = register_strdev(cdev, getmajor(dev))) < 0) {
+			kmem_free(cdev, sizeof(*cdev));
+			return (NODEV);
+		}
+		return (makedevice(err, getminor(dev)));
+	}
+	case STR_IS_MODULE:
+	{
+		struct fmodsw *fmod;
+		int err;
+		if (!(fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)))
+			return (NODEV);
+		fmod->f_name = sa->sa_name;
+		fmod->f_str = st;
+		/* build flags */
+		fmod->f_flag = 0;
+		if (sa->sa_flags & STR_QSAFETY) {
+			fmod->f_flag |= D_SAFE;
+		}
+		switch ((fmod->f_sqlvl = sa->sa_sync_level)) {
+		case SQLVL_NOP:
+			fmod->f_flag |= D_MP;
+			break;
+		case SQLVL_QUEUE:
+			fmod->f_flag |= D_MTPERQ;
+			break;
+		case SQLVL_QUEUEPAIR:
+			fmod->f_flag |= D_MTQPAIR;
+			break;
+		case SQLVL_MODULE:
+			fmod->f_flag |= D_MTPERMOD;
+			break;
+		case SQLVL_ELSEWHERE:
+			fmod->f_flag |= D_MTOUTPERIM;
+			break;
+		case SQLVL_GLOBAL:
+			/* can't really support this, but its only used for debug anyway */
+			fmod->f_flag &= ~D_MP;
+			break;
+		case SQLVL_DEFAULT:
+			fmod->f_flag |= D_MTPERMOD;
+			break;
+		}
+		if ((err = register_strmod(fmod)) < 0) {
+			kmem_free(fmod, sizeof(*fmod));
+			return (NODEV);
+		}
+		return (makedevice(err, 0));
+	}
+	default:
+		return (NODEV);
+	}
+#endif
+}
+
+EXPORT_SYMBOL(strmod_add);
+
+/*
+ *  STRMOD_DEL
+ *  -------------------------------------------------------------------------
+ */
+int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
+{
+#if LIS
+	switch (sa->sa_flags & STR_TYPE_MASK) {
+	case STR_IS_DEVICE:
+		return lis_unregister_strdev(getmajor(dev));
+	case STR_IS_MODULE:
+		return lis_unregister_module(st)
+	default:
+		return (EINVAL);
+	}
+#endif
+#if LFS
+	switch (sa->sa_flags & STR_TYPE_MASK) {
+	case STR_IS_DEVICE:
+	{
+		struct cdevsw *cdev;
+		int err;
+		if ((cdev = cdev_str(st)) == NULL)
+			return (ENOENT);
+		if ((err = unregister_strdev(cdev, getmajor(dev))) == 0)
+			kmem_free(cdev, sizeof(*cdev));
+		return (-err);
+	}
+	case STR_IS_MODULE:
+	{
+		struct fmodsw *fmod;
+		int err;
+		if (!(fmod = fmod_str(st)))
+			return (ENOENT);
+		if ((err = unregister_strmod(fmod)) == 0)
+			kmem_free(fmod, sizeof(fmod));
+		return (-err);
+	}
+	default:
+		return (EINVAL);
+	}
+#endif
+}
+
+EXPORT_SYMBOL(strmod_del);
 
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static

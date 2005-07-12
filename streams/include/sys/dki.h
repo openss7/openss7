@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.9 2005/07/05 22:46:08 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.10 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,59 +45,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DKI_H__
 #define __SYS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:46:08 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 14:06:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
-#include <linux/config.h>
-#include <linux/types.h>
-#include <linux/kdev_t.h>
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
 
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
+#include <sys/streams/dki.h>
 
-typedef __kernel_dev_t major_t;
-typedef __kernel_dev_t minor_t;
-
-/* same layout as in task_struct */
-#define current_creds ((cred_t *)(&current->uid))
-typedef struct cred {
-	uid_t cr_ruid, cr_uid, cr_suid, cr_fsuid;
-	gid_t cr_rgid, cr_gid, cr_sgid, cr_fsgid;
-#ifdef NGROUPS
-	int cr_ngroups;
-	gid_t cr_groups[NGROUPS];
-#endif
-#ifdef NGROUPS_SMALL
-	struct group_info *cr_group_info;
-#endif
-} cred_t;
-
-#if 0
-/* for LiS binary compatibility */
-typedef struct lis_cred {
-	uid_t cr_uid;			/* effective user id */
-	gid_t cr_gid;			/* effective group id */
-	uid_t cr_ruid;			/* real user id */
-	gid_t cr_rgid;			/* real group id */
-} lis_cred_t;
-#endif
-
-/* make SVR4.2 oflag from file flags and mode */
-#define make_oflag(__f) \
-	(((__f)->f_flags & ~O_ACCMODE) | \
-	 ((__f)->f_mode & O_ACCMODE) | \
-	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
-
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
 
 #endif				/* __SYS_DKI_H__ */

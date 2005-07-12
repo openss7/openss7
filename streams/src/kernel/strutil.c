@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 04:13:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:22 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -2531,8 +2531,37 @@ EXPORT_SYMBOL(strqset);
 
 static spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 
-vstrlog_t vstrlog_hook = NULL;
-EXPORT_SYMBOL(vstrlog_hook);
+static int vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
+{
+	unsigned long flags;
+	static char str_err_buf[1024];
+	spin_lock_irqsave(&str_err_lock, flags);
+	vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
+	if (flag & SL_FATAL) {
+		printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_ERROR) {
+		printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_WARN) {
+		printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_NOTE) {
+		printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else if (flag & SL_CONSOLE) {
+		printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	} else {		/* SL_TRACE */
+		printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
+		       (int) sid, str_err_buf);
+	}
+	spin_unlock_irqrestore(&str_err_lock, flags);
+	return (1);
+}
+
+vstrlog_t vstrlog = &vstrlog_default;
+EXPORT_SYMBOL(vstrlog);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -2545,39 +2574,13 @@ EXPORT_SYMBOL(vstrlog_hook);
  */
 int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
-	int result;
-	va_list args;
-	va_start(args, fmt);
-	if (vstrlog_hook != NULL)
-		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
-	else {
-		unsigned long flags;
-		static char str_err_buf[1024];
-		spin_lock_irqsave(&str_err_lock, flags);
-		vsnprintf(str_err_buf, sizeof(str_err_buf), fmt, args);
-		if (flag & SL_FATAL) {
-			printk(KERN_CRIT "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_ERROR) {
-			printk(KERN_ERR "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_WARN) {
-			printk(KERN_WARNING "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_NOTE) {
-			printk(KERN_NOTICE "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else if (flag & SL_CONSOLE) {
-			printk(KERN_INFO "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		} else {	/* SL_TRACE */
-			printk(KERN_DEBUG "strlog(%d)[%d,%d]: %s\n", (int) level, (int) mid,
-			       (int) sid, str_err_buf);
-		}
-		spin_unlock_irqrestore(&str_err_lock, flags);
-		result = 1;
+	int result = 0;
+	if (vstrlog != NULL) {
+		va_list args;
+		va_start(args, fmt);
+		result = (*vstrlog) (mid, sid, level, flag, fmt, args);
+		va_end(args);
 	}
-	va_end(args);
 	return (result);
 }
 

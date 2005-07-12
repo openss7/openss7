@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.6 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.7 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_DEBUG_H__
-#define __SYS_DEBUG_H__
+#ifndef __SYS_STREAMS_DEBUG_H__
+#define __SYS_STREAMS_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_DEBUG_H__
+#warn "Do no include sys/streams/debug.h directly, include sys/debug.h instead."
+#endif
+
+#ifndef __KERNEL__
+#error "Do not use kernel headers for user space programs"
+#endif				/* __KERNEL__ */
 
 #include <linux/kernel.h>
 
@@ -85,4 +93,4 @@
 
 #endif				/* DEBUG */
 
-#endif				/* __SYS_DEBUG_H__ */
+#endif				/* __SYS_STREAMS_DEBUG_H__ */

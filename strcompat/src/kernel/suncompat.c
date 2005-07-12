@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -70,11 +70,11 @@ static char const ident[] =
 
 #define _SUN_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/09 21:51:21 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -150,7 +150,7 @@ void qwait(queue_t *rq)
 	qpwunlock(rq);
 }
 
-EXPORT_SYMBOL(qwait);		/* sunddi.h */
+EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
 #endif
 
 #if LFS
@@ -179,40 +179,40 @@ int qwait_sig(queue_t *rq)
 	return (ret);
 }
 
-EXPORT_SYMBOL(qwait_sig);	/* sunddi.h */
+EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
 #endif
 
 #if LFS
 __SUN_EXTERN_INLINE bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg);
-EXPORT_SYMBOL(qbufcall);	/* sunddi.h */
+EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
-EXPORT_SYMBOL(qtimeout);	/* sunddi.h */
+EXPORT_SYMBOL(qtimeout);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid);
-EXPORT_SYMBOL(qunbufcall);	/* sunddi.h */
+EXPORT_SYMBOL(qunbufcall);	/* sun/ddi.h */
 #endif
 __SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid);
-EXPORT_SYMBOL(quntimeout);	/* sunddi.h */
+EXPORT_SYMBOL(quntimeout);	/* sun/ddi.h */
 #if LFS
 /* LIS already has queclass defined */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
-EXPORT_SYMBOL(queclass);	/* sunddi.h */
+EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
 #endif
 #if LFS
 __SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
-EXPORT_SYMBOL(qwriter);		/* sunddi.h */
+EXPORT_SYMBOL(qwriter);		/* sun/ddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
-EXPORT_SYMBOL(ddi_get_cred);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_get_cred);	/* sun/ddi.h */
 #endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
-EXPORT_SYMBOL(ddi_get_lbolt);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_get_lbolt);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE pid_t ddi_get_pid(void);
-EXPORT_SYMBOL(ddi_get_pid);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_get_pid);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE time_t ddi_get_time(void);
-EXPORT_SYMBOL(ddi_get_time);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_get_time);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev);
-EXPORT_SYMBOL(ddi_getiminor);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_getiminor);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep);
-EXPORT_SYMBOL(ddi_umem_alloc);	/* sunddi.h */
+EXPORT_SYMBOL(ddi_umem_alloc);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep);
 EXPORT_SYMBOL(ddi_umem_free);
 

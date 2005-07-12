@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:51:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $"
 
 static char const ident[] =
-    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $";
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -70,11 +70,11 @@ static char const ident[] =
 
 #define _AIX_SOURCE
 
-#include "os7/compat.h"
+#include "sys/os7/compat.h"
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/09 21:51:21 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 19:15:48 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -121,17 +121,16 @@ int wantio(queue_t *q, struct wantio *w)
 	return (0);
 }
 
-EXPORT_SYMBOL(wantio);		/* aixddi.h */
+EXPORT_SYMBOL(wantio);		/* aix/ddi.h */
 
 /* 
  *  WANTMSG
  *  -------------------------------------------------------------------------
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *));
-EXPORT_SYMBOL(wantmsg);		/* aixddi.h */
+EXPORT_SYMBOL(wantmsg);		/* aix/ddi.h */
 #endif
 
-#if LFS
 /* 
  *  STR_INSTALL
  *  -------------------------------------------------------------------------
@@ -142,158 +141,193 @@ int str_install_AIX(int cmd, strconf_t * sc)
 		return (EINVAL);
 	switch (cmd) {
 	case STR_LOAD_DEV:
+#if LIS
 	{
-		struct cdevsw *cdev;
 		int err;
-#ifdef MAX_CHRDEV
-		if (0 >= sc->sc_major || sc->sc_major >= MAX_CHRDEV)
-#else
-		if (sc->sc_major != MAJOR(MKDEV(sc->sc_major, 0)))
+		if ((err = lis_register_strdev(sc->sc_major, sc->sc_str, 255, sc->sc_name)) > 0)
+			sc->sc_major = err;
+		return (err < 0 ? -err : 0);
+	}
 #endif
-			return (EINVAL);
-		/* We don't do old-style opens */
-		if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))
-			return (ENOSYS);
-		if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
-			/* Modules can always sleep because we are running at soft IRQ. */
+#if LFS
+		{
+			struct cdevsw *cdev;
+			int err;
+#ifdef MAX_CHRDEV
+			if (0 >= sc->sc_major || sc->sc_major >= MAX_CHRDEV)
+#else
+			if (sc->sc_major != MAJOR(MKDEV(sc->sc_major, 0)))
+#endif
+				return (EINVAL);
+			/* We don't do old-style opens */
+			if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))
+				return (ENOSYS);
+			if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
+				/* Modules can always sleep because we are running at soft IRQ. */
+			}
+			if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
+				return (ENOMEM);
+			cdev->d_name = sc->sc_name;
+			cdev->d_str = sc->sc_str;
+			/* build flags */
+			cdev->d_flag = 0;
+			if (sc->sc_open_stylesc_flags & STR_MPSAFE) {
+				cdev->d_flag |= D_MP;
+			}
+			if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
+				cdev->d_flag |= D_SAFE;
+			}
+			if (sc->sc_open_stylesc_flags & STR_PERSTREAM) {
+				cdev->d_flag |= D_UP;
+			}
+			if (sc->sc_open_stylesc_flags & STR_NEWCLONING) {
+				cdev->d_flag |= D_CLONE;
+			}
+			switch ((cdev->d_sqlvl = sc->sc_sqlevel)) {
+			case SQLVL_NOP:
+				cdev->d_flag |= D_MP;
+				break;
+			case SQLVL_QUEUE:
+				cdev->d_flag |= D_MTPERQ;
+				break;
+			case SQLVL_QUEUEPAIR:
+				cdev->d_flag |= D_MTQPAIR;
+				break;
+			case SQLVL_MODULE:
+				cdev->d_flag |= D_MTPERMOD;
+				break;
+			case SQLVL_ELSEWHERE:
+				cdev->d_flag |= D_MTOUTPERIM;
+				break;
+			case SQLVL_GLOBAL:
+				/* can't really support this, but its only used for debug anyway */
+				cdev->d_flag &= ~D_MP;
+				break;
+			case SQLVL_DEFAULT:
+				cdev->d_flag |= D_MTPERMOD;
+				break;
+			}
+			if ((err = register_strdev(cdev, sc->sc_major)) < 0)
+				kmem_free(cdev, sizeof(*cdev));
+			return (-err);
 		}
-		if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
-			return (ENOMEM);
-		cdev->d_name = sc->sc_name;
-		cdev->d_str = sc->sc_str;
-		/* build flags */
-		cdev->d_flag = 0;
-		if (sc->sc_open_stylesc_flags & STR_MPSAFE) {
-			cdev->d_flag |= D_MP;
-		}
-		if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
-			cdev->d_flag |= D_SAFE;
-		}
-		if (sc->sc_open_stylesc_flags & STR_PERSTREAM) {
-			cdev->d_flag |= D_UP;
-		}
-		if (sc->sc_open_stylesc_flags & STR_NEWCLONING) {
-			cdev->d_flag |= D_CLONE;
-		}
-		switch ((cdev->d_sqlvl = sc->sc_sqlevel)) {
-		case SQLVL_NOP:
-			cdev->d_flag |= D_MP;
-			break;
-		case SQLVL_QUEUE:
-			cdev->d_flag |= D_MTPERQ;
-			break;
-		case SQLVL_QUEUEPAIR:
-			cdev->d_flag |= D_MTQPAIR;
-			break;
-		case SQLVL_MODULE:
-			cdev->d_flag |= D_MTPERMOD;
-			break;
-		case SQLVL_ELSEWHERE:
-			cdev->d_flag |= D_MTOUTPERIM;
-			break;
-		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
-			cdev->d_flag &= ~D_MP;
-			break;
-		case SQLVL_DEFAULT:
-			cdev->d_flag |= D_MTPERMOD;
-			break;
-		}
-		if ((err = register_strdev(cdev, sc->sc_major)) < 0)
-			kmem_free(cdev, sizeof(*cdev));
-		return (-err);
-	}
+#endif
 	case STR_UNLOAD_DEV:
+#if LIS
 	{
-		struct cdevsw *cdev;
-		int err;
-		if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
-			return (EINVAL);
-		if ((cdev = sdev_get(sc->sc_major)) == NULL)
-			return (ENOENT);
-		printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
-		printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		sdev_put(cdev);
-		if ((err = unregister_strdev(cdev, sc->sc_major)) == 0)
-			kmem_free(cdev, sizeof(*cdev));
-		return (-err);
+		return lis_unregister_strdev(sc->sc_major);
 	}
+#endif
+#if LFS
+		{
+			struct cdevsw *cdev;
+			int err;
+			if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
+				return (EINVAL);
+			if ((cdev = sdev_get(sc->sc_major)) == NULL)
+				return (ENOENT);
+			printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
+			printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
+			sdev_put(cdev);
+			if ((err = unregister_strdev(cdev, sc->sc_major)) == 0)
+				kmem_free(cdev, sizeof(*cdev));
+			return (-err);
+		}
+#endif
 	case STR_LOAD_MOD:
+#if LIS
 	{
-		struct fmodsw *fmod;
 		int err;
-		if (!sc->sc_str || !sc->sc_str->st_rdinit || !sc->sc_str->st_rdinit->qi_minfo)
-			return (EINVAL);
-		if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
-			return (EINVAL);
-		/* We don't do old-style opens */
-		if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))
-			return (ENOSYS);
-		if (!(fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)))
-			return (ENOMEM);
-		fmod->f_name = sc->sc_name;
-		fmod->f_str = sc->sc_str;
-		/* build flags */
-		fmod->f_flag = 0;
-		if (sc->sc_open_stylesc_flags & STR_MPSAFE) {
-			fmod->f_flag |= D_MP;
-		}
-		if (sc->sc_open_stylesc_flags & STR_PERSTREAM) {
-			fmod->f_flag |= D_UP;
-		}
-		if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
-			/* Modules can always sleep because we are running at soft IRQ; however, it 
-			   has a horrendous impact.  We just ignore it. */
-		}
-		if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
-			fmod->f_flag |= D_SAFE;
-		}
-		if (sc->sc_open_stylesc_flags & STR_NEWCLONING) {
-			fmod->f_flag |= D_CLONE;
-		}
-		switch ((fmod->f_sqlvl = sc->sc_sqlevel)) {
-		case SQLVL_NOP:
-			fmod->f_flag |= D_MP;
-			break;
-		case SQLVL_QUEUE:
-			fmod->f_flag |= D_MTPERQ;
-			break;
-		case SQLVL_QUEUEPAIR:
-			fmod->f_flag |= D_MTQPAIR;
-			break;
-		case SQLVL_MODULE:
-			fmod->f_flag |= D_MTPERMOD;
-			break;
-		case SQLVL_ELSEWHERE:
-			fmod->f_flag |= D_MTOUTPERIM;
-			break;
-		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
-			fmod->f_flag &= ~D_MP;
-			break;
-		case SQLVL_DEFAULT:
-			fmod->f_flag |= D_MTPERMOD;
-			break;
-		}
-		if ((err = register_strmod(fmod)) < 0)
-			kmem_free(fmod, sizeof(*fmod));
-		return (-err);
+		if ((err = lis_register_strmod(sc->sc_str, sc->sc_name)) > 0)
+			sc->sc_major = err;
+		return (err < 0 ? -err : 0);
 	}
+#endif
+#if LFS
+		{
+			struct fmodsw *fmod;
+			int err;
+			if (!sc->sc_str || !sc->sc_str->st_rdinit
+			    || !sc->sc_str->st_rdinit->qi_minfo)
+				return (EINVAL);
+			if (0 >= sc->sc_major || sc->sc_major >= MAX_STRDEV)
+				return (EINVAL);
+			/* We don't do old-style opens */
+			if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))
+				return (ENOSYS);
+			if (!(fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP)))
+				return (ENOMEM);
+			fmod->f_name = sc->sc_name;
+			fmod->f_str = sc->sc_str;
+			/* build flags */
+			fmod->f_flag = 0;
+			if (sc->sc_open_stylesc_flags & STR_MPSAFE) {
+				fmod->f_flag |= D_MP;
+			}
+			if (sc->sc_open_stylesc_flags & STR_PERSTREAM) {
+				fmod->f_flag |= D_UP;
+			}
+			if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
+				/* Modules can always sleep because we are running at soft IRQ;
+				   however, it has a horrendous impact.  We just ignore it. */
+			}
+			if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
+				fmod->f_flag |= D_SAFE;
+			}
+			if (sc->sc_open_stylesc_flags & STR_NEWCLONING) {
+				fmod->f_flag |= D_CLONE;
+			}
+			switch ((fmod->f_sqlvl = sc->sc_sqlevel)) {
+			case SQLVL_NOP:
+				fmod->f_flag |= D_MP;
+				break;
+			case SQLVL_QUEUE:
+				fmod->f_flag |= D_MTPERQ;
+				break;
+			case SQLVL_QUEUEPAIR:
+				fmod->f_flag |= D_MTQPAIR;
+				break;
+			case SQLVL_MODULE:
+				fmod->f_flag |= D_MTPERMOD;
+				break;
+			case SQLVL_ELSEWHERE:
+				fmod->f_flag |= D_MTOUTPERIM;
+				break;
+			case SQLVL_GLOBAL:
+				/* can't really support this, but its only used for debug anyway */
+				fmod->f_flag &= ~D_MP;
+				break;
+			case SQLVL_DEFAULT:
+				fmod->f_flag |= D_MTPERMOD;
+				break;
+			}
+			if ((err = register_strmod(fmod)) < 0)
+				kmem_free(fmod, sizeof(*fmod));
+			return (-err);
+		}
+#endif
 	case STR_UNLOAD_MOD:
+#if LIS
 	{
-		struct fmodsw *fmod;
-		int err;
-		if (!(fmod = fmod_str(sc->sc_str)))
-			return (ENOENT);
-		if ((err = unregister_strmod(fmod)) == 0)
-			kmem_free(fmod, sizeof(fmod));
-		return (-err);
+		return lis_unregister_strmod(sc->sc_str);
 	}
+#endif
+#if LFS
+		{
+			struct fmodsw *fmod;
+			int err;
+			if (!(fmod = fmod_str(sc->sc_str)))
+				return (ENOENT);
+			if ((err = unregister_strmod(fmod)) == 0)
+				kmem_free(fmod, sizeof(fmod));
+			return (-err);
+		}
+#endif
 	}
 	return (EINVAL);
 }
+
 EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
-#endif
 
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 static

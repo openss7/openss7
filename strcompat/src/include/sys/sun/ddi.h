@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.13 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2005/07/12 19:15:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 13:54:44 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -74,9 +74,6 @@
 #define PERIM_OUTER	2	/* Solaris used with qwriter() */
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-
-extern void qprocsoff(queue_t *q);
-extern void qprocson(queue_t *q);
 
 __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
 {

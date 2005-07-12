@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.12 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.13 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,229 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRDEBUG_H__
 #define __SYS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 14:06:21 $"
 
-#undef  __never
-#define __never() \
-do { panic("%s: never() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
 
-#undef  __rare
-#define __rare() \
-do { printk(KERN_NOTICE "%s: rare() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+#include <sys/streams/strdebug.h>
 
-#undef  __seldom
-#define __seldom() \
-do { printk(KERN_NOTICE "%s: seldom() at "__FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
-
-#undef  __usual
-#define __usual(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: usual(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
-
-#undef  __normal
-#define __normal(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: normal(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
-
-#undef  __assert
-#define __assert(__exp) \
-do { if (!(__exp)) { printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); *(int *)0 = 0; } } while(0)
-
-#undef  __assure
-#define __assure(__exp) \
-do { if (!(__exp)) printk(KERN_WARNING "%s: assure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); } while(0)
-
-#undef  __ensure
-#define __ensure(__exp,__sta) \
-do { if (!(__exp)) { printk(KERN_WARNING "%s: ensure(" #__exp ") failed at " __FILE__ " +%d\n",__FUNCTION__, __LINE__); __sta; } } while(0)
-
-#undef  __unless
-#define __unless(__exp,__sta) \
-__ensure(!(__exp),__sta)
-
-#undef  __trace
-#define __trace() \
-do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
-
-#undef  __ptrace
-#define __ptrace(__pkspec) \
-do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
-
-#undef  __fixme
-#define __fixme(__pkspec) \
-do { printk(KERN_INFO "%s: fixme() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
-
-#undef  __todo
-#define __todo(__pkspec) \
-do { printk(KERN_INFO "%s: todo() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
-
-#undef  __ctrace
-#define __ctrace(__fnc) \
-({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
-
-#undef  __printd
-#define __printd(__pkspec) \
-do { printk __pkspec; } while(0)
-
-#undef  __swerr
-#define __swerr() \
-do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
-
-#undef  __pswerr
-#define __pswerr(__pkspec) \
-do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
-
-#define    _never()		do { } while(0)
-#define     _rare()		do { } while(0)
-#define   _seldom()		do { } while(0)
-#define    _usual(__exp)	do { } while(0)
-#define  _unusual(__exp)	do { } while(0)
-#define   _normal(__exp)	do { } while(0)
-#define _abnormal(__exp)	do { } while(0)
-#define   _assert(__exp)	do { } while(0)
-#define   _assure(__exp)	do { } while(0)
-#define   _ensure(__exp,__sta)	do { } while(0)
-#define   _unless(__exp,__sta)	do { } while(0)
-#define    _trace()		do { } while(0)
-#define   _ptrace(__pks)	do { } while(0)
-#define   _ctrace(__fnc)	(__fnc)
-#define    _fixme(__pks)	do { } while(0)
-#define     _todo(__pks)	do { } while(0)
-#define   _printd(__pks)	do { } while(0)
-#define    _swerr()		do { } while(0)
-#define   _pswerr(__pks)	do { } while(0)
-
-#if defined(CONFIG_STREAMS_DEBUG)
-
-#define    never()		__never()
-#define     rare()		__rare()
-#define   seldom()		__seldom()
-#define    usual(__exp)		__usual(__exp)
-#define  unusual(__exp)		__usual(!(__exp))
-#define   normal(__exp)		__normal(__exp)
-#define abnormal(__exp)		__normal(!(__exp))
-#define   assert(__exp)		__assert(__exp)
-#define   assure(__exp)		__assure(__exp)
-#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
-#define    trace()		__trace()
-#define   ptrace(__pks)		__ptrace(__pks)
-#define   ctrace(__fnc)		__ctrace(__fnc)
-#define    fixme(__pks)		__fixme(__pks)
-#define     todo(__pks)		__todo(__pks)
-#define   printd(__pks)		__printd(__pks)
-#define    swerr()		__swerr()
-#define   pswerr(__pks)		__pswerr(__pks)
-
-#undef STATIC
-#define STATIC
-#undef INLINE
-#define INLINE
-
-#elif defined(CONFIG_STREAMS_TEST)
-
-#define    never()		__never()
-#define     rare()		__rare()
-#define   seldom()		__seldom()
-#define    usual(__exp)		__usual(__exp)
-#define  unusual(__exp)		__usual(!(__exp))
-#define   normal(__exp)		__normal(__exp)
-#define abnormal(__exp)		__normal(!(__exp))
-#define   assert(__exp)		__assert(__exp)
-#define   assure(__exp)		__assure(__exp)
-#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
-#define    trace()		_trace()
-#define   ptrace(__pks)		_ptrace(__pks)
-#define   ctrace(__fnc)		_ctrace(__fnc)
-#define    fixme(__pks)		__fixme(__pks)
-#define     todo(__pks)		__todo(__pks)
-#define   printd(__pks)		_printd(__pks)
-#define    swerr()		__swerr()
-#define   pswerr(__pks)		__pswerr(__pks)
-
-#undef STATIC
-#define STATIC static
-#undef INLINE
-#if defined __inline
-#define INLINE __inline
-#elif defined __inline__
-#define INLINE __inline__
-#else
-#define INLINE inline
-#endif
-
-#elif defined(CONFIG_STREAMS_SAFE)
-
-#define    never()		do { *(int *)0 = 0; } while(0)
-#define     rare()		_rare()
-#define   seldom()		_seldom()
-#define    usual(__exp)		_usual(__exp)
-#define  unusual(__exp)		_unusual(__exp)
-#define   normal(__exp)		_normal(__exp)
-#define abnormal(__exp)		_abnormal(__exp)
-#define   assert(__exp)		{ if (!(__exp)) *(int *)0 = 0; } while(0)
-#define   assure(__exp)		__assure(__exp)
-#define   ensure(__exp,__sta)	__ensure(__exp,__sta)
-#define   unless(__exp,__sta)	__ensure(!(__exp),__sta)
-#define    trace()		_trace()
-#define   ptrace(__pks)		_ptrace(__pks)
-#define   ctrace(__fnc)		_ctrace(__fnc)
-#define    fixme(__pks)		__fixme(__pks)
-#define     todo(__pks)		__todo(__pks)
-#define   printd(__pks)		_printd(__pks)
-#define    swerr()		__swerr()
-#define   pswerr(__pks)		__pswerr(__pks)
-
-#undef STATIC
-#define STATIC static
-#undef INLINE
-#if defined __inline
-#define INLINE __inline
-#elif defined __inline__
-#define INLINE __inline__
-#else
-#define INLINE inline
-#endif
-
-#else
-
-#define    never()		_never()
-#define     rare()		_rare()
-#define   seldom()		_seldom()
-#define    usual(__exp)		_usual(__exp)
-#define  unusual(__exp)		_unusual(__exp)
-#define   normal(__exp)		_normal(__exp)
-#define abnormal(__exp)		_abnormal(__exp)
-#define   assert(__exp)		_assert(__exp)
-#define   assure(__exp)		_assure(__exp)
-#define   ensure(__exp,__sta)	_ensure(__exp,__sta)
-#define   unless(__exp,__sta)	_unless(__exp,__sta)
-#define    trace()		_trace()
-#define   ptrace(__pks)		_ptrace(__pks)
-#define   ctrace(__fnc)		_ctrace(__fnc)
-#define    fixme(__pks)		__fixme(__pks)
-#define     todo(__pks)		_todo(__pks)
-#define   printd(__pks)		_printd(__pks)
-#define    swerr()		__swerr()
-#define   pswerr(__pks)		__pswerr(__pks)
-
-#undef STATIC
-#define STATIC static
-#undef INLINE
-#if defined __inline
-#define INLINE __inline
-#elif defined __inline__
-#define INLINE __inline__
-#else
-#define INLINE inline
-#endif
-
-#endif
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
 
 #endif				/* __SYS_STRDEBUG_H__ */

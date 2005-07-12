@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.12 2005/07/12 19:15:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_UW7DDI_H__
-#define __SYS_UW7DDI_H__
+#ifndef __SYS_UW7_DDI_H__
+#define __SYS_UW7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/12 19:15:48 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __UW7_EXTERN_INLINE */
 
 #ifndef _UW7_SOURCE
-#warning "_UW7_SOURCE not defined but uw7ddi.h,v included"
+#warning "_UW7_SOURCE not defined but UW7 ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_UW7) || defined(CONFIG_STREAMS_COMPAT_UW7_MODULE)
@@ -71,7 +71,7 @@
 #ifndef _SVR4_SOURCE
 #define _SVR4_SOURCE
 #endif
-#include <sys/svr4ddi.h>
+#include <sys/svr4/ddi.h>
 
 typedef unsigned long paddr_t;
 typedef struct physreq {
@@ -119,7 +119,10 @@ extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
 extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
 extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
 
+#if 0
+/* not implemented yet */
 int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
+#endif
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 
@@ -169,4 +172,4 @@ __UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value)
 #warning "_UW7_SOURCE defined but not CONFIG_STREAMS_COMPAT_UW7"
 #endif				/* CONFIG_STREAMS_COMPAT_UW7 */
 
-#endif				/* __SYS_UW7DDI_H__ */
+#endif				/* __SYS_UW7_DDI_H__ */

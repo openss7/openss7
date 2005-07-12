@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_IRIXDDI_H__
-#define __SYS_IRIXDDI_H__
+#ifndef __SYS_IRIX_DDI_H__
+#define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:46:04 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 13:54:42 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __IRIX_EXTERN_INLINE */
 
 #ifndef _IRIX_SOURCE
-#warning "_IRIX_SOURCE not defined but irixddi.h,v included"
+#warning "_IRIX_SOURCE not defined but IRIX ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_IRIX) || defined(CONFIG_STREAMS_COMPAT_IRIX_MODULE)
@@ -71,7 +71,7 @@
 #ifndef _SVR4_SOURCE
 #define _SVR4_SOURCE
 #endif
-#include <sys/svr4ddi.h>	/* for lock_t */
+#include <sys/svr4/ddi.h>	/* for lock_t */
 
 __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
 {
@@ -85,4 +85,4 @@ extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args 
 #warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"
 #endif				/* CONFIG_STREAMS_COMPAT_IRIX */
 
-#endif				/* __SYS_IRIXDDI_H__ */
+#endif				/* __SYS_IRIX_DDI_H__ */

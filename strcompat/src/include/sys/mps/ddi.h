@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/07/12 19:15:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.6  2005/07/12 19:15:47  brian
+ - updates and check passes
+
  Revision 0.9.2.5  2005/07/12 13:54:43  brian
  - changes for os7 compatibility and check pass
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -279,10 +282,13 @@ extern int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...) __att
 /*
  *  System wrapper functions.
  */
-extern int mi_sprintf_putc(char *cookie, int ch);
 extern int mi_sprintf(char *buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+#if 0
+/* not implemented yet */
+extern int mi_sprintf_putc(char *cookie, int ch);
 extern int mi_mpprintf(mblk_t *mp, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 extern int mi_mpprintf_nr(mblk_t *mp, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+#endif
 
 extern int mi_strcmp(const caddr_t cp1, const caddr_t cp2);
 extern int mi_strlen(const caddr_t str);

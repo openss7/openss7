@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/09 21:48:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/12 19:15:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:24 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 19:15:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,6 +100,7 @@ noinst_LIBRARIES		= libCOMPATlink.a libCOMPATmods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 EXTRA_libCOMPATlink_a_SOURCES 	= \
+				  src/kernel/os7compat.c \
 				  src/kernel/svr3compat.c \
 				  src/kernel/svr4compat.c \
 				  src/kernel/mpscompat.c \
@@ -114,51 +115,67 @@ EXTRA_libCOMPATlink_a_SOURCES 	= \
 				  src/kernel/maccompat.c
 
 libCOMPATlink_a_SOURCES		= \
-				  src/include/os7/allocb.h \
-				  src/include/os7/bufpool.h \
-				  src/include/os7/bufq.h \
-				  src/include/os7/compat.h \
-				  src/include/os7/debug.h \
-				  src/include/os7/lock.h \
-				  src/include/os7/priv.h \
-				  src/include/os7/queue.h \
-				  src/include/os7/timer.h
+				  src/include/sys/os7/allocb.h \
+				  src/include/sys/os7/bufpool.h \
+				  src/include/sys/os7/bufq.h \
+				  src/include/sys/os7/compat.h \
+				  src/include/sys/os7/debug.h \
+				  src/include/sys/os7/lock.h \
+				  src/include/sys/os7/priv.h \
+				  src/include/sys/os7/queue.h \
+				  src/include/sys/os7/timer.h
 
+if CONFIG_STREAMS_COMPAT_OS7
+libCOMPATlink_a_SOURCES		+= src/kernel/os7compat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/os7/ddi.h src/include/sys/os7/strconf.h src/include/sys/os7/stream.h
+endif
 if CONFIG_STREAMS_COMPAT_SVR3
 libCOMPATlink_a_SOURCES		+= src/kernel/svr3compat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/svr3/ddi.h src/include/sys/svr3/strconf.h src/include/sys/svr3/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR4
 libCOMPATlink_a_SOURCES		+= src/kernel/svr4compat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/svr4/ddi.h src/include/sys/svr4/strconf.h src/include/sys/svr4/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MPS
 libCOMPATlink_a_SOURCES		+= src/kernel/mpscompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/mps/ddi.h src/include/sys/mps/strconf.h src/include/sys/mps/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SUN
 libCOMPATlink_a_SOURCES		+= src/kernel/suncompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/sunddi.h src/include/sys/strsun.h src/include/sys/sun/ddi.h src/include/sys/sun/strconf.h src/include/sys/sun/strsun.h src/include/sys/sun/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_UW7
 libCOMPATlink_a_SOURCES		+= src/kernel/uw7compat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/uw7/ddi.h src/include/sys/uw7/strconf.h src/include/sys/uw7/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_OSF
 libCOMPATlink_a_SOURCES		+= src/kernel/osfcompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/osf/ddi.h src/include/sys/osf/strconf.h src/include/sys/osf/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_AIX
 libCOMPATlink_a_SOURCES		+= src/kernel/aixcompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/aix/ddi.h src/include/sys/aix/strconf.h src/include/sys/aix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_HPUX
 libCOMPATlink_a_SOURCES		+= src/kernel/hpuxcompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/hpux/ddi.h src/include/sys/hpux/strconf.h src/include/sys/hpux/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_IRIX
 libCOMPATlink_a_SOURCES		+= src/kernel/irixcompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/irix/ddi.h src/include/sys/irix/strconf.h src/include/sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 libCOMPATlink_a_SOURCES		+= src/kernel/liscompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/lis/ddi.h src/include/sys/lis/strconf.h src/include/sys/lis/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS
 libCOMPATlink_a_SOURCES		+= src/kernel/lfscompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/lfs/ddi.h src/include/sys/lfs/strconf.h src/include/sys/lfs/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MAC
 libCOMPATlink_a_SOURCES		+= src/kernel/maccompat.c
+libCOMPATlink_a_SOURCES		+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
 endif
 
 libCOMPATlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -168,6 +185,7 @@ libCOMPATlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libTUILlink_a_OBJECTS):	$(libCOMPATlink_a_DEPENDENCIES)
 
 EXTRA_libCOMPATmods_a_SOURCES	= \
+				src/kernel/os7compat.c \
 				src/kernel/svr3compat.c \
 				src/kernel/svr4compat.c \
 				src/kernel/mpscompat.c \
@@ -182,51 +200,67 @@ EXTRA_libCOMPATmods_a_SOURCES	= \
 				src/kernel/maccompat.c
 
 libCOMPATmods_a_SOURCES		= \
-				src/include/os7/allocb.h \
-				src/include/os7/bufpool.h \
-				src/include/os7/bufq.h \
-				src/include/os7/compat.h \
-				src/include/os7/debug.h \
-				src/include/os7/lock.h \
-				src/include/os7/priv.h \
-				src/include/os7/queue.h \
-				src/include/os7/timer.h
+				src/include/sys/os7/allocb.h \
+				src/include/sys/os7/bufpool.h \
+				src/include/sys/os7/bufq.h \
+				src/include/sys/os7/compat.h \
+				src/include/sys/os7/debug.h \
+				src/include/sys/os7/lock.h \
+				src/include/sys/os7/priv.h \
+				src/include/sys/os7/queue.h \
+				src/include/sys/os7/timer.h
 
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+libCOMPATmods_a_SOURCES		+= src/kernel/os7compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/os7/ddi.h src/include/sys/os7/strconf.h src/include/sys/os7/stream.h
+endif
 if CONFIG_STREAMS_COMPAT_SVR3_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/svr3compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/svr3/ddi.h src/include/sys/svr3/strconf.h src/include/sys/svr3/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SVR4_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/svr4compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/svr4/ddi.h src/include/sys/svr4/strconf.h src/include/sys/svr4/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MPS_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/mpscompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/mps/ddi.h src/include/sys/mps/strconf.h src/include/sys/mps/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_SUN_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/suncompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/sunddi.h src/include/sys/strsun.h src/include/sys/sun/ddi.h src/include/sys/sun/strconf.h src/include/sys/sun/strsun.h src/include/sys/sun/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_UW7_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/uw7compat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/uw7/ddi.h src/include/sys/uw7/strconf.h src/include/sys/uw7/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_OSF_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/osfcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/osf/ddi.h src/include/sys/osf/strconf.h src/include/sys/osf/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_AIX_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/aixcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/aix/ddi.h src/include/sys/aix/strconf.h src/include/sys/aix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_HPUX_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/hpuxcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/hpux/ddi.h src/include/sys/hpux/strconf.h src/include/sys/hpux/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_IRIX_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/irixcompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/irix/ddi.h src/include/sys/irix/strconf.h src/include/sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/liscompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/lis/ddi.h src/include/sys/lis/strconf.h src/include/sys/lis/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/lfscompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/lfs/ddi.h src/include/sys/lfs/strconf.h src/include/sys/lfs/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_MAC_MODULE
 libCOMPATmods_a_SOURCES		+= src/kernel/maccompat.c
+libCOMPATmods_a_SOURCES		+= src/include/sys/mac/ddi.h src/include/sys/mac/strconf.h src/include/sys/mac/stream.h
 endif
 
 libCOMPATmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
@@ -318,6 +352,9 @@ endif
 if CONFIG_STREAMS_COMPAT_MPS
 EXPORT_SRCFILES			+= src/kernel/mpscompat.c
 endif
+if CONFIG_STREAMS_COMPAT_OS7
+EXPORT_SRCFILES			+= src/kernel/os7compat.c
+endif
 if CONFIG_STREAMS_COMPAT_OSF
 EXPORT_SRCFILES			+= src/kernel/osfcompat.c
 endif
@@ -353,6 +390,9 @@ EXPORT_SRCFILES			+= src/kernel/maccompat.c
 endif
 if CONFIG_STREAMS_COMPAT_MPS_MODULE
 EXPORT_SRCFILES			+= src/kernel/mpscompat.c
+endif
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+EXPORT_SRCFILES			+= src/kernel/os7compat.c
 endif
 if CONFIG_STREAMS_COMPAT_OSF_MODULE
 EXPORT_SRCFILES			+= src/kernel/osfcompat.c
@@ -393,6 +433,9 @@ endif
 if CONFIG_STREAMS_COMPAT_MPS
 EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
 endif
+if CONFIG_STREAMS_COMPAT_OS7
+EXPORT_VERFILES			+= $(PKGINCL)/versions/os7compat.ver
+endif
 if CONFIG_STREAMS_COMPAT_OSF
 EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver
 endif
@@ -428,6 +471,9 @@ EXPORT_VERFILES			+= $(PKGINCL)/versions/maccompat.ver
 endif
 if CONFIG_STREAMS_COMPAT_MPS_MODULE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/mpscompat.ver
+endif
+if CONFIG_STREAMS_COMPAT_OS7_MODULE
+EXPORT_VERFILES			+= $(PKGINCL)/versions/os7compat.ver
 endif
 if CONFIG_STREAMS_COMPAT_OSF_MODULE
 EXPORT_VERFILES			+= $(PKGINCL)/versions/osfcompat.ver

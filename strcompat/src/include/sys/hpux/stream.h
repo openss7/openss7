@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: irixddi.h,v 0.9.2.6 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
@@ -45,44 +45,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.1  2005/07/12 13:54:42  brian
+ - changes for os7 compatibility and check pass
 
  *****************************************************************************/
 
-#ifndef __SYS_IRIXDDI_H__
-#define __SYS_IRIXDDI_H__
+#ifndef __SYS_HPUX_STREAM_H__
+#define __SYS_HPUX_STREAM_H__
 
-#ident "@(#) $RCSfile: irixddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:46:04 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+
+#ifndef __SYS_STREAM_H__
+#warning "Do not include sys/hpux/stream.h directly, include sys/stream.h instead."
+#endif
 
 #ifndef __KERNEL__
-#error "Do not use kernel headers for user space programs"
-#endif				/* __KERNEL__ */
-
-#ifndef __IRIX_EXTERN_INLINE
-#define __IRIX_EXTERN_INLINE extern __inline__
-#endif				/* __IRIX_EXTERN_INLINE */
-
-#ifndef _IRIX_SOURCE
-#warning "_IRIX_SOURCE not defined but irixddi.h,v included"
+#error "Do not include kernel header files in user space programs."
 #endif
 
-#if defined(CONFIG_STREAMS_COMPAT_IRIX) || defined(CONFIG_STREAMS_COMPAT_IRIX_MODULE)
-
-#ifndef _SVR4_SOURCE
-#define _SVR4_SOURCE
+#ifndef __HPUX_EXTERN_INLINE
+#define __HPUX_EXTERN_INLINE extern __inline__
 #endif
-#include <sys/svr4ddi.h>	/* for lock_t */
 
-__IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args)
-{
-	return vcmn_err(err_lvl, fmt, args);
-}
+#ifndef _HPUX_SOURCE
+#warning "_HPUX_SOURCE not defined but HPUX stream.h included."
+#endif
 
-/* gcc 3.4.3 can't handle inlining with variable argument list */
-extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ ) __attribute__ ((format(printf, 3, 4)));
+#include <sys/strcompat/config.h>
 
-#elif defined(_IRIX_SOURCE)
-#warning "_IRIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_IRIX"
-#endif				/* CONFIG_STREAMS_COMPAT_IRIX */
+#if defined CONFIG_STREAMS_COMPAT_HPUX || defined CONFIG_STREAMS_COMPAT_HPUX_MODULE
 
-#endif				/* __SYS_IRIXDDI_H__ */
+#elif defined _HPUX_SOURCE
+#warning "_HPUX_SOURCE defined by not CONFIG_STREAMS_COMPAT_HPUX"
+#endif
+
+#endif				/* __SYS_HPUX_STREAM_H__ */

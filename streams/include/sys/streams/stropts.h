@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.13 2005/06/23 10:50:01 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.14 2005/07/12 14:06:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 10:50:01 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STROPTS_H__
-#define __SYS_STROPTS_H__
+#ifndef __SYS_STREAMS_STROPTS_H__
+#define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/06/23 10:50:01 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 14:06:22 $"
+
+#ifndef __SYS_STROPTS_H__
+#warn "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
+#endif
 
 #ifndef HAVE_LINUX_FAST_STREAMS
 #define HAVE_LINUX_FAST_STREAMS
@@ -261,4 +265,4 @@ struct strpmsg {
 
 #define LFS_GETMSG_PUTMSG_ULEN	(-0x12345678)
 
-#endif				/* __SYS_STROPTS_H__ */
+#endif				/* __SYS_STREAMS_STROPTS_H__ */

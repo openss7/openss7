@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 19:22:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 13:54:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 19:22:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -120,6 +120,11 @@ svr4_compat_pages = \
 	man9/UNLOCK.9 \
 	man9/wakeup.9
 
+mps_unimpl_pages = \
+	man9/mi_mpprintf.9 \
+	man9/mi_mpprintf_nr.9 \
+	man9/mi_sprintf_putc.9
+
 mps_compat_pages = \
 	man9/mpscompat.9 \
 	man9/mi_alloc.9 \
@@ -144,8 +149,6 @@ mps_compat_pages = \
 	man9/mi_first_ptr.9 \
 	man9/mi_free.9 \
 	man9/mi_freeq.9 \
-	man9/mi_mpprintf.9 \
-	man9/mi_mpprintf_nr.9 \
 	man9/mi_next_dev_ptr.9 \
 	man9/mi_next_ptr.9 \
 	man9/mi_offset_param.9 \
@@ -164,7 +167,6 @@ mps_compat_pages = \
 	man9/mi_set_sth_maxblk.9 \
 	man9/mi_set_sth_wroff.9 \
 	man9/mi_sprintf.9 \
-	man9/mi_sprintf_putc.9 \
 	man9/mi_strcmp.9 \
 	man9/mi_strlen.9 \
 	man9/mi_strlog.9 \
@@ -185,7 +187,8 @@ mps_compat_pages = \
 	man9/mi_zalloc_sleep.9 \
 	man9/mps_become_writer.9 \
 	man9/mps_intr_disable.9 \
-	man9/mps_intr_enable.9
+	man9/mps_intr_enable.9 \
+	$(mps_unimpl_pages)
 
 sun_unimpl_pages = \
 	man9/ddi_create_minor_node.9 \
@@ -250,6 +253,9 @@ sun_compat_pages = \
 	man9/unfreezestr_SUN.9 \
 	$(sun_unimpl_pages)
 
+uw7_unimpl_pages = \
+	man9/strioccall.9
+
 uw7_compat_pages = \
 	man9/uw7compat.9 \
 	man9/ATOMIC_INT_ADD.9 \
@@ -265,7 +271,7 @@ uw7_compat_pages = \
 	man9/msgpullup_physreq.9 \
 	man9/msgscgth.9 \
 	man9/printf_UW7.9 \
-	man9/strioccall.9
+	$(uw7_unimpl_pages)
 
 if WITH_LFS
 uw7_compat_pages += \
@@ -1632,6 +1638,8 @@ MANS_UNUSED = \
 	$(hpux_unimpl_pages) \
 	$(sun_unimpl_pages) \
 	$(mac_unimpl_pages) \
+	$(mps_unimpl_pages) \
+	$(uw7_unimpl_pages) \
 	$(lis_deprec_pages)
 
 

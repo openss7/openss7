@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.4 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -79,7 +79,7 @@ typedef struct ss7_bufpool {
 /*
    assumes bufpool is locked 
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -100,7 +100,7 @@ __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use in the bottom half or tasklet 
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -124,7 +124,7 @@ ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    for use outside the bottom half 
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -156,7 +156,7 @@ ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    assumes bufpool is locked 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -164,9 +164,8 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 		mp->b_cont = xchg(&pool->head, mp);
 		atomic_inc(&pool->count);
 	} else {
-		/*
-		   other references, use normal free mechanism 
-		 */
+		/* 
+		   other references, use normal free mechanism */
 		freeb(mp);
 	}
 }
@@ -174,7 +173,7 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -184,9 +183,8 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 		spin_unlock(&pool->lock);
 		atomic_inc(&pool->count);
 	} else {
-		/*
-		   other references, use normal free mechanism 
-		 */
+		/* 
+		   other references, use normal free mechanism */
 		freeb(mp);
 	}
 }
@@ -194,7 +192,7 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -204,9 +202,8 @@ ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 		spin_unlock_bh(&pool->lock);
 		atomic_inc(&pool->count);
 	} else {
-		/*
-		   other references, use normal free mechanism 
-		 */
+		/* 
+		   other references, use normal free mechanism */
 		freeb(mp);
 	}
 }
@@ -222,7 +219,7 @@ ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    assumes bufpool is locked 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -235,7 +232,7 @@ __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use inside the bottom half 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -248,7 +245,7 @@ ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    for use outside the bottom half 
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -269,7 +266,7 @@ ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp)
  *  -----------------------------------
  *  Initialized the buffer pool for operation.
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_init(struct ss7_bufpool *pool)
 {
 	if (!pool->initialized) {
@@ -288,14 +285,13 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
  *  Reserves n more FASTBUF sized blocks in the buffer pool and precharges
  *  those n blocks into the buffer pool.
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 {
 	mblk_t *mp;
 	atomic_add(n, &pool->reserve);
-	/*
-	   precharge the pool 
-	 */
+	/* 
+	   precharge the pool */
 	while (n--) {
 		if (!(mp = allocb(FASTBUF, BPRI_LO)))
 			break;
@@ -309,7 +305,7 @@ ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
  *  Releases reservation of n FASTBUF sized blocks.  We do not release them
  *  here, we wait for them to be used normally, or freed on termination.
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 {
 	atomic_sub(n, &pool->reserve);
@@ -320,7 +316,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
  *  -----------------------------------
  *  Terminate the buffer pool and free any blocks in the pool.
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	unsigned long flags;

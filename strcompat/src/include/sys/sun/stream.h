@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: svr3ddi.h,v 0.9.2.5 2005/07/11 12:47:59 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
@@ -45,69 +45,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:47:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.1  2005/07/12 13:54:44  brian
+ - changes for os7 compatibility and check pass
 
  *****************************************************************************/
 
-#ifndef __SYS_SVR3DDI_H__
-#define __SYS_SVR3DDI_H__
+#ifndef __SYS_SUN_STREAM_H__
+#define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: svr3ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/11 12:47:59 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
-#ifndef __KERNEL__
-#error "Do not use kernel headers for user space programs"
-#endif				/* __KERNEL__ */
-
-#ifndef __SVR3_EXTERN_INLINE
-#define __SVR3_EXTERN_INLINE extern __inline__
-#endif				/* __SVR3_EXTERN_INLINE */
-
-#ifndef _SVR3_SOURCE
-#warning "_SVR3_SOURCE not defined but svr4ddi.h,v included"
+#ifndef __SYS_STREAM_H__
+#warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
 #endif
 
-#if defined(CONFIG_STREAMS_COMPAT_SVR3) || defined(CONFIG_STREAMS_COMPAT_SVR3_MODULE)
+#ifndef __KERNEL__
+#error "Do not include kernel header files in user space programs."
+#endif
 
-#include <sys/kmem.h>		/* for kmem_alloc/free */
+#ifndef __SUN_EXTERN_INLINE
+#define __SUN_EXTERN_INLINE extern __inline__
+#endif
 
-__SVR3_EXTERN_INLINE major_t emajor(dev_t dev)
-{
-	return (getmajor(dev) + MAJOR(getminor(dev)));
-}
-__SVR3_EXTERN_INLINE minor_t eminor(dev_t dev)
-{
-	return (MINOR(getminor(dev)));
-}
+#ifndef _SUN_SOURCE
+#warning "_SUN_SOURCE not defined but SUN stream.h included."
+#endif
 
-__SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
-{
-	mblk_t *mp = NULL, *dp = NULL;
-	if (psize && !(mp = allocb(psize, bpri)))
-		goto enobufs;
-	if (dsize && !(dp = allocb(dsize, bpri)))
-		goto enobufs;
-	if (mp) {
-		mp->b_datap->db_type = type;
-		mp->b_wptr = mp->b_rptr + psize;
-		bzero(mp->b_rptr, psize);
-		mp->b_cont = dp;
-	}
-	if (dp) {
-		dp->b_datap->db_type = M_DATA;
-		dp->b_wptr = dp->b_rptr + dsize;
-		bzero(dp->b_rptr, dsize);
-	}
-	return (mp ? mp : dp);
-      enobufs:
-	if (mp)
-		freemsg(mp);
-	if (dp)
-		freemsg(dp);
-	return (NULL);
-}
+#include <sys/strcompat/config.h>
 
-#elif defined(_SVR3_SOURCE)
-#warning "_SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3"
-#endif				/* CONFIG_STREAMS_COMPAT_SVR3 */
+#if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
 
-#endif				/* __SYS_SVR3DDI_H__ */
+#elif defined _SUN_SOURCE
+#warning "_SUN_SOURCE defined by not CONFIG_STREAMS_COMPAT_SUN"
+#endif
+
+#endif				/* __SYS_SUN_STREAM_H__ */

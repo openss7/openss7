@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_MACDDI_H__
-#define __SYS_MACDDI_H__
+#ifndef __SYS_MAC_DDI_H__
+#define __SYS_MAC_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _MAC_SOURCE
-#warning "_MAC_SOURCE not defined but macddi.h included"
+#warning "_MAC_SOURCE not defined but MAC ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_MAC) || defined(CONFIG_STREAMS_COMPAT_MAC_MODULE)
@@ -121,4 +121,4 @@ extern void mi_copy_set_rval(mblk_t *mp, int rval);
 #warning "_MAC_SOURCE defined but not CONFIG_STREAMS_COMPAT_MAC"
 #endif
 
-#endif				/* __SYS_MACDDI_H__ */
+#endif				/* __SYS_MAC_DDI_H__ */

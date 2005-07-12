@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/07/12 13:54:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_OSFDDI_H__
-#define __SYS_OSFDDI_H__
+#ifndef __SYS_OSF_DDI_H__
+#define __SYS_OSF_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/12 13:54:44 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __OSF_EXTERN_INLINE */
 
 #ifndef _OSF_SOURCE
-#warning "_OSF_SOURCE not defined but osfddi.h,v included"
+#warning "_OSF_SOURCE not defined but OSF ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
@@ -95,4 +95,4 @@ __OSF_EXTERN_INLINE time_t time(void)
 #warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
 #endif
 
-#endif				/* __SYS_OSFDDI_H__ */
+#endif				/* __SYS_OSF_DDI_H__ */

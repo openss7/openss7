@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/07/12 13:54:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_AXIDDI_H__
-#define __SYS_AXIDDI_H__
+#ifndef __SYS_AIX_DDI_H__
+#define __SYS_AIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:04 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:41 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _AIX_SOURCE
-#warning "_AIX_SOURCE not defined but aixddi.h included"
+#warning "_AIX_SOURCE not defined but AIX ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
@@ -96,4 +96,4 @@ __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
 #endif
 
-#endif				/* __SYS_AXIDDI_H__ */
+#endif				/* __SYS_AIX_DDI_H__ */

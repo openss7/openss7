@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.7 2005/07/06 03:47:46 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,140 +45,34 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/06 03:47:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STRCONF_H__
-#define __SYS_STRCONF_H__
+#ifndef __SYS_SUN_STRCONF_H__
+#define __SYS_SUN_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/06 03:47:46 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:44 $"
+
+#ifndef __SYS_STRCONF_H__
+#warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
-#include <linux/fs.h>		/* for file_operations */
-
-#include <sys/sad.h>		/* for strapush */
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
-#endif
-
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
-
 #ifndef __SUN_EXTERN_INLINE
 #define __SUN_EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
+#endif				/* __SUN_EXTERN_INLINE */
 
-#ifdef _AIX_SOURCE
-
-typedef struct {
-	char *sc_name;
-	struct streamtab *sc_str;
-	int sc_open_stylesc_flags;
-	int sc_major;
-	int sc_sqlevel;
-	caddr_t sc_sqinfo;
-} strconf_t;
-
-extern int str_install_AIX(int cmd, strconf_t * conf);
-
-#define STR_LOAD_DEV	1	/* add a device */
-#define STR_UNLOAD_DEV	2	/* remove a device */
-#define STR_LOAD_MOD	3	/* load a module */
-#define STR_UNLOAD_MOD	4	/* unload a module */
-
-#define STR_OLD_OPEN	0x00000000	/* SVR3 open semantics */
-#define STR_NEW_OPEN	0x00000100	/* SVR4 open semantics */
-
-#define STR_QSAFETY     0x00000200	/* Module needs safe callbacks */
-#define STR_MPSAFE	0x00000400	/* Module is MP safe */
-#define STR_PERSTREAM	0x00000800	/* Module has per-stream sync */
-#define STR_Q_NOTTOSPEC	0x00001000	/* Module runs under process context */
-#define STR_64BIT	0x00002000	/* 64-bit capable */
-#define STR_NEWCLONING	0x00004000	/* Module does cloning without CLONEOPEN */
-
-#ifndef str_install
-#define str_install(__cmd, __conf) str_install_AIX(__cmd, __conf)
+#ifndef _SUN_SOURCE
+#warning "_SUN_SOURCE not defined but SUN strconf.h included"
 #endif
 
-#endif				/* _AIX_SOURCE */
+#include <sys/strcompat/config.h>
 
-#ifdef _OSF_SOURCE
-
-#if 0				/* we don't support the static configuration */
-
-#define OSF_STREAMS_CONFIG_10   0x04026019
-#define OSF_STREAMS_CONFIG_11   0x0503611A
-
-typedef struct str_config {
-	uint sc_version;
-	uint sc_sa_flags;
-	char sc_sa_name[FMNAMESZ + 1];
-	dev_t sc_devnum;
-} str_config_t;
-
-#endif
-
-#define OSF_STREAMS_10  0x04026019	/* OSF/1.0 */
-#define OSF_STREAMS_11  0x0503611B	/* OSF/1.1 */
-
-struct streamadm {
-	uint sa_version;
-	uint sa_flags;
-	char sa_name[FMNAMESZ + 1];
-	caddr_t sa_ttys;
-	uint sa_sync_level;
-	caddr_t sa_sync_info;
-};
-
-extern dev_t strmod_add(dev_t dev, struct streamtab *str, struct streamadm *sa);
-extern int strmod_del(dev_t dev, struct streamtab *str, struct streamadm *sa);
-
-#endif				/* _OSF_SOURCE */
-
-#ifdef _HPUX_SOURCE
-
-typedef struct stream_inst {
-	char *name;			/* name of driver or module */
-	int inst_major;			/* major number for driver (-1 dynamic or module) */
-	struct streamtab inst_str_tab;	/* current streams tab entry */
-	unsigned int inst_flags;	/* flags, e.g. STR_SVR4_OPEN, STR_IS_MODULE */
-	int inst_sync_level;		/* sync level defined by stream.h */
-	char inst_sync_info[FMNAMESZ + 1];	/* elsewhere sync param described in MP */
-} streams_info_t;
-
-extern int str_install_HPUX(struct stream_inst *inst);
-extern int str_uninstall(struct stream_inst *inst);
-
-#ifndef str_install
-#define str_install(__inst) str_install_HPUX(__inst)
-#endif
-
-#endif				/* _HPUX_SOURCE */
-
-#define STR_IS_DEVICE   0x00000001	/* device */
-#define STR_IS_MODULE   0x00000002	/* module */
-#define STR_TYPE_MASK   (STR_IS_DEVICE|STR_IS_MODULE)
-#define STR_SYSV4_OPEN  0x00000100	/* V.4 open signature/return */
-#define STR_QSAFETY     0x00000200	/* Module needs safe callbacks */
-#define STR_IS_SECURE   0x00010000	/* Module/device is secure */
-
-typedef enum {
-	SQLVL_DEFAULT = 0,		/* default level */
-	SQLVL_GLOBAL = 1,		/* STREAMS scheduler level */
-	SQLVL_ELSEWHERE = 2,		/* module group level */
-	SQLVL_MODULE = 3,		/* module level (default) */
-	SQLVL_QUEUEPAIR = 4,		/* queue pair level */
-	SQLVL_QUEUE = 5,		/* queue level */
-	SQLVL_NOP = 6,			/* no synchronization */
-} sqlvl_t;
-
-#ifdef _SUN_SOURCE
+#if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
 #if 0
 struct cb_ops {
@@ -339,34 +233,8 @@ extern int mod_install(struct modlinkage *ml);
 extern int mod_remove(struct modlinkage *ml);
 extern int mod_info(struct modlinkage *ml, struct modinfo *mi);
 
-#endif /* _SUN_SOURCE */
+#elif defined(_SUN_SOURCE)
+#warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"
+#endif				/* CONFIG_STREAMS_COMPAT_SUN */
 
-#if defined LIS
-extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
-			       const char *name);
-extern int lis_unregister_strdev(major_t major);
-extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
-extern int lis_unregister_strmod(struct streamtab *strtab);
-#endif				/* _LIS_SOURCE */
-
-#if defined LFS
-extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
-extern int register_strdev(struct cdevsw *cdev, major_t major);
-extern int register_strdrv(struct cdevsw *cdev);
-extern int register_strmod(struct fmodsw *fmod);
-extern int unregister_strnod(struct cdevsw *cdev, minor_t minor);
-extern int unregister_strdev(struct cdevsw *cdev, major_t major);
-extern int unregister_strdrv(struct cdevsw *cdev);
-extern int unregister_strmod(struct fmodsw *fmod);
-
-extern int autopush_add(struct strapush *sap);
-extern int autopush_del(struct strapush *sap);
-extern int autopush_vml(struct str_mlist *smp, int nmods);
-extern struct strapush *autopush_find(dev_t dev);
-
-extern int apush_get(struct strapush *sap);
-extern int apush_set(struct strapush *sap);
-extern int apush_vml(struct str_list *slp);
-#endif
-
-#endif				/* __SYS_STRCONF_H__ */
+#endif				/* __SYS_SUN_STRCONF_H__ */

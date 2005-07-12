@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 13:54:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 19:15:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 13:54:39 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 19:15:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,6 @@ nobase_pkginclude_HEADERS 	= \
 				  sys/ddi.h \
 				  sys/strconf.h \
 				  sys/stream.h \
-				  sys/strlog.h \
 				  sys/os7/allocb.h \
 				  sys/os7/bufpool.h \
 				  sys/os7/bufq.h \
@@ -80,7 +79,7 @@ if CONFIG_STREAMS_COMPAT_IRIX
 nobase_pkginclude_HEADERS	+= sys/irix/ddi.h sys/irix/strconf.h sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS
-nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h
+nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h sys/strlog.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS
 nobase_pkginclude_HEADERS	+= sys/lis/ddi.h sys/lis/strconf.h sys/lis/stream.h
@@ -120,7 +119,7 @@ if CONFIG_STREAMS_COMPAT_IRIX_MODULE
 nobase_pkginclude_HEADERS	+= sys/irix/ddi.h sys/irix/strconf.h sys/irix/stream.h
 endif
 if CONFIG_STREAMS_COMPAT_LFS_MODULE
-nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h
+nobase_pkginclude_HEADERS	+= sys/lfs/ddi.h sys/lfs/strconf.h sys/lfs/stream.h sys/strlog.h
 endif
 if CONFIG_STREAMS_COMPAT_LIS_MODULE
 nobase_pkginclude_HEADERS	+= sys/lis/ddi.h sys/lis/strconf.h sys/lis/stream.h

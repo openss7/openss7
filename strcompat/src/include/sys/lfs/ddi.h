@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.2 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.3 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.3  2005/07/12 13:54:42  brian
+ - changes for os7 compatibility and check pass
+
  Revision 0.9.2.2  2005/07/05 22:46:05  brian
  - change for strcompat package
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ifndef __SYS_LFSDDI_H__
-#define __SYS_LFSDDI_H__
+#ifndef __SYS_LFS_DDI_H__
+#define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,7 +77,7 @@
 #include <linux/delay.h>	/* for udelay */
 
 #ifndef _LFS_SOURCE
-#warning "_LFS_SOURCE not defined but lfsddi.h,v included"
+#warning "_LFS_SOURCE not defined but LFS ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_LFS) || defined(CONFIG_STREAMS_COMPAT_LFS_MODULE)
@@ -325,4 +328,4 @@ __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2
 #warning "_LFS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LFS"
 #endif				/* CONFIG_STREAMS_COMPAT_LFS */
 
-#endif				/* __SYS_LFSDDI_H__ */
+#endif				/* __SYS_LFS_DDI_H__ */

@@ -1,0 +1,564 @@
+/*****************************************************************************
+
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: os7compat.c,v $
+ Revision 0.9.2.1  2005/07/12 13:54:46  brian
+ - changes for os7 compatibility and check pass
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $"
+
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $";
+
+/* 
+ *  This is my solution for those who don't want to inline GPL'ed functions or
+ *  who don't use optimizations when compiling or specifies
+ *  -fnoinline-functions or something of the like.  This file implements all
+ *  of the extern inlines from the header files by just including the header
+ *  files with the functions declared 'inline' instead of 'extern inline'.
+ *
+ *  There are implemented here in a separate object, out of the way of the
+ *  modules that don't use them.
+ */
+
+#define __OS7_EXTERN_INLINE inline
+
+#define _OS7_SOURCE
+
+#include "sys/os7/compat.h"
+
+#define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $"
+#define OS7COMP_DEVICE		"OpenSS7 Compatibility"
+#define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define OS7COMP_LICENSE		"GPL"
+#define OS7COMP_BANNER		OS7COMP_DESCRIP		"\n" \
+				OS7COMP_COPYRIGHT	"\n" \
+				OS7COMP_REVISION	"\n" \
+				OS7COMP_DEVICE		"\n" \
+				OS7COMP_CONTACT		"\n"
+#define OS7COMP_SPLASH		OS7COMP_DEVICE		" - " \
+				OS7COMP_REVISION	"\n"
+
+#ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
+MODULE_AUTHOR(OS7COMP_CONTACT);
+MODULE_DESCRIPTION(OS7COMP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(OS7COMP_DEVICE);
+MODULE_LICENSE(OS7COMP_LICENSE);
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-os7compat");
+#endif
+#endif
+
+__OS7_EXTERN_INLINE void ss7_bufsrv(long data);
+EXPORT_SYMBOL(ss7_bufsrv);
+__OS7_EXTERN_INLINE void ss7_unbufcall(str_t * s);
+EXPORT_SYMBOL(ss7_unbufcall);
+__OS7_EXTERN_INLINE void ss7_bufcall(queue_t *q, size_t size, int prior);
+EXPORT_SYMBOL(ss7_bufcall);
+__OS7_EXTERN_INLINE void ss7_esbbcall(queue_t *q, int prior);
+EXPORT_SYMBOL(ss7_esbbcall);
+__OS7_EXTERN_INLINE mblk_t *ss7_allocb(queue_t *q, size_t size, int prior);
+EXPORT_SYMBOL(ss7_allocb);
+__OS7_EXTERN_INLINE mblk_t *ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior,
+					 frtn_t *frtn);
+EXPORT_SYMBOL(ss7_esballoc);
+__OS7_EXTERN_INLINE int ss7_pullupmsg(queue_t *q, mblk_t *mp, int size);
+EXPORT_SYMBOL(ss7_pullupmsg);
+__OS7_EXTERN_INLINE mblk_t *ss7_dupb(queue_t *q, mblk_t *bp);
+EXPORT_SYMBOL(ss7_dupb);
+__OS7_EXTERN_INLINE mblk_t *ss7_dupmsg(queue_t *q, mblk_t *bp);
+EXPORT_SYMBOL(ss7_dupmsg);
+__OS7_EXTERN_INLINE mblk_t *ss7_copyb(queue_t *q, mblk_t *bp);
+EXPORT_SYMBOL(ss7_copyb);
+__OS7_EXTERN_INLINE mblk_t *ss7_copymsg(queue_t *q, mblk_t *bp);
+EXPORT_SYMBOL(ss7_copymsg);
+
+__OS7_EXTERN_INLINE mblk_t *__ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
+EXPORT_SYMBOL(__ss7_fast_allocb);
+__OS7_EXTERN_INLINE mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
+EXPORT_SYMBOL(ss7_fast_allocb);
+__OS7_EXTERN_INLINE mblk_t *ss7_fast_allocb_bh(struct ss7_bufpool *pool, size_t size, int prior);
+EXPORT_SYMBOL(ss7_fast_allocb_bh);
+__OS7_EXTERN_INLINE void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(__ss7_fast_freeb);
+__OS7_EXTERN_INLINE void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(ss7_fast_freeb);
+__OS7_EXTERN_INLINE void ss7_fast_freeb_bh(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(ss7_fast_freeb_bh);
+__OS7_EXTERN_INLINE void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(__ss7_fast_freemsg);
+__OS7_EXTERN_INLINE void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(ss7_fast_freemsg);
+__OS7_EXTERN_INLINE void ss7_fast_freemsg_bh(struct ss7_bufpool *pool, mblk_t *mp);
+EXPORT_SYMBOL(ss7_fast_freemsg_bh);
+__OS7_EXTERN_INLINE void ss7_bufpool_init(struct ss7_bufpool *pool);
+EXPORT_SYMBOL(ss7_bufpool_init);
+__OS7_EXTERN_INLINE void ss7_bufpool_reserve(struct ss7_bufpool *pool, int n);
+EXPORT_SYMBOL(ss7_bufpool_reserve);
+__OS7_EXTERN_INLINE void ss7_bufpool_release(struct ss7_bufpool *pool, int n);
+EXPORT_SYMBOL(ss7_bufpool_release);
+__OS7_EXTERN_INLINE void ss7_bufpool_term(struct ss7_bufpool *pool);
+EXPORT_SYMBOL(ss7_bufpool_term);
+
+__OS7_EXTERN_INLINE void bufq_init(bufq_t * q);
+EXPORT_SYMBOL(bufq_init);
+__OS7_EXTERN_INLINE void bufq_lock(bufq_t * q);
+EXPORT_SYMBOL(bufq_lock);
+__OS7_EXTERN_INLINE void bufq_unlock(bufq_t * q);
+EXPORT_SYMBOL(bufq_unlock);
+__OS7_EXTERN_INLINE size_t bufq_length(bufq_t * q);
+EXPORT_SYMBOL(bufq_length);
+__OS7_EXTERN_INLINE size_t bufq_size(bufq_t * q);
+EXPORT_SYMBOL(bufq_size);
+__OS7_EXTERN_INLINE mblk_t *bufq_head(bufq_t * q);
+EXPORT_SYMBOL(bufq_head);
+__OS7_EXTERN_INLINE mblk_t *bufq_tail(bufq_t * q);
+EXPORT_SYMBOL(bufq_tail);
+__OS7_EXTERN_INLINE void __bufq_add(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(__bufq_add);
+__OS7_EXTERN_INLINE void __bufq_sub(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(__bufq_sub);
+__OS7_EXTERN_INLINE void __bufq_queue(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(__bufq_queue);
+__OS7_EXTERN_INLINE void bufq_queue(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(bufq_queue);
+__OS7_EXTERN_INLINE void bufq_queue_head(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(bufq_queue_head);
+__OS7_EXTERN_INLINE void bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np);
+EXPORT_SYMBOL(bufq_insert);
+__OS7_EXTERN_INLINE void bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np);
+EXPORT_SYMBOL(bufq_append);
+__OS7_EXTERN_INLINE mblk_t *__bufq_dequeue(bufq_t * q);
+EXPORT_SYMBOL(__bufq_dequeue);
+__OS7_EXTERN_INLINE mblk_t *bufq_dequeue(bufq_t * q);
+EXPORT_SYMBOL(bufq_dequeue);
+__OS7_EXTERN_INLINE mblk_t *__bufq_dequeue_tail(bufq_t * q);
+EXPORT_SYMBOL(__bufq_dequeue_tail);
+__OS7_EXTERN_INLINE mblk_t *bufq_dequeue_tail(bufq_t * q);
+EXPORT_SYMBOL(bufq_dequeue_tail);
+__OS7_EXTERN_INLINE mblk_t *__bufq_unlink(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(__bufq_unlink);
+__OS7_EXTERN_INLINE mblk_t *bufq_unlink(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(bufq_unlink);
+__OS7_EXTERN_INLINE void bufq_splice_head(bufq_t * q1, bufq_t * q2);
+EXPORT_SYMBOL(bufq_splice_head);
+__OS7_EXTERN_INLINE void bufq_splice_tail(bufq_t * q1, bufq_t * q2);
+EXPORT_SYMBOL(bufq_splice_tail);
+__OS7_EXTERN_INLINE void bufq_freehead(bufq_t * q);
+EXPORT_SYMBOL(bufq_freehead);
+__OS7_EXTERN_INLINE void bufq_purge(bufq_t * q);
+EXPORT_SYMBOL(bufq_purge);
+__OS7_EXTERN_INLINE void __bufq_supply(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(__bufq_supply);
+__OS7_EXTERN_INLINE void bufq_supply(bufq_t * q, mblk_t *mp);
+EXPORT_SYMBOL(bufq_supply);
+__OS7_EXTERN_INLINE mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount);
+EXPORT_SYMBOL(bufq_resupply);
+
+int ss7_trylockq(queue_t *q)
+{
+	int res;
+	str_t *s = STR_PRIV(q);
+	if (!(res = spin_trylock(&s->qlock))) {
+		if (q == s->iq)
+			s->iwait = q;
+		if (q == s->oq)
+			s->owait = q;
+	}
+	return (res);
+}
+
+EXPORT_SYMBOL(ss7_trylockq);
+
+void ss7_unlockq(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+	spin_unlock(&s->qlock);
+	if (s->iwait) {
+		if (s->iwait->q_qinfo && s->iwait->q_qinfo->qi_srvp)
+			qenable(xchg(&s->iwait, NULL));
+		else
+			ss7_isrv(xchg(&s->iwait, NULL));
+	}
+	if (s->owait) {
+		if (s->owait->q_qinfo && s->owait->q_qinfo->qi_srvp)
+			qenable(xchg(&s->owait, NULL));
+		else
+			ss7_osrv(xchg(&s->iwait, NULL));
+	}
+}
+
+EXPORT_SYMBOL(ss7_unlockq);
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  M_FLUSH Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+int ss7_w_flush(queue_t *q, mblk_t *mp)
+{
+	if (*mp->b_rptr & FLUSHW) {
+		if (*mp->b_rptr & FLUSHBAND)
+			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(WR(q), FLUSHALL);
+		if (q->q_next)
+			return (QR_PASSALONG);
+		*mp->b_rptr &= ~FLUSHW;
+	}
+	if (*mp->b_rptr & FLUSHR) {
+		if (*mp->b_rptr & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(RD(q), FLUSHALL);
+		if (!q->q_next)
+			return (QR_LOOP);
+		*mp->b_rptr &= ~FLUSHR;
+	}
+	return (QR_DONE);
+}
+
+EXPORT_SYMBOL(ss7_w_flush);
+
+int ss7_r_flush(queue_t *q, mblk_t *mp)
+{
+	if (*mp->b_rptr & FLUSHR) {
+		if (*mp->b_rptr & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(RD(q), FLUSHALL);
+		if (q->q_next)
+			return (QR_PASSALONG);
+		*mp->b_rptr &= ~FLUSHR;
+	}
+	if (*mp->b_rptr & FLUSHW) {
+		if (*mp->b_rptr & FLUSHBAND)
+			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+		else
+			flushq(WR(q), FLUSHALL);
+		if (!q->q_next)
+			return (QR_LOOP);
+		*mp->b_rptr &= ~FLUSHW;
+	}
+	return (QR_DONE);
+}
+
+EXPORT_SYMBOL(ss7_r_flush);
+
+/*
+ *  =========================================================================
+ *
+ *  PUT and SRV
+ *
+ *  =========================================================================
+ */
+
+/*
+ *  PUTQ Put Routine
+ *  -------------------------------------------------------------------------
+ */
+int ss7_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *))
+{
+	int rtn = 0, locked = 0;
+	ensure(q, return (-EFAULT));
+	ensure(mp, return (-EFAULT));
+	if (q->q_count && mp->b_datap->db_type < QPCTL) {
+		putq(q, mp);
+		return (0);
+	}
+	if ((locked = ss7_trylockq(q)) || mp->b_datap->db_type == M_FLUSH) {
+		do {
+			/* Fast Path */
+			if ((rtn = proc(q, mp)) == QR_DONE) {
+				freemsg(mp);
+				break;
+			}
+			switch (rtn) {
+			case QR_DONE:
+				freemsg(mp);
+			case QR_ABSORBED:
+				break;
+			case QR_STRIP:
+				if (mp->b_cont)
+					putq(q, mp->b_cont);
+			case QR_TRIMMED:
+				freeb(mp);
+				break;
+			case QR_LOOP:
+				if (!q->q_next) {
+					qreply(q, mp);
+					break;
+				}
+			case QR_PASSALONG:
+				if (q->q_next) {
+					putnext(q, mp);
+					break;
+				}
+				rtn = -EOPNOTSUPP;
+			default:
+				printd(("%s: %p: ERROR: (q dropping) %d\n",
+					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+				freemsg(mp);
+				break;
+			case QR_DISABLE:
+				putq(q, mp);
+				rtn = 0;
+				break;
+			case QR_PASSFLOW:
+				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+					putnext(q, mp);
+					break;
+				}
+			case -ENOBUFS:
+			case -EBUSY:
+			case -ENOMEM:
+			case -EAGAIN:
+				putq(q, mp);
+				break;
+			case QR_RETRY:
+				putq(q, mp);
+				break;
+			}
+		} while (0);
+		if (wakeup)
+			wakeup(q);
+		if (locked)
+			ss7_unlockq(q);
+	} else {
+		rare();
+		putq(q, mp);
+	}
+	return (rtn);
+}
+
+EXPORT_SYMBOL(ss7_putq);
+
+/*
+ *  SRVQ Service Routine
+ *  -------------------------------------------------------------------------
+ */
+int ss7_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), void (*wakeup) (queue_t *))
+{
+	int rtn = 0;
+	ensure(q, return (-EFAULT));
+	if (ss7_trylockq(q)) {
+		mblk_t *mp;
+		while ((mp = getq(q))) {
+			/* Fast Path */
+			if ((rtn = proc(q, mp)) == QR_DONE) {
+				freemsg(mp);
+				continue;
+			}
+			switch (rtn) {
+			case QR_DONE:
+				freemsg(mp);
+			case QR_ABSORBED:
+				continue;
+			case QR_STRIP:
+				if (mp->b_cont)
+					putbq(q, mp->b_cont);
+			case QR_TRIMMED:
+				freeb(mp);
+				continue;
+			case QR_LOOP:
+				if (!q->q_next) {
+					qreply(q, mp);
+					continue;
+				}
+			case QR_PASSALONG:
+				if (q->q_next) {
+					putnext(q, mp);
+					continue;
+				}
+				rtn = -EOPNOTSUPP;
+			default:
+				printd(("%s: %p: ERROR: (q dropping) %d\n",
+					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+				freemsg(mp);
+				continue;
+			case QR_DISABLE:
+				printd(("%s: %p: ERROR: (q disabling) %d\n",
+					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+				noenable(q);
+				putbq(q, mp);
+				rtn = 0;
+				break;
+			case QR_PASSFLOW:
+				if (mp->b_datap->db_type >= QPCTL || canputnext(q)) {
+					putnext(q, mp);
+					continue;
+				}
+			case -ENOBUFS:	/* proc must have scheduled bufcall */
+			case -EBUSY:	/* proc must have failed canput */
+			case -ENOMEM:	/* proc must have scheduled bufcall */
+			case -EAGAIN:	/* proc must re-enable on some event */
+				if (mp->b_datap->db_type < QPCTL) {
+					printd(("%s: %p: ERROR: (q stalled) %d\n",
+						q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+					putbq(q, mp);
+					break;
+				}
+				/* 
+				 *  Be careful not to put a priority
+				 *  message back on the queue.
+				 */
+				if (mp->b_datap->db_type == M_PCPROTO) {
+					mp->b_datap->db_type = M_PROTO;
+					mp->b_band = 255;
+					putq(q, mp);
+					break;
+				}
+				printd(("%s: %p: ERROR: (q dropping) %d\n",
+					q->q_qinfo->qi_minfo->mi_idname, q->q_ptr, rtn));
+				freemsg(mp);
+				continue;
+			case QR_RETRY:
+				putbq(q, mp);
+				continue;
+			}
+			break;
+		}
+		/* perform wakeups */
+		if (wakeup)
+			wakeup(q);
+		ss7_unlockq(q);
+	} else {
+		rare();
+	}
+	return (rtn);
+}
+
+EXPORT_SYMBOL(ss7_srvq);
+
+int ss7_oput(queue_t *q, mblk_t *mp)
+{
+	str_t *s = STR_PRIV(q);
+	if (s->oq) {
+		if (s->o_prim)
+			ss7_putq(s->oq, mp, s->o_prim, s->o_wakeup);
+		else
+			putq(s->oq, mp);
+	} else
+		putq(q, mp);
+	return (0);
+}
+
+EXPORT_SYMBOL(ss7_oput);
+
+int ss7_osrv(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+	if (s->oq) {
+		if (s->o_prim) {
+			ss7_srvq(s->oq, s->o_prim, s->o_wakeup);
+			return (0);
+		} else if (s->o_wakeup) {
+			s->o_wakeup(s->oq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
+
+EXPORT_SYMBOL(ss7_osrv);
+
+int ss7_iput(queue_t *q, mblk_t *mp)
+{
+	str_t *s = STR_PRIV(q);
+	if (s->iq) {
+		if (s->i_prim)
+			ss7_putq(s->iq, mp, s->i_prim, s->i_wakeup);
+		else
+			putq(s->iq, mp);
+	} else
+		putq(q, mp);
+	return (0);
+}
+
+EXPORT_SYMBOL(ss7_iput);
+
+int ss7_isrv(queue_t *q)
+{
+	str_t *s = STR_PRIV(q);
+	if (s->iq) {
+		if (s->i_prim) {
+			ss7_srvq(s->iq, s->i_prim, s->i_wakeup);
+			return (0);
+		} else if (s->i_wakeup) {
+			s->i_wakeup(s->iq);
+			return (0);
+		}
+	}
+	swerr();
+	noenable(q);
+	return (-EFAULT);
+}
+
+EXPORT_SYMBOL(ss7_isrv);
+
+__OS7_EXTERN_INLINE void ss7_do_timeout(caddr_t data, const char *timer, const char *mod,
+					ulong *timeo, int (*to_fnc) (struct head *),
+					void (*exp_func) (caddr_t));
+EXPORT_SYMBOL(ss7_do_timeout);
+__OS7_EXTERN_INLINE void ss7_stop_timer(struct head *h, const char *timer, const char *mod,
+					ulong *timeo);
+EXPORT_SYMBOL(ss7_stop_timer);
+__OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer, const char *mod,
+					 ulong *timeo, void (*exp_func) (caddr_t), ulong val);
+EXPORT_SYMBOL(ss7_start_timer);

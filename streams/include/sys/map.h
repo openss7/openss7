@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: map.h,v 0.9.2.5 2005/07/11 12:42:27 brian Exp $
+ @(#) $Id: map.h,v 0.9.2.6 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,81 +45,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_MAP_H
 #define _SYS_MAP_H
 
-#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/11 12:42:27 $"
+#ident "@(#) $RCSfile: map.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/12 14:06:21 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
 #endif				/* __KERNEL__ */
 
-#ifndef __EXTERN_INLINE
-#define __EXTERN_INLINE extern __inline__
-#endif				/* __EXTERN_INLINE */
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
 
-#include <linux/types.h>
+#include <sys/streams/map.h>
 
-struct map {
-	ulong m_size;			/* size of this segment in units */
-	ulong m_addr;			/* index of the base of this segment */
-};
-
-__EXTERN_INLINE struct map *mapstart(struct map *map)
-{
-	return (&map[2]);
-}
-__EXTERN_INLINE ulong mapfree(struct map *map)
-{
-	return map[0].m_size;
-}
-__EXTERN_INLINE ulong mapwant(struct map *map)
-{
-	return map[0].m_addr;
-}
-__EXTERN_INLINE char *mapname(struct map *map)
-{
-	return (char *) map[1].m_addr;
-}
-__EXTERN_INLINE ulong mapsize(struct map *map)
-{
-	return map[1].m_size;
-}
-
-void rminit(struct map *map, ulong mapsize);
-void mapinit(struct map *map, long size, ulong index, char *name, int mapsize);
-
-struct map *rmallocmap(size_t mapsize);
-struct map *rmallocmap_wait(size_t mapsize);
-void rmfreemap(struct map *map);
-
-/* ulong malloc(struct map *map, size_t size); */ /* GCC 3.4 hates this */
-ulong rmalloc(struct map *map, size_t size);
-ulong rmalloc_wait(struct map *map, size_t size);
-ulong rmalloc_locked(struct map *map, size_t size);
-
-void mfree(struct map *map, size_t size, ulong index);	/* also long for size */
-void rmfree(struct map *map, size_t size, ulong index);	/* also long for size */
-
-int rmget(struct map *map, size_t size, ulong index);	/* also long for size */
-
-__EXTERN_INLINE ulong rmwanted(struct map *map)
-{
-	return map[0].m_addr;
-}
-
-void rmsetwant(struct map *map);
-
-#if defined _OSF_SOURCE || defined _SUN_SOURCE
-#define rminit mapinit
-#define mapinit mapinit
-#elif defined _UW7_SOURCE || defined _UXP_SOURCE || defined _SUX_SOURCE
-#define rminit rminit
-#define mapinit rminit
-#endif
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
 
 #endif				/* _SYS_MAP_H */

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: osfddi.h,v 0.9.2.4 2005/07/05 22:46:05 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
@@ -45,54 +45,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:05 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.1  2005/07/12 13:54:42  brian
+ - changes for os7 compatibility and check pass
 
  *****************************************************************************/
 
-#ifndef __SYS_OSFDDI_H__
-#define __SYS_OSFDDI_H__
+#ifndef __SYS_IRIX_STREAM_H__
+#define __SYS_IRIX_STREAM_H__
 
-#ident "@(#) $RCSfile: osfddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/05 22:46:05 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+
+#ifndef __SYS_STREAM_H__
+#warning "Do not include sys/irix/stream.h directly, include sys/stream.h instead."
+#endif
 
 #ifndef __KERNEL__
-#error "Do not use kernel headers for user space programs"
-#endif				/* __KERNEL__ */
-
-#ifndef __OSF_EXTERN_INLINE
-#define __OSF_EXTERN_INLINE extern __inline__
-#endif				/* __OSF_EXTERN_INLINE */
-
-#ifndef _OSF_SOURCE
-#warning "_OSF_SOURCE not defined but osfddi.h,v included"
+#error "Do not include kernel header files in user space programs."
 #endif
 
-#if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
+#ifndef __IRIX_EXTERN_INLINE
+#define __IRIX_EXTERN_INLINE extern __inline__
 #endif
 
-extern int streams_close_comm(queue_t *, int, cred_t *);
-extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
-extern int streams_open_ocomm(dev_t, unsigned int, queue_t *, dev_t *, int, int, cred_t *);
-
-__OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp)
-{
-	put(q, mp);
-}
-__OSF_EXTERN_INLINE time_t lbolt(void)
-{
-	return jiffies;
-}
-__OSF_EXTERN_INLINE time_t time(void)
-{
-	struct timeval tv;
-	do_gettimeofday(&tv);
-	return tv.tv_sec;
-}
-
-#elif defined(_OSF_SOURCE)
-#warning "_OSF_SOURCE defined but not CONFIG_STREAMS_COMPAT_OSF"
+#ifndef _IRIX_SOURCE
+#warning "_IRIX_SOURCE not defined but IRIX stream.h included."
 #endif
 
-#endif				/* __SYS_OSFDDI_H__ */
+#include <sys/strcompat/config.h>
+
+#if defined CONFIG_STREAMS_COMPAT_IRIX || defined CONFIG_STREAMS_COMPAT_IRIX_MODULE
+
+#elif defined _IRIX_SOURCE
+#warning "_IRIX_SOURCE defined by not CONFIG_STREAMS_COMPAT_IRIX"
+#endif
+
+#endif				/* __SYS_IRIX_STREAM_H__ */

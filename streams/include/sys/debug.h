@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.6 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.7 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,44 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_DEBUG_H__
 #define __SYS_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 14:06:21 $"
 
-#include <linux/kernel.h>
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
 
-#ifdef ASSERT
-#undef ASSERT
-#endif				/* ASSERT */
+#include <sys/streams/debug.h>
 
-#ifdef assert
-#undef assert
-#endif				/* assert */
-
-#ifdef DEBUG
-
-/* the greater ASSERT does a panic */
-#define ASSERT(__exp) \
-	do { if (!(__exp)) \
-		panic("%s: ASSERT(" #__exp ") failed at " __FILE __ " +%d\n", __FUNCTION__, __LINE__); \
-	} while (0)
-
-/* the lesser assert does an oops */
-#define assert(__exp) \
-	do { if (!(__exp)) \
-		printk(KERN_EMERG "%s: assert(" #__exp ") failed at " __FILE __ " +%d\n", __FUNCTION__, __LINE__); \
-		*(int *)0 = 0; \
-	} while (0)
-#else				/* DEBUG */
-
-#define ASSERT(__exp)
-#define assert(__exp)
-
-#endif				/* DEBUG */
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
 
 #endif				/* __SYS_DEBUG_H__ */

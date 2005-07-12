@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.15 2005/07/05 22:46:08 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.16 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STRCONF_H__
-#define __SYS_STRCONF_H__
+#ifndef __SYS_STREAMS_STRCONF_H__
+#define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/05 22:46:08 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_STRCONF_H__
+#warn "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -106,4 +110,4 @@ extern int apush_get(struct strapush *sap);
 extern int apush_set(struct strapush *sap);
 extern int apush_vml(struct str_list *slp);
 
-#endif				/* __SYS_STRCONF_H__ */
+#endif				/* __SYS_STREAMS_STRCONF_H__ */

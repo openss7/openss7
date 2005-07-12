@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2005/07/12 14:06:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 14:06:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -714,7 +714,7 @@ lfs_compat_pages = \
 	man9/putnextctl1.9 \
 	man9/putnextctl2.9 \
 	man9/strlog.9 \
-	man9/vstrlog_hook.9
+	man9/vstrlog.9
 
 mac_compat_pages = \
 	man9/maccompat.9 \
@@ -1040,7 +1040,7 @@ man_MANS = \
 	man9/untimeout.9 \
 	man9/unweldq.9 \
 	man9/vcmn_err.9 \
-	man9/vstrlog_hook.9 \
+	man9/vstrlog.9 \
 	man9/weld_arg_t.9 \
 	man9/weld_fcn_t.9 \
 	man9/weldq.9 \
@@ -1705,7 +1705,7 @@ dist_noinst_lfs_compat_pages = \
 	man9/putnextctl1.9.man \
 	man9/putnextctl2.9.man \
 	man9/strlog.9.man \
-	man9/vstrlog_hook.9.man
+	man9/vstrlog.9.man
 
 dist_noinst_mac_compat_pages = \
 	man9/maccompat.9.man \
@@ -2030,7 +2030,7 @@ dist_noinst_MANS = \
 	man9/untimeout.9.man \
 	man9/unweldq.9.man \
 	man9/vcmn_err.9.man \
-	man9/vstrlog_hook.9.man \
+	man9/vstrlog.9.man \
 	man9/weld_arg_t.9.man \
 	man9/weld_fcn_t.9.man \
 	man9/weldq.9.man \

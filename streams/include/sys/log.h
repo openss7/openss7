@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.5 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.6 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _SYS_LOG_H
-#define _SYS_LOG_H
+#ifndef __SYS_LOG_H__
+#define __SYS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/12 14:06:21 $"
 
-#endif				/* _SYS_LOG_H */
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
+#endif				/* __BEGIN_DECLS */
+
+#include <sys/streams/log.h>
+
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
+#endif				/* __END_DECLS */
+
+#endif				/* __SYS_LOG_H__ */

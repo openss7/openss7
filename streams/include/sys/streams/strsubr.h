@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.26 2005/07/12 04:13:46 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.27 2005/07/12 14:06:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STRSUBR_H__
-#define __SYS_STRSUBR_H__
+#ifndef __SYS_STREAMS_STRSUBR_H__
+#define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/12 04:13:46 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/12 14:06:22 $"
+
+#ifndef __SYS_STRSUBR_H__
+#warn "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -595,9 +599,6 @@ extern int sefree(struct strevent *se);
 
 extern int sysctl_str_strctlsz;
 
-typedef int (*vstrlog_t) (short, short, char, unsigned short, char *, va_list);
-extern vstrlog_t vstrlog_hook;
-
 extern int register_clone(struct cdevsw *cdev);
 extern int unregister_clone(struct cdevsw *cdev);
 
@@ -608,4 +609,4 @@ extern int strwsrv(queue_t *q);
 
 extern struct file_operations strm_f_ops;
 
-#endif				/* __SYS_STRSUBR_H__ */
+#endif				/* __SYS_STREAMS_STRSUBR_H__ */

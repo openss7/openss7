@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lock.h,v 0.9.2.3 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: lock.h,v 0.9.2.4 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,46 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __OS7_LOCK_H__
 #define __OS7_LOCK_H__
 
-STATIC int ss7_osrv(queue_t *);
-STATIC int ss7_isrv(queue_t *);
-
-STATIC INLINE int
-ss7_trylockq(queue_t *q)
-{
-	int res;
-	str_t *s = STR_PRIV(q);
-	if (!(res = spin_trylock(&s->qlock))) {
-		if (q == s->iq)
-			s->iwait = q;
-		if (q == s->oq)
-			s->owait = q;
-	}
-	return (res);
-}
-STATIC INLINE void
-ss7_unlockq(queue_t *q)
-{
-	str_t *s = STR_PRIV(q);
-	spin_unlock(&s->qlock);
-	if (s->iwait) {
-		if (s->iwait->q_qinfo && s->iwait->q_qinfo->qi_srvp)
-			qenable(xchg(&s->iwait, NULL));
-		else
-			ss7_isrv(xchg(&s->iwait, NULL));
-	}
-	if (s->owait) {
-		if (s->owait->q_qinfo && s->owait->q_qinfo->qi_srvp)
-			qenable(xchg(&s->owait, NULL));
-		else
-			ss7_osrv(xchg(&s->iwait, NULL));
-	}
-}
+extern int ss7_trylockq(queue_t *q);
+extern void ss7_unlockq(queue_t *q);
 
 #endif				/* __OS7_LOCK_H__ */

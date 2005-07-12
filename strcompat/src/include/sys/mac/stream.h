@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: aixddi.h,v 0.9.2.8 2005/07/05 22:46:04 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
@@ -45,55 +45,43 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: stream.h,v $
+ Revision 0.9.2.1  2005/07/12 13:54:43  brian
+ - changes for os7 compatibility and check pass
 
  *****************************************************************************/
 
-#ifndef __SYS_AXIDDI_H__
-#define __SYS_AXIDDI_H__
+#ifndef __SYS_MAC_STREAM_H__
+#define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: aixddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:04 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+
+#ifndef __SYS_STREAM_H__
+#warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
+#endif
 
 #ifndef __KERNEL__
-#error "Do not use kernel headers for user space programs"
-#endif				/* __KERNEL__ */
-
-#ifndef __AIX_EXTERN_INLINE
-#define __AIX_EXTERN_INLINE extern __inline__
-#endif				/* __AIX_EXTERN_INLINE */
-
-#ifndef _AIX_SOURCE
-#warning "_AIX_SOURCE not defined but aixddi.h included"
+#error "Do not include kernel header files in user space programs."
 #endif
 
-#if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
+#ifndef __MAC_EXTERN_INLINE
+#define __MAC_EXTERN_INLINE extern __inline__
 #endif
 
-/* These are MPS definitions exposed by AIX, but implemented in mpscompat.c */
-extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag, cred_t *credp);
-extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
-extern caddr_t mi_next_ptr(caddr_t strptr);
-extern caddr_t mi_prev_ptr(caddr_t strptr);
-extern void mi_bufcall(queue_t *q, int size, int priority);
-
-#if LFS
-extern int wantio(queue_t *q, struct wantio *w);
-
-__AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
-{
-	if (!q->q_qinfo->qi_srvp) {
-		q->q_ftmsg = func;
-		return (1);
-	}
-	return (0);
-}
+#ifndef _MAC_SOURCE
+#warning "_MAC_SOURCE not defined but MAC stream.h included."
 #endif
 
-#elif defined(_AIX_SOURCE)
-#warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"
+#include <sys/strcompat/config.h>
+
+#if defined CONFIG_STREAMS_COMPAT_MAC || defined CONFIG_STREAMS_COMPAT_MAC_MODULE
+
+#elif defined _MAC_SOURCE
+#warning "_MAC_SOURCE defined by not CONFIG_STREAMS_COMPAT_MAC"
 #endif
 
-#endif				/* __SYS_AXIDDI_H__ */
+#endif				/* __SYS_MAC_STREAM_H__ */

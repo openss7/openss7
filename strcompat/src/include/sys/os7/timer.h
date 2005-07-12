@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.4 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -69,7 +69,7 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 	ss7_start_timer((struct head *)__o, # __t, __n, &__o->timers.__t, &__o ## _ ## __t ## _expiry, __o->__c.__t); \
 } \
 
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 	       int (*to_fnc) (struct head *), void (*exp_func) (caddr_t))
 {
@@ -99,7 +99,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, ulong *timeo,
 		*timeo = timeout(exp_func, data, 2);
 	}
 }
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 {
 	ulong to;
@@ -113,7 +113,7 @@ ss7_stop_timer(struct head *h, const char *timer, const char *mod, ulong *timeo)
 	}
 	return;
 }
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_start_timer(struct head *h, const char *timer, const char *mod, ulong *timeo,
 		void (*exp_func) (caddr_t), ulong val)
 {

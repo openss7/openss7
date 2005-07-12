@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.13 2005/07/11 13:31:54 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.14 2005/07/12 13:54:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 13:31:54 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_SVR4DDI_H__
-#define __SYS_SVR4DDI_H__
+#ifndef __SYS_SVR4_DDI_H__
+#define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/11 13:31:54 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 13:54:45 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __SVR4_EXTERN_INLINE */
 
 #ifndef _SVR4_SOURCE
-#warning "_SVR4_SOURCE not defined but svr4ddi.h,v included"
+#warning "_SVR4_SOURCE not defined but SVR4 ddi.h included"
 #define _SVR4_SOURCE 1
 #endif
 
@@ -357,4 +357,4 @@ extern void wakeup(caddr_t event);
 do { if (!(__exp)) { panic("assertion failed: " #__exp ", file: " __FILE__ ", line: %d\n", __LINE__); } } while(0)
 #endif
 
-#endif				/* __SYS_SVR4DDI_H__ */
+#endif				/* __SYS_SVR4_DDI_H__ */

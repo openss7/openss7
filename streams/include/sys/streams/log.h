@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.5 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.6 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef _SYS_LOG_H
-#define _SYS_LOG_H
+#ifndef __SYS_STREAMS_LOG_H__
+#define __SYS_STREAMS_LOG_H__
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/12 14:06:21 $"
 
-#endif				/* _SYS_LOG_H */
+#ifndef __SYS_LOG_H__
+#warn "Do no include sys/streams/log.h directly, include sys/log.h instead."
+#endif
+
+#ifndef __KERNEL__
+#error "Do not use kernel headers for user space programs"
+#endif				/* __KERNEL__ */
+
+#endif				/* __SYS_STREAMS_LOG_H__ */

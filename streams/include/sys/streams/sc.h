@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.7 2005/05/14 08:34:36 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.8 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_SC_H__
-#define __SYS_SC_H__
+#ifndef __SYS_STREAMS_SC_H__
+#define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/05/14 08:34:36 $"
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_SC_H__
+#warn "Do no include sys/streams/sc.h directly, include sys/sc.h instead."
+#endif
 
 #define SC_IOC_MAGIC 'C'
 #define SC_IOC_LIST ((SC_IOC_MAGIC << 8) | 0x01)
@@ -103,4 +107,4 @@ struct sc_list {
 	struct sc_mlist *sc_mlist;
 };
 
-#endif				/* __SYS_SC_H__ */
+#endif				/* __SYS_STREAMS_SC_H__ */

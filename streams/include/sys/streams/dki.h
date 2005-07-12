@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.9 2005/07/05 22:46:08 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.10 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,18 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_DKI_H__
-#define __SYS_DKI_H__ 1
+#ifndef __SYS_STREAMS_DKI_H__
+#define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:46:08 $"
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_DKI_H__
+#warn "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
+#endif
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -100,4 +104,4 @@ typedef struct lis_cred {
 	 ((__f)->f_flags & FNDELAY ? (O_NONBLOCK | O_NDELAY) : 0))
 
 
-#endif				/* __SYS_DKI_H__ */
+#endif				/* __SYS_STREAMS_DKI_H__ */

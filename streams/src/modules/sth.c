@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/09 21:55:23 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $";
 
 //#define __NO_VERSION__
 
@@ -92,7 +92,7 @@ static char const ident[] =
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2005/07/09 21:55:23 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2005/07/12 14:06:22 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3393,14 +3393,14 @@ int strrput(queue_t *q, mblk_t *mp)
 			strqset(q, QMAXPSZ, 0, so->so_maxpsz);
 		if (so->so_flags & SO_BAND) {
 			if (so->so_flags & SO_HIWAT)
-				strqset(q, QHIWAT, so->so_band, so->so_minpsz);
+				strqset(q, QHIWAT, so->so_band, so->so_hiwat);
 			if (so->so_flags & SO_LOWAT)
-				strqset(q, QLOWAT, so->so_band, so->so_minpsz);
+				strqset(q, QLOWAT, so->so_band, so->so_lowat);
 		} else {
 			if (so->so_flags & SO_HIWAT)
-				strqset(q, QHIWAT, 0, so->so_minpsz);
+				strqset(q, QHIWAT, 0, so->so_hiwat);
 			if (so->so_flags & SO_LOWAT)
-				strqset(q, QLOWAT, 0, so->so_minpsz);
+				strqset(q, QLOWAT, 0, so->so_lowat);
 		}
 		return (0);
 	}

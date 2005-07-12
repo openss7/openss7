@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/11 12:47:59 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/12 19:15:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:47:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_SVR3DDI_H__
-#define __SYS_SVR3DDI_H__
+#ifndef __SYS_SVR3_DDI_H__
+#define __SYS_SVR3_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/11 12:47:59 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 19:15:48 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -63,7 +63,7 @@
 #endif				/* __SVR3_EXTERN_INLINE */
 
 #ifndef _SVR3_SOURCE
-#warning "_SVR3_SOURCE not defined but svr4ddi.h,v included"
+#warning "_SVR3_SOURCE not defined but SVR3 ddi.h included"
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR3) || defined(CONFIG_STREAMS_COMPAT_SVR3_MODULE)
@@ -110,4 +110,4 @@ __SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t dsize, int type, u
 #warning "_SVR3_SOURCE defined but not CONFIG_STREAMS_COMPAT_SVR3"
 #endif				/* CONFIG_STREAMS_COMPAT_SVR3 */
 
-#endif				/* __SYS_SVR3DDI_H__ */
+#endif				/* __SYS_SVR3_DDI_H__ */

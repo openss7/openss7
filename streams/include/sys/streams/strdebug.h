@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.12 2005/05/14 08:34:37 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.13 2005/07/12 14:06:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ifndef __SYS_STRDEBUG_H__
-#define __SYS_STRDEBUG_H__
+#ifndef __SYS_STREAMS_STRDEBUG_H__
+#define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/05/14 08:34:37 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 14:06:21 $"
+
+#ifndef __SYS_STRDEBUG_H__
+#warn "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
+#endif
+
+#ifndef __KERNEL__
+#error "Do not use kernel headers for user space programs"
+#endif				/* __KERNEL__ */
 
 #undef  __never
 #define __never() \
@@ -270,4 +278,4 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 
 #endif
 
-#endif				/* __SYS_STRDEBUG_H__ */
+#endif				/* __SYS_STREAMS_STRDEBUG_H__ */

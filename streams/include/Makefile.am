@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/11 12:42:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/12 14:06:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 14:06:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,9 +74,24 @@ nobase_pkginclude_HEADERS = \
 	sys/stream.h \
 	sys/strlog.h \
 	sys/stropts.h \
-	sys/strsubr.h
+	sys/strsubr.h \
+	sys/streams/cmn_err.h \
+	sys/streams/ddi.h \
+	sys/streams/debug.h \
+	sys/streams/dki.h \
+	sys/streams/kmem.h \
+	sys/streams/log.h \
+	sys/streams/sad.h \
+	sys/streams/sc.h \
+	sys/streams/strconf.h \
+	sys/streams/strdebug.h \
+	sys/streams/stream.h \
+	sys/streams/strlog.h \
+	sys/streams/stropts.h \
+	sys/streams/strsubr.h
 
 nobase_nodist_pkginclude_HEADERS = \
+	sys/streams/config.h \
 	sys/streams/version.h
 
 if PERFORM_CHECKS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: allocb.h,v 0.9.2.4 2005/05/14 08:26:12 brian Exp $
+ @(#) $Id: allocb.h,v 0.9.2.5 2005/07/12 13:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:26:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -63,7 +63,7 @@
  *  BUFSRV call service routine
  *  -------------------------------------------------------------------------
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -96,7 +96,7 @@ ss7_bufsrv(long data)
  *  UNBUFCALL
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE void
+__OS7_EXTERN_INLINE void
 ss7_unbufcall(str_t * s)
 {
 	if (s->ibid) {
@@ -113,7 +113,7 @@ ss7_unbufcall(str_t * s)
  *  BUFCALL
  *  -------------------------------------------------------------------------
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
@@ -141,7 +141,7 @@ ss7_bufcall(queue_t *q, size_t size, int prior)
  *  ESBBCALL
  *  -------------------------------------------------------------------------
  */
-STATIC void
+__OS7_EXTERN_INLINE void
 ss7_esbbcall(queue_t *q, int prior)
 {
 	if (q) {
@@ -169,7 +169,7 @@ ss7_esbbcall(queue_t *q, int prior)
  *  ALLOCB
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
@@ -184,7 +184,7 @@ ss7_allocb(queue_t *q, size_t size, int prior)
  *  ESBALLOC
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
@@ -199,7 +199,7 @@ ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *fr
  *  PULLUPMSG
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE int
+__OS7_EXTERN_INLINE int
 ss7_pullupmsg(queue_t *q, mblk_t *mp, int size)
 {
 	if (pullupmsg(mp, size) != 0)
@@ -212,7 +212,7 @@ ss7_pullupmsg(queue_t *q, mblk_t *mp, int size)
  *  DUPB
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_dupb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -225,7 +225,7 @@ ss7_dupb(queue_t *q, mblk_t *bp)
  *  DUPMSG
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -238,7 +238,7 @@ ss7_dupmsg(queue_t *q, mblk_t *bp)
  *  COPYB
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_copyb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -251,7 +251,7 @@ ss7_copyb(queue_t *q, mblk_t *bp)
  *  COPYMSG
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 ss7_copymsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;

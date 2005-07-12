@@ -1,0 +1,421 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: os7compat.9.man,v 0.9.2.1 2005/07/12 13:54:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/12 13:54:39 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so strcompat.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH OS7COMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B os7compat
+\- OpenSS7 \fISTREAMS\fR Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _OS7_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B Linux Fast-STREAMS
+provides a compatibility module,
+.BR streams-os7compat.o ,
+that provides compatibility functions that smooth porting of drivers from the
+.I OpenSS7
+.I STREAMS
+environment to
+.BR "Linux Fast-STREAMS" .
+The functions provided by this compatibility module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+None of the functions that are provided by
+.I OpenSS7
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "Linux Fast-STREAMS" .
+Other
+.I OpenSS7
+functions are provided by the
+.B streams-os7compat.o
+compatibility kernel module.
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast STREAMS
+are as follows:
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B Linux Fast-STREAMS
+.I OpenSS7
+compatibility module,
+.BR streams-os7compat.o ,
+are as follows:
+.HP
+.BR bufq_append (9)\ \-\ \c
+.PD 0
+.HP
+.BR bufq_dequeue (9)\ \-\ \c
+.HP
+.BR bufq_dequeue_tail (9)\ \-\ \c
+.HP
+.BR bufq_freehead (9)\ \-\ \c
+.HP
+.BR bufq_head (9)\ \-\ \c
+.HP
+.BR bufq_init (9)\ \-\ \c
+.HP
+.BR bufq_insert (9)\ \-\ \c
+.HP
+.BR bufq_length (9)\ \-\ \c
+.HP
+.BR bufq_lock (9)\ \-\ \c
+.HP
+.BR bufq_purge (9)\ \-\ \c
+.HP
+.BR bufq_queue (9)\ \-\ \c
+.HP
+.BR bufq_queue_head (9)\ \-\ \c
+.HP
+.BR bufq_resupply (9)\ \-\ \c
+.HP
+.BR bufq_size (9)\ \-\ \c
+.HP
+.BR bufq_splice_head (9)\ \-\ \c
+.HP
+.BR bufq_splice_tail (9)\ \-\ \c
+.HP
+.BR bufq_supply (9)\ \-\ \c
+.HP
+.BR bufq_tail (9)\ \-\ \c
+.HP
+.BR bufq_unlink (9)\ \-\ \c
+.HP
+.BR bufq_unlock (9)\ \-\ \c
+.HP
+.BR ss7_allocb (9)\ \-\ \c
+.HP
+.BR ss7_bufcall (9)\ \-\ \c
+.HP
+.BR ss7_bufpool_init (9)\ \-\ \c
+.HP
+.BR ss7_bufpool_release (9)\ \-\ \c
+.HP
+.BR ss7_bufpool_reserve (9)\ \-\ \c
+.HP
+.BR ss7_bufpool_term (9)\ \-\ \c
+.HP
+.BR ss7_bufsrv (9)\ \-\ \c
+.HP
+.BR ss7_copyb (9)\ \-\ \c
+.HP
+.BR ss7_copymsg (9)\ \-\ \c
+.HP
+.BR ss7_do_timeout (9)\ \-\ \c
+.HP
+.BR ss7_dupb (9)\ \-\ \c
+.HP
+.BR ss7_dupmsg (9)\ \-\ \c
+.HP
+.BR ss7_esballoc (9)\ \-\ \c
+.HP
+.BR ss7_esbbcall (9)\ \-\ \c
+.HP
+.BR ss7_fast_allocb (9)\ \-\ \c
+.HP
+.BR ss7_fast_allocb_bh (9)\ \-\ \c
+.HP
+.BR ss7_fast_freeb (9)\ \-\ \c
+.HP
+.BR ss7_fast_freeb_bh (9)\ \-\ \c
+.HP
+.BR ss7_fast_freemsg (9)\ \-\ \c
+.HP
+.BR ss7_fast_freemsg_bh (9)\ \-\ \c
+.HP
+.BR ss7_iput (9)\ \-\ \c
+.HP
+.BR ss7_isrv (9)\ \-\ \c
+.HP
+.BR ss7_oput (9)\ \-\ \c
+.HP
+.BR ss7_osrv (9)\ \-\ \c
+.HP
+.BR ss7_pullupmsg (9)\ \-\ \c
+.HP
+.BR ss7_putq (9)\ \-\ \c
+.HP
+.BR ss7_r_flush (9)\ \-\ \c
+.HP
+.BR ss7_srvq (9)\ \-\ \c
+.HP
+.BR ss7_start_timer (9)\ \-\ \c
+.HP
+.BR ss7_stop_timer (9)\ \-\ \c
+.HP
+.BR ss7_trylockq (9)\ \-\ \c
+.HP
+.BR ss7_unbufcall (9)\ \-\ \c
+.HP
+.BR ss7_unlockq (9)\ \-\ \c
+.HP
+.BR ss7_w_flush (9)\ \-\ \c
+.PD
+.\"
+.SS "Transport Functions"
+.PP
+.PD 0
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+These are
+.IR OpenSS7 -specific
+functions:
+.B _OS7_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B Linux Fast-STREAMS
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_OS7
+or
+.B CONFIG_STREAMS_COMPAT_OS7_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.PP
+Compatibility functions:
+.BR bufq_append (9),
+.BR bufq_dequeue (9),
+.BR bufq_dequeue_tail (9),
+.BR bufq_freehead (9),
+.BR bufq_head (9),
+.BR bufq_init (9),
+.BR bufq_insert (9),
+.BR bufq_length (9),
+.BR bufq_lock (9),
+.BR bufq_purge (9),
+.BR bufq_queue (9),
+.BR bufq_queue_head (9),
+.BR bufq_resupply (9),
+.BR bufq_size (9),
+.BR bufq_splice_head (9),
+.BR bufq_splice_tail (9),
+.BR bufq_supply (9),
+.BR bufq_tail (9),
+.BR bufq_unlink (9),
+.BR bufq_unlock (9),
+.BR ss7_allocb (9),
+.BR ss7_bufcall (9),
+.BR ss7_bufpool_init (9),
+.BR ss7_bufpool_release (9),
+.BR ss7_bufpool_reserve (9),
+.BR ss7_bufpool_term (9),
+.BR ss7_bufsrv (9),
+.BR ss7_copyb (9),
+.BR ss7_copymsg (9),
+.BR ss7_do_timeout (9),
+.BR ss7_dupb (9),
+.BR ss7_dupmsg (9),
+.BR ss7_esballoc (9),
+.BR ss7_esbbcall (9),
+.BR ss7_fast_allocb (9),
+.BR ss7_fast_allocb_bh (9),
+.BR ss7_fast_freeb (9),
+.BR ss7_fast_freeb_bh (9),
+.BR ss7_fast_freemsg (9),
+.BR ss7_fast_freemsg_bh (9),
+.BR ss7_iput (9),
+.BR ss7_isrv (9),
+.BR ss7_oput (9),
+.BR ss7_osrv (9),
+.BR ss7_pullupmsg (9),
+.BR ss7_putq (9),
+.BR ss7_r_flush (9),
+.BR ss7_srvq (9),
+.BR ss7_start_timer (9),
+.BR ss7_stop_timer (9),
+.BR ss7_trylockq (9),
+.BR ss7_unbufcall (9),
+.BR ss7_unlockq (9),
+.BR ss7_w_flush (9).
+.PP
+Transport functions:
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.I OpenSS7
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+These are
+.IR OpenSS7 -specific
+functions and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+These functions
+are provided for source level compatibility with
+.I OpenSS7
+for the purpose of porting
+.I OpenSS7
+drivers to
+.BR Linux .
+.IP \(em
+These functions
+only provide functionality comparable to
+.I OpenSS7
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+these functions
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I OpenSS7
+DDI documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR OpenSS7 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
