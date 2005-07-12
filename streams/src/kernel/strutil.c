@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:42:28 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 04:13:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $"
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:28 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:47 $";
 
 #include <linux/config.h>
 #include <linux/module.h>
@@ -743,6 +743,8 @@ void qbackenable(queue_t *q)
 	hrunlock(q);
 	return;
 }
+
+EXPORT_SYMBOL(qbackenable);
 
 /*
  *  __bcangetany:
@@ -1898,6 +1900,8 @@ void qdelete(queue_t *q)
 	qput(&q);
 	sd_put(sd);
 }
+
+EXPORT_SYMBOL(qdelete);
 
 /**
  *  qdetach:	- detach a queue pair from a stream

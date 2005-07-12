@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.8 2005/07/11 12:42:27 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.9 2005/07/12 04:13:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -54,7 +54,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 1997-2005  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -63,6 +63,15 @@ __BEGIN_DECLS
 #endif
 
 #include <sys/stropts.h>
+
+#if 0
+/* Perform the I/O control operation specified by REQUEST on FD.
+   One argument may follow; its presence and type depend on REQUEST.
+   Return value depends on REQUEST.  Usually -1 indicates error.  */
+extern int ioctl (int __fd, unsigned long int __request, ...) __THROW;
+#endif
+
+#include <sys/ioctl.h>
 
 /* Test whether FILDES is associated with a STREAM-based file.  */
 extern int isastream (int __fildes) __THROW;
@@ -83,11 +92,6 @@ extern int getmsg (int __fildes, struct strbuf *__restrict __ctlptr,
 extern int getpmsg (int __fildes, struct strbuf *__restrict __ctlptr,
 		    struct strbuf *__restrict __dataptr,
 		    int *__restrict __bandp, int *__restrict __flagsp);
-
-/* Perform the I/O control operation specified by REQUEST on FD.
-   One argument may follow; its presence and type depend on REQUEST.
-   Return value depends on REQUEST.  Usually -1 indicates error.  */
-extern int ioctl (int __fd, unsigned long int __request, ...) __THROW;
 
 /* Send a message on a STREAM.
 

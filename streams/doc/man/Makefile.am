@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2005/07/11 12:42:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2005/07/12 04:13:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -806,7 +806,6 @@ man_MANS = \
 	man9/allocb.9 \
 	man9/alloclk.9 \
 	man9/allocq.9 \
-	man9/allocqb.9 \
 	man9/allocstr.9 \
 	man9/appq.9 \
 	man9/apush_get.9 \
@@ -904,11 +903,9 @@ man_MANS = \
 	man9/fmodsw_list.9 \
 	man9/fmodsw_lock.9 \
 	man9/freeb.9 \
-	man9/freechain.9 \
 	man9/freelk.9 \
 	man9/freemsg.9 \
 	man9/freeq.9 \
-	man9/freeqb.9 \
 	man9/freestr.9 \
 	man9/freezestr.9 \
 	man9/frtn_t.9 \
@@ -932,8 +929,6 @@ man_MANS = \
 	man9/makedevice.9 \
 	man9/max.9 \
 	man9/mblk_t.9 \
-	man9/mdbblock_alloc.9 \
-	man9/mdbblock_free.9 \
 	man9/min.9 \
 	man9/minor_t.9 \
 	man9/modID_t.9 \
@@ -960,7 +955,6 @@ man_MANS = \
 	man9/putnextctl2.9 \
 	man9/putnextctl.9 \
 	man9/putq.9 \
-	man9/qallocb.9 \
 	man9/qattach.9 \
 	man9/qbackenable.9 \
 	man9/qband.9 \
@@ -990,8 +984,6 @@ man_MANS = \
 	man9/queinfo.9 \
 	man9/queue.9 \
 	man9/queue_t.9 \
-	man9/qwait.9 \
-	man9/qwait_sig.9 \
 	man9/RD.9 \
 	man9/register_clone.9 \
 	man9/register_cmajor.9 \
@@ -1800,7 +1792,6 @@ dist_noinst_MANS = \
 	man9/allocb.9.man \
 	man9/alloclk.9.man \
 	man9/allocq.9.man \
-	man9/allocqb.9.man \
 	man9/allocstr.9.man \
 	man9/appq.9.man \
 	man9/apush_get.9.man \
@@ -1899,11 +1890,9 @@ dist_noinst_MANS = \
 	man9/fmodsw_list.9.man \
 	man9/fmodsw_lock.9.man \
 	man9/freeb.9.man \
-	man9/freechain.9.man \
 	man9/freelk.9.man \
 	man9/freemsg.9.man \
 	man9/freeq.9.man \
-	man9/freeqb.9.man \
 	man9/freestr.9.man \
 	man9/freezestr.9.man \
 	man9/frtn_t.9.man \
@@ -1928,8 +1917,6 @@ dist_noinst_MANS = \
 	man9/makedevice.9.man \
 	man9/max.9.man \
 	man9/mblk_t.9.man \
-	man9/mdbblock_alloc.9.man \
-	man9/mdbblock_free.9.man \
 	man9/min.9.man \
 	man9/minor_t.9.man \
 	man9/modID_t.9.man \
@@ -1957,7 +1944,6 @@ dist_noinst_MANS = \
 	man9/putnextctl2.9.man \
 	man9/putnextctl.9.man \
 	man9/putq.9.man \
-	man9/qallocb.9.man \
 	man9/qattach.9.man \
 	man9/qbackenable.9.man \
 	man9/qband.9.man \
@@ -1987,8 +1973,6 @@ dist_noinst_MANS = \
 	man9/queinfo.9.man \
 	man9/queue.9.man \
 	man9/queue_t.9.man \
-	man9/qwait.9.man \
-	man9/qwait_sig.9.man \
 	man9/RD.9.man \
 	man9/register_clone.9.man \
 	man9/register_cmajor.9.man \

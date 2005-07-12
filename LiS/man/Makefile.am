@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.10 $) $Date: 2005/07/11 12:24:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.11 $) $Date: 2005/07/12 04:18:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/11 12:24:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/12 04:18:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1379,6 +1379,16 @@ dist_noinst_MANS = \
 	man9/xmsgsize.9.man
 
 ## PKG_BUILD_INDEP
+endif
+
+if PERFORM_CHECKS
+## PERFORM_CHECKS
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
+TESTS_ENVIRONMENT	+= PKG_MANPATH='$(PKG_MANPATH)' \
+			   mandir='$(mandir)'
+CLEANFILES		+= $(top_builddir)/check_decls.log
+DISTCLEANFILES		+= *.err *.out
+## PERFORM_CHECKS
 endif
 
 include ../am/man.am

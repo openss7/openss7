@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.25 2005/07/11 12:42:27 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.26 2005/07/12 04:13:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/11 12:42:27 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STRSUBR_H__
 #define __SYS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/11 12:42:27 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/12 04:13:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -507,11 +507,13 @@ struct mdbblock {
 };
 
 /* from strsched.c */
+#if 0
 extern void mdbblock_free(mblk_t *mp);
 extern mblk_t *mdbblock_alloc(uint priority, void *func);
 extern void freechain(mblk_t *mp, mblk_t **mpp);
 extern struct qband *allocqb(void);
 extern void freeqb(qband_t *qb);
+#endif
 
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */

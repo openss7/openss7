@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.34 2005/07/04 20:21:58 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.35 2005/07/12 04:13:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:21:58 $ by $Author: brian $
+ Last Modified $Date: 2005/07/12 04:13:46 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/04 20:21:58 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/12 04:13:46 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -126,8 +126,6 @@ typedef unsigned long __streams_dev_t;
 #ifndef FEXCL
 #define FEXCL O_EXCL
 #endif
-
-extern int nstrpush;
 
 /* 
  *  strdata - qinit structure stream head read
@@ -907,7 +905,6 @@ extern int qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp);
 extern int qpop(struct stdata *sd, int oflag, cred_t *crp);
 extern int qpush(struct stdata *sd, const char *name, dev_t *devp, int oflag, cred_t *crp);
 extern int qready(void);
-extern int qwait_sig(queue_t *q);
 extern int strqget(queue_t *q, qfields_t what, unsigned char band, long *val);
 extern int strqset(queue_t *q, qfields_t what, unsigned char band, long val);
 extern int weldq(queue_t *, queue_t *, queue_t *, queue_t *, weld_fcn_t, weld_arg_t, queue_t *);
@@ -921,7 +918,6 @@ extern mblk_t *dupmsg(mblk_t *mp);
 extern mblk_t *esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo);
 extern mblk_t *getq(queue_t *q);
 extern mblk_t *msgpullup(mblk_t *mp, ssize_t len);
-extern mblk_t *qallocb(queue_t *q, size_t size, unsigned int priority);
 
 extern modID_t getmid(const char *name);
 extern qi_qadmin_t getadmin(modID_t modid);
@@ -941,7 +937,6 @@ extern void qinsert(queue_t *brq, queue_t *irq);
 extern void qprocsoff(queue_t *q);
 extern void qprocson(queue_t *q);
 extern void unbufcall(bcid_t bcid);
-extern void qwait(queue_t *q);
 extern void rmvq(queue_t *q, mblk_t *mp);
 extern void setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
 extern void setqsched(void);
