@@ -79,16 +79,17 @@
  * value for the convenience of constructs such as ptr = lis_free_mem(ptr).
  * Also, the mem_area argument to lis_free_mem can be NULL.
  */
-void	*lis_alloc_atomic_fcn(int nbytes, char *file, int line) _RP;
-void	*lis_alloc_kernel_fcn(int nbytes, char *file, int line) _RP;
-void	*lis_alloc_dma_fcn(int nbytes, char *file, int line) _RP;
-void	*lis_free_mem_fcn(void *mem_area, char *file, int line) _RP;
-void	*lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)_RP;
-void	*lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line) _RP;
-void	*lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) _RP;
-void	*lis_free_pages_fcn(void *ptr, char *file, int line) _RP;
-#if __LIS_INTERNAL__
-void	 lis_free_all_pages(void) _RP;	/* internal cleanup routine */
+void *lis_alloc_atomic_fcn(int nbytes, char *file, int line);
+void *lis_alloc_kernel_fcn(int nbytes, char *file, int line);
+void *lis_alloc_dma_fcn(int nbytes, char *file, int line);
+void *lis_free_mem_fcn(void *mem_area, char *file, int line);
+void *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line);
+void *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line);
+void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line);
+void *lis_free_pages_fcn(void *ptr, char *file, int line);
+
+#ifdef __LIS_INTERNAL__
+void lis_free_all_pages(void);		/* internal cleanup routine */
 #endif
 
 /*
@@ -108,6 +109,5 @@ void	 lis_free_all_pages(void) _RP;	/* internal cleanup routine */
 #define	lis_get_free_pages_atomic(n)	lis_get_free_pages_atomic_fcn((n), \
 							__FILE__, __LINE__)
 #define	lis_free_pages(p)	lis_free_pages_fcn((p), __FILE__, __LINE__)
-
 
 #endif				/* SYS_LISPCI_H from top of file */

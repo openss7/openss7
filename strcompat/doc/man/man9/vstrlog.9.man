@@ -1,0 +1,1 @@
+.so man9/strlog.9.man

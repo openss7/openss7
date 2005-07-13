@@ -67,26 +67,22 @@
 
 #define MAXB 100
 
-static struct module_info log_minfo =
-{
-		0, "strlog", 0, INFPSZ, 0, 0
+static struct module_info log_minfo = {
+	0, "strlog", 0, INFPSZ, 0, 0
 };
 
-static int _RP log_open (), _RP log_close ();
-static int _RP log_wput (), _RP log_rput ();
+static int log_open(), log_close();
+static int log_wput(), log_rput();
 
-static struct qinit log_rinit =
-{
-		log_rput, NULL, log_open, log_close, NULL, &log_minfo, NULL
+static struct qinit log_rinit = {
+	log_rput, NULL, log_open, log_close, NULL, &log_minfo, NULL
 };
 
-static struct qinit log_winit =
-{
-		log_wput, NULL, NULL, NULL, NULL, &log_minfo, NULL
+static struct qinit log_winit = {
+	log_wput, NULL, NULL, NULL, NULL, &log_minfo, NULL
 };
 
-struct streamtab log_info =
-{&log_rinit, &log_winit, NULL, NULL};
+struct streamtab log_info = { &log_rinit, &log_winit, NULL, NULL };
 
 #define NLOG 10
 static struct log {
@@ -96,22 +92,21 @@ static struct log {
 
 static int log_cnt = NLOG;
 
-
-static int _RP
-log_open (queue_t * q, int dev, int flag, int sflag
+static int
+log_open(queue_t *q, int dev, int flag, int sflag
 #ifdef DO_ADDERROR
-		,int *err
+	 , int *err
 #endif
-)
+    )
 {
 	struct log *log;
 
 #ifdef DO_STREAMDEBUG
-	logme ();
+	logme();
 #endif
 	if (q->q_ptr) {
 		if (0)
-			printf ("Log: already open?\n");
+			printf("Log: already open?\n");
 		return 0;
 	}
 	for (dev = 0; dev < log_cnt; dev++) {
@@ -120,81 +115,78 @@ log_open (queue_t * q, int dev, int flag, int sflag
 	}
 
 	if (dev >= log_cnt) {
-		printf ("log: all %d devices allocated\n", log_cnt);
+		printf("log: all %d devices allocated\n", log_cnt);
 		return OPENFAIL;
 	}
 	log = &log_log[dev];
-	WR (q)->q_ptr = (char *) log;
+	WR(q)->q_ptr = (char *) log;
 	q->q_ptr = (char *) log;
 
 	log->flags = LOG_INUSE | LOG_READ | LOG_WRITE;
-	log->nr = minor (dev);
+	log->nr = minor(dev);
 	if (1)
-		printf ("Log driver %d opened.\n", dev);
+		printf("Log driver %d opened.\n", dev);
 
 	return 0;
 }
 
-
 #if 0
 void
-log_printtcp (struct log *log, mblk_t * mp, char wr)
+log_printtcp(struct log *log, mblk_t *mp, char wr)
 {
 	register struct ip *ip;
 	register uint_t hlen;
 	register struct tcphdr *oth;
 	register struct tcphdr *th;
 
-	register mblk_t *mq = dupmsg (mp);
+	register mblk_t *mq = dupmsg(mp);
 
 	if (wr)
 		wr = 'w';
 	else
 		wr = 'r';
 
-	mp = pullup (mq, 128);
+	mp = pullup(mq, 128);
 	if (mp == NULL) {
-		freemsg (mq);
-		printf ("Log%cN %d ", wr);
+		freemsg(mq);
+		printf("Log%cN %d ", wr);
 		return;
 	}
 	ip = (struct ip *) mp->b_rptr;
 	hlen = ip->ip_hl;
 
-
-	if (ip->ip_p != IPPROTO_TCP
-			|| (ip->ip_off & htons (0x3fff)) || mq->b_wptr - mq->b_rptr < 40) {
-		freemsg (mp);
-		printf ("Log%cT %x", wr, ip->ip_p);
+	if (ip->ip_p != IPPROTO_TCP || (ip->ip_off & htons(0x3fff)) || mq->b_wptr - mq->b_rptr < 40) {
+		freemsg(mp);
+		printf("Log%cT %x", wr, ip->ip_p);
 		return;
 	}
-	th = (struct tcphdr *) & ((unchar *) ip)[hlen << 2];
+	th = (struct tcphdr *) &((unchar *) ip)[hlen << 2];
 	if (wr == 'w') {
-		printf ("TCP %x.%x ", th->th_seq, dsize (mp) - th->th_off);
+		printf("TCP %x.%x ", th->th_seq, dsize(mp) - th->th_off);
 	} else {
-		printf ("TCP %x ", th->th_ack);
+		printf("TCP %x ", th->th_ack);
 	}
-	freemsg (mp);
+	freemsg(mp);
 }
 
 #endif
 
 void
-log_printmsg (struct log *log, const char *text, mblk_t * mp)
+log_printmsg(struct log *log, const char *text, mblk_t *mp)
 {
-	int ms = splstr ();
+	int ms = splstr();
 
 #ifdef DO_STREAMDEBUG
-	logme ();
+	logme();
 #endif
 	if (log != NULL) {
 #if 0
 		if (log - log_log != 0 && mp->b_datap->db_type == M_DATA)
 			return;
 #endif
-		printf ("Log %d: ", log - log_log);
+		printf("Log %d: ", log - log_log);
 	}
-	printf ("%s", text);
+	printf("%s", text);
 
 	{
 		mblk_t *mp1;
@@ -306,31 +298,33 @@ log_printmsg (struct log *log, const char *text, mblk_t * mp)
 #endif
 #endif
 			default:
-				printf (":%d:", mp1->b_datap->db_type);
-				name = "unknown"; /* ,mp->b_datap->db_type); */
+				printf(":%d:", mp1->b_datap->db_type);
+				name = "unknown";	/* ,mp->b_datap->db_type); */
 				break;
 			}
-			printf ("; %s: %x.%x.%d", name, mp1, mp1->b_datap, mp1->b_wptr - mp1->b_rptr);
+			printf("; %s: %x.%x.%d", name, mp1, mp1->b_datap,
+			       mp1->b_wptr - mp1->b_rptr);
 			if (nblocks == MAXB) {
-				printf ("\n*** Block 0x%x pointed to 0x%x", mp1, mp1->b_cont);
+				printf("\n*** Block 0x%x pointed to 0x%x", mp1, mp1->b_cont);
 				mp1->b_cont = NULL;
 			} else {
 				int j;
 
 				for (j = 0; j < nblocks; j++) {
 					if (mp1->b_cont == blocks[j]) {
-						printf ("\n*** Block 0x%x circled to 0x%x (%d)", mp1, mp1->b_cont, j);
+						printf("\n*** Block 0x%x circled to 0x%x (%d)", mp1,
+						       mp1->b_cont, j);
 						mp1->b_cont = NULL;
 					}
 				}
 			}
 		}
 	}
-	printf ("\n");
+	printf("\n");
 	{
 		int j;
 		mblk_t *mp1;
-		const char ctab[]= "0123456789abcdef";
+		const char ctab[] = "0123456789abcdef";
 
 #define BLOCKSIZE 0x10
 		for (j = 0, mp1 = mp; mp1 != NULL; mp1 = mp1->b_cont, j++) {
@@ -338,99 +332,99 @@ log_printmsg (struct log *log, const char *text, mblk_t * mp)
 			unchar *dp;
 			unchar x;
 
-			for (i = 0, dp = (unchar *) mp1->b_rptr; dp < (unchar *) mp1->b_wptr; dp += BLOCKSIZE) {
+			for (i = 0, dp = (unchar *) mp1->b_rptr; dp < (unchar *) mp1->b_wptr;
+			     dp += BLOCKSIZE) {
 				int k;
 				int l = (unchar *) mp1->b_wptr - dp;
 
-				printf ("    ");
+				printf("    ");
 				for (k = 0; k < BLOCKSIZE && k < l; k++)
-					printf ("%c%c ", ctab[dp[k] >> 4], ctab[dp[k] & 0x0F]);
+					printf("%c%c ", ctab[dp[k] >> 4], ctab[dp[k] & 0x0F]);
 				for (; k < BLOCKSIZE; k++)
-					printf ("   ");
-				printf (" : ");
+					printf("   ");
+				printf(" : ");
 				for (k = 0; k < BLOCKSIZE && k < l; k++)
 					if (dp[k] > 31 && dp[k] < 127)
-						printf ("%c", dp[k]);
+						printf("%c", dp[k]);
 					else
-						printf (".");
+						printf(".");
 				if (k < l)
-					printf (" +\n");
+					printf(" +\n");
 				else if (mp1->b_cont != NULL) {
 					for (; k < BLOCKSIZE; k++)
-						printf (" ");
-					printf (" -\n");
+						printf(" ");
+					printf(" -\n");
 				} else
-					printf ("\n");
+					printf("\n");
 			}
 		}
 	}
-	splx (ms);
+	splx(ms);
 }
 
-static int _RP
-log_wput (queue_t * q, mblk_t * mp)
+static int
+log_wput(queue_t *q, mblk_t *mp)
 {
 	register struct log *log;
 
 #ifdef DO_STREAMDEBUG
-	logme ();
+	logme();
 #endif
 	log = (struct log *) q->q_ptr;
 
 	if (log->flags & LOG_WRITE) {
 #if 0
 		if (*mp->b_rptr == 0x45)
-			log_printtcp (log, mp, 1);
+			log_printtcp(log, mp, 1);
 		else
 #endif
-			log_printmsg (log, "write", mp);
+			log_printmsg(log, "write", mp);
 		switch (mp->b_datap->db_type) {
 		default:{
-				break;
-			}
+			break;
+		}
 		}
 	}
-	putnext (q, mp);
+	putnext(q, mp);
 	return 0;
 }
 
-static int _RP
-log_rput (queue_t * q, mblk_t * mp)
+static int
+log_rput(queue_t *q, mblk_t *mp)
 {
 	register struct log *log;
 
 #ifdef DO_STREAMDEBUG
-	logme ();
+	logme();
 #endif
 	log = (struct log *) q->q_ptr;
 
 	if (log->flags & LOG_READ) {
 #if 0
 		if (*mp->b_rptr == 0x45)
-			log_printtcp (log, mp, 0);
+			log_printtcp(log, mp, 0);
 		else
 #endif
-			log_printmsg (log, "read", mp);
+			log_printmsg(log, "read", mp);
 	}
-	putnext (q, mp);
+	putnext(q, mp);
 	return 0;
 }
 
-
-static int _RP
-log_close (queue_t * q)
+static int
+log_close(queue_t *q)
 {
 	struct log *log;
 
 #ifdef DO_STREAMDEBUG
-	logme ();
+	logme();
 #endif
 	log = (struct log *) q->q_ptr;
 
-	flushq (q, FLUSHALL);
-	flushq (WR (q), FLUSHALL);
+	flushq(q, FLUSHALL);
+	flushq(WR(q), FLUSHALL);
 	if (1)
-		printf ("Log driver %d closed.\n", log->nr);
+		printf("Log driver %d closed.\n", log->nr);
 	log->flags = 0;
 	return 0;
 }

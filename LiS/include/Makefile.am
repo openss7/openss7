@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.9 $) $Date: 2005/07/13 01:37:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.10 $) $Date: 2005/07/13 12:01:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/13 01:37:12 $ by $Author: brian $
+# Last Modified $Date: 2005/07/13 12:01:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -114,7 +114,6 @@ nobase_nodist_pkginclude_HEADERS = \
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 CTAGIDS			= -I _RP \
-			  -I __LIS_INTERNAL__=0 \
 			  -I __attribute__+ \
 			  -I __BEGIN_DECLS \
 			  -I __END_DECLS \
@@ -153,7 +152,4 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-EXTRA_DIST += $(nobase_pkginclude_HEADERS)
-
-# vim: ft=automake
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -55,41 +55,43 @@
 #ifdef LINUX
 
 static int svi_major;
-char kernel_version
-= UTS_RELEASE;
+char kernel_version = UTS_RELEASE;
 
-int init_module( void )
+int
+init_module(void)
 {
-        svi_major = lis_register_strdev (0, &sviinfo, 0, "svi");
-        if      (svi_major < 0)
-                return -EIO;
-        sviinit ();
-        return  0;
+	svi_major = lis_register_strdev(0, &sviinfo, 0, "svi");
+	if (svi_major < 0)
+		return -EIO;
+	sviinit();
+	return 0;
 }
 
-void cleanup_module( void )
+void
+cleanup_module(void)
 {
-        lis_unregister_strdev (svi_major, &sviinfo, 0);
+	lis_unregister_strdev(svi_major, &sviinfo, 0);
 }
 
-void * bzero(void * s,size_t count)
+void *
+bzero(void *s, size_t count)
 {
-        char *xs = (char *) s;
+	char *xs = (char *) s;
 
-        while (count--)
-                *xs++ = '\0';
+	while (count--)
+		*xs++ = '\0';
 
-        return s;
+	return s;
 }
 
-char * bcopy(const char * src, char * dest, int count)
+char *
+bcopy(const char *src, char *dest, int count)
 {
-        char *tmp = dest;
+	char *tmp = dest;
 
-        while (count--)
-                *tmp++ = *src++;
+	while (count--)
+		*tmp++ = *src++;
 
-        return dest;
+	return dest;
 }
-#endif /* LINUX */
-
+#endif				/* LINUX */

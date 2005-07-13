@@ -79,144 +79,133 @@
 
 /* Module info for the relay module
  */
-static struct module_info relay_minfo =
-{
-  0,				/* id */
-  "relay",			/* name */
-  0,				/* min packet size accepted */
-  INFPSZ,			/* max packet size accepted */
-  10240L,			/* high water mark */
-  512L				/* low water mark */
+static struct module_info relay_minfo = {
+	0,			/* id */
+	"relay",		/* name */
+	0,			/* min packet size accepted */
+	INFPSZ,			/* max packet size accepted */
+	10240L,			/* high water mark */
+	512L			/* low water mark */
 };
 
-static struct module_info relay2_minfo =
-{
-  0,				/* id */
-  "relay2",			/* name */
-  0,				/* min packet size accepted */
-  INFPSZ,			/* max packet size accepted */
-  10240L,			/* high water mark */
-  512L				/* low water mark */
+static struct module_info relay2_minfo = {
+	0,			/* id */
+	"relay2",		/* name */
+	0,			/* min packet size accepted */
+	INFPSZ,			/* max packet size accepted */
+	10240L,			/* high water mark */
+	512L			/* low water mark */
 };
 
-static struct module_info relay3_minfo =
-{
-  0,				/* id */
-  "relay3",			/* name */
-  0,				/* min packet size accepted */
-  INFPSZ,			/* max packet size accepted */
-  10240L,			/* high water mark */
-  512L				/* low water mark */
+static struct module_info relay3_minfo = {
+	0,			/* id */
+	"relay3",		/* name */
+	0,			/* min packet size accepted */
+	INFPSZ,			/* max packet size accepted */
+	10240L,			/* high water mark */
+	512L			/* low water mark */
 };
 
 /* These are the entry points to the driver: open, close, write side put and
  * service procedures and read side service procedure.
  */
-static int   _RP relay_open  (queue_t *,dev_t*,int,int, cred_t *);
-static int   _RP relay_close (queue_t *, int, cred_t *);
-static int   _RP relay_wput  (queue_t *, mblk_t *);
-static int   _RP relay_rput  (queue_t *, mblk_t *);
+static int relay_open(queue_t *, dev_t *, int, int, cred_t *);
+static int relay_close(queue_t *, int, cred_t *);
+static int relay_wput(queue_t *, mblk_t *);
+static int relay_rput(queue_t *, mblk_t *);
+
 #if 0
-static int   _RP relay_wsrv  (queue_t *);
-static int   _RP relay_rsrv  (queue_t *);
+static int relay_wsrv(queue_t *);
+static int relay_rsrv(queue_t *);
 #endif
 
 /* qinit structures (rd and wr side) 
  */
-static struct qinit relay_rinit =
-{
-  relay_rput,			/* put */       
-  NULL,				/* service  */  
-  relay_open,			/* open */      
-  relay_close,			/* close */     
-  NULL,				/* admin */     
-  &relay_minfo,			/* info */      
-  NULL				/* stat */      
+static struct qinit relay_rinit = {
+	relay_rput,		/* put */
+	NULL,			/* service */
+	relay_open,		/* open */
+	relay_close,		/* close */
+	NULL,			/* admin */
+	&relay_minfo,		/* info */
+	NULL			/* stat */
 };
 
-static struct qinit relay_winit =
-{
-  relay_wput,                    /* put */       
-  NULL, 			/* service  */  
-  NULL, 			/* open */      
-  NULL, 			/* close */     
-  NULL, 			/* admin */     
-  &relay_minfo, 			/* info */      
-  NULL				/* stat */      
-};
-
-/* streamtab for the relay modules
- */
-struct streamtab relay_info =
-{
-  &relay_rinit,			/* read queue */
-  &relay_winit,			/* write queue */
-  NULL,				/* mux read queue  */
-  NULL				/* mux write queue */
-};
-
-static struct qinit relay2_rinit =
-{
-  relay_rput,			/* put */       
-  NULL,				/* service  */  
-  relay_open,			/* open */      
-  relay_close,			/* close */     
-  NULL,				/* admin */     
-  &relay2_minfo,		/* info */      
-  NULL				/* stat */      
-};
-
-static struct qinit relay2_winit =
-{
-  relay_wput,                   /* put */       
-  NULL, 			/* service  */  
-  NULL, 			/* open */      
-  NULL, 			/* close */     
-  NULL, 			/* admin */     
-  &relay2_minfo, 		/* info */      
-  NULL				/* stat */      
+static struct qinit relay_winit = {
+	relay_wput,		/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&relay_minfo,		/* info */
+	NULL			/* stat */
 };
 
 /* streamtab for the relay modules
  */
-struct streamtab relay2_info =
-{
-  &relay2_rinit,		/* read queue */
-  &relay2_winit,		/* write queue */
-  NULL,				/* mux read queue  */
-  NULL				/* mux write queue */
+struct streamtab relay_info = {
+	&relay_rinit,		/* read queue */
+	&relay_winit,		/* write queue */
+	NULL,			/* mux read queue */
+	NULL			/* mux write queue */
 };
 
-static struct qinit relay3_rinit =
-{
-  relay_rput,			/* put */       
-  NULL,				/* service  */  
-  relay_open,			/* open */      
-  relay_close,			/* close */     
-  NULL,				/* admin */     
-  &relay3_minfo,		/* info */      
-  NULL				/* stat */      
+static struct qinit relay2_rinit = {
+	relay_rput,		/* put */
+	NULL,			/* service */
+	relay_open,		/* open */
+	relay_close,		/* close */
+	NULL,			/* admin */
+	&relay2_minfo,		/* info */
+	NULL			/* stat */
 };
 
-static struct qinit relay3_winit =
-{
-  relay_wput,                   /* put */       
-  NULL, 			/* service  */  
-  NULL, 			/* open */      
-  NULL, 			/* close */     
-  NULL, 			/* admin */     
-  &relay3_minfo, 		/* info */      
-  NULL				/* stat */      
+static struct qinit relay2_winit = {
+	relay_wput,		/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&relay2_minfo,		/* info */
+	NULL			/* stat */
 };
 
 /* streamtab for the relay modules
  */
-struct streamtab relay3_info =
-{
-  &relay3_rinit,		/* read queue */
-  &relay3_winit,		/* write queue */
-  NULL,				/* mux read queue  */
-  NULL				/* mux write queue */
+struct streamtab relay2_info = {
+	&relay2_rinit,		/* read queue */
+	&relay2_winit,		/* write queue */
+	NULL,			/* mux read queue */
+	NULL			/* mux write queue */
+};
+
+static struct qinit relay3_rinit = {
+	relay_rput,		/* put */
+	NULL,			/* service */
+	relay_open,		/* open */
+	relay_close,		/* close */
+	NULL,			/* admin */
+	&relay3_minfo,		/* info */
+	NULL			/* stat */
+};
+
+static struct qinit relay3_winit = {
+	relay_wput,		/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&relay3_minfo,		/* info */
+	NULL			/* stat */
+};
+
+/* streamtab for the relay modules
+ */
+struct streamtab relay3_info = {
+	&relay3_rinit,		/* read queue */
+	&relay3_winit,		/* write queue */
+	NULL,			/* mux read queue */
+	NULL			/* mux write queue */
 };
 
 /*  -------------------------------------------------------------------  */
@@ -226,15 +215,14 @@ struct streamtab relay3_info =
 /*  -------------------------------------------------------------------  */
 /*				relay_open				 */
 /*  -------------------------------------------------------------------  */
-static int _RP
-relay_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+static int
+relay_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-  printk("relay_open(dev=0x%x, flag=0x%x, sflag=0x%x)\n",
-				  DEV_TO_INT(*devp), flag, sflag) ;
-  if (sflag == CLONEOPEN)
-      return(EINVAL) ;
+	printk("relay_open(dev=0x%x, flag=0x%x, sflag=0x%x)\n", DEV_TO_INT(*devp), flag, sflag);
+	if (sflag == CLONEOPEN)
+		return (EINVAL);
 
-  return 0;					/* success */
+	return 0;		/* success */
 
 }
 
@@ -242,24 +230,24 @@ relay_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 /*				relay_wput				 */
 /*  -------------------------------------------------------------------  */
 
-static int _RP
-relay_wput (queue_t *q, mblk_t *mp)
+static int
+relay_wput(queue_t *q, mblk_t *mp)
 {
-    lis_print_msg(mp, "relay_wput", PRINT_DATA_RDWR) ;
-    putnext(q, mp) ;			/* relay downstream */
-    return(0) ;
+	lis_print_msg(mp, "relay_wput", PRINT_DATA_RDWR);
+	putnext(q, mp);		/* relay downstream */
+	return (0);
 }
 
 /*  -------------------------------------------------------------------  */
 /*				relay_rput				 */
 /*  -------------------------------------------------------------------  */
 
-static int _RP
-relay_rput (queue_t *q, mblk_t *mp)
+static int
+relay_rput(queue_t *q, mblk_t *mp)
 {
-    lis_print_msg(mp, "relay_rput", PRINT_DATA_RDWR) ;
-    putnext(q, mp) ;			/* relay upstream */
-    return(0) ;
+	lis_print_msg(mp, "relay_rput", PRINT_DATA_RDWR);
+	putnext(q, mp);		/* relay upstream */
+	return (0);
 }
 
 #if 0
@@ -267,11 +255,11 @@ relay_rput (queue_t *q, mblk_t *mp)
 /*				relay_wsrv				 */
 /*  -------------------------------------------------------------------  */
 
-static int _RP
-relay_wsrv (queue_t *q)
+static int
+relay_wsrv(queue_t *q)
 {
-    /* not used */
-    return(0) ;
+	/* not used */
+	return (0);
 }
 #endif
 
@@ -280,11 +268,11 @@ relay_wsrv (queue_t *q)
 /*				relay_rsrv				 */
 /*  -------------------------------------------------------------------  */
 
-static int _RP
-relay_rsrv (queue_t *q)
+static int
+relay_rsrv(queue_t *q)
 {
-    /* not used */
-    return(0) ;
+	/* not used */
+	return (0);
 }
 #endif
 
@@ -292,11 +280,11 @@ relay_rsrv (queue_t *q)
 /*				relay_close				 */
 /*  -------------------------------------------------------------------  */
 
-static int _RP
-relay_close (queue_t *q, int dummy, cred_t *credp)
+static int
+relay_close(queue_t *q, int dummy, cred_t *credp)
 {
-    printk("relay_close\n") ;
-    return 0;
+	printk("relay_close\n");
+	return 0;
 }
 
 /*  -------------------------------------------------------------------  */
@@ -306,39 +294,43 @@ relay_close (queue_t *q, int dummy, cred_t *credp)
 #if !defined __NO_VERSION__
 
 #ifdef KERNEL_2_5
-int relay3_init_module(void)
+int
+relay3_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
-    int ret = lis_register_strmod(&relay3_info, "relay3");
-    if (ret < 0)
-    {
-	printk("relay3.init_module: Unable to register module.\n");
-	return ret;
-    }
-    return 0;
+	int ret = lis_register_strmod(&relay3_info, "relay3");
+
+	if (ret < 0) {
+		printk("relay3.init_module: Unable to register module.\n");
+		return ret;
+	}
+	return 0;
 }
 
 #ifdef KERNEL_2_5
-void relay3_cleanup_module(void)
+void
+relay3_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
-    if (lis_unregister_strmod(&relay3_info) < 0)
-	printk("relay3.cleanup_module: Unable to unregister module.\n");
-    else
-	printk("relay3.cleanup_module: Unregistered, ready to be unloaded.\n");
-    return;
+	if (lis_unregister_strmod(&relay3_info) < 0)
+		printk("relay3.cleanup_module: Unable to unregister module.\n");
+	else
+		printk("relay3.cleanup_module: Unregistered, ready to be unloaded.\n");
+	return;
 }
 
 #ifdef KERNEL_2_5
-module_init(relay3_init_module) ;
-module_exit(relay3_cleanup_module) ;
+module_init(relay3_init_module);
+module_exit(relay3_cleanup_module);
 #endif
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
 #endif
 
-#endif			/* !defined __NO_VERSION__ */
+#endif				/* !defined __NO_VERSION__ */

@@ -70,7 +70,6 @@
 #include <sys/types.h>
 #endif
 
-
 #ifndef NULL
 #define	NULL		( (void *) 0 )
 #endif
@@ -95,36 +94,34 @@
 
 #ifdef __KERNEL__
 
-typedef void	_RP timo_fcn_t(caddr_t arg) ;
-typedef unsigned long	 toid_t ;		/* SVR4 */
-typedef unsigned long	 timeout_id_t ;		/* Solaris */
+typedef void timo_fcn_t (caddr_t arg);
+typedef unsigned long toid_t;		/* SVR4 */
+typedef unsigned long timeout_id_t;	/* Solaris */
 
 #define	timeout(fcn,arg,ticks)	lis_timeout_fcn(fcn,arg,ticks,__FILE__, __LINE__)
 #define	untimeout		lis_untimeout
 
-extern toid_t	lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-			    char *file_name, int line_nr) _RP;
-extern toid_t	lis_untimeout(toid_t id) _RP;
+extern toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name,
+			      int line_nr);
+extern toid_t lis_untimeout(toid_t id);
 
 /*
  * The following are internal routines not exported
  */
-#if __LIS_INTERNAL__
-void lis_initialize_dki(void) ;			/* dki.c */
-void lis_terminate_dki(void) ;			/* dki.c */
+#ifdef __LIS_INTERNAL__
+void lis_initialize_dki(void);		/* dki.c */
+void lis_terminate_dki(void);		/* dki.c */
 
-void *lis_alloc_timer(char *file, int line) ;	/* mdep rouitine */
-void *lis_free_timer(void *timerp) ;		/* mdep rouitine */
-void lis_init_timers(int size) ;		/* mdep routine */
-void lis_terminate_timers(void) ;		/* mdep rouitine */
+void *lis_alloc_timer(char *file, int line);	/* mdep rouitine */
+void *lis_free_timer(void *timerp);	/* mdep rouitine */
+void lis_init_timers(int size);		/* mdep routine */
+void lis_terminate_timers(void);	/* mdep rouitine */
 #endif
 
 #endif				/* __KERNEL__ */
 
-
-
 #ifndef HZ
-#define	HZ	100			/* ticks per second */
+#define	HZ	100		/* ticks per second */
 #endif
 
 /*
@@ -133,7 +130,7 @@ void lis_terminate_timers(void) ;		/* mdep rouitine */
  *
  * The routine is located in osif.c.
  */
-unsigned lis_usectohz(unsigned usec) _RP;
+unsigned lis_usectohz(unsigned usec);
 
 /************************************************************************
 *                        Creating Nodes                                 *
@@ -153,18 +150,13 @@ unsigned lis_usectohz(unsigned usec) _RP;
 *									*
 ************************************************************************/
 
-extern int	lis_mknod(char *name, int mode, dev_t dev) _RP;
-extern int	lis_unlink(char *name) _RP;
-#if __LIS_INTERNAL__
-extern int	lis_mount(char *dev_name,
-			  char *dir_name,
-			  char *fstype,
-			  unsigned long rwflag,
-			  void *data) ;
-extern int	lis_umount2(char *path, int flags) ;
+extern int lis_mknod(char *name, int mode, dev_t dev);
+extern int lis_unlink(char *name);
+
+#ifdef __LIS_INTERNAL__
+extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag,
+		     void *data);
+extern int lis_umount2(char *path, int flags);
 #endif
-
-
-
 
 #endif				/* from top of file */

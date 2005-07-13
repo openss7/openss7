@@ -68,7 +68,7 @@
 
 #include <string.h>
 #ifndef SYS_LISLOCKS_H
-#include <sys/lislocks.h>			/* for lis_semaphore_t */
+#include <sys/lislocks.h>	/* for lis_semaphore_t */
 #endif
 
 #define	inode		u_inode
@@ -79,40 +79,38 @@
 
 #define REFERENCE_INODE	1	/* inode that will not be removed */
 
-typedef struct u_inode
-{
-    struct u_inode	*i_link ;		/* in case of linked list */
-    long		 i_mode ;		/* file mode */
-    port_dev_t		 i_dev ;		/* major/minor */
-    struct stdata	*i_str ;		/* ptr to stream struct */
-    lis_semaphore_t	 i_sem ;		/* inode semaphore */
-    int			 i_use ;		/* use count */
-    int			 i_inum ;		/* inode number (phoney) */
-    long		 i_ctime ;		/* status change time */
-    long		 i_mtime ;		/* modified time */
-    long		 i_atime ;		/* accessed time */
-    long		 i_ftime ;		/* creation time */
-    int			 i_flags ;		/* flags field */
-} u_inode_t ;
+typedef struct u_inode {
+	struct u_inode *i_link;		/* in case of linked list */
+	long i_mode;			/* file mode */
+	port_dev_t i_dev;		/* major/minor */
+	struct stdata *i_str;		/* ptr to stream struct */
+	lis_semaphore_t i_sem;		/* inode semaphore */
+	int i_use;			/* use count */
+	int i_inum;			/* inode number (phoney) */
+	long i_ctime;			/* status change time */
+	long i_mtime;			/* modified time */
+	long i_atime;			/* accessed time */
+	long i_ftime;			/* creation time */
+	int i_flags;			/* flags field */
+} u_inode_t;
 
-#define i_rdev		i_dev			/* head.c uses i_rdev */
-#define i_count		i_use			/* head.c uses i_count */
+#define i_rdev		i_dev	/* head.c uses i_rdev */
+#define i_count		i_use	/* head.c uses i_count */
 
-typedef struct u_file
-{
-    struct u_file	*f_link ;		/* in case of linked list */
-    char		*f_name ;		/* file name */
-    int			 f_flags ;		/* file open flags */
-    int			 f_mode ;		/* file rd/wr mode */
-    int			 f_count ;		/* reference count */
-    int			 f_fdnr ;		/* file number */
-    struct inode	*f_inode ;		/* inode of file */
-    struct file_operations * f_op;		/* handler routines */
-    void		*f_drvr_ptr ;		/* driver's pointer */
-    lis_semaphore_t	 f_sem ;		/* to lock file struct */
-    void		*f_ptr ;		/* ptr for user's use */
+typedef struct u_file {
+	struct u_file *f_link;		/* in case of linked list */
+	char *f_name;			/* file name */
+	int f_flags;			/* file open flags */
+	int f_mode;			/* file rd/wr mode */
+	int f_count;			/* reference count */
+	int f_fdnr;			/* file number */
+	struct inode *f_inode;		/* inode of file */
+	struct file_operations *f_op;	/* handler routines */
+	void *f_drvr_ptr;		/* driver's pointer */
+	lis_semaphore_t f_sem;		/* to lock file struct */
+	void *f_ptr;			/* ptr for user's use */
 
-} u_file_t ;
+} u_file_t;
 
 #define LOCK_FILE(f)	lis_down(&(f)->f_sem)
 #define ULOCK_FILE(f)	lis_up(&(f)->f_sem)
@@ -128,8 +126,7 @@ typedef struct u_file
 #define	I_COUNT(i)	((i)->i_count)
 #define	F_COUNT(f)	((f)->f_count)
 
-struct u_file_operations			/* from linux/fs.h */
-{
+struct u_file_operations {		/* from linux/fs.h */
 	int (*lseek) (void);
 	ssize_t (*read) (struct file *, char *, size_t, loff_t *);
 	ssize_t (*write) (struct file *, const char *, size_t, loff_t *);
@@ -146,9 +143,9 @@ struct u_file_operations			/* from linux/fs.h */
 	int (*fasync) (void);
 	int (*check_media_change) (void);
 	int (*revalidate) (void);
-	int (*putpmsg)(struct inode *, struct file *, void *, void *, int, int);
-	int (*getpmsg)(struct inode *, struct file *, void *, void *, int *, int *, int);
-	int (*pollfd)(struct inode *, struct file *, void *);
+	int (*putpmsg) (struct inode *, struct file *, void *, void *, int, int);
+	int (*getpmsg) (struct inode *, struct file *, void *, void *, int *, int *, int);
+	int (*pollfd) (struct inode *, struct file *, void *);
 };
 
 /*
@@ -224,6 +221,5 @@ struct u_file_operations			/* from linux/fs.h */
  */
 #define	lis_mknod	user_mknod
 #define	lis_unlink	user_unlink
-
 
 #endif

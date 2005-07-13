@@ -65,16 +65,15 @@
 *									*
 ************************************************************************/
 
-
 #ifndef	_SCO_MDEP_H
 #define	_SCO_MDEP_H			1
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
 #include <sys/types.h>
-#include <sys/errno.h>	      /* for errno */
-#include <memory.h>	      /* for memcpy */
-#include <sys/signal.h>	      /* for signal numbers */
+#include <sys/errno.h>		/* for errno */
+#include <memory.h>		/* for memcpy */
+#include <sys/signal.h>		/* for signal numbers */
 
 /*
  * name changes for these structures.
@@ -102,7 +101,7 @@
 
 #define	_INKERNEL		1
 
-#include <sys/sysmacros.h>		/* SCO include file */
+#include <sys/sysmacros.h>	/* SCO include file */
 
 #define	MAJOR		_major
 #define	MINOR		_minor
@@ -114,37 +113,33 @@
 
 #endif
 
-typedef unsigned long	port_dev_t ;		/* device major/minor */
+typedef unsigned long port_dev_t;	/* device major/minor */
 
-#undef uid 
+#undef uid
 #undef gid
-typedef int     o_uid_t;
-typedef int     o_gid_t;
-typedef unsigned   char uchar;
+typedef int o_uid_t;
+typedef int o_gid_t;
+typedef unsigned char uchar;
 typedef struct cred {
-	uid_t	cr_uid;			/* effective user id */
-	uid_t	cr_ruid;			/* effective user id */
-	gid_t	cr_gid;			/* effective group id */
-	gid_t	cr_rgid;			/* effective group id */
+	uid_t cr_uid;			/* effective user id */
+	uid_t cr_ruid;			/* effective user id */
+	gid_t cr_gid;			/* effective group id */
+	gid_t cr_rgid;			/* effective group id */
 } cred_t;
 
-typedef struct u_semaphore
-{
-    int			sem_count ;		/* semaphore counter */
-    long		sem_xxx[8] ;		/* just a placeholder */
+typedef struct u_semaphore {
+	int sem_count;			/* semaphore counter */
+	long sem_xxx[8];		/* just a placeholder */
 
-} u_semaphore_t ;
+} u_semaphore_t;
 
-
-#define	kvtophys(addr)		(addr)		/* user level fakery */
+#define	kvtophys(addr)		(addr)	/* user level fakery */
 
 /*
  * bzero and bcopy
  */
 #define	bzero(addr,nbytes)	memset(addr, 0, nbytes)
 #define	bcopy(src,dst,n)	memcpy(dst,src,n)
-
-
 
 #ifndef PORTABLE
 #define	PORTABLE	1
@@ -155,16 +150,13 @@ typedef struct u_semaphore
  */
 #define	SIGURG		31
 
-
 /*
  * A dummy to support the select structure in stdata_t.
  */
-typedef struct lis_select_struct
-{
-    int		dummy ;
+typedef struct lis_select_struct {
+	int dummy;
 
-} lis_select_t ;
-
+} lis_select_t;
 
 /*
  * Now include the portable stuff
@@ -175,6 +167,5 @@ typedef struct lis_select_struct
 #ifndef _PORT_MDEP_H
 #include <sys/LiS/port-mdep.h>
 #endif
-
 
 #endif

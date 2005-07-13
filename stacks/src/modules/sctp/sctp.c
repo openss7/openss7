@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:38 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,15 +46,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:38 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $"
 
-static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:38 $";
+static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $";
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -67,7 +67,7 @@ static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for LiS STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/05 22:45:38 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:36 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -73,7 +73,7 @@
 
 #include <sys/strport.h>
 #include <sys/strconfig.h>	/* config definitions */
-#include <sys/LiS/share.h>	/* streams shared defs*/
+#include <sys/LiS/share.h>	/* streams shared defs */
 #include <sys/LiS/stats.h>	/* module interface */
 
 /*  -------------------------------------------------------------------  */
@@ -84,8 +84,7 @@
 
 /* This are the stats 
  */
-lis_atomic_t lis_strstats[STRMAXSTAT][4] ;
-
+lis_atomic_t lis_strstats[STRMAXSTAT][4];
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
@@ -97,43 +96,43 @@ lis_atomic_t lis_strstats[STRMAXSTAT][4] ;
 #define	AA	K_ATOMIC_ADD
 #define	AS	K_ATOMIC_SET
 
-void	lis_stat_neg(void)
+void
+lis_stat_neg(void)
 {
-    extern int	lis_negstat ;
-    lis_negstat++ ;		/* caught statistic going negative */
+	extern int lis_negstat;
+
+	lis_negstat++;		/* caught statistic going negative */
 }
 
 /* increment count for one item
  * STATUS: complete, untested
  */
-void 
+void
 LisUpCounter(int item, int n)
 {
-    int		c ;
+	int c;
 
-    AA(&lis_strstats[item][TOTAL], n) ;
-    AA(&lis_strstats[item][CURRENT], n) ;
-    if ((c = AR(&lis_strstats[item][CURRENT])) >
-	     AR(&lis_strstats[item][MAXIMUM]))
-	AS(&lis_strstats[item][MAXIMUM], c);
+	AA(&lis_strstats[item][TOTAL], n);
+	AA(&lis_strstats[item][CURRENT], n);
+	if ((c = AR(&lis_strstats[item][CURRENT])) > AR(&lis_strstats[item][MAXIMUM]))
+		AS(&lis_strstats[item][MAXIMUM], c);
 
-}/*LisUpCounter*/
+}				/* LisUpCounter */
 
 /*
  * Set a counter to a particular value and keep track of the max.
  */
-void LisSetCounter(int item, int val)
+void
+LisSetCounter(int item, int val)
 {
-    int		c ;
+	int c;
 
-    AA(&lis_strstats[item][TOTAL], val) ;
-    AS(&lis_strstats[item][CURRENT], val);
-    if ((c = AR(&lis_strstats[item][CURRENT])) >
-	     AR(&lis_strstats[item][MAXIMUM]))
-	AS(&lis_strstats[item][MAXIMUM], c) ;
+	AA(&lis_strstats[item][TOTAL], val);
+	AS(&lis_strstats[item][CURRENT], val);
+	if ((c = AR(&lis_strstats[item][CURRENT])) > AR(&lis_strstats[item][MAXIMUM]))
+		AS(&lis_strstats[item][MAXIMUM], c);
 
-} /* LisSetCounter */
-
+}				/* LisSetCounter */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

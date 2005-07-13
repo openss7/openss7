@@ -67,7 +67,7 @@
 #include <sys/stream.h>
 #include <sys/osif.h>
 
-lis_spin_lock_t	  lis_tlist_lock ;
+lis_spin_lock_t lis_tlist_lock;
 
 /************************************************************************
 *                       SVR4 Compatible timeout                         *
@@ -85,139 +85,137 @@ lis_spin_lock_t	  lis_tlist_lock ;
 *									*
 ************************************************************************/
 
-typedef struct tlist
-{
-    struct tlist	*next ;		/* thread of these */
-    struct timer_list	 tl ;		/* Linux timer structure */
-    int			 handle ;	/* SVR4-style handle */
-    timo_fcn_t		*fcn ;		/* function to call */
-    caddr_t		 arg ;		/* function argument */
+typedef struct tlist {
+	struct tlist *next;		/* thread of these */
+	struct timer_list tl;		/* Linux timer structure */
+	int handle;			/* SVR4-style handle */
+	timo_fcn_t *fcn;		/* function to call */
+	caddr_t arg;			/* function argument */
 
-} tlist_t ;
+} tlist_t;
 
-#define THASH		757		/* prime number */
+#define THASH		757	/* prime number */
 
 /*
  * head[0] is for free timer structures.  The others head linked
  * lists of timer structures whose handles hash to the same value.
  */
-volatile tlist_t *lis_tlist_heads[THASH] ;
+volatile tlist_t *lis_tlist_heads[THASH];
+
 /*
  * The tlist handles roll over at 2^31 and thus are virtually never
  * repeated.  But we check whenever assigning a timer handle to ensure
  * that it is not already in use.  The hash table makes this easy.
  */
-volatile int	  lis_tlist_handle ;	/* next handle to use */
+volatile int lis_tlist_handle;		/* next handle to use */
 
 /*
  * Timer list manipulations
  *
  * Caller has timer list locked
  */
-static INLINE void enter_timer_in_list(tlist_t *tp)
+static INLINE void
+enter_timer_in_list(tlist_t * tp)
 {
-    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[tp->handle % THASH] ;
+	tlist_t **headp = (tlist_t **) & lis_tlist_heads[tp->handle % THASH];
 
-    tp->next = *headp ;
-    *headp = tp ;
+	tp->next = *headp;
+	*headp = tp;
 }
 
-static INLINE void remove_timer_from_list(tlist_t *tp)
+static INLINE void
+remove_timer_from_list(tlist_t * tp)
 {
-    tlist_t	*t ;
-    tlist_t	*nxt ;
-    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[tp->handle % THASH] ;
+	tlist_t *t;
+	tlist_t *nxt;
+	tlist_t **headp = (tlist_t **) & lis_tlist_heads[tp->handle % THASH];
 
-    if ((t = *headp) == NULL)	/* nothing in that hash list */
-    {
-	tp->next = NULL ;
-	return ;
-    }
-
-    if (t == tp)		/* our entry is first in list */
-    {
-	*headp = tp->next ;
-	tp->next = NULL ;
-	return ;
-    }
-
-    /* Find this entry starting at the 2nd element and on down the list */
-    for (nxt = NULL; t->next != NULL; t = nxt)
-    {
-	nxt = t->next ;
-	if (nxt == tp)
-	{
-	    t->next = tp->next ;
-	    tp->next = NULL ;
-	    return ;
+	if ((t = *headp) == NULL) {	/* nothing in that hash list */
+		tp->next = NULL;
+		return;
 	}
-    }
 
-    tp->next = NULL ;		/* ensure null next pointer */
+	if (t == tp) {		/* our entry is first in list */
+		*headp = tp->next;
+		tp->next = NULL;
+		return;
+	}
+
+	/* Find this entry starting at the 2nd element and on down the list */
+	for (nxt = NULL; t->next != NULL; t = nxt) {
+		nxt = t->next;
+		if (nxt == tp) {
+			t->next = tp->next;
+			tp->next = NULL;
+			return;
+		}
+	}
+
+	tp->next = NULL;	/* ensure null next pointer */
 }
 
-static INLINE tlist_t *alloc_timer(char *file_name, int line_nr)
+static INLINE tlist_t *
+alloc_timer(char *file_name, int line_nr)
 {
-    tlist_t	*t ;
-    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[0] ;
+	tlist_t *t;
+	tlist_t **headp = (tlist_t **) & lis_tlist_heads[0];
 
-    if ((t = *headp) == NULL)	/* nothing in the hash list */
-	t = (tlist_t *) lis_alloc_timer(file_name, line_nr) ;
-    else
-    {
-	*headp = t->next ;	/* link around 1st element */
-	lis_mark_mem(t, file_name, line_nr) ;
-    }
+	if ((t = *headp) == NULL)	/* nothing in the hash list */
+		t = (tlist_t *) lis_alloc_timer(file_name, line_nr);
+	else {
+		*headp = t->next;	/* link around 1st element */
+		lis_mark_mem(t, file_name, line_nr);
+	}
 
-    return(t) ;			/* NULL if could not allocate */
+	return (t);		/* NULL if could not allocate */
 }
 
 /*
  * This is always the function passed to the kernel.  'arg' is a pointer to
  * the tlist_t for the timeout.
  */
-static void sys_timeout_fcn(ulong arg)
+static void
+sys_timeout_fcn(ulong arg)
 {
-    tlist_t		*tp = (tlist_t *) arg ;
-    timo_fcn_t		*fcn = (timo_fcn_t *) NULL ;
-    caddr_t		 uarg = NULL ;
-    lis_flags_t  	 psw;
+	tlist_t *tp = (tlist_t *) arg;
+	timo_fcn_t *fcn = (timo_fcn_t *) NULL;
+	caddr_t uarg = NULL;
+	lis_flags_t psw;
 
-    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
 
-    remove_timer_from_list(tp) ;	/* handle can no longer be found */
-    if (tp->handle != 0 && tp->fcn != NULL)
-    {
-	fcn        = tp->fcn ;		/* save local copy */
-	uarg       = tp->arg ;
-    }
+	remove_timer_from_list(tp);	/* handle can no longer be found */
+	if (tp->handle != 0 && tp->fcn != NULL) {
+		fcn = tp->fcn;	/* save local copy */
+		uarg = tp->arg;
+	}
 
-    tp->handle = 0 ;			/* entry now available */
-    tp->fcn    = NULL ;
-    enter_timer_in_list(tp) ;		/* enter in list 0 (free list) */
-    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
+	tp->handle = 0;		/* entry now available */
+	tp->fcn = NULL;
+	enter_timer_in_list(tp);	/* enter in list 0 (free list) */
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
 
-    if (fcn != (timo_fcn_t *) NULL)
-	fcn(uarg) ;			/* call fcn while not holding lock */
+	if (fcn != (timo_fcn_t *) NULL)
+		fcn(uarg);	/* call fcn while not holding lock */
 }
-
 
 /*
  * Find the timer entry associated with the given handle.
  *
  * Caller has timer list locked
  */
-static INLINE tlist_t *find_timer_by_handle(int handle)
+static INLINE tlist_t *
+find_timer_by_handle(int handle)
 {
-    tlist_t	*tp = NULL ;
-    tlist_t	**headp = (tlist_t **) &lis_tlist_heads[handle % THASH] ;
+	tlist_t *tp = NULL;
+	tlist_t **headp = (tlist_t **) & lis_tlist_heads[handle % THASH];
 
-    for (tp = *headp; tp != NULL; tp = tp->next)
-    {
-	if (tp->handle == handle) return(tp) ;
-    }
+	for (tp = *headp; tp != NULL; tp = tp->next) {
+		if (tp->handle == handle)
+			return (tp);
+	}
 
-    return(NULL) ;
+	return (NULL);
 }
 
 /*
@@ -228,114 +226,110 @@ static INLINE tlist_t *find_timer_by_handle(int handle)
  *
  * Caller has locked the timer list.
  */
-static INLINE int alloc_handle(void)
+static INLINE int
+alloc_handle(void)
 {
-    tlist_t	*tp = NULL ;
-    int		 handle ;
+	tlist_t *tp = NULL;
+	int handle;
 
-    while (1)
-    {
-	do
-	{					/* next handle */
-	    handle = (++lis_tlist_handle) & 0x7FFFFFFF ;
+	while (1) {
+		do {		/* next handle */
+			handle = (++lis_tlist_handle) & 0x7FFFFFFF;
+		}
+		while ((handle % THASH) == 0);	/* prevent use of handle 0 */
+
+		tp = find_timer_by_handle(handle);
+		if (tp == NULL)	/* handle available */
+			break;
 	}
-	while ((handle % THASH) == 0) ;		/* prevent use of handle 0 */
 
-	tp = find_timer_by_handle(handle) ;
-	if (tp == NULL)				/* handle available */
-	    break ;
-    }
-
-    return(handle) ;
+	return (handle);
 }
 
 /*
  * "timeout" is #defined to be this function in dki.h.
  */
-toid_t	_RP lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-		    char *file_name, int line_nr)
+toid_t
+lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, char *file_name, int line_nr)
 {
-    tlist_t	*tp ;
-    int		 handle ;
-    lis_flags_t  psw;
-    static tlist_t z ;
+	tlist_t *tp;
+	int handle;
+	lis_flags_t psw;
+	static tlist_t z;
 
-    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
+	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
 
-    handle = alloc_handle() ;
-    tp = alloc_timer(file_name, line_nr) ;	/* available timer struct */
-    if (tp == NULL)				/* must allocate a new one */
-    {
-	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-	return(0) ;				/* no memory for timer */
-    }
-
-    *tp = z ;					/* zero out structure */
-    tp->handle	= handle ;
-    tp->fcn	= timo_fcn ;
-    tp->arg	= arg ;
-    
-    enter_timer_in_list(tp) ;			/* hashed by handle */
-    lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks) ;
-						/* start system timer */
-    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-
-    return(handle) ;				/* return handle */
-
-} /* lis_timeout_fcn */
-
-toid_t	_RP lis_untimeout(toid_t id)
-{
-    tlist_t	*tp ;
-    lis_flags_t  psw;
-
-    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-
-    tp = find_timer_by_handle(id) ;
-    if (tp != NULL)
-    {
-	lis_mark_mem(tp, "unused-timer", MEM_TIMER) ;
-	remove_timer_from_list(tp) ;
-	lis_untmout(&tp->tl) ;			/* stop system timer */
-	tp->handle = 0 ;			/* make available */
-	enter_timer_in_list(tp) ;		/* list 0 is free list */
-    }
-
-    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-    return(0);					/* no rtn value specified */
-
-} /* lis_untimeout */
-
-void lis_terminate_dki(void)
-{
-    lis_flags_t     psw;
-    int		    i ;
-
-    /*
-     *  In case of buggy drivers, timeouts could still happen.
-     *  Better be on the safe side.
-     */
-    lis_spin_lock_irqsave(&lis_tlist_lock, &psw) ;
-
-    for (i = 0; i < THASH; i++)
-    {
-	while (lis_tlist_heads[i] != NULL)
-	{
-	    tlist_t *tp = (tlist_t *) lis_tlist_heads[i];
-
-	    lis_untmout(&tp->tl);
-	    remove_timer_from_list(tp) ;
-	    lis_free_timer(tp);
+	handle = alloc_handle();
+	tp = alloc_timer(file_name, line_nr);	/* available timer struct */
+	if (tp == NULL) {	/* must allocate a new one */
+		lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+		return (0);	/* no memory for timer */
 	}
-    }
 
-    lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw) ;
-    lis_terminate_timers() ;			/* an mdep routine */
-}
+	*tp = z;		/* zero out structure */
+	tp->handle = handle;
+	tp->fcn = timo_fcn;
+	tp->arg = arg;
 
-void lis_initialize_dki(void)
+	enter_timer_in_list(tp);	/* hashed by handle */
+	lis_tmout(&tp->tl, sys_timeout_fcn, (long) tp, ticks);
+	/* start system timer */
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+
+	return (handle);	/* return handle */
+
+}				/* lis_timeout_fcn */
+
+toid_t
+lis_untimeout(toid_t id)
 {
-    lis_init_timers(sizeof(tlist_t)) ;		/* an mdep routine */
+	tlist_t *tp;
+	lis_flags_t psw;
+
+	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
+
+	tp = find_timer_by_handle(id);
+	if (tp != NULL) {
+		lis_mark_mem(tp, "unused-timer", MEM_TIMER);
+		remove_timer_from_list(tp);
+		lis_untmout(&tp->tl);	/* stop system timer */
+		tp->handle = 0;	/* make available */
+		enter_timer_in_list(tp);	/* list 0 is free list */
+	}
+
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+	return (0);		/* no rtn value specified */
+
+}				/* lis_untimeout */
+
+void
+lis_terminate_dki(void)
+{
+	lis_flags_t psw;
+	int i;
+
+	/* 
+	 *  In case of buggy drivers, timeouts could still happen.
+	 *  Better be on the safe side.
+	 */
+	lis_spin_lock_irqsave(&lis_tlist_lock, &psw);
+
+	for (i = 0; i < THASH; i++) {
+		while (lis_tlist_heads[i] != NULL) {
+			tlist_t *tp = (tlist_t *) lis_tlist_heads[i];
+
+			lis_untmout(&tp->tl);
+			remove_timer_from_list(tp);
+			lis_free_timer(tp);
+		}
+	}
+
+	lis_spin_unlock_irqrestore(&lis_tlist_lock, &psw);
+	lis_terminate_timers();	/* an mdep routine */
 }
 
-
+void
+lis_initialize_dki(void)
+{
+	lis_init_timers(sizeof(tlist_t));	/* an mdep routine */
+}

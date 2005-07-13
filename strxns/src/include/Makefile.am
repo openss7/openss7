@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/10 11:42:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:42:53 $ by $Author: brian $
+# Last Modified $Date: 2005/07/13 12:01:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,8 +67,35 @@ nobase_nodist_pkginclude_HEADERS = \
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
+CTAGIDS			= -I _RP \
+			  -I __attribute__+ \
+			  -I __BEGIN_DECLS \
+			  -I __END_DECLS \
+			  -I __THROW \
+			  -I __depr \
+			  -I __const=const \
+			  -I __inline__=inline \
+			  -I HEAD_DECLARATION+ \
+			  -I STR_DECLARATION+ \
+			  -I __EXTERN_INLINE=inline \
+			  -I __AIX_EXTERN_INLINE=inline \
+			  -I __HPUX_EXTERN_INLINE=inline \
+			  -I __IRIX_EXTERN_INLINE=inline \
+			  -I __LIS_EXTERN_INLINE=inline \
+			  -I __LFS_EXTERN_INLINE=inline \
+			  -I __MAC_EXTERN_INLINE=inline \
+			  -I __MPS_EXTERN_INLINE=inline \
+			  -I __OS7_EXTERN_INLINE=inline \
+			  -I __OSF_EXTERN_INLINE=inline \
+			  -I __SUN_EXTERN_INLINE=inline \
+			  -I __SUX_EXTERN_INLINE=inline \
+			  -I __SVR3_EXTERN_INLINE=inline \
+			  -I __SVR4_EXTERN_INLINE=inline \
+			  -I __UW7_EXTERN_INLINE=inline \
+			  -I __UXP_EXTERN_INLINE=inline
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
-TESTS_ENVIRONMENT	+= PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
+TESTS_ENVIRONMENT	+= CTAGS='$(CTAGIDS)' \
+			   PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= $(top_builddir)/check_headers.log
@@ -79,4 +106,4 @@ endif
 ## PKG_BUILD_ARCH
 endif
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

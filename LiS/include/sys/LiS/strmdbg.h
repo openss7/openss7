@@ -79,13 +79,12 @@
 #include <sys/LiS/head.h>
 #endif
 
-
 /*
  * These bits can be set to cause the streams module to print
  * interesting stuff while it is executing.
  */
-extern unsigned long	lis_debug_mask ;
-extern unsigned long	lis_debug_mask2 ;
+extern unsigned long lis_debug_mask;
+extern unsigned long lis_debug_mask2;
 
 /*
  * Bits in lis_debug_mask
@@ -115,8 +114,8 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_CLEAN_MSG_BIT		0x00040000L
 #define LIS_DEBUG_SPL_TRACE_BIT		0x00080000L
 
-#define LIS_DEBUG_MP_ALLOC		0x00100000L	/* allocb debug */ 
-#define LIS_DEBUG_MP_FREEMSG		0x00200000L	/* freemsg debug */ 
+#define LIS_DEBUG_MP_ALLOC		0x00100000L	/* allocb debug */
+#define LIS_DEBUG_MP_FREEMSG		0x00200000L	/* freemsg debug */
 #define	LIS_DEBUG_MALLOC_BIT		0x00400000L	/* lis_malloc/free */
 #define LIS_DEBUG_MONITOR_MEM_BIT	0x00800000L	/* monitor memory */
 
@@ -184,7 +183,6 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_VCLOSE	(lis_debug_mask & LIS_DEBUG_VCLOSE_BIT)
 #define LIS_DEBUG_ADDRS		(lis_debug_mask & LIS_DEBUG_ADDRS_BIT)
 
-
 #define LIS_DEBUG_SNDFD		(lis_debug_mask2 & LIS_DEBUG_SNDFD_BIT)
 #define LIS_DEBUG_CP		(lis_debug_mask2 & LIS_DEBUG_CP_BIT)
 #define LIS_DEBUG_CACHE		(lis_debug_mask2 & LIS_DEBUG_CACHE_BIT)
@@ -193,7 +191,7 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_REFCNTS	(lis_debug_mask2 & LIS_DEBUG_REFCNTS_BIT)
 #define LIS_DEBUG_SEMTIME	(lis_debug_mask2 & LIS_DEBUG_SEMTIME_BIT)
 
-#else /* !CONFIG_DEV */
+#else				/* !CONFIG_DEV */
 
 #define LIS_DEBUG_OPEN		0
 #define LIS_DEBUG_CLOSE		0
@@ -234,7 +232,6 @@ extern unsigned long	lis_debug_mask2 ;
 #define LIS_DEBUG_VCLOSE	0
 #define LIS_DEBUG_ADDRS		0
 
-
 #define LIS_DEBUG_SNDFD		0
 #define LIS_DEBUG_CP		0
 #define LIS_DEBUG_CACHE		0
@@ -244,39 +241,42 @@ extern unsigned long	lis_debug_mask2 ;
 
 #define LIS_DEBUG_REFCNTS	0
 
-#endif /* !CONFIG_DEV */
+#endif				/* !CONFIG_DEV */
 
 /*
  * Some routines to assist in debug printing
  */
 #ifdef __KERNEL__
-void		 lis_print_block(void *ptr) _RP;
-void		 lis_print_mem(void) _RP;
-void		 lis_print_queue(queue_t * q) _RP;
-#if __LIS_INTERNAL__
-void		 lis_print_queues(void) _RP;
-void		 lis_print_stream(stdata_t *head) _RP;
+void lis_print_block(void *ptr);
+void lis_print_mem(void);
+void lis_print_queue(queue_t *q);
+
+#ifdef __LIS_INTERNAL__
+void lis_print_queues(void);
+void lis_print_stream(stdata_t *head);
 #endif
-const char	*lis_strm_name(stdata_t *head) _RP;
-const char      *lis_strm_name_from_queue(queue_t *q) _RP;
-const char	*lis_queue_name(queue_t *q) _RP;
-#if __LIS_INTERNAL__
-const char	*lis_maj_min_name(stdata_t *head) _RP;
+const char *lis_strm_name(stdata_t *head);
+const char *lis_strm_name_from_queue(queue_t *q);
+const char *lis_queue_name(queue_t *q);
+
+#ifdef __LIS_INTERNAL__
+const char *lis_maj_min_name(stdata_t *head);
 #endif
-const char	*lis_msg_type_name(mblk_t *mp) _RP;
-void		 lis_print_data(mblk_t *mp, int opt, int cont) _RP;
-void		 lis_print_msg(mblk_t *mp, const char *prefix, int opt) _RP;
-#if __LIS_INTERNAL__
-char		*lis_poll_events(short events) _RP;
+const char *lis_msg_type_name(mblk_t *mp);
+void lis_print_data(mblk_t *mp, int opt, int cont);
+void lis_print_msg(mblk_t *mp, const char *prefix, int opt);
+
+#ifdef __LIS_INTERNAL__
+char *lis_poll_events(short events);
 #endif
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 /*                             print_msg options			 */
 
-#define	PRINT_DATA_SHORT	0		/* short form		 */
-#define	PRINT_DATA_ENTIRE	1		/* print entire dblk	 */
-#define	PRINT_DATA_RDWR		2		/* print just rptr->wptr */
+#define	PRINT_DATA_SHORT	0	/* short form */
+#define	PRINT_DATA_ENTIRE	1	/* print entire dblk */
+#define	PRINT_DATA_RDWR		2	/* print just rptr->wptr */
 
 /*  -------------------------------------------------------------------  */
 /*                             Memory Allocation			 */
@@ -286,31 +286,32 @@ char		*lis_poll_events(short events) _RP;
  * memory.
  */
 #ifdef __KERNEL__
-void	*lis_malloc(int nbytes, int class, int use_cache, 
-			char *file_name, int line_nr) _RP;
-void	*lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) _RP;
-void	 lis_free(void *ptr, char *file_name, int line_nr) _RP;
-void	 lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr) _RP;
+void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
+void *lis_zmalloc(int nbytes, int class, char *file_name, int line_nr);
+void lis_free(void *ptr, char *file_name, int line_nr);
+void lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr);
+
 #if defined(CONFIG_DEV)
 #define	lis_mark_mem	lis_mark_mem_fcn
 #else
 #define	lis_mark_mem(a, b, c)
 #endif
-#if __LIS_INTERNAL__
-int      lis_check_guard(void *ptr, char *msg) ;
-int      lis_check_mem(void) ;
-void     lis_terminate_mem(void) ;
+#ifdef __LIS_INTERNAL__
+int lis_check_guard(void *ptr, char *msg);
+int lis_check_mem(void);
+void lis_terminate_mem(void);
 #endif
 
 #if defined(LINUX)
-static inline const char *lis_basename( const char *filename )
+static inline const char *
+lis_basename(const char *filename)
 {
-    char        *p ;
+	char *p;
 
-    p = strrchr(filename, '/') ;
-    if (p == NULL)
-	return(filename) ;
-    return(p+1) ;
+	p = strrchr(filename, '/');
+	if (p == NULL)
+		return (filename);
+	return (p + 1);
 }
 #else
 const char *lis_basename(const char *filename);
@@ -327,17 +328,15 @@ const char *lis_basename(const char *filename);
 /*  -------------------------------------------------------------------  */
 /*				Memory Codes				 */
 
-#define	MEM_QUEUE	-1		/* it's a queue */
-#define	MEM_MSG		-2		/* it's a message (mblk) */
-#define	MEM_STRMHD	-3		/* it's a stream head (stdata) */
-#define	MEM_TIMER	-4		/* it's a timer structure */
-
+#define	MEM_QUEUE	-1	/* it's a queue */
+#define	MEM_MSG		-2	/* it's a message (mblk) */
+#define	MEM_STRMHD	-3	/* it's a stream head (stdata) */
+#define	MEM_TIMER	-4	/* it's a timer structure */
 
 /*
  * Guard word value
  */
 #define	MEM_GUARD	0x1234abcd	/* unique pattern at end of mem area */
-
 
 /*  -------------------------------------------------------------------  */
 /*				Streams Statistics			 */
@@ -346,9 +345,10 @@ const char *lis_basename(const char *filename);
 /*                             Print Buffer				 */
 
 #define	LIS_PRINT_BUFFER_SIZE		50000	/* large-ish buffer */
-#if __LIS_INTERNAL__
-extern void	lis_bprintf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));	/* print into buffer */
-extern void	lis_flush_print_buffer(void) ;	/* print out the buffer */
+#ifdef __LIS_INTERNAL__
+extern void lis_bprintf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));	/* print into
+										   buffer */
+extern void lis_flush_print_buffer(void);	/* print out the buffer */
 #endif
 
 #endif

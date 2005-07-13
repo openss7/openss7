@@ -65,7 +65,6 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-
 #ifndef _STATS_H
 #define _STATS_H 1
 
@@ -73,7 +72,6 @@
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
-
 
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
@@ -83,32 +81,32 @@
 #define HEADERS		0
 #define FREEHDRS	1
 #define DATABS		2
-#define	MEMALLOCS	3			/* # times allocator called */
-#define	MEMFREES	4			/* # times free called */
-#define	MEMALLOCD	5			/* amount of memory */
-#define	DBLKMEM		6			/* amt of mem allocated dblks */
-#define	MSGSQD		7			/* # messages queued */
-#define	MSGQDSTRHD	8			/* # msgs qd at strm hd */
-#define	QUEUES		9			/* # queues allocated */
-#define	CANPUTS		10			/* # canput calls */
-#define	QSCHEDS		11			/* # queues scheduled to run */
-#define	BUFCALLS	12			/* # bufcalls */
-#define	MEMLIM		13			/* lis_max_mem */
-#define	MSGMEMLIM	14			/* lis_max_msg_mem */
-#define	MODUSE		15			/* really # open files */
-#define	OPENTIME	16			/* file open time */
-#define	CLOSETIME	17			/* file close time */
-#define	READTIME	18			/* file read time */
-#define	WRITETIME	19			/* file write time */
-#define	IOCTLTIME	20			/* file ioctl time */
-#define	GETMSGTIME	21			/* file getmsg time */
-#define	PUTMSGTIME	22			/* file putmsg time */
-#define	POLLTIME	23			/* poll time */
-#define	LOCKCNTS	24			/* locks and contention */
-#define	WRITECNT	25			/* write/putmsg */
-#define	READCNT		26			/* read/getmsg */
+#define	MEMALLOCS	3	/* # times allocator called */
+#define	MEMFREES	4	/* # times free called */
+#define	MEMALLOCD	5	/* amount of memory */
+#define	DBLKMEM		6	/* amt of mem allocated dblks */
+#define	MSGSQD		7	/* # messages queued */
+#define	MSGQDSTRHD	8	/* # msgs qd at strm hd */
+#define	QUEUES		9	/* # queues allocated */
+#define	CANPUTS		10	/* # canput calls */
+#define	QSCHEDS		11	/* # queues scheduled to run */
+#define	BUFCALLS	12	/* # bufcalls */
+#define	MEMLIM		13	/* lis_max_mem */
+#define	MSGMEMLIM	14	/* lis_max_msg_mem */
+#define	MODUSE		15	/* really # open files */
+#define	OPENTIME	16	/* file open time */
+#define	CLOSETIME	17	/* file close time */
+#define	READTIME	18	/* file read time */
+#define	WRITETIME	19	/* file write time */
+#define	IOCTLTIME	20	/* file ioctl time */
+#define	GETMSGTIME	21	/* file getmsg time */
+#define	PUTMSGTIME	22	/* file putmsg time */
+#define	POLLTIME	23	/* poll time */
+#define	LOCKCNTS	24	/* locks and contention */
+#define	WRITECNT	25	/* write/putmsg */
+#define	READCNT		26	/* read/getmsg */
 
-#define	STRMAXSTAT	27			/* largest slot */
+#define	STRMAXSTAT	27	/* largest slot */
 #define HEADERSSTR      "In-Use Message Blocks"
 #define FREEHDRSSTR     "Free Message Blocks"
 #define DATABSSTR       "Data Blocks"
@@ -145,45 +143,40 @@
 #define FAILURES	3
 #define CURRENTSTR	"Current"
 #define TOTALSTR	"Total"
-#define MAXIMUMSTR	"Maximum" 
+#define MAXIMUMSTR	"Maximum"
 #define FAILURESSTR	"Failures"
-
 
 /*  -------------------------------------------------------------------  */
 /*				    Types                                */
-
 
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
 
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern lis_atomic_t lis_strstats[STRMAXSTAT][4]; /* the stats */
+#ifdef __LIS_INTERNAL__
+extern lis_atomic_t lis_strstats[STRMAXSTAT][4];	/* the stats */
 #endif
-#endif			/* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /* If in user mode, include a stats dump routine 
  */
 #ifdef MEMPRINT
 
-typedef struct
-{
-    int         stats_inx ;             /* index into lis_strstats */
-    char        *name ;                 /* ASCII name */
-} itemname_t ;
+typedef struct {
+	int stats_inx;			/* index into lis_strstats */
+	char *name;			/* ASCII name */
+} itemname_t;
 
-
-#if __LIS_INTERNAL__
-extern itemname_t  lis_itemnames[];
-extern char       *lis_countnames[];
+#ifdef __LIS_INTERNAL__
+extern itemname_t lis_itemnames[];
+extern char *lis_countnames[];
 #endif
 #endif
-
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 /* increment count for one item
  */
 extern void LisUpCounter(int item, int n);
@@ -193,7 +186,7 @@ extern void LisUpCounter(int item, int n);
  */
 extern void LisSetCounter(int item, int val);
 
-extern void    lis_stat_neg(void) ;
+extern void lis_stat_neg(void);
 #endif
 
 #define	LisUpCount(item)	LisUpCounter(item,1)
@@ -227,10 +220,10 @@ extern void    lis_stat_neg(void) ;
 				    lis_stat_neg() ;			     \
 				} while (0)
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_STATS_H*/
+#endif				/* !_STATS_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

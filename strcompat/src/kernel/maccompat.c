@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:49 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 13:54:46 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:49 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"
@@ -269,3 +269,28 @@ extern mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t le
  *  MPS_INTR_ENABLE
  *  -------------------------------------------------------------------------
  */
+
+#ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
+static
+#endif
+int __init maccomp_init(void)
+{
+#ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
+	printk(KERN_INFO MACCOMP_BANNER);
+#else
+	printk(KERN_INFO MACCOMP_SPLASH);
+#endif
+	return (0);
+}
+#ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
+static
+#endif
+void __exit maccomp_exit(void)
+{
+	return;
+}
+
+#ifdef CONFIG_STREAMS_COMPAT_MAC_MODULE
+module_init(maccomp_init);
+module_exit(maccomp_exit);
+#endif

@@ -64,7 +64,6 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-
 #ifndef _LIS_CONFIG_H
 #define _LIS_CONFIG_H 1
 
@@ -74,11 +73,10 @@
 /*				 Dependencies                            */
 
 #ifdef LINUX
-#include <linux/major.h>		/* for MAX_CHRDEV */
+#include <linux/major.h>	/* for MAX_CHRDEV */
 #else
 #define	MAX_CHRDEV	256
 #endif
-
 
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
@@ -92,9 +90,9 @@
 /* This is only for documentation purposes
  */
 
-#define SHARE          /* you can RW */
-#define EXPORT         /* you can R */
-#define PRIVATE        /* you can't */
+#define SHARE			/* you can RW */
+#define EXPORT			/* you can R */
+#define PRIVATE			/* you can't */
 
 /*  -------------------------------------------------------------------  */
 /*		       Global tunable vars. and symbols                  */
@@ -103,7 +101,6 @@
  * Maximum number of mblk headers to keep on hand for fast allocation
  */
 #define	MAX_MBLKS	10
-
 
 /* From mod.h:
  * (we've been using a char for the module id, so if the # of modules
@@ -117,20 +114,19 @@
 #define	LIS_NAMESZ	64	/* LiS internal name length */
 
 #ifdef KERNEL_2_5		/* 2.5/2.6 kernel */
-#define MAX_STRDEV	1024	/*Max # of stream devices */
-#define MAX_STRMOD	256	 /* Max # of stream modules */
+#define MAX_STRDEV	1024	/* Max # of stream devices */
+#define MAX_STRMOD	256	/* Max # of stream modules */
 #else
-#define MAX_STRDEV	MAX_CHRDEV /*Max # of stream devices */
-#define MAX_STRMOD	MAX_CHRDEV /* Max # of stream modules */
+#define MAX_STRDEV	MAX_CHRDEV	/* Max # of stream devices */
+#define MAX_STRMOD	MAX_CHRDEV	/* Max # of stream modules */
 #endif
 #define MAX_STRAMOD	8	/* max # of autopushed mods per str */
 #define MAX_APUSH       8	/* max # of autopushed mods */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern int lis_reuse_modsw;	/* we reuse modsw entries if this is true */
+#ifdef __LIS_INTERNAL__
+extern int lis_reuse_modsw;		/* we reuse modsw entries if this is true */
 #endif
 #endif				/* __KERNEL__ */
-
 
 /* From queue.h:
  */
@@ -143,30 +139,29 @@ extern int lis_reuse_modsw;	/* we reuse modsw entries if this is true */
 #define LIS_MAXPSZ   4096	/* max. packet size (must be non-zero) */
 #define LIS_MINPSZ   0		/* min. packet size */
 
-#define LIS_MEMLIMIT	(1*1024*1024) /*  STREAMS memory limit */
+#define LIS_MEMLIMIT	(1*1024*1024)	/* STREAMS memory limit */
 
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern unsigned long lis_strthresh;	/* configurable STREAMS memory limit */
 #endif
-#if __LIS_INTERNAL__
-extern int lis_nstrpush;	/* maximum # of pushed modules */
+#ifdef __LIS_INTERNAL__
+extern int lis_nstrpush;		/* maximum # of pushed modules */
 #endif
-#if __LIS_INTERNAL__
-extern int lis_strhold;		/* if not zero str hold feature's activated*/
+#ifdef __LIS_INTERNAL__
+extern int lis_strhold;			/* if not zero str hold feature's activated */
 #endif
 #endif				/* __KERNEL__ */
 
 /* From msg.h:
  */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_strmsgsz;		/* maximum stream message size */
 #endif
 #endif				/* __KERNEL__ */
 
-
-#endif /*!_LIS_CONFIG_H*/
+#endif				/* !_LIS_CONFIG_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

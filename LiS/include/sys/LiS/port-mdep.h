@@ -100,66 +100,64 @@
 #include <sys/types.h>
 #endif
 #ifndef _STLIB_H
-#include <stdlib.h>	      /* for NULL, malloc, free */
+#include <stdlib.h>		/* for NULL, malloc, free */
 #endif
 #ifndef _STDIO_H
-#include <stdio.h>	      /* for printf */
+#include <stdio.h>		/* for printf */
 #endif
 #ifndef _FCNTL_H
-#include <fcntl.h>	      /* open flags, etc */
+#include <fcntl.h>		/* open flags, etc */
 #endif
 #ifndef _ASSERT_H
-#include <assert.h>	      /* for assert macro */
+#include <assert.h>		/* for assert macro */
 #endif
 
 /*  -------------------------------------------------------------------  */
 
-
 /* some missing symbols
  */
 
-#define SECS_TO(t)	(1000*(t))    /* pass secs to system tmout time units */
+#define SECS_TO(t)	(1000*(t))	/* pass secs to system tmout time units */
 
 /* some missing generic types 
  */
 #ifdef dev_t
 #undef dev_t
 #endif
-#define	dev_t	port_dev_t		/* our own definition */
+#define	dev_t	port_dev_t	/* our own definition */
 
+int port_kill_proc(int pid, int sig, int priv);
+int port_kill_pg(int pgrp, int sig, int priv);
+int port_suser(struct file *fp);
 
-int	port_kill_proc(int pid, int sig, int priv) ;
-int	port_kill_pg (int pgrp, int sig, int priv) ;
-int	port_suser(struct file *fp) ;
+#define	lis_suser	port_suser	/* are we super user */
+#define	lis_kill_proc	port_kill_proc	/* signal a process */
+#define	lis_kill_pg	port_kill_pg	/* signal a process group */
 
-#define	lis_suser	port_suser		/* are we super user */
-#define	lis_kill_proc	port_kill_proc		/* signal a process */
-#define	lis_kill_pg	port_kill_pg		/* signal a process group */
+int port_printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));	/* printf routine */
 
-int	port_printf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));		/* printf routine */
 #define	printk		port_printf
 #define PRINTK		port_printf
 
-int	port_register_chrdev(unsigned major, const char *name, 
-				struct file_operations *fops) ;
-int	port_unregister_chrdev(unsigned major, char *name) ;
+int port_register_chrdev(unsigned major, const char *name, struct file_operations *fops);
+int port_unregister_chrdev(unsigned major, char *name);
+
 #define	register_chrdev		port_register_chrdev
 #define	unregister_chrdev	port_unregister_chrdev
 
 /*  -------------------------------------------------------------------  */
 /*                          Timer Structure				 */
 
-struct timer_list			/* borrowed from Linux kernel */
-{
+struct timer_list {			/* borrowed from Linux kernel */
 	struct timer_list *next;
 	struct timer_list *prev;
-	unsigned long	   tdelta;
-	unsigned long	   data;
-	void		 (*function)(unsigned long);
+	unsigned long tdelta;
+	unsigned long data;
+	void (*function) (unsigned long);
 };
 
-extern void port_add_timer(struct timer_list * timer);
-extern int  port_del_timer(struct timer_list * timer);
+extern void port_add_timer(struct timer_list *timer);
+extern int port_del_timer(struct timer_list *timer);
 extern void port_announce_time(long milli_sec);
 extern long port_time_till(long target_time);
 extern long port_target_time(long milli_sec);
@@ -180,11 +178,10 @@ extern long port_milli_to_ticks(long milli_sec);
 
 /*  -------------------------------------------------------------------  */
 
-
 #define lis_free_page(cp) port_free_page((unsigned long)(cp))
 #define	lis_fd2str	  port_fd_to_str
 
-struct stdata		 *port_fd_to_str(int fd) ;
+struct stdata *port_fd_to_str(int fd);
 
 /* should well-define this...
  */
@@ -192,21 +189,20 @@ struct stdata		 *port_fd_to_str(int fd) ;
 
 /* disable/enable interrupts
  */
-#define SPLSTR(x)	port_splstr(&(x))		/* save intr state */
-#define SPLX(x)		port_splx  (&(x))		/* restore intr state */
-#define	SPL0(x)		port_spl0  (&(x))		/* enable intrs */
+#define SPLSTR(x)	port_splstr(&(x))	/* save intr state */
+#define SPLX(x)		port_splx  (&(x))	/* restore intr state */
+#define	SPL0(x)		port_spl0  (&(x))	/* enable intrs */
 
 #define	lis_print_spl_track	port_print_spl_track	/* if it exists */
-void	port_print_spl_track(void) ;
+void port_print_spl_track(void);
 
 #if 0
 #define	lis_hitime()	0	/* no such routine here */
 #endif
 
-void	port_splstr(lis_flags_t *save_state) ;
-void	port_splx(lis_flags_t *saved_state) ;
-void	port_spl0(lis_flags_t *save_state) ;
-
+void port_splstr(lis_flags_t * save_state);
+void port_splx(lis_flags_t * saved_state);
+void port_spl0(lis_flags_t * save_state);
 
 /* lock inodes...
  */
@@ -229,18 +225,16 @@ void	port_spl0(lis_flags_t *save_state) ;
 #define	lis_cleanup_file_closing       port_cleanup_file_closing
 
 extern struct inode *port_grab_inode(struct inode *);
-extern void 	     port_put_inode(struct inode *);
-extern int 	     port_is_stream_inode(struct inode *);
+extern void port_put_inode(struct inode *);
+extern int port_is_stream_inode(struct inode *);
 extern struct inode *port_new_inode(struct file *, dev_t);
-extern struct inode *port_old_inode(struct file *,struct inode *);
-extern void 	     port_show_inode_aliases(struct inode *);
-extern struct inode *port_set_up_inode(struct file *f, struct inode *inode) ;
-extern int           port_new_file_name(struct file *, const char *);
-extern void          port_cleanup_file_opening(struct file *,
-						struct stdata *, int);
-extern void          port_cleanup_file_closing(struct file *,
-						struct stdata *);
-extern void          port_new_stream_name(struct stdata *, struct file *);
+extern struct inode *port_old_inode(struct file *, struct inode *);
+extern void port_show_inode_aliases(struct inode *);
+extern struct inode *port_set_up_inode(struct file *f, struct inode *inode);
+extern int port_new_file_name(struct file *, const char *);
+extern void port_cleanup_file_opening(struct file *, struct stdata *, int);
+extern void port_cleanup_file_closing(struct file *, struct stdata *);
+extern void port_new_stream_name(struct stdata *, struct file *);
 
 /*
  *  FIFO/pipe support
@@ -292,7 +286,6 @@ extern int port_fdetach(const char *);
 #define	STR_MAJOR(port_dev_t_var)	MAJOR((port_dev_t_var))
 #define	STR_MINOR(port_dev_t_var)	MINOR((port_dev_t_var))
 
-
 #ifndef VOID
 #define VOID	void
 #endif
@@ -330,30 +323,30 @@ extern int port_fdetach(const char *);
 #define MEMCPY(dest, src, len)	port_memcpy(dest, src, len)
 #define PANIC(msg)		port_panic(msg)
 
-int		 port_get_uid(struct file *) ;
-int		 port_get_gid(struct file *) ;
-int		 port_get_euid(struct file *) ;
-int		 port_get_egid(struct file *) ;
-int		 port_get_pgrp(struct file *) ;
-int		 port_get_pid(struct file *) ;
+int port_get_uid(struct file *);
+int port_get_gid(struct file *);
+int port_get_euid(struct file *);
+int port_get_egid(struct file *);
+int port_get_pgrp(struct file *);
+int port_get_pid(struct file *);
 
-void		*port_malloc(int size, int class) ;
-void		 port_free(void *ptr) ;
-void		 port_print_mem(void) ;
-void		 port_memcpy(void *dest, void *src, int len) ;
-void		 port_panic(char *msg) ;
+void *port_malloc(int size, int class);
+void port_free(void *ptr);
+void port_print_mem(void);
+void port_memcpy(void *dest, void *src, int len);
+void port_panic(char *msg);
 
-int		 port_openfiles(void) ;
-int		 port_session(struct file *) ;
-struct inode	*port_file_to_ino(int fd) ;
+int port_openfiles(void);
+int port_session(struct file *);
+struct inode *port_file_to_ino(int fd);
 
 /*
  * These are really called indirectly from port.c
  */
-int		 port_sem_P(struct semaphore *sem_addr) ;
-void		 port_sem_V(struct semaphore *sem_addr) ;
-void		 port_sem_init(struct semaphore *sem_addr, int counter) ;
-void		 port_sem_destroy(struct semaphore *sem_addr) ;
+int port_sem_P(struct semaphore *sem_addr);
+void port_sem_V(struct semaphore *sem_addr);
+void port_sem_init(struct semaphore *sem_addr, int counter);
+void port_sem_destroy(struct semaphore *sem_addr);
 
 /*  -------------------------------------------------------------------  */
 
@@ -361,17 +354,16 @@ void		 port_sem_destroy(struct semaphore *sem_addr) ;
  * The surrounding OS should be fixed to call them when appropriate.
  */
 
-void		port_init(void) ;		/* intialize STREAMS */
+void port_init(void);			/* intialize STREAMS */
 
 /* some kernel memory has been free'd 
  * tell STREAMS
  */
-extern void
-lis_memfree( void );
+extern void lis_memfree(void);
 
 /* Get avail kernel memory size
  */
-#define lis_kmemavail()	((unsigned long)-1) /* lots of mem avail :) */
+#define lis_kmemavail()	((unsigned long)-1)	/* lots of mem avail :) */
 
 /*  -------------------------------------------------------------------  */
 /* This will copyin usr string pointed by ustr and return the result  in
@@ -381,33 +373,28 @@ lis_memfree( void );
  * STATUS: complete, untested
  */
 #define	lis_copyin_str		port_copyin_str
-int	port_copyin_str(struct file *fp, const char *ustr,
-			char **kstr, int max) ;
+int port_copyin_str(struct file *fp, const char *ustr, char **kstr, int max);
 
 /* Just another copy in / out
  */
 #define lis_copyin(fp,kbuf,ubuf,len)	port_memcpy_fromfs(fp,kbuf,ubuf,len)
 #define lis_copyout(fp,kbuf,ubuf,len)	port_memcpy_tofs(fp,kbuf,ubuf,len)
 
-int	port_memcpy_fromfs(struct file *fp, void *kbuf,
-					const void *ubuf, int len) ;
-int	port_memcpy_tofs(struct file *fp, const void *kbuf,
-					    void *ubuf, int len) ;
-int	port_get_fs_byte(struct file *fp, const void *uaddr) ;
+int port_memcpy_fromfs(struct file *fp, void *kbuf, const void *ubuf, int len);
+int port_memcpy_tofs(struct file *fp, const void *kbuf, void *ubuf, int len);
+int port_get_fs_byte(struct file *fp, const void *uaddr);
 
 /* check a user memory area
  */
 #define lis_check_umem(fp,f,p,l)	port_verify_area(fp,f,p,l)
-int	port_verify_area(struct file *fp, int rd_wr_fcn,
-			 const void *usr_addr, int lgth);
+int port_verify_area(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth);
 
-#ifndef VERIFY_READ	
+#ifndef VERIFY_READ
 #define VERIFY_READ 0		/* argument for lis_check_umem */
 #endif
-#ifndef VERIFY_WRITE	
+#ifndef VERIFY_WRITE
 #define VERIFY_WRITE 1		/* argument for lis_check_umem */
 #endif
-
 
 /*  -------------------------------------------------------------------  */
 
@@ -420,9 +407,7 @@ int	port_verify_area(struct file *fp, int rd_wr_fcn,
 #define	lis_setqsched		port_setqsched
 #define	lis_runqueues()		port_setqsched(1)
 
-extern void    port_setqsched(int can_call) ;
-
-
+extern void port_setqsched(int can_call);
 
 /*  -------------------------------------------------------------------  */
 
@@ -435,18 +420,16 @@ extern void    port_setqsched(int can_call) ;
  */
 #define	lis_select_wakeup	port_select_wakeup
 
-extern void port_select_wakeup(struct stdata *hd) ;
-
+extern void port_select_wakeup(struct stdata *hd);
 
 /*  -------------------------------------------------------------------  */
-
 
 /*
  * Dummies for module count manipulations.  Used only in Linux kernel.
  */
 #if 0				/* replaced by MODGET/PUT */
-#define lis_inc_mod_cnt() 	/* nothing at all */
-#define lis_dec_mod_cnt() 	/* nothing at all */
+#define lis_inc_mod_cnt()	/* nothing at all */
+#define lis_dec_mod_cnt()	/* nothing at all */
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -457,8 +440,7 @@ extern void port_select_wakeup(struct stdata *hd) ;
 #define TL_NEXT(tl)  (tl).next
 #define TL_PREV(tl)  (tl).prev
 
-#endif /*!__LIS_M_DEP_H*/
-
+#endif				/* !__LIS_M_DEP_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

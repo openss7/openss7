@@ -97,13 +97,12 @@
 /*				    Types                                */
 /* Stream event info
  */
-typedef
-struct strevent {
-    struct strevent *se_next;	/* next event for this stream or NULL*/
-    struct strevent *se_prev;	/* previous event for this stream or last
-				 * event if this is the first one*/
-    pid_t se_pid;		/* process to be signaled */
-    short se_evs;		/* events wanted */
+typedef struct strevent {
+	struct strevent *se_next;	/* next event for this stream or NULL */
+	struct strevent *se_prev;	/* previous event for this stream or last event if this is
+					   the first one */
+	pid_t se_pid;			/* process to be signaled */
+	short se_evs;			/* events wanted */
 } strevent_t;
 
 #if 0
@@ -122,55 +121,52 @@ struct strevent {
  * -- nemo
  */
 
-struct strinfo {};
-#endif /* 0 */
+struct strinfo {
+};
+#endif				/* 0 */
 
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
 
-#if __LIS_INTERNAL__
-extern struct strevent *lis_sefreelist; /* list of free stream events */
-extern struct strevent *lis_secachep;   /* reserve store of free str events */
+#ifdef __LIS_INTERNAL__
+extern struct strevent *lis_sefreelist;	/* list of free stream events */
+extern struct strevent *lis_secachep;	/* reserve store of free str events */
 #endif
 
 #if 0
 /* see long comment above -- nemo */
-extern struct strinfo lis_strinfo[]; /* keeps track of allocated events	*/
+extern struct strinfo lis_strinfo[];	/* keeps track of allocated events */
 #endif
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 /* get events for pid in list
  * STATUS: complete, untested
  */
-extern  short
-lis_get_elist_ent( strevent_t *list, pid_t pid );
+extern short lis_get_elist_ent(strevent_t * list, pid_t pid);
 
 /* add event to list
  * STATUS: complete, untested
  */
-extern int
-lis_add_to_elist( strevent_t **list, pid_t pid, short events );
+extern int lis_add_to_elist(strevent_t ** list, pid_t pid, short events);
 
 /* del event from list
  * rets non-zero if not-found
  * STATUS: complete, untested
  */
-extern int
-lis_del_from_elist( strevent_t **list, pid_t pid, short events );
+extern int lis_del_from_elist(strevent_t ** list, pid_t pid, short events);
 
 /*
  * Free the entire elist
  */
-extern void
-lis_free_elist( strevent_t **list);
+extern void lis_free_elist(strevent_t ** list);
 #endif
 
 /*  -------------------------------------------------------------------  */
-#endif /* __KERNEL__ */
-#endif /*!_EVENT_H*/
+#endif				/* __KERNEL__ */
+#endif				/* !_EVENT_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

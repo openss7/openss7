@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:46:00 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:00 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:46:00 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:46:00 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:45 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -58,7 +58,7 @@ static char const ident[] =
 
 #define X400P_DOWNLOAD_FIRMWARE
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #ifdef LINUX
 #include <linux/ioport.h>

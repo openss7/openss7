@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/05 22:45:36 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:35 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/05 22:45:36 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:35 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/05 22:45:36 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:35 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver
@@ -61,7 +61,7 @@ static char const ident[] =
  *  underneath it to form a complete Signalling Connection Control Part
  *  protocol layer for SS7.
  */
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -84,7 +84,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/05 22:45:36 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 12:01:35 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2003 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

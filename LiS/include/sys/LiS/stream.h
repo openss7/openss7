@@ -178,7 +178,8 @@
 #define  SAMESTR     LIS_SAMESTR
 #define	 strqset	lis_strqset
 #define	 strqget	lis_strqget
-extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l) _RP;
+extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l);
+
 #define put(q,m)	lis_safe_putmsg((q),(m),__FILE__,__LINE__)
 #endif				/* __KERNEL__ */
 
@@ -294,8 +295,8 @@ extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l) _RP;
 /*  -------------------------------------------------------------------  */
 
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-	extern int lis_init_stream_subsystem(int memlimit);
+#ifdef __LIS_INTERNAL__
+extern int lis_init_stream_subsystem(int memlimit);
 #endif
 /* void lis_scantmout_handler(unsigned long arg); */
 /* void lis_runqueues(void) ; */

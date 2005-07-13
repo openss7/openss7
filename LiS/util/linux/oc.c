@@ -58,8 +58,8 @@
 
 #ident "@(#) $RCSfile: oc.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile: oc.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
-
+static char const ident[] =
+    "$RCSfile: oc.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /* 
  *  oc.c - open/<default>close testing of files.  Given a list of paths,
@@ -90,11 +90,12 @@ static char const ident[] = "$RCSfile: oc.c,v $ $Name:  $($Revision: 1.1.1.1.12.
 
 int verbose = 1;
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
-    if (!verbose)
-	return;
-    fprintf(stdout, "\
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
 \n\
@@ -133,7 +134,8 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -151,7 +153,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -164,7 +167,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -206,7 +210,8 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	char path[40];
 	int fd, i, n = 1;
@@ -218,6 +223,7 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		int c;
+
 #ifdef _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -237,6 +243,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "n:w:rWRBqv::hVC?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "n:w:rWRBqv::hVC?");
@@ -307,17 +314,17 @@ int main(int argc, char *argv[])
 			strcpy(path, argv[p0++]);
 
 			if ((fd = open(path, o_flags)) < 0) {
-				fprintf(stderr, "open( \"%s\", 0%o ) failed: %s (%d)\n",
-					path, o_flags, strerror(errno), errno);
+				fprintf(stderr, "open( \"%s\", 0%o ) failed: %s (%d)\n", path,
+					o_flags, strerror(errno), errno);
 				exit(1);
 			}
 
 			if (verbose) {
 				fstat(fd, &stat);
 				printf("%d: fd %d = open( \"%s\", 0%o ) "
-				       "mode 0%o dev 0x%04x rdev 0x%04x",
-				       i, fd, path, o_flags, (int) (stat.st_mode),
-				       (int) (stat.st_dev), (int) (stat.st_rdev));
+				       "mode 0%o dev 0x%04x rdev 0x%04x", i, fd, path, o_flags,
+				       (int) (stat.st_mode), (int) (stat.st_dev),
+				       (int) (stat.st_rdev));
 				is_stream = isastream(fd);
 				printf("%s", (is_stream ? " [STREAM]" : ""));
 				printf("\n");

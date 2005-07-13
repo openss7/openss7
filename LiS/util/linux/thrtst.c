@@ -58,7 +58,8 @@
 
 #ident "@(#) $RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
+static char const ident[] =
+    "$RCSfile: thrtst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /************************************************************************
 *                     Multi-Threaded Test                               *
@@ -152,7 +153,8 @@ int initial_burst = 0;
 * Initialize a thread info structure.					*
 *									*
 ************************************************************************/
-void setup_thread_info(int thread_nr)
+void
+setup_thread_info(int thread_nr)
 {
 	thread_info_t *tp = &thread_info[thread_nr];
 	int i;
@@ -235,7 +237,8 @@ void setup_thread_info(int thread_nr)
 * Set the loopback file to point to its partner.			*
 *									*
 ************************************************************************/
-int set_loop(int fd, int other_minor)
+int
+set_loop(int fd, int other_minor)
 {
 	int rslt;
 	struct strioctl ioc;
@@ -262,7 +265,8 @@ int set_loop(int fd, int other_minor)
 * this value is used until the file is closed.				*
 *									*
 ************************************************************************/
-int set_timer(int fd, int timeout)
+int
+set_timer(int fd, int timeout)
 {
 	int rslt;
 	struct strioctl ioc;
@@ -286,7 +290,8 @@ int set_timer(int fd, int timeout)
 * The reader process.  It reads messages and writes them back.		*
 *									*
 ************************************************************************/
-void *reader(void *arg)
+void *
+reader(void *arg)
 {
 	thread_info_t *tp = (thread_info_t *) arg;
 	int nbytes;
@@ -323,7 +328,8 @@ void *reader(void *arg)
 * The writer process.  It writes messages and then reads them back.	*
 *									*
 ************************************************************************/
-void *writer(void *arg)
+void *
+writer(void *arg)
 {
 	thread_info_t *tp = (thread_info_t *) arg;
 	int msg_size = MAX_MSG;
@@ -370,7 +376,8 @@ void *writer(void *arg)
 * Print a status report on the progress of the threads.			*
 *									*
 ************************************************************************/
-void print_progress(void)
+void
+print_progress(void)
 {
 	int i;
 	time_t now;
@@ -386,17 +393,16 @@ void print_progress(void)
 	for (i = 1; i <= max_threads; i++) {
 		tp = &thread_info[i];
 		if (verbose)
-			printf("%3u %10u %8u %10u %8u\n",
-			       i,
-			       tp->xmcnt, (int) (tp->xmcnt / delta), tp->rmcnt,
-			       (int) (tp->rmcnt / delta));
+			printf("%3u %10u %8u %10u %8u\n", i, tp->xmcnt, (int) (tp->xmcnt / delta),
+			       tp->rmcnt, (int) (tp->rmcnt / delta));
 	}
 }
 
 /************************************************************************
 *                           get_options                                 *
 ************************************************************************/
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -439,7 +445,8 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -457,7 +464,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -470,7 +478,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -503,10 +512,12 @@ Options:\n\
 ", argv[0]);
 }
 
-void get_options(int argc, char **argv)
+void
+get_options(int argc, char **argv)
 {
 	for (;;) {
 		int c;
+
 #ifdef _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -523,6 +534,7 @@ void get_options(int argc, char **argv)
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "b:f:t:qv::hVC?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "b:f:t:qv::hVC?");
@@ -589,7 +601,8 @@ void get_options(int argc, char **argv)
 * then lets the threads just move the data.				*
 *									*
 ************************************************************************/
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	int rslt;
 	int i;

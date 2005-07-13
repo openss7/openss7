@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:30 $
+ @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:30 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:30 $"
+#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:30 $"
 
 static char const ident[] =
-    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/05 22:45:30 $";
+    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/13 12:01:30 $";
 
 #define __NO_VERSION__
 
@@ -62,7 +62,7 @@ static char const ident[] =
 #define _LIS_SOURCE
 #endif
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #ifdef LFS
 #include <sys/lisddi.h>

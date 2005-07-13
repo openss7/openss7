@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.2  2005/07/13 12:01:49  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 0.9.2.1  2005/07/12 13:54:46  brian
  - changes for os7 compatibility and check pass
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/13 12:01:49 $"
 
-static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $";
+static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:46 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/13 12:01:49 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -562,3 +565,28 @@ EXPORT_SYMBOL(ss7_stop_timer);
 __OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer, const char *mod,
 					 ulong *timeo, void (*exp_func) (caddr_t), ulong val);
 EXPORT_SYMBOL(ss7_start_timer);
+
+#ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
+static
+#endif
+int __init os7comp_init(void)
+{
+#ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
+	printk(KERN_INFO OS7COMP_BANNER);
+#else
+	printk(KERN_INFO OS7COMP_SPLASH);
+#endif
+	return (0);
+}
+#ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
+static
+#endif
+void __exit os7comp_exit(void)
+{
+	return;
+}
+
+#ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE
+module_init(os7comp_init);
+module_exit(os7comp_exit);
+#endif

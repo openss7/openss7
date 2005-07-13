@@ -99,7 +99,7 @@
 #undef  KERN_EMERG
 #define	KERN_EMERG	""
 
-#else					/* SVR4 style cmn_err */
+#else				/* SVR4 style cmn_err */
 
 #define	PRE_NL		"\n"
 #ifndef KERN_NOTICE
@@ -117,74 +117,73 @@
 
 #endif
 
+lis_spin_lock_t lis_cmn_err_lock;
+char lis_cmn_err_buf[4096];
 
-lis_spin_lock_t	 lis_cmn_err_lock ;
-char	    lis_cmn_err_buf[4096];
 #define	buf lis_cmn_err_buf
 
-void	lis_cmn_err_init(void)
+void
+lis_cmn_err_init(void)
 {
-    lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock") ;
+	lis_spin_lock_init(&lis_cmn_err_lock, "CmnErr-Lock");
 }
 
-void	_RP lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
+void
+lis_vcmn_err(int err_lvl, const char *fmt, va_list args)
 {
-    lis_flags_t  psw;
-    char	*p ;
+	lis_flags_t psw;
+	char *p;
 
-    lis_spin_lock_irqsave(&lis_cmn_err_lock, &psw) ;
-    switch (err_lvl)
-    {
-    case CE_CONT:		/* continue printing */
-	buf[0] = 0 ;
-	break ;
-    case CE_NOTE:		/* NOTICE */
-	strcpy(buf, PRE_NL KERN_NOTICE "NOTICE: ") ;
-	break ;
-    case CE_WARN:		/* WARNING */
-	strcpy(buf, PRE_NL KERN_WARNING "WARNING: ") ;
-	break ;
-    case CE_PANIC:		/* PANIC */
-	strcpy(buf, PRE_NL KERN_EMERG "PANIC: ") ;
-	break ;
-    default:
-	lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw) ;
-	printk("\n" KERN_NOTICE
-		     "cmn_err:  Called with invalid arguments "
-		     "(0x%lx, 0x%lx)\n",
-		     (long) err_lvl, (long) fmt) ;
-	return ;
-    }
+	lis_spin_lock_irqsave(&lis_cmn_err_lock, &psw);
+	switch (err_lvl) {
+	case CE_CONT:		/* continue printing */
+		buf[0] = 0;
+		break;
+	case CE_NOTE:		/* NOTICE */
+		strcpy(buf, PRE_NL KERN_NOTICE "NOTICE: ");
+		break;
+	case CE_WARN:		/* WARNING */
+		strcpy(buf, PRE_NL KERN_WARNING "WARNING: ");
+		break;
+	case CE_PANIC:		/* PANIC */
+		strcpy(buf, PRE_NL KERN_EMERG "PANIC: ");
+		break;
+	default:
+		lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw);
+		printk("\n" KERN_NOTICE "cmn_err:  Called with invalid arguments "
+		       "(0x%lx, 0x%lx)\n", (long) err_lvl, (long) fmt);
+		return;
+	}
 
-    for (p = buf; *p; p++) ;		/* find end of string */
+	for (p = buf; *p; p++) ;	/* find end of string */
 
-    vsprintf (p, fmt, args);
+	vsprintf(p, fmt, args);
 
 #if defined(SOLARIS_STYLE_CMN_ERR)	/* config option */
-    if (err_lvl != CE_CONT)
-    {
-	for (; *p; p++) ;		/* find end of string */
-	*p++ = '\n' ;			/* add newline at end */
-	*p   = 0 ;
-    }
+	if (err_lvl != CE_CONT) {
+		for (; *p; p++) ;	/* find end of string */
+		*p++ = '\n';	/* add newline at end */
+		*p = 0;
+	}
 #endif
 
-    if (err_lvl == CE_PANIC)
-	PANIC(buf);
-    else
-	printk("%s", buf) ;
+	if (err_lvl == CE_PANIC)
+		PANIC(buf);
+	else
+		printk("%s", buf);
 
-    lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw) ;
+	lis_spin_unlock_irqrestore(&lis_cmn_err_lock, &psw);
 
-} /* lis_cmn_err */
+}				/* lis_cmn_err */
 
-__attribute__ ((format(printf, 2, 3)))
-void	_RP lis_cmn_err(int err_lvl, const char *fmt, ...)
+void
+lis_cmn_err(int err_lvl, const char *fmt, ...)
 {
 	va_list args;
+
 	va_start(args, fmt);
 	lis_vcmn_err(err_lvl, fmt, args);
 	va_end(args);
 	return;
 
-} /* lis_cmn_err */
+}				/* lis_cmn_err */

@@ -58,8 +58,8 @@
 
 #ident "@(#) $RCSfile: test.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile: test.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
-
+static char const ident[] =
+    "$RCSfile: test.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /* 
  *  Test program for clarification of Berges bug.
@@ -90,7 +90,8 @@ int verbose = 1;
 
 int fd1, fd2;
 
-void sleeper1(void)
+void
+sleeper1(void)
 {
 	struct strbuf datbuf;
 	char buf[256];
@@ -112,7 +113,8 @@ void sleeper1(void)
 	}
 }
 
-void sleeper2(void)
+void
+sleeper2(void)
 {
 	struct strbuf datbuf;
 	char buf[256];
@@ -134,7 +136,8 @@ void sleeper2(void)
 	}
 }
 
-void hanger(void)
+void
+hanger(void)
 {
 	struct strbuf datbuf;
 	char buf[256];
@@ -156,7 +159,8 @@ void hanger(void)
 	}
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -200,7 +204,8 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -218,7 +223,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -231,7 +237,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -258,13 +265,15 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	struct strioctl ioc;
 	int arg, i;
 
 	for (;;) {
 		int c;
+
 #ifdef _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -278,6 +287,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "qhv::VC?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "qhv::VC?");

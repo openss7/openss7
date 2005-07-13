@@ -72,8 +72,8 @@
 #include <linux/module.h>
 #include <linux/init.h>
 
-char	lis_version[] = PACKAGE_VERSION "." PACKAGE_RELEASE ;
-char	lis_date[]    = PACKAGE_DATE ;
+char lis_version[] = PACKAGE_VERSION "." PACKAGE_RELEASE;
+char lis_date[] = PACKAGE_DATE;
 
 /*
 

@@ -86,11 +86,11 @@
 /*  -------------------------------------------------------------------  */
 /*                         Shared global variables                       */
 
-#if __LIS_INTERNAL__
-extern struct streamtab lis_fifo_strtab; /* streamtab for streams fifo's */
+#ifdef __LIS_INTERNAL__
+extern struct streamtab lis_fifo_strtab;	/* streamtab for streams fifo's */
 #endif
 
-#endif /*!_FIFO_H*/
+#endif				/* !_FIFO_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

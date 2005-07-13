@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 01:40:39 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:40:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.11  2005/07/13 12:01:49  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 0.9.2.10  2005/07/13 01:40:39  brian
  - changes for check pass
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 01:40:39 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:49 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 01:40:39 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -110,7 +113,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 01:40:39 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:49 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -1138,11 +1141,10 @@ void mi_timer_free(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_free);
 
-#if LFS
 queue_t *mi_allocq(struct streamtab *st)
 {
 #if LIS
-	return (NULL);
+	return lis_allocq(st->st_rdinit->qi_minfo->mi_idname);
 #endif
 #if LFS
 	queue_t *q;
@@ -1165,7 +1167,6 @@ void mi_freeq(queue_t *q)
 }
 
 EXPORT_SYMBOL(mi_freeq);
-#endif
 
 int mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
@@ -1451,3 +1452,28 @@ void mps_intr_enable(pl_t pl)
 }
 
 EXPORT_SYMBOL(mps_intr_enable);
+
+#ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
+static
+#endif
+int __init mpscomp_init(void)
+{
+#ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
+	printk(KERN_INFO MPSCOMP_BANNER);
+#else
+	printk(KERN_INFO MPSCOMP_SPLASH);
+#endif
+	return (0);
+}
+#ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
+static
+#endif
+void __exit mpscomp_exit(void)
+{
+	return;
+}
+
+#ifdef CONFIG_STREAMS_COMPAT_MPS_MODULE
+module_init(mpscomp_init);
+module_exit(mpscomp_exit);
+#endif

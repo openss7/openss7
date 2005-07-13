@@ -66,7 +66,6 @@
  *    gram@aztec.co.za
  */
 
-
 #ifndef _MSG_H
 #define _MSG_H 1
 
@@ -89,8 +88,6 @@
 #include <sys/strconfig.h>	/* config definitions */
 #endif
 #include <sys/LiS/genconf.h>
-
-
 
 /*
  * The memory allocation mechanism is based on that in SVR4.2.
@@ -133,8 +130,7 @@
 /* size of header and fastbuf data 
  */
 #define HDRSZ	(sizeof(struct mbinfo)+sizeof(struct dbinfo))
-#define FASTBUF	(128-HDRSZ)		  /* space remaining for data	*/
-
+#define FASTBUF	(128-HDRSZ)	/* space remaining for data */
 
 /* Code for M_ERROR msg 
  */
@@ -153,7 +149,6 @@
 #define INFPSZ  (-1)
 #endif
 
-
 /*  -------------------------------------------------------------------  */
 /*				    Types                                */
 
@@ -162,21 +157,18 @@
  * in msgs.
  */
 
-typedef
-struct  msgb {
-  SHARE    
-        struct  msgb    *b_next; /* next msg on queue */
-        struct  msgb    *b_prev; /* prev msg on queue */
-        struct  msgb    *b_cont; /* next blk of msg */
-        unsigned char   *b_rptr; /* 1st unread byte */
-        unsigned char   *b_wptr; /* 1st unwriten byte */
-  EXPORT
-        struct datab    *b_datap; /* pointer to data */
-        unsigned char	 b_band;  /* message priority */
-        unsigned char	 b_pad1;
-  PRIVATE
-	unsigned short	 b_flag;  /* see below */
-        long         	 b_pad2;
+typedef struct msgb {
+	struct msgb *b_next;		/* next msg on queue */
+	struct msgb *b_prev;		/* prev msg on queue */
+	struct msgb *b_cont;		/* next blk of msg */
+	unsigned char *b_rptr;		/* 1st unread byte */
+	unsigned char *b_wptr;		/* 1st unwriten byte */
+	struct datab *b_datap;		/* pointer to data */
+	unsigned char b_band;		/* message priority */
+	unsigned char b_pad1;
+	/* implementation specific */
+	unsigned short b_flag;		/* see below */
+	long b_pad2;
 } msgb_t;
 
 typedef msgb_t mblk_t;
@@ -188,65 +180,58 @@ typedef msgb_t mblk_t;
 #define	MSGNOLOOP	0x02	/* stream head won't loop around to write q */
 #define	MSGDELIM	0x04	/* message is delimited */
 
-
 /*
  * This structure is used in calls to esballoc
  */
 
-typedef
-struct free_rtn {
-  SHARE
-        void _RP (*free_func)(char *);      /* the free() function */
-        char *free_arg;                 /* argument */
+typedef struct free_rtn {
+	void (*free_func) (char *);	/* the free() function */
+	char *free_arg;			/* argument */
 } frtn_t;
 
 /* This is the data block. It stores data for a message block
  */
-typedef
-struct datab {
-  SHARE
-        struct  free_rtn* frtnp;	/* for SVR4 compatibility */
-  EXPORT
-        unsigned char   *db_base;
-        unsigned char   *db_lim;
+typedef struct datab {
+	struct free_rtn *frtnp;		/* for SVR4 compatibility */
+	unsigned char *db_base;
+	unsigned char *db_lim;
 	volatile
-        unsigned char   db_ref;
-	unsigned char	db_type; /* QNORM or QPCTL */
-  PRIVATE
-        unsigned int    db_size;
-	frtn_t		db_rtn ;
+	unsigned char db_ref;
+	unsigned char db_type;		/* QNORM or QPCTL */
+	/* implementation specific */
+	unsigned int db_size;
+	frtn_t db_rtn;
 } datab_t;
 
 typedef datab_t dblk_t;
 
-
 /* Structures for the message headers
  */
 
-struct mbinfo{
-    mblk_t	m_mblock;
-    void	(*m_func)(void);
+struct mbinfo {
+	mblk_t m_mblock;
+	void (*m_func) (void);
 };
 
-struct dbinfo{
-    dblk_t	d_dblock;
+struct dbinfo {
+	dblk_t d_dblock;
 };
 
-struct mdbblock{
-    struct mbinfo	msgblk;		  /* message block header info	*/
-    struct dbinfo	datblk;		  /* data block header info	*/
-    char   		databuf[FASTBUF]; /* internal small data buffer */
+struct mdbblock {
+	struct mbinfo msgblk;		/* message block header info */
+	struct dbinfo datblk;		/* data block header info */
+	char databuf[FASTBUF];		/* internal small data buffer */
 };
 
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
 #ifdef __KERNEL__
 
-#if __LIS_INTERNAL__
-extern volatile struct mdbblock  *lis_mdbfreelist; /* msg block free list */
+#ifdef __LIS_INTERNAL__
+extern volatile struct mdbblock *lis_mdbfreelist;	/* msg block free list */
 #endif
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
@@ -254,13 +239,12 @@ extern volatile struct mdbblock  *lis_mdbfreelist; /* msg block free list */
 
 /* lis_strgiveback - return some free headers to system heap
  */
-#if __LIS_INTERNAL__
-extern void
-lis_strgiveback(unsigned long arg);
+#ifdef __LIS_INTERNAL__
+extern void lis_strgiveback(unsigned long arg);
 #endif
 
-#if defined(LINUX) 
-#if __LIS_INTERNAL__
+#if defined(LINUX)
+#ifdef __LIS_INTERNAL__
 extern void lis_init_msg(void);
 #endif
 #endif
@@ -268,9 +252,8 @@ extern void lis_init_msg(void);
 /*  lis_terminate_msg - do the final shutdown of the msg memory subsystem
  */
 #if !(defined(LINUX) && defined(USE_KMEM_CACHE))
-#if __LIS_INTERNAL__
-extern void
-lis_terminate_msg(void);
+#ifdef __LIS_INTERNAL__
+extern void lis_terminate_msg(void);
 #endif
 #endif
 
@@ -280,45 +263,41 @@ lis_terminate_msg(void);
  * allocb_physreq: allocate M_DATA in a memory block with specific
  *      physical characteristics.
  */
-struct msgb *
-lis_allocb(int size, unsigned int priority, char *file_name, int line_nr)_RP;
-struct msgb *
-lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr,
-		   char *file_name, int line_nr)_RP;
+struct msgb *lis_allocb(int size, unsigned int priority, char *file_name, int line_nr);
+struct msgb *lis_allocb_physreq(int size, unsigned int priority, void *physreq_ptr, char *file_name,
+				int line_nr);
 
 /* testb: see if an allocation can actually be done.
  *
  */
-extern int
-lis_testb(int size, unsigned int priority)_RP;
+extern int lis_testb(int size, unsigned int priority);
 
 /*
  * esballoc: allocate a message block, using a user-provided data buffer
  *
  */
-extern mblk_t *
-lis_esballoc(unsigned char *base, int size, int priority,
-	     frtn_t *freeinfo, char *file_name, int line_nr)_RP;
+extern mblk_t *lis_esballoc(unsigned char *base, int size, int priority, frtn_t *freeinfo,
+			    char *file_name, int line_nr);
 
 /* freeb - Free data buffer and place message block on free list. Don't
  *      follow the continuation pointer.
  *
  */
-extern void lis_freeb(mblk_t *bp)_RP;
-#if __LIS_INTERNAL__
-extern void lis_freedb(mblk_t *bp, int free_hdr)_RP;
+extern void lis_freeb(mblk_t *bp);
+
+#ifdef __LIS_INTERNAL__
+extern void lis_freedb(mblk_t *bp, int free_hdr);
 #endif
 
 /* freemsg - free a whole message
  *
  */
-void
-lis_freemsg(mblk_t *mp)_RP;
+void lis_freemsg(mblk_t *mp);
 
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_MSG_H*/
+#endif				/* !_MSG_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

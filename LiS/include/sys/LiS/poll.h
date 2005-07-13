@@ -65,7 +65,6 @@
  *    nemo@ordago.uc3m.es, gram@aztec.co.za
  */
 
-
 #ifndef _POLL_H
 #define _POLL_H 1
 
@@ -80,22 +79,22 @@
 /* Poll list head structure.  
  */
 struct pollhead {
-	struct polldat	*ph_list;	/* list of pollers */
+	struct polldat *ph_list;	/* list of pollers */
 };
 
 /* Data necessary to notify process sleeping in poll(2)
  * when an event has occurred.
  */
 struct polldat {
-	struct polldat	*pd_next;  /* next in poll list */
-	struct polldat	*pd_prev;  /* previous in poll list */
-	struct pollhead *pd_headp; /* backptr to pollhead */
-	short		pd_events; /* events being polled */
-	void    (*pd_fn)(long);    /* event callback fn */
-	long            pd_arg;	   /* arg to fn */
+	struct polldat *pd_next;	/* next in poll list */
+	struct polldat *pd_prev;	/* previous in poll list */
+	struct pollhead *pd_headp;	/* backptr to pollhead */
+	short pd_events;		/* events being polled */
+	void (*pd_fn) (long);		/* event callback fn */
+	long pd_arg;			/* arg to fn */
 };
 typedef struct pollhead pollhead_t;
-typedef struct polldat  polldat_t;
+typedef struct polldat polldat_t;
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -106,17 +105,16 @@ typedef struct polldat  polldat_t;
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
-
 #ifdef __KERNEL__
 /* poll() syscall entry point
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 int lis_syspoll(char *ubuff, unsigned long n, int tmout);
 #endif
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_POLL_H*/
+#endif				/* !_POLL_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

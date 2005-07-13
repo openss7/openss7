@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:45:36 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:36 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:45:36 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:34 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:45:36 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:34 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -67,7 +67,7 @@ static char const ident[] =
  *  channel (slot) operation, where each SDL stream represents one DS0 or DS0a
  *  bearer channel.
  */
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -77,7 +77,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:45:36 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:34 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

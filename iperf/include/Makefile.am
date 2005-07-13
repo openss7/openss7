@@ -80,4 +80,4 @@ noinst_HEADERS = \
 		util.h \
 		version.h
 
-# vim: ft=automake
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

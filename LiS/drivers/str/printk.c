@@ -71,111 +71,104 @@
 #include <sys/stream.h>
 #include <sys/osif.h>
 
-static struct module_info printk_minfo =
-{
-  0,				/* id */
-  "printk",			/* name */
-  0,				/* min packet size accepted */
-  INFPSZ,			/* max packet size accepted */
-  50000,			/* high water mark */
-  40000				/* low water mark */
+static struct module_info printk_minfo = {
+	0,			/* id */
+	"printk",		/* name */
+	0,			/* min packet size accepted */
+	INFPSZ,			/* max packet size accepted */
+	50000,			/* high water mark */
+	40000			/* low water mark */
 };
 
-static int   _RP printk_open  (queue_t *, dev_t*, int, int, cred_t *);
-static int   _RP printk_close (queue_t *, int, cred_t *);
-static int   _RP printk_wput (queue_t *, mblk_t *);
+static int printk_open(queue_t *, dev_t *, int, int, cred_t *);
+static int printk_close(queue_t *, int, cred_t *);
+static int printk_wput(queue_t *, mblk_t *);
 
 /* qinit structures (rd and wr side) 
  */
-static struct qinit printk_rinit =
-{
-  NULL,				/* put */       
-  NULL,				/* service  */  
-  printk_open,			/* open */      
-  printk_close,			/* close */     
-  NULL,				/* admin */     
-  &printk_minfo,		/* info */      
-  NULL				/* stat */      
+static struct qinit printk_rinit = {
+	NULL,			/* put */
+	NULL,			/* service */
+	printk_open,		/* open */
+	printk_close,		/* close */
+	NULL,			/* admin */
+	&printk_minfo,		/* info */
+	NULL			/* stat */
 };
 
-static struct qinit printk_winit =
-{
-  printk_wput, 	                /* put */       
-  NULL, 			/* service  */  
-  NULL, 			/* open */      
-  NULL, 			/* close */     
-  NULL, 			/* admin */     
-  &printk_minfo, 		/* info */      
-  NULL				/* stat */      
+static struct qinit printk_winit = {
+	printk_wput,		/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&printk_minfo,		/* info */
+	NULL			/* stat */
 };
 
 /* streamtab for the printk driver.
  */
-struct streamtab printk_info =
-{
-  &printk_rinit,		/* read queue */
-  &printk_winit,		/* write queue */
-  NULL,				/* mux read queue  */
-  NULL				/* mux write queue */
+struct streamtab printk_info = {
+	&printk_rinit,		/* read queue */
+	&printk_winit,		/* write queue */
+	NULL,			/* mux read queue */
+	NULL			/* mux write queue */
 };
-
 
 /*
  * Open routine grants all opens
  */
-static int _RP
-printk_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+static int
+printk_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-    (void) q ;					/* compiler happiness */
-    (void) devp ;				/* compiler happiness */
-    (void) flag ;				/* compiler happiness */
-    (void) sflag ;				/* compiler happiness */
-    (void) credp ;				/* compiler happiness */
+	(void) q;		/* compiler happiness */
+	(void) devp;		/* compiler happiness */
+	(void) flag;		/* compiler happiness */
+	(void) sflag;		/* compiler happiness */
+	(void) credp;		/* compiler happiness */
 
-    return(0) ;					/* success */
+	return (0);		/* success */
 
-} /* printk_open */
+}				/* printk_open */
 
-
-static int _RP
-printk_close (queue_t *q, int dummy, cred_t *credp)
+static int
+printk_close(queue_t *q, int dummy, cred_t *credp)
 {
-    (void) q ;					/* compiler happiness */
-    (void) dummy ;
-    (void) credp ;
+	(void) q;		/* compiler happiness */
+	(void) dummy;
+	(void) credp;
 
-    return(0) ;
+	return (0);
 }
 
-static int  _RP
-printk_wput (queue_t *q, mblk_t *msg)
+static int
+printk_wput(queue_t *q, mblk_t *msg)
 {
-    mblk_t	*mp ;
-    char	*p ;
-    char	 c ;
+	mblk_t *mp;
+	char *p;
+	char c;
 
-    (void) q;				/* compiler happiness */
+	(void) q;		/* compiler happiness */
 
-    if (msg->b_datap->db_type != M_DATA)
-    {
-	freemsg(msg) ;
-	return(0) ;
-    }
+	if (msg->b_datap->db_type != M_DATA) {
+		freemsg(msg);
+		return (0);
+	}
 
-    for (mp = msg; mp != NULL; mp = mp->b_cont)
-    {
-	if (mp->b_rptr >= mp->b_wptr) continue ;
+	for (mp = msg; mp != NULL; mp = mp->b_cont) {
+		if (mp->b_rptr >= mp->b_wptr)
+			continue;
 
-	p = mp->b_wptr - 1 ;			/* to last chr of msg */
-	c = *p ;				/* fetch last chr */
-	*p = 0 ;				/* last chr to NUL */
-	printk("%s%c", mp->b_rptr, c) ;		/* write msg */
-    }
+		p = mp->b_wptr - 1;	/* to last chr of msg */
+		c = *p;		/* fetch last chr */
+		*p = 0;		/* last chr to NUL */
+		printk("%s%c", mp->b_rptr, c);	/* write msg */
+	}
 
-    freemsg(msg) ;				/* done with msg */
-    return(0) ;
+	freemsg(msg);		/* done with msg */
+	return (0);
 
-} /* printk_wput  */
+}				/* printk_wput */
 
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-printk");

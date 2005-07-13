@@ -67,7 +67,7 @@
 #endif
 
 #ifndef _STRPORT_H
-#include <sys/strport.h>		/* pick up inode definition */
+#include <sys/strport.h>	/* pick up inode definition */
 #endif
 
 #ifndef NULL
@@ -90,30 +90,28 @@
 *                        Data Structures                                *
 ************************************************************************/
 
-typedef struct dir			/* directory entry */
-{
-    char	*d_name ;		/* file name */
-    dev_t	 d_dev ;		/* device number major/minor */
-    int		 d_mode ;		/* file mode */
-    time_t	 d_ftime ;		/* time file was created */
-    time_t	 d_ctime ;		/* time file was created */
-    time_t	 d_atime ;		/* time file was accessed */
-    time_t	 d_mtime ;		/* time file was modified */
-    int		 d_refcnt;		/* reference count */
-    u_inode_t   *d_inode ;
-    int		 d_inum ;
+typedef struct dir {			/* directory entry */
+	char *d_name;			/* file name */
+	dev_t d_dev;			/* device number major/minor */
+	int d_mode;			/* file mode */
+	time_t d_ftime;			/* time file was created */
+	time_t d_ctime;			/* time file was created */
+	time_t d_atime;			/* time file was accessed */
+	time_t d_mtime;			/* time file was modified */
+	int d_refcnt;			/* reference count */
+	u_inode_t *d_inode;
+	int d_inum;
 
-} dir_t ;
+} dir_t;
 
-typedef struct maj			/* major device entry */
-{
-    char	*m_name ;		/* device name */
-    struct file_operations *m_op ;	/* open, close,... ptrs */
+typedef struct maj {			/* major device entry */
+	char *m_name;			/* device name */
+	struct file_operations *m_op;	/* open, close,... ptrs */
 
-} maj_t ;
+} maj_t;
 
-#define	NDIR	1024			/* number of directory entries */
-#define	NMAJOR	100			/* number of major device numbers */
+#define	NDIR	1024		/* number of directory entries */
+#define	NMAJOR	100		/* number of major device numbers */
 
 /************************************************************************
 *                      Directory Searching                              *
@@ -124,32 +122,29 @@ typedef struct maj			/* major device entry */
 * our internal directory.						*
 *									*
 ************************************************************************/
-typedef struct
-{
-    int		 dd_fd;			/* file descriptor */
-    int		 dd_loc;		/* offset in block */
-    int		 dd_size;		/* amount of valid data */
-    char	*dd_buf;		/* directory block */
+typedef struct {
+	int dd_fd;			/* file descriptor */
+	int dd_loc;			/* offset in block */
+	int dd_size;			/* amount of valid data */
+	char *dd_buf;			/* directory block */
 
-} user_DIR ;
-
+} user_DIR;
 
 /*
  * Returned by readdir routine
  */
-typedef struct user_dirent
-{
-    int			d_ino ;		/* inode number */
-    off_t		d_off ;		/* offset of directory entry */
-    unsigned short	d_reclen ;	/* length of this record */
-    char		d_name[1] ;	/* name of file */
+typedef struct user_dirent {
+	int d_ino;			/* inode number */
+	off_t d_off;			/* offset of directory entry */
+	unsigned short d_reclen;	/* length of this record */
+	char d_name[1];			/* name of file */
 
-} user_dirent_t ;
+} user_dirent_t;
 
-extern user_DIR			*user_opendir(char *);
-extern struct user_dirent	*user_readdir(user_DIR *);
-extern int			 user_closedir(user_DIR *);
-extern void			 user_rewinddir(user_DIR *) ;
+extern user_DIR *user_opendir(char *);
+extern struct user_dirent *user_readdir(user_DIR *);
+extern int user_closedir(user_DIR *);
+extern void user_rewinddir(user_DIR *);
 
 /************************************************************************
 *                          File Status                                  *
@@ -176,33 +171,31 @@ extern void			 user_rewinddir(user_DIR *) ;
 #undef st_ctime
 #endif
 
-typedef struct user_stat
-{
-    int		st_dev ;	/* device which contains the directory */
-    int		st_ino ;	/* inode number of file (phoney) */
-    long	st_mode ;	/* mode of file */
-    int		st_nlink ;	/* number of links */
-    int		st_uid ;	/* owner */
-    int		st_gid ;	/* group */
-    dev_t	st_rdev ;	/* device if special file (ours are) */
-    int		st_size ;	/* file size */
-    long	st_atime ;	/* last access time */
-    long	st_mtime ;	/* last modification */
-    long	st_ctime ;	/* last status change */
-    long	st_ftime ;	/* creation change */
-    long	st_blksize ;	/* preferred block size */
-    long	st_blocks ;	/* number of st_blksize blks allocated */
-    char	st_fstype[16];	/* type of file system */
-    int		st_aclcnt ;	/* number of ACL entries */
-    int		st_level ;	/* MAC level */
-    long	st_flags ;	/* general purpose flags */
-    int		st_cmwlevel ;	/* future MAC level */
+typedef struct user_stat {
+	int st_dev;			/* device which contains the directory */
+	int st_ino;			/* inode number of file (phoney) */
+	long st_mode;			/* mode of file */
+	int st_nlink;			/* number of links */
+	int st_uid;			/* owner */
+	int st_gid;			/* group */
+	dev_t st_rdev;			/* device if special file (ours are) */
+	int st_size;			/* file size */
+	long st_atime;			/* last access time */
+	long st_mtime;			/* last modification */
+	long st_ctime;			/* last status change */
+	long st_ftime;			/* creation change */
+	long st_blksize;		/* preferred block size */
+	long st_blocks;			/* number of st_blksize blks allocated */
+	char st_fstype[16];		/* type of file system */
+	int st_aclcnt;			/* number of ACL entries */
+	int st_level;			/* MAC level */
+	long st_flags;			/* general purpose flags */
+	int st_cmwlevel;		/* future MAC level */
 
-} user_stat_t ;
+} user_stat_t;
 
-extern int	user_stat(char *name, struct user_stat *buf) ;
-extern int	user_fstat(int fd, struct user_stat *buf) ;
-
+extern int user_stat(char *name, struct user_stat *buf);
+extern int user_fstat(int fd, struct user_stat *buf);
 
 /************************************************************************
 *                         fcntl Types                                   *
@@ -236,9 +229,8 @@ extern int	user_fstat(int fd, struct user_stat *buf) ;
 #define F_SETOWN	24
 #endif
 #ifndef F_CHKFL
-#define F_CHKFL		99			/* completely bogus value */
+#define F_CHKFL		99	/* completely bogus value */
 #endif
-
 
 /************************************************************************
 *                         Printing Options                              *
@@ -257,38 +249,32 @@ extern int	user_fstat(int fd, struct user_stat *buf) ;
 #define	user_putmsg(f,c,d,g)	user_putpmsg(f,c,d,-1,g)
 #define	user_getmsg(f,c,d,g)	user_getpmsg(f,c,d,NULL,g)
 
-int	user_mknod(char *name, int mode, dev_t dev) ;
-int	user_unlink(char *name) ;
-int	user_open(char *name, int flags, int mode) ;
-int	user_close(int fd) ;
-int	user_read(int fd, void *buf, int nbytes) ;
-int	user_write(int fd, void *buf, int nbytes) ;
-int	user_ioctl(int fd, int cmd, ...) ;
-int	user_fcntl(int fd, int cmd, ...) ;
-int	user_putpmsg(int fd, struct strbuf *ctlptr,
-			     struct strbuf *dataptr,
-			     int band,
-			     int flags) ;
-int	user_getpmsg(int fd, struct strbuf *ctlptr,
-			     struct strbuf *dataptr,
-			     int *bandp,
-			     int *flagsp) ;
-int	user_poll(struct pollfd *fds, int nfds, int time_out) ;
-int	user_set_ptr(int fd, void *ptr) ;
-void	*user_get_ptr(int fd) ;
-void	 user_print_dir(char *name, int optns) ;
-void	 user_print_inode(inode_t *ip) ;
-void	 user_print_inodes(void) ;
+int user_mknod(char *name, int mode, dev_t dev);
+int user_unlink(char *name);
+int user_open(char *name, int flags, int mode);
+int user_close(int fd);
+int user_read(int fd, void *buf, int nbytes);
+int user_write(int fd, void *buf, int nbytes);
+int user_ioctl(int fd, int cmd, ...);
+int user_fcntl(int fd, int cmd, ...);
+int user_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+int user_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+int user_poll(struct pollfd *fds, int nfds, int time_out);
+int user_set_ptr(int fd, void *ptr);
+void *user_get_ptr(int fd);
+void user_print_dir(char *name, int optns);
+void user_print_inode(inode_t * ip);
+void user_print_inodes(void);
 
-int	 user_add_dir_entry(char *name, int mode, dev_t dev) ;
-dir_t	*user_search_dir(char *name) ;
-dir_t	*user_search_dir_inode(inode_t *i) ;
-file_t	*user_file_of_inode(inode_t * i) ;
-file_t	*user_alloc_file(void) ;
+int user_add_dir_entry(char *name, int mode, dev_t dev);
+dir_t *user_search_dir(char *name);
+dir_t *user_search_dir_inode(inode_t * i);
+file_t *user_file_of_inode(inode_t * i);
+file_t *user_alloc_file(void);
 
 int user_pipe(unsigned int *);
 int user_isastream(unsigned int);
 int user_fattach(unsigned int, const char *);
 int user_fdetach(const char *);
 
-#endif /* _USRIO_H_ */
+#endif				/* _USRIO_H_ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.4 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.5 2005/07/13 12:01:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <sys/tpi.h>	/* common definitions */
 
@@ -264,7 +264,9 @@ extern int t_getstate __P((int fd));
 extern int t_listen __P((int fd, struct t_call * call));
 /* TLI Library Function: t_look - look at current event on a transport endpoint */
 extern int t_look __P((int fd));
-extern int t_nonblocking __P((int fd));
+#if 0
+extern int t_nonblocking __P((int fd)); /* not an XTI function */
+#endif
 /* TLI Library Function: t_open - establish a transport endpoint */
 extern int t_open __P((const char *path, int oflag, struct t_info * info));
 /* TLI Library Function: t_optmgmt - manage options for a transport endpoint */

@@ -84,8 +84,6 @@
  * help developing internal code
  */
 
-
-
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
@@ -118,19 +116,19 @@ enum { STR_ERR = 0, STR_OK = 1 };
 
 #ifdef __KERNEL__
 /* extract values from a char pointer and advance the pointer */
-int lis_getint(unsigned char **p) _RP;				/* msg.c */
+int lis_getint(unsigned char **p);	/* msg.c */
 
-void lis_putbyte(unsigned char **p, unsigned char byte) _RP;	/* msg.c */
+void lis_putbyte(unsigned char **p, unsigned char byte);	/* msg.c */
 
 #if 0
-void	lis_bzero(void *ptr, int cnt) ;				/* head.c */
+void lis_bzero(void *ptr, int cnt);	/* head.c */
 #else
 #define lis_bzero(ptr, cnt) memset(ptr, 0, cnt);
 #endif
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_SHARE_H*/
+#endif				/* !_SHARE_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

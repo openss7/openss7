@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 13:54:45 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/13 12:01:49 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -398,6 +398,11 @@ int lis_apush_set(struct lis_strapush *ap)
 }
 
 EXPORT_SYMBOL(lis_apush_set);
+int lis_apush_vml(struct str_list *slp)
+{
+	return apush_vml(slp);
+}
+EXPORT_SYMBOL(lis_apush_vml);
 #if LIS_DEPRECARTED_FUNCTIONS
 int lis_apushm(dev_t dev, const char *mods[])
 {

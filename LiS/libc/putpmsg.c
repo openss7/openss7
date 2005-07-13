@@ -52,7 +52,8 @@
 
 #ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $"
 
-static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $";
+static char const ident[] =
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:29 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -61,7 +62,7 @@ static char const ident[] = "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/ioctl.h>  /* bad: according to POSIX, stropts.h must expose ioctl()... */
+#include <sys/ioctl.h>		/* bad: according to POSIX, stropts.h must expose ioctl()... */
 #include <stropts.h>
 
 #include <pthread.h>
@@ -129,7 +130,7 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
 #else
 #if 0
-	/*
+	/* 
 	 *  This no longer works on FC4 2.6.11 kernel: validity checks are
 	 *  performed on the length before we get here.  We might as well patch
 	 *  this out for all kernels and use the ioctl method instead.
@@ -146,17 +147,18 @@ __putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int band, int fl
 		int flags;
 	};
 	struct __lis_putpmsg_args args = {
-		fd:fd,
-		ctlptr:ctlptr,
-		datptr:datptr,
-		band:band,
-		flags:flags,
+	      fd:fd,
+	      ctlptr:ctlptr,
+	      datptr:datptr,
+	      band:band,
+	      flags:flags,
 	};
 
 	return (write(fd, &args, LIS_GETMSG_PUTMSG_ULEN));
 #else
-	struct strpmsg args = {  { -1, -1, NULL }, { -1, -1, NULL }, band, flags };
+	struct strpmsg args = { {-1, -1, NULL}, {-1, -1, NULL}, band, flags };
 	int rc;
+
 	if (ctlptr)
 		args.ctlbuf = *ctlptr;
 	if (datptr)

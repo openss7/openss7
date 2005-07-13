@@ -92,13 +92,13 @@
 #include <sys/LiS/sys54-mdep.h>
 #elif defined(PORTABLE)
 #include <sys/LiS/port-mdep.h>
-#endif /* !__MSDOS__ */
+#endif				/* !__MSDOS__ */
 
 /*
  * INLINE and STATIC
  */
 #ifndef INLINE
-#define	INLINE	
+#define	INLINE
 #endif
 #ifndef STATIC
 #define	STATIC	static
@@ -109,21 +109,23 @@
  * For user level pgms, stdint.h supplies these
  */
 #if defined(__KERNEL__) && !defined(_INTTYPES_H)
-#define _INTTYPES_H	1		/* kernel types.h is just as good */
- 					/* with the addition of these */
+#define _INTTYPES_H	1	/* kernel types.h is just as good */
+					/* with the addition of these */
 # if defined(_ASM_IA64_UNISTD_H)
 #  ifndef intptr_t
-typedef long		_intptr_t;
+typedef long _intptr_t;
+
 #  define intptr_t	_intptr_t
 #  endif
-typedef unsigned long	uintptr_t;
-# else					/* _ASM_IA64_UNISTD_H */
+typedef unsigned long uintptr_t;
+# else				/* _ASM_IA64_UNISTD_H */
 #  ifndef intptr_t
-typedef int		_intptr_t;
+typedef int _intptr_t;
+
 #  define intptr_t	_intptr_t
 #  endif
-typedef unsigned int	uintptr_t;
-# endif					/* _ASM_IA64_UNISTD_H */
+typedef unsigned int uintptr_t;
+# endif				/* _ASM_IA64_UNISTD_H */
 
 /*
  * Define some selected formatting phrases that we would have gotten
@@ -136,14 +138,14 @@ typedef unsigned int	uintptr_t;
 #  define PRId64	"qd"
 #  define PRIu32	"u"
 #  define PRIu64	"qu"
-# else					/* _ASM_IA64_UNISTD_H */
+# else				/* _ASM_IA64_UNISTD_H */
 #  define PRIx32	"x"
 #  define PRIx64	"lx"
 #  define PRId32	"d"
 #  define PRId64	"ld"
 #  define PRIu32	"u"
 #  define PRIu64	"lu"
-# endif					/* _ASM_IA64_UNISTD_H */
+# endif				/* _ASM_IA64_UNISTD_H */
 
 #endif
 
@@ -175,16 +177,14 @@ typedef unsigned int	uintptr_t;
 #endif
 
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern char	*lis_errmsg(int lvl) ;
+#ifdef __LIS_INTERNAL__
+extern char *lis_errmsg(int lvl);
 #endif
-extern void	*lis_malloc(int nbytes, int class, int use_cache,
-					char *file_name,int line_nr)_RP;
-extern void	 lis_free(void *ptr, char *file_name,int line_nr)_RP;
+extern void *lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr);
+extern void lis_free(void *ptr, char *file_name, int line_nr);
 #endif				/* __KERNEL__ */
 
-#endif /* _STRPORT_H */
-
+#endif				/* _STRPORT_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

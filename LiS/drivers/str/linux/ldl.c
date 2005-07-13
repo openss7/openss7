@@ -1,113 +1,107 @@
-/*
- *  ldl: Yet another unfinished DLPI driver
- *
- *  Version: 0.4.1
- *
- *  Copyright (C) 1998, 1999 Ole Husgaard (sparre@login.dknet.dk)
- *
- *  Token ring support by Dave Grothe Copyright (C) 1999
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * 
- * 
- * This driver does not attempt to do any hardware programming. Instead
- * this driver is an interface between the existing Linux network device
- * driver interface and the DLPI interface.
- * 
- * It will also work in cooperation with Linux protocol drivers. You can
- * BIND the IP protocol to a Linux netdevice that is also used by the
- * Linux IP socket interface:
- * Incoming packets are delivered to this DLPI driver *and* to the Linux
- * IP socket interface. But packets sent out by this DLPI driver are *not*
- * seen by the Linux IP socket interface, and packets send out by the Linux
- * IP socket interface are *not* seen by this driver. This means that the
- * Linux IP code will see a response to an IP protocol packet sent out from
- * this DLPI driver.
- * To avoid this sort of confusion, you should do one of:
- *   1) Use this driver for listening only.
- *   2) Use protocols *not* used by the Linux socket code.
- *   3) Tell Linux that the interface is down (does this work?)
- *
- * The PPA (device number) used for ATTACH is determined by looking at
- * the Linux netdevice list. The first netdevice has PPA 0. You can see
- * the device list in /proc/net/dev, or you can do a LDL_FINDPPA IOCTL if
- * you know the netdevice name.
- * You can OR the PPA with one of the LDL_FRAME_xxx constants defined in
- * ldl.h if you want to use other framing types that the default ethernet II.
- * 
- * Currently only ethernet devices and the loopback device are supported.
- * 
- * 
- * TODO: Sending IP packets from ldl to the native Linux IP layer across
- * the loopback interface no longer works. The native IP receive code now
- * checks a field skb->dst to see if the packet is bogus. This field is set
- * on receive from a network card, but due to some optimizations this is
- * set before transmit when using the loopback interface. The skb->dst field
- * should point to an entry in the ipv4 FIB, and I do not think that there is
- * any way to get at this without changing the native Linux ipv4 code.
- * And it looks like doing this would either slow down the native ipv4 code,
- * open up a security hole, or make the kernel significantly bigger.
- * Another option could be to change this driver to check for ipv4 on the
- * loopback interface. When this is detected, we could set skb->dst.
- * 
- */
-
+_RP				/* 
+				 *  ldl: Yet another unfinished DLPI driver
+				 *
+				 *  Version: 0.4.1
+				 *
+				 *  Copyright (C) 1998, 1999 Ole Husgaard (sparre@login.dknet.dk)
+				 *
+				 *  Token ring support by Dave Grothe Copyright (C) 1999
+				 *
+				 *  This program is free software; you can redistribute it and/or modify
+				 *  it under the terms of the GNU General Public License as published by
+				 *  the Free Software Foundation; either version 2 of the License, or
+				 *  (at your option) any later version.
+				 *
+				 *  This program is distributed in the hope that it will be useful,
+				 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+				 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+				 *  GNU General Public License for more details.
+				 *
+				 *  You should have received a copy of the GNU General Public License
+				 *  along with this program; if not, write to the Free Software
+				 *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+				 *
+				 * 
+				 * 
+				 * This driver does not attempt to do any hardware programming. Instead
+				 * this driver is an interface between the existing Linux network device
+				 * driver interface and the DLPI interface.
+				 * 
+				 * It will also work in cooperation with Linux protocol drivers. You can
+				 * BIND the IP protocol to a Linux netdevice that is also used by the
+				 * Linux IP socket interface:
+				 * Incoming packets are delivered to this DLPI driver *and* to the Linux
+				 * IP socket interface. But packets sent out by this DLPI driver are *not*
+				 * seen by the Linux IP socket interface, and packets send out by the Linux
+				 * IP socket interface are *not* seen by this driver. This means that the
+				 * Linux IP code will see a response to an IP protocol packet sent out from
+				 * this DLPI driver.
+				 * To avoid this sort of confusion, you should do one of:
+				 *   1) Use this driver for listening only.
+				 *   2) Use protocols *not* used by the Linux socket code.
+				 *   3) Tell Linux that the interface is down (does this work?)
+				 *
+				 * The PPA (device number) used for ATTACH is determined by looking at
+				 * the Linux netdevice list. The first netdevice has PPA 0. You can see
+				 * the device list in /proc/net/dev, or you can do a LDL_FINDPPA IOCTL if
+				 * you know the netdevice name.
+				 * You can OR the PPA with one of the LDL_FRAME_xxx constants defined in
+				 * ldl.h if you want to use other framing types that the default ethernet II.
+				 * 
+				 * Currently only ethernet devices and the loopback device are supported.
+				 * 
+				 * 
+				 * TODO: Sending IP packets from ldl to the native Linux IP layer across
+				 * the loopback interface no longer works. The native IP receive code now
+				 * checks a field skb->dst to see if the packet is bogus. This field is set
+				 * on receive from a network card, but due to some optimizations this is
+				 * set before transmit when using the loopback interface. The skb->dst field
+				 * should point to an entry in the ipv4 FIB, and I do not think that there is
+				 * any way to get at this without changing the native Linux ipv4 code.
+				 * And it looks like doing this would either slow down the native ipv4 code,
+				 * open up a security hole, or make the kernel significantly bigger.
+				 * Another option could be to change this driver to check for ipv4 on the
+				 * loopback interface. When this is detected, we could set skb->dst.
+				 * 
+				 */
 #undef DEBUG			/* unused symbol that causes a warning */
-
 #include <sys/LiS/module.h>	/* must be VERY first include */
 #include <linux/version.h>
-
 #ifndef KERNEL_VERSION
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 #endif
-
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
 # define KERNEL_2_5
 #endif
-
 #include <sys/stream.h>
 #include <sys/stropts.h>
-
- /*
-  * irda uses queue_t which interferes with our use later
-  */
+    /* 
+     * irda uses queue_t which interferes with our use later
+     */
 #define queue_t	irda_queue_t
-#include <asm/byteorder.h>   /* ntohs() etc..			*/
+#include <asm/byteorder.h>	/* ntohs() etc..  */
 #include <linux/errno.h>
-#include <linux/string.h>    /* memcpy() and family		*/
-# ifdef RH_71_KLUDGE	     /* boogered up incls in 2.4.2 */
-#  undef CONFIG_HIGHMEM	     /* b_page has semi-circular reference */
+#include <linux/string.h>	/* memcpy() and family */
+# ifdef RH_71_KLUDGE		/* boogered up incls in 2.4.2 */
+#  undef CONFIG_HIGHMEM		/* b_page has semi-circular reference */
 # endif
-#include <linux/netdevice.h> /* Linux netdevice header		*/
-#include <linux/if_arp.h>    /* Linux netdevice types		*/
-#include <linux/if_ether.h>  /* Linux ethernet defs		*/
-#include <linux/skbuff.h>    /* Linux socket buffer		*/
+#include <linux/netdevice.h>	/* Linux netdevice header */
+#include <linux/if_arp.h>	/* Linux netdevice types */
+#include <linux/if_ether.h>	/* Linux ethernet defs */
+#include <linux/skbuff.h>	/* Linux socket buffer */
 #ifdef KERNEL_2_1
- /*
-  * This file is not available if kernel source is not installed
-  */
+    /* 
+     * This file is not available if kernel source is not installed
+     */
 #if !defined(NOKSRC)
-#include <net/pkt_sched.h>   /* Linux queue disciplines		*/
+#include <net/pkt_sched.h>	/* Linux queue disciplines */
 #else
 void qdisc_reset(struct Qdisc *qdisc);
 #endif
 #endif
 #ifdef KERNEL_2_0
 #define atomic_read(int_ptr)	(*(int_ptr))
-#define	ARPHRD_HDLC		513		/* 2.1 compatibility */
+#define	ARPHRD_HDLC		513	/* 2.1 compatibility */
 #endif
 #undef queue_t			/* allow visibility again */
 
@@ -150,7 +144,6 @@ void qdisc_reset(struct Qdisc *qdisc);
 #error The major number should be defined
 #endif
 
-
 #define LDL_MAX_HDR_LEN	64
 
 #define MAXADDRLEN	8
@@ -163,16 +156,18 @@ void qdisc_reset(struct Qdisc *qdisc);
 #define DONE		0
 #define RETRY		1
 
-typedef struct { unsigned char sap[MAXSAPLEN]; } sap_t;
+typedef struct {
+	unsigned char sap[MAXSAPLEN];
+} sap_t;
 
 /*
  *  Private per stream flags
  */
-#define LDLFLAG_PROMISC_SAP     0x0400 /* Promiscous SAP mode		*/
-#define LDLFLAG_SET_ADDR	0x1000 /* Changing physical address	*/
-#define LDLFLAG_HANGUP		0x2000 /* Deferred M_HANGUP needed	*/
-#define LDLFLAG_HANGUP_DONE	0x4000 /* M_HANGUP completed		*/
-#define LDLFLAG_PRIVATE		0x7400 /* Private flag mask		*/
+#define LDLFLAG_PROMISC_SAP     0x0400	/* Promiscous SAP mode */
+#define LDLFLAG_SET_ADDR	0x1000	/* Changing physical address */
+#define LDLFLAG_HANGUP		0x2000	/* Deferred M_HANGUP needed */
+#define LDLFLAG_HANGUP_DONE	0x4000	/* M_HANGUP completed */
+#define LDLFLAG_PRIVATE		0x7400	/* Private flag mask */
 
 /*
  *  Transmission priorities
@@ -266,66 +261,62 @@ typedef struct { unsigned char sap[MAXSAPLEN]; } sap_t;
  */
 
 /* Netdevice structure */
-struct ndev
-{
-	dl_ulong magic;		/* Debugging paranoia (==0 iff free)	*/
-	struct ldldev *dev;	/* Linux netdevice			*/
-	struct dl *endpoints;	/* List of endpoints attached to this	*/
-	struct ndev *next;	/* List of all struct ndev		*/
-	atomic_t wr_cur;	/* Currently on write queue		*/
-	int wr_max;		/* Max. outstanding on write queue	*/
-	int wr_min;		/* Min. outstanding on write queue	*/
-	toid_t tx_congest_timer;/* Tx. congestion backoff restart timer	*/
-	int sleeping;		/* Tx. sleeping flag			*/
+struct ndev {
+	dl_ulong magic;			/* Debugging paranoia (==0 iff free) */
+	struct ldldev *dev;		/* Linux netdevice */
+	struct dl *endpoints;		/* List of endpoints attached to this */
+	struct ndev *next;		/* List of all struct ndev */
+	atomic_t wr_cur;		/* Currently on write queue */
+	int wr_max;			/* Max. outstanding on write queue */
+	int wr_min;			/* Min. outstanding on write queue */
+	toid_t tx_congest_timer;	/* Tx. congestion backoff restart timer */
+	int sleeping;			/* Tx. sleeping flag */
 };
 
 /* Packet type structure */
-struct pt
-{
-	struct packet_type pt;	/* Packet type filter			*/
-	dl_ulong magic;		/* Debugging paranoia (==0 iff free)	*/
-	lis_rw_lock_t lock;	/* listening SAP list synchronization	*/
-	struct sap *listen;	/* listening SAP list (==NULL iff free)	*/
-	struct pt *next;	/* List of all struct pt		*/
+struct pt {
+	struct packet_type pt;		/* Packet type filter */
+	dl_ulong magic;			/* Debugging paranoia (==0 iff free) */
+	lis_rw_lock_t lock;		/* listening SAP list synchronization */
+	struct sap *listen;		/* listening SAP list (==NULL iff free) */
+	struct pt *next;		/* List of all struct pt */
 };
 
 /* Binding structure */
 struct sap {
-	sap_t sap;		/* Bound SAP				*/
-	dl_ulong magic;		/* Debugging paranoia (==0 iff free)	*/
-	struct dl *dl;		/* DLPI minor pointer (==NULL iff free)	*/
-	struct pt *pt;		/* Packet type filter			*/
-	struct sap *next_listen;/* Listening sap list (same pkt. type)	*/
-	struct sap *next_sap;	/* Subsequent sap list (same dl)	*/
+	sap_t sap;			/* Bound SAP */
+	dl_ulong magic;			/* Debugging paranoia (==0 iff free) */
+	struct dl *dl;			/* DLPI minor pointer (==NULL iff free) */
+	struct pt *pt;			/* Packet type filter */
+	struct sap *next_listen;	/* Listening sap list (same pkt. type) */
+	struct sap *next_sap;		/* Subsequent sap list (same dl) */
 };
 
 /* DLPI endpoint structure */
-struct dl
-{
-	dl_ulong magic;		/* Debugging paranoia (==0 iff free)	*/
-	queue_t	*rq;		/* Read queue				*/
-	ulong dlstate;		/* State				*/
-	dl_ulong flags;		/* Current flags			*/
-	dl_ulong lost_rcv, lost_send; /* Statistics			*/
-	dl_ulong priority;	/* Current priority			*/
-	struct dl *next_open;	/* List of open devices			*/
-	struct ndev *ndev;	/* Our netdevice, known after ATTACH	*/
-	struct dl *next_ndev;	/* List of endpoints on same netdevice	*/
-	int bufwait;		/* Flag: We are waiting for a buffer	*/
-	int addr_len;		/* Link physical address length		*/
-	int sap_len;		/* Link SAP length			*/
-	int machdr_len;		/* MAC header length			*/
-	int machdr_reserve;	/* MAC header alloc length		*/
-	int mtu;		/* DLSDU				*/
-	struct sap *sap;	/* Primary SAP				*/
-	struct sap *subs;	/* Subsequent (peer) SAPs		*/
-	dl_ulong framing;	/* Data link framing used		*/
-	unsigned char oui[3];	/* OUI for SNAP framing			*/
+struct dl {
+	dl_ulong magic;			/* Debugging paranoia (==0 iff free) */
+	queue_t *rq;			/* Read queue */
+	ulong dlstate;			/* State */
+	dl_ulong flags;			/* Current flags */
+	dl_ulong lost_rcv, lost_send;	/* Statistics */
+	dl_ulong priority;		/* Current priority */
+	struct dl *next_open;		/* List of open devices */
+	struct ndev *ndev;		/* Our netdevice, known after ATTACH */
+	struct dl *next_ndev;		/* List of endpoints on same netdevice */
+	int bufwait;			/* Flag: We are waiting for a buffer */
+	int addr_len;			/* Link physical address length */
+	int sap_len;			/* Link SAP length */
+	int machdr_len;			/* MAC header length */
+	int machdr_reserve;		/* MAC header alloc length */
+	int mtu;			/* DLSDU */
+	struct sap *sap;		/* Primary SAP */
+	struct sap *subs;		/* Subsequent (peer) SAPs */
+	dl_ulong framing;		/* Data link framing used */
+	unsigned char oui[3];		/* OUI for SNAP framing */
 
-	int (*wantsframe)(struct dl *dl, unsigned char *fr, int len);
-	mblk_t *(*rcvind)(struct dl *dl, mblk_t *dp);
-	int (*mkhdr)(struct dl *dl, unsigned char *dst,
-		     int datalen, struct sk_buff *skb);
+	int (*wantsframe) (struct dl * dl, unsigned char *fr, int len);
+	mblk_t *(*rcvind) (struct dl * dl, mblk_t *dp);
+	int (*mkhdr) (struct dl * dl, unsigned char *dst, int datalen, struct sk_buff * skb);
 };
 
 /* Magic numbers */
@@ -335,12 +326,13 @@ struct dl
 #define DL_MAGIC	0xA5B4C3D4
 
 /* Default netdevice write queue water marks */
-#define DEV_WR_MIN 0x08000 /* Low water:  32 Kb */
-#define DEV_WR_MAX 0x10000 /* High water: 64 Kb */
+#define DEV_WR_MIN 0x08000	/* Low water: 32 Kb */
+#define DEV_WR_MAX 0x10000	/* High water: 64 Kb */
 
-ldl_gstats_ioctl_t	ldl_gstats ;
+ldl_gstats_ioctl_t ldl_gstats;
+
 #define	ginc(field)	lis_atomic_inc(&ldl_gstats.field)
-STATIC unsigned long	ldl_debug_mask ;
+STATIC unsigned long ldl_debug_mask;
 
 STATIC struct pt *first_pt;
 STATIC lis_spin_lock_t first_pt_lock;
@@ -357,189 +349,222 @@ STATIC int pt_n_alloc = 0;
 STATIC int sap_n_alloc = 0;
 STATIC int ndev_n_alloc = 0;
 
-STATIC char *ldl_pkt_type(unsigned saptype) ;
+STATIC char *ldl_pkt_type(unsigned saptype);
 STATIC int _RP dl_open(queue_t *, dev_t *, int, int, cred_t *);
 STATIC int _RP dl_close(queue_t *, int, cred_t *);
 STATIC int _RP dl_rsrv(queue_t *);
 STATIC int _RP dl_wput(queue_t *, mblk_t *);
 STATIC int _RP dl_wsrv(queue_t *);
 
-STATIC int rcv_func(struct sk_buff *skb,
-		    struct ldldev *dev, struct packet_type *pt);
+STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt);
 STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp);
 
-STATIC struct module_info dl_minfo = 
-{
-	0x7253,		/* Module ID number		*/
-	"ldl",		/* Module name: Linux DataLink	*/
-	4,		/* Min packet size accepted	*/
-	INFPSZ,		/* Max packet size accepted	*/
-	0x10000,	/* Hi water mark: 64 Kb		*/
-	0x04000		/* Low water mark: 16 Kb	*/
+STATIC struct module_info dl_minfo = {
+	0x7253,			/* Module ID number */
+	"ldl",			/* Module name: Linux DataLink */
+	4,			/* Min packet size accepted */
+	INFPSZ,			/* Max packet size accepted */
+	0x10000,		/* Hi water mark: 64 Kb */
+	0x04000			/* Low water mark: 16 Kb */
 };
 
-STATIC struct qinit dl_rinit = 
-{
-	NULL,		/* No read put		*/
-	dl_rsrv,	/* Read service		*/
-	dl_open,	/* Each open		*/
-	dl_close,	/* Last close		*/
-	NULL,		/* Reserved		*/
-	&dl_minfo,	/* Information		*/
-	NULL		/* No statistics	*/
+STATIC struct qinit dl_rinit = {
+	NULL,			/* No read put */
+	dl_rsrv,		/* Read service */
+	dl_open,		/* Each open */
+	dl_close,		/* Last close */
+	NULL,			/* Reserved */
+	&dl_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
-STATIC struct qinit dl_winit = 
-{
-	dl_wput,	/* Write put		*/
-	dl_wsrv,	/* Write service	*/
-	NULL,		/* Ignored		*/
-	NULL,		/* Ignored		*/
-	NULL,		/* Reserved		*/
-	&dl_minfo,	/* Information		*/
-	NULL		/* No statistics	*/
+STATIC struct qinit dl_winit = {
+	dl_wput,		/* Write put */
+	dl_wsrv,		/* Write service */
+	NULL,			/* Ignored */
+	NULL,			/* Ignored */
+	NULL,			/* Reserved */
+	&dl_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
 #ifdef MODULE
 STATIC
 #endif
-struct streamtab ldl_info = 
-{
-	&dl_rinit,	/* Read queue		*/
-	&dl_winit,	/* Write queue		*/
-	NULL,		/* Unused		*/
-	NULL		/* Unused		*/
+struct streamtab ldl_info = {
+	&dl_rinit,		/* Read queue */
+	&dl_winit,		/* Write queue */
+	NULL,			/* Unused */
+	NULL			/* Unused */
 };
 
-
-STATIC void ldl_bfr_dump(char *msg, void *ptr, int len, int alldata)
+STATIC void
+ldl_bfr_dump(char *msg, void *ptr, int len, int alldata)
 {
-    unsigned char	*p = ptr ;
-    int			 bytes = 0 ;
-    int			 trunc = 0 ;
-    int			 nl = 0 ;
+	unsigned char *p = ptr;
+	int bytes = 0;
+	int trunc = 0;
+	int nl = 0;
 
-    printk("%s -- %d bytes\n", msg, len) ;
+	printk("%s -- %d bytes\n", msg, len);
 
-    if (!alldata && len > 24)
-    {
-	len = 24 ;
-	trunc = 1 ;
-    }
-
-    for (; len > 0; len--, p++)
-    {
-	printk("%02x ", *p) ;
-	nl = 0 ;
-	if (!trunc && ++bytes == 16)
-	{
-	    printk("\n");
-	    nl = 1 ;
-	    bytes = 0 ;
+	if (!alldata && len > 24) {
+		len = 24;
+		trunc = 1;
 	}
-    }
 
-    if (!nl)
-	printk("\n") ;
+	for (; len > 0; len--, p++) {
+		printk("%02x ", *p);
+		nl = 0;
+		if (!trunc && ++bytes == 16) {
+			printk("\n");
+			nl = 1;
+			bytes = 0;
+		}
+	}
+
+	if (!nl)
+		printk("\n");
 }
 
-STATIC void ldl_mp_dump(char *msg, mblk_t *mp, int alldata)
+STATIC void
+ldl_mp_dump(char *msg, mblk_t *mp, int alldata)
 {
-    ldl_bfr_dump(msg, mp->b_rptr, mp->b_wptr - mp->b_rptr, alldata) ;
+	ldl_bfr_dump(msg, mp->b_rptr, mp->b_wptr - mp->b_rptr, alldata);
 }
 
-STATIC void ldl_mp_data_dump(char *msg, mblk_t *mp, int alldata)
+STATIC void
+ldl_mp_data_dump(char *msg, mblk_t *mp, int alldata)
 {
-    for (; mp != NULL && mp->b_datap->db_type != M_DATA; mp = mp->b_cont) ;
-    if (mp == NULL)
-	return ;
+	for (; mp != NULL && mp->b_datap->db_type != M_DATA; mp = mp->b_cont) ;
+	if (mp == NULL)
+		return;
 
-    ldl_mp_dump(msg, mp, alldata) ;
+	ldl_mp_dump(msg, mp, alldata);
 }
 
-STATIC void ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
+STATIC void
+ldl_skbuff_dump(char *msg, struct sk_buff *skb, int alldata)
 {
 #define	L	unsigned long
-    int		cnt ;
+	int cnt;
 
-    if (msg != NULL)
-	printk("%s:\n", msg) ;
+	if (msg != NULL)
+		printk("%s:\n", msg);
 
-    printk("head=%lx data=%lx tail=%lx end=%lx truesize=%d\n"
-           "h.raw=%lx nh.raw=%lx mac.raw=%lx type=%s len=%d\n",
-	   (L)skb->head, (L)skb->data, (L)skb->tail, (L)skb->end, skb->truesize,
-	   (L)skb->h.raw, (L)skb->nh.raw, (L)skb->mac.raw, 
-	   ldl_pkt_type(skb->pkt_type),
-	   skb->len) ;
-    if (alldata)
-	cnt = skb->tail - skb->head ;	/* dump everything in the buffer */
-    else
-	alldata = cnt = 64 ;		/* make alldata non-zero */
+	printk("head=%lx data=%lx tail=%lx end=%lx truesize=%d\n"
+	       "h.raw=%lx nh.raw=%lx mac.raw=%lx type=%s len=%d\n", (L) skb->head, (L) skb->data,
+	       (L) skb->tail, (L) skb->end, skb->truesize, (L) skb->h.raw, (L) skb->nh.raw,
+	       (L) skb->mac.raw, ldl_pkt_type(skb->pkt_type), skb->len);
+	if (alldata)
+		cnt = skb->tail - skb->head;	/* dump everything in the buffer */
+	else
+		alldata = cnt = 64;	/* make alldata non-zero */
 
-    ldl_bfr_dump("Dump from skb->head", skb->head, cnt, alldata) ;
+	ldl_bfr_dump("Dump from skb->head", skb->head, cnt, alldata);
 
 #undef L
 }
 
-STATIC char *ldl_framing_type(unsigned long framing)
+STATIC char *
+ldl_framing_type(unsigned long framing)
 {
-    switch (framing & LDL_FRAME_MASK)
-    {
-    case LDL_FRAME_EII:		return("LDL_FRAME_EII");
-    case LDL_FRAME_802_2:	return("LDL_FRAME_802_2");
-    case LDL_FRAME_SNAP:	return("LDL_FRAME_SNAP");
-    case LDL_FRAME_802_3:	return("LDL_FRAME_802_3");
-    case LDL_FRAME_RAW_LLC:	return("LDL_FRAME_RAW_LLC");
-    }
-    return("LDL_FRAME_UNKNOWN");
+	switch (framing & LDL_FRAME_MASK) {
+	case LDL_FRAME_EII:
+		return ("LDL_FRAME_EII");
+	case LDL_FRAME_802_2:
+		return ("LDL_FRAME_802_2");
+	case LDL_FRAME_SNAP:
+		return ("LDL_FRAME_SNAP");
+	case LDL_FRAME_802_3:
+		return ("LDL_FRAME_802_3");
+	case LDL_FRAME_RAW_LLC:
+		return ("LDL_FRAME_RAW_LLC");
+	}
+	return ("LDL_FRAME_UNKNOWN");
 }
 
-STATIC char *ldl_pkt_type(unsigned saptype)
+STATIC char *
+ldl_pkt_type(unsigned saptype)
 {
-    switch (saptype)
-    {
+	switch (saptype) {
 #ifdef ETH_P_ECHO
-    case ETH_P_ECHO:	return("ETH_P_ECHO");
+	case ETH_P_ECHO:
+		return ("ETH_P_ECHO");
 #endif
-    case ETH_P_PUP:	return("ETH_P_PUP");
-    case ETH_P_IP:	return("ETH_P_IP");
-    case ETH_P_X25:	return("ETH_P_X25");
-    case ETH_P_ARP:	return("ETH_P_ARP");
-    case ETH_P_BPQ:	return("ETH_P_BPQ");
-    case ETH_P_DEC:	return("ETH_P_DEC");
-    case ETH_P_DNA_DL:	return("ETH_P_DNA_DL");
-    case ETH_P_DNA_RC:	return("ETH_P_DNA_RC");
-    case ETH_P_DNA_RT:	return("ETH_P_DNA_RT");
-    case ETH_P_LAT:	return("ETH_P_LAT");
-    case ETH_P_DIAG:	return("ETH_P_DIAG");
-    case ETH_P_CUST:	return("ETH_P_CUST");
-    case ETH_P_SCA:	return("ETH_P_SCA");
-    case ETH_P_RARP:	return("ETH_P_RARP");
-    case ETH_P_ATALK:	return("ETH_P_ATALK");
-    case ETH_P_AARP:	return("ETH_P_AARP");
-    case ETH_P_IPX:	return("ETH_P_IPX");
-    case ETH_P_IPV6:	return("ETH_P_IPV6");
-    case ETH_P_802_3:	return("ETH_P_802_3");
-    case ETH_P_AX25:	return("ETH_P_AX25");
-    case ETH_P_ALL:	return("ETH_P_ALL");
-    case ETH_P_802_2:	return("ETH_P_802_2");
-    case ETH_P_SNAP:	return("ETH_P_SNAP");
-    case ETH_P_DDCMP:	return("ETH_P_DDCMP");
-    case ETH_P_WAN_PPP:	return("ETH_P_WAN_PPP");
-    case ETH_P_PPP_MP:	return("ETH_P_PPP_MP");
-    case ETH_P_LOCALTALK:return("ETH_P_LOCALTALK");
-    case ETH_P_PPPTALK:	return("ETH_P_PPPTALK");
-    case ETH_P_TR_802_2:return("ETH_P_TR_802_2");
-    case ETH_P_MOBITEX:	return("ETH_P_MOBITEX");
-    case ETH_P_CONTROL:	return("ETH_P_CONTROL");
-    case ETH_P_IRDA:	return("ETH_P_IRDA");
-    case 0:		return("NULL(0)");
-    }
+	case ETH_P_PUP:
+		return ("ETH_P_PUP");
+	case ETH_P_IP:
+		return ("ETH_P_IP");
+	case ETH_P_X25:
+		return ("ETH_P_X25");
+	case ETH_P_ARP:
+		return ("ETH_P_ARP");
+	case ETH_P_BPQ:
+		return ("ETH_P_BPQ");
+	case ETH_P_DEC:
+		return ("ETH_P_DEC");
+	case ETH_P_DNA_DL:
+		return ("ETH_P_DNA_DL");
+	case ETH_P_DNA_RC:
+		return ("ETH_P_DNA_RC");
+	case ETH_P_DNA_RT:
+		return ("ETH_P_DNA_RT");
+	case ETH_P_LAT:
+		return ("ETH_P_LAT");
+	case ETH_P_DIAG:
+		return ("ETH_P_DIAG");
+	case ETH_P_CUST:
+		return ("ETH_P_CUST");
+	case ETH_P_SCA:
+		return ("ETH_P_SCA");
+	case ETH_P_RARP:
+		return ("ETH_P_RARP");
+	case ETH_P_ATALK:
+		return ("ETH_P_ATALK");
+	case ETH_P_AARP:
+		return ("ETH_P_AARP");
+	case ETH_P_IPX:
+		return ("ETH_P_IPX");
+	case ETH_P_IPV6:
+		return ("ETH_P_IPV6");
+	case ETH_P_802_3:
+		return ("ETH_P_802_3");
+	case ETH_P_AX25:
+		return ("ETH_P_AX25");
+	case ETH_P_ALL:
+		return ("ETH_P_ALL");
+	case ETH_P_802_2:
+		return ("ETH_P_802_2");
+	case ETH_P_SNAP:
+		return ("ETH_P_SNAP");
+	case ETH_P_DDCMP:
+		return ("ETH_P_DDCMP");
+	case ETH_P_WAN_PPP:
+		return ("ETH_P_WAN_PPP");
+	case ETH_P_PPP_MP:
+		return ("ETH_P_PPP_MP");
+	case ETH_P_LOCALTALK:
+		return ("ETH_P_LOCALTALK");
+	case ETH_P_PPPTALK:
+		return ("ETH_P_PPPTALK");
+	case ETH_P_TR_802_2:
+		return ("ETH_P_TR_802_2");
+	case ETH_P_MOBITEX:
+		return ("ETH_P_MOBITEX");
+	case ETH_P_CONTROL:
+		return ("ETH_P_CONTROL");
+	case ETH_P_IRDA:
+		return ("ETH_P_IRDA");
+	case 0:
+		return ("NULL(0)");
+	}
 
-    return("ETH_P_UNKNOWN");
+	return ("ETH_P_UNKNOWN");
 }
 
-void ldl_init(void)
+void
+ldl_init(void)
 {
 	if (initialized)
 		return;
@@ -559,7 +584,6 @@ void ldl_init(void)
 	initialized = 1;
 }
 
-
 /****************************************************************************/
 /*                                                                          */
 /*  Packet type and SAP handling.                                           */
@@ -573,7 +597,8 @@ void ldl_init(void)
  *
  *  Notice that sap_create is always called under SPLSTR()
  */
-STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
+STATIC int
+sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 {
 	struct pt *pt, *npt;
 	struct sap *sap;
@@ -607,8 +632,7 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 	lis_spin_lock(&first_pt_lock);
 	do {
 		for (pt = first_pt; pt; pt = pt->next)
-			if (pt->pt.type == saptype &&
-			    pt->pt.dev == dl->ndev->dev)
+			if (pt->pt.type == saptype && pt->pt.dev == dl->ndev->dev)
 				break;
 		if (pt == NULL) {
 			if (npt == NULL) {
@@ -636,7 +660,7 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 	if (pt->listen == NULL) {
 		/* New, unused packet_type */
 		LISASSERT(pt->magic == 0);
-		/* No need to synchronize with rcv_func() */ 
+		/* No need to synchronize with rcv_func() */
 		sap->next_listen = pt->listen;
 		pt->listen = sap;
 		lis_rw_lock_init(&pt->lock, "LiS SAP listening list");
@@ -671,7 +695,8 @@ STATIC int sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
  *
  *  Returns 0 on success, -1 if not found.
  */
-STATIC int sap_destroy(struct dl *dl, struct sap *sap)
+STATIC int
+sap_destroy(struct dl *dl, struct sap *sap)
 {
 	int psw;
 	struct pt *pt, *opt;
@@ -713,7 +738,7 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 		for (;;) {
 			LISASSERT(*sapp_pt != NULL);
 			if (*sapp_pt == NULL) {
-				/*
+				/* 
 				 * Not found, but it should be there:
 				 * Emergency brake
 				 */
@@ -734,10 +759,10 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 		dl->sap = NULL;
 	} else {
 		sapp_dl = &dl->subs;
-		for(;;) {
+		for (;;) {
 			LISASSERT(*sapp_dl != NULL);
 			if (*sapp_dl == NULL) {
-				/*
+				/* 
 				 * Not found, but it should be there:
 				 * Emergency brake
 				 */
@@ -766,7 +791,8 @@ STATIC int sap_destroy(struct dl *dl, struct sap *sap)
 /*
  *  sap_destroy_all  - remove and destroy all packet types (sap) from a device.
  */
-STATIC void sap_destroy_all(struct dl *dl)
+STATIC void
+sap_destroy_all(struct dl *dl)
 {
 	int ret;
 
@@ -777,7 +803,7 @@ STATIC void sap_destroy_all(struct dl *dl)
 		ret = sap_destroy(dl, dl->subs);
 		LISASSERT(ret == 0);
 		if (ret != 0)
-			return; /* Emergency brake */
+			return;	/* Emergency brake */
 	}
 	if (dl->sap) {
 		LISASSERT(dl->sap->pt != NULL);
@@ -785,7 +811,6 @@ STATIC void sap_destroy_all(struct dl *dl)
 		LISASSERT(ret == 0);
 	}
 }
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -798,34 +823,36 @@ STATIC void sap_destroy_all(struct dl *dl)
  *
  *  Not reentrant.
  */
-STATIC INLINE void hangup_set(struct dl *dl)
+STATIC INLINE void
+hangup_set(struct dl *dl)
 {
 	if ((dl->flags & LDLFLAG_HANGUP) == 0) {
-		/*
+		/* 
 		 *  A hangup should never happen on an unattached device.
 		 */
 		LISASSERT(dl->dlstate != DL_UNATTACHED);
 
-		/*
+		/* 
 		 *  The hangup has not already been done.
 		 */
 		LISASSERT((dl->flags & LDLFLAG_HANGUP_DONE) != 0);
 
-		/*
+		/* 
 		 *  This endpoint should already have been disassociated
 		 *  from the netdevice.
 		 */
 		LISASSERT(dl->ndev == NULL);
 
-		dl->flags |= LDLFLAG_HANGUP;	/* Set flag		*/
-		++n_hangup;			/* Update count		*/
+		dl->flags |= LDLFLAG_HANGUP;	/* Set flag */
+		++n_hangup;	/* Update count */
 	}
 }
 
 /*
  *  hangup_do  - do the actual hangup on an endpoint
  */
-STATIC INLINE void hangup_do(struct dl *dl)
+STATIC INLINE void
+hangup_do(struct dl *dl)
 {
 	int psw;
 
@@ -841,18 +868,17 @@ STATIC INLINE void hangup_do(struct dl *dl)
 
 	LISASSERT(n_hangup > 0);
 
-	/*
+	/* 
 	 *  In the transient states a hangup cannot easily be done.
-         *  A check of the hangup flag retries the hangup when these states
+	 *  A check of the hangup flag retries the hangup when these states
 	 *  are left.
 	 */
-	if (dl->dlstate == DL_UNBIND_PENDING ||
-	    dl->dlstate == DL_SUBS_UNBIND_PND) {
+	if (dl->dlstate == DL_UNBIND_PENDING || dl->dlstate == DL_SUBS_UNBIND_PND) {
 		SPLX(psw);
 		return;
 	}
 
-	/*
+	/* 
 	 *  Go into the DL_UNATTACHED state before hanging up.
 	 *  This ensures that all resources associated with the endpoint
 	 *  are released. In particular, no more unitdata indications
@@ -873,9 +899,8 @@ STATIC INLINE void hangup_do(struct dl *dl)
 	LISASSERT(dl->dlstate == DL_UNATTACHED);
 
 	SPLX(psw);
-	
-	if (putctl(dl->rq->q_next, M_HANGUP))
-	{
+
+	if (putctl(dl->rq->q_next, M_HANGUP)) {
 		SPLSTR(psw);
 		if ((dl->flags & LDLFLAG_HANGUP_DONE) == 0) {
 			dl->flags |= LDLFLAG_HANGUP_DONE;
@@ -885,7 +910,6 @@ STATIC INLINE void hangup_do(struct dl *dl)
 	} else
 		printk("ldl: cannot send M_HANGUP\n");
 }
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -898,7 +922,8 @@ STATIC INLINE void hangup_do(struct dl *dl)
  *
  *  Not reentrant, returns NULL if not found.
  */
-STATIC INLINE struct ndev *ndev_find(struct ldldev *dev)
+STATIC INLINE struct ndev *
+ndev_find(struct ldldev *dev)
 {
 	struct ndev *ndev;
 
@@ -913,14 +938,15 @@ STATIC INLINE struct ndev *ndev_find(struct ldldev *dev)
  *
  *  Not reentrant, returns NULL on failure.
  */
-STATIC struct ndev *ndev_get(dl_ulong ppa)
+STATIC struct ndev *
+ndev_get(dl_ulong ppa)
 {
 	dl_ulong i;
 	struct ldldev *dev;
 	struct ndev *ndev;
 
 	/* Find the Linux netdevice to attach to */
-	for (dev = dev_base, i = 0; dev; dev = dev->next, ++i) 
+	for (dev = dev_base, i = 0; dev; dev = dev->next, ++i)
 		if (ppa == i)
 			break;
 
@@ -947,7 +973,8 @@ STATIC struct ndev *ndev_get(dl_ulong ppa)
  *
  *  Not reentrant.
  */
-STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
+STATIC void
+ndev_attach(struct ndev *ndev, struct dl *dl)
 {
 	LISASSERT(ndev != NULL);
 	LISASSERT(ndev->magic == NDEV_MAGIC);
@@ -966,14 +993,15 @@ STATIC void ndev_attach(struct ndev *ndev, struct dl *dl)
  *
  *  Not reentrant.
  */
-STATIC void ndev_free(struct ndev *ndev)
+STATIC void
+ndev_free(struct ndev *ndev)
 {
 	LISASSERT(ndev != NULL);
 	LISASSERT(ndev->magic == NDEV_MAGIC);
 	LISASSERT(ndev->dev == NULL);
 
 	if (atomic_read(&ndev->wr_cur) > 0 || ndev->endpoints != NULL)
-		return; /* Have to wait to free */
+		return;		/* Have to wait to free */
 
 	if (ndev->tx_congest_timer) {
 		/* Drop old timer */
@@ -990,7 +1018,8 @@ STATIC void ndev_free(struct ndev *ndev)
  *
  *  Not reentrant.
  */
-STATIC void ndev_release(struct dl *dl)
+STATIC void
+ndev_release(struct dl *dl)
 {
 	struct ndev *ndev = dl->ndev;
 	struct dl **dlp;
@@ -1008,9 +1037,8 @@ STATIC void ndev_release(struct dl *dl)
 	dl->ndev = NULL;
 	if (ndev->endpoints == NULL) {
 		/* No more attached endpoints: Try to free. */
-		if (ndev->dev != NULL)
-		{
-			/*
+		if (ndev->dev != NULL) {
+			/* 
 			 * We may get unloaded while the driver below
 			 * has buffers from us still queued.  Bad news
 			 * since we have a destructor function pointer
@@ -1020,9 +1048,9 @@ STATIC void ndev_release(struct dl *dl)
 			 * clients of the driver, but that's just the
 			 * way has to be.  DMG 8/25/00
 			 */
-			START_BH_ATOMIC(ndev->dev) ;
-			qdisc_reset(ndev->dev->qdisc) ;
-			END_BH_ATOMIC(ndev->dev) ;
+			START_BH_ATOMIC(ndev->dev);
+			qdisc_reset(ndev->dev->qdisc);
+			END_BH_ATOMIC(ndev->dev);
 			ndev->dev = NULL;
 		}
 		ndev_free(ndev);
@@ -1035,7 +1063,8 @@ STATIC void ndev_release(struct dl *dl)
  *  The hard flag is set if the netdevice is removed.
  *  Not reentrant.
  */
-STATIC void ndev_down(struct ndev *ndev, int hard)
+STATIC void
+ndev_down(struct ndev *ndev, int hard)
 {
 	struct dl *dl;
 
@@ -1058,7 +1087,8 @@ STATIC void ndev_down(struct ndev *ndev, int hard)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
+STATIC void
+ndev_wr_wakeup_endp(struct ndev *ndev)
 {
 	struct dl *dl;
 
@@ -1077,13 +1107,14 @@ STATIC void ndev_wr_wakeup_endp(struct ndev *ndev)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_wakeup(struct ndev *ndev)
+STATIC void
+ndev_wr_wakeup(struct ndev *ndev)
 {
 	LISASSERT(ndev->magic == NDEV_MAGIC);
 	LISASSERT(ndev->sleeping);
 
 	if (ndev->tx_congest_timer) {
-		untimeout(ndev->tx_congest_timer); /* Drop old timer */
+		untimeout(ndev->tx_congest_timer);	/* Drop old timer */
 		ndev->tx_congest_timer = 0;
 	}
 	ndev->sleeping = 0;
@@ -1093,10 +1124,11 @@ STATIC void ndev_wr_wakeup(struct ndev *ndev)
 
 #ifndef KERNEL_2_1		/* old 2.0 kernel, not supported anymore */
 
-STATIC void _RP tx_congestion_timeout(caddr_t dp)
+STATIC void _RP
+tx_congestion_timeout(caddr_t dp)
 {
 	int psw;
-	struct ndev *ndev = (struct ndev *)dp;
+	struct ndev *ndev = (struct ndev *) dp;
 
 	SPLSTR(psw);
 
@@ -1114,14 +1146,14 @@ STATIC void _RP tx_congestion_timeout(caddr_t dp)
  *
  *  Not reentrant.
  */
-STATIC void ndev_wr_sleep(struct ndev *ndev)
+STATIC void
+ndev_wr_sleep(struct ndev *ndev)
 {
 	LISASSERT(!ndev->sleeping);
 
 	if (!ndev->tx_congest_timer)
-		ndev->tx_congest_timer = timeout(tx_congestion_timeout,
-						 (caddr_t)ndev,
-						 CONGESTION_BACKOFF_TICKS);
+		ndev->tx_congest_timer =
+		    timeout(tx_congestion_timeout, (caddr_t) ndev, CONGESTION_BACKOFF_TICKS);
 	if (ndev->tx_congest_timer)
 		ndev->sleeping = 1;
 	else
@@ -1134,7 +1166,8 @@ STATIC void ndev_wr_sleep(struct ndev *ndev)
  *  Need to adjust amount of outstanding data on the netdevice write queue,
  *  and possibly free our ndev structure if no longer in use.
  */
-STATIC void ndev_skb_destruct(struct sk_buff *skb)
+STATIC void
+ndev_skb_destruct(struct sk_buff *skb)
 {
 	struct ndev *ndev;
 
@@ -1148,7 +1181,7 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 		return;
 #endif
 
-	ndev = (struct ndev *)skb->sk;
+	ndev = (struct ndev *) skb->sk;
 	skb->sk = NULL;
 	LISASSERT(ndev != NULL);
 	LISASSERT(ndev->magic == NDEV_MAGIC);
@@ -1172,7 +1205,8 @@ STATIC void ndev_skb_destruct(struct sk_buff *skb)
 
 #if defined(KERNEL_2_1)
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 {
 	LISASSERT(skb != NULL);
 	LISASSERT(ndev != NULL);
@@ -1190,7 +1224,8 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 
 #elif defined(too_complicated_KERNEL_2_1)
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 {
 	int psw;
 	struct ldldev *dev;
@@ -1203,7 +1238,7 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 	skb->mac.raw = skb->data;
 	skb->dev = dev = ndev->dev;
 	atomic_add(skb->truesize, &ndev->wr_cur);
-	(struct ndev *)skb->sk = ndev;
+	(struct ndev *) skb->sk = ndev;
 	skb->destructor = ndev_skb_destruct;
 
 	if (atomic_read(&ndev->wr_cur) <= ndev->wr_max) {
@@ -1242,10 +1277,11 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb)
 
 #else
 
-STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
+STATIC int
+ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
 {
 	atomic_add(skb->truesize, &ndev->wr_cur);
-	(struct ndev *)skb->sk = ndev;
+	(struct ndev *) skb->sk = ndev;
 	skb->dev = ndev->dev;
 	skb->arp = 1;
 	skb->destructor = ndev_skb_destruct;
@@ -1264,8 +1300,7 @@ STATIC int ndev_xmit(struct ndev *ndev, struct sk_buff *skb, int pri)
  *  device_notification  - device notification callback.
  */
 STATIC int
-device_notification(struct notifier_block *notifier,
-		    unsigned long event, void *ptr)
+device_notification(struct notifier_block *notifier, unsigned long event, void *ptr)
 {
 	struct ldldev *dev = ptr;
 	struct ndev *d;
@@ -1304,16 +1339,17 @@ STATIC struct notifier_block dl_notifier = {
 	0
 };
 
-STATIC INLINE int notifier_register(void)
+STATIC INLINE int
+notifier_register(void)
 {
 	return register_netdevice_notifier(&dl_notifier);
 }
 
-STATIC INLINE int notifier_unregister(void)
+STATIC INLINE int
+notifier_unregister(void)
 {
 	return unregister_netdevice_notifier(&dl_notifier);
 }
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -1321,7 +1357,8 @@ STATIC INLINE int notifier_unregister(void)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC void _RP dl_bufcallback(long idx)
+STATIC void _RP
+dl_bufcallback(long idx)
 {
 	struct dl *dl = &dl_dl[idx];
 
@@ -1332,17 +1369,17 @@ STATIC void _RP dl_bufcallback(long idx)
 	qenable(WR(dl->rq));
 }
 
-STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
+STATIC int
+dl_bufcall(struct dl *dl, mblk_t *mp, int size)
 {
 	LISASSERT(!dl->bufwait);
-	if ((dl->bufwait = bufcall(size, BPRI_HI, dl_bufcallback, dl-dl_dl)) == 0) {
+	if ((dl->bufwait = bufcall(size, BPRI_HI, dl_bufcallback, dl - dl_dl)) == 0) {
 		printk("ldl: bufcall failed\n");
 		freemsg(mp);
 		return DONE;
 	}
 	return RETRY;
 }
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -1353,13 +1390,13 @@ STATIC int dl_bufcall(struct dl *dl, mblk_t *mp, int size)
 /*
  *  Translate from DLPI priority to Linux netdevice priority
  */
-STATIC INLINE int pri_dlpi2netdevice(dl_ulong pri)
+STATIC INLINE int
+pri_dlpi2netdevice(dl_ulong pri)
 {
 	LISASSERT(pri >= 0);
 	LISASSERT(pri <= 100);
 
-	return (pri < 33) ? LDLPRI_HI :
-			    (pri < 66) ? LDLPRI_MED : LDLPRI_LO;
+	return (pri < 33) ? LDLPRI_HI : (pri < 66) ? LDLPRI_MED : LDLPRI_LO;
 }
 
 /*
@@ -1370,36 +1407,38 @@ STATIC INLINE int pri_dlpi2netdevice(dl_ulong pri)
  *  freed, read and write pointers are reset, and 1 is returned.
  *  Otherwise, the message is untouched and 0 is returned.
  */
-STATIC INLINE int reuse_msg(msgb_t *mp, dl_ushort size)
+STATIC INLINE int
+reuse_msg(msgb_t * mp, dl_ushort size)
 {
 	msgb_t *bp;
 
 	LISASSERT(mp != NULL);
 	LISASSERT(mp->b_datap != NULL);
 
-	if (mp->b_datap->db_lim - mp->b_datap->db_base < size);
-		return 0;
+	if (mp->b_datap->db_lim - mp->b_datap->db_base < size) ;
+	return 0;
 	if (mp->b_datap->db_ref != 1)
 		return 0;
 
 	if ((bp = unlinkb(mp)) != NULL)
 		freemsg(bp);
 	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
- 
+
 	return 1;
 }
 
 /*
  *  Convert mp to DL_OK_ACK.
  */
-STATIC INLINE void make_dl_ok_ack(msgb_t *mp, dl_ulong primitive)
+STATIC INLINE void
+make_dl_ok_ack(msgb_t * mp, dl_ulong primitive)
 {
 	dl_ok_ack_t *ackp;
 
 	/* LISASSERT(reuse_msg(mp, DL_OK_ACK_SIZE)); */
 
 	mp->b_datap->db_type = M_PCPROTO;
-	ackp = (dl_ok_ack_t *)mp->b_datap->db_base;
+	ackp = (dl_ok_ack_t *) mp->b_datap->db_base;
 	ackp->dl_primitive = DL_OK_ACK;
 	ackp->dl_correct_primitive = primitive;
 	mp->b_wptr += DL_OK_ACK_SIZE;
@@ -1408,15 +1447,15 @@ STATIC INLINE void make_dl_ok_ack(msgb_t *mp, dl_ulong primitive)
 /*
  *  Convert mp to DL_ERROR_ACK.
  */
-STATIC INLINE void make_dl_error_ack(msgb_t *mp, dl_ulong primitive,
-				     dl_ulong err, dl_ulong uerr)
+STATIC INLINE void
+make_dl_error_ack(msgb_t * mp, dl_ulong primitive, dl_ulong err, dl_ulong uerr)
 {
 	dl_error_ack_t *ackp;
 
 	/* LISASSERT(reuse_msg(mp, DL_ERROR_ACK_SIZE)); */
 
 	mp->b_datap->db_type = M_PCPROTO;
-	ackp = (dl_error_ack_t *)mp->b_datap->db_base;
+	ackp = (dl_error_ack_t *) mp->b_datap->db_base;
 	ackp->dl_primitive = DL_ERROR_ACK;
 	ackp->dl_error_primitive = primitive;
 	ackp->dl_errno = err;
@@ -1432,7 +1471,8 @@ STATIC INLINE void make_dl_error_ack(msgb_t *mp, dl_ulong primitive,
  *  (But if bufcall fails *mp is freed and set to NULL
  *   and a bogus DONE is returned to avoid hanging.)
  */
-STATIC INLINE int do_ok_ack(struct dl *dl, msgb_t **mp, dl_ulong primitive)
+STATIC INLINE int
+do_ok_ack(struct dl *dl, msgb_t ** mp, dl_ulong primitive)
 {
 	if (!reuse_msg(*mp, DL_OK_ACK_SIZE)) {
 		mblk_t *bp;
@@ -1452,7 +1492,6 @@ STATIC INLINE int do_ok_ack(struct dl *dl, msgb_t **mp, dl_ulong primitive)
 	return DONE;
 }
 
-
 /*
  *  Send DL_ERROR_ACK reply
  *
@@ -1461,8 +1500,8 @@ STATIC INLINE int do_ok_ack(struct dl *dl, msgb_t **mp, dl_ulong primitive)
  *  (But if bufcall fails mp is freed and a bogus DONE is returned
  *   to avoid hanging.)
  */
-STATIC int reply_error_ack(struct dl *dl, msgb_t *mp, dl_ulong primitive,
-			   dl_ulong err, dl_ulong uerr)
+STATIC int
+reply_error_ack(struct dl *dl, msgb_t * mp, dl_ulong primitive, dl_ulong err, dl_ulong uerr)
 {
 	if (!reuse_msg(mp, DL_ERROR_ACK_SIZE)) {
 		mblk_t *bp;
@@ -1474,10 +1513,9 @@ STATIC int reply_error_ack(struct dl *dl, msgb_t *mp, dl_ulong primitive,
 	}
 	make_dl_error_ack(mp, primitive, err, uerr);
 	putnext(dl->rq, mp);
-	ginc(error_ack_cnt) ;
+	ginc(error_ack_cnt);
 	return DONE;
 }
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -1518,33 +1556,34 @@ STATIC int reply_error_ack(struct dl *dl, msgb_t *mp, dl_ulong primitive,
  *  Ethernet II
  */
 
-STATIC int eth_ii_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_ii_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(dl->sap_len == 2);
 	if (len < 14)
 		return 0;
-	if (*(short *)(fr + 12) != *(short *)dl->sap->sap.sap) {
+	if (*(short *) (fr + 12) != *(short *) dl->sap->sap.sap) {
 		struct sap *sap = dl->subs;
 
 		while (sap != NULL) {
-			if (*(short *)(fr + 12) == *(short *)sap->sap.sap)
+			if (*(short *) (fr + 12) == *(short *) sap->sap.sap)
 				break;
 			sap = sap->next_sap;
 		}
 		if (sap == NULL)
 			return 0;
 	}
-	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) &&
-	    memcmp(fr, dl->ndev->dev->broadcast, 6))
+	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) && memcmp(fr, dl->ndev->dev->broadcast, 6))
 		return 0;
 	return 1;
 }
 
-STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
-	unsigned short dsap = ntohs(*(unsigned short *)(dp->b_rptr + 12));
+	unsigned short dsap = ntohs(*(unsigned short *) (dp->b_rptr + 12));
 
 	LISASSERT(dl->sap_len == 2);
 	LISASSERT(dl->addr_len == 6);
@@ -1555,7 +1594,7 @@ STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 8;
 	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 8;
@@ -1566,12 +1605,12 @@ STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 
 	memcpy(bp->b_wptr, dp->b_rptr + 6, 6);
 	bp->b_wptr += 6;
-	*(unsigned short *)(bp->b_wptr) = dsap;
+	*(unsigned short *) (bp->b_wptr) = dsap;
 	bp->b_wptr += 2;
 
 	memcpy(bp->b_wptr, dp->b_rptr, 6);
 	bp->b_wptr += 6;
-	*(unsigned short *)(bp->b_wptr) = dsap;
+	*(unsigned short *) (bp->b_wptr) = dsap;
 	bp->b_wptr += 2;
 
 	dp->b_rptr += 14;
@@ -1580,23 +1619,23 @@ STATIC mblk_t *eth_ii_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_ii_mkhdr(struct dl *dl, unsigned char *dst,
-		        int datalen, struct sk_buff *skb)
+STATIC int
+eth_ii_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned short dsap;
 
-	dsap = htons(*(unsigned short *)(dst + 6));
+	dsap = htons(*(unsigned short *) (dst + 6));
 	hdr = skb_push(skb, 14);
 	memcpy(hdr, dst, 6);
 	memcpy(hdr + 6, dl->ndev->dev->dev_addr, 6);
-	*(unsigned short *)(hdr + 12) = dsap;
+	*(unsigned short *) (hdr + 12) = dsap;
 
-	if (dsap != *(unsigned short *)dl->sap->sap.sap) {
+	if (dsap != *(unsigned short *) dl->sap->sap.sap) {
 		struct sap *sap;
 
 		for (sap = dl->subs; sap; sap = sap->next_sap)
-			if (dsap == *(unsigned short *)sap->sap.sap)
+			if (dsap == *(unsigned short *) sap->sap.sap)
 				return 1;
 		return 0;
 	}
@@ -1606,11 +1645,12 @@ STATIC int eth_ii_mkhdr(struct dl *dl, unsigned char *dst,
 /*
  *  Ethernet 802.2
  */
-STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(dl->sap_len == 1);
 
-	/*
+	/* 
 	 * The LDLFLAG_RAW check will disappear when we
 	 * get the RAW LLC frametype to work.
 	 * It means that when running in RAW mode, any value of the
@@ -1618,12 +1658,13 @@ STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 	 */
 	if (len < 17 || (!(dl->flags & LDLFLAG_RAW) && *(fr + 16) != 0x03))
 		return 0;
-	if (ntohs(*(unsigned short *)(fr + 12)) < 3)
+	if (ntohs(*(unsigned short *) (fr + 12)) < 3)
 		return 0;
 	if (dl->flags & LDLFLAG_PROMISC_SAP)
 		return 1;
 	if (*(fr + 14) != dl->sap->sap.sap[0]) {
 		struct sap *sap = dl->subs;
+
 		while (sap != NULL) {
 			if (*(fr + 14) == sap->sap.sap[0])
 				break;
@@ -1633,34 +1674,39 @@ STATIC int eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 			return 0;
 	}
 #if 0
-	{       
-		int i ; 
-		printk("eth_8022_want: SAP checked, MAC@ not yet ...") ;
-		for (i = 0; i < 16; i++) printk("%02x ", fr[i]) ;
-		printk("\n") ;
-	}       
+	{
+		int i;
+
+		printk("eth_8022_want: SAP checked, MAC@ not yet ...");
+		for (i = 0; i < 16; i++)
+			printk("%02x ", fr[i]);
+		printk("\n");
+	}
 #endif
-	/*
+	/* 
 	 * Start filtering on MAC addresses ...
 	 */
 	if (!memcmp(fr, dl->ndev->dev->dev_addr, 6))
 		return 1;
 	if (!memcmp(fr, dl->ndev->dev->broadcast, 6))
 		return 1;
-	/*
+	/* 
 	 * Check the registered multicast address list ...
 	 */
 	{
 		struct dev_mc_list *dmi = dl->ndev->dev->mc_list;
+
 		while (dmi != NULL)
 			if (!memcmp(fr, dmi->dmi_addr, 6))
-			       return 1;
-			else dmi = dmi->next;	
-	}       
+				return 1;
+			else
+				dmi = dmi->next;
+	}
 	return 0;
 }
 
-STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -1675,7 +1721,7 @@ STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 7;
 	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 7;
@@ -1692,7 +1738,7 @@ STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 	bp->b_wptr += 6;
 	*bp->b_wptr++ = *(dp->b_rptr + 14);
 
-	len = ntohs(*(unsigned short *)(dp->b_rptr + 12)) - 3;
+	len = ntohs(*(unsigned short *) (dp->b_rptr + 12)) - 3;
 	dp->b_rptr += 17;
 	if (dp->b_wptr - dp->b_rptr > len)
 		dp->b_wptr = dp->b_rptr + len;
@@ -1701,8 +1747,8 @@ STATIC mblk_t *eth_8022_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+eth_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned char dsap;
@@ -1721,7 +1767,7 @@ STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst,
 	hdr = skb_push(skb, 17);
 	memcpy(hdr, dst, 6);
 	memcpy(hdr + 6, dl->ndev->dev->dev_addr, 6);
-	*(unsigned short *)(hdr + 12) = htons(datalen + 3);
+	*(unsigned short *) (hdr + 12) = htons(datalen + 3);
 	*(hdr + 14) = *(hdr + 15) = dsap;
 	*(hdr + 16) = 3;
 	return 1;
@@ -1730,18 +1776,20 @@ STATIC int eth_8022_mkhdr(struct dl *dl, unsigned char *dst,
 /*
  *  Ethernet RAW 802.2
  */
-STATIC int eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(dl->sap_len == 1);
 
-	if (len < 17 || ntohs(*(unsigned short *)(fr + 12)) < 3)
+	if (len < 17 || ntohs(*(unsigned short *) (fr + 12)) < 3)
 		return 0;
-	if (*(unsigned short *)(fr + 14) == 0xffff)
-		return 0; /* "raw" 802.3 IPX */
+	if (*(unsigned short *) (fr + 14) == 0xffff)
+		return 0;	/* "raw" 802.3 IPX */
 	if (dl->flags & LDLFLAG_PROMISC_SAP)
 		return 1;
 	if (*(fr + 14) != dl->sap->sap.sap[0]) {
 		struct sap *sap = dl->subs;
+
 		while (sap != NULL) {
 			if (*(fr + 14) == sap->sap.sap[0])
 				break;
@@ -1750,13 +1798,13 @@ STATIC int eth_raw8022_want(struct dl *dl, unsigned char *fr, int len)
 		if (sap == NULL)
 			return 0;
 	}
-	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) &&
-	    memcmp(fr, dl->ndev->dev->broadcast, 6))
+	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) && memcmp(fr, dl->ndev->dev->broadcast, 6))
 		return 0;
 	return 1;
 }
 
-STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -1771,7 +1819,7 @@ STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 7;
 	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 7;
@@ -1788,7 +1836,7 @@ STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 	bp->b_wptr += 6;
 	*bp->b_wptr++ = *(dp->b_rptr + 14);
 
-	len = ntohs(*(unsigned short *)(dp->b_rptr + 12));
+	len = ntohs(*(unsigned short *) (dp->b_rptr + 12));
 	dp->b_rptr += 14;
 	if (dp->b_wptr - dp->b_rptr > len)
 		dp->b_wptr = dp->b_rptr + len;
@@ -1797,15 +1845,15 @@ STATIC mblk_t *eth_raw8022_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 
 	hdr = skb_push(skb, 14);
 	memcpy(hdr, dst, 6);
 	memcpy(hdr + 6, dl->ndev->dev->dev_addr, 6);
-	*(unsigned short *)(hdr + 12) = htons(datalen);
+	*(unsigned short *) (hdr + 12) = htons(datalen);
 	*(hdr + 14) = *(dst + 6);
 	*(hdr + 15) = dl->sap->sap.sap[0];
 	return 1;
@@ -1815,14 +1863,13 @@ STATIC int eth_raw8022_mkhdr(struct dl *dl, unsigned char *dst,
  *  Ethernet SNAP
  */
 
-STATIC int eth_snap_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+eth_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(dl->sap_len == 2);
-	if (len < 22 ||
-	    ntohs(*(unsigned short *)(fr + 12)) < 8 ||
-	    *(unsigned short *)(fr + 14) != 0xAAAA ||
-	    *(fr + 16) != 0x03 ||
-	    memcmp(dl->oui, fr + 17, 3))
+	if (len < 22 || ntohs(*(unsigned short *) (fr + 12)) < 8
+	    || *(unsigned short *) (fr + 14) != 0xAAAA || *(fr + 16) != 0x03
+	    || memcmp(dl->oui, fr + 17, 3))
 		return 0;
 
 	if (memcmp(fr + 20, dl->sap->sap.sap, 2)) {
@@ -1837,19 +1884,19 @@ STATIC int eth_snap_want(struct dl *dl, unsigned char *fr, int len)
 			return 0;
 	}
 
-	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) &&
-	    memcmp(fr, dl->ndev->dev->broadcast, 6))
+	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) && memcmp(fr, dl->ndev->dev->broadcast, 6))
 		return 0;
 
 	return 1;
 }
 
-STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
 	unsigned short len;
-	unsigned short dsap = ntohs(*(unsigned short *)(dp->b_rptr + 17));
+	unsigned short dsap = ntohs(*(unsigned short *) (dp->b_rptr + 17));
 
 	LISASSERT(dl->sap_len == 2);
 	LISASSERT(dl->addr_len == 6);
@@ -1860,7 +1907,7 @@ STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 8;
 	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 8;
@@ -1871,15 +1918,15 @@ STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 
 	memcpy(bp->b_wptr, dp->b_rptr + 6, 6);
 	bp->b_wptr += 6;
-	*(unsigned short *)(bp->b_wptr) = dsap;
+	*(unsigned short *) (bp->b_wptr) = dsap;
 	bp->b_wptr += 2;
 
 	memcpy(bp->b_wptr, dp->b_rptr, 6);
 	bp->b_wptr += 6;
-	*(unsigned short *)(bp->b_wptr) = dsap;
+	*(unsigned short *) (bp->b_wptr) = dsap;
 	bp->b_wptr += 2;
 
-	len = ntohs(*(unsigned short *)(dp->b_rptr + 12)) - 8;
+	len = ntohs(*(unsigned short *) (dp->b_rptr + 12)) - 8;
 	dp->b_rptr += 22;
 	if (dp->b_wptr - dp->b_rptr > len)
 		dp->b_wptr = dp->b_rptr + len;
@@ -1888,18 +1935,18 @@ STATIC mblk_t *eth_snap_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+eth_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 	unsigned short dsap;
 
-	dsap = *(unsigned short *)(dst + 6);
-	if (dsap != *(unsigned short *)dl->sap->sap.sap) {
+	dsap = *(unsigned short *) (dst + 6);
+	if (dsap != *(unsigned short *) dl->sap->sap.sap) {
 		struct sap *sap = dl->subs;
 
 		while (sap != NULL) {
-			if (dsap == *(unsigned short *)sap->sap.sap)
+			if (dsap == *(unsigned short *) sap->sap.sap)
 				break;
 			sap = sap->next_sap;
 		}
@@ -1910,11 +1957,11 @@ STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst,
 	hdr = skb_push(skb, 22);
 	memcpy(hdr, dst, 6);
 	memcpy(hdr + 6, dl->ndev->dev->dev_addr, 6);
-	*(unsigned short *)(hdr + 12) = htons(datalen + 8);
-	*(unsigned short *)(hdr + 14) = 0xaaaa;
+	*(unsigned short *) (hdr + 12) = htons(datalen + 8);
+	*(unsigned short *) (hdr + 14) = 0xaaaa;
 	*(hdr + 16) = 3;
 	memcpy(hdr + 17, dl->oui, 3);
-	*(unsigned short *)(hdr + 20) = dsap;
+	*(unsigned short *) (hdr + 20) = dsap;
 	return 1;
 }
 
@@ -1922,22 +1969,23 @@ STATIC int eth_snap_mkhdr(struct dl *dl, unsigned char *dst,
  *  Ethernet 802.3 IPX
  */
 
-STATIC int ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+ipx_8023_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(dl->sap_len == 0);
 	/* Must have a complete IPX header */
-	if (len < 44 || ntohs(*(unsigned short *)(fr + 12)) < 30)
+	if (len < 44 || ntohs(*(unsigned short *) (fr + 12)) < 30)
 		return 0;
 	/* Must have no IPX checksum */
-	if (ntohs(*(unsigned short *)(fr + 14)) != 0xffff)
+	if (ntohs(*(unsigned short *) (fr + 14)) != 0xffff)
 		return 0;
-	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) &&
-	    memcmp(fr, dl->ndev->dev->broadcast, 6))
+	if (memcmp(fr, dl->ndev->dev->dev_addr, 6) && memcmp(fr, dl->ndev->dev->broadcast, 6))
 		return 0;
 	return 1;
 }
 
-STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -1952,7 +2000,7 @@ STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 6;
 	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE;
@@ -1964,7 +2012,7 @@ STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 	memcpy(bp->b_wptr, dp->b_rptr, 12);
 	bp->b_wptr += 12;
 
-	len = *(unsigned short *)(dp->b_rptr + 12);
+	len = *(unsigned short *) (dp->b_rptr + 12);
 	dp->b_rptr += 14;
 	if (dp->b_wptr - dp->b_rptr > len)
 		dp->b_wptr = dp->b_rptr + len;
@@ -1973,18 +2021,17 @@ STATIC mblk_t *ipx_8023_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int ipx_8023_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+ipx_8023_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	unsigned char *hdr;
 
 	hdr = skb_push(skb, 14);
 	memcpy(hdr, dst, 6);
 	memcpy(hdr + 6, dl->ndev->dev->dev_addr, 6);
-	*(unsigned short *)(hdr + 12) = htons(datalen);
+	*(unsigned short *) (hdr + 12) = htons(datalen);
 	return 1;
 }
-
 
 /*
  * Token Ring 802.2 LLC
@@ -2007,228 +2054,229 @@ STATIC int ipx_8023_mkhdr(struct dl *dl, unsigned char *dst,
  * header.  IP packet types have to be encoded inside a SNAP header
  * beyond the LLC header.
  */
-typedef struct tr_hdr
-{
-    u8        acf ;     
-    u8        fcf ;     
-    u8        dst_addr[6] ;
-    u8        src_addr[6] ;
-    /*
-     * Routing control bytes: Only present if the routing bit
-     * is set in the first byte of the src_addr.
-     */
-    u8        bl ;                    /* brdcst & lgth */
-    u8        df ;                    /* direction & lrgst frm bits */
+typedef struct tr_hdr {
+	u8 acf;
+	u8 fcf;
+	u8 dst_addr[6];
+	u8 src_addr[6];
+	/* 
+	 * Routing control bytes: Only present if the routing bit
+	 * is set in the first byte of the src_addr.
+	 */
+	u8 bl;				/* brdcst & lgth */
+	u8 df;				/* direction & lrgst frm bits */
 
-} tr_hdr_t ;
+} tr_hdr_t;
 
 /*
  * After a variable amount of routing data you come to the
  * LLC header.
  */
-typedef struct tr_llc_frm_hdr
-{
-    u8        llc_dsap ;              /* destination SAP address */
-    u8        llc_ssap ;              /* source SAP address */
-    u8        llc_ctl[1] ;            /* control field */
+typedef struct tr_llc_frm_hdr {
+	u8 llc_dsap;			/* destination SAP address */
+	u8 llc_ssap;			/* source SAP address */
+	u8 llc_ctl[1];			/* control field */
 
-} tr_llc_frm_hdr_t ;
+} tr_llc_frm_hdr_t;
 
 /* 
  * A few bits from the token ring header.
  */
-#define SADDR_0_RTE_PRES        0x80    /* 1=rte info present, 0=none */
-#define RCF_0_LLLLL             0x1F    /* length bits */
-#define FCF_FF          	0xC0    /* frame type bits */
-#define     FCF_MAC     	0x00    /* MAC frame */
-#define     FCF_LLC     	0x40    /* LLC frame */
+#define SADDR_0_RTE_PRES        0x80	/* 1=rte info present, 0=none */
+#define RCF_0_LLLLL             0x1F	/* length bits */
+#define FCF_FF          	0xC0	/* frame type bits */
+#define     FCF_MAC     	0x00	/* MAC frame */
+#define     FCF_LLC     	0x40	/* LLC frame */
 
-STATIC int tr_8022_want(struct dl *dl, unsigned char *fr, int len)
-{					/* patterned after eth_8022_want */
-    tr_hdr_t		*trp ;
-    tr_llc_frm_hdr_t	*llcp ;
-    int			 rtelgth ;
+STATIC int
+tr_8022_want(struct dl *dl, unsigned char *fr, int len)
+{				/* patterned after eth_8022_want */
+	tr_hdr_t *trp;
+	tr_llc_frm_hdr_t *llcp;
+	int rtelgth;
 
 #if 0
-    {
-	int i ;
-	printk("tr_8022_want:\n") ;
-	for (i = 0; i < 16; i++)
-	    printk("%02x ", fr[i]) ;
-	printk("\n") ;
-	for (; i < 32; i++)
-	    printk("%02x ", fr[i]) ;
-	printk("\n") ;
-    }
+	{
+		int i;
+
+		printk("tr_8022_want:\n");
+		for (i = 0; i < 16; i++)
+			printk("%02x ", fr[i]);
+		printk("\n");
+		for (; i < 32; i++)
+			printk("%02x ", fr[i]);
+		printk("\n");
+	}
 #endif
 
-    trp = (tr_hdr_t *) fr ;
-    LISASSERT(dl->sap_len == 1);
-    if (len < sizeof(tr_hdr_t)-2 + sizeof(tr_llc_frm_hdr_t))
-	    return 0;
-    /*
-     * Decode the type of frame.  If a MAC frame, we don't want it.
-     * If an LLC frame, we will look at it.
-     */
-    if ((trp->fcf & FCF_FF) != FCF_LLC)		/* must be LLC type frame */
-	return(0) ;				/* we don't want it */
+	trp = (tr_hdr_t *) fr;
+	LISASSERT(dl->sap_len == 1);
+	if (len < sizeof(tr_hdr_t) - 2 + sizeof(tr_llc_frm_hdr_t))
+		return 0;
+	/* 
+	 * Decode the type of frame.  If a MAC frame, we don't want it.
+	 * If an LLC frame, we will look at it.
+	 */
+	if ((trp->fcf & FCF_FF) != FCF_LLC)	/* must be LLC type frame */
+		return (0);	/* we don't want it */
 
-    /*
-     * Find out how much routing info is present and skip over it.
-     * Establish llcp pointing to the LLC header.
-     *
-     * The length in the RCF includes the two bytes of routing control
-     * at the front of the RCF.  These two bytes are included in our
-     * header structure.
-     */
-    if (trp->src_addr[0] & SADDR_0_RTE_PRES)
-    {					/* has source route field */
-	rtelgth = trp->bl & RCF_0_LLLLL ;
-	if (rtelgth < 2)		/* count includes rte ctl fld */
-	    return 0 ;			/* ill-formed, don't want it */
+	/* 
+	 * Find out how much routing info is present and skip over it.
+	 * Establish llcp pointing to the LLC header.
+	 *
+	 * The length in the RCF includes the two bytes of routing control
+	 * at the front of the RCF.  These two bytes are included in our
+	 * header structure.
+	 */
+	if (trp->src_addr[0] & SADDR_0_RTE_PRES) {	/* has source route field */
+		rtelgth = trp->bl & RCF_0_LLLLL;
+		if (rtelgth < 2)	/* count includes rte ctl fld */
+			return 0;	/* ill-formed, don't want it */
 
-	if (rtelgth & 0x01)		/* must be pairs of bytes */
-	    return 0 ;			/* ill-formed, don't want it */
+		if (rtelgth & 0x01)	/* must be pairs of bytes */
+			return 0;	/* ill-formed, don't want it */
 
-	llcp = (tr_llc_frm_hdr_t *) (fr + sizeof(*trp)-2 + rtelgth) ;
-    }
-    else				/* no source route field */
-    {					/* don't skip as many bytes */
-	llcp = (tr_llc_frm_hdr_t *) (fr + sizeof(*trp)-2) ;
-    }
+		llcp = (tr_llc_frm_hdr_t *) (fr + sizeof(*trp) - 2 + rtelgth);
+	} else {		/* no source route field */
+		/* don't skip as many bytes */
+		llcp = (tr_llc_frm_hdr_t *) (fr + sizeof(*trp) - 2);
+	}
 
-    /*
-     * Now that we know where the SAPs are and that it's an LLC frame
-     * we can search for a dlsap match.
-     *
-     * The LDLFLAG_RAW check will disappear when we
-     * get the RAW LLC frametype to work.
-     * It means that when running in RAW mode, any value of the
-     * control field will be accepted.
-     */
-    if (!(dl->flags & LDLFLAG_RAW) && llcp->llc_ctl[0] != 0x03)
-	return 0 ;
+	/* 
+	 * Now that we know where the SAPs are and that it's an LLC frame
+	 * we can search for a dlsap match.
+	 *
+	 * The LDLFLAG_RAW check will disappear when we
+	 * get the RAW LLC frametype to work.
+	 * It means that when running in RAW mode, any value of the
+	 * control field will be accepted.
+	 */
+	if (!(dl->flags & LDLFLAG_RAW) && llcp->llc_ctl[0] != 0x03)
+		return 0;
 
-    if (dl->flags & LDLFLAG_PROMISC_SAP)
-	    return 1;				/* wants everything */
+	if (dl->flags & LDLFLAG_PROMISC_SAP)
+		return 1;	/* wants everything */
 
-    if (llcp->llc_dsap != dl->sap->sap.sap[0]) {
-	    struct sap *sap = dl->subs;
-	    while (sap != NULL) {
-		    if (llcp->llc_dsap == sap->sap.sap[0])
-			    break;
-		    sap = sap->next_sap;
-	    }
-	    if (sap == NULL)
-		    return 0;
-    }
+	if (llcp->llc_dsap != dl->sap->sap.sap[0]) {
+		struct sap *sap = dl->subs;
 
-    return 1;
+		while (sap != NULL) {
+			if (llcp->llc_dsap == sap->sap.sap[0])
+				break;
+			sap = sap->next_sap;
+		}
+		if (sap == NULL)
+			return 0;
+	}
+
+	return 1;
 }
 
 /*
  * Strip the token ring addresses from the frame.  Also strip out the
  * route information and the LLC header.
  */
-STATIC mblk_t *tr_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+tr_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
-    mblk_t		*bp;
-    dl_unitdata_ind_t	*ud;
-    tr_hdr_t		*trp ;
-    tr_llc_frm_hdr_t	*llcp ;
-    int			 rtelgth = 0 ;
+	mblk_t *bp;
+	dl_unitdata_ind_t *ud;
+	tr_hdr_t *trp;
+	tr_llc_frm_hdr_t *llcp;
+	int rtelgth = 0;
 
-    LISASSERT(dl->sap_len == 1);
-    LISASSERT(dl->addr_len == 6);
+	LISASSERT(dl->sap_len == 1);
+	LISASSERT(dl->addr_len == 6);
 
-    trp = (tr_hdr_t *) dp->b_rptr ;
-    if (trp->src_addr[0] & SADDR_0_RTE_PRES)
-    {					/* has source route field */
-	rtelgth = trp->bl & RCF_0_LLLLL ;
-    }
+	trp = (tr_hdr_t *) dp->b_rptr;
+	if (trp->src_addr[0] & SADDR_0_RTE_PRES) {	/* has source route field */
+		rtelgth = trp->bl & RCF_0_LLLLL;
+	}
 
-    llcp = (tr_llc_frm_hdr_t *) (dp->b_rptr + sizeof(*trp)-2 + rtelgth) ;
+	llcp = (tr_llc_frm_hdr_t *) (dp->b_rptr + sizeof(*trp) - 2 + rtelgth);
 
-    if ((bp = allocb(DL_UNITDATA_IND_SIZE + 14, BPRI_LO)) == NULL) {
-	    freeb(dp);
-	    return NULL;
-    }
+	if ((bp = allocb(DL_UNITDATA_IND_SIZE + 14, BPRI_LO)) == NULL) {
+		freeb(dp);
+		return NULL;
+	}
 
-    bp->b_datap->db_type = M_PROTO;
-    ud = (dl_unitdata_ind_t *)bp->b_rptr;
-    ud->dl_primitive        = DL_UNITDATA_IND;
-    ud->dl_dest_addr_length = 7;
-    ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 7;
-    ud->dl_src_addr_length  = 7;
-    ud->dl_src_addr_offset  = DL_UNITDATA_IND_SIZE;
-    ud->dl_group_address    = 0 ;
-    bp->b_wptr += DL_UNITDATA_IND_SIZE;
+	bp->b_datap->db_type = M_PROTO;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
+	ud->dl_primitive = DL_UNITDATA_IND;
+	ud->dl_dest_addr_length = 7;
+	ud->dl_dest_addr_offset = DL_UNITDATA_IND_SIZE + 7;
+	ud->dl_src_addr_length = 7;
+	ud->dl_src_addr_offset = DL_UNITDATA_IND_SIZE;
+	ud->dl_group_address = 0;
+	bp->b_wptr += DL_UNITDATA_IND_SIZE;
 
-    memcpy(bp->b_wptr, trp->dst_addr, 6);
-    bp->b_wptr += 6 ;
-    *bp->b_wptr++ = llcp->llc_dsap ;
-    memcpy(bp->b_wptr+6, trp->src_addr, 6);
-    bp->b_wptr += 6 ;
-    *bp->b_wptr++ = llcp->llc_ssap ;
+	memcpy(bp->b_wptr, trp->dst_addr, 6);
+	bp->b_wptr += 6;
+	*bp->b_wptr++ = llcp->llc_dsap;
+	memcpy(bp->b_wptr + 6, trp->src_addr, 6);
+	bp->b_wptr += 6;
+	*bp->b_wptr++ = llcp->llc_ssap;
 
-    dp->b_rptr += sizeof(*trp)-2 + rtelgth + sizeof(tr_llc_frm_hdr_t) ;
+	dp->b_rptr += sizeof(*trp) - 2 + rtelgth + sizeof(tr_llc_frm_hdr_t);
 
-    linkb(bp, dp);
-    return bp;
+	linkb(bp, dp);
+	return bp;
 }
 
 /*
  * Data buffer contains the data part of an LLC frame.  Add the LLC
  * header and the token ring MAC header.
  */
-STATIC int tr_8022_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+tr_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
-    tr_hdr_t		*trp ;
-    tr_llc_frm_hdr_t	*llcp ;
-    unsigned char	 dsap;
+	tr_hdr_t *trp;
+	tr_llc_frm_hdr_t *llcp;
+	unsigned char dsap;
 
-    dsap = *(dst + 6);
-    if (dsap != dl->sap->sap.sap[0]) {
-	    struct sap *sap;
+	dsap = *(dst + 6);
+	if (dsap != dl->sap->sap.sap[0]) {
+		struct sap *sap;
 
-	    for (sap = dl->subs; sap; sap = sap->next_sap)
-		    if (dsap == sap->sap.sap[0])
-			    break;
-	    if (sap == NULL)
-	        return 0;
-    }
+		for (sap = dl->subs; sap; sap = sap->next_sap)
+			if (dsap == sap->sap.sap[0])
+				break;
+		if (sap == NULL)
+			return 0;
+	}
 
-    /*
-     * Omit the router control field and turn off the source route
-     * bit in the source address.  This may or may not prove to
-     * be correct.
-     */
-    trp = (tr_hdr_t *) skb_push(skb, sizeof(tr_hdr_t)-2 + sizeof(*llcp));
+	/* 
+	 * Omit the router control field and turn off the source route
+	 * bit in the source address.  This may or may not prove to
+	 * be correct.
+	 */
+	trp = (tr_hdr_t *) skb_push(skb, sizeof(tr_hdr_t) - 2 + sizeof(*llcp));
 
-    trp->acf = 0x10 ;				/* canned */
-    trp->fcf = 0x40 ;				/* canned */
-    memcpy(trp->dst_addr, dst, 6);
-    memcpy(trp->src_addr, dl->ndev->dev->dev_addr, 6);
-    trp->src_addr[0] &= ~SADDR_0_RTE_PRES ;	/* no route */
+	trp->acf = 0x10;	/* canned */
+	trp->fcf = 0x40;	/* canned */
+	memcpy(trp->dst_addr, dst, 6);
+	memcpy(trp->src_addr, dl->ndev->dev->dev_addr, 6);
+	trp->src_addr[0] &= ~SADDR_0_RTE_PRES;	/* no route */
 
-    llcp = (tr_llc_frm_hdr_t *) ( ((char *)(trp+1)) - 2 ) ;
-    llcp->llc_dsap = dsap ;
-    llcp->llc_ssap = dsap ;
-    llcp->llc_ctl[0] = 0x03 ;
+	llcp = (tr_llc_frm_hdr_t *) (((char *) (trp + 1)) - 2);
+	llcp->llc_dsap = dsap;
+	llcp->llc_ssap = dsap;
+	llcp->llc_ctl[0] = 0x03;
 
-    return 1;
+	return 1;
 }
 
 /*
  *  HDLC Raw
  */
-STATIC int hdlc_raw_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+hdlc_raw_want(struct dl *dl, unsigned char *fr, int len)
 {
 	return 1;		/* take everything */
 }
 
-STATIC mblk_t *hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
 {
 	mblk_t *bp;
 	dl_unitdata_ind_t *ud;
@@ -2239,7 +2287,7 @@ STATIC mblk_t *hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
 	}
 
 	bp->b_datap->db_type = M_PROTO;
-	ud = (dl_unitdata_ind_t *)bp->b_rptr;
+	ud = (dl_unitdata_ind_t *) bp->b_rptr;
 	ud->dl_primitive = DL_UNITDATA_IND;
 	ud->dl_dest_addr_length = 0;
 	ud->dl_dest_addr_offset = 0;
@@ -2252,31 +2300,32 @@ STATIC mblk_t *hdlc_raw_rcvind(struct dl *dl, mblk_t *dp)
 	return bp;
 }
 
-STATIC int hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst,
-			  int datalen, struct sk_buff *skb)
+STATIC int
+hdlc_raw_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	return 1;
 }
-
 
 /*
  *  FDDI 802.2
  */
 
-STATIC int fddi_8022_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+fddi_8022_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(0);
 	return 0;
 }
 
-STATIC mblk_t *fddi_8022_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+fddi_8022_rcvind(struct dl *dl, mblk_t *dp)
 {
 	LISASSERT(0);
 	return NULL;
 }
 
-STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst,
-			   int datalen, struct sk_buff *skb)
+STATIC int
+fddi_8022_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	LISASSERT(0);
 	return 0;
@@ -2286,20 +2335,22 @@ STATIC int fddi_8022_mkhdr(struct dl *dl, unsigned char *dst,
  *  FDDI SNAP
  */
 
-STATIC int fddi_snap_want(struct dl *dl, unsigned char *fr, int len)
+STATIC int
+fddi_snap_want(struct dl *dl, unsigned char *fr, int len)
 {
 	LISASSERT(0);
 	return 0;
 }
 
-STATIC mblk_t *fddi_snap_rcvind(struct dl *dl, mblk_t *dp)
+STATIC mblk_t *
+fddi_snap_rcvind(struct dl *dl, mblk_t *dp)
 {
 	LISASSERT(0);
 	return NULL;
 }
 
-STATIC int fddi_snap_mkhdr(struct dl *dl, unsigned char *dst,
-			   int datalen, struct sk_buff *skb)
+STATIC int
+fddi_snap_mkhdr(struct dl *dl, unsigned char *dst, int datalen, struct sk_buff *skb)
 {
 	LISASSERT(0);
 	return 0;
@@ -2315,7 +2366,8 @@ STATIC int fddi_snap_mkhdr(struct dl *dl, unsigned char *dst,
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
+STATIC INLINE void
+dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 {
 	mblk_t *mp;
 
@@ -2328,11 +2380,11 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 
 	if (copy != 0 && (dp = dupb(dp)) == NULL) {
 		++dl->lost_rcv;
-		ginc(net_rx_drp_cnt) ;
+		ginc(net_rx_drp_cnt);
 		return;
 	}
 
-	ginc(net_rx_cnt) ;
+	ginc(net_rx_cnt);
 	if ((dl->flags & LDLFLAG_RAW) == 0) {
 		if ((mp = dl->rcvind(dl, dp)) == NULL) {
 			freeb(dp);
@@ -2342,31 +2394,31 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
 	} else
 		mp = dp;
 #if 1
-	/*
+	/* 
 	 * Insert in our read queue and send upstream from the read
 	 * service routine.  Do not do putnexts from interrupt level.
 	 */
 	if (canput(dl->rq)) {
 		putqf(dl->rq, mp);
-		ginc(unitdata_q_cnt) ;
+		ginc(unitdata_q_cnt);
 	} else {
 		freemsg(mp);
-		ginc(unitdata_drp_cnt) ;
+		ginc(unitdata_drp_cnt);
 		++dl->lost_rcv;
 	}
 #else
 	if (qsize(dl->rq) == 0 && canputnext(dl->rq)) {
 		if (ldl_debug_mask & LDL_DEBUG_UDIND)
-		    ldl_mp_data_dump("ldl_unitdata_ind", mp,
-				     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+			ldl_mp_data_dump("ldl_unitdata_ind", mp,
+					 ldl_debug_mask & LDL_DEBUG_ALLDATA);
 		putnext(dl->rq, mp);
-		ginc(unitdata_ind_cnt) ;
+		ginc(unitdata_ind_cnt);
 	} else if (canput(dl->rq)) {
 		putqf(dl->rq, mp);
-		ginc(unitdata_q_cnt) ;
+		ginc(unitdata_q_cnt);
 	} else {
 		freemsg(mp);
-		ginc(unitdata_drp_cnt) ;
+		ginc(unitdata_drp_cnt);
 		++dl->lost_rcv;
 	}
 #endif
@@ -2393,26 +2445,27 @@ STATIC INLINE void dl_rcv_put(mblk_t *dp, struct dl *dl, int copy)
  *  otherwise our M_PROTO message could go upstream before any
  *  M_PCPROTO messages queued on our read queue.
  */
-STATIC int rcv_func(struct sk_buff *skb,
-		    struct ldldev *dev, struct packet_type *pt)
+STATIC int
+rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 {
 	mblk_t *dp;
 	struct dl *dl, *last = NULL;
 	struct sap *sap;
+
 #if 0
-	struct ethhdr *hdr = (struct ethhdr *)skb->mac.raw;
+	struct ethhdr *hdr = (struct ethhdr *) skb->mac.raw;
 #endif
 	unsigned char *fr_ptr, fr_buf[LDL_MAX_HDR_LEN];
 	int fr_len;
 
 	LISASSERT(dev->type == ARPHRD_ETHER || dev->type == ARPHRD_LOOPBACK
-	       || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
-	       || dev->type == ARPHRD_HDLC);
-		/*	ARPHRD_FDDI	*/
+		  || dev->type == ARPHRD_IEEE802 || IS_ARPHRD_IEEE802_TR(dev)
+		  || dev->type == ARPHRD_HDLC);
+	/* ARPHRD_FDDI */
 
 	fr_len = skb->tail - skb->mac.raw;
 	if ((dp = allocb(2 + fr_len, BPRI_LO)) != NULL) {
-		/*
+		/* 
 		 *  Prepare the data block.
 		 *  The header is removed later for those that do no want it.
 		 *  The two extra unused bytes makes the data more processor
@@ -2424,17 +2477,15 @@ STATIC int rcv_func(struct sk_buff *skb,
 		memcpy(dp->b_wptr, skb->mac.raw, fr_len);
 		fr_ptr = dp->b_rptr;
 		dp->b_wptr += fr_len;
-	} else { /* We still need the frame type for correct drop stats */
+	} else {		/* We still need the frame type for correct drop stats */
 		fr_ptr = &fr_buf[0];
 		fr_len = lis_min(skb->end - skb->mac.raw, LDL_MAX_HDR_LEN);
 		LISASSERT(fr_len > 0);
 		memcpy(fr_buf, skb->mac.raw, fr_len);
 	}
 
-
 	if (ldl_debug_mask & LDL_DEBUG_RCV_FUNC)
-	    ldl_skbuff_dump("ldl_rcv_func: skb", skb, 
-			     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+		ldl_skbuff_dump("ldl_rcv_func: skb", skb, ldl_debug_mask & LDL_DEBUG_ALLDATA);
 #ifdef KERNEL_2_1
 	dev_kfree_skb(skb);
 #else
@@ -2442,14 +2493,12 @@ STATIC int rcv_func(struct sk_buff *skb,
 #endif
 
 	if (ldl_debug_mask & LDL_DEBUG_RCV_FUNC)
-	    ldl_bfr_dump("ldl_rcv_func", fr_ptr, fr_len,
-			 ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+		ldl_bfr_dump("ldl_rcv_func", fr_ptr, fr_len, ldl_debug_mask & LDL_DEBUG_ALLDATA);
 
-	lis_rw_read_lock(&((struct pt *)pt)->lock);
-	LISASSERT(((struct pt *)pt)->magic == PT_MAGIC);
+	lis_rw_read_lock(&((struct pt *) pt)->lock);
+	LISASSERT(((struct pt *) pt)->magic == PT_MAGIC);
 
-	for (sap = ((struct pt *)pt)->listen;
-	     sap != NULL; sap = sap->next_listen) {
+	for (sap = ((struct pt *) pt)->listen; sap != NULL; sap = sap->next_listen) {
 		dl = sap->dl;
 		LISASSERT(dl != NULL);
 		LISASSERT(dl->magic == DL_MAGIC);
@@ -2470,7 +2519,7 @@ STATIC int rcv_func(struct sk_buff *skb,
 		if (dp != NULL)
 			freeb(dp);
 	}
-	lis_rw_read_unlock(&((struct pt *)pt)->lock);
+	lis_rw_read_unlock(&((struct pt *) pt)->lock);
 
 	return 0;
 }
@@ -2484,16 +2533,16 @@ STATIC int rcv_func(struct sk_buff *skb,
 /*
  *  Try to send an unitdata error upstream
  */
-STATIC void send_uderror(struct dl *dl, char *addr, int addrlen,
-			 dl_ulong err, dl_ulong uerr)
+STATIC void
+send_uderror(struct dl *dl, char *addr, int addrlen, dl_ulong err, dl_ulong uerr)
 {
-	mblk_t * mp;
+	mblk_t *mp;
 	dl_uderror_ind_t *nakp;
 
 	if ((mp = allocb(DL_UDERROR_IND_SIZE + addrlen, BPRI_HI)) == NULL)
 		return;
 	mp->b_datap->db_type = M_PCPROTO;
-	nakp = (dl_uderror_ind_t *)mp->b_wptr;
+	nakp = (dl_uderror_ind_t *) mp->b_wptr;
 	nakp->dl_primitive = DL_UDERROR_IND;
 	if (addrlen) {
 		nakp->dl_dest_addr_length = addrlen;
@@ -2506,9 +2555,9 @@ STATIC void send_uderror(struct dl *dl, char *addr, int addrlen,
 	nakp->dl_unix_errno = uerr;
 	nakp->dl_errno = err;
 	mp->b_wptr += DL_UDERROR_IND_SIZE + addrlen;
-	
+
 	putnext(dl->rq, mp);
-	ginc(uderror_ind_cnt) ;
+	ginc(uderror_ind_cnt);
 }
 
 /*
@@ -2521,52 +2570,51 @@ STATIC void send_uderror(struct dl *dl, char *addr, int addrlen,
 #define	TXE_NULL	5
 #define	TXE_BADPRIO	6
 
-STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
+STATIC int
+tx_failed(struct dl *dl, mblk_t *mp, int err)
 {
-	dl_unitdata_req_t *reqp = (dl_unitdata_req_t *)mp->b_rptr;
-	static dl_unitdata_req_t	dummy ;	/* all zeros */
+	dl_unitdata_req_t *reqp = (dl_unitdata_req_t *) mp->b_rptr;
+	static dl_unitdata_req_t dummy;	/* all zeros */
 
-	ginc(net_tx_fail_cnt) ;
+	ginc(net_tx_fail_cnt);
 	if (ldl_debug_mask & LDL_DEBUG_TX) {
-		ldl_mp_dump("ldl: tx_failed", mp,
-			    ldl_debug_mask & LDL_DEBUG_ALLDATA);
+		ldl_mp_dump("ldl: tx_failed", mp, ldl_debug_mask & LDL_DEBUG_ALLDATA);
 		printk("ldl: tx_failed(%d)\n", err);
 	}
 
-	if (mp->b_datap->db_ref == 0)		/* bug hunting */
-	{
-	    printk("ldl: message with ref-count zero\n") ;
-	    return DONE ;
+	if (mp->b_datap->db_ref == 0) {	/* bug hunting */
+		printk("ldl: message with ref-count zero\n");
+		return DONE;
 	}
 
 	if (mp->b_datap->db_type == M_DATA)	/* not a unitdata req */
-		reqp = &dummy ;
+		reqp = &dummy;
 	else
 		LISASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
 
 	switch (err) {
-	    case TXE_OUTSTATE:
-		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
-			     reqp->dl_dest_addr_length, DL_OUTSTATE, 0);
+	case TXE_OUTSTATE:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset, reqp->dl_dest_addr_length,
+			     DL_OUTSTATE, 0);
 		break;
-	    case TXE_BADADDR:
-		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
-			     reqp->dl_dest_addr_length, DL_BADADDR, 0);
+	case TXE_BADADDR:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset, reqp->dl_dest_addr_length,
+			     DL_BADADDR, 0);
 		break;
-	    case TXE_BADMTU:
-		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
-			     reqp->dl_dest_addr_length, DL_BADDATA, 0);
+	case TXE_BADMTU:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset, reqp->dl_dest_addr_length,
+			     DL_BADDATA, 0);
 		break;
-	    case TXE_NOMEM:
-	    case TXE_NULL:
-		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
-			     reqp->dl_dest_addr_length, DL_UNDELIVERABLE, 0);
+	case TXE_NOMEM:
+	case TXE_NULL:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset, reqp->dl_dest_addr_length,
+			     DL_UNDELIVERABLE, 0);
 		break;
-	    case TXE_BADPRIO:
-		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset,
-			     reqp->dl_dest_addr_length, DL_UNSUPPORTED, 0);
+	case TXE_BADPRIO:
+		send_uderror(dl, mp->b_rptr + reqp->dl_dest_addr_offset, reqp->dl_dest_addr_length,
+			     DL_UNSUPPORTED, 0);
 		break;
-	    default:
+	default:
 		LISASSERT(0);
 	}
 
@@ -2578,7 +2626,8 @@ STATIC int tx_failed(struct dl *dl, mblk_t *mp, int err)
  *  Return transmission priority, or -1 in case of congestion, or -2 if invalid
  */
 #ifndef KERNEL_2_1
-STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
+STATIC INLINE int
+tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 {
 	int p_min, p_max;
 
@@ -2592,7 +2641,7 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 		else
 			p_max = reqp->dl_priority.dl_max;
 		if (p_min < 0 || p_max < 0 || p_min > 100 || p_max > 100)
-			return -2; /* invalid */
+			return -2;	/* invalid */
 
 		if (p_max < dl->priority)
 			p_max = dl->priority;
@@ -2607,8 +2656,8 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 	}
 
 	/* Use the highest priority that has free netdevice buffers */
-	while (skb_queue_len(dl->ndev->dev->buffs + p_max) > dl->ndev->dev->tx_queue_len &&
-	       p_max <= p_min)
+	while (skb_queue_len(dl->ndev->dev->buffs + p_max) > dl->ndev->dev->tx_queue_len
+	       && p_max <= p_min)
 		++p_max;
 	if (p_max > p_min) {
 		int psw;
@@ -2622,7 +2671,8 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 	return p_max;
 }
 #else
-STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
+STATIC INLINE int
+tx_pri(struct dl *dl, dl_unitdata_req_t * reqp)
 {
 	int p_min, p_max;
 
@@ -2643,48 +2693,46 @@ STATIC INLINE int tx_pri(struct dl *dl, dl_unitdata_req_t *reqp)
 		p_max = dl->priority;
 
 	if (p_max < 0 || p_max > 100)
-		return -2; /* invalid */
+		return -2;	/* invalid */
 
 	return pri_dlpi2netdevice(p_max);
 }
 #endif
 
-
-STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+tx_func_proto(struct dl *dl, mblk_t *mp)
 {
 	dl_unitdata_req_t *reqp;
 	mblk_t *dmp;
 	struct sk_buff *skb;
 	int pri, dlen;
 
-	ginc(unitdata_req_cnt) ;
-	LISASSERT(mp->b_datap->db_type == M_PROTO ||
-	       mp->b_datap->db_type == M_PCPROTO);
+	ginc(unitdata_req_cnt);
+	LISASSERT(mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO);
 	LISASSERT(dl->magic == DL_MAGIC);
 
 	if (ldl_debug_mask & LDL_DEBUG_UDREQ)
-	    ldl_mp_data_dump("ldl_unitdata_req", mp,
-			     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+		ldl_mp_data_dump("ldl_unitdata_req", mp, ldl_debug_mask & LDL_DEBUG_ALLDATA);
 
 	if (dl->dlstate != DL_IDLE)
 		return tx_failed(dl, mp, TXE_OUTSTATE);
 
-	reqp = (dl_unitdata_req_t *)mp->b_rptr;
+	reqp = (dl_unitdata_req_t *) mp->b_rptr;
 	LISASSERT(reqp->dl_primitive == DL_UNITDATA_REQ);
 
 	if ((dl->flags & LDLFLAG_RAW) != 0) {	/* raw means don't chk addrs */
-	    int		rslt ;
-	    dmp = mp->b_cont;
-	    LISASSERT(dmp != NULL);		/* needs data buffer */
-	    if (dmp == NULL)
-		return tx_failed(dl, mp, TXE_NULL);
-	    rslt = tx_func_raw(dl, dmp) ;	/* send raw pkt */
-	    if (rslt == DONE)
-	    {
-		unlinkb(mp);			/* unlink b_cont */
-		freemsg(mp);			/* free unitdata header */
-	    }					/* else leave lnkd for retry */
-	    return rslt ;
+		int rslt;
+
+		dmp = mp->b_cont;
+		LISASSERT(dmp != NULL);	/* needs data buffer */
+		if (dmp == NULL)
+			return tx_failed(dl, mp, TXE_NULL);
+		rslt = tx_func_raw(dl, dmp);	/* send raw pkt */
+		if (rslt == DONE) {
+			unlinkb(mp);	/* unlink b_cont */
+			freemsg(mp);	/* free unitdata header */
+		}		/* else leave lnkd for retry */
+		return rslt;
 	}
 
 	if (reqp->dl_dest_addr_length != dl->addr_len + dl->sap_len)
@@ -2697,7 +2745,7 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 			return tx_failed(dl, mp, TXE_BADMTU);
 	} else
 		dlen = 0;
-	
+
 	if ((pri = tx_pri(dl, reqp)) < 0)
 		return pri == -1 ? RETRY : tx_failed(dl, mp, TXE_BADPRIO);
 
@@ -2709,15 +2757,14 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 
 	LISASSERT(dlen == 0 || dmp != NULL);
 
-	/*
+	/* 
 	 *  Fill in the MAC header
 	 */
 	skb_reserve(skb, dl->machdr_reserve);
 #ifdef KERNEL_2_1
 	skb->nh.raw = skb->data;
 #endif
-	if (dl->mkhdr(dl, (char *)reqp + reqp->dl_dest_addr_offset,
-		      dlen, skb) != 1) {
+	if (dl->mkhdr(dl, (char *) reqp + reqp->dl_dest_addr_offset, dlen, skb) != 1) {
 #ifdef KERNEL_2_1
 		kfree_skb(skb);
 #else
@@ -2726,14 +2773,14 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		return tx_failed(dl, mp, TXE_BADADDR);
 	}
 
-	/*
+	/* 
 	 *  Fill in the data portion
 	 */
 	while (dmp) {
 		void *p;
 		int dlen;
 
-		LISASSERT(dmp->b_datap->db_type == M_DATA); 
+		LISASSERT(dmp->b_datap->db_type == M_DATA);
 
 		dlen = dmp->b_wptr - dmp->b_rptr;
 		LISASSERT(dlen > 0);
@@ -2744,12 +2791,11 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 	}
 	LISASSERT(skb->len == dlen + dl->machdr_len);
 
-
 	if (ldl_debug_mask & LDL_DEBUG_TX)
-	    ldl_bfr_dump("ldl_tx_func", skb->data, skb->len,
-			 ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+		ldl_bfr_dump("ldl_tx_func", skb->data, skb->len,
+			     ldl_debug_mask & LDL_DEBUG_ALLDATA);
 #ifdef KERNEL_2_1
-	skb->priority = pri;		/* Set priority			*/
+	skb->priority = pri;	/* Set priority */
 	if (ndev_xmit(dl->ndev, skb) == RETRY)
 		return RETRY;
 #else
@@ -2757,22 +2803,23 @@ STATIC INLINE int tx_func_proto(struct dl *dl, mblk_t *mp)
 		return RETRY;
 #if 0
 	atomic_add(skb->truesize, &ndev->wr_cur);
-	(struct ndev *)skb->sk = dl->ndev;
-	skb->dev = dl->ndev->dev;	/* Set outgoing netdevice	*/
-	skb->free = 1;			/* Free skb after transmission	*/
-	skb->arp = 1;			/* To avoid header rebuild	*/
-	skb->destructor = ndev_skb_destruct; /* Set "done" callback	*/
-	dev_queue_xmit(skb, dl->ndev->dev, pri); /* Send it		*/
+	(struct ndev *) skb->sk = dl->ndev;
+	skb->dev = dl->ndev->dev;	/* Set outgoing netdevice */
+	skb->free = 1;		/* Free skb after transmission */
+	skb->arp = 1;		/* To avoid header rebuild */
+	skb->destructor = ndev_skb_destruct;	/* Set "done" callback */
+	dev_queue_xmit(skb, dl->ndev->dev, pri);	/* Send it */
 #endif
 #endif
 	freemsg(mp);
-	ginc(net_tx_cnt) ;
+	ginc(net_tx_cnt);
 	return DONE;
 }
 
-STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+tx_func_raw(struct dl *dl, mblk_t *mp)
 {
-	mblk_t	       *omp = mp ;
+	mblk_t *omp = mp;
 	struct sk_buff *skb;
 	int pri, dlen;
 
@@ -2780,8 +2827,7 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 	LISASSERT(dl->magic == DL_MAGIC);
 	LISASSERT((dl->flags & LDLFLAG_RAW) != 0);
 
-	if (   dl->dlstate != DL_IDLE
-	    || !driver_started(dl->ndev->dev)
+	if (dl->dlstate != DL_IDLE || !driver_started(dl->ndev->dev)
 	    || netif_queue_stopped(dl->ndev->dev))
 		return tx_failed(dl, mp, TXE_OUTSTATE);
 
@@ -2799,12 +2845,12 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 #else
 	skb->free = 1;
 #endif
-	
+
 	while (mp) {
 		void *p;
 		int dlen;
 
-		LISASSERT(mp->b_datap->db_type == M_DATA); 
+		LISASSERT(mp->b_datap->db_type == M_DATA);
 
 		dlen = mp->b_wptr - mp->b_rptr;
 		LISASSERT(dlen > 0);
@@ -2816,8 +2862,8 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 	LISASSERT(skb->len == dlen);
 
 	if (ldl_debug_mask & LDL_DEBUG_TX)
-	    ldl_bfr_dump("ldl_tx_func", skb->data, skb->len,
-			 ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+		ldl_bfr_dump("ldl_tx_func", skb->data, skb->len,
+			     ldl_debug_mask & LDL_DEBUG_ALLDATA);
 #ifdef KERNEL_2_1
 	skb->priority = pri;
 	if (ndev_xmit(dl->ndev, skb) == RETRY)
@@ -2826,17 +2872,15 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 	if (ndev_xmit(dl->ndev, skb, pri) == RETRY)
 		return RETRY;
 #endif
-	freemsg(omp);			/* free original message */
-	ginc(net_tx_cnt) ;
+	freemsg(omp);		/* free original message */
+	ginc(net_tx_cnt);
 
 	return DONE;
 }
 
-
 /****************************************************************************/
 /* End of: Linux socket driver interface routines.                          */
 /****************************************************************************/
-
 
 /****************************************************************************/
 /*                                                                          */
@@ -2846,7 +2890,8 @@ STATIC INLINE int tx_func_raw(struct dl *dl, mblk_t *mp)
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_info(struct dl *dl, mblk_t *mp)
 {
 	dl_info_ack_t *ackp;
 	dl_qos_cl_sel1_t *qos;
@@ -2855,9 +2900,9 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 
 	len = DL_INFO_ACK_SIZE + sizeof(dl_qos_cl_sel1_t) + sizeof(dl_qos_cl_range1_t);
 	if (dl->dlstate != DL_UNATTACHED)
-		len += dl->addr_len; /* Broadcast address */
+		len += dl->addr_len;	/* Broadcast address */
 	if (dl->dlstate == DL_IDLE)
-		len += dl->addr_len + dl->sap_len; /* DLSAP */
+		len += dl->addr_len + dl->sap_len;	/* DLSAP */
 
 	if (!reuse_msg(mp, len)) {
 		mblk_t *bp;
@@ -2869,30 +2914,29 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 	}
 
 	mp->b_datap->db_type = M_PCPROTO;
-	ackp = (dl_info_ack_t *)mp->b_wptr;
+	ackp = (dl_info_ack_t *) mp->b_wptr;
 	ackp->dl_primitive = DL_INFO_ACK;
 	ackp->dl_min_sdu = MINDATA;
 	ackp->dl_reserved = 0;
 	ackp->dl_current_state = dl->dlstate;
-	ackp->dl_sap_length =
-		(dl->dlstate == DL_UNATTACHED) ? -2 : -dl->sap_len;
+	ackp->dl_sap_length = (dl->dlstate == DL_UNATTACHED) ? -2 : -dl->sap_len;
 	ackp->dl_service_mode = DL_CLDLS;
 	ackp->dl_provider_style = DL_STYLE2;
 	ackp->dl_version = DL_VERSION_2;
 	ackp->dl_growth = 0;
 	mp->b_wptr += DL_INFO_ACK_SIZE;
 
-	qos = (dl_qos_cl_sel1_t *)mp->b_wptr;
+	qos = (dl_qos_cl_sel1_t *) mp->b_wptr;
 	qos->dl_qos_type = DL_QOS_CL_SEL1;
 	qos->dl_trans_delay = DL_UNKNOWN;
 	qos->dl_priority = dl->priority;
 	qos->dl_protection = DL_NONE;
 	qos->dl_residual_error = DL_UNKNOWN;
 	ackp->dl_qos_length = sizeof(dl_qos_cl_sel1_t);
-	ackp->dl_qos_offset = (char *)qos - (char *)ackp;
+	ackp->dl_qos_offset = (char *) qos - (char *) ackp;
 	mp->b_wptr += sizeof(dl_qos_cl_sel1_t);
 
-	qos_range = (dl_qos_cl_range1_t *)mp->b_wptr;
+	qos_range = (dl_qos_cl_range1_t *) mp->b_wptr;
 	qos_range->dl_qos_type = DL_QOS_CL_RANGE1;
 	qos_range->dl_trans_delay.dl_target_value = DL_UNKNOWN;
 	qos_range->dl_trans_delay.dl_accept_value = DL_UNKNOWN;
@@ -2902,7 +2946,7 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 	qos_range->dl_protection.dl_max = DL_NONE;
 	qos_range->dl_residual_error = DL_UNKNOWN;
 	ackp->dl_qos_range_length = sizeof(dl_qos_cl_range1_t);
-	ackp->dl_qos_range_offset = (char *)qos_range - (char *)ackp;
+	ackp->dl_qos_range_offset = (char *) qos_range - (char *) ackp;
 	mp->b_wptr += sizeof(dl_qos_cl_range1_t);
 
 	if (dl->dlstate != DL_UNATTACHED) {
@@ -2915,27 +2959,27 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 		ackp->dl_max_sdu = dl->ndev->dev->mtu;
 
 		switch (dl->ndev->dev->type) {
-			case ARPHRD_ETHER:
-				ackp->dl_mac_type = DL_ETHER;
-				break;
-			case ARPHRD_LOOPBACK:
-				ackp->dl_mac_type = DL_LOOP;
-				break;
-			case ARPHRD_FDDI:
-				ackp->dl_mac_type = DL_FDDI;
-				break;
-			case ARPHRD_IEEE802:
+		case ARPHRD_ETHER:
+			ackp->dl_mac_type = DL_ETHER;
+			break;
+		case ARPHRD_LOOPBACK:
+			ackp->dl_mac_type = DL_LOOP;
+			break;
+		case ARPHRD_FDDI:
+			ackp->dl_mac_type = DL_FDDI;
+			break;
+		case ARPHRD_IEEE802:
 #if defined(ARPHRD_IEEE802_TR)
-			case ARPHRD_IEEE802_TR:
+		case ARPHRD_IEEE802_TR:
 #endif
-				ackp->dl_mac_type = DL_TPR;
-				break;
-			case ARPHRD_HDLC:
-				ackp->dl_mac_type = DL_HDLC;
-				break;
-			default:
-				ackp->dl_mac_type = DL_OTHER;
-				break;
+			ackp->dl_mac_type = DL_TPR;
+			break;
+		case ARPHRD_HDLC:
+			ackp->dl_mac_type = DL_HDLC;
+			break;
+		default:
+			ackp->dl_mac_type = DL_OTHER;
+			break;
 		}
 
 		ackp->dl_brdcst_addr_offset = ofs;
@@ -2951,7 +2995,8 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 			memcpy(mp->b_wptr, dl->ndev->dev->dev_addr, dl->addr_len);
 			mp->b_wptr += dl->addr_len;
 			if (dl->framing == LDL_FRAME_EII || dl->framing == LDL_FRAME_SNAP)
-				*(unsigned short *)mp->b_wptr = ntohs(*(unsigned short *)&dl->sap->sap.sap[0]);
+				*(unsigned short *) mp->b_wptr =
+				    ntohs(*(unsigned short *) &dl->sap->sap.sap[0]);
 			else
 				memcpy(mp->b_wptr, &dl->sap->sap.sap[0], dl->sap_len);
 			mp->b_wptr += dl->sap_len;
@@ -2977,7 +3022,8 @@ STATIC INLINE int ws_info(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ws_phys_addr(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_phys_addr(struct dl *dl, mblk_t *mp)
 {
 	dl_phys_addr_req_t *reqp;
 	dl_phys_addr_ack_t *ackp;
@@ -2986,43 +3032,44 @@ STATIC INLINE int ws_phys_addr(struct dl *dl, mblk_t *mp)
 	if (dl->dlstate == DL_UNATTACHED)
 		return reply_error_ack(dl, mp, DL_PHYS_ADDR_REQ, DL_OUTSTATE, 0);
 
-	reqp = (dl_phys_addr_req_t *)mp->b_rptr;
+	reqp = (dl_phys_addr_req_t *) mp->b_rptr;
 	switch (reqp->dl_addr_type) {
-		case DL_CURR_PHYS_ADDR:
-			len = DL_PHYS_ADDR_ACK_SIZE + dl->addr_len;
-			if (!reuse_msg(mp, len)) {
-				mblk_t *bp;
+	case DL_CURR_PHYS_ADDR:
+		len = DL_PHYS_ADDR_ACK_SIZE + dl->addr_len;
+		if (!reuse_msg(mp, len)) {
+			mblk_t *bp;
 
-				if ((bp = allocb(len, BPRI_HI)) == NULL)
-					return dl_bufcall(dl, mp, DL_ERROR_ACK_SIZE);
-				freemsg(mp);
-				mp = bp;
-			}
+			if ((bp = allocb(len, BPRI_HI)) == NULL)
+				return dl_bufcall(dl, mp, DL_ERROR_ACK_SIZE);
+			freemsg(mp);
+			mp = bp;
+		}
 
-			mp->b_datap->db_type = M_PCPROTO;
-			ackp = (dl_phys_addr_ack_t *)mp->b_wptr;
-			ackp->dl_primitive = DL_PHYS_ADDR_ACK;
-			ackp->dl_addr_length = dl->addr_len;
-			ackp->dl_addr_offset = DL_PHYS_ADDR_ACK_SIZE;
-			mp->b_wptr += DL_PHYS_ADDR_ACK_SIZE;
-			memcpy(mp->b_wptr, dl->ndev->dev->dev_addr, dl->addr_len);
-			mp->b_wptr += dl->addr_len;
-			putnext(dl->rq, mp);
-			return DONE;
+		mp->b_datap->db_type = M_PCPROTO;
+		ackp = (dl_phys_addr_ack_t *) mp->b_wptr;
+		ackp->dl_primitive = DL_PHYS_ADDR_ACK;
+		ackp->dl_addr_length = dl->addr_len;
+		ackp->dl_addr_offset = DL_PHYS_ADDR_ACK_SIZE;
+		mp->b_wptr += DL_PHYS_ADDR_ACK_SIZE;
+		memcpy(mp->b_wptr, dl->ndev->dev->dev_addr, dl->addr_len);
+		mp->b_wptr += dl->addr_len;
+		putnext(dl->rq, mp);
+		return DONE;
 
-		case DL_FACT_PHYS_ADDR:
-			/*
-			 *  I do not think that there is a general way of
-			 *  getting the factory default address of a
-			 *  native Linux netdevice.
-			 */
-		default:
-			return reply_error_ack(dl, mp, DL_PHYS_ADDR_REQ, DL_NOTSUPPORTED, 0);
+	case DL_FACT_PHYS_ADDR:
+		/* 
+		 *  I do not think that there is a general way of
+		 *  getting the factory default address of a
+		 *  native Linux netdevice.
+		 */
+	default:
+		return reply_error_ack(dl, mp, DL_PHYS_ADDR_REQ, DL_NOTSUPPORTED, 0);
 	}
 }
 
-#if 0			/* remove if routine is ever used */
-STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
+#if 0				/* remove if routine is ever used */
+STATIC INLINE int
+ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 {
 	dl_set_phys_addr_req_t *reqp;
 	int err;
@@ -3030,19 +3077,16 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 	int psw;
 
 	if (dl->dlstate == DL_UNATTACHED)
-		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ,
-				       DL_OUTSTATE, 0);
+		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ, DL_OUTSTATE, 0);
 	if (dl->ndev->dev->set_mac_address == NULL)
-		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ,
-				       DL_NOTSUPPORTED, 0);
+		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ, DL_NOTSUPPORTED, 0);
 
-	reqp = (dl_set_phys_addr_req_t *)mp->b_rptr;
+	reqp = (dl_set_phys_addr_req_t *) mp->b_rptr;
 
 	if (reqp->dl_addr_length != dl->addr_len)
-		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ,
-				       DL_BADADDR, 0);
+		return reply_error_ack(dl, mp, DL_SET_PHYS_ADDR_REQ, DL_BADADDR, 0);
 
-	/*
+	/* 
 	 *  After we have begun playing with the device,
 	 *  we do not want to run out of buffers for
 	 *  our (ok or error) ack.
@@ -3063,7 +3107,7 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 		freemsg(mp);
 		make_dl_error_ack(ack_mp, DL_SET_PHYS_ADDR_REQ, DL_SYSERR, -err);
 		putnext(dl->rq, ack_mp);
-		ginc(error_ack_cnt) ;
+		ginc(error_ack_cnt);
 		return DONE;
 	}
 	dl->ndev->dev->set_mac_address(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset);
@@ -3083,13 +3127,14 @@ STATIC INLINE int ws_set_phys_addr(struct dl *dl, mblk_t *mp)
 
 	make_dl_ok_ack(ack_mp, DL_SET_PHYS_ADDR_REQ);
 	putnext(dl->rq, ack_mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 #endif
 
-STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_attach(struct dl *dl, mblk_t *mp)
 {
 	struct ndev *ndev;
 	struct ldldev *dev;
@@ -3097,17 +3142,16 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 	dl_ulong framing, ppa;
 	int psw;
 
-	ginc(attach_req_cnt) ;
+	ginc(attach_req_cnt);
 	if (dl->dlstate != DL_UNATTACHED)
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_OUTSTATE, 0);
 
-	reqp = (dl_attach_req_t *)mp->b_rptr;
+	reqp = (dl_attach_req_t *) mp->b_rptr;
 
 	ppa = reqp->dl_ppa & ~LDL_FRAME_MASK;
 	framing = reqp->dl_ppa & LDL_FRAME_MASK;
-	if (framing != LDL_FRAME_EII  && framing != LDL_FRAME_802_2 &&
-	    framing != LDL_FRAME_SNAP && framing != LDL_FRAME_802_3 &&
-	    framing != LDL_FRAME_RAW_LLC)
+	if (framing != LDL_FRAME_EII && framing != LDL_FRAME_802_2 && framing != LDL_FRAME_SNAP
+	    && framing != LDL_FRAME_802_3 && framing != LDL_FRAME_RAW_LLC)
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 
 	SPLSTR(psw);
@@ -3122,50 +3166,42 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 	LISASSERT(dev != NULL);
 
 	switch (dev->type) {
-	    case ARPHRD_ETHER:
-	    case ARPHRD_LOOPBACK:
-		if (   framing != LDL_FRAME_EII
-		    && framing != LDL_FRAME_802_2
-		    && framing != LDL_FRAME_SNAP
-		    && framing != LDL_FRAME_802_3
+	case ARPHRD_ETHER:
+	case ARPHRD_LOOPBACK:
+		if (framing != LDL_FRAME_EII && framing != LDL_FRAME_802_2
+		    && framing != LDL_FRAME_SNAP && framing != LDL_FRAME_802_3
 		    && framing != LDL_FRAME_RAW_LLC) {
 			SPLX(psw);
-			return reply_error_ack(dl, mp, DL_ATTACH_REQ,
-					       DL_BADPPA, 0);
+			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		}
 		break;
-	    case ARPHRD_FDDI:
+	case ARPHRD_FDDI:
 		if (framing == 0)
-			framing = LDL_FRAME_SNAP; /* Default */
-		if (   framing != LDL_FRAME_802_2
-		    && framing != LDL_FRAME_SNAP
+			framing = LDL_FRAME_SNAP;	/* Default */
+		if (framing != LDL_FRAME_802_2 && framing != LDL_FRAME_SNAP
 		    && framing != LDL_FRAME_RAW_LLC) {
 			SPLX(psw);
-			return reply_error_ack(dl, mp, DL_ATTACH_REQ,
-					       DL_BADPPA, 0);
+			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		}
 		break;
-	    case ARPHRD_IEEE802:	/* claims to be for token ring */
+	case ARPHRD_IEEE802:	/* claims to be for token ring */
 #if defined(ARPHRD_IEEE802_TR)
-	    case ARPHRD_IEEE802_TR:
+	case ARPHRD_IEEE802_TR:
 #endif
-		if (   framing != LDL_FRAME_802_2
-		    && framing != LDL_FRAME_SNAP
+		if (framing != LDL_FRAME_802_2 && framing != LDL_FRAME_SNAP
 		    && framing != LDL_FRAME_RAW_LLC) {
 			SPLX(psw);
-			return reply_error_ack(dl, mp, DL_ATTACH_REQ,
-					       DL_BADPPA, 0);
+			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		}
 		break;
-	    case ARPHRD_HDLC:
+	case ARPHRD_HDLC:
 		if (framing != LDL_FRAME_RAW_LLC) {
 			SPLX(psw);
-			return reply_error_ack(dl, mp, DL_ATTACH_REQ,
-					       DL_BADPPA, 0);
+			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		}
 		break;
-	    default:
-		printk("ldl: ws_attach: Unknown dev->type (%d)\n", (int)(dev->type));
+	default:
+		printk("ldl: ws_attach: Unknown dev->type (%d)\n", (int) (dev->type));
 		SPLX(psw);
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 	}
@@ -3173,17 +3209,16 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 	if (do_ok_ack(dl, &mp, DL_ATTACH_REQ) == RETRY) {
 		SPLX(psw);
 		return RETRY;
-	}
-	else if (mp == NULL) {
+	} else if (mp == NULL) {
 		SPLX(psw);
-		return DONE; /* Bogus, bufcall failed */
+		return DONE;	/* Bogus, bufcall failed */
 	}
 
 	dl->dlstate = DL_UNBOUND;
 	dl->addr_len = ETH_ALEN;
 	dl->framing = framing;
 	switch (dl->framing) {
-	    case LDL_FRAME_EII:
+	case LDL_FRAME_EII:
 		dl->mtu = 1500;
 		dl->machdr_len = 14;
 		dl->machdr_reserve = 16;
@@ -3192,7 +3227,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 		dl->rcvind = eth_ii_rcvind;
 		dl->mkhdr = eth_ii_mkhdr;
 		break;
-	    case LDL_FRAME_SNAP:
+	case LDL_FRAME_SNAP:
 		dl->oui[0] = dl->oui[1] = dl->oui[2] = '\0';
 		dl->sap_len = 2;
 		if (dev->type == ARPHRD_FDDI) {
@@ -3211,24 +3246,22 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 			dl->mkhdr = eth_snap_mkhdr;
 		}
 		break;
-	    case LDL_FRAME_802_2:
+	case LDL_FRAME_802_2:
 		dl->sap_len = 1;
-		switch (dev->type)
-		{
-		case ARPHRD_IEEE802:		/* token ring */
+		switch (dev->type) {
+		case ARPHRD_IEEE802:	/* token ring */
 #if defined(ARPHRD_IEEE802_TR)
 		case ARPHRD_IEEE802_TR:
 #endif
-		token_ring_case:
+		      token_ring_case:
 			dl->sap_len = 1;
-			dl->mtu = 1514;		/* matchs T.R. driver */
-			dl->machdr_len = sizeof(tr_hdr_t) - 2 +
-					 sizeof(tr_llc_frm_hdr_t);
-			dl->machdr_reserve = dl->machdr_len + 64 ;
+			dl->mtu = 1514;	/* matchs T.R. driver */
+			dl->machdr_len = sizeof(tr_hdr_t) - 2 + sizeof(tr_llc_frm_hdr_t);
+			dl->machdr_reserve = dl->machdr_len + 64;
 			dl->wantsframe = tr_8022_want;
 			dl->rcvind = tr_8022_rcvind;
 			dl->mkhdr = tr_8022_mkhdr;
-			break ;
+			break;
 		case ARPHRD_FDDI:
 			dl->mtu = 4475;
 			dl->machdr_len = 16;
@@ -3236,7 +3269,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 			dl->wantsframe = fddi_8022_want;
 			dl->rcvind = fddi_8022_rcvind;
 			dl->mkhdr = fddi_8022_mkhdr;
-			break ;
+			break;
 		case ARPHRD_ETHER:
 		default:
 			dl->mtu = 1497;
@@ -3245,19 +3278,18 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 			dl->wantsframe = eth_8022_want;
 			dl->rcvind = eth_8022_rcvind;
 			dl->mkhdr = eth_8022_mkhdr;
-			break ;
+			break;
 		}
 		break;
-	    case LDL_FRAME_RAW_LLC:
+	case LDL_FRAME_RAW_LLC:
 		dl->sap_len = 1;
-	        dl->flags |= LDLFLAG_RAW ;	/* implicitly raw */
-		switch (dev->type)
-		{
-		case ARPHRD_IEEE802:		/* token ring */
+		dl->flags |= LDLFLAG_RAW;	/* implicitly raw */
+		switch (dev->type) {
+		case ARPHRD_IEEE802:	/* token ring */
 #if defined(ARPHRD_IEEE802_TR)
 		case ARPHRD_IEEE802_TR:
 #endif
-		    goto token_ring_case;
+			goto token_ring_case;
 
 		case ARPHRD_FDDI:
 			/* Not implemented */
@@ -3266,15 +3298,15 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 			return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
 		case ARPHRD_HDLC:
 			if (dev->mtu)
-			    dl->mtu = dev->mtu;
+				dl->mtu = dev->mtu;
 			else
-			    dl->mtu = 1500;
+				dl->mtu = 1500;
 			dl->machdr_len = 0;
 			dl->machdr_reserve = 0;
 			dl->wantsframe = hdlc_raw_want;
 			dl->rcvind = hdlc_raw_rcvind;
 			dl->mkhdr = hdlc_raw_mkhdr;
-			break ;
+			break;
 
 		case ARPHRD_ETHER:
 		default:
@@ -3284,10 +3316,10 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 			dl->wantsframe = eth_raw8022_want;
 			dl->rcvind = eth_raw8022_rcvind;
 			dl->mkhdr = eth_raw8022_mkhdr;
-			break ;
+			break;
 		}
 		break;
-	    case LDL_FRAME_802_3:
+	case LDL_FRAME_802_3:
 		dl->mtu = 1500;
 		dl->machdr_len = 14;
 		dl->machdr_reserve = 16;
@@ -3296,7 +3328,7 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 		dl->rcvind = ipx_8023_rcvind;
 		dl->mkhdr = ipx_8023_mkhdr;
 		break;
-	    default:
+	default:
 		LISASSERT(0);
 		SPLX(psw);
 		return reply_error_ack(dl, mp, DL_ATTACH_REQ, DL_BADPPA, 0);
@@ -3307,29 +3339,28 @@ STATIC INLINE int ws_attach(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	if (ldl_debug_mask & LDL_DEBUG_ATTACH)
-	    printk("ldl: ws_attach: "
-	    	   "ppa=%x dev=\"%s\" framing=%s\n",
-		   ppa, dev->name, ldl_framing_type(framing)) ;
+		printk("ldl: ws_attach: " "ppa=%x dev=\"%s\" framing=%s\n", ppa, dev->name,
+		       ldl_framing_type(framing));
 
-	
 	putnext(dl->rq, mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 
-STATIC INLINE int ws_detach(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_detach(struct dl *dl, mblk_t *mp)
 {
 	int psw;
 
-	ginc(detach_req_cnt) ;
+	ginc(detach_req_cnt);
 	if (dl->dlstate != DL_UNBOUND)
 		return reply_error_ack(dl, mp, DL_DETACH_REQ, DL_OUTSTATE, 0);
 
 	if (do_ok_ack(dl, &mp, DL_DETACH_REQ) == RETRY)
 		return RETRY;
 	else if (mp == NULL)
-		return DONE; /* Bogus, bufcall failed */
+		return DONE;	/* Bogus, bufcall failed */
 
 	SPLSTR(psw);
 	LISASSERT(dl->dlstate == DL_UNBOUND);
@@ -3339,12 +3370,13 @@ STATIC INLINE int ws_detach(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	putnext(dl->rq, mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 
-STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_bind(struct dl *dl, mblk_t *mp)
 {
 	dl_bind_req_t *reqp;
 	dl_bind_ack_t *ackp;
@@ -3353,14 +3385,14 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	int psw;
 	int len;
 
-	ginc(bind_req_cnt) ;
+	ginc(bind_req_cnt);
 	SPLSTR(psw);
 	if (dl->dlstate != DL_UNBOUND) {
 		SPLX(psw);
 		return reply_error_ack(dl, mp, DL_BIND_REQ, DL_OUTSTATE, 0);
 	}
 
-	reqp = (dl_bind_req_t *)mp->b_rptr;
+	reqp = (dl_bind_req_t *) mp->b_rptr;
 
 	if (reqp->dl_service_mode != DL_CLDLS) {
 		SPLX(psw);
@@ -3372,48 +3404,48 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	}
 
 	switch (dl->framing) {
-		case LDL_FRAME_SNAP:
-			if (reqp->dl_sap <= 0xffff) {
-				*(unsigned short *)&dlsap.sap[0] = htons((unsigned short)reqp->dl_sap);
-				/*saptype = htons(ETH_P_802_2);*/
-				saptype = ETH_P_802_2;
-				break;
-			} else {
-				SPLX(psw);
-				return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
-			}
-		case LDL_FRAME_EII:
-			if (reqp->dl_sap <= 0xffff) {
-				*(unsigned short *)&dlsap.sap[0] = htons((unsigned short)reqp->dl_sap);
-				/*saptype = *(unsigned short *)&dlsap.sap[0];*/
-				saptype = (unsigned short)reqp->dl_sap;
-				break;
-			} else {
-				SPLX(psw);
-				return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
-			}
-		case LDL_FRAME_802_2:
-		case LDL_FRAME_RAW_LLC:
-			if (reqp->dl_sap <= 0xff) {
-				dlsap.sap[0] = reqp->dl_sap;
-				saptype = ETH_P_802_2;
-				break;
-			} else {
-				SPLX(psw);
-				return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
-			}
-		case LDL_FRAME_802_3:
-			if (reqp->dl_sap == 0) {
-				/*saptype = htons(ETH_P_802_3);*/
-				saptype = ETH_P_802_3;
-				break;
-			} else {
-				SPLX(psw);
-				return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
-			}
-		default:
-			LISASSERT(0);
+	case LDL_FRAME_SNAP:
+		if (reqp->dl_sap <= 0xffff) {
+			*(unsigned short *) &dlsap.sap[0] = htons((unsigned short) reqp->dl_sap);
+			/* saptype = htons(ETH_P_802_2); */
+			saptype = ETH_P_802_2;
+			break;
+		} else {
+			SPLX(psw);
 			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
+		}
+	case LDL_FRAME_EII:
+		if (reqp->dl_sap <= 0xffff) {
+			*(unsigned short *) &dlsap.sap[0] = htons((unsigned short) reqp->dl_sap);
+			/* saptype = *(unsigned short *)&dlsap.sap[0]; */
+			saptype = (unsigned short) reqp->dl_sap;
+			break;
+		} else {
+			SPLX(psw);
+			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
+		}
+	case LDL_FRAME_802_2:
+	case LDL_FRAME_RAW_LLC:
+		if (reqp->dl_sap <= 0xff) {
+			dlsap.sap[0] = reqp->dl_sap;
+			saptype = ETH_P_802_2;
+			break;
+		} else {
+			SPLX(psw);
+			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
+		}
+	case LDL_FRAME_802_3:
+		if (reqp->dl_sap == 0) {
+			/* saptype = htons(ETH_P_802_3); */
+			saptype = ETH_P_802_3;
+			break;
+		} else {
+			SPLX(psw);
+			return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
+		}
+	default:
+		LISASSERT(0);
+		return reply_error_ack(dl, mp, DL_BIND_REQ, DL_BADADDR, 0);
 	}
 
 	if (sap_create(dl, dlsap, saptype) < 0) {
@@ -3434,7 +3466,7 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	}
 
 	mp->b_datap->db_type = M_PCPROTO;
-	ackp = (dl_bind_ack_t *)mp->b_wptr;
+	ackp = (dl_bind_ack_t *) mp->b_wptr;
 	ackp->dl_primitive = DL_BIND_ACK;
 	ackp->dl_sap = reqp->dl_sap;
 	ackp->dl_addr_length = dl->addr_len + dl->sap_len;
@@ -3445,7 +3477,7 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	memcpy(mp->b_wptr, dl->ndev->dev->dev_addr, dl->addr_len);
 	mp->b_wptr += dl->addr_len;
 	if (dl->framing == LDL_FRAME_EII || dl->framing == LDL_FRAME_SNAP)
-		*(unsigned short *)mp->b_wptr = ntohs(*(unsigned short *)&dlsap.sap[0]);
+		*(unsigned short *) mp->b_wptr = ntohs(*(unsigned short *) &dlsap.sap[0]);
 	else
 		memcpy(mp->b_wptr, &dl->sap->sap.sap[0], dl->sap_len);
 	mp->b_wptr += dl->sap_len;
@@ -3454,22 +3486,20 @@ STATIC INLINE int ws_bind(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	if (ldl_debug_mask & LDL_DEBUG_BIND)
-	    printk("ldl: ws_bind: "
-	    	   "dl_sap=%x framing=%s pkt-type=%s\n",
-		   reqp->dl_sap, ldl_framing_type(dl->framing),
-		   ldl_pkt_type(saptype)) ;
+		printk("ldl: ws_bind: " "dl_sap=%x framing=%s pkt-type=%s\n", reqp->dl_sap,
+		       ldl_framing_type(dl->framing), ldl_pkt_type(saptype));
 
 	putnext(dl->rq, mp);
 
 	return DONE;
 }
 
-
-STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_unbind(struct dl *dl, mblk_t *mp)
 {
 	int psw;
 
-	ginc(unbind_req_cnt) ;
+	ginc(unbind_req_cnt);
 	SPLSTR(psw);
 	if (dl->dlstate != DL_IDLE) {
 		SPLX(psw);
@@ -3481,7 +3511,7 @@ STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
 		return RETRY;
 	} else if (mp == NULL) {
 		SPLX(psw);
-		return DONE; /* Bogus, bufcall failed */
+		return DONE;	/* Bogus, bufcall failed */
 	}
 
 	/* Change state */
@@ -3506,19 +3536,20 @@ STATIC INLINE int ws_unbind(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	putnext(dl->rq, mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 
-STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_subs_bind(struct dl *dl, mblk_t *mp)
 {
 	dl_subs_bind_req_t *reqp;
 	dl_subs_bind_ack_t *ackp;
 	int len;
 	int psw;
-	
-	ginc(subs_bind_req_cnt) ;
+
+	ginc(subs_bind_req_cnt);
 	SPLSTR(psw);
 	if (dl->dlstate != DL_IDLE) {
 		SPLX(psw);
@@ -3529,7 +3560,7 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 		return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_UNSUPPORTED, 0);
 	}
 
-	reqp = (dl_subs_bind_req_t *)mp->b_rptr;
+	reqp = (dl_subs_bind_req_t *) mp->b_rptr;
 
 	if (reqp->dl_subs_bind_class == DL_HIERARCHICAL_BIND) {
 		unsigned char oui[3];
@@ -3563,7 +3594,7 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 		SPLX(psw);
 
 		mp->b_datap->db_type = M_PCPROTO;
-		ackp = (dl_subs_bind_ack_t *)mp->b_wptr;
+		ackp = (dl_subs_bind_ack_t *) mp->b_wptr;
 		ackp->dl_primitive = DL_SUBS_BIND_ACK;
 		ackp->dl_subs_sap_length = 3;
 		ackp->dl_subs_sap_offset = DL_SUBS_BIND_ACK_SIZE;
@@ -3574,22 +3605,22 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 		putnext(dl->rq, mp);
 		return DONE;
 	} else if (reqp->dl_subs_bind_class == DL_PEER_BIND) {
-		sap_t dlsap; 
+		sap_t dlsap;
 		dl_ushort saptype;
 		int saplen = reqp->dl_subs_sap_length;
 		unsigned char *sapptr = mp->b_rptr + reqp->dl_subs_sap_offset;
-	
+
 		switch (dl->framing) {
-		    case LDL_FRAME_EII:
+		case LDL_FRAME_EII:
 			if (saplen != 2) {
 				SPLX(psw);
 				return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_BADADDR, 0);
 			}
-			*(unsigned short *)&dlsap.sap[0] = htons(*(unsigned short *)sapptr);
-			saptype = *(unsigned short *)sapptr;
+			*(unsigned short *) &dlsap.sap[0] = htons(*(unsigned short *) sapptr);
+			saptype = *(unsigned short *) sapptr;
 			break;
-		    case LDL_FRAME_802_2:
-		    case LDL_FRAME_RAW_LLC:
+		case LDL_FRAME_802_2:
+		case LDL_FRAME_RAW_LLC:
 			if (saplen != 1) {
 				SPLX(psw);
 				return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_BADADDR, 0);
@@ -3598,16 +3629,16 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 			saptype = ETH_P_802_2;
 
 			break;
-		    case LDL_FRAME_SNAP:
+		case LDL_FRAME_SNAP:
 			if (saplen != 2) {
 				SPLX(psw);
 				return reply_error_ack(dl, mp, DL_SUBS_BIND_REQ, DL_BADADDR, 0);
 			}
-			*(unsigned short *)&dlsap.sap[0] = htons(*(unsigned short *)sapptr);
+			*(unsigned short *) &dlsap.sap[0] = htons(*(unsigned short *) sapptr);
 			saptype = ETH_P_802_2;
 			break;
-		    case LDL_FRAME_802_3:
-		    default:
+		case LDL_FRAME_802_3:
+		default:
 			LISASSERT(0);
 			freemsg(mp);
 			return DONE;
@@ -3632,14 +3663,13 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 		SPLX(psw);
 
 		mp->b_datap->db_type = M_PCPROTO;
-		ackp = (dl_subs_bind_ack_t *)mp->b_wptr;
+		ackp = (dl_subs_bind_ack_t *) mp->b_wptr;
 		ackp->dl_primitive = DL_SUBS_BIND_ACK;
 		ackp->dl_subs_sap_length = saplen;
 		ackp->dl_subs_sap_offset = DL_SUBS_BIND_ACK_SIZE;
 		mp->b_wptr += DL_SUBS_BIND_ACK_SIZE;
-		if (dl->framing == LDL_FRAME_EII ||
-		    dl->framing == LDL_FRAME_SNAP)
-			*(unsigned short *)mp->b_wptr = ntohs(*(unsigned short *)&dlsap.sap[0]);
+		if (dl->framing == LDL_FRAME_EII || dl->framing == LDL_FRAME_SNAP)
+			*(unsigned short *) mp->b_wptr = ntohs(*(unsigned short *) &dlsap.sap[0]);
 		else
 			memcpy(mp->b_wptr, dlsap.sap, saplen);
 		mp->b_wptr += saplen;
@@ -3652,7 +3682,8 @@ STATIC INLINE int ws_subs_bind(struct dl *dl, mblk_t *mp)
 	}
 }
 
-STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_subs_unbind(struct dl *dl, mblk_t *mp)
 {
 	dl_subs_unbind_req_t *reqp;
 	int saplen;
@@ -3660,42 +3691,40 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	struct sap *sap;
 	sap_t dlsap;
 	int psw;
-	
-	ginc(subs_unbind_req_cnt) ;
+
+	ginc(subs_unbind_req_cnt);
 	if (dl->dlstate != DL_IDLE)
 		return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_OUTSTATE, 0);
 
 	if (dl->subs != NULL)
 		return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 
-	reqp = (dl_subs_unbind_req_t *)mp->b_rptr;
+	reqp = (dl_subs_unbind_req_t *) mp->b_rptr;
 	saplen = reqp->dl_subs_sap_length;
 	sapptr = mp->b_rptr + reqp->dl_subs_sap_offset;
-	
+
 	switch (dl->framing) {
-	    case LDL_FRAME_EII:
-	    case LDL_FRAME_SNAP:
+	case LDL_FRAME_EII:
+	case LDL_FRAME_SNAP:
 		LISASSERT(dl->sap_len == 2);
 		if (saplen != 2)
 			return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
-		*(unsigned short *)&dlsap.sap[0] = htons(*(unsigned short *)sapptr);
+		*(unsigned short *) &dlsap.sap[0] = htons(*(unsigned short *) sapptr);
 		break;
-	    case LDL_FRAME_802_2:
-	    case LDL_FRAME_RAW_LLC:
+	case LDL_FRAME_802_2:
+	case LDL_FRAME_RAW_LLC:
 		LISASSERT(dl->sap_len == 1);
 		if (saplen != 1)
 			return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 		dlsap.sap[0] = *sapptr;
 		break;
-	    case LDL_FRAME_802_3:
-	    default:
+	case LDL_FRAME_802_3:
+	default:
 		return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
 	}
 
-	for (sap = dl->subs;
-	     sap != NULL && memcmp(dlsap.sap, sap->sap.sap, dl->sap_len);
-	     sap = sap->next_sap)
-		;
+	for (sap = dl->subs; sap != NULL && memcmp(dlsap.sap, sap->sap.sap, dl->sap_len);
+	     sap = sap->next_sap) ;
 
 	if (sap == NULL)
 		return reply_error_ack(dl, mp, DL_SUBS_UNBIND_REQ, DL_BADADDR, 0);
@@ -3716,7 +3745,7 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	if (do_ok_ack(dl, &mp, DL_SUBS_UNBIND_REQ) == RETRY)
 		return RETRY;
 	else if (mp == NULL)
-		return DONE; /* Bogus, bufcall failed */
+		return DONE;	/* Bogus, bufcall failed */
 
 	if (sap_destroy(dl, sap) < 0) {
 		dl->dlstate = DL_IDLE;
@@ -3737,27 +3766,28 @@ STATIC INLINE int ws_subs_unbind(struct dl *dl, mblk_t *mp)
 	SPLX(psw);
 
 	putnext(dl->rq, mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 
-STATIC INLINE int ws_udqos(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_udqos(struct dl *dl, mblk_t *mp)
 {
 	dl_udqos_req_t *reqp;
 	dl_qos_cl_sel1_t *qos;
 	long priority;
 
-	ginc(udqos_req_cnt) ;
+	ginc(udqos_req_cnt);
 	if (dl->dlstate != DL_IDLE)
 		return reply_error_ack(dl, mp, DL_UDQOS_REQ, DL_OUTSTATE, 0);
 
-	reqp = (dl_udqos_req_t *)mp->b_rptr;
-	if (reqp->dl_qos_length < sizeof(dl_qos_cl_sel1_t) ||
-	    reqp->dl_qos_offset < DL_UDQOS_REQ_SIZE)
+	reqp = (dl_udqos_req_t *) mp->b_rptr;
+	if (reqp->dl_qos_length < sizeof(dl_qos_cl_sel1_t)
+	    || reqp->dl_qos_offset < DL_UDQOS_REQ_SIZE)
 		return reply_error_ack(dl, mp, DL_UDQOS_REQ, DL_BADQOSTYPE, 0);
 
-	qos = (dl_qos_cl_sel1_t *)(mp->b_rptr + reqp->dl_qos_offset);
+	qos = (dl_qos_cl_sel1_t *) (mp->b_rptr + reqp->dl_qos_offset);
 	if (qos->dl_qos_type != DL_QOS_CL_SEL1)
 		return reply_error_ack(dl, mp, DL_UDQOS_REQ, DL_BADQOSTYPE, 0);
 	if (qos->dl_trans_delay >= 0)
@@ -3777,135 +3807,124 @@ STATIC INLINE int ws_udqos(struct dl *dl, mblk_t *mp)
 	if (do_ok_ack(dl, &mp, DL_UDQOS_REQ) == RETRY)
 		return RETRY;
 	else if (mp == NULL)
-		return DONE; /* Bogus, bufcall failed */
+		return DONE;	/* Bogus, bufcall failed */
 
 	dl->priority = priority;
 
 	putnext(dl->rq, mp);
-	ginc(ok_ack_cnt) ;
+	ginc(ok_ack_cnt);
 
 	return DONE;
 }
 
-STATIC INLINE int ws_promiscon(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_promiscon(struct dl *dl, mblk_t *mp)
 {
-        dl_promiscon_req_t *reqp;
+	dl_promiscon_req_t *reqp;
 
-        /* FIXME: DL_UNATTACHED state should be allowed */
-        if (dl->dlstate != DL_UNBOUND && dl->dlstate != DL_IDLE)
-                return reply_error_ack(dl, mp, DL_PROMISCON_REQ,
-				       DL_OUTSTATE, 0);
+	/* FIXME: DL_UNATTACHED state should be allowed */
+	if (dl->dlstate != DL_UNBOUND && dl->dlstate != DL_IDLE)
+		return reply_error_ack(dl, mp, DL_PROMISCON_REQ, DL_OUTSTATE, 0);
 
-        /* FIXME: Other frametypes should be allowed */
-        if (dl->framing != LDL_FRAME_802_2 &&
-	    dl->framing != LDL_FRAME_RAW_LLC)
-                return reply_error_ack(dl, mp, DL_PROMISCON_REQ,
-				       DL_NOTSUPPORTED, 0);
+	/* FIXME: Other frametypes should be allowed */
+	if (dl->framing != LDL_FRAME_802_2 && dl->framing != LDL_FRAME_RAW_LLC)
+		return reply_error_ack(dl, mp, DL_PROMISCON_REQ, DL_NOTSUPPORTED, 0);
 
-        reqp = (dl_promiscon_req_t *)mp->b_rptr;
-        switch (reqp->dl_level) {
-	    case DL_PROMISC_SAP:
+	reqp = (dl_promiscon_req_t *) mp->b_rptr;
+	switch (reqp->dl_level) {
+	case DL_PROMISC_SAP:
 		if (do_ok_ack(dl, &mp, DL_PROMISCON_REQ) == RETRY)
 			return RETRY;
 		if (mp != NULL) {
 			dl->flags |= LDLFLAG_PROMISC_SAP;
 			putnext(dl->rq, mp);
-			ginc(ok_ack_cnt) ;
+			ginc(ok_ack_cnt);
 		}
 		return DONE;
-	    case DL_PROMISC_PHYS:
+	case DL_PROMISC_PHYS:
 		/* TODO */
-	    case DL_PROMISC_MULTI:
+	case DL_PROMISC_MULTI:
 		/* TODO */
-	    default:
-		return reply_error_ack(dl, mp, DL_PROMISCON_REQ,
-				       DL_NOTSUPPORTED, 0);
-        }
+	default:
+		return reply_error_ack(dl, mp, DL_PROMISCON_REQ, DL_NOTSUPPORTED, 0);
+	}
 }
 
-
-STATIC INLINE int ws_promiscoff(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_promiscoff(struct dl *dl, mblk_t *mp)
 {
-        dl_promiscoff_req_t *reqp;
+	dl_promiscoff_req_t *reqp;
 
-        /* FIXME: DL_UNATTACHED state should be allowed */
-        if (dl->dlstate != DL_UNBOUND && dl->dlstate != DL_IDLE)
-                return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ,
-				       DL_OUTSTATE, 0);
+	/* FIXME: DL_UNATTACHED state should be allowed */
+	if (dl->dlstate != DL_UNBOUND && dl->dlstate != DL_IDLE)
+		return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ, DL_OUTSTATE, 0);
 
-        /* FIXME: Other frametypes should be allowed */
-        if (dl->framing != LDL_FRAME_802_2 &&
-	    dl->framing != LDL_FRAME_RAW_LLC)
-                return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ,
-				       DL_NOTSUPPORTED, 0);
+	/* FIXME: Other frametypes should be allowed */
+	if (dl->framing != LDL_FRAME_802_2 && dl->framing != LDL_FRAME_RAW_LLC)
+		return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ, DL_NOTSUPPORTED, 0);
 
-        reqp = (dl_promiscoff_req_t *)mp->b_rptr;
-        switch (reqp->dl_level) {
-	    case DL_PROMISC_SAP:
+	reqp = (dl_promiscoff_req_t *) mp->b_rptr;
+	switch (reqp->dl_level) {
+	case DL_PROMISC_SAP:
 		if (do_ok_ack(dl, &mp, DL_PROMISCOFF_REQ) == RETRY)
 			return RETRY;
 		if (mp != NULL) {
 			dl->flags &= ~LDLFLAG_PROMISC_SAP;
 			putnext(dl->rq, mp);
-			ginc(ok_ack_cnt) ;
+			ginc(ok_ack_cnt);
 		}
 		return DONE;
-	    case DL_PROMISC_PHYS:
+	case DL_PROMISC_PHYS:
 		/* TODO */
-	    case DL_PROMISC_MULTI:
+	case DL_PROMISC_MULTI:
 		/* TODO */
-	    default:
-		return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ,
-				       DL_NOTSUPPORTED, 0);
-        }
+	default:
+		return reply_error_ack(dl, mp, DL_PROMISCOFF_REQ, DL_NOTSUPPORTED, 0);
+	}
 }
 
-
-STATIC INLINE int ws_enabmulti(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_enabmulti(struct dl *dl, mblk_t *mp)
 {
-        dl_enabmulti_req_t *reqp;
+	dl_enabmulti_req_t *reqp;
 
-        if (dl->dlstate == DL_UNATTACHED)
-                return reply_error_ack(dl, mp, DL_ENABMULTI_REQ,
-                                       DL_OUTSTATE, 0);
+	if (dl->dlstate == DL_UNATTACHED)
+		return reply_error_ack(dl, mp, DL_ENABMULTI_REQ, DL_OUTSTATE, 0);
 
-        reqp = (dl_enabmulti_req_t *)mp->b_rptr;
+	reqp = (dl_enabmulti_req_t *) mp->b_rptr;
 
-        switch (dev_mc_add(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset,
-                                         reqp->dl_addr_length, 0))
-        {
-            case 0 :
-                if (do_ok_ack(dl, &mp, DL_ENABMULTI_REQ) == RETRY)
-                        return RETRY;
-                else if (mp == NULL)
-                        return DONE; /* Bogus, bufcall failed */
-                break;
+	switch (dev_mc_add
+		(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset, reqp->dl_addr_length, 0)) {
+	case 0:
+		if (do_ok_ack(dl, &mp, DL_ENABMULTI_REQ) == RETRY)
+			return RETRY;
+		else if (mp == NULL)
+			return DONE;	/* Bogus, bufcall failed */
+		break;
 
-            default :
-                return reply_error_ack(dl, mp, DL_ENABMULTI_REQ,
-                                       DL_NOTSUPPORTED, 0);
-        }
+	default:
+		return reply_error_ack(dl, mp, DL_ENABMULTI_REQ, DL_NOTSUPPORTED, 0);
+	}
 
-        putnext(dl->rq, mp);
-        ginc(ok_ack_cnt) ;
-        return DONE;
+	putnext(dl->rq, mp);
+	ginc(ok_ack_cnt);
+	return DONE;
 }
 
-
-STATIC INLINE int ws_disabmulti(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ws_disabmulti(struct dl *dl, mblk_t *mp)
 {
-        dl_disabmulti_req_t *reqp;
+	dl_disabmulti_req_t *reqp;
 
-        if (dl->dlstate == DL_UNATTACHED )
-                return reply_error_ack(dl, mp, DL_DISABMULTI_REQ,
-                                       DL_OUTSTATE, 0);
+	if (dl->dlstate == DL_UNATTACHED)
+		return reply_error_ack(dl, mp, DL_DISABMULTI_REQ, DL_OUTSTATE, 0);
 
-        reqp = (dl_disabmulti_req_t *)mp->b_rptr;
-        return 0;
+	reqp = (dl_disabmulti_req_t *) mp->b_rptr;
+	return 0;
 }
 
-
-STATIC INLINE int ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err)
+STATIC INLINE int
+ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulong err)
 {
 	if (reply_error_ack(dl, mp, primitive, err, 0) == RETRY)
 		return RETRY;
@@ -3923,14 +3942,16 @@ STATIC INLINE int ws_error(struct dl *dl, mblk_t *mp, dl_ulong primitive, dl_ulo
 /*                                                                          */
 /****************************************************************************/
 
-STATIC INLINE int ioc_nak(struct dl *dl, mblk_t *mp)
+STATIC INLINE int
+ioc_nak(struct dl *dl, mblk_t *mp)
 {
 	mp->b_datap->db_type = M_IOCNAK;
 	qreply(WR(dl->rq), mp);
 	return DONE;
 }
 
-STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	struct ldl_flags_ioctl *flg;
 	mblk_t *dp;
@@ -3939,13 +3960,13 @@ STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	LISASSERT(iocp->ioc_cmd == LDL_SETFLAGS);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
-		return ioc_nak(dl, mp); /* No M_DATA block for flags */
+		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
 	if (iocp->ioc_count != sizeof(struct ldl_flags_ioctl))
-		return ioc_nak(dl, mp); /* Bad data size */
+		return ioc_nak(dl, mp);	/* Bad data size */
 	dp = mp->b_cont;
 	LISASSERT(dp->b_wptr - dp->b_rptr >= sizeof(struct ldl_flags_ioctl));
-	flg = (struct ldl_flags_ioctl *)dp->b_rptr;
-	flg->mask &= ~LDLFLAG_PRIVATE; /* Cannot set private flags */
+	flg = (struct ldl_flags_ioctl *) dp->b_rptr;
+	flg->mask &= ~LDLFLAG_PRIVATE;	/* Cannot set private flags */
 	SPLSTR(psw);
 	dl->flags = (dl->flags & ~flg->mask) | (flg->flags & flg->mask);
 	SPLX(psw);
@@ -3959,7 +3980,8 @@ STATIC INLINE int ioc_setflags(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	struct ldldev *dev;
 	dl_ulong ppa;
@@ -3968,22 +3990,22 @@ STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	LISASSERT(iocp->ioc_cmd == LDL_FINDPPA);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
-		return ioc_nak(dl, mp); /* No M_DATA block for name */
+		return ioc_nak(dl, mp);	/* No M_DATA block for name */
 
 	if (iocp->ioc_count <= 0)
-		return ioc_nak(dl, mp); /* Empty name */
+		return ioc_nak(dl, mp);	/* Empty name */
 
 	dp = mp->b_cont;
 
 	/* Find device with this name */
-	for (dev = dev_base, ppa = 0; dev != NULL; dev = dev->next, ++ppa) 
+	for (dev = dev_base, ppa = 0; dev != NULL; dev = dev->next, ++ppa)
 		if (!strcmp(dev->name, dp->b_rptr))
 			break;
 	if (dev == NULL)
-		return ioc_nak(dl, mp); /* No such device */
+		return ioc_nak(dl, mp);	/* No such device */
 
 	dp->b_wptr = dp->b_rptr + sizeof(dl_ulong);
-	*(dl_ulong *)dp->b_rptr = ppa;
+	*(dl_ulong *) dp->b_rptr = ppa;
 
 	mp->b_datap->db_type = M_IOCACK;
 	iocp->ioc_count = sizeof(dl_ulong);
@@ -3994,7 +4016,8 @@ STATIC INLINE int ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 	int len;
@@ -4002,7 +4025,7 @@ STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	LISASSERT(iocp->ioc_cmd == LDL_GETNAME);
 
 	if (dl->dlstate == DL_UNATTACHED)
-		return ioc_nak(dl, mp); /* Not attached to a device */
+		return ioc_nak(dl, mp);	/* Not attached to a device */
 
 	LISASSERT(dl->ndev != NULL);
 	LISASSERT(dl->ndev->dev != NULL);
@@ -4025,13 +4048,14 @@ STATIC INLINE int ioc_getname(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
 
 	LISASSERT(iocp->ioc_cmd == LDL_GETGSTATS);
 	if (iocp->ioc_count != sizeof(ldl_gstats))
-		return ioc_nak(dl, mp);		/* wrong size struct */
+		return ioc_nak(dl, mp);	/* wrong size struct */
 
 	if ((dp = allocb(sizeof(ldl_gstats), BPRI_HI)) == NULL)
 		return RETRY;
@@ -4051,21 +4075,22 @@ STATIC INLINE int ioc_getgstats(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	return DONE;
 }
 
-STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
+STATIC INLINE int
+ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 {
 	mblk_t *dp;
-	unsigned long	*lp ;
+	unsigned long *lp;
 
 	LISASSERT(iocp->ioc_cmd == LDL_SETDEBUG);
 
 	if (mp->b_cont == NULL || mp->b_cont->b_datap->db_type != M_DATA)
-		return ioc_nak(dl, mp); /* No M_DATA block for flags */
+		return ioc_nak(dl, mp);	/* No M_DATA block for flags */
 	if (iocp->ioc_count != sizeof(ldl_debug_mask))
-		return ioc_nak(dl, mp); /* Bad data size */
+		return ioc_nak(dl, mp);	/* Bad data size */
 	dp = mp->b_cont;
 	LISASSERT(dp->b_wptr - dp->b_rptr >= sizeof(ldl_debug_mask));
-	lp = (unsigned long *)dp->b_rptr;
-	ldl_debug_mask = *lp ;
+	lp = (unsigned long *) dp->b_rptr;
+	ldl_debug_mask = *lp;
 
 	mp->b_datap->db_type = M_IOCACK;
 	iocp->ioc_error = 0;
@@ -4079,7 +4104,8 @@ STATIC INLINE int ioc_set_debug_mask(struct dl *dl, struct iocblk *iocp, mblk_t 
 /* End of: IOCTL routine helpers.                                           */
 /****************************************************************************/
 
-STATIC int _RP dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int _RP
+dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	dev_t i;
 
@@ -4135,14 +4161,15 @@ STATIC int _RP dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp
 	} else
 		lis_spin_unlock(&first_open_lock);
 
-        MODGET();
+	MODGET();
 
 	return 0;
 }
 
-STATIC int _RP dl_close(queue_t *q, int flag, cred_t *crp)
+STATIC int _RP
+dl_close(queue_t *q, int flag, cred_t *crp)
 {
-	struct dl **dlp, *dl = (struct dl *)q->q_ptr;
+	struct dl **dlp, *dl = (struct dl *) q->q_ptr;
 	int psw;
 
 	LISASSERT(dl != NULL);
@@ -4189,15 +4216,15 @@ STATIC int _RP dl_close(queue_t *q, int flag, cred_t *crp)
 	} else
 		lis_spin_unlock(&first_open_lock);
 
-
-        MODPUT();
+	MODPUT();
 
 /* printk("After close: pt_n_alloc=%d sap_n_alloc=%d ndev_n_alloc=%d\n",
 	pt_n_alloc, sap_n_alloc, ndev_n_alloc); */
 	return 0;
 }
 
-STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
+STATIC int
+write_service_raw(struct dl *dl, mblk_t *mp)
 {
 	LISASSERT(dl != NULL);
 	LISASSERT(dl->magic == DL_MAGIC);
@@ -4209,12 +4236,11 @@ STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
 
 	LISASSERT(mp->b_datap->db_type == M_DATA);
 
-	if ((dl->flags & LDLFLAG_RAW) != 0)
-	{
+	if ((dl->flags & LDLFLAG_RAW) != 0) {
 		if (ldl_debug_mask & LDL_DEBUG_UDREQ)
-		    ldl_mp_data_dump("ldl_unitdata_req", mp,
-				     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
-		ginc(unitdata_req_cnt) ;
+			ldl_mp_data_dump("ldl_unitdata_req", mp,
+					 ldl_debug_mask & LDL_DEBUG_ALLDATA);
+		ginc(unitdata_req_cnt);
 		return tx_func_raw(dl, mp);
 	}
 
@@ -4224,7 +4250,8 @@ STATIC int write_service_raw(struct dl *dl, mblk_t *mp)
 	return DONE;
 }
 
-STATIC int write_service(struct dl *dl, mblk_t *mp)
+STATIC int
+write_service(struct dl *dl, mblk_t *mp)
 {
 	dl_ulong primitive;
 
@@ -4236,85 +4263,85 @@ STATIC int write_service(struct dl *dl, mblk_t *mp)
 	LISASSERT(mp->b_datap != NULL);
 	LISASSERT(mp->b_rptr != NULL);
 
-	LISASSERT(mp->b_datap->db_type == M_PROTO ||
-	       mp->b_datap->db_type == M_PCPROTO);
+	LISASSERT(mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO);
 
-	primitive = ((union DL_primitives *)mp->b_rptr)->dl_primitive;
+	primitive = ((union DL_primitives *) mp->b_rptr)->dl_primitive;
 
 	if (primitive == DL_UNITDATA_REQ)
 		return tx_func_proto(dl, mp);
 
-	switch(primitive) {
-		case DL_INFO_REQ:
-			return ws_info(dl, mp);
-		case DL_PHYS_ADDR_REQ:
-			return ws_phys_addr(dl, mp);
-		case DL_ATTACH_REQ:
-			return ws_attach(dl, mp);
-		case DL_DETACH_REQ:
-			return ws_detach(dl, mp);
-		case DL_BIND_REQ:
-			return ws_bind(dl, mp);
-		case DL_UNBIND_REQ:
-			return ws_unbind(dl, mp);
-		case DL_SUBS_BIND_REQ:
-			return ws_subs_bind(dl, mp);
-		case DL_SUBS_UNBIND_REQ:
-			return ws_subs_unbind(dl, mp);
-		case DL_UDQOS_REQ:
-			return ws_udqos(dl, mp);
-		case DL_PROMISCON_REQ:
-			return ws_promiscon(dl, mp);
-		case DL_PROMISCOFF_REQ:
-			return ws_promiscoff(dl, mp);
+	switch (primitive) {
+	case DL_INFO_REQ:
+		return ws_info(dl, mp);
+	case DL_PHYS_ADDR_REQ:
+		return ws_phys_addr(dl, mp);
+	case DL_ATTACH_REQ:
+		return ws_attach(dl, mp);
+	case DL_DETACH_REQ:
+		return ws_detach(dl, mp);
+	case DL_BIND_REQ:
+		return ws_bind(dl, mp);
+	case DL_UNBIND_REQ:
+		return ws_unbind(dl, mp);
+	case DL_SUBS_BIND_REQ:
+		return ws_subs_bind(dl, mp);
+	case DL_SUBS_UNBIND_REQ:
+		return ws_subs_unbind(dl, mp);
+	case DL_UDQOS_REQ:
+		return ws_udqos(dl, mp);
+	case DL_PROMISCON_REQ:
+		return ws_promiscon(dl, mp);
+	case DL_PROMISCOFF_REQ:
+		return ws_promiscoff(dl, mp);
 
-		case DL_ENABMULTI_REQ:
-                        return ws_enabmulti(dl, mp);
-		case DL_DISABMULTI_REQ:
-                        return ws_disabmulti(dl, mp);
-		case DL_CONNECT_REQ:
-		case DL_CONNECT_RES:
-		case DL_TOKEN_REQ:
-		case DL_DISCONNECT_REQ:
-		case DL_RESET_REQ:
-		case DL_RESET_RES:
-		case DL_DATA_ACK_REQ:
-		case DL_REPLY_REQ:
-		case DL_REPLY_UPDATE_REQ:
-		case DL_XID_REQ:
-		case DL_TEST_REQ:
-		case DL_SET_PHYS_ADDR_REQ:
-		case DL_GET_STATISTICS_REQ:
-			return ws_error(dl, mp, primitive, DL_NOTSUPPORTED);
-		default:
-			return ws_error(dl, mp, primitive, DL_BADPRIM);
+	case DL_ENABMULTI_REQ:
+		return ws_enabmulti(dl, mp);
+	case DL_DISABMULTI_REQ:
+		return ws_disabmulti(dl, mp);
+	case DL_CONNECT_REQ:
+	case DL_CONNECT_RES:
+	case DL_TOKEN_REQ:
+	case DL_DISCONNECT_REQ:
+	case DL_RESET_REQ:
+	case DL_RESET_RES:
+	case DL_DATA_ACK_REQ:
+	case DL_REPLY_REQ:
+	case DL_REPLY_UPDATE_REQ:
+	case DL_XID_REQ:
+	case DL_TEST_REQ:
+	case DL_SET_PHYS_ADDR_REQ:
+	case DL_GET_STATISTICS_REQ:
+		return ws_error(dl, mp, primitive, DL_NOTSUPPORTED);
+	default:
+		return ws_error(dl, mp, primitive, DL_BADPRIM);
 	}
 }
 
-STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
+STATIC int
+do_ioctl(struct dl *dl, mblk_t *mp)
 {
 	struct iocblk *iocp;
 
-	ginc(ioctl_cnt) ;
+	ginc(ioctl_cnt);
 	LISASSERT(dl != NULL);
 	LISASSERT(dl->magic == DL_MAGIC);
 	LISASSERT(mp != NULL);
 	LISASSERT(mp->b_datap->db_type == M_IOCTL);
 
-	iocp = (struct iocblk *)mp->b_rptr;
+	iocp = (struct iocblk *) mp->b_rptr;
 
 	switch (iocp->ioc_cmd) {
-	    case LDL_SETFLAGS:
+	case LDL_SETFLAGS:
 		return ioc_setflags(dl, iocp, mp);
-	    case LDL_FINDPPA:
+	case LDL_FINDPPA:
 		return ioc_findppa(dl, iocp, mp);
-	    case LDL_GETNAME:
+	case LDL_GETNAME:
 		return ioc_getname(dl, iocp, mp);
-	    case LDL_GETGSTATS:
+	case LDL_GETGSTATS:
 		return ioc_getgstats(dl, iocp, mp);
-	    case LDL_SETDEBUG:
+	case LDL_SETDEBUG:
 		return ioc_set_debug_mask(dl, iocp, mp);
-	    default:
+	default:
 		return ioc_nak(dl, mp);
 	}
 }
@@ -4322,37 +4349,35 @@ STATIC int do_ioctl(struct dl *dl, mblk_t *mp)
 /*
  *  Write queue put routine
  */
-STATIC int _RP dl_wput(queue_t *q, mblk_t *mp)
+STATIC int _RP
+dl_wput(queue_t *q, mblk_t *mp)
 {
 	unsigned char msg_type = mp->b_datap->db_type;
-	dl_ulong      primitive;
+	dl_ulong primitive;
 
 	/* Keep most common case out of switch for optimum performance */
 	if (msg_type == M_PROTO) {
-		primitive = ((union DL_primitives *)mp->b_rptr)->dl_primitive;
-		if (primitive == DL_UNITDATA_REQ && q->q_count != 0)
-		{				/* keep msgs FIFO */
-		    putqf(q, mp) ;
-		    ginc(unitdata_req_q_cnt) ;
-		    return(0) ;
+		primitive = ((union DL_primitives *) mp->b_rptr)->dl_primitive;
+		if (primitive == DL_UNITDATA_REQ && q->q_count != 0) {	/* keep msgs FIFO */
+			putqf(q, mp);
+			ginc(unitdata_req_q_cnt);
+			return (0);
 		}
-		if (write_service((struct dl *)q->q_ptr, mp) == DONE)
-			return(0) ;
+		if (write_service((struct dl *) q->q_ptr, mp) == DONE)
+			return (0);
 	} else {
-	    switch (msg_type)
-	    {
+		switch (msg_type) {
 		case M_PCPROTO:
-			if (write_service((struct dl *)q->q_ptr, mp) == DONE)
-				return(0) ;
+			if (write_service((struct dl *) q->q_ptr, mp) == DONE)
+				return (0);
 			break;
 		case M_DATA:
-			if (q->q_count != 0)
-			{			/* keep msgs FIFO */
-			    putqf(q, mp) ;
-			    return(0) ;
+			if (q->q_count != 0) {	/* keep msgs FIFO */
+				putqf(q, mp);
+				return (0);
 			}
-			if (write_service_raw((struct dl *)q->q_ptr, mp) == DONE)
-				return(0) ;
+			if (write_service_raw((struct dl *) q->q_ptr, mp) == DONE)
+				return (0);
 			break;
 		case M_FLUSH:
 			if (*mp->b_rptr & FLUSHW) {
@@ -4364,111 +4389,118 @@ STATIC int _RP dl_wput(queue_t *q, mblk_t *mp)
 				qreply(q, mp);
 			} else
 				freemsg(mp);
-			return(0) ;
+			return (0);
 		case M_IOCTL:
-			if (do_ioctl((struct dl *)q->q_ptr, mp) == DONE)
-				return(0) ;
+			if (do_ioctl((struct dl *) q->q_ptr, mp) == DONE)
+				return (0);
 			break;
 		default:
 			freemsg(mp);
-			return(0) ;
-	    }
+			return (0);
+		}
 	}
 	putqf(q, mp);
-	return(0) ;
+	return (0);
 }
 
 /*
  *  Write queue service routine
  */
-STATIC int _RP dl_wsrv(queue_t *q)
+STATIC int _RP
+dl_wsrv(queue_t *q)
 {
 	mblk_t *mp;
-	struct dl *dl = (struct dl *)q->q_ptr;
+	struct dl *dl = (struct dl *) q->q_ptr;
 
 	LISASSERT(q != NULL);
 	LISASSERT(dl != NULL);
 	LISASSERT(dl->magic == DL_MAGIC);
 	LISASSERT(!dl->bufwait);
 
-	while ((mp = getq(q)) != NULL)
-	{
+	while ((mp = getq(q)) != NULL) {
 		if (mp->b_datap->db_type != M_DATA) {
-			LISASSERT(mp->b_datap->db_type == M_PROTO || 
-			       mp->b_datap->db_type == M_PCPROTO);
+			LISASSERT(mp->b_datap->db_type == M_PROTO
+				  || mp->b_datap->db_type == M_PCPROTO);
 
 			if (write_service(dl, mp) == RETRY) {
 				putbqf(q, mp);
-				return(0) ;
+				return (0);
 			}
 		} else if (write_service_raw(dl, mp) == RETRY) {
 			putbqf(q, mp);
-			return(0) ;
+			return (0);
 		}
 	}
-	return(0) ;
+	return (0);
 }
 
 /*
  *  Read queue service routine
  */
-STATIC int _RP dl_rsrv(queue_t *q)
+STATIC int _RP
+dl_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while (canputnext(q)) {
 		if ((mp = getq(q)) == NULL)
 			break;
 
 		if (ldl_debug_mask & LDL_DEBUG_UDIND)
-		    ldl_mp_data_dump("ldl_unitdata_ind", mp,
-				     ldl_debug_mask & LDL_DEBUG_ALLDATA) ;
+			ldl_mp_data_dump("ldl_unitdata_ind", mp,
+					 ldl_debug_mask & LDL_DEBUG_ALLDATA);
 		putnext(q, mp);
-		ginc(unitdata_ind_cnt) ;
+		ginc(unitdata_ind_cnt);
 	}
-	return(0) ;
+	return (0);
 }
 
 #ifdef MODULE
 
 #ifdef KERNEL_2_5
-int ldl_init_module(void)
+int
+ldl_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
-        int ret = lis_register_strdev(LDL__CMAJOR_0, &ldl_info,
+	int ret = lis_register_strdev(LDL__CMAJOR_0, &ldl_info,
 				      LDL_N_MINOR, "ldl");
+
 	if (ret < 0) {
-                printk("ldl.init_module: Unable to register module.\n");
-                return ret;
-        }
-	inter_module_register("ldl_init", THIS_MODULE, ldl_init) ;
+		printk("ldl.init_module: Unable to register module.\n");
+		return ret;
+	}
+	inter_module_register("ldl_init", THIS_MODULE, ldl_init);
 	ldl_init();
-        return 0;
+	return 0;
 }
 
 #ifdef KERNEL_2_5
-void ldl_cleanup_module(void)
+void
+ldl_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
-	inter_module_unregister("ldl_init") ;
-        if (lis_unregister_strdev(LDL__CMAJOR_0) < 0)
-                printk("ldl.cleanup_module: Unable to unregister module.\n");
-        else
-                printk("ldl.cleanup_module: Unregistered, ready to be unloaded.\n");
-        return;
+	inter_module_unregister("ldl_init");
+	if (lis_unregister_strdev(LDL__CMAJOR_0) < 0)
+		printk("ldl.cleanup_module: Unable to unregister module.\n");
+	else
+		printk("ldl.cleanup_module: Unregistered, ready to be unloaded.\n");
+	return;
 }
 
 #ifdef KERNEL_2_5
-module_init(ldl_init_module) ;
-module_exit(ldl_cleanup_module) ;
+module_init(ldl_init_module);
+module_exit(ldl_cleanup_module);
 #endif
 
 #endif
 
-#if defined(LINUX)			/* linux kernel */
+#if defined(LINUX)		/* linux kernel */
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
 #endif
@@ -4482,4 +4514,3 @@ MODULE_DESCRIPTION("STREAMS DLPI to Linux network driver conversion");
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 #endif
 #endif
-

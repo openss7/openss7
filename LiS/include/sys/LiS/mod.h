@@ -77,16 +77,16 @@
 #include <sys/strport.h>
 #endif
 #ifndef _LIS_CONFIG_H
-#include <sys/strconfig.h>	/* config definitions	*/
+#include <sys/strconfig.h>	/* config definitions */
 #endif
 #ifndef _SHARE_H
-#include <sys/LiS/share.h>	/* streams shared defs	*/
+#include <sys/LiS/share.h>	/* streams shared defs */
 #endif
 #ifndef _STR_OPTS_H
-#include <sys/stropts.h>	/* struct str_list	*/
+#include <sys/stropts.h>	/* struct str_list */
 #endif
 #ifndef _SYS_SAD_H
-#include <sys/sad.h>		/* autopush defs	*/
+#include <sys/sad.h>		/* autopush defs */
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -96,13 +96,12 @@
 /* module open flags
  */
 #define DRVOPEN		0x00	/* device open */
-#define MODOPEN		0x01    /* plain module open */
-#define CLONEOPEN	0x02    /* clone open -> pick new minor dev */
+#define MODOPEN		0x01	/* plain module open */
+#define CLONEOPEN	0x02	/* clone open -> pick new minor dev */
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
-
-#ifdef LIS_OBJNAME /* Some macros that do something useful with LIS_OBJNAME */
+#ifdef LIS_OBJNAME		/* Some macros that do something useful with LIS_OBJNAME */
 
 /*
  *  LIS_OBJNAME_STR expands to the quoted object file name,
@@ -120,7 +119,7 @@
 #define ___LIS_OBJNAME_XCAT(name, objname) ___LIS_OBJNAME_CAT(name, objname)
 #define ___LIS_OBJNAME_CAT(name, objname) lis_##objname##_##name
 
-#endif /* ifdef LIS_OBJNAME */
+#endif				/* ifdef LIS_OBJNAME */
 
 /*  -------------------------------------------------------------------  */
 /*				    Types                                */
@@ -132,30 +131,29 @@
  */
 
 typedef struct streamtab {
-  SHARE
-        struct qinit *st_rdinit; /* read queue */
-        struct qinit *st_wrinit; /* write queue */
-        struct qinit *st_muxrinit; /* mux read queue */
-        struct qinit *st_muxwinit; /* mux write queue */
+	struct qinit *st_rdinit;	/* read queue */
+	struct qinit *st_wrinit;	/* write queue */
+	struct qinit *st_muxrinit;	/* mux read queue */
+	struct qinit *st_muxwinit;	/* mux write queue */
 } streamtab_t;
 
 #ifdef __KERNEL__
 
 /* Module ID number */
 typedef unsigned short modID_t;
+
 #define LIS_NULL_MID ((modID_t)0)
 
 /*
  *  Module information structure
  */
 typedef struct lis_module_info {
-  SHARE
-        modID_t mi_idnum;               /* module id number */
-        const char *mi_idname;          /* module name */
-        long    mi_minpsz;              /* min packet size accepted */
-        long    mi_maxpsz;              /* max packet size accepted */
-        ulong   mi_hiwat;               /* hi-water mark */
-        ulong   mi_lowat;               /* lo-water mark */
+	modID_t mi_idnum;		/* module id number */
+	const char *mi_idname;		/* module name */
+	long mi_minpsz;			/* min packet size accepted */
+	long mi_maxpsz;			/* max packet size accepted */
+	ulong mi_hiwat;			/* hi-water mark */
+	ulong mi_lowat;			/* lo-water mark */
 } lis_module_info_t;
 
 /*
@@ -170,41 +168,39 @@ typedef struct lis_module_info {
  */
 
 typedef struct module_stat {
-  SHARE
-    char *ms_xptr;              /* pointer to private statistics */
-    short ms_xsize;             /* length of private statistics buffer */
-    uint ms_flags;              /* bool stats -- for future use */
-  EXPORT
+	char *ms_xptr;			/* pointer to private statistics */
+	short ms_xsize;			/* length of private statistics buffer */
+	uint ms_flags;			/* bool stats -- for future use */
 #ifndef LIS_ATOMIC_STATS
-    long ms_pcnt;               /* count of calls to put proc */
-    long ms_scnt;               /* count of calls to service proc */
-    long ms_ocnt;               /* count of calls to open proc */
-    long ms_ccnt;               /* count of calls to close proc */
-    long ms_acnt;               /* count of calls to admin proc */
+	long ms_pcnt;			/* count of calls to put proc */
+	long ms_scnt;			/* count of calls to service proc */
+	long ms_ocnt;			/* count of calls to open proc */
+	long ms_ccnt;			/* count of calls to close proc */
+	long ms_acnt;			/* count of calls to admin proc */
 #else
 /* use non-standard but MP-safe statistics */
-    lis_atomic_t ms_pcnt;               /* count of calls to put proc */
-    lis_atomic_t ms_scnt;               /* count of calls to service proc */
-    lis_atomic_t ms_ocnt;               /* count of calls to open proc */
-    lis_atomic_t ms_ccnt;               /* count of calls to close proc */
-    lis_atomic_t ms_acnt;               /* count of calls to admin proc */
+	lis_atomic_t ms_pcnt;		/* count of calls to put proc */
+	lis_atomic_t ms_scnt;		/* count of calls to service proc */
+	lis_atomic_t ms_ocnt;		/* count of calls to open proc */
+	lis_atomic_t ms_ccnt;		/* count of calls to close proc */
+	lis_atomic_t ms_acnt;		/* count of calls to admin proc */
 #endif
 } module_stat_t;
 
 typedef struct fmodsw {
-        struct streamtab  *f_str;
-	ushort             f_count;	/* open count */
-        short              f_flags;     /* module/driver flags */
-        char               f_name[LIS_NAMESZ+1];
-        char               f_objname[LIS_NAMESZ+1];
-        int		   f_state;	/* state of module */
-	lis_semaphore_t	   f_sem;	/* to synchronize loading */
-	int		   f_qlock_option; /* for initializing queues */
+	struct streamtab *f_str;
+	ushort f_count;			/* open count */
+	short f_flags;			/* module/driver flags */
+	char f_name[LIS_NAMESZ + 1];
+	char f_objname[LIS_NAMESZ + 1];
+	int f_state;			/* state of module */
+	lis_semaphore_t f_sem;		/* to synchronize loading */
+	int f_qlock_option;		/* for initializing queues */
 } fmodsw_t;
 
-#define LIS_MODFLG_CLONE   0x0001       /* module is 'clone' */
-#define LIS_MODFLG_FIFO    0x0002       /* module is 'fifo'  */
-#define LIS_MODFLG_REOPEN  0x0004       /* cloned minors can reopen */
+#define LIS_MODFLG_CLONE   0x0001	/* module is 'clone' */
+#define LIS_MODFLG_FIFO    0x0002	/* module is 'fifo' */
+#define LIS_MODFLG_REOPEN  0x0004	/* cloned minors can reopen */
 
 /*
  * States
@@ -218,19 +214,19 @@ typedef struct fmodsw {
 
 #define LIS_MODSTATE_INITED	0x100	/* initialized */
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
 
 #ifdef __KERNEL__
 
-#if __LIS_INTERNAL__
-extern struct fmodsw lis_fstr_sw[MAX_STRDEV]; /* streams devices */
+#ifdef __LIS_INTERNAL__
+extern struct fmodsw lis_fstr_sw[MAX_STRDEV];	/* streams devices */
 #endif
-extern struct fmodsw lis_fmod_sw[MAX_STRMOD]; /* streams modules */
+extern struct fmodsw lis_fmod_sw[MAX_STRMOD];	/* streams modules */
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
@@ -238,44 +234,43 @@ extern struct fmodsw lis_fmod_sw[MAX_STRMOD]; /* streams modules */
 #ifdef __KERNEL__
 
 /* Register and unregister streams modules and drivers */
-extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name)_RP;
-extern int lis_unregister_strmod(struct streamtab *strtab)_RP;
-extern int lis_register_strdev(major_t major, struct streamtab *strtab,
-			       int nminor, const char *name)_RP;
-extern int lis_unregister_strdev(major_t major)_RP;
-extern int lis_register_driver_qlock_option(major_t major, int qlock_option)_RP;
-extern int lis_register_module_qlock_option(modID_t id, int qlock_option)_RP;
+extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name);
+extern int lis_unregister_strmod(struct streamtab *strtab);
+extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
+			       const char *name);
+extern int lis_unregister_strdev(major_t major);
+extern int lis_register_driver_qlock_option(major_t major, int qlock_option);
+extern int lis_register_module_qlock_option(modID_t id, int qlock_option);
 
 /* Back compatible: Will go away when no longer used */
 #define	register_strdev		lis_register_strdev
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 /* Find streamtab of a device */
 extern streamtab_t *lis_find_strdev(major_t major);
 #endif
 
 /* Find/load a module id by name */
 extern modID_t lis_findmod(const char *name);
-#if __LIS_INTERNAL__
+
+#ifdef __LIS_INTERNAL__
 extern modID_t lis_loadmod(const char *name);
 extern modID_t lis_findmod_strtab(struct streamtab *strtab);
 #endif
 
-
 /* Autopush */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_apushm(dev_t dev, const char *mods[]);
 #endif
-extern int lis_apush_set(struct strapush *ap)_RP;
-extern int lis_apush_get(struct strapush *ap)_RP;
-#if __LIS_INTERNAL__
-extern int lis_valid_mod_list(struct str_list ml);	
+extern int lis_apush_set(struct strapush *ap);
+extern int lis_apush_get(struct strapush *ap);
+extern int lis_apush_vml(struct str_list *mlp);
 
 /* mod.c initialization and cleanup functions */
+#ifdef __LIS_INTERNAL__
 extern void lis_init_mod(void);
 extern void lis_terminate_mod(void);
 #endif
-
 
 /* Get strtab for mod or NULL if not a valid id */
 #define lis_modstr(i)		( ((i) <= 0) ? NULL : lis_fmod_sw[i].f_str )
@@ -303,7 +298,7 @@ extern void lis_terminate_mod(void);
  */
 #define LIS_ISDEV(majnum,kind)	((majnum)==(kind))
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_MOD_H*/
+#endif				/* !_MOD_H */

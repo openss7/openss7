@@ -56,28 +56,18 @@
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
-#if defined(__MSDOS__)				/* DOS version */
+#if defined(__MSDOS__)		/* DOS version */
 #include "dos-mdep.c"
-#elif defined(LINUX)				/* Linux version */
+#elif defined(LINUX)		/* Linux version */
 #include "linux-mdep.c"
-#elif defined(USER)				/* user-level version */
+#elif defined(USER)		/* user-level version */
 #include "user-mdep.c"
-#elif defined(SYS_SCO)				/* SCO user-level version */
+#elif defined(SYS_SCO)		/* SCO user-level version */
 #include "user-mdep.c"
-#elif defined(SYS_54)				/* SCO user-level version */
+#elif defined(SYS_54)		/* SCO user-level version */
 #include "user-mdep.c"
-#elif defined(QNX)				/* QNX driver version */
+#elif defined(QNX)		/* QNX driver version */
 #include "qnx-mdep.c"
-#elif defined(PORTABLE)				/* just the portable part */
+#elif defined(PORTABLE)		/* just the portable part */
 #include "port-mdep.c"
 #endif
-
-
-
-
-
-
-
-
-
-

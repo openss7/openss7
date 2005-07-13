@@ -58,8 +58,8 @@
 
 #ident "@(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
-
+static char const ident[] =
+    "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /* 
  *  psfd.c - pass a pipe end's FD to itself
@@ -87,11 +87,12 @@ static char const ident[] = "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.1
 
 static int verbose = 1;
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
-    if (!verbose)
-	return;
-    fprintf(stdout, "\
+	if (!verbose)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
 \n\
@@ -130,7 +131,8 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -148,7 +150,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -161,7 +164,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -197,7 +201,8 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int fd[2], sfd, rfd;
 	struct stat stat;
@@ -206,6 +211,7 @@ int main(int argc, char *argv[])
 
 	for (;;) {
 		int c;
+
 #ifdef _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -222,6 +228,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "w:inqvhVC?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "w:inqvhVC?");
@@ -280,12 +287,12 @@ int main(int argc, char *argv[])
 	}
 	if (verbose) {
 		fstat(fd[0], &stat);
-		printf("pipe() fd[0]=%d mode 0%o dev 0x%x rdev 0x%x",
-		       fd[0], (int) stat.st_mode, (int) stat.st_dev, (int) stat.st_rdev);
+		printf("pipe() fd[0]=%d mode 0%o dev 0x%x rdev 0x%x", fd[0], (int) stat.st_mode,
+		       (int) stat.st_dev, (int) stat.st_rdev);
 		printf(" [%s]\n", (isastream(fd[0]) ? "STREAMS" : "Linux"));
 		fstat(fd[1], &stat);
-		printf("pipe() fd[1]=%d mode 0%o dev 0x%x rdev 0x%x",
-		       fd[1], (int) stat.st_mode, (int) stat.st_dev, (int) stat.st_rdev);
+		printf("pipe() fd[1]=%d mode 0%o dev 0x%x rdev 0x%x", fd[1], (int) stat.st_mode,
+		       (int) stat.st_dev, (int) stat.st_rdev);
 		printf(" [%s]\n", (isastream(fd[1]) ? "STREAMS" : "Linux"));
 	}
 
@@ -307,8 +314,7 @@ int main(int argc, char *argv[])
 			rfd = recv.fd;
 			if (verbose) {
 				fstat(rfd, &stat);
-				printf("I_RECVFD: fd %d mode 0%o dev 0x%x rdev 0x%x",
-				       rfd,
+				printf("I_RECVFD: fd %d mode 0%o dev 0x%x rdev 0x%x", rfd,
 				       (int) stat.st_mode, (int) stat.st_dev, (int) stat.st_rdev);
 				printf(" [%s]\n", (isastream(rfd) ? "STREAMS" : "Linux"));
 			}

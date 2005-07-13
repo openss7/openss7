@@ -78,22 +78,20 @@
 *                        Data Structures                                *
 ************************************************************************/
 
-
 /************************************************************************
 *                         Global Storage                                *
 ************************************************************************/
-int		 spin_lock_nest_level ;
-int		 spin_lock_error_count ;
-lis_atomic_t	 lis_spin_lock_count ;
-lis_atomic_t	 lis_spin_lock_contention_count ;
-lis_spin_lock_t	*most_recent_spin_lock ;
-
+int spin_lock_nest_level;
+int spin_lock_error_count;
+lis_atomic_t lis_spin_lock_count;
+lis_atomic_t lis_spin_lock_contention_count;
+lis_spin_lock_t *most_recent_spin_lock;
 
 /************************************************************************
 *                           Prototypes                                  *
 ************************************************************************/
 
-extern file_t		*user_file_of_fd(int fd) ;  /* in usrio.c */
+extern file_t *user_file_of_fd(int fd);	/* in usrio.c */
 
 #define _return(e) return ((e)<0?-(errno=-(e)):(e))
 
@@ -104,9 +102,10 @@ extern file_t		*user_file_of_fd(int fd) ;  /* in usrio.c */
 * Mainly a place to put a breakpoint.					*
 *									*
 ************************************************************************/
-void spin_lock_error(void)
+void
+spin_lock_error(void)
 {
-    spin_lock_error_count++ ;
+	spin_lock_error_count++;
 }
 
 /************************************************************************
@@ -117,34 +116,31 @@ void spin_lock_error(void)
 * potential sleeps while holding a spinlock.				*
 *									*
 ************************************************************************/
-void check_for_holding_spinlock(void)
+void
+check_for_holding_spinlock(void)
 {
-    if (spin_lock_nest_level)
-    {
-	if (most_recent_spin_lock != NULL)
-	    printf("Holding spin lock \"%s\"\n", most_recent_spin_lock->name) ;
-	else
-	    printf("spin_lock_nest_level != 0 but no recent spin lock\n") ;
+	if (spin_lock_nest_level) {
+		if (most_recent_spin_lock != NULL)
+			printf("Holding spin lock \"%s\"\n", most_recent_spin_lock->name);
+		else
+			printf("spin_lock_nest_level != 0 but no recent spin lock\n");
 
-	spin_lock_error() ;
-    }
+		spin_lock_error();
+	}
 }
 
 /************************************************************************
 *                         decr_spin_lock_count                          *
 ************************************************************************/
-void decr_spin_lock_count(lis_spin_lock_t *lock)
+void
+decr_spin_lock_count(lis_spin_lock_t *lock)
 {
-    if (spin_lock_nest_level == 0)
-    {
-	printf("Spin lock nest level would go negative.  Lock=\"%s\"\n",
-		lock->name) ;
+	if (spin_lock_nest_level == 0) {
+		printf("Spin lock nest level would go negative.  Lock=\"%s\"\n", lock->name);
 
-	spin_lock_error() ;
-    }
-    else
-    if (--spin_lock_nest_level == 0)
-	most_recent_spin_lock = NULL ;
+		spin_lock_error();
+	} else if (--spin_lock_nest_level == 0)
+		most_recent_spin_lock = NULL;
 }
 
 /************************************************************************
@@ -155,17 +151,17 @@ void decr_spin_lock_count(lis_spin_lock_t *lock)
 *									*
 ************************************************************************/
 __attribute__ ((format(printf, 1, 2)))
-int	port_printf(char *fmt, ...)
+	int port_printf(char *fmt, ...)
 {
-    va_list args;
+	va_list args;
 
-    va_start (args, fmt);
-    vprintf (fmt, args);
-    va_end (args);
+	va_start(args, fmt);
+	vprintf(fmt, args);
+	va_end(args);
 
-    return(0) ;
+	return (0);
 
-} /* port_printf */
+}				/* port_printf */
 
 /************************************************************************
 *                            port_panic                                 *
@@ -174,12 +170,13 @@ int	port_printf(char *fmt, ...)
 * This is the panic routine.  It is not supposed to return.		*
 *									*
 ************************************************************************/
-void	port_panic(char *msg)
+void
+port_panic(char *msg)
 {
-    port_printf("\nPANIC: %s\n", msg) ;
-    exit(1) ;
+	port_printf("\nPANIC: %s\n", msg);
+	exit(1);
 
-} /* port_panic */
+}				/* port_panic */
 
 /************************************************************************
 *                           port_malloc                                 *
@@ -188,13 +185,14 @@ void	port_panic(char *msg)
 * Allocate nbytes of memory and return a pointer to it.			*
 *									*
 ************************************************************************/
-void	*port_malloc(int nbytes, int class)
+void *
+port_malloc(int nbytes, int class)
 {
-    (void) class ;			/* memory class */
+	(void) class;		/* memory class */
 
-    return(malloc(nbytes)) ;
+	return (malloc(nbytes));
 
-} /* port_malloc */
+}				/* port_malloc */
 
 /************************************************************************
 *                          port_zmalloc                                 *
@@ -203,18 +201,19 @@ void	*port_malloc(int nbytes, int class)
 * Allocate nbytes of memory and clear to zero.				*
 *									*
 ************************************************************************/
-void	*port_zmalloc(int nbytes, int class)
+void *
+port_zmalloc(int nbytes, int class)
 {
-    void	*ptr = malloc(nbytes) ;
+	void *ptr = malloc(nbytes);
 
-    (void) class ;			/* memory class */
+	(void) class;		/* memory class */
 
-    if (ptr != NULL)
-	memset(ptr, 0, nbytes) ;
+	if (ptr != NULL)
+		memset(ptr, 0, nbytes);
 
-    return(ptr) ;
+	return (ptr);
 
-} /* port_zmalloc */
+}				/* port_zmalloc */
 
 /************************************************************************
 *                           port_free                                   *
@@ -223,11 +222,12 @@ void	*port_zmalloc(int nbytes, int class)
 * Free a block of memory allocated by port_malloc.			*
 *									*
 ************************************************************************/
-void	port_free(void *ptr)
+void
+port_free(void *ptr)
 {
-    free(ptr) ;
+	free(ptr);
 
-} /* port_free */
+}				/* port_free */
 
 /************************************************************************
 *                          port_print_mem                               *
@@ -236,11 +236,12 @@ void	port_free(void *ptr)
 * Walk the memory link list and print out each element.			*
 *									*
 ************************************************************************/
-void	port_print_mem(void)
+void
+port_print_mem(void)
 {
-    lis_print_mem() ;
+	lis_print_mem();
 
-} /* port_print_mem */
+}				/* port_print_mem */
 
 /************************************************************************
 *                             port_memcpy                               *
@@ -249,11 +250,12 @@ void	port_print_mem(void)
 * Copy nbytes from src to dst.						*
 *									*
 ************************************************************************/
-void	port_memcpy(void *dst, void *src, int nbytes)
+void
+port_memcpy(void *dst, void *src, int nbytes)
 {
-    memcpy(dst, src, nbytes) ;
+	memcpy(dst, src, nbytes);
 
-} /* port_memcpy */
+}				/* port_memcpy */
 
 /************************************************************************
 *                            port_verify_area                           *
@@ -266,34 +268,29 @@ void	port_memcpy(void *dst, void *src, int nbytes)
 * is an "errno" value.  Return 0 for success.				*
 *									*
 ************************************************************************/
-int	port_verify_area(struct file *f, int rd_wr_fcn,
-			 const void *usr_addr, int lgth)
+int
+port_verify_area(struct file *f, int rd_wr_fcn, const void *usr_addr, int lgth)
 {
-    (void) f ;
-    (void) usr_addr ;
-    (void) lgth ;
+	(void) f;
+	(void) usr_addr;
+	(void) lgth;
 
-    switch (rd_wr_fcn)
-    {
-    case VERIFY_READ:
-	if (   usr_addr == NULL
-	    || lgth > 0x10000
-	   )
-	    _return(-EFAULT) ;
+	switch (rd_wr_fcn) {
+	case VERIFY_READ:
+		if (usr_addr == NULL || lgth > 0x10000)
+			_return(-EFAULT);
 
-	return(0) ;				/* OK */
-    case VERIFY_WRITE:
-	if (   usr_addr == NULL
-	    || lgth > 0x10000
-	   )
-	    _return(-EFAULT) ;
+		return (0);	/* OK */
+	case VERIFY_WRITE:
+		if (usr_addr == NULL || lgth > 0x10000)
+			_return(-EFAULT);
 
-	return(0) ;				/* OK */
-    default:
-	_return(-EINVAL) ;			/* bad fcn code */
-    }
+		return (0);	/* OK */
+	default:
+		_return(-EINVAL);	/* bad fcn code */
+	}
 
-} /* port_verify_area */
+}				/* port_verify_area */
 
 /************************************************************************
 *                          port_memcpy_fromfs                           *
@@ -309,15 +306,15 @@ int	port_verify_area(struct file *f, int rd_wr_fcn,
 * this routine.								*
 *									*
 ************************************************************************/
-int	port_memcpy_fromfs(struct file *f, void *kbuf,
-			    const void *ubuf, int len)
+int
+port_memcpy_fromfs(struct file *f, void *kbuf, const void *ubuf, int len)
 {
-    (void) f ;
-    check_for_holding_spinlock() ;
-    memcpy(kbuf, ubuf, len) ;
-    return(0) ;
+	(void) f;
+	check_for_holding_spinlock();
+	memcpy(kbuf, ubuf, len);
+	return (0);
 
-} /* port_memcpy_fromfs */
+}				/* port_memcpy_fromfs */
 
 /************************************************************************
 *                           port_memcpy_tofs                            *
@@ -333,14 +330,15 @@ int	port_memcpy_fromfs(struct file *f, void *kbuf,
 * this routine.								*
 *									*
 ************************************************************************/
-int	port_memcpy_tofs(struct file *f, const void *kbuf, void *ubuf, int len)
+int
+port_memcpy_tofs(struct file *f, const void *kbuf, void *ubuf, int len)
 {
-    (void) f ;
-    check_for_holding_spinlock() ;
-    memcpy(ubuf, kbuf, len) ;
-    return(0) ;
+	(void) f;
+	check_for_holding_spinlock();
+	memcpy(ubuf, kbuf, len);
+	return (0);
 
-} /* port_memcpy_tofs */
+}				/* port_memcpy_tofs */
 
 /************************************************************************
 *                          port_get_fs_byte                             *
@@ -349,17 +347,19 @@ int	port_memcpy_tofs(struct file *f, const void *kbuf, void *ubuf, int len)
 * Get a byte from user space and return it.				*
 *									*
 ************************************************************************/
-int	port_get_fs_byte(struct file *f, const void *uaddr)
+int
+port_get_fs_byte(struct file *f, const void *uaddr)
 {
-    char	c ;
+	char c;
 
-    check_for_holding_spinlock() ;
-    if (port_verify_area(f, VERIFY_READ, uaddr, 1) < 0) return(0) ;
+	check_for_holding_spinlock();
+	if (port_verify_area(f, VERIFY_READ, uaddr, 1) < 0)
+		return (0);
 
-    port_memcpy_fromfs(f, &c, uaddr, 1) ;
-    return( (int) c ) ;
+	port_memcpy_fromfs(f, &c, uaddr, 1);
+	return ((int) c);
 
-} /* port_get_fs_byte */
+}				/* port_get_fs_byte */
 
 /************************************************************************
 *                            port_splstr                                *
@@ -371,11 +371,12 @@ int	port_get_fs_byte(struct file *f, const void *uaddr)
 * For user level testing, this is a dummy routine.			*
 *									*
 ************************************************************************/
-void	port_splstr(lis_flags_t *save_state)
+void
+port_splstr(lis_flags_t * save_state)
 {
-    (void) save_state ;
+	(void) save_state;
 
-} /* port_splstr */
+}				/* port_splstr */
 
 /************************************************************************
 *                             port_splx                                 *
@@ -385,17 +386,19 @@ void	port_splstr(lis_flags_t *save_state)
 * in the integer pointed to by saved_state.				*
 *									*
 ************************************************************************/
-void	port_splx(lis_flags_t *saved_state)
+void
+port_splx(lis_flags_t * saved_state)
 {
-    (void) saved_state ;
+	(void) saved_state;
 
-} /* port_splx */
+}				/* port_splx */
 
-void	lis_splx_fcn(lis_flags_t x, char *file, int line)
+void
+lis_splx_fcn(lis_flags_t x, char *file, int line)
 {
-    port_splx(&x) ;
-    (void) file ;
-    (void) line ;
+	port_splx(&x);
+	(void) file;
+	(void) line;
 }
 
 /************************************************************************
@@ -406,11 +409,12 @@ void	lis_splx_fcn(lis_flags_t x, char *file, int line)
 * in the integer pointed to by save_state.				*
 *									*
 ************************************************************************/
-void	port_spl0(lis_flags_t *save_state)
+void
+port_spl0(lis_flags_t * save_state)
 {
-    (void) save_state ;
+	(void) save_state;
 
-} /* port_spl0 */
+}				/* port_spl0 */
 
 /************************************************************************
 *                          port_sem_P                                   *
@@ -421,34 +425,33 @@ void	port_spl0(lis_flags_t *save_state)
 * This is a dummy for user-level testing.				*
 *									*
 ************************************************************************/
-int	port_sem_P(struct semaphore *sem_addr)
+int
+port_sem_P(struct semaphore *sem_addr)
 {
-    lis_flags_t		flags ;
+	lis_flags_t flags;
 
-    check_for_holding_spinlock() ;
-    SPLSTR(flags) ;
-    if (sem_addr->sem_count > 0)
-    {					/* semaphore is available */
-	sem_addr->sem_count-- ;		/* acquire it */
-	SPLX(flags) ;
-	return(0) ;
-    }
+	check_for_holding_spinlock();
+	SPLSTR(flags);
+	if (sem_addr->sem_count > 0) {	/* semaphore is available */
+		sem_addr->sem_count--;	/* acquire it */
+		SPLX(flags);
+		return (0);
+	}
 
-    do
-    {
-	SPLX(flags) ;			/* open interrupt window */
-	SPLSTR(flags) ;
+	do {
+		SPLX(flags);	/* open interrupt window */
+		SPLSTR(flags);
 
-	port_announce_time(1) ;		/* make time appear to pass */
-	lis_runqueues() ;		/* run streams scheduler */
-    }
-    while (sem_addr->sem_count <= 0) ;	/* exit when semaphore available */
+		port_announce_time(1);	/* make time appear to pass */
+		lis_runqueues();	/* run streams scheduler */
+	}
+	while (sem_addr->sem_count <= 0);	/* exit when semaphore available */
 
-    sem_addr->sem_count-- ;		/* acquire it */
-    SPLX(flags) ;
-    return(0) ;
+	sem_addr->sem_count--;	/* acquire it */
+	SPLX(flags);
+	return (0);
 
-} /* port_sem_P */
+}				/* port_sem_P */
 
 /************************************************************************
 *                          port_sem_V                                   *
@@ -459,11 +462,12 @@ int	port_sem_P(struct semaphore *sem_addr)
 * This is a dummy for user-level testing.				*
 *									*
 ************************************************************************/
-void	port_sem_V(struct semaphore *sem_addr)
+void
+port_sem_V(struct semaphore *sem_addr)
 {
-    ++sem_addr->sem_count ;		/* give up semaphore */
+	++sem_addr->sem_count;	/* give up semaphore */
 
-} /* port_sem_V */
+}				/* port_sem_V */
 
 /************************************************************************
 *                            port_sem_init                              *
@@ -474,11 +478,12 @@ void	port_sem_V(struct semaphore *sem_addr)
 * This is a dummy for user-level testing.				*
 *									*
 ************************************************************************/
-void	port_sem_init(struct semaphore *sem_addr, int counter)
+void
+port_sem_init(struct semaphore *sem_addr, int counter)
 {
-    sem_addr->sem_count = counter ;
+	sem_addr->sem_count = counter;
 
-} /* port_sem_init */
+}				/* port_sem_init */
 
 /************************************************************************
 *                            port_sem_destroy                           *
@@ -489,11 +494,12 @@ void	port_sem_init(struct semaphore *sem_addr, int counter)
 * This is a dummy for user-level testing.				*
 *									*
 ************************************************************************/
-void	port_sem_destroy(struct semaphore *sem_addr)
+void
+port_sem_destroy(struct semaphore *sem_addr)
 {
-    memset(sem_addr, 0, sizeof(*sem_addr)) ;
+	memset(sem_addr, 0, sizeof(*sem_addr));
 
-} /* port_sem_destroy */
+}				/* port_sem_destroy */
 
 /************************************************************************
 *                         Spin Locks                                    *
@@ -504,77 +510,87 @@ void	port_sem_destroy(struct semaphore *sem_addr)
 ************************************************************************/
 #define	FL	char *file, int line
 
-int    lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
+int
+lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL)
 {
-    return(0) ;
+	return (0);
 }
 
-void    lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
+void
+lis_spin_lock_fcn(lis_spin_lock_t *lock, FL)
 {
-    lock->spin_lock_mem[0]++ ;
-    spin_lock_nest_level++ ;
-    most_recent_spin_lock = lock ;
+	lock->spin_lock_mem[0]++;
+	spin_lock_nest_level++;
+	most_recent_spin_lock = lock;
 }
 
-void    lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
+void
+lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL)
 {
-    if (--lock->spin_lock_mem[0] < 0)
-	spin_lock_error() ;
-    decr_spin_lock_count(lock) ;
+	if (--lock->spin_lock_mem[0] < 0)
+		spin_lock_error();
+	decr_spin_lock_count(lock);
 }
 
-int     lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
+int
+lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL)
 {
-    lock->spin_lock_mem[0]++ ;
-    spin_lock_nest_level++ ;
-    most_recent_spin_lock = lock ;
-    return(1) ;
+	lock->spin_lock_mem[0]++;
+	spin_lock_nest_level++;
+	most_recent_spin_lock = lock;
+	return (1);
 }
 
-void    lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
+void
+lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
-    lock->spin_lock_mem[0]++ ;
-    spin_lock_nest_level++ ;
-    most_recent_spin_lock = lock ;
+	lock->spin_lock_mem[0]++;
+	spin_lock_nest_level++;
+	most_recent_spin_lock = lock;
 }
 
-void    lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
+void
+lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL)
 {
-    if (--lock->spin_lock_mem[0] < 0)
-	spin_lock_error() ;
-    decr_spin_lock_count(lock) ;
+	if (--lock->spin_lock_mem[0] < 0)
+		spin_lock_error();
+	decr_spin_lock_count(lock);
 }
 
-void    lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t *flags, FL)
+void
+lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL)
 {
-    lock->spin_lock_mem[0]++ ;
-    spin_lock_nest_level++ ;
-    most_recent_spin_lock = lock ;
+	lock->spin_lock_mem[0]++;
+	spin_lock_nest_level++;
+	most_recent_spin_lock = lock;
 }
 
-void    lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
-				       lis_flags_t *flags, FL)
+void
+lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL)
 {
-    if (--lock->spin_lock_mem[0] < 0)
-	spin_lock_error() ;
-    decr_spin_lock_count(lock) ;
+	if (--lock->spin_lock_mem[0] < 0)
+		spin_lock_error();
+	decr_spin_lock_count(lock);
 }
 
-void    lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
+void
+lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL)
 {
-    static lis_spin_lock_t	z ;
+	static lis_spin_lock_t z;
 
-    *lock = z ;
-    lock->name = (char *) name ;
+	*lock = z;
+	lock->name = (char *) name;
 }
 
-void	lis_print_spl_track(void)
+void
+lis_print_spl_track(void)
 {
 }
 
-int	lis_own_spl(void)
+int
+lis_own_spl(void)
 {
-    return(0) ;
+	return (0);
 }
 
 #undef FL
@@ -589,96 +605,107 @@ int	lis_own_spl(void)
 
 #define	FL	char *file, int line
 
-void    lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
+void
+lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL)
 {
 }
 
-void    lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				     lis_flags_t *flags, FL)
+void
+lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 }
 
-void    lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				      lis_flags_t *flags, FL)
+void
+lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 }
 
-void    lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					  lis_flags_t *flags, FL)
+void
+lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 }
 
-void    lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					   lis_flags_t *flags, FL)
+void
+lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL)
 {
 }
 
-static void lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
+static void
+lis_rw_lock_fill(lis_rw_lock_t *lock, const char *name, FL)
 {
-    if (name == NULL) name = "RW-Lock" ;
+	if (name == NULL)
+		name = "RW-Lock";
 
-    lock->name 		= (char *) name ;
-    lock->spinner_file  = "Initialized" ;
-    lock->owner_file    = lock->spinner_file ;
-    lock->unlocker_file = lock->spinner_file ;
+	lock->name = (char *) name;
+	lock->spinner_file = "Initialized";
+	lock->owner_file = lock->spinner_file;
+	lock->unlocker_file = lock->spinner_file;
 }
 
-
-void    lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
+void
+lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL)
 {
-    memset((void *)lock, 0, sizeof(*lock)) ;
-    lis_rw_lock_fill(lock, name, file, line) ;
+	memset((void *) lock, 0, sizeof(*lock));
+	lis_rw_lock_fill(lock, name, file, line);
 }
 
 lis_rw_lock_t *
 lis_rw_lock_alloc_fcn(const char *name, FL)
 {
-    lis_rw_lock_t	*lock ;
-    int			 lock_size ;
+	lis_rw_lock_t *lock;
+	int lock_size;
 
-    lock_size = sizeof(*lock) ;
-    lock = (lis_rw_lock_t *) ALLOCF(lock_size, "RW-Lock ");
-    if (lock == NULL) return(NULL) ;
+	lock_size = sizeof(*lock);
+	lock = (lis_rw_lock_t *) ALLOCF(lock_size, "RW-Lock ");
+	if (lock == NULL)
+		return (NULL);
 
-    lis_rw_lock_init_fcn(lock, name, file, line) ;
-    lock->allocated = 1 ;
-    return(lock) ;
+	lis_rw_lock_init_fcn(lock, name, file, line);
+	lock->allocated = 1;
+	return (lock);
 }
 
 lis_rw_lock_t *
 lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 {
-    if (lock->allocated)
-	FREE((void *)lock) ;
-    return(NULL) ;
+	if (lock->allocated)
+		FREE((void *) lock);
+	return (NULL);
 }
 
 #undef FL
@@ -690,12 +717,13 @@ lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL)
 * Get user id.								*
 *									*
 ************************************************************************/
-int	 port_get_uid(struct file *f)
+int
+port_get_uid(struct file *f)
 {
-    (void) f ;
-    return(0 /*204*/) ;
+	(void) f;
+	return (0 /* 204 */ );
 
-} /* port_get_uid */
+}				/* port_get_uid */
 
 /************************************************************************
 *                           port_get_gid                                *
@@ -704,12 +732,13 @@ int	 port_get_uid(struct file *f)
 * Get group id.								*
 *									*
 ************************************************************************/
-int	 port_get_gid(struct file *f)
+int
+port_get_gid(struct file *f)
 {
-    (void) f ;
-    return(0 /*145*/) ;
+	(void) f;
+	return (0 /* 145 */ );
 
-} /* port_get_gid */
+}				/* port_get_gid */
 
 /************************************************************************
 *                          port_get_euid                                *
@@ -718,12 +747,13 @@ int	 port_get_gid(struct file *f)
 * Get effective user id.						*
 *									*
 ************************************************************************/
-int	 port_get_euid(struct file *f)
+int
+port_get_euid(struct file *f)
 {
-    (void) f ;
-    return(0 /*205*/) ;
+	(void) f;
+	return (0 /* 205 */ );
 
-} /* port_get_euid */
+}				/* port_get_euid */
 
 /************************************************************************
 *                           port_get_egid                               *
@@ -732,12 +762,13 @@ int	 port_get_euid(struct file *f)
 * Get effective group id.						*
 *									*
 ************************************************************************/
-int	 port_get_egid(struct file *f)
+int
+port_get_egid(struct file *f)
 {
-    (void) f ;
-    return(0 /*146*/) ;
+	(void) f;
+	return (0 /* 146 */ );
 
-} /* port_get_egid */
+}				/* port_get_egid */
 
 /************************************************************************
 *                             port_get_pgrp                             *
@@ -746,12 +777,13 @@ int	 port_get_egid(struct file *f)
 * Get process group id.							*
 *									*
 ************************************************************************/
-int	 port_get_pgrp(struct file *f)
+int
+port_get_pgrp(struct file *f)
 {
-    (void) f ;
-    return(33) ;
+	(void) f;
+	return (33);
 
-} /* port_get_pgrp */
+}				/* port_get_pgrp */
 
 /************************************************************************
 *                              port_get_pid                             *
@@ -760,12 +792,13 @@ int	 port_get_pgrp(struct file *f)
 * Get process id.							*
 *									*
 ************************************************************************/
-int	 port_get_pid(struct file *f)
+int
+port_get_pid(struct file *f)
 {
-    (void) f ;
-    return(19) ;
+	(void) f;
+	return (19);
 
-} /* port_get_pid */
+}				/* port_get_pid */
 
 /************************************************************************
 *                             port_suser                                *
@@ -774,11 +807,12 @@ int	 port_get_pid(struct file *f)
 * Return true if we are running as the super user, false otherwise.	*
 *									*
 ************************************************************************/
-int	port_suser(struct file *f)
+int
+port_suser(struct file *f)
 {
-    return(port_get_uid(f) == 0) ;
+	return (port_get_uid(f) == 0);
 
-} /* port_suser */
+}				/* port_suser */
 
 /************************************************************************
 *                           port_kill_proc                              *
@@ -789,14 +823,15 @@ int	port_suser(struct file *f)
 * success.								*
 *									*
 ************************************************************************/
-int	port_kill_proc(int pid, int sig, int priv)
+int
+port_kill_proc(int pid, int sig, int priv)
 {
-    (void) pid ;			/* compiler happiness */
-    (void) sig ;			/* compiler happiness */
-    (void) priv ;			/* compiler happiness */
-    return(0) ;
+	(void) pid;		/* compiler happiness */
+	(void) sig;		/* compiler happiness */
+	(void) priv;		/* compiler happiness */
+	return (0);
 
-} /* port_kill_proc */
+}				/* port_kill_proc */
 
 /************************************************************************
 *                            port_kill_pg                               *
@@ -807,14 +842,15 @@ int	port_kill_proc(int pid, int sig, int priv)
 * zero for success.							*
 *									*
 ************************************************************************/
-int	port_kill_pg(int pgrp, int sig, int priv)
+int
+port_kill_pg(int pgrp, int sig, int priv)
 {
-    (void) pgrp ;			/* compiler happiness */
-    (void) sig ;			/* compiler happiness */
-    (void) priv ;			/* compiler happiness */
-    return(0) ;
+	(void) pgrp;		/* compiler happiness */
+	(void) sig;		/* compiler happiness */
+	(void) priv;		/* compiler happiness */
+	return (0);
 
-} /* port_kill_pg */
+}				/* port_kill_pg */
 
 /************************************************************************
 *                         port_fd_to_str				*
@@ -824,16 +860,17 @@ int	port_kill_pg(int pgrp, int sig, int priv)
 * head structure associated with the file.				*
 *									*
 ************************************************************************/
-stdata_t	*port_fd_to_str(int fd)
+stdata_t *
+port_fd_to_str(int fd)
 {
-    file_t	*fp = user_file_of_fd(fd) ;
+	file_t *fp = user_file_of_fd(fd);
 
-    if (fp == NULL)
-	return(NULL) ;		/* no file */
+	if (fp == NULL)
+		return (NULL);	/* no file */
 
-    return(fp->f_drvr_ptr) ;	/* ptr to stdata structure */
+	return (fp->f_drvr_ptr);	/* ptr to stdata structure */
 
-} /* port_fd_to_str */
+}				/* port_fd_to_str */
 
 /************************************************************************
 *                            port_session                               *
@@ -843,11 +880,12 @@ stdata_t	*port_fd_to_str(int fd)
 * what this is supposed to be and it may be superfluous.		*
 *									*
 ************************************************************************/
-int	port_session(struct file *f)
+int
+port_session(struct file *f)
 {
-    return(port_get_pid(f)) ;
+	return (port_get_pid(f));
 
-} /* port_session */
+}				/* port_session */
 
 /************************************************************************
 *                         port_setqsched                                *
@@ -859,14 +897,16 @@ int	port_session(struct file *f)
 * run the queues.							*
 *									*
 ************************************************************************/
-void	port_setqsched(int can_call)
+void
+port_setqsched(int can_call)
 {
-    (void) can_call ;			/* parameter not used */
-#if 0					/* do nothing */
-    lis_run_queues() ;
+	(void) can_call;	/* parameter not used */
+#if 0				/* do nothing */
+	lis_run_queues();
 #endif
 
-} /* port_setqsched */
+}				/* port_setqsched */
+
 /************************************************************************
 *                         port_select_wakeup                            *
 *************************************************************************
@@ -874,9 +914,10 @@ void	port_setqsched(int can_call)
 * A dummy for select mechanism (which we don't implement).		*
 *									*
 ************************************************************************/
-void port_select_wakeup(stdata_t *hd)
+void
+port_select_wakeup(stdata_t *hd)
 {
-} /* port_select_wakeup */
+}				/* port_select_wakeup */
 
 /************************************************************************
 *                           Semaphores                                  *
@@ -888,61 +929,64 @@ void port_select_wakeup(stdata_t *hd)
 
 #define FL	char *file, int line
 
-void	lis_up_fcn(lis_semaphore_t *lsem, FL)
+void
+lis_up_fcn(lis_semaphore_t *lsem, FL)
 {
-    struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
+	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
 
-    lsem->upper_file = file ;
-    lsem->upper_line = line ;
-    lsem->owner_file = "Available" ;
-    lsem->owner_line = 0 ;
-    port_sem_V(sem) ;
+	lsem->upper_file = file;
+	lsem->upper_line = line;
+	lsem->owner_file = "Available";
+	lsem->owner_line = 0;
+	port_sem_V(sem);
 }
 
-int	lis_down_fcn(lis_semaphore_t *lsem, FL)
+int
+lis_down_fcn(lis_semaphore_t *lsem, FL)
 {
-    struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
-    int			 ret ;
+	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
+	int ret;
 
-    lsem->downer_file = file ;
-    lsem->downer_line = line ;
-    ret = port_sem_P(sem) ;
-    if (ret == 0)
-    {
-	lsem->owner_file = file ;
-	lsem->owner_line = line ;
-    }
-    else
-    {
-	lsem->owner_file = "Error" ;
-	lsem->owner_line = ret ;
-    }
+	lsem->downer_file = file;
+	lsem->downer_line = line;
+	ret = port_sem_P(sem);
+	if (ret == 0) {
+		lsem->owner_file = file;
+		lsem->owner_line = line;
+	} else {
+		lsem->owner_file = "Error";
+		lsem->owner_line = ret;
+	}
 
-    return(ret) ;
+	return (ret);
 }
 
-void	lis_down_nosig_fcn(lis_semaphore_t *lsem, FL)
+void
+lis_down_nosig_fcn(lis_semaphore_t *lsem, FL)
 {
-    lis_down_fcn(lsem, file, line) ;
+	lis_down_fcn(lsem, file, line);
 }
 
 #undef FL
 
-void	lis_sem_init(lis_semaphore_t *lsem, int count)
+void
+lis_sem_init(lis_semaphore_t *lsem, int count)
 {
-    struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
-    static lis_semaphore_t	blank ;
+	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
+	static lis_semaphore_t blank;
 
-    *lsem = blank ;
-    port_sem_init(sem, count) ;
-    lsem->owner_file = "Initialized" ;
+	*lsem = blank;
+	port_sem_init(sem, count);
+	lsem->owner_file = "Initialized";
 }
 
-lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem)
+lis_semaphore_t *
+lis_sem_destroy(lis_semaphore_t *lsem)
 {
-    struct semaphore	*sem = (struct semaphore *) lsem->sem_mem ;
-    port_sem_destroy(sem) ;
-    return(NULL) ;
+	struct semaphore *sem = (struct semaphore *) lsem->sem_mem;
+
+	port_sem_destroy(sem);
+	return (NULL);
 }
 
 /************************************************************************
@@ -952,12 +996,14 @@ lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem)
 * Dummies.  Only meaningful in kernel context.				*
 *									*
 ************************************************************************/
-void lis_clear_and_save_sigs(stdata_t *hd)
+void
+lis_clear_and_save_sigs(stdata_t *hd)
 {
-    (void) hd ;
+	(void) hd;
 }
 
-void lis_restore_sigs(stdata_t *hd)
+void
+lis_restore_sigs(stdata_t *hd)
 {
-    (void) hd ;
+	(void) hd;
 }

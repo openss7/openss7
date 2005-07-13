@@ -70,64 +70,58 @@
 #include <sys/timod.h>
 #include <sys/osif.h>
 
-#define TIMOD_TRACE 0 /* Verbose level */
+#define TIMOD_TRACE 0		/* Verbose level */
 
 /*
  *  The private state of a timod stream
  */
 typedef struct {
-	mblk_t *ioc_mp;	/* IOCTL command we are processing, NULL if none */
+	mblk_t *ioc_mp;			/* IOCTL command we are processing, NULL if none */
 	int verbose;
 } timod_priv_t;
 
-STATIC int _RP timod_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int _RP timod_close(queue_t *, int, cred_t *);
-STATIC int _RP timod_rput(queue_t *, mblk_t *);
-STATIC int _RP timod_wput(queue_t *, mblk_t *);
+STATIC int timod_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int timod_close(queue_t *, int, cred_t *);
+STATIC int timod_rput(queue_t *, mblk_t *);
+STATIC int timod_wput(queue_t *, mblk_t *);
 
-
-STATIC struct module_info timod_minfo = 
-{
-	0,		/* Module ID number 				*/
-	"timod",	/* Module name					*/
-	0,		/* Min packet size accepted			*/
-	INFPSZ,		/* Max packet size accepted			*/
-	0,		/* Hi water mark ignored, no queue service	*/
-	0		/* Low water mark ignored, no queue service	*/
+STATIC struct module_info timod_minfo = {
+	0,			/* Module ID number */
+	"timod",		/* Module name */
+	0,			/* Min packet size accepted */
+	INFPSZ,			/* Max packet size accepted */
+	0,			/* Hi water mark ignored, no queue service */
+	0			/* Low water mark ignored, no queue service */
 };
 
-
-STATIC struct qinit timod_rinit = 
-{
-	timod_rput,	/* Read put			*/
-	NULL,		/* No read queue service	*/
-	timod_open,	/* Each open			*/
-	timod_close,	/* Last close			*/
-	NULL,		/* Reserved			*/
-	&timod_minfo,	/* Information			*/
-	NULL		/* No statistics		*/
+STATIC struct qinit timod_rinit = {
+	timod_rput,		/* Read put */
+	NULL,			/* No read queue service */
+	timod_open,		/* Each open */
+	timod_close,		/* Last close */
+	NULL,			/* Reserved */
+	&timod_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
-STATIC struct qinit timod_winit = 
-{
-	timod_wput,	/* Write put			*/
-	NULL,		/* No write queue service	*/
-	NULL,		/* Each open			*/
-	NULL,		/* Last close			*/
-	NULL,		/* Reserved			*/
-	&timod_minfo,	/* Information			*/
-	NULL		/* No statistics		*/
+STATIC struct qinit timod_winit = {
+	timod_wput,		/* Write put */
+	NULL,			/* No write queue service */
+	NULL,			/* Each open */
+	NULL,			/* Last close */
+	NULL,			/* Reserved */
+	&timod_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
 #ifdef MODULE
 STATIC
 #endif
-struct streamtab timod_info = 
-{
-	&timod_rinit,	/* Read queue			*/
-	&timod_winit,	/* Write queue			*/
-	NULL,		/* Not a multiplexer		*/
-	NULL		/* Not a multiplexer		*/
+struct streamtab timod_info = {
+	&timod_rinit,		/* Read queue */
+	&timod_winit,		/* Write queue */
+	NULL,			/* Not a multiplexer */
+	NULL			/* Not a multiplexer */
 };
 
 /*
@@ -139,7 +133,7 @@ struct streamtab timod_info =
 STATIC void
 vtrace(char *func, queue_t *rq, int verbose, char *msg, va_list args)
 {
-	timod_priv_t *priv = (timod_priv_t *)rq->q_ptr;
+	timod_priv_t *priv = (timod_priv_t *) rq->q_ptr;
 
 	if (verbose <= priv->verbose) {
 		char s1[128], s2[1024];
@@ -154,9 +148,10 @@ vtrace(char *func, queue_t *rq, int verbose, char *msg, va_list args)
 }
 
 STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
-	__attribute__ ((format (printf, 4, 5)));
+    __attribute__ ((format(printf, 4, 5)));
 
-STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
+STATIC void
+trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 {
 	va_list args;
 
@@ -171,7 +166,7 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 #define FUNC_ENTER(rq)	TRACE(rq, 10, "Entered")
 #define FUNC_EXIT(rq)	TRACE(rq, 10, "Exiting")
 
-#else /* No trace logging */
+#else				/* No trace logging */
 
 #define TRACE(rq, verbose, msg, args...)
 
@@ -185,18 +180,16 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
  */
 
 STATIC INLINE void
-do_ioctl_getinfo(queue_t *q, mblk_t *mp,
-		 struct iocblk *iocp, timod_priv_t *priv)
+do_ioctl_getinfo(queue_t *q, mblk_t *mp, struct iocblk *iocp, timod_priv_t * priv)
 {
 	mblk_t *bp = unlinkb(mp);
 	struct T_info_req *req;
 
 	FUNC_ENTER(q);
 	LISASSERT(bp != NULL);
-	req = (struct T_info_req *)bp->b_rptr;
-	if (bp == NULL ||
-	    bp->b_wptr - bp->b_rptr < sizeof(struct T_info_req) ||
-	    req->PRIM_type != T_INFO_REQ) {
+	req = (struct T_info_req *) bp->b_rptr;
+	if (bp == NULL || bp->b_wptr - bp->b_rptr < sizeof(struct T_info_req)
+	    || req->PRIM_type != T_INFO_REQ) {
 		if (bp != NULL)
 			freemsg(bp);
 		mp->b_datap->db_type = M_IOCNAK;
@@ -213,18 +206,16 @@ do_ioctl_getinfo(queue_t *q, mblk_t *mp,
 }
 
 STATIC INLINE void
-do_ioctl_optmgmt(queue_t *q, mblk_t *mp,
-		 struct iocblk *iocp, timod_priv_t *priv)
+do_ioctl_optmgmt(queue_t *q, mblk_t *mp, struct iocblk *iocp, timod_priv_t * priv)
 {
 	mblk_t *bp = unlinkb(mp);
 	struct T_optmgmt_req *req;
 
 	FUNC_ENTER(q);
 	LISASSERT(bp != NULL);
-	req = (struct T_optmgmt_req *)bp->b_rptr;
-	if (bp == NULL ||
-	    bp->b_wptr - bp->b_rptr < sizeof(struct T_optmgmt_req) ||
-	    req->PRIM_type != T_OPTMGMT_REQ) {
+	req = (struct T_optmgmt_req *) bp->b_rptr;
+	if (bp == NULL || bp->b_wptr - bp->b_rptr < sizeof(struct T_optmgmt_req)
+	    || req->PRIM_type != T_OPTMGMT_REQ) {
 		if (bp != NULL)
 			freemsg(bp);
 		mp->b_datap->db_type = M_IOCNAK;
@@ -241,18 +232,16 @@ do_ioctl_optmgmt(queue_t *q, mblk_t *mp,
 }
 
 STATIC INLINE void
-do_ioctl_bind(queue_t *q, mblk_t *mp,
-	      struct iocblk *iocp, timod_priv_t *priv)
+do_ioctl_bind(queue_t *q, mblk_t *mp, struct iocblk *iocp, timod_priv_t * priv)
 {
 	mblk_t *bp = unlinkb(mp);
 	struct T_bind_req *req;
 
 	FUNC_ENTER(q);
 	LISASSERT(bp != NULL);
-	req = (struct T_bind_req *)bp->b_rptr;
-	if (bp == NULL ||
-	    bp->b_wptr - bp->b_rptr < sizeof(struct T_bind_req) ||
-	    req->PRIM_type != T_BIND_REQ) {
+	req = (struct T_bind_req *) bp->b_rptr;
+	if (bp == NULL || bp->b_wptr - bp->b_rptr < sizeof(struct T_bind_req)
+	    || req->PRIM_type != T_BIND_REQ) {
 		if (bp != NULL)
 			freemsg(bp);
 		mp->b_datap->db_type = M_IOCNAK;
@@ -269,18 +258,16 @@ do_ioctl_bind(queue_t *q, mblk_t *mp,
 }
 
 STATIC INLINE void
-do_ioctl_unbind(queue_t *q, mblk_t *mp,
-	      struct iocblk *iocp, timod_priv_t *priv)
+do_ioctl_unbind(queue_t *q, mblk_t *mp, struct iocblk *iocp, timod_priv_t * priv)
 {
 	mblk_t *bp = unlinkb(mp);
 	struct T_unbind_req *req;
 
 	FUNC_ENTER(q);
 	LISASSERT(bp != NULL);
-	req = (struct T_unbind_req *)bp->b_rptr;
-	if (bp == NULL ||
-	    bp->b_wptr - bp->b_rptr < sizeof(struct T_unbind_req) ||
-	    req->PRIM_type != T_UNBIND_REQ) {
+	req = (struct T_unbind_req *) bp->b_rptr;
+	if (bp == NULL || bp->b_wptr - bp->b_rptr < sizeof(struct T_unbind_req)
+	    || req->PRIM_type != T_UNBIND_REQ) {
 		if (bp != NULL)
 			freemsg(bp);
 		mp->b_datap->db_type = M_IOCNAK;
@@ -296,22 +283,23 @@ do_ioctl_unbind(queue_t *q, mblk_t *mp,
 	FUNC_EXIT(q);
 }
 
-STATIC void do_ioctl(queue_t *q, mblk_t *mp)
+STATIC void
+do_ioctl(queue_t *q, mblk_t *mp)
 {
 	timod_priv_t *priv;
-	struct iocblk *iocp = (struct iocblk *)mp->b_rptr;
+	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 
 	FUNC_ENTER(q);
 	/* Is this for me ? */
-	if (iocp->ioc_cmd != TI_GETINFO && iocp->ioc_cmd != TI_OPTMGMT &&
-	    iocp->ioc_cmd != TI_BIND    && iocp->ioc_cmd != TI_UNBIND) {
+	if (iocp->ioc_cmd != TI_GETINFO && iocp->ioc_cmd != TI_OPTMGMT && iocp->ioc_cmd != TI_BIND
+	    && iocp->ioc_cmd != TI_UNBIND) {
 		/* Nope, pass through */
 		TRACE(q, 1, "M_IOCTL not for me, passing down.");
 		putnext(q, mp);
 		return;
 	}
 
-	priv = (timod_priv_t *)q->q_ptr;
+	priv = (timod_priv_t *) q->q_ptr;
 	LISASSERT(priv != NULL);
 
 	if (priv->ioc_mp != NULL) {
@@ -325,33 +313,32 @@ STATIC void do_ioctl(queue_t *q, mblk_t *mp)
 	priv->ioc_mp = mp;
 
 	switch (iocp->ioc_cmd) {
-	    case TI_GETINFO:
+	case TI_GETINFO:
 		TRACE(q, 1, "Processing TI_GETINFO ioctl...");
 		do_ioctl_getinfo(q, mp, iocp, priv);
 		FUNC_EXIT(q);
 		return;
-	    case TI_OPTMGMT:
+	case TI_OPTMGMT:
 		TRACE(q, 1, "Processing TI_OPTMGMT ioctl...");
 		do_ioctl_optmgmt(q, mp, iocp, priv);
 		FUNC_EXIT(q);
 		return;
-	    case TI_BIND:
+	case TI_BIND:
 		TRACE(q, 1, "Processing TI_BIND ioctl...");
 		do_ioctl_bind(q, mp, iocp, priv);
 		FUNC_EXIT(q);
 		return;
-	    case TI_UNBIND:
+	case TI_UNBIND:
 		TRACE(q, 1, "Processing TI_UNBIND ioctl...");
 		do_ioctl_unbind(q, mp, iocp, priv);
 		FUNC_EXIT(q);
 		return;
-	    default:
+	default:
 		LISASSERT(0);
 		FUNC_EXIT(q);
 		return;
 	}
-	/*NOTREACHED*/
-}
+ /*NOTREACHED*/}
 
 /*
  *  Read put function.
@@ -363,15 +350,15 @@ STATIC void do_ioctl(queue_t *q, mblk_t *mp)
  *  earlier when we started processing of the ioctl.
  *
  */
-STATIC void do_ioctl_rput(queue_t *q, mblk_t *mp)
+STATIC void
+do_ioctl_rput(queue_t *q, mblk_t *mp)
 {
 	timod_priv_t *priv;
 	struct iocblk *iocp;
 	struct T_error_ack *error_ack;
 
 	FUNC_ENTER(q);
-	LISASSERT(mp->b_datap->db_type == M_PROTO ||
-	       mp->b_datap->db_type == M_PCPROTO);
+	LISASSERT(mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO);
 
 	if (mp->b_wptr - mp->b_rptr < sizeof(t_scalar_t)) {
 		/* Short message */
@@ -381,68 +368,66 @@ STATIC void do_ioctl_rput(queue_t *q, mblk_t *mp)
 		return;
 	}
 
-	priv = (timod_priv_t *)q->q_ptr;
+	priv = (timod_priv_t *) q->q_ptr;
 
-	/*
+	/* 
 	 *  Recheck: This could change at interrupt time.
 	 */
 	if (priv->ioc_mp == NULL) {
-not_for_us:
+	      not_for_us:
 		putnext(q, mp);
 		FUNC_EXIT(q);
 		return;
 	}
 
-	iocp = (struct iocblk *)priv->ioc_mp->b_rptr;
+	iocp = (struct iocblk *) priv->ioc_mp->b_rptr;
 
-	switch (*(t_scalar_t *)mp->b_rptr) {
-	    case T_INFO_ACK:
+	switch (*(t_scalar_t *) mp->b_rptr) {
+	case T_INFO_ACK:
 		if (iocp->ioc_cmd != TI_GETINFO)
 			goto not_for_us;
 		TRACE(q, 1, "Finishing TI_GETINFO ioctl...");
 		goto send_iocack;
 
-	    case T_OPTMGMT_ACK:
+	case T_OPTMGMT_ACK:
 		if (iocp->ioc_cmd != TI_OPTMGMT)
 			goto not_for_us;
 		TRACE(q, 1, "Finishing TI_OPTMGMT ioctl...");
 		goto send_iocack;
 
-	    case T_BIND_ACK:
+	case T_BIND_ACK:
 		if (iocp->ioc_cmd != TI_BIND)
 			goto not_for_us;
 		TRACE(q, 1, "Finishing TI_BIND ioctl...");
 		goto send_iocack;
 
-	    case T_ERROR_ACK:
-		error_ack = (struct T_error_ack *)mp->b_rptr;
-		TRACE(q, 1, "Got T_ERROR_ACK: ERROR_prim=%ld, "
-		      "TLI_error=%ld, UNIX_error=%ld",
-		      error_ack->ERROR_prim,
-		      error_ack->TLI_error, error_ack->UNIX_error);
+	case T_ERROR_ACK:
+		error_ack = (struct T_error_ack *) mp->b_rptr;
+		TRACE(q, 1, "Got T_ERROR_ACK: ERROR_prim=%ld, " "TLI_error=%ld, UNIX_error=%ld",
+		      error_ack->ERROR_prim, error_ack->TLI_error, error_ack->UNIX_error);
 		switch (iocp->ioc_cmd) {
-		    case TI_GETINFO:
+		case TI_GETINFO:
 			if (error_ack->ERROR_prim != T_INFO_REQ)
 				goto not_for_us;
 			TRACE(q, 1, "Got TI_GETINFO error ack...");
 			goto send_error_ack;
-		    case TI_OPTMGMT:
+		case TI_OPTMGMT:
 			if (error_ack->ERROR_prim != T_OPTMGMT_REQ)
 				goto not_for_us;
 			TRACE(q, 1, "Got TI_OPTMGMT error ack...");
 			goto send_error_ack;
-		    case TI_BIND:
+		case TI_BIND:
 			if (error_ack->ERROR_prim != T_BIND_REQ)
 				goto not_for_us;
 			TRACE(q, 1, "Got TI_BIND error ack...");
-send_error_ack:		priv->ioc_mp->b_datap->db_type = M_IOCACK;
+		      send_error_ack:priv->ioc_mp->b_datap->db_type =
+			    M_IOCACK;
 			iocp->ioc_count = 0;
 			iocp->ioc_error = 0;
 			iocp->ioc_rval = (error_ack->UNIX_error << 8)
-					 + error_ack->TLI_error;
+			    + error_ack->TLI_error;
 			if (iocp->ioc_rval == 0) {
-				TRACE(q, 1, "No error code, changing "
-				      "to TSYSERR:EINVAL");
+				TRACE(q, 1, "No error code, changing " "to TSYSERR:EINVAL");
 				iocp->ioc_rval = (EINVAL << 8) + TSYSERR;
 			}
 			freemsg(mp);
@@ -452,29 +437,27 @@ send_error_ack:		priv->ioc_mp->b_datap->db_type = M_IOCACK;
 			TRACE(q, 1, "Sent error M_IOCACK.");
 			FUNC_EXIT(q);
 			return;
-		    case TI_UNBIND:
-			error_ack = (struct T_error_ack *)mp->b_rptr;
+		case TI_UNBIND:
+			error_ack = (struct T_error_ack *) mp->b_rptr;
 			if (error_ack->ERROR_prim != T_UNBIND_REQ)
 				goto not_for_us;
 			TRACE(q, 1, "Got TI_UNBIND error ack...");
 			goto send_error_ack;
-		    default:
+		default:
 			goto not_for_us;
 		}
 		if (iocp->ioc_cmd != TI_UNBIND)
 			goto not_for_us;
-		if (((struct T_ok_ack *)mp->b_rptr)->CORRECT_prim
-							!= T_UNBIND_REQ)
+		if (((struct T_ok_ack *) mp->b_rptr)->CORRECT_prim != T_UNBIND_REQ)
 			goto not_for_us;
 
-	    case T_OK_ACK:
+	case T_OK_ACK:
 		if (iocp->ioc_cmd != TI_UNBIND)
 			goto not_for_us;
-		if (((struct T_ok_ack *)mp->b_rptr)->CORRECT_prim
-							!= T_UNBIND_REQ)
+		if (((struct T_ok_ack *) mp->b_rptr)->CORRECT_prim != T_UNBIND_REQ)
 			goto not_for_us;
 		TRACE(q, 1, "Finishing TI_UNBIND ioctl...");
-send_iocack:	mp->b_datap->db_type = M_DATA;
+	      send_iocack:mp->b_datap->db_type = M_DATA;
 		freemsg(unlinkb(priv->ioc_mp));
 		priv->ioc_mp->b_cont = mp;
 		priv->ioc_mp->b_datap->db_type = M_IOCACK;
@@ -486,14 +469,13 @@ send_iocack:	mp->b_datap->db_type = M_DATA;
 		FUNC_EXIT(q);
 		return;
 
-	    default:
+	default:
 		goto not_for_us;
 	}
-	/*NOTREACHED*/
-}
+ /*NOTREACHED*/}
 
-
-STATIC int _RP timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	timod_priv_t *priv;
 
@@ -510,9 +492,10 @@ STATIC int _RP timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *
 	return 0;
 }
 
-STATIC int _RP timod_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+timod_close(queue_t *q, int flag, cred_t *crp)
 {
-	timod_priv_t *priv = (timod_priv_t *)q->q_ptr;
+	timod_priv_t *priv = (timod_priv_t *) q->q_ptr;
 
 	LISASSERT(priv != NULL);
 	LISASSERT(q->q_ptr == WR(q)->q_ptr);
@@ -523,13 +506,13 @@ STATIC int _RP timod_close(queue_t *q, int flag, cred_t *crp)
 	return 0;
 }
 
-STATIC int _RP timod_rput(queue_t *q, mblk_t *mp)
+STATIC int
+timod_rput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
-	if (((timod_priv_t *)q->q_ptr)->ioc_mp != NULL &&
-	    (mp->b_datap->db_type == M_PROTO ||
-	     mp->b_datap->db_type == M_PCPROTO)) {
-		/*
+	if (((timod_priv_t *) q->q_ptr)->ioc_mp != NULL
+	    && (mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO)) {
+		/* 
 		 *  We are processing an IOCTL
 		 *  and got a M_PROTO or M_PCPROTO message.
 		 */
@@ -542,10 +525,11 @@ STATIC int _RP timod_rput(queue_t *q, mblk_t *mp)
 		TRACE(q, 9, "Returned from putnext() of msg not for me.");
 	}
 	FUNC_EXIT(q);
-	return(0) ;
+	return (0);
 }
 
-STATIC int _RP timod_wput(queue_t *q, mblk_t *mp)
+STATIC int
+timod_wput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 	if (mp->b_datap->db_type != M_IOCTL) {
@@ -558,18 +542,21 @@ STATIC int _RP timod_wput(queue_t *q, mblk_t *mp)
 		TRACE(q, 5, "Returned from do_ioctl()");
 	}
 	FUNC_EXIT(q);
-	return(0) ;
+	return (0);
 }
 
 #ifdef MODULE
 
 #ifdef KERNEL_2_5
-int timod_init_module(void)
+int
+timod_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
 	int ret = lis_register_strmod(&timod_info, "timod");
+
 	if (ret < 0) {
 		printk("timod.init_module: Unable to register module.\n");
 		return ret;
@@ -578,9 +565,11 @@ int init_module(void)
 }
 
 #ifdef KERNEL_2_5
-void timod_cleanup_module(void)
+void
+timod_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
 	if (lis_unregister_strmod(&timod_info) < 0)
@@ -591,11 +580,11 @@ void cleanup_module(void)
 }
 
 #ifdef KERNEL_2_5
-module_init(timod_init_module) ;
-module_exit(timod_cleanup_module) ;
+module_init(timod_init_module);
+module_exit(timod_cleanup_module);
 #endif
 
-#if defined(LINUX)			/* linux kernel */
+#if defined(LINUX)		/* linux kernel */
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
 #endif
@@ -608,6 +597,6 @@ MODULE_DESCRIPTION("STREAMS timod module, converts ioctls to TLI");
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 #endif
-#endif					/* LINUX */
+#endif				/* LINUX */
 
-#endif					/* MODULE */
+#endif				/* MODULE */

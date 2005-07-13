@@ -72,10 +72,8 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
-
 
 /*  -------------------------------------------------------------------  */
 /*				   Symbols                               */
@@ -95,17 +93,14 @@
  * STATUS: incomplete, untested
  */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern int
-lis_strlog(short mid, short sid, char level, unsigned short flags,
-	   char *fmt, ... ) __attribute__ ((format(printf, 5, 6)));
+#ifdef __LIS_INTERNAL__
+extern int lis_strlog(short mid, short sid, char level, unsigned short flags, char *fmt, ...)
+    __attribute__ ((format(printf, 5, 6)));
 #endif
 #endif				/* __KERNEL__ */
 
-
-
 /*  -------------------------------------------------------------------  */
-#endif /*!_STRLOG_H*/
+#endif				/* !_STRLOG_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

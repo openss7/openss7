@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:40 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:40 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:40 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
  *  capabilities of the SDL to any pipe.  Its principal purpose is testing.
  */
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -67,7 +67,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:40 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:38 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

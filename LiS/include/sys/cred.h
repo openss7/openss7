@@ -72,7 +72,7 @@
  * This is in the xxx-mdep.h family of files -- DMG
  */
 
-#endif /*!_CRED_H*/
+#endif				/* !_CRED_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

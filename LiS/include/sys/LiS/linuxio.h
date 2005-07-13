@@ -79,7 +79,6 @@
 #define _IOW(x,y,t)     (((((int)sizeof(t))&0xFFFF)<<16)|(x<<8)|y)
 #endif
 
-
 #define user_stat	stat
 #define user_fstat	fstat
 #define user_mknod	mknod
@@ -103,7 +102,6 @@
 #define user_isastream  isastream
 #define user_fattach    fattach
 #define user_fdetach    fdetach
-
 
 /************************************************************************
 *                         fcntl Types                                   *
@@ -137,10 +135,7 @@
 #define F_SETOWN	24
 #endif
 #ifndef F_CHKFL
-#define F_CHKFL		99			/* completely bogus value */
+#define F_CHKFL		99	/* completely bogus value */
 #endif
 
-
-
-
-#endif /* _USRIO_H_ */
+#endif				/* _USRIO_H_ */

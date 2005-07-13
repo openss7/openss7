@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:45:41 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:45:41 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:45:41 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -64,7 +64,7 @@ static char const ident[] =
  *  bottom side of the multiplexor.  A binding operation is performed to bind
  *  an upper stream to a lower stream.
  */
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include <sys/dlpi.h>
 #include <sys/dlpi_mtp2.h>
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/05 22:45:41 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/13 12:01:38 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -419,7 +419,7 @@ sdlm_free_dl(queue_t *q)
 }
 
 STATIC struct sd *
-sd_get(struct sd *sd)
+sdlm_get(struct sd *sd)
 {
 	assure(sd);
 	if (sd)
@@ -428,7 +428,7 @@ sd_get(struct sd *sd)
 }
 
 STATIC void
-sd_put(struct sd *sd)
+sdlm_put(struct sd *sd)
 {
 	if (sd && atomic_dec_and_test(&sd->refcnt)) {
 		kmem_cache_free(sdlm_sd_cachep, sd);
@@ -443,12 +443,12 @@ sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
 	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, SLAB_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
-		sd_get(sd);	/* first get */
+		sdlm_get(sd);	/* first get */
 		sd->u.mux.index = index;
 		sd->cred = *crp;
 		spin_lock_init(&sd->qlock);
-		(sd->iq = RD(q))->q_ptr = sd_get(sd);
-		(sd->oq = WR(q))->q_ptr = sd_get(sd);
+		(sd->iq = RD(q))->q_ptr = sdlm_get(sd);
+		(sd->oq = WR(q))->q_ptr = sdlm_get(sd);
 		sd->o_prim = sd_w_prim;
 		sd->i_prim = sd_r_prim;
 		sd->o_wakeup = NULL;
@@ -460,7 +460,7 @@ sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
 		if ((sd->next = *spp))
 			sd->next->prev = &sd->next;
 		sd->prev = spp;
-		*spp = sd_get(sd);
+		*spp = sdlm_get(sd);
 		master.sd.numb++;
 	} else
 		printd(("%s: %s: ERROR: failed to allocate sd structure %lu\n", DRV_NAME,
@@ -487,15 +487,15 @@ sdlm_free_sd(queue_t *q)
 			sd->next->prev = sd->prev;
 		sd->next = NULL;
 		sd->prev = &sd->next;
-		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
-		sd_put(sd);
+		ensure(atomic_read(&sd->refcnt) > 1, sdlm_get(sd));
+		sdlm_put(sd);
 		assure(master.sd.numb > 0);
 		master.sd.numb--;
 		/* remove from queues */
-		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
-		sd_put(xchg(&sd->oq->q_ptr, NULL));
-		ensure(atomic_read(&sd->refcnt) > 1, sd_get(sd));
-		sd_put(xchg(&sd->iq->q_ptr, NULL));
+		ensure(atomic_read(&sd->refcnt) > 1, sdlm_get(sd));
+		sdlm_put(xchg(&sd->oq->q_ptr, NULL));
+		ensure(atomic_read(&sd->refcnt) > 1, sdlm_get(sd));
+		sdlm_put(xchg(&sd->iq->q_ptr, NULL));
 		/* done, check final count */
 		if (atomic_read(&sd->refcnt) != 1) {
 			pswerr(("%s: %s: %p: ERROR: sd lingering reference count = %d\n",
@@ -504,7 +504,7 @@ sdlm_free_sd(queue_t *q)
 		}
 	}
 	spin_unlock_irqrestore(&sd->lock, flags);
-	sd_put(sd);		/* final put */
+	sdlm_put(sd);		/* final put */
 	return;
 }
 

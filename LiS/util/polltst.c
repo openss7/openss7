@@ -69,7 +69,7 @@
 #include <sys/poll.h>
 #include <sys/stropts.h>
 #include <sys/ioctl.h>
-#include <sys/LiS/loop.h>		/* an odd place for this file */
+#include <sys/LiS/loop.h>	/* an odd place for this file */
 #include <signal.h>
 #include <string.h>
 #include <time.h>
@@ -94,15 +94,14 @@
 #define	STDIN		0
 #define	STDOUT		1
 
-
 /************************************************************************
 *                        Storage Declarations                           *
 ************************************************************************/
-struct pollfd		fds[4] ;
-int			loop1 ;		/* loop driver stream */
-int			loop2 ;		/* loop driver stream */
-struct termios		old_tty ;
-struct termios		new_tty ;
+struct pollfd fds[4];
+int loop1;				/* loop driver stream */
+int loop2;				/* loop driver stream */
+struct termios old_tty;
+struct termios new_tty;
 
 /************************************************************************
 *                            poll_events                                *
@@ -112,30 +111,42 @@ struct termios		new_tty ;
 *									*
 ************************************************************************/
 
-char	*poll_events(short events)
+char *
+poll_events(short events)
 {
-    static char		ascii_events[200] ;
+	static char ascii_events[200];
 
-    ascii_events[0] = 0 ;
+	ascii_events[0] = 0;
 
-    if (events & POLLIN) strcat(ascii_events, "POLLIN ") ;
-    if (events & POLLRDNORM) strcat(ascii_events, "POLLRDNORM ") ;
-    if (events & POLLRDBAND) strcat(ascii_events, "POLLRDBAND ") ;
-    if (events & POLLPRI) strcat(ascii_events, "POLLPRI ") ;
-    if (events & POLLOUT) strcat(ascii_events, "POLLOUT ") ;
-    if (events & POLLWRNORM) strcat(ascii_events, "POLLWRNORM ") ;
-    if (events & POLLWRBAND) strcat(ascii_events, "POLLWRBAND ") ;
-    if (events & POLLMSG) strcat(ascii_events, "POLLMSG ") ;
-    if (events & POLLERR) strcat(ascii_events, "POLLERR ") ;
-    if (events & POLLHUP) strcat(ascii_events, "POLLHUP ") ;
-    if (events & POLLNVAL) strcat(ascii_events, "POLLNVAL ") ;
+	if (events & POLLIN)
+		strcat(ascii_events, "POLLIN ");
+	if (events & POLLRDNORM)
+		strcat(ascii_events, "POLLRDNORM ");
+	if (events & POLLRDBAND)
+		strcat(ascii_events, "POLLRDBAND ");
+	if (events & POLLPRI)
+		strcat(ascii_events, "POLLPRI ");
+	if (events & POLLOUT)
+		strcat(ascii_events, "POLLOUT ");
+	if (events & POLLWRNORM)
+		strcat(ascii_events, "POLLWRNORM ");
+	if (events & POLLWRBAND)
+		strcat(ascii_events, "POLLWRBAND ");
+	if (events & POLLMSG)
+		strcat(ascii_events, "POLLMSG ");
+	if (events & POLLERR)
+		strcat(ascii_events, "POLLERR ");
+	if (events & POLLHUP)
+		strcat(ascii_events, "POLLHUP ");
+	if (events & POLLNVAL)
+		strcat(ascii_events, "POLLNVAL ");
 
-    if (ascii_events[0] == 0)
-	sprintf(ascii_events, "0x%x", events) ;
+	if (ascii_events[0] == 0)
+		sprintf(ascii_events, "0x%x", events);
 
-    return(ascii_events) ;
+	return (ascii_events);
 
-} /* poll_events */
+}				/* poll_events */
 
 /************************************************************************
 *                            open_files                                 *
@@ -145,43 +156,41 @@ char	*poll_events(short events)
 * connect the two streams together with an ioctl.			*
 *									*
 ************************************************************************/
-int	open_files(int *fd1, int *fd2)
+int
+open_files(int *fd1, int *fd2)
 {
-    int			arg ;
-    int			rslt ;
-    struct strioctl	ioc ;
+	int arg;
+	int rslt;
+	struct strioctl ioc;
 
-    *fd1 = open(LOOP_1, O_RDWR, 0) ;
-    if (*fd1 < 0)
-    {
-	print("loop.1: %s\n", strerror(-*fd1)) ;
-	return(*fd1) ;
-    }
+	*fd1 = open(LOOP_1, O_RDWR, 0);
+	if (*fd1 < 0) {
+		print("loop.1: %s\n", strerror(-*fd1));
+		return (*fd1);
+	}
 
-    *fd2 = open(LOOP_2, O_RDWR, 0) ;
-    if (*fd2 < 0)
-    {
-	print("loop.2: %s\n", strerror(-*fd2)) ;
-	close(*fd1) ;
-	return(*fd2) ;
-    }
+	*fd2 = open(LOOP_2, O_RDWR, 0);
+	if (*fd2 < 0) {
+		print("loop.2: %s\n", strerror(-*fd2));
+		close(*fd1);
+		return (*fd2);
+	}
 
-    ioc.ic_cmd 	  = LOOP_SET ;
-    ioc.ic_timout = 10 ;
-    ioc.ic_len	  = sizeof(int) ;
-    ioc.ic_dp	  = (char *) &arg ;
+	ioc.ic_cmd = LOOP_SET;
+	ioc.ic_timout = 10;
+	ioc.ic_len = sizeof(int);
+	ioc.ic_dp = (char *) &arg;
 
-    arg = 2 ;
-    rslt = ioctl(*fd1, I_STR, &ioc) ;
-    if (rslt < 0)
-    {
-	print("loop.1: ioctl LOOP_SET: %s\n", strerror(-rslt)) ;
-	return(rslt) ;
-    }
+	arg = 2;
+	rslt = ioctl(*fd1, I_STR, &ioc);
+	if (rslt < 0) {
+		print("loop.1: ioctl LOOP_SET: %s\n", strerror(-rslt));
+		return (rslt);
+	}
 
-    return(1) ;
+	return (1);
 
-} /* open_files */
+}				/* open_files */
 
 /************************************************************************
 *                           term_sig                                    *
@@ -190,13 +199,14 @@ int	open_files(int *fd1, int *fd2)
 * Catch the TERM signal.  Put the tty back and exit.			*
 *									*
 ************************************************************************/
-void term_sig(int signo)
+void
+term_sig(int signo)
 {
-    tcsetattr(STDIN, 0, &old_tty) ;
-    printf("\nTerminated\n") ;
-    exit(0) ;
+	tcsetattr(STDIN, 0, &old_tty);
+	printf("\nTerminated\n");
+	exit(0);
 
-} /* term_sig */
+}				/* term_sig */
 
 /************************************************************************
 *                           do_poll                                     *
@@ -205,116 +215,108 @@ void term_sig(int signo)
 * Poll between STDIN and the loop streams.				*
 *									*
 ************************************************************************/
-void do_poll(void)
+void
+do_poll(void)
 {
-    int		rslt ;
-    char	c ;
-    int		iterations ;
-    time_t	time_on ;
-    time_t	time_off ;
+	int rslt;
+	char c;
+	int iterations;
+	time_t time_on;
+	time_t time_off;
 
-    fds[0].fd		= loop1 ;
-    fds[0].events	= POLLIN ;
-    fds[0].revents	= 0 ;		/* returned events */
-    fds[1].fd		= loop2 ;
-    fds[1].events	= POLLIN ;
-    fds[1].revents	= 0 ;		/* returned events */
-    fds[2].fd		= STDIN ;
-    fds[2].events	= POLLIN ;
-    fds[2].revents	= 0 ;		/* returned events */
+	fds[0].fd = loop1;
+	fds[0].events = POLLIN;
+	fds[0].revents = 0;	/* returned events */
+	fds[1].fd = loop2;
+	fds[1].events = POLLIN;
+	fds[1].revents = 0;	/* returned events */
+	fds[2].fd = STDIN;
+	fds[2].events = POLLIN;
+	fds[2].revents = 0;	/* returned events */
 
-    rslt = ioctl(loop1, I_SRDOPT, RMSGN) ;
-    if (rslt < 0)
-    {
-	print("loop.1: I_SRDOPT(RMSGN): %s\n", strerror(-rslt)) ;
-	return ;
-    }
-
-    rslt = ioctl(loop2, I_SRDOPT, RMSGN) ;
-    if (rslt < 0)
-    {
-	print("loop.2: I_SRDOPT(RMSGN): %s\n", strerror(-rslt)) ;
-	return ;
-    }
-
-    time_on = time(NULL) ;
-
-    for (iterations = 0;;iterations++)
-    {
-	if (poll(fds, 3, -1) < 0)
-	{
-	    perror("do_poll: poll():") ;
-	    break ;
+	rslt = ioctl(loop1, I_SRDOPT, RMSGN);
+	if (rslt < 0) {
+		print("loop.1: I_SRDOPT(RMSGN): %s\n", strerror(-rslt));
+		return;
 	}
 
-	if (fds[0].revents & POLLIN)
-	{				/* loop.1 has data */
-	    rslt = read(loop1, &c, 1) ;
-	    if (rslt < 0)
-	    {
-		perror("loop.1: read:") ;
-		break ;
-	    }
-
-	    write(loop1, &c, 1) ;	/* write back to loop.1 */
+	rslt = ioctl(loop2, I_SRDOPT, RMSGN);
+	if (rslt < 0) {
+		print("loop.2: I_SRDOPT(RMSGN): %s\n", strerror(-rslt));
+		return;
 	}
 
-	if (fds[1].revents & POLLIN)
-	{				/* loop.2 has data */
-	    rslt = read(loop2, &c, 1) ;
-	    if (rslt < 0)
-	    {
-		perror("loop.2: read:") ;
-		break ;
-	    }
+	time_on = time(NULL);
 
-	    write(STDOUT, &c, 1) ;	/* write to tty */
+	for (iterations = 0;; iterations++) {
+		if (poll(fds, 3, -1) < 0) {
+			perror("do_poll: poll():");
+			break;
+		}
+
+		if (fds[0].revents & POLLIN) {	/* loop.1 has data */
+			rslt = read(loop1, &c, 1);
+			if (rslt < 0) {
+				perror("loop.1: read:");
+				break;
+			}
+
+			write(loop1, &c, 1);	/* write back to loop.1 */
+		}
+
+		if (fds[1].revents & POLLIN) {	/* loop.2 has data */
+			rslt = read(loop2, &c, 1);
+			if (rslt < 0) {
+				perror("loop.2: read:");
+				break;
+			}
+
+			write(STDOUT, &c, 1);	/* write to tty */
+		}
+
+		if (fds[2].revents & POLLIN) {	/* stdin has data */
+			rslt = read(STDIN, &c, 1);
+			if (rslt < 0) {
+				perror("STDIN: read:");
+				break;
+			}
+
+			if (rslt == 0)
+				break;
+
+			write(loop2, &c, 1);	/* write to loop.2 */
+		}
 	}
 
-	if (fds[2].revents & POLLIN)
-	{				/* stdin has data */
-	    rslt = read(STDIN, &c, 1) ;
-	    if (rslt < 0)
-	    {
-		perror("STDIN: read:") ;
-		break ;
-	    }
+	time_off = time(NULL);
+	printf("\nIteration count = %d", iterations);
+	if ((time_off -= time_on) != 0)
+		printf(" Elapsed time = %ld seconds, %ld polls/sec\n", (long) time_off,
+		       (long) iterations / time_off);
+	else
+		printf(" Elapsed time = 0 seconds\n");
 
-	    if (rslt == 0)
-		break ;
-
-	    write(loop2, &c, 1) ;	/* write to loop.2 */
-	}
-    }
-
-    time_off = time(NULL) ;
-    printf("\nIteration count = %d", iterations) ;
-    if ((time_off -= time_on) != 0)
-	printf(" Elapsed time = %ld seconds, %ld polls/sec\n",
-		(long)time_off, (long)iterations/time_off) ;
-    else
-	printf(" Elapsed time = 0 seconds\n") ;
-
-} /* do_poll */
+}				/* do_poll */
 
 /************************************************************************
 *                           main                                        *
 ************************************************************************/
-int main(void)
+int
+main(void)
 {
-    open_files(&loop1, &loop2) ;
+	open_files(&loop1, &loop2);
 
-    tcgetattr(STDIN, &old_tty) ;
-    new_tty = old_tty ;
-    new_tty.c_lflag &= ~(ICANON | ECHO) ;
-    tcsetattr(STDIN, 0, &new_tty) ;
+	tcgetattr(STDIN, &old_tty);
+	new_tty = old_tty;
+	new_tty.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN, 0, &new_tty);
 
-    signal(SIGTERM, term_sig) ;
-    signal(SIGINT, term_sig) ;
-    signal(SIGQUIT, term_sig) ;
-    do_poll() ;
+	signal(SIGTERM, term_sig);
+	signal(SIGINT, term_sig);
+	signal(SIGQUIT, term_sig);
+	do_poll();
 
-    tcsetattr(STDIN, 0, &old_tty) ;
+	tcsetattr(STDIN, 0, &old_tty);
 
-    return 0;
-} /* main */
+	return 0;
+}				/* main */

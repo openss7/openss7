@@ -95,154 +95,156 @@
 /*
  *  function prototypes
  */
-static int  _RP pipemod_open(queue_t *, dev_t*, int, int, cred_t *);
-static int  _RP pipemod_close(queue_t *, int, cred_t *);
-static int  _RP pipemod_put(queue_t *, mblk_t *);
+static int pipemod_open(queue_t *, dev_t *, int, int, cred_t *);
+static int pipemod_close(queue_t *, int, cred_t *);
+static int pipemod_put(queue_t *, mblk_t *);
 
 static void flush_module(queue_t *, mblk_t *);
 
 /*
  *  module structure
  */
-static struct module_info pipemod_minfo =
-{ 
-    MOD_ID,            /* id */
-    MOD_NAME,          /* name */
-    0,                 /* min packet size accepted */
-    INFPSZ,            /* max packet size accepted */
-    10240L,            /* highwater mark */
-    512L               /* lowwater mark */
+static struct module_info pipemod_minfo = {
+	MOD_ID,			/* id */
+	MOD_NAME,		/* name */
+	0,			/* min packet size accepted */
+	INFPSZ,			/* max packet size accepted */
+	10240L,			/* highwater mark */
+	512L			/* lowwater mark */
 };
 
 static struct qinit pipemod_rinit = {
-    pipemod_put,       /* put */
-    NULL,              /* service */
-    pipemod_open,      /* open */
-    pipemod_close,     /* close */
-    NULL,              /* admin */
-    &pipemod_minfo,    /* info */
-    NULL               /* stat */
+	pipemod_put,		/* put */
+	NULL,			/* service */
+	pipemod_open,		/* open */
+	pipemod_close,		/* close */
+	NULL,			/* admin */
+	&pipemod_minfo,		/* info */
+	NULL			/* stat */
 };
 
-static struct qinit pipemod_winit = { 
-    pipemod_put,       /* put */
-    NULL,              /* service */
-    NULL,              /* open */
-    NULL,              /* close */
-    NULL,              /* admin */
-    &pipemod_minfo,    /* info */
-    NULL               /* stat */
+static struct qinit pipemod_winit = {
+	pipemod_put,		/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&pipemod_minfo,		/* info */
+	NULL			/* stat */
 };
 
-struct streamtab pipemod_info =
-{
-    &pipemod_rinit,        /* read queue init */
-    &pipemod_winit,        /* write queue init */
-    NULL,                  /* lower mux read queue init */
-    NULL                   /* lower mux write queue init */
+struct streamtab pipemod_info = {
+	&pipemod_rinit,		/* read queue init */
+	&pipemod_winit,		/* write queue init */
+	NULL,			/* lower mux read queue init */
+	NULL			/* lower mux write queue init */
 };
 
 /*
  *  open
  */
-static int _RP pipemod_open( q, devp, flag, sflag, credp )
-queue_t *q;
-dev_t *devp;
-int flag, sflag;
-cred_t *credp;
+static int
+pipemod_open(q, devp, flag, sflag, credp)
+	queue_t *q;
+	dev_t *devp;
+	int flag, sflag;
+	cred_t *credp;
 {
-    queue_t	*rq = RD(q);
-    char	*cp = rq->q_ptr ;
+	queue_t *rq = RD(q);
+	char *cp = rq->q_ptr;
+
 #ifdef PIPE_DEBUG
-    cmn_err( CE_CONT,
-	     "%s_open( 0x%p, 0x%x, 0x%x, 0x%x, ... )\n",
-	     MOD_NAME, q, *devp, flag, sflag );
+	cmn_err(CE_CONT, "%s_open( 0x%p, 0x%x, 0x%x, 0x%x, ... )\n", MOD_NAME, q, *devp, flag,
+		sflag);
 #endif
 
-    if (rq->q_ptr == NULL) MODGET() ;
-    rq->q_ptr = (void *) ++cp ;
-    WR(q)->q_ptr = rq->q_ptr;
+	if (rq->q_ptr == NULL)
+		MODGET();
+	rq->q_ptr = (void *) ++cp;
+	WR(q)->q_ptr = rq->q_ptr;
 
-    qprocson(q);
+	qprocson(q);
 
-    return 0;	/* success */
+	return 0;		/* success */
 }
 
 /*
  *  close
  */
-static int _RP pipemod_close( q, flag, credp )
-queue_t *q;
-int flag;
-cred_t *credp;
+static int
+pipemod_close(q, flag, credp)
+	queue_t *q;
+	int flag;
+	cred_t *credp;
 {
 #ifdef PIPE_DEBUG
-    cmn_err( CE_CONT,
-	     "%s_close( 0x%p, 0x%x, ... )\n", MOD_NAME, q, flag );
+	cmn_err(CE_CONT, "%s_close( 0x%p, 0x%x, ... )\n", MOD_NAME, q, flag);
 #endif
-    
-    RD(q)->q_ptr = WR(q)->q_ptr = NULL;
-    MODPUT();
-    qprocsoff(q);
 
-    return 0;	/* success */
+	RD(q)->q_ptr = WR(q)->q_ptr = NULL;
+	MODPUT();
+	qprocsoff(q);
+
+	return 0;		/* success */
 }
- 
+
 /*
  *  canonical module flush handling - this could be used in any module
  */
-static void flush_module( q, mp )
-queue_t *q;
-mblk_t *mp;
+static void
+flush_module(q, mp)
+	queue_t *q;
+	mblk_t *mp;
 {
-    queue_t *rq = RD(q), *wq = WR(q);
+	queue_t *rq = RD(q), *wq = WR(q);
 
-    if (*(mp->b_rptr) & FLUSHW) {
-	if (*(mp->b_rptr) & FLUSHBAND)
-	    flushband( wq, FLUSHDATA, *(mp->b_rptr + 1) );
-	else
-	    flushq( wq, FLUSHDATA );
-    }
-    if (*(mp->b_rptr) & FLUSHR) {
-	if (*(mp->b_rptr) & FLUSHBAND)
-	    flushband( rq, FLUSHDATA, *(mp->b_rptr + 1) );
-	else
-	    flushq( rq, FLUSHDATA );
-    }
-    if (!SAMESTR(q)) {
-	char flush = *(mp->b_rptr) & FLUSHRW;
-	
-	switch (flush & FLUSHRW) {
-	case FLUSHR:
-	case FLUSHW:
-	    *(mp->b_rptr) = (flush & ~FLUSHRW) | (flush ^ FLUSHRW);
-	default:
-	    break;
+	if (*(mp->b_rptr) & FLUSHW) {
+		if (*(mp->b_rptr) & FLUSHBAND)
+			flushband(wq, FLUSHDATA, *(mp->b_rptr + 1));
+		else
+			flushq(wq, FLUSHDATA);
 	}
-    }
-    putnext( q, mp );
+	if (*(mp->b_rptr) & FLUSHR) {
+		if (*(mp->b_rptr) & FLUSHBAND)
+			flushband(rq, FLUSHDATA, *(mp->b_rptr + 1));
+		else
+			flushq(rq, FLUSHDATA);
+	}
+	if (!SAMESTR(q)) {
+		char flush = *(mp->b_rptr) & FLUSHRW;
+
+		switch (flush & FLUSHRW) {
+		case FLUSHR:
+		case FLUSHW:
+			*(mp->b_rptr) = (flush & ~FLUSHRW) | (flush ^ FLUSHRW);
+		default:
+			break;
+		}
+	}
+	putnext(q, mp);
 }
+
 /*
  *  put
  */
-static int _RP pipemod_put( q, mp )
-queue_t *q;
-mblk_t *mp;
+static int
+pipemod_put(q, mp)
+	queue_t *q;
+	mblk_t *mp;
 {
 #ifdef PIPE_DEBUG
-    cmn_err( CE_CONT,
-	     "%s_wput( 0x%08x, 0x%08x )\n", MOD_NAME, q, mp );
+	cmn_err(CE_CONT, "%s_wput( 0x%08x, 0x%08x )\n", MOD_NAME, q, mp);
 #endif
 
-    switch (mp->b_datap->db_type) {
-    case M_FLUSH:
-	flush_module( q, mp );
-	break;
-    default:
-	putnext( q, mp );
-	break;
-    }
-    return(0) ;
+	switch (mp->b_datap->db_type) {
+	case M_FLUSH:
+		flush_module(q, mp);
+		break;
+	default:
+		putnext(q, mp);
+		break;
+	}
+	return (0);
 }
 
 #ifdef MODULE
@@ -252,41 +254,42 @@ mblk_t *mp;
  */
 
 #ifdef KERNEL_2_5
-int pipemod_init_module(void)
+int
+pipemod_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
-    int ret = lis_register_strmod( &pipemod_info, MOD_NAME );
-    if (ret < 0) {
-	cmn_err( CE_CONT,
-		 "%s - unable to register module.\n",
-		 MOD_NAME );
-	return ret;
-    }
+	int ret = lis_register_strmod(&pipemod_info, MOD_NAME);
 
-    return 0;
+	if (ret < 0) {
+		cmn_err(CE_CONT, "%s - unable to register module.\n", MOD_NAME);
+		return ret;
+	}
+
+	return 0;
 }
 
 #ifdef KERNEL_2_5
-void pipemod_cleanup_module(void)
+void
+pipemod_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
-    if (lis_unregister_strmod(&pipemod_info) < 0)
-	cmn_err( CE_CONT,
-		 "%s - unable to unregister module.\n",
-		 MOD_NAME );
-    return;
+	if (lis_unregister_strmod(&pipemod_info) < 0)
+		cmn_err(CE_CONT, "%s - unable to unregister module.\n", MOD_NAME);
+	return;
 }
 
 #ifdef KERNEL_2_5
-module_init(pipemod_init_module) ;
-module_exit(pipemod_cleanup_module) ;
+module_init(pipemod_init_module);
+module_exit(pipemod_cleanup_module);
 #endif
 
-#if defined(LINUX)			/* linux kernel */
+#if defined(LINUX)		/* linux kernel */
 
 #ifdef __attribute_used__
 #undef __attribute_used__
@@ -306,5 +309,5 @@ MODULE_DESCRIPTION("STREAMS 'pipemod' pipe flushing module");
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 #endif
 
-#endif					/* LINUX */
-#endif					/* MODULE */
+#endif				/* LINUX */
+#endif				/* MODULE */

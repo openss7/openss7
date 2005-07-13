@@ -76,7 +76,6 @@
 #define	NULL		( (void *) 0 )
 #endif
 
-
 #define user_stat	stat
 #define user_fstat	fstat
 #define user_mknod	mknod
@@ -96,8 +95,6 @@
 #define user_readdir	readdir
 #define user_closedir	closedir
 #define user_rewinddir	rewinddir
-
-
 
 /************************************************************************
 *                         fcntl Types                                   *
@@ -131,10 +128,7 @@
 #define F_SETOWN	24
 #endif
 #ifndef F_CHKFL
-#define F_CHKFL		99			/* completely bogus value */
+#define F_CHKFL		99	/* completely bogus value */
 #endif
 
-
-
-
-#endif /* _USRIO_H_ */
+#endif				/* _USRIO_H_ */

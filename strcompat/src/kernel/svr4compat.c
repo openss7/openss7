@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/13 12:01:49 $"
 
 static char const ident[] =
-    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/12 13:54:46 $";
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2005/07/12 13:54:46 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2005/07/13 12:01:49 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -95,6 +95,9 @@ MODULE_LICENSE(SVR4COMP_LICENSE);
 MODULE_ALIAS("streams-svr4compat");
 #endif
 #endif
+
+__SVR4_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
+EXPORT_SYMBOL(bcmp);
 
 /* don't use these functions, they are way too dangerous */
 #undef MPSTR_QLOCK

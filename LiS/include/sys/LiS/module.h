@@ -90,7 +90,7 @@
 #  if defined(LINUX) && defined(__KERNEL__)
 #    ifdef MODVERSIONS
 #     ifdef LISMODVERS
-#      include <sys/modversions.h>      /* /usr/src/LiS/include/sys */
+#      include <sys/modversions.h>	/* /usr/src/LiS/include/sys */
 #     else
 #      include <linux/modversions.h>
 #     endif
@@ -109,4 +109,4 @@
 
 #include <sys/LiS/modcnt.h>	/* MODGET(), MODPUT() */
 
-#endif		/* LIS_MODULE_H */
+#endif				/* LIS_MODULE_H */

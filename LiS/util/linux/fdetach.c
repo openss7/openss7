@@ -58,8 +58,8 @@
 
 #ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:15 $"
 
-static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:15 $";
-
+static char const ident[] =
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:15 $";
 
 /*
  *  fdetach.c - try to fdetach a list of paths.
@@ -87,13 +87,14 @@ static char const ident[] = "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 
-int             output = 1;
+int output = 1;
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
 \n\
@@ -132,11 +133,12 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
     Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
@@ -150,11 +152,12 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stderr, "\
+	if (!output)
+		return;
+	fprintf(stderr, "\
 Usage:\n\
     %1$s [options] -a\n\
     %1$s [options] PATH ...\n\
@@ -164,11 +167,12 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 Usage:\n\
     %1$s [options] -a\n\
@@ -200,13 +204,16 @@ Options:\n\
 #define PATH_MAX 4096
 #endif
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-    char            path[PATH_MAX];
-    for (;;) {
-	int             c;
+	char path[PATH_MAX];
+
+	for (;;) {
+		int c;
+
 #ifdef _GNU_SOURCE
-	int             option_index = 0;
+		int option_index = 0;
 	/* *INDENT-OFF* */
 	static struct option long_options[] = {
 	    { "all",	 no_argument, NULL, 'a' },
@@ -219,80 +226,80 @@ int main(int argc, char *argv[])
 	    { 0, }
 	};
 	/* *INDENT-ON* */
-	c = getopt_long_only(argc, argv, "avqVCh?", long_options, &option_index);
+
+		c = getopt_long_only(argc, argv, "avqVCh?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
-	c = getopt(argc, argv, "avqVCh?");
+		c = getopt(argc, argv, "avqVCh?");
 #endif				/* _GNU_SOURCE */
 
-	if (c == -1)
-	    break;
-	switch (c) {
-	case 'a':		/* -a, --all */
-	    strcpy(path, "*");
-	    break;
-	case 'v':		/* -v, --verbose */
-	    output += 1;
-	    break;
-	case 'q':		/* -q, --quiet */
-	    output = 0;
-	    break;
-	case 'V':		/* -V, --version */
-	    version(argc, argv);
-	    exit(0);
-	case 'C':		/* -C, --copying */
-	    copying(argc, argv);
-	    exit(0);
-	case 'h':		/* -h, --help */
-	    help(argc, argv);
-	    exit(0);
-	case '?':
-	default:
-	    optind--;
-	  bad_nonopt:
-	    if (optind < argc && output) {
-		fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-		for (; optind < argc; optind++)
-		    fprintf(stderr, "%s ", argv[optind]);
-		fprintf(stderr, "\n");
-	    }
-	  bad_usage:
-	    usage(argc, argv);
-	    exit(2);
+		if (c == -1)
+			break;
+		switch (c) {
+		case 'a':	/* -a, --all */
+			strcpy(path, "*");
+			break;
+		case 'v':	/* -v, --verbose */
+			output += 1;
+			break;
+		case 'q':	/* -q, --quiet */
+			output = 0;
+			break;
+		case 'V':	/* -V, --version */
+			version(argc, argv);
+			exit(0);
+		case 'C':	/* -C, --copying */
+			copying(argc, argv);
+			exit(0);
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case '?':
+		default:
+			optind--;
+		      bad_nonopt:
+			if (optind < argc && output) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				for (; optind < argc; optind++)
+					fprintf(stderr, "%s ", argv[optind]);
+				fprintf(stderr, "\n");
+			}
+		      bad_usage:
+			usage(argc, argv);
+			exit(2);
+		}
 	}
-    }
 
-    if (strcmp(path, "*") == 0) {
-	if (optind < argc)
-	    goto bad_nonopt;
-	if (fdetach("*") < 0) {
-	    if (output)
-		fprintf(stderr, "%s: -a failed: %s\n", argv[0],
-			strerror(errno));
-	    exit(1);
+	if (strcmp(path, "*") == 0) {
+		if (optind < argc)
+			goto bad_nonopt;
+		if (fdetach("*") < 0) {
+			if (output)
+				fprintf(stderr, "%s: -a failed: %s\n", argv[0], strerror(errno));
+			exit(1);
+		} else {
+			if (output > 1)
+				printf("%s: -a OK\n", argv[0]);
+		}
 	} else {
-	    if (output > 1)
-		printf("%s: -a OK\n", argv[0]);
-	}
-    } else {
-	if (optind == argc) {
-	    if (output)
-		fprintf(stderr, "%s: missing path\n", argv[0]);
-	    goto bad_usage;
-	}
-	while (optind < argc) {
-	    strcpy(path, argv[optind++]);
+		if (optind == argc) {
+			if (output)
+				fprintf(stderr, "%s: missing path\n", argv[0]);
+			goto bad_usage;
+		}
+		while (optind < argc) {
+			strcpy(path, argv[optind++]);
 
-	    if (fdetach(path) < 0) {
-		if (output)
-		    fprintf(stderr, "fdetach( \"%s\" ) failed: %s\n",
-			    path, strerror(errno));
-		exit(1);
-	    } else {
-		if (output > 1)
-		    printf("fdetach( \"%s\" ) OK\n", path);
-	    }
+			if (fdetach(path) < 0) {
+				if (output)
+					fprintf(stderr, "fdetach( \"%s\" ) failed: %s\n", path,
+						strerror(errno));
+				exit(1);
+			} else {
+				if (output > 1)
+					printf("fdetach( \"%s\" ) OK\n", path);
+			}
+		}
 	}
-    }
 
-    exit(0);
+	exit(0);
 }

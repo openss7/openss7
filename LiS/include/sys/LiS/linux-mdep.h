@@ -82,10 +82,6 @@
 
 /* Here follows complete drivel: */
 
-#ifndef _RP
-#define _RP
-#endif
-
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
 
@@ -107,8 +103,8 @@
  */
 #ifdef __KERNEL__
 #ifdef LISAUTOCONF
-#include <sys/autoconf.h>           /* /usr/src/LiS/include/sys */
-#define _LINUX_CONFIG_H 1	    /* prevent <linux/config.h> */
+#include <sys/autoconf.h>	/* /usr/src/LiS/include/sys */
+#define _LINUX_CONFIG_H 1	/* prevent <linux/config.h> */
 #endif
 #if !defined(NOKSRC)		/* have kernel source */
 #ifndef _SYS_TYPES_H
@@ -156,7 +152,7 @@
 
 #if defined(NOKSRC)
 
-#include <linux/types.h>        /* common system types */
+#include <linux/types.h>	/* common system types */
 #include <linux/spinlock.h>
 #define	__need_sigset_t	1
 #include <signal.h>
@@ -167,7 +163,7 @@
 #else
 
 #if !defined(_LINUX_TYPES_H)
-#include <linux/types.h>        /* common system types */
+#include <linux/types.h>	/* common system types */
 #endif
 
 #endif
@@ -175,7 +171,7 @@
 #include <linux/kdev_t.h>	/* 1.3.xx needs this */
 #include <linux/sched.h>	/* sleep,wake,... */
 #include <linux/wait.h>
-#include <linux/kernel.h>	/* suser,...*/
+#include <linux/kernel.h>	/* suser,... */
 #include <linux/interrupt.h>
 #include <linux/major.h>
 #include <linux/fs.h>		/* inodes,... */
@@ -187,8 +183,8 @@
 #include <linux/stat.h>		/* S_ISCHR */
 #include <asm/segment.h>	/* memcpy_{to,from}_fs */
 #include <asm/system.h>		/* sti,cli */
-#include <linux/errno.h>	      /* for errno */
-#include <linux/signal.h>	      /* for signal numbers */
+#include <linux/errno.h>	/* for errno */
+#include <linux/signal.h>	/* for signal numbers */
 #include <sys/poll.h>		/* ends up being linux/poll.h */
 #include <linux/file.h>
 #include <asm/uaccess.h>
@@ -217,7 +213,7 @@
 #undef dev_t
 #endif
 
-typedef unsigned int		lis_dev_t ;
+typedef unsigned int lis_dev_t;
 
 #define dev_t lis_dev_t
 
@@ -238,12 +234,11 @@ typedef unsigned int		lis_dev_t ;
 #define LIS_CACHE_BYTES	16
 #endif
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 
 /*  -------------------------------------------------------------------  */
-
 
 #ifdef __KERNEL__
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,2,1)
@@ -258,7 +253,6 @@ typedef unsigned int		lis_dev_t ;
 #endif
 #endif
 #endif
-
 
 /*  -------------------------------------------------------------------  */
 
@@ -279,34 +273,34 @@ typedef unsigned int		lis_dev_t ;
 			/* seconds to system tmout time units */
 #define SECS_TO(t)	lis_milli_to_ticks(1000*(t))
 
-#if __LIS_INTERNAL__
-extern long lis_time_till(long target_time) _RP;
-extern long lis_target_time(long milli_sec) _RP;
+#ifdef __LIS_INTERNAL__
+extern long lis_time_till(long target_time);
+extern long lis_target_time(long milli_sec);
 #endif
-extern long lis_milli_to_ticks(long milli_sec)  _RP;
+extern long lis_milli_to_ticks(long milli_sec);
 
-extern char		lis_kernel_version[];
-extern char		lis_version[] ;
-extern char		lis_date[] ;
-extern char		*lis_stropts_file ;
-extern int              lis_num_cpus ;
+extern char lis_kernel_version[];
+extern char lis_version[];
+extern char lis_date[];
+extern char *lis_stropts_file;
+extern int lis_num_cpus;
 
 #endif				/* __KERNEL__ */
 
 /* some missing generic types 
  */
-#undef uid 
+#undef uid
 #undef gid
-typedef int     o_uid_t;
-typedef int     o_gid_t;
-typedef unsigned   char uchar;
+typedef int o_uid_t;
+typedef int o_gid_t;
+typedef unsigned char uchar;
 
 #if 0
 typedef struct cred {
-	uid_t	cr_uid;			/* effective user id */
-	gid_t	cr_gid;			/* effective group id */
-	uid_t	cr_ruid;		/* real user id */
-	gid_t	cr_rgid;		/* real group id */
+	uid_t cr_uid;			/* effective user id */
+	gid_t cr_gid;			/* effective group id */
+	uid_t cr_ruid;			/* real user id */
+	gid_t cr_rgid;			/* real group id */
 } cred_t;
 #else
 /* same layout as task_struct */
@@ -324,7 +318,6 @@ typedef struct cred {
 } cred_t;
 #endif
 
-
 #ifdef __KERNEL__
 #if defined(KERNEL_2_5)
 #define lis_suser(fp)	capable(CAP_SYS_ADMIN)
@@ -335,7 +328,6 @@ typedef struct cred {
 
 /*  -------------------------------------------------------------------  */
 
-
 #ifdef __KERNEL__
 #define lis_free_page(cp) free_page((unsigned long)(cp))
 
@@ -344,8 +336,8 @@ typedef struct cred {
 /*
  *  The ASSERT macro.
  */
-extern void lis_assert_fail(const char *expr, const char *objname,
-			    const char *file, unsigned int line) _RP;
+extern void lis_assert_fail(const char *expr, const char *objname, const char *file,
+			    unsigned int line);
 
 #ifdef LIS_OBJNAME
 #define ___ASSERT_XSTR(s) ___ASSERT_STR(s)
@@ -371,7 +363,6 @@ extern void lis_assert_fail(const char *expr, const char *objname,
 #define SPLSTR(x)	x = lis_splstr()
 #define SPLX(x)		lis_splx(x)
 
-
 /*
  * Atomic functions
  *
@@ -387,7 +378,8 @@ extern void lis_assert_fail(const char *expr, const char *objname,
  * for operational purposes.  By keeping the kernel's atomic_t type invisible
  * from STREAMS drivers we help insulate them from kernel changes.
  */
-typedef	volatile long		lis_atomic_t ;
+typedef volatile long lis_atomic_t;
+
 /*
  * Bad idea.  LDL foolishes exposes this to user space with a ioctl structure
  * in ldl_gstats_ioctl.  Therefore, long can be 64 bits or 32 bits or 31 bits
@@ -396,13 +388,13 @@ typedef	volatile long		lis_atomic_t ;
  */
 #define lis_atomic_t lis_atomic_t
 
-void	lis_atomic_set(lis_atomic_t *atomic_addr, int valu) _RP;
-int	lis_atomic_read(lis_atomic_t *atomic_addr) _RP;
-void	lis_atomic_add(lis_atomic_t *atomic_addr, int amt) _RP;
-void	lis_atomic_sub(lis_atomic_t *atomic_addr, int amt) _RP;
-void	lis_atomic_inc(lis_atomic_t *atomic_addr) _RP;
-void	lis_atomic_dec(lis_atomic_t *atomic_addr) _RP;
-int	lis_atomic_dec_and_test(lis_atomic_t *atomic_addr) _RP;
+void lis_atomic_set(lis_atomic_t *atomic_addr, int valu);
+int lis_atomic_read(lis_atomic_t *atomic_addr);
+void lis_atomic_add(lis_atomic_t *atomic_addr, int amt);
+void lis_atomic_sub(lis_atomic_t *atomic_addr, int amt);
+void lis_atomic_inc(lis_atomic_t *atomic_addr);
+void lis_atomic_dec(lis_atomic_t *atomic_addr);
+int lis_atomic_dec_and_test(lis_atomic_t *atomic_addr);
 
 /*
  * Internally we can use these direct access macros for speed since LiS
@@ -418,7 +410,7 @@ int	lis_atomic_dec_and_test(lis_atomic_t *atomic_addr) _RP;
 #define	K_ATOMIC_SUB(lis_atomic_addr,v)		\
 				atomic_sub((v),(atomic_t *)(lis_atomic_addr))
 
-extern int	lis_in_interrupt(void) _RP ;
+extern int lis_in_interrupt(void);
 
 /*
  * Now include lislocks.h
@@ -428,18 +420,17 @@ extern int	lis_in_interrupt(void) _RP ;
 /*
  *  lis_gettimeofday -  used by lis_hitime and similar functions
  */
-void lis_gettimeofday(struct timeval *tv)_RP;
-
+void lis_gettimeofday(struct timeval *tv);
 
 /* lock inodes...
  *
  * Must use kernel semaphore routine directly since the inode semaphore is a
  * kernel semaphore and not an LiS semaphore.
  */
-int lis_kernel_down(struct semaphore *sem)_RP;
-void lis_kernel_up(struct semaphore *sem)_RP;
+int lis_kernel_down(struct semaphore *sem);
+void lis_kernel_up(struct semaphore *sem);
 
-#if 0			/* don't need to hold inode semaphore for I/O oprns */
+#if 0				/* don't need to hold inode semaphore for I/O oprns */
 #define	LOCK_INO(i)	lis_kernel_down(&((i)->i_sem))
 #define	ULOCK_INO(i)	lis_kernel_up(&((i)->i_sem))
 #else
@@ -450,14 +441,14 @@ void lis_kernel_up(struct semaphore *sem)_RP;
 /*
  *  inode/stdata access
  */
-#if __LIS_INTERNAL__
-struct inode  *lis_file_inode(struct file *f);
-char          *lis_file_name(struct file *f);
+#ifdef __LIS_INTERNAL__
+struct inode *lis_file_inode(struct file *f);
+char *lis_file_name(struct file *f);
 struct stdata *lis_file_str(struct file *f);
-void           lis_set_file_str(struct file *f, struct stdata *s);
+void lis_set_file_str(struct file *f, struct stdata *s);
 struct stdata *lis_inode_str(struct inode *i);
-void           lis_set_inode_str(struct inode *i, struct stdata *s);
-struct inode  *lis_set_up_inode(struct file *f, struct inode *inode) ;
+void lis_set_inode_str(struct inode *i, struct stdata *s);
+struct inode *lis_set_up_inode(struct file *f, struct inode *inode);
 #endif
 #define FILE_INODE(f)   lis_file_inode(f)
 #define FILE_NAME(f)    lis_file_name(f)
@@ -468,9 +459,9 @@ struct inode  *lis_set_up_inode(struct file *f, struct inode *inode) ;
 #define	I_COUNT(i)	( (i) ? atomic_read(&((i)->i_count)) : -1 )
 #define F_COUNT(f)	( (f) ? atomic_read(&((f)->f_count)) : -1 )
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 struct dentry *lis_d_alloc_root(struct inode *i, int m);
-void           lis_dput(struct dentry *d);
+void lis_dput(struct dentry *d);
 struct dentry *lis_dget(struct dentry *d);
 #endif
 
@@ -484,32 +475,30 @@ struct dentry *lis_dget(struct dentry *d);
 /*
  *  clone support
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern struct inode *lis_grab_inode(struct inode *ino);
-extern void          lis_put_inode(struct inode *ino);
-extern int           lis_is_stream_inode(struct inode *ino);
-extern struct inode *lis_new_inode(struct file *,dev_t);
-extern struct inode *lis_old_inode(struct file *,struct inode *);
-extern int           lis_new_file_name(struct file *, const char *);
-extern void          lis_new_stream_name(struct stdata *, struct file *);
+extern void lis_put_inode(struct inode *ino);
+extern int lis_is_stream_inode(struct inode *ino);
+extern struct inode *lis_new_inode(struct file *, dev_t);
+extern struct inode *lis_old_inode(struct file *, struct inode *);
+extern int lis_new_file_name(struct file *, const char *);
+extern void lis_new_stream_name(struct stdata *, struct file *);
+
 #if defined(KERNEL_2_1)
-extern void          lis_cleanup_file_opening(struct file *,
-					      struct stdata *, int,
-					      struct dentry *,  int,
-					      struct vfsmount *, int);
+extern void lis_cleanup_file_opening(struct file *, struct stdata *, int, struct dentry *, int,
+				     struct vfsmount *, int);
 #else
-extern void          lis_cleanup_file_opening(struct file *,
-					      struct stdata *, int);
+extern void lis_cleanup_file_opening(struct file *, struct stdata *, int);
 #endif
 #endif
-#if __LIS_INTERNAL__
-extern void          lis_cleanup_file_closing(struct file *, struct stdata *);
+#ifdef __LIS_INTERNAL__
+extern void lis_cleanup_file_closing(struct file *, struct stdata *);
 #endif
 
 extern int lis_major;
 
 #if defined(KERNEL_2_5)
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_strflush(struct file *);
 #endif
 #endif
@@ -517,33 +506,32 @@ extern int lis_strflush(struct file *);
 /*
  * Device node support
  */
-int     lis_mknod(char *name, int mode, dev_t dev) _RP;
-int     lis_unlink(char *name) _RP;
-
+int lis_mknod(char *name, int mode, dev_t dev);
+int lis_unlink(char *name);
 
 /*
  *  FIFO/pipe support
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_get_fifo(struct file **);
 extern int lis_get_pipe(struct file **, struct file **);
-extern int lis_pipe( unsigned int * );
+extern int lis_pipe(unsigned int *);
 
-extern int  lis_fifo_open_sync(struct inode *, struct file *);
+extern int lis_fifo_open_sync(struct inode *, struct file *);
 extern void lis_fifo_close_sync(struct inode *, struct file *);
-extern int  lis_fifo_write_sync(struct inode *, int);
+extern int lis_fifo_write_sync(struct inode *, int);
 #endif
 
 /*
  *  syscall interface
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern asmlinkage int lis_sys_pipe(unsigned int *);
 #endif
 /*
  *  ioctl interface
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_ioc_pipe(unsigned int *);
 
 /*
@@ -556,14 +544,14 @@ extern int lis_fdetach(const char *);
 /*
  *  syscall interfaces
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern asmlinkage int lis_sys_fattach(int, const char *);
 extern asmlinkage int lis_sys_fdetach(const char *);
 #endif
 /*
  *  ioctl interfaces
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern int lis_ioc_fattach(struct file *, char *);
 extern int lis_ioc_fdetach(char *);
 #endif
@@ -580,16 +568,16 @@ extern int lis_ioc_fdetach(char *);
  * Routine is always present but returns error if the kernel is not
  * built for dynamic loading of modules from within the kernel.
  */
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 int lis_loadable_load(const char *name);
 #endif
 
 /*
  * Process kill
  */
-#if __LIS_INTERNAL__
-extern int	lis_kill_proc(int pid, int sig, int priv) ;
-extern int	lis_kill_pg (int pgrp, int sig, int priv) ;
+#ifdef __LIS_INTERNAL__
+extern int lis_kill_proc(int pid, int sig, int priv);
+extern int lis_kill_pg(int pgrp, int sig, int priv);
 #endif
 
 /************************************************************************
@@ -644,16 +632,18 @@ extern int	lis_kill_pg (int pgrp, int sig, int priv) ;
 #undef major_t
 #endif
 
-typedef unsigned	lis_major_t ;
-typedef unsigned	lis_minor_t ;
+typedef unsigned lis_major_t;
+typedef unsigned lis_minor_t;
+
 #define	major_t		lis_major_t
 #define	minor_t		lis_minor_t
 
-extern major_t		lis_getmajor(dev_t dev) _RP;
-extern minor_t		lis_getminor(dev_t dev) _RP;
-extern dev_t		lis_makedevice(major_t majr, minor_t minr) _RP;
-#if __LIS_INTERNAL__
-extern dev_t		lis_kern_to_lis_dev(dev_t dev) ;
+extern major_t lis_getmajor(dev_t dev);
+extern minor_t lis_getminor(dev_t dev);
+extern dev_t lis_makedevice(major_t majr, minor_t minr);
+
+#ifdef __LIS_INTERNAL__
+extern dev_t lis_kern_to_lis_dev(dev_t dev);
 #endif
 
 /*
@@ -676,8 +666,9 @@ extern dev_t		lis_kern_to_lis_dev(dev_t dev) ;
 #define DEV_TO_INT(dev) ((int)(dev))
 #define DEV_SAME(d1,d2)	(DEV_TO_INT(d1) == DEV_TO_INT(d2))
 
-#if __LIS_INTERNAL__
-extern dev_t			lis_i_rdev(struct inode *) ;
+#ifdef __LIS_INTERNAL__
+extern dev_t lis_i_rdev(struct inode *);
+
 #define	GET_I_RDEV(inode)	lis_i_rdev(inode)
 #endif
 
@@ -700,7 +691,6 @@ extern dev_t			lis_i_rdev(struct inode *) ;
 #define	RDEV_TO_INT(rdev)	((int)(rdev))
 #endif
 
-
 #define	LIS_FIFO  FIFO__CMAJOR_0
 #define LIS_CLONE CLONE__CMAJOR_0
 
@@ -709,17 +699,17 @@ extern dev_t			lis_i_rdev(struct inode *) ;
 
 #define	STR_MAJOR		lis_getmajor	/* for dev_t */
 #define	STR_MINOR		lis_getminor	/* for dev_t */
-#define	STR_KMAJOR		MAJOR		/* for kdev struct */
-#define	STR_KMINOR		MINOR		/* for kdev struct */
+#define	STR_KMAJOR		MAJOR	/* for kdev struct */
+#define	STR_KMINOR		MINOR	/* for kdev struct */
 
-#else			/* not KERNEL_2_5 */
+#else				/* not KERNEL_2_5 */
 
 #define	STR_MAJOR		lis_getmajor	/* for dev_t */
 #define	STR_MINOR		lis_getminor	/* for dev_t */
-#define	STR_KMAJOR		MAJOR		/* for kdev struct */
-#define	STR_KMINOR		MINOR		/* for kdev struct */
+#define	STR_KMAJOR		MAJOR	/* for kdev struct */
+#define	STR_KMINOR		MINOR	/* for kdev struct */
 
-#endif			/* KERNEL_2_5 */
+#endif				/* KERNEL_2_5 */
 
 /*			End of Major/Minor Device Definitions		*/
 
@@ -756,16 +746,17 @@ extern dev_t			lis_i_rdev(struct inode *) ;
  * this returned value.  It particular, it is not visible to the thread that
  * started the new thread.
  */
-pid_t   lis_thread_start(int (*fcn)(void *), void *arg, const char *name) _RP;
-int	lis_thread_stop(pid_t pid) _RP;
+pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name);
+int lis_thread_stop(pid_t pid);
 
 #else				/* __KERNEL__ */
 
 /*
  * sad.h needs these definitions in user space.
  */
-typedef unsigned	lis_major_t ;
-typedef unsigned	lis_minor_t ;
+typedef unsigned lis_major_t;
+typedef unsigned lis_minor_t;
+
 #define	major_t		lis_major_t
 #define	minor_t		lis_minor_t
 
@@ -775,7 +766,7 @@ typedef unsigned	lis_minor_t ;
  * type.  This allows uer programs to view data structures that have
  * lis_atomic_t data in them.
  */
-typedef	volatile long		lis_atomic_t ;
+typedef volatile long lis_atomic_t;
 
 #define	lis_atomic_set(atomic_addr,valu) (*(atomic_addr) = (valu))
 #define	lis_atomic_read(atomic_addr) 	 (*(atomic_addr))
@@ -784,8 +775,6 @@ typedef	volatile long		lis_atomic_t ;
 #define	lis_atomic_inc(atomic_addr) 	 ((*(atomic_addr))++)
 #define	lis_atomic_dec(atomic_addr) 	 ((*(atomic_addr))--)
 #define	lis_atomic_dec_and_test(atomic_addr) ((*(atomic_addr))--)
-
-
 
 #endif				/* __KERNEL__ */
 
@@ -822,24 +811,25 @@ typedef	volatile long		lis_atomic_t ;
 
 #if (defined(LINUX) && defined(USE_KMEM_CACHE))
 
-#if __LIS_INTERNAL__
-extern lis_atomic_t             lis_qsync_cnt;
-extern lis_atomic_t             lis_locks_cnt;
-extern lis_atomic_t             lis_head_cnt;
-extern lis_atomic_t             lis_qband_cnt;
-extern lis_atomic_t             lis_queue_cnt;
+#ifdef __LIS_INTERNAL__
+extern lis_atomic_t lis_qsync_cnt;
+extern lis_atomic_t lis_locks_cnt;
+extern lis_atomic_t lis_head_cnt;
+extern lis_atomic_t lis_qband_cnt;
+extern lis_atomic_t lis_queue_cnt;
 
 void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label);
 #endif
 
-static inline void *lis_cache_alloc(kmem_cache_t *cp, lis_atomic_t *cntr)
+static inline void *
+lis_cache_alloc(kmem_cache_t *cp, lis_atomic_t *cntr)
 {
-    void *p = kmem_cache_alloc(cp, GFP_ATOMIC) ;
+	void *p = kmem_cache_alloc(cp, GFP_ATOMIC);
 
-    if (p != NULL)
-	K_ATOMIC_INC(cntr) ;
+	if (p != NULL)
+		K_ATOMIC_INC(cntr);
 
-    return(p) ;
+	return (p);
 }
 
 #define LIS_CA(cachep, cntr)	lis_cache_alloc(cachep, &cntr)
@@ -875,13 +865,13 @@ static inline void *lis_cache_alloc(kmem_cache_t *cp, lis_atomic_t *cntr)
  * These are used only internally
  */
 #define	KALLOC(n,cls,cache)	lis__kmalloc(n,cls,cache)	/* lismem.c */
-#define	KFREE(p)		lis__kfree(p)			/* lismem.c */
+#define	KFREE(p)		lis__kfree(p)	/* lismem.c */
 
-#if __LIS_INTERNAL__
-extern struct stdata	*lis_fd2str(int fd) ;	/* file descr -> stream */
+#ifdef __LIS_INTERNAL__
+extern struct stdata *lis_fd2str(int fd);	/* file descr -> stream */
 
-extern void *lis__kmalloc(int nbytes, int class, int use_cache) ;
-extern void *lis__kfree(void *ptr) ;
+extern void *lis__kmalloc(int nbytes, int class, int use_cache);
+extern void *lis__kfree(void *ptr);
 #endif
 
 #endif				/* __KERNEL__ */
@@ -896,14 +886,13 @@ extern void *lis__kfree(void *ptr) ;
  * tell STREAMS
  */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern void
-lis_memfree( void );
+#ifdef __LIS_INTERNAL__
+extern void lis_memfree(void);
 #endif
 
 /* Get avail kernel memory size
  */
-#define lis_kmemavail()	((unsigned long)-1) /* lots of mem avail :) */
+#define lis_kmemavail()	((unsigned long)-1)	/* lots of mem avail :) */
 
 #endif				/* __KERNEL__ */
 
@@ -914,20 +903,17 @@ lis_memfree( void );
  * Will return 0 or errno
  */
 #ifdef __KERNEL__
-#if __LIS_INTERNAL__
-extern int 
-lis_copyin_str(struct file *fp, const char *ustr, char **kstr, int max);
+#ifdef __LIS_INTERNAL__
+extern int lis_copyin_str(struct file *fp, const char *ustr, char **kstr, int max);
 #endif
-int     lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
-int     lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len);
-#if __LIS_INTERNAL__
-int	lis_check_umem(struct file *fp, int rd_wr_fcn,
-	                   const void *usr_addr, int lgth) ;
-#endif
+int lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len);
+int lis_copyout(struct file *fp, const void *kbuf, void *ubuf, int len);
 
+#ifdef __LIS_INTERNAL__
+int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth);
+#endif
 
 #endif				/* __KERNEL__ */
-
 
 /*  -------------------------------------------------------------------  */
 
@@ -939,16 +925,15 @@ int	lis_check_umem(struct file *fp, int rd_wr_fcn,
  */
 #ifdef __KERNEL__
 
-#if __LIS_INTERNAL__
-extern void	lis_setqsched(int can_call) ;
-extern lis_atomic_t	lis_in_syscall ;
-extern lis_atomic_t	lis_runq_req_cnt ;
+#ifdef __LIS_INTERNAL__
+extern void lis_setqsched(int can_call);
+extern lis_atomic_t lis_in_syscall;
+extern lis_atomic_t lis_runq_req_cnt;
 #endif
 #define	lis_runqueues()		do {					      \
     				     if (K_ATOMIC_READ(&lis_runq_req_cnt))  \
 					lis_setqsched(1);		      \
 				   } while(0)
-
 
 #endif				/* __KERNEL__ */
 
@@ -961,7 +946,6 @@ extern lis_atomic_t	lis_runq_req_cnt ;
 #define lis_unlockqf(qp,f,l) lis_unlockq_fcn((qp),f,l)
 #define lis_unlockq(qp)	     lis_unlockqf(qp,__FILE__,__LINE__)
 
-
 /*  -------------------------------------------------------------------  */
 
 /*
@@ -973,23 +957,21 @@ extern lis_atomic_t	lis_runq_req_cnt ;
 
 #ifdef KERNEL_2_0
 
-typedef struct lis_select_struct
-{
-    struct wait_queue	*sel_wait ;
+typedef struct lis_select_struct {
+	struct wait_queue *sel_wait;
 
-} lis_select_t ;
+} lis_select_t;
 
-#if __LIS_INTERNAL__
-extern int	lis_select(struct inode *inode, struct file *file,
-			   int sel_type, select_table *wait) ;
+#ifdef __LIS_INTERNAL__
+extern int lis_select(struct inode *inode, struct file *file, int sel_type, select_table * wait);
 
-extern void	lis_select_wakeup(struct stdata *hd) ;
+extern void lis_select_wakeup(struct stdata *hd);
 #endif
 
 #elif defined(KERNEL_2_1)
 
-#if __LIS_INTERNAL__
-extern unsigned	lis_poll_2_1(struct file *fp, poll_table * wait);
+#ifdef __LIS_INTERNAL__
+extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait);
 #endif
 
 #else
@@ -1018,52 +1000,51 @@ extern unsigned	lis_poll_2_1(struct file *fp, poll_table * wait);
 #define FILE_MNTGET(f)  MNTGET(FILE_MNT((f)))
 #define FILE_MNTPUT(f)  MNTPUT(FILE_MNT((f)))
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern struct vfsmount *lis_mnt;
-extern lis_atomic_t     lis_mnt_cnt;
+extern lis_atomic_t lis_mnt_cnt;
 
 static inline
-void lis_mnt_cnt_sync(void)
+    void
+lis_mnt_cnt_sync(void)
 {
-    if (lis_mnt)
-	K_ATOMIC_SET(&lis_mnt_cnt,MNT_COUNT(lis_mnt));
+	if (lis_mnt)
+		K_ATOMIC_SET(&lis_mnt_cnt, MNT_COUNT(lis_mnt));
 }
 
 static inline
-struct vfsmount *lis_mntget(struct vfsmount *m)
+struct vfsmount *
+lis_mntget(struct vfsmount *m)
 {
-    struct vfsmount *mm = (m ? mntget(m) : NULL) ;
+	struct vfsmount *mm = (m ? mntget(m) : NULL);
 
-    lis_mnt_cnt_sync();
+	lis_mnt_cnt_sync();
 
-    return(mm) ;
+	return (mm);
 }
 
 static inline
-void lis_mntput(struct vfsmount *m)
+    void
+lis_mntput(struct vfsmount *m)
 {
-    if (m == NULL)
-	return;
+	if (m == NULL)
+		return;
 
-    if (MNT_COUNT(m) > 0)
-	mntput(m) ;
+	if (MNT_COUNT(m) > 0)
+		mntput(m);
 
-    lis_mnt_cnt_sync() ;
+	lis_mnt_cnt_sync();
 }
 #endif
 
 #if defined(CONFIG_DEV)
-#if __LIS_INTERNAL__
-extern void
-lis_mnt_cnt_sync_fcn(const char *file, int line, const char *fn);
+#ifdef __LIS_INTERNAL__
+extern void lis_mnt_cnt_sync_fcn(const char *file, int line, const char *fn);
 
-extern struct vfsmount *
-lis_mntget_fcn(struct vfsmount *m, 
-	       const char *file, int line, const char *fn);
+extern struct vfsmount *lis_mntget_fcn(struct vfsmount *m, const char *file, int line,
+				       const char *fn);
 
-extern void
-lis_mntput_fcn(struct vfsmount *m, 
-	       const char *file, int line, const char *fn);
+extern void lis_mntput_fcn(struct vfsmount *m, const char *file, int line, const char *fn);
 #endif
 
 #define MNTSYNC()      lis_mnt_cnt_sync_fcn(__LIS_FILE__,__LINE__,__FUNCTION__)
@@ -1073,7 +1054,7 @@ lis_mntput_fcn(struct vfsmount *m,
 #define MNTSYNC()      lis_mnt_cnt_sync()
 #define MNTGET(m)      lis_mntget((m))
 #define MNTPUT(m)      lis_mntput((m))
-#endif  /* CONFIG_DEV  */
+#endif				/* CONFIG_DEV */
 
 #endif				/* __KERNEL__ */
 
@@ -1099,7 +1080,7 @@ lis_mntput_fcn(struct vfsmount *m,
      (   LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,0)	\
       && LINUX_VERSION_CODE <  KERNEL_VERSION(2,4,1))
 
-extern void	put_unused_fd(unsigned int fd) ;
+extern void put_unused_fd(unsigned int fd);
 
 # endif
 
@@ -1111,7 +1092,7 @@ extern void	put_unused_fd(unsigned int fd) ;
 # if (   LINUX_VERSION_CODE >= KERNEL_VERSION(2,2,0)	\
       && LINUX_VERSION_CODE <  KERNEL_VERSION(2,2,14))	\
 
-extern struct inode *igrab(struct inode *inode) ;
+extern struct inode *igrab(struct inode *inode);
 
 # endif
 #endif
@@ -1122,7 +1103,6 @@ extern struct inode *igrab(struct inode *inode) ;
 #if defined(KERNEL_2_4_7)
 #define FATTACH_VIA_MOUNT 1
 #endif
-
 
 #endif				/* __KERNEL__ */
 
@@ -1137,7 +1117,7 @@ extern struct inode *igrab(struct inode *inode) ;
 #endif
 
 #define freehdr(a) lis_msgb_cache_freehdr((a))
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern kmem_cache_t *lis_msgb_cachep;
 extern kmem_cache_t *lis_queue_cachep;
 extern kmem_cache_t *lis_qsync_cachep;
@@ -1154,11 +1134,9 @@ extern void lis_terminate_locks(void);
 #endif
 #endif				/* USE_KMEM_CACHE */
 
-
 #endif				/* __KERNEL__ */
 
-#endif /*!__LIS_M_DEP_H*/
-
+#endif				/* !__LIS_M_DEP_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

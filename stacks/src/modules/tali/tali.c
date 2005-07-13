@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:56 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:56 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:42 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:56 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:42 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:56 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:42 $";
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include "tali.h"
 #include "tali_data.h"
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2005/07/05 22:45:56 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:42 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

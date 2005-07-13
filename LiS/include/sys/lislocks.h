@@ -102,16 +102,12 @@
     char	*unlocker_file ;	/* last to unlock the lock */	\
     int		 unlocker_line ;					\
     int		 unlocker_cntr ;	/* seq cntr */			\
-    int		 allocated ;		/* allocated structure */
+    int		 allocated ;	/* allocated structure */
 
-typedef volatile struct lis_spin_lock
-{
-    LIS_SPIN_RW_COMMON_FIELDS
+typedef volatile struct lis_spin_lock {
+	LIS_SPIN_RW_COMMON_FIELDS long spin_lock_mem[16];
 
-    long	 spin_lock_mem[16] ;
-
-} lis_spin_lock_t ;
-
+} lis_spin_lock_t;
 
 /*
  * Call the lock functions by these define names so as to automatically
@@ -123,19 +119,19 @@ typedef volatile struct lis_spin_lock
  * LiS spin locks must be initialized via a call to lis_spin_lock_init.
  */
 #define lis_spin_is_locked(lock) 	 	\
-    				lis_spin_is_locked_fcn(lock,__FILE__,__LINE__) 
+    				lis_spin_is_locked_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_lock(lock) 	 	\
-    				lis_spin_lock_fcn(lock,__FILE__,__LINE__) 
+    				lis_spin_lock_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_unlock(lock) 	 	\
-    				lis_spin_unlock_fcn(lock,__FILE__,__LINE__) 
+    				lis_spin_unlock_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_trylock(lock) 	 	\
-    				lis_spin_trylock_fcn(lock,__FILE__,__LINE__) 
+    				lis_spin_trylock_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_lock_irq(lock) 	\
-    				lis_spin_lock_irq_fcn(lock,__FILE__,__LINE__) 
+    				lis_spin_lock_irq_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_unlock_irq(lock) 	\
-				lis_spin_unlock_irq_fcn(lock,__FILE__,__LINE__) 
+				lis_spin_unlock_irq_fcn(lock,__FILE__,__LINE__)
 #define lis_spin_lock_irqsave(lock,flags) 	 \
-			lis_spin_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__) 
+			lis_spin_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__)
 #define lis_spin_unlock_irqrestore(lock,flags) 	 \
 		    lis_spin_unlock_irqrestore_fcn(lock,flags,__FILE__,__LINE__)
 #define	lis_spin_lock_init(lock,name)	\
@@ -149,27 +145,22 @@ typedef volatile struct lis_spin_lock
  * These are the real routines.  Not to be called directly.
  */
 #if defined(INT_PSW) && !defined(KERNEL_2_5)
-typedef int		lis_flags_t ;
+typedef int lis_flags_t;
 #else
-typedef unsigned long	lis_flags_t ;
+typedef unsigned long lis_flags_t;
 #endif
 
-int	lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL) _RP;
-void	lis_spin_lock_fcn(lis_spin_lock_t *lock, FL) _RP;
-void	lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL) _RP;
-int	lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL) _RP;
-void	lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL) _RP;
-void	lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL) _RP;
-void	lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock,
-				  lis_flags_t *flags, FL) _RP;
-void	lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock,
-				       lis_flags_t *flags, FL) _RP;
-void	lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL) _RP;
-lis_spin_lock_t *
-	lis_spin_lock_alloc_fcn(const char *name, FL) _RP;
-lis_spin_lock_t *
-	lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL) _RP;
-
+int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, FL);
+void lis_spin_lock_fcn(lis_spin_lock_t *lock, FL);
+void lis_spin_unlock_fcn(lis_spin_lock_t *lock, FL);
+int lis_spin_trylock_fcn(lis_spin_lock_t *lock, FL);
+void lis_spin_lock_irq_fcn(lis_spin_lock_t *lock, FL);
+void lis_spin_unlock_irq_fcn(lis_spin_lock_t *lock, FL);
+void lis_spin_lock_irqsave_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL);
+void lis_spin_unlock_irqrestore_fcn(lis_spin_lock_t *lock, lis_flags_t * flags, FL);
+void lis_spin_lock_init_fcn(lis_spin_lock_t *lock, const char *name, FL);
+lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, FL);
+lis_spin_lock_t *lis_spin_lock_free_fcn(lis_spin_lock_t *lock, FL);
 
 /************************************************************************
 *                           Read/Write Spin Locks			*
@@ -182,23 +173,20 @@ lis_spin_lock_t *
 * writing.  There are irq and non-irq forms of the routines.		*
 *									*
 ************************************************************************/
-typedef volatile struct lis_rw_lock
-{
-    LIS_SPIN_RW_COMMON_FIELDS
+typedef volatile struct lis_rw_lock {
+	LIS_SPIN_RW_COMMON_FIELDS long rw_lock_mem[16];
 
-    long	 rw_lock_mem[16] ;
-
-} lis_rw_lock_t ;
+} lis_rw_lock_t;
 
 #define lis_rw_read_lock(lock) 	 	\
-    				lis_rw_read_lock_fcn(lock,__FILE__,__LINE__) 
+    				lis_rw_read_lock_fcn(lock,__FILE__,__LINE__)
 #define lis_rw_write_lock(lock) 	 	\
-    				lis_rw_write_lock_fcn(lock,__FILE__,__LINE__) 
+    				lis_rw_write_lock_fcn(lock,__FILE__,__LINE__)
 
 #define lis_rw_read_unlock(lock) 	 	\
-    				lis_rw_read_unlock_fcn(lock,__FILE__,__LINE__) 
+    				lis_rw_read_unlock_fcn(lock,__FILE__,__LINE__)
 #define lis_rw_write_unlock(lock) 	 	\
-    				lis_rw_write_unlock_fcn(lock,__FILE__,__LINE__) 
+    				lis_rw_write_unlock_fcn(lock,__FILE__,__LINE__)
 
 #define lis_rw_read_lock_irq(lock) 	\
 			    lis_rw_read_lock_irq_fcn(lock,__FILE__,__LINE__)
@@ -206,14 +194,14 @@ typedef volatile struct lis_rw_lock
 			    lis_rw_write_lock_irq_fcn(lock,__FILE__,__LINE__)
 
 #define lis_rw_read_unlock_irq(lock) 	\
-			    lis_rw_read_unlock_irq_fcn(lock,__FILE__,__LINE__) 
+			    lis_rw_read_unlock_irq_fcn(lock,__FILE__,__LINE__)
 #define lis_rw_write_unlock_irq(lock) 	\
-			    lis_rw_write_unlock_irq_fcn(lock,__FILE__,__LINE__) 
+			    lis_rw_write_unlock_irq_fcn(lock,__FILE__,__LINE__)
 
 #define lis_rw_read_lock_irqsave(lock,flags) 	 \
-		    lis_rw_read_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__) 
+		    lis_rw_read_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__)
 #define lis_rw_write_lock_irqsave(lock,flags) 	 \
-		    lis_rw_write_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__) 
+		    lis_rw_write_lock_irqsave_fcn(lock,flags,__FILE__,__LINE__)
 
 #define lis_rw_read_unlock_irqrestore(lock,flags) 	 \
 		lis_rw_read_unlock_irqrestore_fcn(lock,flags,__FILE__,__LINE__)
@@ -229,33 +217,27 @@ typedef volatile struct lis_rw_lock
 /*
  * These are the real routines.  Not to be called directly.
  */
-void	lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL) _RP;
-void	lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL) _RP;
+void lis_rw_read_lock_fcn(lis_rw_lock_t *lock, FL);
+void lis_rw_write_lock_fcn(lis_rw_lock_t *lock, FL);
 
-void	lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL) _RP;
-void	lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL) _RP;
+void lis_rw_read_unlock_fcn(lis_rw_lock_t *lock, FL);
+void lis_rw_write_unlock_fcn(lis_rw_lock_t *lock, FL);
 
-void	lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL) _RP;
-void	lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL) _RP;
+void lis_rw_read_lock_irq_fcn(lis_rw_lock_t *lock, FL);
+void lis_rw_write_lock_irq_fcn(lis_rw_lock_t *lock, FL);
 
-void	lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL) _RP;
-void	lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL) _RP;
+void lis_rw_read_unlock_irq_fcn(lis_rw_lock_t *lock, FL);
+void lis_rw_write_unlock_irq_fcn(lis_rw_lock_t *lock, FL);
 
-void	lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				     lis_flags_t *flags, FL) _RP;
-void	lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock,
-				      lis_flags_t *flags, FL) _RP;
+void lis_rw_read_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
+void lis_rw_write_lock_irqsave_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
 
-void	lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					  lis_flags_t *flags, FL) _RP;
-void	lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock,
-					   lis_flags_t *flags, FL)_RP;
+void lis_rw_read_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
+void lis_rw_write_unlock_irqrestore_fcn(lis_rw_lock_t *lock, lis_flags_t * flags, FL);
 
-void	lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL) _RP;
-lis_rw_lock_t *
-	lis_rw_lock_alloc_fcn(const char *name, FL) _RP;
-lis_rw_lock_t *
-	lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL) _RP;
+void lis_rw_lock_init_fcn(lis_rw_lock_t *lock, const char *name, FL);
+lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, FL);
+lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, FL);
 
 /************************************************************************
 *                           SPL Routines                                *
@@ -270,13 +252,14 @@ lis_rw_lock_t *
 #define	lis_splx(x)		lis_splx_fcn(x,__FILE__,__LINE__)
 #define	lis_spl0(x)		lis_spl0_fcn(__FILE__,__LINE__)
 
-lis_flags_t	lis_splstr_fcn(FL) _RP;
-void	lis_splx_fcn(lis_flags_t x, FL) _RP;
-void	lis_spl0_fcn(FL) _RP;
-#if __LIS_INTERNAL__
-void	lis_print_spl_track(void) _RP;
+lis_flags_t lis_splstr_fcn(FL);
+void lis_splx_fcn(lis_flags_t x, FL);
+void lis_spl0_fcn(FL);
+
+#ifdef __LIS_INTERNAL__
+void lis_print_spl_track(void);
 #endif
-int	lis_own_spl(void) _RP;		/* do I own the global spl lock? */
+int lis_own_spl(void);			/* do I own the global spl lock? */
 
 /************************************************************************
 *                           Semaphores                                  *
@@ -287,28 +270,27 @@ int	lis_own_spl(void) _RP;		/* do I own the global spl lock? */
 *									*
 ************************************************************************/
 
-typedef struct lis_semaphore
-{
-    void	*taskp ;		/* owners task pointer */
-    unsigned	 contention_cnt ;	/* # times sem in contention */
-    char	*downer_file ;		/* most recent "down" operation */
-    int		 downer_line ;
-    int		 downer_cntr ;		/* seq cntr */
-    char	*owner_file ;		/* most recent successful "down" */
-    int		 owner_line ;
-    int		 owner_cntr ;		/* seq cntr */
-    char	*upper_file ;		/* most recent "up" operation */
-    int		 upper_line ;
-    int		 upper_cntr ;		/* seq cntr */
-    int		 allocated ;		/* allocated structure */
-    struct timeval up_time ;		/* timestamp when lis_up called */
+typedef struct lis_semaphore {
+	void *taskp;			/* owners task pointer */
+	unsigned contention_cnt;	/* # times sem in contention */
+	char *downer_file;		/* most recent "down" operation */
+	int downer_line;
+	int downer_cntr;		/* seq cntr */
+	char *owner_file;		/* most recent successful "down" */
+	int owner_line;
+	int owner_cntr;			/* seq cntr */
+	char *upper_file;		/* most recent "up" operation */
+	int upper_line;
+	int upper_cntr;			/* seq cntr */
+	int allocated;			/* allocated structure */
+	struct timeval up_time;		/* timestamp when lis_up called */
 #if defined(CONFIG_PRIO_INHERIT)	/* a Timesys Linux thing */
-    long	 sem_mem[50] ;
+	long sem_mem[50];
 #else
-    long	 sem_mem[20] ;
+	long sem_mem[20];
 #endif
 
-} lis_semaphore_t ;
+} lis_semaphore_t;
 
 /*
  * Drivers use these defines and not the real routines.
@@ -316,16 +298,16 @@ typedef struct lis_semaphore
 #define	lis_up(s)	lis_up_fcn(s, __FILE__,__LINE__)
 #define	lis_down(s)	lis_down_fcn(s, __FILE__,__LINE__)
 #define	lis_down_nosig(s) lis_down_nosig_fcn(s, __FILE__,__LINE__)
-extern void	lis_sem_init(lis_semaphore_t *,int)_RP;
-extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *)_RP;
-extern lis_semaphore_t *lis_sem_alloc(int)_RP;
+extern void lis_sem_init(lis_semaphore_t *, int);
+extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *);
+extern lis_semaphore_t *lis_sem_alloc(int);
 
 /*
  * Implementation routines, not to be used directly by drivers.
  */
-extern void	lis_up_fcn(lis_semaphore_t *sem, FL) _RP;
-extern int	lis_down_fcn(lis_semaphore_t *sem, FL) _RP;
-extern void	lis_down_nosig_fcn(lis_semaphore_t *lsem, FL) _RP;
+extern void lis_up_fcn(lis_semaphore_t *sem, FL);
+extern int lis_down_fcn(lis_semaphore_t *sem, FL);
+extern void lis_down_nosig_fcn(lis_semaphore_t *lsem, FL);
 
 /*
  * Semaphore initialization is handled by lis_sem_init.  Semaphore destruction
@@ -333,9 +315,6 @@ extern void	lis_down_nosig_fcn(lis_semaphore_t *lsem, FL) _RP;
  * sem_destroy will free it and return a NULL pointer.
  */
 #define	SEM_DESTROY(sem_addr)	lis_sem_destroy(sem_addr)
-
-
-
 
 #undef FL
 #endif				/* SYS_LISLOCKS_H from top of file */

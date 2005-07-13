@@ -95,7 +95,7 @@
 #define	KERNEL_2_4
 #endif
 
-#include <linux/kernel.h>			/* for printk */
+#include <linux/kernel.h>	/* for printk */
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,3,0)
 #include <linux/sched.h>
@@ -107,7 +107,6 @@
  * circular dependencies on streams.o.
  */
 
-
 /************************************************************************
 *                       Module Init and Cleanup                         *
 *************************************************************************
@@ -117,24 +116,27 @@
 ************************************************************************/
 
 #ifdef KERNEL_2_5
-int liskmod_init_module(void)
+int
+liskmod_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
-    printk("LiS Kernel Module Loaded\n") ;
-    return(0) ;			/* if we're here, we're OK */
+	printk("LiS Kernel Module Loaded\n");
+	return (0);		/* if we're here, we're OK */
 }
 
 #ifdef KERNEL_2_5
-void liskmod_cleanup_module(void)
+void
+liskmod_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
-    printk("LiS Kernel Module Unloading\n") ;
+	printk("LiS Kernel Module Unloading\n");
 }
-
 
 /************************************************************************
 *                        put_unused_fd                                  *
@@ -148,18 +150,20 @@ void cleanup_module(void)
 
 # if LINUX_VERSION_CODE < KERNEL_VERSION(2,2,6)	/* inexact version test */
 
-void put_unused_fd(unsigned int fd)
+void
+put_unused_fd(unsigned int fd)
 {
-        FD_CLR(fd, &current->files->open_fds);
+	FD_CLR(fd, &current->files->open_fds);
 }
 
 # elif LINUX_VERSION_CODE < KERNEL_VERSION(2,2,18)
 
-void put_unused_fd(unsigned int fd)
+void
+put_unused_fd(unsigned int fd)
 {
-        FD_CLR(fd, current->files->open_fds);
-        if (fd < current->files->next_fd)
-                current->files->next_fd = fd;
+	FD_CLR(fd, current->files->open_fds);
+	if (fd < current->files->next_fd)
+		current->files->next_fd = fd;
 }
 
 # else
@@ -170,20 +174,22 @@ void put_unused_fd(unsigned int fd)
 
 # if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,1)
 
-inline void __put_unused_fd(struct files_struct *files, unsigned int fd)
+inline void
+__put_unused_fd(struct files_struct *files, unsigned int fd)
 {
-        FD_CLR(fd, files->open_fds);
-        if (fd < files->next_fd)
-                files->next_fd = fd;
+	FD_CLR(fd, files->open_fds);
+	if (fd < files->next_fd)
+		files->next_fd = fd;
 }
 
-void put_unused_fd(unsigned int fd)
+void
+put_unused_fd(unsigned int fd)
 {
-        struct files_struct *files = current->files;
+	struct files_struct *files = current->files;
 
-        write_lock(&files->file_lock);
-        __put_unused_fd(files, fd);
-        write_unlock(&files->file_lock);
+	write_lock(&files->file_lock);
+	__put_unused_fd(files, fd);
+	write_unlock(&files->file_lock);
 }
 
 # else
@@ -206,25 +212,27 @@ void put_unused_fd(unsigned int fd)
 /*
  * The following code was lifted from 2.2.12.
  */
-static void __wait_on_inode(struct inode * inode)
+static void
+__wait_on_inode(struct inode *inode)
 {
-        struct wait_queue wait = { current, NULL };
+	struct wait_queue wait = { current, NULL };
 
-        add_wait_queue(&inode->i_wait, &wait);
-repeat:
-        current->state = TASK_UNINTERRUPTIBLE;
-        if (inode->i_state & I_LOCK) {
-                schedule();
-                goto repeat;
-        }
-        remove_wait_queue(&inode->i_wait, &wait);
-        current->state = TASK_RUNNING;
+	add_wait_queue(&inode->i_wait, &wait);
+      repeat:
+	current->state = TASK_UNINTERRUPTIBLE;
+	if (inode->i_state & I_LOCK) {
+		schedule();
+		goto repeat;
+	}
+	remove_wait_queue(&inode->i_wait, &wait);
+	current->state = TASK_RUNNING;
 }
 
-static inline void wait_on_inode(struct inode *inode)
+static inline void
+wait_on_inode(struct inode *inode)
 {
-        if (inode->i_state & I_LOCK)
-                __wait_on_inode(inode);
+	if (inode->i_state & I_LOCK)
+		__wait_on_inode(inode);
 }
 
 /*
@@ -232,17 +240,18 @@ static inline void wait_on_inode(struct inode *inode)
  * since it is not exported.  So we just have to risk bumping the
  * count without holding the lock.
  */
-struct inode *igrab(struct inode *inode)
+struct inode *
+igrab(struct inode *inode)
 {
-        /* spin_lock(&inode_lock); */
-        if (inode->i_state & I_FREEING)
-                inode = NULL;
-        else
-                inode->i_count++;
-        /* spin_unlock(&inode_lock); */
-        if (inode)
-                wait_on_inode(inode);
-        return inode;
+	/* spin_lock(&inode_lock); */
+	if (inode->i_state & I_FREEING)
+		inode = NULL;
+	else
+		inode->i_count++;
+	/* spin_unlock(&inode_lock); */
+	if (inode)
+		wait_on_inode(inode);
+	return inode;
 }
 
 # endif

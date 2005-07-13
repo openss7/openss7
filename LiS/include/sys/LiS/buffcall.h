@@ -86,15 +86,14 @@
 /* buffcall list 
  */
 /* entry */
-typedef struct bcinfo
-{
-    struct bcinfo *next;	/* next node  */
-    struct bcinfo *prev;	/* prev node  */
-    unsigned	   size;	/* size for this node */
-    int		   id ;		/* identifier for user */
-    volatile int   state ;	/* state of entry */
-    void	 _RP (*usr_f)(long);/* user callback */
-    long	   usr_arg;	/* arg for user callback */
+typedef struct bcinfo {
+	struct bcinfo *next;		/* next node */
+	struct bcinfo *prev;		/* prev node */
+	unsigned size;			/* size for this node */
+	int id;				/* identifier for user */
+	volatile int state;		/* state of entry */
+	void (*usr_f) (long);		/* user callback */
+	long usr_arg;			/* arg for user callback */
 } bcinfo_t;
 
 #define BC_STATE_UNUSED		0	/* unused entry */
@@ -102,14 +101,13 @@ typedef struct bcinfo
 #define	BC_STATE_CALLOUT	2	/* calling user function */
 
 /* list head */
-typedef struct bclist
-{
-    struct bcinfo *first;
-    struct bcinfo *last;
-    int		   n_elts ;
-} bclist_t ;
+typedef struct bclist {
+	struct bcinfo *first;
+	struct bcinfo *last;
+	int n_elts;
+} bclist_t;
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
@@ -119,14 +117,14 @@ typedef struct bclist
  * A power of 2 hash will do since the bufcall ids are allocated as
  * sequential numbers.
  */
-#define	N_BCHASH	128		/* power of 2 */
+#define	N_BCHASH	128	/* power of 2 */
 #define	BCHASH_MSK	(N_BCHASH - 1)
-#if __LIS_INTERNAL__
-extern volatile bclist_t	lis_bchash[N_BCHASH] ;	/* the bufcall table */
-extern volatile bcinfo_t	*lis_bcfreel ;		/* the free list */
+#ifdef __LIS_INTERNAL__
+extern volatile bclist_t lis_bchash[N_BCHASH];	/* the bufcall table */
+extern volatile bcinfo_t *lis_bcfreel;	/* the free list */
 #endif
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
 #endif
 
@@ -137,16 +135,14 @@ extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
 #define BUFCALL_N_TICKS ((SECS_TO(1)*BUFCALL_MS_TICKS/1000) ? \
 			(SECS_TO(1)*BUFCALL_MS_TICKS/1000) : 1)
 
-
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
 /* lis_bufcall - schedule recovery from alloc failure
  */
 #ifdef __KERNEL__
-extern int 
-lis_bufcall(unsigned size, int priority, void _RP (*function)(long), long arg)_RP;
+extern int lis_bufcall(unsigned size, int priority, void (*function) (long), long arg);
 #endif				/* __KERNEL__ */
 
 /* esbbcall - like bufcall, but for lis_esballoc. The function
@@ -154,31 +150,30 @@ lis_bufcall(unsigned size, int priority, void _RP (*function)(long), long arg)_R
  *	lis_esballoc will succeed.
  */
 #ifdef __KERNEL__
-extern int lis_esbbcall(int priority, void _RP (*function)(long), long arg)_RP;
+extern int lis_esbbcall(int priority, void (*function) (long), long arg);
 #endif				/* __KERNEL__ */
 
 /* unbufcall - cancels a bufcall/esbbcall
  */
 #ifdef __KERNEL__
-extern void lis_unbufcall(int bcid)_RP;
+extern void lis_unbufcall(int bcid);
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
 
 #ifdef __KERNEL__
 
-#if __LIS_INTERNAL__
+#ifdef __LIS_INTERNAL__
 extern void lis_init_bufcall(void);
 extern void lis_terminate_bufcall(void);
 
-extern void lis_dobufcall(int) ;
+extern void lis_dobufcall(int);
 #endif
 
-#endif /* __KERNEL__ */
-
+#endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
-#endif /*!_BUFFCALL_H*/
+#endif				/* !_BUFFCALL_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

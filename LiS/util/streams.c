@@ -58,9 +58,8 @@
 
 #ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/05/14 08:35:12 $"
 
-static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/05/14 08:35:12 $";
-
-
+static char const ident[] =
+    "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.3 $) $Date: 2005/05/14 08:35:12 $";
 
 #include <sys/types.h>
 #undef GCOM_OPEN
@@ -86,177 +85,171 @@ static char const ident[] = "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.
 /*
  * Storage Declarations
  */
-unsigned long strstats[STRMAXSTAT][4]; /* the stats */
-char	      buf[100000] ;		/* large buffer */
+unsigned long strstats[STRMAXSTAT][4];	/* the stats */
+char buf[100000];			/* large buffer */
 
-int             output = 1;
+int output = 1;
 
-unsigned long   strstats[STRMAXSTAT][4];	/* the stats */
+unsigned long strstats[STRMAXSTAT][4];	/* the stats */
 
-int		cflag = 0;
-int		Cflag = 0;
-int		mflag = 0;
-int		dflag = 0;
-int		Dflag = 0;
-int		Lflag = 0;
-int		sflag = 0;
-int		Sflag = 0;
-int		tflag = 0;
-int		Tflag = 0;
-int		pflag = 0;
-int		qflag = 0;
-int		Hflag = 0;
+int cflag = 0;
+int Cflag = 0;
+int mflag = 0;
+int dflag = 0;
+int Dflag = 0;
+int Lflag = 0;
+int sflag = 0;
+int Sflag = 0;
+int tflag = 0;
+int Tflag = 0;
+int pflag = 0;
+int qflag = 0;
+int Hflag = 0;
 
-char           *prog_name;
+char *prog_name;
 
-long            memK = 0;
-long            msgmemK = 0;
+long memK = 0;
+long msgmemK = 0;
 
 lis_qrun_stats_t qrun_stats;
 
-typedef struct
-{
-    int		micro_secs ;
-    unsigned	counter ;
+typedef struct {
+	int micro_secs;
+	unsigned counter;
 
-} histogram_bucket_t ;
+} histogram_bucket_t;
 
 /*
  * Names of stat slots
  */
-itemname_t lis_itemnames[] =
-{
-    {MODUSE,		MODUSESTR},
-    {MEMALLOCS,		MEMALLOCSSTR},
-    {MEMFREES,		MEMFREESSSTR},
-    {MEMALLOCD,		MEMALLOCDSTR},
-    {MEMLIM,		MEMLIMSTR},
-    {HEADERS,		HEADERSSTR},
-    {FREEHDRS,		FREEHDRSSTR},
-    {DATABS,		DATABSSTR},
-    {DBLKMEM,		DBLKMEMSTR},
-    {MSGMEMLIM,		MSGMEMLIMSTR},
-    {BUFCALLS,		BUFCALLSSTR},
-    {MSGSQD,		MSGSQDSTR},
-    {MSGQDSTRHD,	MSGQDSTRHDSTR},
-    {CANPUTS,		CANPUTSSTR},
-    {QUEUES,		QUEUESSTR},
-    {QSCHEDS,		QSCHEDSSTR},
-    {WRITECNT,		WRITESTR},
-    {READCNT,		READSTR},
-    {OPENTIME,		OPENTIMESTR},
-    {CLOSETIME,		CLOSETIMESTR},
-    {READTIME,		READTIMESTR},
-    {WRITETIME,		WRITETIMESTR},
-    {IOCTLTIME,		IOCTLTIMESTR},
-    {GETMSGTIME,	GETMSGTIMESTR},
-    {PUTMSGTIME,	PUTMSGTIMESTR},
-    {POLLTIME,		POLLTIMESTR},
-    {LOCKCNTS,		LOCKCNTSSTR}
+itemname_t lis_itemnames[] = {
+	{MODUSE, MODUSESTR},
+	{MEMALLOCS, MEMALLOCSSTR},
+	{MEMFREES, MEMFREESSSTR},
+	{MEMALLOCD, MEMALLOCDSTR},
+	{MEMLIM, MEMLIMSTR},
+	{HEADERS, HEADERSSTR},
+	{FREEHDRS, FREEHDRSSTR},
+	{DATABS, DATABSSTR},
+	{DBLKMEM, DBLKMEMSTR},
+	{MSGMEMLIM, MSGMEMLIMSTR},
+	{BUFCALLS, BUFCALLSSTR},
+	{MSGSQD, MSGSQDSTR},
+	{MSGQDSTRHD, MSGQDSTRHDSTR},
+	{CANPUTS, CANPUTSSTR},
+	{QUEUES, QUEUESSTR},
+	{QSCHEDS, QSCHEDSSTR},
+	{WRITECNT, WRITESTR},
+	{READCNT, READSTR},
+	{OPENTIME, OPENTIMESTR},
+	{CLOSETIME, CLOSETIMESTR},
+	{READTIME, READTIMESTR},
+	{WRITETIME, WRITETIMESTR},
+	{IOCTLTIME, IOCTLTIMESTR},
+	{GETMSGTIME, GETMSGTIMESTR},
+	{PUTMSGTIME, PUTMSGTIMESTR},
+	{POLLTIME, POLLTIMESTR},
+	{LOCKCNTS, LOCKCNTSSTR}
 };
 
-char           *lis_countnames[] = {
-    CURRENTSTR, TOTALSTR, MAXIMUMSTR, FAILURESSTR
+char *lis_countnames[] = {
+	CURRENTSTR, TOTALSTR, MAXIMUMSTR, FAILURESSTR
 };
 
-void LisShowStrStats(void)
+void
+LisShowStrStats(void)
 {
-    int             i;
-    int             inx;
-    int             found_time = 0;
-    int             have_hdr = 0;
+	int i;
+	int inx;
+	int found_time = 0;
+	int have_hdr = 0;
 
-    if (!output)
-	return;
-    if (!sflag && !tflag)
-	return;			/* no stats desired */
+	if (!output)
+		return;
+	if (!sflag && !tflag)
+		return;		/* no stats desired */
 
-    /*
-     * Print statistics 
-     */
-    for (i = 0; i < STRMAXSTAT; i++)
-    {
-	int             j;
+	/* 
+	 * Print statistics 
+	 */
+	for (i = 0; i < STRMAXSTAT; i++) {
+		int j;
 
-	if (lis_itemnames[i].name == NULL)
-	    continue;
+		if (lis_itemnames[i].name == NULL)
+			continue;
 
-	inx = lis_itemnames[i].stats_inx;
-	if (inx == OPENTIME)
-	{			/* time for a new header */
-	    found_time = 1;
-	    have_hdr = 0;
+		inx = lis_itemnames[i].stats_inx;
+		if (inx == OPENTIME) {	/* time for a new header */
+			found_time = 1;
+			have_hdr = 0;
+		}
+
+		if (found_time) {	/* got to time stats */
+			if (!tflag)
+				break;	/* not supposed to print them */
+		} else /* still in regular stats */ if (!sflag)	/* not supposed to * * print them */
+			continue;
+
+		if (!have_hdr) {
+			int k;
+
+			have_hdr = 1;
+			printf("\n%-28s  ", "");
+			for (k = 0; k < 4; k++)
+				printf("%12s", lis_countnames[k]);
+			printf("\n");
+		}
+
+		printf("%-28s: ", lis_itemnames[i].name);
+		for (j = 0; j < 4; j++)
+			printf("%12lu", strstats[inx][j]);
+		printf("\n");
 	}
-
-	if (found_time)
-	{			/* got to time stats */
-	    if (!tflag)
-		break;		/* not supposed to print them */
-	}
-	else /* still in regular stats */ if (!sflag)	/* not supposed to * * print them 
-							 */
-	    continue;
-
-	if (!have_hdr)
-	{
-	    int             k;
-	    have_hdr = 1;
-	    printf("\n%-28s  ", "");
-	    for (k = 0; k < 4; k++)
-		printf("%12s", lis_countnames[k]);
-	    printf("\n");
-	}
-
-	printf("%-28s: ", lis_itemnames[i].name);
-	for (j = 0; j < 4; j++)
-	    printf("%12lu", strstats[inx][j]);
-	printf("\n");
-    }
 
 }				/* LisShowStrStats */
 
-void print_qrun_stats(void)
+void
+print_qrun_stats(void)
 {
-    int             cpu;
+	int cpu;
 
-    if (!output)
-	return;
-    printf("N-CPUs N-Qrunners N-Running N-Requested\n" "%6u %10u %9u %10u\n",
-	   qrun_stats.num_cpus, qrun_stats.num_qrunners, qrun_stats.queues_running,
-	   qrun_stats.runq_req_cnt);
+	if (!output)
+		return;
+	printf("N-CPUs N-Qrunners N-Running N-Requested\n" "%6u %10u %9u %10u\n",
+	       qrun_stats.num_cpus, qrun_stats.num_qrunners, qrun_stats.queues_running,
+	       qrun_stats.runq_req_cnt);
 
-    printf("\n"
-	   "CPU   Qsched-Cnts Qsched-ISR Svc-Q-Cnts Qrun-Wkups Qrun-Cnts Active Thread-PID"
-	   "\n");
-    for (cpu = 0; cpu < qrun_stats.num_cpus; cpu++)
-    {
-	printf("%3u   %11lu %10lu %10lu %10lu %9lu %6u %10u\n", cpu,
-	       qrun_stats.setqsched_cnts[cpu], qrun_stats.setqsched_isr_cnts[cpu],
-	       qrun_stats.runq_cnts[cpu], qrun_stats.runq_wakeups[cpu],
-	       qrun_stats.queuerun_cnts[cpu], qrun_stats.active_flags[cpu],
-	       qrun_stats.runq_pids[cpu]);
-    }
+	printf("\n" "CPU   Qsched-Cnts Qsched-ISR Svc-Q-Cnts Qrun-Wkups Qrun-Cnts Active Thread-PID"
+	       "\n");
+	for (cpu = 0; cpu < qrun_stats.num_cpus; cpu++) {
+		printf("%3u   %11lu %10lu %10lu %10lu %9lu %6u %10u\n", cpu,
+		       qrun_stats.setqsched_cnts[cpu], qrun_stats.setqsched_isr_cnts[cpu],
+		       qrun_stats.runq_cnts[cpu], qrun_stats.runq_wakeups[cpu],
+		       qrun_stats.queuerun_cnts[cpu], qrun_stats.active_flags[cpu],
+		       qrun_stats.runq_pids[cpu]);
+	}
 }
 
-void print_sem_time_hist(char *buf, int nbytes)
+void
+print_sem_time_hist(char *buf, int nbytes)
 {
-    histogram_bucket_t	*p = (histogram_bucket_t *)buf ;
+	histogram_bucket_t *p = (histogram_bucket_t *) buf;
 
-    for (; p->micro_secs != 0; p++)
-    {
+	for (; p->micro_secs != 0; p++) {
+		if (p->counter != 0)
+			printf("%8d %12u\n", p->micro_secs, p->counter);
+	}
+
 	if (p->counter != 0)
-	    printf("%8d %12u\n", p->micro_secs, p->counter) ;
-    }
-
-    if (p->counter != 0)
-	printf("%8s %12u\n", "Larger", p->counter) ;
+		printf("%8s %12u\n", "Larger", p->counter);
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
 \n\
@@ -296,11 +289,12 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
     Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
@@ -314,11 +308,12 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stderr, "\
+	if (!output)
+		return;
+	fprintf(stderr, "\
 Usage:\n\
     %1$s [command]\n\
     %1$s [options]\n\
@@ -328,11 +323,12 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
-    if (!output)
-	return;
-    fprintf(stdout, "\
+	if (!output)
+		return;
+	fprintf(stdout, "\
 \n\
 Usage:\n\
     %5$s [command]\n\
@@ -394,42 +390,39 @@ Options:\n\
 ", msgmemK, memK, 0, 0, argv[0]);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-    int             fd;
-    int             rslt;
-    unsigned long   debug_mask = 0;
-    unsigned long   debug_mask2 = 0;
+	int fd;
+	int rslt;
+	unsigned long debug_mask = 0;
+	unsigned long debug_mask2 = 0;
 
-    prog_name = argv[0];
+	prog_name = argv[0];
 
-    /*
-     * Check for mnemonic options.  These must appear alone
-     * after the command name.
-     */
-    if (argc >= 2 && argv[1] != NULL)
-    {
-	if (strcmp(argv[1], "start") == 0)
-	{
-	    exit( system("/usr/sbin/strms_up") );
+	/* 
+	 * Check for mnemonic options.  These must appear alone
+	 * after the command name.
+	 */
+	if (argc >= 2 && argv[1] != NULL) {
+		if (strcmp(argv[1], "start") == 0) {
+			exit(system("/usr/sbin/strms_up"));
+		}
+
+		if (strcmp(argv[1], "stop") == 0) {
+			exit(system("/usr/sbin/strms_down"));
+		}
+
+		if (strcmp(argv[1], "status") == 0) {
+			exit(system("/usr/sbin/strms_status"));
+		}
 	}
 
-	if (strcmp(argv[1], "stop") == 0)
-	{
-	    exit( system("/usr/sbin/strms_down") );
-	}
+	while (1) {
+		int c;
 
-	if (strcmp(argv[1], "status") == 0)
-	{
-	    exit( system("/usr/sbin/strms_status") );
-	}
-    }
-    
-    while (1)
-    {
-	int             c;
 #ifdef _GNU_SOURCE
-	int             option_index = 0;
+		int option_index = 0;
 	/* *INDENT-OFF* */
 	static struct option long_options[] = {
 	    { "help",		no_argument,		NULL, 'h' },
@@ -485,249 +478,225 @@ int main(int argc, char *argv[])
 	    { 0, }
 	};
 	/* *INDENT-ON* */
-	c = getopt_long_only(argc, argv, "pqsStmhHVQd:D:c::C::", long_options,
-			     &option_index);
+
+		c = getopt_long_only(argc, argv, "pqsStmhHVQd:D:c::C::", long_options,
+				     &option_index);
 #else				/* _GNU_SOURCE */
-	c = getopt(argc, argv, "pqsStmhHVQd:D:c::C::");
+		c = getopt(argc, argv, "pqsStmhHVQd:D:c::C::");
 #endif				/* _GNU_SOURCE */
-	if (c == -1)
-	    break;
-	switch (c)
-	{
-	    case 0:
-		usage(argc, argv);
-		exit(2);
-	    case 'c':		/* -c, --maxmsg KBYTES */
-		cflag = 1;
-		if (optarg != NULL && sscanf(optarg, "%li", &msgmemK) != 1)
-		    goto bad_option;
-		break;
-	    case 'C':		/* -C, --maxmem KBYTES */
-		Cflag = 1;
-		if (optarg != NULL && sscanf(optarg, "%li", &memK) != 1)
-		    goto bad_option;
-		break;
-	    case 'd':		/* -d, --debug1 MASK */
-		dflag = 1;
-		if (sscanf(optarg, "%lx", &debug_mask) != 1)
-		    goto bad_option;
-		break;
-	    case 'D':		/* -D, --debug2 MASK */
-		Dflag = 1;
-		if (sscanf(optarg, "%lx", &debug_mask2) != 1)
-		    goto bad_option;
-		break;
-	    case 's':		/* -s, --memstats */
-		sflag = 1;
-		break;
-	    case 'S':		/* -S, --qrunstats */
-		Sflag = 1;
-		break;
-	    case 't':		/* -t, --timestats */
-		tflag = 1;
-		break;
-	    case 'm':		/* -m, --dumpmem */
-		mflag = 1;
-		break;
-	    case 'p':		/* -p, --dumpspl */
-		pflag = 1;
-		break;
-	    case 'q':		/* -q, --dumpqueues */
-		qflag = 1;
-		break;
-	    case 'Q':		/* -Q, --quiet */
-		output = 0;
-		break;
-	    case 'H':		/* -H (obsolete) */
-		Hflag = 1;
-	    case 'h':		/* -h, --help */
-		help(argc, argv);
-		exit(0);
-	    case 'V':		/* -V, --version */
-		version(argc, argv);
-		exit(0);
-	    case 55:		/* --copying */
-		copying(argc, argv);
-		exit(0);
-	    default:
-		if (0 < c && c <= 32)
-		{
-		    dflag = 1;	/* debug 1 flag */
-		    debug_mask |= (1 << (c - 1));
-		    break;
+		if (c == -1)
+			break;
+		switch (c) {
+		case 0:
+			usage(argc, argv);
+			exit(2);
+		case 'c':	/* -c, --maxmsg KBYTES */
+			cflag = 1;
+			if (optarg != NULL && sscanf(optarg, "%li", &msgmemK) != 1)
+				goto bad_option;
+			break;
+		case 'C':	/* -C, --maxmem KBYTES */
+			Cflag = 1;
+			if (optarg != NULL && sscanf(optarg, "%li", &memK) != 1)
+				goto bad_option;
+			break;
+		case 'd':	/* -d, --debug1 MASK */
+			dflag = 1;
+			if (sscanf(optarg, "%lx", &debug_mask) != 1)
+				goto bad_option;
+			break;
+		case 'D':	/* -D, --debug2 MASK */
+			Dflag = 1;
+			if (sscanf(optarg, "%lx", &debug_mask2) != 1)
+				goto bad_option;
+			break;
+		case 's':	/* -s, --memstats */
+			sflag = 1;
+			break;
+		case 'S':	/* -S, --qrunstats */
+			Sflag = 1;
+			break;
+		case 't':	/* -t, --timestats */
+			tflag = 1;
+			break;
+		case 'm':	/* -m, --dumpmem */
+			mflag = 1;
+			break;
+		case 'p':	/* -p, --dumpspl */
+			pflag = 1;
+			break;
+		case 'q':	/* -q, --dumpqueues */
+			qflag = 1;
+			break;
+		case 'Q':	/* -Q, --quiet */
+			output = 0;
+			break;
+		case 'H':	/* -H (obsolete) */
+			Hflag = 1;
+		case 'h':	/* -h, --help */
+			help(argc, argv);
+			exit(0);
+		case 'V':	/* -V, --version */
+			version(argc, argv);
+			exit(0);
+		case 55:	/* --copying */
+			copying(argc, argv);
+			exit(0);
+		default:
+			if (0 < c && c <= 32) {
+				dflag = 1;	/* debug 1 flag */
+				debug_mask |= (1 << (c - 1));
+				break;
+			}
+			if (32 < c && c <= 35) {
+				Dflag = 1;	/* debug 2 flag */
+				debug_mask2 |= (1 << (c - 32));
+				break;
+			}
+		case '?':
+		      bad_option:
+			optind--;
+		      bad_nonoption:
+			if (optind < argc && output) {
+				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
+				for (; optind < argc; optind++)
+					fprintf(stderr, "%s ", argv[optind]);
+				fprintf(stderr, "\n");
+			}
+			usage(argc, argv);
+			exit(2);
 		}
-		if (32 < c && c <= 35)
-		{
-		    Dflag = 1;	/* debug 2 flag */
-		    debug_mask2 |= (1 << (c - 32));
-		    break;
-		}
-	    case '?':
-	      bad_option:
-		optind--;
-	      bad_nonoption:
-		if (optind < argc && output)
-		{
-		    fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-		    for (; optind < argc; optind++)
-			fprintf(stderr, "%s ", argv[optind]);
-		    fprintf(stderr, "\n");
-		}
-		usage(argc, argv);
-		exit(2);
 	}
-    }
-    /*
-     * don't ignore (permuted) non-option arguments 
-     */
-    if (optind < argc)
-	goto bad_nonoption;
-
-    if (   !mflag && !dflag && !sflag && !tflag && !pflag && !qflag
-	&& !cflag && !Cflag && !Sflag && !Dflag && !Lflag && !Tflag)
-    {
-	usage(argc, argv);
-	exit(1);
-    }
-
-    if ((fd = open(LOOP_CLONE, 0, 0)) < 0)
-    {
-	if (output)
-	    fprintf(stderr, LOOP_CLONE ": %s\n", strerror(-fd));
-	exit(1);
-    }
-    if (dflag && (rslt = ioctl(fd, I_LIS_SDBGMSK, debug_mask)) < 0)
-    {
-	if (output)
-	    fprintf(stderr, LOOP_CLONE ": I_LIS_SDBGMSK: %s\n", strerror(-rslt));
-	exit(1);
-    }
-    if (Dflag && (rslt = ioctl(fd, I_LIS_SDBGMSK2, debug_mask2)) < 0)
-    {
-	if (output)
-	    fprintf(stderr, LOOP_CLONE ": I_LIS_SDBGMSK2: %s\n", strerror(-rslt));
-	exit(1);
-    }
-    if (sflag || tflag)
-    {
-	/*
-	 * printf("sizeof strstats: %d\n", sizeof(strstats)); 
+	/* 
+	 * don't ignore (permuted) non-option arguments 
 	 */
-	if ((rslt = ioctl(fd, I_LIS_GETSTATS, strstats)) < 0)
-	{
-	    if (output)
-		fprintf(stderr, LOOP_CLONE ": I_LIS_GETSTATS: %s\n", strerror(-rslt));
-	    exit(1);
+	if (optind < argc)
+		goto bad_nonoption;
+
+	if (!mflag && !dflag && !sflag && !tflag && !pflag && !qflag && !cflag && !Cflag && !Sflag
+	    && !Dflag && !Lflag && !Tflag) {
+		usage(argc, argv);
+		exit(1);
 	}
-	if (output)
-	    LisShowStrStats();
-    }
-    if (Sflag)
-    {
-	if ((rslt = ioctl(fd, I_LIS_QRUN_STATS, &qrun_stats)) < 0)
-	{
-	    if (output)
-		fprintf(stderr, LOOP_CLONE ": I_LIS_QRUN_STATS: %s\n", strerror(-rslt));
-	    exit(1);
+
+	if ((fd = open(LOOP_CLONE, 0, 0)) < 0) {
+		if (output)
+			fprintf(stderr, LOOP_CLONE ": %s\n", strerror(-fd));
+		exit(1);
 	}
-	print_qrun_stats();
-    }
-    if (mflag)
-    {
-	if ((rslt = ioctl(fd, I_LIS_PRNTMEM, 0)) < 0)
-	{
-	    if (output)
-		fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTMEM: %s\n", strerror(-rslt));
-	    exit(1);
+	if (dflag && (rslt = ioctl(fd, I_LIS_SDBGMSK, debug_mask)) < 0) {
+		if (output)
+			fprintf(stderr, LOOP_CLONE ": I_LIS_SDBGMSK: %s\n", strerror(-rslt));
+		exit(1);
 	}
+	if (Dflag && (rslt = ioctl(fd, I_LIS_SDBGMSK2, debug_mask2)) < 0) {
+		if (output)
+			fprintf(stderr, LOOP_CLONE ": I_LIS_SDBGMSK2: %s\n", strerror(-rslt));
+		exit(1);
+	}
+	if (sflag || tflag) {
+		/* 
+		 * printf("sizeof strstats: %d\n", sizeof(strstats)); 
+		 */
+		if ((rslt = ioctl(fd, I_LIS_GETSTATS, strstats)) < 0) {
+			if (output)
+				fprintf(stderr, LOOP_CLONE ": I_LIS_GETSTATS: %s\n",
+					strerror(-rslt));
+			exit(1);
+		}
+		if (output)
+			LisShowStrStats();
+	}
+	if (Sflag) {
+		if ((rslt = ioctl(fd, I_LIS_QRUN_STATS, &qrun_stats)) < 0) {
+			if (output)
+				fprintf(stderr, LOOP_CLONE ": I_LIS_QRUN_STATS: %s\n",
+					strerror(-rslt));
+			exit(1);
+		}
+		print_qrun_stats();
+	}
+	if (mflag) {
+		if ((rslt = ioctl(fd, I_LIS_PRNTMEM, 0)) < 0) {
+			if (output)
+				fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTMEM: %s\n",
+					strerror(-rslt));
+			exit(1);
+		}
 #ifdef QNX
-	if (output)
-	    printf("The memory dump is in the /usr/lib/gcom/streams.log file\n");
+		if (output)
+			printf("The memory dump is in the /usr/lib/gcom/streams.log file\n");
 #endif
-    }
-    if (pflag && (rslt = ioctl(fd, I_LIS_PRNTSPL, 0)) < 0)
-    {
-	if (output)
-	    fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTSPL: %s\n", strerror(-rslt));
-	exit(1);
-    }
-    if (qflag && (rslt = ioctl(fd, I_LIS_PRNTQUEUES, 0)) < 0)
-    {
-	if (output)
-	    fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTQUEUES: %s\n", strerror(-rslt));
-	exit(1);
-    }
-    if (cflag)
-    {
-	if (msgmemK && (rslt = ioctl(fd, I_LIS_SET_MAXMSGMEM, msgmemK * 1024)) < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_SET_MAXMSGMEM");
-	    exit(1);
 	}
-	if ((rslt = ioctl(fd, I_LIS_GET_MAXMSGMEM, &msgmemK)) < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_GET_MAXMSGMEM");
-	    exit(1);
+	if (pflag && (rslt = ioctl(fd, I_LIS_PRNTSPL, 0)) < 0) {
+		if (output)
+			fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTSPL: %s\n", strerror(-rslt));
+		exit(1);
 	}
-	if (output)
-	{
-	    if ((msgmemK /= 1024))
-		printf("Maximum memory to use for messages: %ldK\n", msgmemK);
-	    else
-		printf("Maximum memory to use for messages: No limit\n");
+	if (qflag && (rslt = ioctl(fd, I_LIS_PRNTQUEUES, 0)) < 0) {
+		if (output)
+			fprintf(stderr, LOOP_CLONE ": I_LIS_PRNTQUEUES: %s\n", strerror(-rslt));
+		exit(1);
 	}
-    }
-    if (Cflag)
-    {
-	if (memK && (rslt = ioctl(fd, I_LIS_SET_MAXMEM, memK * 1024)) < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_SET_MAXMEM");
-	    exit(1);
+	if (cflag) {
+		if (msgmemK && (rslt = ioctl(fd, I_LIS_SET_MAXMSGMEM, msgmemK * 1024)) < 0) {
+			if (output)
+				perror("ioctl I_LIS_SET_MAXMSGMEM");
+			exit(1);
+		}
+		if ((rslt = ioctl(fd, I_LIS_GET_MAXMSGMEM, &msgmemK)) < 0) {
+			if (output)
+				perror("ioctl I_LIS_GET_MAXMSGMEM");
+			exit(1);
+		}
+		if (output) {
+			if ((msgmemK /= 1024))
+				printf("Maximum memory to use for messages: %ldK\n", msgmemK);
+			else
+				printf("Maximum memory to use for messages: No limit\n");
+		}
 	}
-	if ((rslt = ioctl(fd, I_LIS_GET_MAXMEM, &memK)) < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_GET_MAXMEM");
-	    exit(1);
+	if (Cflag) {
+		if (memK && (rslt = ioctl(fd, I_LIS_SET_MAXMEM, memK * 1024)) < 0) {
+			if (output)
+				perror("ioctl I_LIS_SET_MAXMEM");
+			exit(1);
+		}
+		if ((rslt = ioctl(fd, I_LIS_GET_MAXMEM, &memK)) < 0) {
+			if (output)
+				perror("ioctl I_LIS_GET_MAXMEM");
+			exit(1);
+		}
+		if (output) {
+			if ((memK /= 1024))
+				printf("Maximum total memory to use: %ldK\n", memK);
+			else
+				printf("Maximum total memory to use: No limit\n");
+		}
 	}
-	if (output)
-	{
-	    if ((memK /= 1024))
-		printf("Maximum total memory to use: %ldK\n", memK);
-	    else
-		printf("Maximum total memory to use: No limit\n");
-	}
-    }
 
-    if ( Lflag )
-    {
-	rslt = ioctl(fd, I_LIS_LOCKS, &buf) ;
-	if (rslt < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_LOCKS") ;
-	    exit(1) ;
+	if (Lflag) {
+		rslt = ioctl(fd, I_LIS_LOCKS, &buf);
+		if (rslt < 0) {
+			if (output)
+				perror("ioctl I_LIS_LOCKS");
+			exit(1);
+		}
+		printf("%s", buf);
 	}
-	printf("%s", buf) ;
-    }
 
-    if (Tflag)
-    {
-	rslt = ioctl(fd, I_LIS_SEMTIME, &buf) ;
-	if (rslt < 0)
-	{
-	    if (output)
-		perror("ioctl I_LIS_SEMTIME") ;
-	    exit(1) ;
+	if (Tflag) {
+		rslt = ioctl(fd, I_LIS_SEMTIME, &buf);
+		if (rslt < 0) {
+			if (output)
+				perror("ioctl I_LIS_SEMTIME");
+			exit(1);
+		}
+		printf("Semaphore wakeup latency histogram:\n");
+		print_sem_time_hist(buf, rslt);
 	}
-	printf("Semaphore wakeup latency histogram:\n") ;
-	print_sem_time_hist(buf, rslt) ;
-    }
 
-    close(fd) ;
+	close(fd);
 
-    return 0;
+	return 0;
 }				/* main */

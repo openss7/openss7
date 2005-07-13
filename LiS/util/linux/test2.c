@@ -58,7 +58,8 @@
 
 #ident "@(#) $RCSfile: test2.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
 
-static char const ident[] = "$RCSfile: test2.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
+static char const ident[] =
+    "$RCSfile: test2.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
 
 /* 
  *  Test program for clarification of bug with inode locking.
@@ -92,7 +93,8 @@ int verbose = 1;
 
 int fd1, fd2;
 
-void writer1(void)
+void
+writer1(void)
 {
 	struct strbuf datbuf;
 	char buf[1024];
@@ -112,7 +114,8 @@ void writer1(void)
 	}
 }
 
-void writer2(void)
+void
+writer2(void)
 {
 	int fd;
 	struct strbuf datbuf;
@@ -158,7 +161,8 @@ void writer2(void)
 	}
 }
 
-void reader(void)
+void
+reader(void)
 {
 	struct strbuf datbuf;
 	char buf[1024];
@@ -180,7 +184,8 @@ void reader(void)
 	}
 }
 
-void copying(int argc, char *argv[])
+void
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -224,7 +229,8 @@ regulations).\n\
 ", argv[0], ident);
 }
 
-void version(int argc, char *argv[])
+void
+version(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -242,7 +248,8 @@ void version(int argc, char *argv[])
 ", argv[0], ident);
 }
 
-void usage(int argc, char *argv[])
+void
+usage(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -255,7 +262,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-void help(int argc, char *argv[])
+void
+help(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
@@ -280,13 +288,15 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	struct strioctl ioc;
 	int arg;
 
 	for (;;) {
 		int c;
+
 #ifdef _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -300,6 +310,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "qvhVC?", long_options, &option_index);
 #else				/* _GNU_SOURCE */
 		c = getopt(argc, argv, "qvhVC?");

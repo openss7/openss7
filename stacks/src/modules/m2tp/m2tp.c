@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:31 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,20 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:31 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:31 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:31 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/05 22:45:31 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/13 12:01:31 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
  *  SCTP association.  It is similar to the M2TP/UDP driver except that it has
  *  different path characteristics.
  */
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #include <sys/tpi.h>
 #include <sys/tpi_sctp.h>
@@ -75,7 +75,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.9 $
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for LiS STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

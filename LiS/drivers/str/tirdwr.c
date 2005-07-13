@@ -75,7 +75,7 @@
 #define STATIC static
 #endif
 
-#define TIRDWR_TRACE 0 /* Verbose level */
+#define TIRDWR_TRACE 0		/* Verbose level */
 
 /*
  *  The private state of a tirdwr stream
@@ -87,54 +87,48 @@ typedef struct {
 #endif
 } tirdwr_priv_t;
 
-STATIC int _RP tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC int _RP tirdwr_close(queue_t *, int, cred_t *);
-STATIC int _RP tirdwr_rput(queue_t *, mblk_t *);
-STATIC int _RP tirdwr_wput(queue_t *, mblk_t *);
+STATIC int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int tirdwr_close(queue_t *, int, cred_t *);
+STATIC int tirdwr_rput(queue_t *, mblk_t *);
+STATIC int tirdwr_wput(queue_t *, mblk_t *);
 
-
-STATIC struct module_info tirdwr_minfo = 
-{
-	0,		/* Module ID number 				*/
-	"tirdwr",	/* Module name					*/
-	0,		/* Min packet size accepted			*/
-	INFPSZ,		/* Max packet size accepted			*/
-	0,		/* Hi water mark ignored, no queue service	*/
-	0		/* Low water mark ignored, no queue service	*/
+STATIC struct module_info tirdwr_minfo = {
+	0,			/* Module ID number */
+	"tirdwr",		/* Module name */
+	0,			/* Min packet size accepted */
+	INFPSZ,			/* Max packet size accepted */
+	0,			/* Hi water mark ignored, no queue service */
+	0			/* Low water mark ignored, no queue service */
 };
 
-
-STATIC struct qinit tirdwr_rinit = 
-{
-	tirdwr_rput,	/* Read put			*/
-	NULL,		/* No read queue service	*/
-	tirdwr_open,	/* Each open			*/
-	tirdwr_close,	/* Last close			*/
-	NULL,		/* Reserved			*/
-	&tirdwr_minfo,	/* Information			*/
-	NULL		/* No statistics		*/
+STATIC struct qinit tirdwr_rinit = {
+	tirdwr_rput,		/* Read put */
+	NULL,			/* No read queue service */
+	tirdwr_open,		/* Each open */
+	tirdwr_close,		/* Last close */
+	NULL,			/* Reserved */
+	&tirdwr_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
-STATIC struct qinit tirdwr_winit = 
-{
-	tirdwr_wput,	/* Write put			*/
-	NULL,		/* No write queue service	*/
-	NULL,		/* Each open			*/
-	NULL,		/* Last close			*/
-	NULL,		/* Reserved			*/
-	&tirdwr_minfo,	/* Information			*/
-	NULL		/* No statistics		*/
+STATIC struct qinit tirdwr_winit = {
+	tirdwr_wput,		/* Write put */
+	NULL,			/* No write queue service */
+	NULL,			/* Each open */
+	NULL,			/* Last close */
+	NULL,			/* Reserved */
+	&tirdwr_minfo,		/* Information */
+	NULL			/* No statistics */
 };
 
 #ifdef MODULE
 STATIC
 #endif
-struct streamtab tirdwr_info = 
-{
-	&tirdwr_rinit,	/* Read queue			*/
-	&tirdwr_winit,	/* Write queue			*/
-	NULL,		/* Not a multiplexer		*/
-	NULL		/* Not a multiplexer		*/
+struct streamtab tirdwr_info = {
+	&tirdwr_rinit,		/* Read queue */
+	&tirdwr_winit,		/* Write queue */
+	NULL,			/* Not a multiplexer */
+	NULL			/* Not a multiplexer */
 };
 
 /*
@@ -146,7 +140,7 @@ struct streamtab tirdwr_info =
 STATIC void
 vtrace(char *func, queue_t *rq, int verbose, char *msg, va_list args)
 {
-	tirdwr_priv_t *priv = (tirdwr_priv_t *)rq->q_ptr;
+	tirdwr_priv_t *priv = (tirdwr_priv_t *) rq->q_ptr;
 
 	if (verbose <= priv->verbose) {
 		char s1[128], s2[1024];
@@ -161,9 +155,10 @@ vtrace(char *func, queue_t *rq, int verbose, char *msg, va_list args)
 }
 
 STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
-	__attribute__ ((format (printf, 4, 5)));
+    __attribute__ ((format(printf, 4, 5)));
 
-STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
+STATIC void
+trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 {
 	va_list args;
 
@@ -178,7 +173,7 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 #define FUNC_ENTER(rq)	TRACE(rq, 10, "Entered")
 #define FUNC_EXIT(rq)	TRACE(rq, 10, "Exiting")
 
-#else /* No trace logging */
+#else				/* No trace logging */
 
 #define TRACE(rq, verbose, msg, args...) do {} while (0)
 
@@ -187,11 +182,11 @@ STATIC void trace(char *func, queue_t *rq, int verbose, char *msg, ...)
 
 #endif
 
-
-STATIC int _RP tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+STATIC int
+tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	tirdwr_priv_t *priv;
-	lis_flags_t    psw;
+	lis_flags_t psw;
 	queue_t *hq;
 	mblk_t *mp;
 
@@ -206,31 +201,30 @@ STATIC int _RP tirdwr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t 
 	priv->verbose = TIRDWR_TRACE;
 #endif
 	q->q_ptr = WR(q)->q_ptr = priv;
-	
-	/*
+
+	/* 
 	 *  This is Very Ugly
 	 */
 	hq = q->q_next;
-	LIS_QISRLOCK(hq, &psw) ;
+	LIS_QISRLOCK(hq, &psw);
 	LISASSERT(hq != NULL);
 	for (mp = hq->q_first; mp; mp = mp->b_next) {
-		if (mp->b_datap->db_type == M_PROTO ||
-		    mp->b_datap->db_type == M_PCPROTO) {
-			LIS_QISRUNLOCK(hq, &psw) ;
-			TRACE(q, 1, "Control message present at head, "
-			      "failing open.");
+		if (mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO) {
+			LIS_QISRUNLOCK(hq, &psw);
+			TRACE(q, 1, "Control message present at head, " "failing open.");
 			return EPROTO;
 		}
 	}
-	LIS_QISRUNLOCK(hq, &psw) ;
+	LIS_QISRUNLOCK(hq, &psw);
 
 	MODGET();
 	return 0;
 }
 
-STATIC int _RP tirdwr_close(queue_t *q, int flag, cred_t *crp)
+STATIC int
+tirdwr_close(queue_t *q, int flag, cred_t *crp)
 {
-	tirdwr_priv_t *priv = (tirdwr_priv_t *)q->q_ptr;
+	tirdwr_priv_t *priv = (tirdwr_priv_t *) q->q_ptr;
 
 	LISASSERT(priv != NULL);
 	LISASSERT(q->q_ptr == WR(q)->q_ptr);
@@ -244,7 +238,7 @@ STATIC int _RP tirdwr_close(queue_t *q, int flag, cred_t *crp)
 		else {
 			struct T_ordrel_req *req;
 
-			req = (struct T_ordrel_req *)mp->b_rptr;
+			req = (struct T_ordrel_req *) mp->b_rptr;
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_wptr += sizeof(*req);
 			req->PRIM_type = T_ORDREL_REQ;
@@ -256,11 +250,12 @@ STATIC int _RP tirdwr_close(queue_t *q, int flag, cred_t *crp)
 	return 0;
 }
 
-STATIC int _RP tirdwr_rput(queue_t *q, mblk_t *mp)
+STATIC int
+tirdwr_rput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 
-	if (mp->b_datap->db_type!=M_PROTO && mp->b_datap->db_type!=M_PCPROTO)
+	if (mp->b_datap->db_type != M_PROTO && mp->b_datap->db_type != M_PCPROTO)
 		putnext(q, mp);
 	else {
 		t_scalar_t prim;
@@ -271,7 +266,7 @@ STATIC int _RP tirdwr_rput(queue_t *q, mblk_t *mp)
 			putctl1(RD(q), M_ERROR, EPROTO);
 			goto quit;
 		}
-		prim = *(t_scalar_t *)mp->b_rptr;
+		prim = *(t_scalar_t *) mp->b_rptr;
 		if (prim == T_DATA_IND) {
 			mblk_t *bp;
 
@@ -289,7 +284,7 @@ STATIC int _RP tirdwr_rput(queue_t *q, mblk_t *mp)
 		}
 		if (prim == T_ORDREL_IND) {
 			TRACE(q, 5, "Orderly release received.");
-			((tirdwr_priv_t *)q->q_ptr)->got_ordrel = 1;
+			((tirdwr_priv_t *) q->q_ptr)->got_ordrel = 1;
 			freemsg(unlinkb(mp));
 			mp->b_wptr = mp->b_rptr;
 			mp->b_datap->db_type = M_DATA;
@@ -304,11 +299,12 @@ STATIC int _RP tirdwr_rput(queue_t *q, mblk_t *mp)
 		putctl1(RD(q), M_ERROR, EPROTO);
 	}
 
-quit:	FUNC_EXIT(q);
-	return(0) ;
+      quit:FUNC_EXIT(q);
+	return (0);
 }
 
-STATIC int _RP tirdwr_wput(queue_t *q, mblk_t *mp)
+STATIC int
+tirdwr_wput(queue_t *q, mblk_t *mp)
 {
 	FUNC_ENTER(q);
 	if (mp->b_datap->db_type == M_DATA) {
@@ -319,8 +315,7 @@ STATIC int _RP tirdwr_wput(queue_t *q, mblk_t *mp)
 			TRACE(q, 4, "Freeing zero length data msg.");
 			freemsg(mp);
 		}
-	} else if (mp->b_datap->db_type == M_PROTO ||
-	    mp->b_datap->db_type == M_PCPROTO) {
+	} else if (mp->b_datap->db_type == M_PROTO || mp->b_datap->db_type == M_PCPROTO) {
 		TRACE(q, 1, "Control portion present, erroring.");
 		freemsg(mp);
 		putctl1(RD(q), M_ERROR, EPROTO);
@@ -329,18 +324,21 @@ STATIC int _RP tirdwr_wput(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 	}
 	FUNC_EXIT(q);
-	return(0) ;
+	return (0);
 }
 
 #ifdef MODULE
 
 #ifdef KERNEL_2_5
-int tirdwr_init_module(void)
+int
+tirdwr_init_module(void)
 #else
-int init_module(void)
+int
+init_module(void)
 #endif
 {
 	int ret = lis_register_strmod(&tirdwr_info, "tirdwr");
+
 	if (ret < 0) {
 		printk("Unable to register tirdwr module.\n");
 		return ret;
@@ -350,9 +348,11 @@ int init_module(void)
 }
 
 #ifdef KERNEL_2_5
-void tirdwr_cleanup_module(void)
+void
+tirdwr_cleanup_module(void)
 #else
-void cleanup_module(void)
+void
+cleanup_module(void)
 #endif
 {
 	if (lis_unregister_strmod(&tirdwr_info) < 0)
@@ -363,11 +363,11 @@ void cleanup_module(void)
 }
 
 #ifdef KERNEL_2_5
-module_init(tirdwr_init_module) ;
-module_exit(tirdwr_cleanup_module) ;
+module_init(tirdwr_init_module);
+module_exit(tirdwr_cleanup_module);
 #endif
 
-#if defined(LINUX)			/* linux kernel */
+#if defined(LINUX)		/* linux kernel */
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
 #endif
@@ -380,6 +380,6 @@ MODULE_DESCRIPTION("STREAMS tirdwr, converts read/write to TLI");
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
 #endif
-#endif					/* LINUX */
+#endif				/* LINUX */
 
-#endif					/* MODULE */
+#endif				/* MODULE */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_compat.h,v 0.9.2.4 2005/07/05 22:46:10 brian Exp $
+ @(#) $Id: sctp_compat.h,v 0.9.2.5 2005/07/13 12:01:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:10 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_SCTP_COMPAT_H__
 #define __LOCAL_SCTP_COMPAT_H__
 
-#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_compat.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #undef sctp_addr
 #define sctp_addr n_sctp_addr

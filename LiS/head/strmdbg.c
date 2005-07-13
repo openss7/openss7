@@ -62,14 +62,13 @@
 *									*
 ************************************************************************/
 
-
 #include <sys/stream.h>
 #include <sys/poll.h>
 #include <sys/lislocks.h>
 
 #include <stdarg.h>
 #include <sys/osif.h>
-#if defined(LINUX)			/* Linux kernel version */
+#if defined(LINUX)		/* Linux kernel version */
 #include <sys/lismem.h>
 #endif
 
@@ -83,34 +82,30 @@
 *									*
 ************************************************************************/
 
-typedef struct mem_link
-{
-    struct mem_link	*next ;
-    struct mem_link	*prev ;
+typedef struct mem_link {
+	struct mem_link *next;
+	struct mem_link *prev;
 
-    long		 size ;
-    char		 file_name[32] ;
-    int	 		 line_nr ;
+	long size;
+	char file_name[32];
+	int line_nr;
 
-    unsigned char	__pad[SMP_CACHE_BYTES
-			      - ((2 * sizeof(struct mem_link *)
-			      + sizeof(long) - 32 * sizeof(char)
-			      + sizeof(int)) % SMP_CACHE_BYTES)];
+	unsigned char __pad[SMP_CACHE_BYTES - ((2 * sizeof(struct mem_link *)
+						+ sizeof(long) - 32 * sizeof(char)
+						+ sizeof(int)) % SMP_CACHE_BYTES)];
 
-} mem_link_t ;
+} mem_link_t;
 
-typedef struct mem_link_space
-{
-    mem_link_t		ml ;
-    char		padding[LIS_CACHE_BYTES -
-				(sizeof(mem_link_t) % LIS_CACHE_BYTES)];
-} mem_link_space_t ;
+typedef struct mem_link_space {
+	mem_link_t ml;
+	char padding[LIS_CACHE_BYTES - (sizeof(mem_link_t) % LIS_CACHE_BYTES)];
+} mem_link_space_t;
 
-lis_spin_lock_t	 lis_mem_lock ;
-long		 lis_mem_alloced ;	/* keep track of allocated memory */
-long		 lis_max_mem ;		/* maximum to allocate */
+lis_spin_lock_t lis_mem_lock;
+long lis_mem_alloced;			/* keep track of allocated memory */
+long lis_max_mem;			/* maximum to allocate */
 
-mem_link_t	 lis_mem_head = {&lis_mem_head, &lis_mem_head} ;
+mem_link_t lis_mem_head = { &lis_mem_head, &lis_mem_head };
 
 /*
  * Allocations larger than this allocate pages instead of calling
@@ -129,8 +124,8 @@ mem_link_t	 lis_mem_head = {&lis_mem_head, &lis_mem_head} ;
 #ifndef DEBUG_MASK2
 #define	DEBUG_MASK2	0
 #endif
-unsigned long	lis_debug_mask = DEBUG_MASK;	/* debug mask */
-unsigned long	lis_debug_mask2 = DEBUG_MASK2;	/* debug mask */
+unsigned long lis_debug_mask = DEBUG_MASK;	/* debug mask */
+unsigned long lis_debug_mask2 = DEBUG_MASK2;	/* debug mask */
 
 /************************************************************************
 *                          Print Buffer                                 *
@@ -143,73 +138,69 @@ unsigned long	lis_debug_mask2 = DEBUG_MASK2;	/* debug mask */
 *									*
 ************************************************************************/
 
-char			 lis_print_buffer[LIS_PRINT_BUFFER_SIZE] ;
-char			*lis_nxt_print_ptr = lis_print_buffer ;
-static lis_spin_lock_t	 lis_print_buffer_lock ;
-static int		 lock_initialized ;
+char lis_print_buffer[LIS_PRINT_BUFFER_SIZE];
+char *lis_nxt_print_ptr = lis_print_buffer;
+static lis_spin_lock_t lis_print_buffer_lock;
+static int lock_initialized;
 
 __attribute__ ((format(printf, 1, 2)))
-void	lis_bprintf(char *fmt, ...)
+	void lis_bprintf(char *fmt, ...)
 {
-    extern char	 lis_cmn_err_buf[];
-    extern int	 _RP vsprintf (char *, const char *, va_list);
-    va_list	 args;
-    int		 nbytes ;
+	extern char lis_cmn_err_buf[];
+	extern int vsprintf(char *, const char *, va_list);
+	va_list args;
+	int nbytes;
 
-    if (!lock_initialized)
-    {
-	lis_spin_lock_init(&lis_print_buffer_lock, "PrntBfr") ;
-	lock_initialized = 1 ;
-    }
+	if (!lock_initialized) {
+		lis_spin_lock_init(&lis_print_buffer_lock, "PrntBfr");
+		lock_initialized = 1;
+	}
 
-    lis_spin_lock(&lis_print_buffer_lock) ;
+	lis_spin_lock(&lis_print_buffer_lock);
 
-    va_start (args, fmt);
-    vsprintf (lis_cmn_err_buf, fmt, args);
-    va_end (args);
-    nbytes = strlen(lis_cmn_err_buf) ;
+	va_start(args, fmt);
+	vsprintf(lis_cmn_err_buf, fmt, args);
+	va_end(args);
+	nbytes = strlen(lis_cmn_err_buf);
 
-    if (&lis_print_buffer[LIS_PRINT_BUFFER_SIZE] - lis_nxt_print_ptr - 50
-								       > nbytes)
-    {					/* will fit in buffer */
-	strcpy(lis_nxt_print_ptr, lis_cmn_err_buf) ;
-	lis_nxt_print_ptr += nbytes ;
-    }
-    else				/* nearing end of buffer */
-	strcpy(lis_nxt_print_ptr, "\n...Truncated...\n") ;
+	if (&lis_print_buffer[LIS_PRINT_BUFFER_SIZE] - lis_nxt_print_ptr - 50 > nbytes) {
+		/* will fit in buffer */
+		strcpy(lis_nxt_print_ptr, lis_cmn_err_buf);
+		lis_nxt_print_ptr += nbytes;
+	} else			/* nearing end of buffer */
+		strcpy(lis_nxt_print_ptr, "\n...Truncated...\n");
 
-    lis_spin_unlock(&lis_print_buffer_lock) ;
+	lis_spin_unlock(&lis_print_buffer_lock);
 }
 
-void	lis_flush_print_buffer(void)
+void
+lis_flush_print_buffer(void)
 {
-    char	*p ;
-    char	 c ;
-    int		 nbytes ;
-    int		 printed ;
+	char *p;
+	char c;
+	int nbytes;
+	int printed;
 
-    if (!lock_initialized)
-    {
-	lis_spin_lock_init(&lis_print_buffer_lock, "PrntBfr") ;
-	lock_initialized = 1 ;
-    }
+	if (!lock_initialized) {
+		lis_spin_lock_init(&lis_print_buffer_lock, "PrntBfr");
+		lock_initialized = 1;
+	}
 
-    lis_spin_lock(&lis_print_buffer_lock) ;
-    printed = 1000 ;			/* kernel's buf is 1024, leave room */
-    for (nbytes = strlen(lis_print_buffer), p = lis_print_buffer;
-	 nbytes > 0;
-	 nbytes -= printed, p += printed)
-    {
-	if (nbytes < 1000) printed = nbytes ;
-	c = p[printed] ;
-	p[printed] = 0 ;
-	printk("%s", p) ;
-	p[printed] = c ;
-    }
+	lis_spin_lock(&lis_print_buffer_lock);
+	printed = 1000;		/* kernel's buf is 1024, leave room */
+	for (nbytes = strlen(lis_print_buffer), p = lis_print_buffer; nbytes > 0;
+	     nbytes -= printed, p += printed) {
+		if (nbytes < 1000)
+			printed = nbytes;
+		c = p[printed];
+		p[printed] = 0;
+		printk("%s", p);
+		p[printed] = c;
+	}
 
-    lis_nxt_print_ptr = lis_print_buffer ;
-    *lis_nxt_print_ptr = 0 ;
-    lis_spin_unlock(&lis_print_buffer_lock) ;
+	lis_nxt_print_ptr = lis_print_buffer;
+	*lis_nxt_print_ptr = 0;
+	lis_spin_unlock(&lis_print_buffer_lock);
 }
 
 /************************************************************************
@@ -220,15 +211,16 @@ void	lis_flush_print_buffer(void)
 * name is too long, just take the last 'n' characters of it.		*
 *									*
 ************************************************************************/
-static void put_file_name(mem_link_t *p, const char *name)
+static void
+put_file_name(mem_link_t * p, const char *name)
 {
-    int		len = strlen(name) ;
-    int		index = 0 ;
+	int len = strlen(name);
+	int index = 0;
 
-    if (len > sizeof(p->file_name) - 1)
-	index = len - (sizeof(p->file_name) - 1) ;
+	if (len > sizeof(p->file_name) - 1)
+		index = len - (sizeof(p->file_name) - 1);
 
-    strcpy(p->file_name, &name[index]) ;
+	strcpy(p->file_name, &name[index]);
 }
 
 /************************************************************************
@@ -238,80 +230,75 @@ static void put_file_name(mem_link_t *p, const char *name)
 * Allocate nbytes of memory and return a pointer to it.			*
 *									*
 ************************************************************************/
-void	* _RP lis_malloc(int nbytes, int class, int use_cache,
-		         char *file_name, int line_nr)
+void *
+lis_malloc(int nbytes, int class, int use_cache, char *file_name, int line_nr)
 {
-    mem_link_t	*p ;
-    mem_link_space_t	*pp ;
-    long	*lp ;				/* ptr to guard word */
-    int		 abytes ;			/* # bytes to allocate */
-    int		 tbytes ;			/* total # of bytes */
-    lis_flags_t  psw;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	long *lp;			/* ptr to guard word */
+	int abytes;			/* # bytes to allocate */
+	int tbytes;			/* total # of bytes */
+	lis_flags_t psw;
 
-    LisUpCount(MEMALLOCS) ;			/* stats array */
+	LisUpCount(MEMALLOCS);	/* stats array */
 
-    if (lis_max_mem != 0 && lis_mem_alloced >= lis_max_mem)
-    {
-	LisUpFailCount(MEMALLOCD) ;		/* stats array */
-	LisUpFailCount(MEMALLOCS) ;		/* stats array */
-	return(NULL) ;
-    }
+	if (lis_max_mem != 0 && lis_mem_alloced >= lis_max_mem) {
+		LisUpFailCount(MEMALLOCD);	/* stats array */
+		LisUpFailCount(MEMALLOCS);	/* stats array */
+		return (NULL);
+	}
 
-    /*
-     * Round nbytes up to even multiple of 16 bytes.  Then allocate
-     * that much space plus room for the header plus room for the
-     * guard word at the end of the area.
-     */
-    abytes = (nbytes + 15) & ~0x0F ;
-    tbytes = abytes + sizeof(*pp) + sizeof(long) ;
-#if defined(LINUX)			/* Linux kernel version */
-    if (abytes > MAX_KMALLOC_SIZE)
-	p = (mem_link_t *) lis_get_free_pages_fcn(tbytes, class,
-						  file_name, line_nr) ;
-    else
+	/* 
+	 * Round nbytes up to even multiple of 16 bytes.  Then allocate
+	 * that much space plus room for the header plus room for the
+	 * guard word at the end of the area.
+	 */
+	abytes = (nbytes + 15) & ~0x0F;
+	tbytes = abytes + sizeof(*pp) + sizeof(long);
+#if defined(LINUX)		/* Linux kernel version */
+	if (abytes > MAX_KMALLOC_SIZE)
+		p = (mem_link_t *) lis_get_free_pages_fcn(tbytes, class, file_name, line_nr);
+	else
 #endif
-	p = (mem_link_t *) KALLOC(tbytes, class, use_cache) ;
+		p = (mem_link_t *) KALLOC(tbytes, class, use_cache);
 
-    if (p == NULL)
-    {
-	LisUpFailCount(MEMALLOCD) ;		/* stats array */
-	LisUpFailCount(MEMALLOCS) ;		/* stats array */
-	return(NULL) ;
-    }
+	if (p == NULL) {
+		LisUpFailCount(MEMALLOCD);	/* stats array */
+		LisUpFailCount(MEMALLOCS);	/* stats array */
+		return (NULL);
+	}
 
-    pp = (mem_link_space_t *) p ;
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
+	pp = (mem_link_space_t *) p;
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
 
-    lis_mem_alloced += abytes ;			/* keep track of memory */
-    p->next	  = &lis_mem_head ;		/* we point fwd to head */
-    p->prev	  = lis_mem_head.prev ;		/* we point back to old last */
-    p->prev->next = p ;				/* elt b4 us points to us */
-    lis_mem_head.prev = p ;			/* we are last elt in list */
+	lis_mem_alloced += abytes;	/* keep track of memory */
+	p->next = &lis_mem_head;	/* we point fwd to head */
+	p->prev = lis_mem_head.prev;	/* we point back to old last */
+	p->prev->next = p;	/* elt b4 us points to us */
+	lis_mem_head.prev = p;	/* we are last elt in list */
 
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
 
-    LisUpCounter(MEMALLOCD, abytes) ;		/* stats array */
+	LisUpCounter(MEMALLOCD, abytes);	/* stats array */
 
-    p->size	  = abytes ;			/* save # bytes */
-    put_file_name(p, file_name) ;		/* copy in filename of caller */
-    p->line_nr	  = line_nr;			/* line number called from */
+	p->size = abytes;	/* save # bytes */
+	put_file_name(p, file_name);	/* copy in filename of caller */
+	p->line_nr = line_nr;	/* line number called from */
 
-    lp = (long *) (((char *)p) + abytes + sizeof(*pp)) ; /* to guard word */
-    *lp = MEM_GUARD ;				/* plant guard word */
+	lp = (long *) (((char *) p) + abytes + sizeof(*pp));	/* to guard word */
+	*lp = MEM_GUARD;	/* plant guard word */
 
-    if (LIS_DEBUG_MALLOC)			/* debugging allocations */
-    {
-	printk("lis_malloc: ") ;
-	lis_print_block(pp+1) ;
-    }
+	if (LIS_DEBUG_MALLOC) {	/* debugging allocations */
+		printk("lis_malloc: ");
+		lis_print_block(pp + 1);
+	}
 
+	if (LIS_DEBUG_MONITOR_MEM)
+		lis_check_mem();	/* check all mem areas */
 
-    if (LIS_DEBUG_MONITOR_MEM)
-	lis_check_mem() ;			/* check all mem areas */
+	return (pp + 1);	/* rtn area caller can use */
 
-    return(pp+1) ;				/* rtn area caller can use */
-
-} /* lis_malloc */
+}				/* lis_malloc */
 
 /************************************************************************
 *                            lis_zmalloc                                *
@@ -320,14 +307,15 @@ void	* _RP lis_malloc(int nbytes, int class, int use_cache,
 * Like lis_malloc, only it zeros the memory before returning.		*
 *									*
 ************************************************************************/
-void	* _RP lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
+void *
+lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 {
-    void	*ptr = lis_malloc(nbytes, class, 0, file_name, line_nr) ;
+	void *ptr = lis_malloc(nbytes, class, 0, file_name, line_nr);
 
-    if (ptr != NULL)
-	memset(ptr, 0, nbytes) ;
+	if (ptr != NULL)
+		memset(ptr, 0, nbytes);
 
-    return(ptr) ;
+	return (ptr);
 }
 
 /************************************************************************
@@ -342,28 +330,30 @@ void	* _RP lis_zmalloc(int nbytes, int class, char *file_name, int line_nr)
 * that is, the same value as returned by lis_malloc.			*
 *									*
 ************************************************************************/
-int	lis_check_guard(void *ptr, char *msg)
+int
+lis_check_guard(void *ptr, char *msg)
 {
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
-    long		*lp ;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	long *lp;
 
-    if (ptr == NULL) return(1) ;		/* "good" */
+	if (ptr == NULL)
+		return (1);	/* "good" */
 
-    pp = (mem_link_space_t *) ptr ;
-    pp-- ;					/* go back to link structure */
-    p = (mem_link_t *) pp ;
-    lp = (long *) (((char *)p) + p->size + sizeof(*pp)) ; /* to guard word */
+	pp = (mem_link_space_t *) ptr;
+	pp--;			/* go back to link structure */
+	p = (mem_link_t *) pp;
+	lp = (long *) (((char *) p) + p->size + sizeof(*pp));	/* to guard word */
 
-    if (*lp == MEM_GUARD) return(1) ;		/* good guard word */
+	if (*lp == MEM_GUARD)
+		return (1);	/* good guard word */
 
-    printk("%s: memory area at 0x%lx: guard word = 0x%lx, should be 0x%lx\n",
-		msg == NULL ? "lis_check_guard" : msg, 
-		(long) ptr, *lp, (long) MEM_GUARD) ;
-    lis_print_block(ptr) ;			/* print the hdr info */
-    return(0);
+	printk("%s: memory area at 0x%lx: guard word = 0x%lx, should be 0x%lx\n",
+	       msg == NULL ? "lis_check_guard" : msg, (long) ptr, *lp, (long) MEM_GUARD);
+	lis_print_block(ptr);	/* print the hdr info */
+	return (0);
 
-} /* lis_check_guard */
+}				/* lis_check_guard */
 
 /************************************************************************
 *                            lis_free                                   *
@@ -372,60 +362,58 @@ int	lis_check_guard(void *ptr, char *msg)
 * Free a block of memory allocated by lis_malloc.			*
 *									*
 ************************************************************************/
-void	_RP lis_free(void *ptr, char *file_name, int line_nr)
+void
+lis_free(void *ptr, char *file_name, int line_nr)
 {
-    mem_link_t	*p ;
-    mem_link_space_t	*pp ;
-    lis_flags_t  psw;
-    int		 rslt ;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	lis_flags_t psw;
+	int rslt;
 
-    if (ptr == NULL) return ;
+	if (ptr == NULL)
+		return;
 
-
-    LisUpCount(MEMFREES) ;			/* stats array */
-    if (LIS_DEBUG_MONITOR_MEM)
-	rslt = lis_check_mem() ;		/* check all mem areas */
+	LisUpCount(MEMFREES);	/* stats array */
+	if (LIS_DEBUG_MONITOR_MEM)
+		rslt = lis_check_mem();	/* check all mem areas */
 #if defined(CONFIG_DEV)
-    else
-	rslt = lis_check_guard(ptr, file_name) ;/* check the guard word */
+	else
+		rslt = lis_check_guard(ptr, file_name);	/* check the guard word */
 
-    if (rslt == 0)
-	LisUpFailCount(MEMFREES) ;		/* stats array */
+	if (rslt == 0)
+		LisUpFailCount(MEMFREES);	/* stats array */
 #endif
 
-    pp = (mem_link_space_t *) ptr ;
-    pp-- ;					/* go back to link structure */
-    p = (mem_link_t *) pp ;
+	pp = (mem_link_space_t *) ptr;
+	pp--;			/* go back to link structure */
+	p = (mem_link_t *) pp;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
 
-    lis_mem_alloced -= p->size ;		/* keep track of memory */
-    p->prev->next = p->next ;			/* prev elt links around us */
-    p->next->prev = p->prev ;			/* next elt links around us */
-    p->next	  = NULL ;			/* clobber our links */
-    p->prev	  = NULL ;
+	lis_mem_alloced -= p->size;	/* keep track of memory */
+	p->prev->next = p->next;	/* prev elt links around us */
+	p->next->prev = p->prev;	/* next elt links around us */
+	p->next = NULL;		/* clobber our links */
+	p->prev = NULL;
 
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
 
-    LisDownCounter(MEMALLOCD, p->size) ;	/* stats array */
-    put_file_name(p, file_name) ;		/* copy in filename of caller */
-    p->line_nr	  = line_nr;			/* line number called from */
+	LisDownCounter(MEMALLOCD, p->size);	/* stats array */
+	put_file_name(p, file_name);	/* copy in filename of caller */
+	p->line_nr = line_nr;	/* line number called from */
 
-    if (LIS_DEBUG_MALLOC)			/* debugging allocations */
-    {
-	printk("lis_free: ") ;
-	lis_print_block(pp+1) ;
-    }
-
-
-#if defined(LINUX)				/* Linux kernel version */
-    if (p->size > MAX_KMALLOC_SIZE)
-	lis_free_pages(p) ;			/* pages, not slab */
-    else
+	if (LIS_DEBUG_MALLOC) {	/* debugging allocations */
+		printk("lis_free: ");
+		lis_print_block(pp + 1);
+	}
+#if defined(LINUX)		/* Linux kernel version */
+	if (p->size > MAX_KMALLOC_SIZE)
+		lis_free_pages(p);	/* pages, not slab */
+	else
 #endif
-	KFREE(p) ;
+		KFREE(p);
 
-} /* lis_free */
+}				/* lis_free */
 
 /************************************************************************
 *                         lis_terminate_mem                             *
@@ -435,30 +423,30 @@ void	_RP lis_free(void *ptr, char *file_name, int line_nr)
 * This will clean up any memory leaks.                                 *
 *                                                                      *
 ************************************************************************/
-void   lis_terminate_mem(void)
+void
+lis_terminate_mem(void)
 {
-    mem_link_t *p ;
-    mem_link_space_t *pp ;
-    lis_flags_t psw;
-    int		nbytes = 0 ;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	lis_flags_t psw;
+	int nbytes = 0;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
-    while (lis_mem_head.next != &lis_mem_head)
-    {
-	p = lis_mem_head.next ;
-	pp = (mem_link_space_t *) p ;
-	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
-        if (LIS_DEBUG_MEM_LEAK)
-	   printk("lis: %ld bytes (at %p) leaked from file %s, line %d\n",
-				      p->size, pp+1, p->file_name, p->line_nr);
-	nbytes += p->size ;
-	lis_free(pp+1, "lis_terminate_mem", __LINE__) ;
-	lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
-    }
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
+	while (lis_mem_head.next != &lis_mem_head) {
+		p = lis_mem_head.next;
+		pp = (mem_link_space_t *) p;
+		lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
+		if (LIS_DEBUG_MEM_LEAK)
+			printk("lis: %ld bytes (at %p) leaked from file %s, line %d\n", p->size,
+			       pp + 1, p->file_name, p->line_nr);
+		nbytes += p->size;
+		lis_free(pp + 1, "lis_terminate_mem", __LINE__);
+		lis_spin_lock_irqsave(&lis_mem_lock, &psw);
+	}
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
 
-    if (nbytes > 0)
-	printk("lis_terminate_mem: %d bytes of leaked memory freed\n", nbytes) ;
+	if (nbytes > 0)
+		printk("lis_terminate_mem: %d bytes of leaked memory freed\n", nbytes);
 }
 
 /************************************************************************
@@ -473,24 +461,25 @@ void   lis_terminate_mem(void)
 * Return 1 if all areas are OK.  Return 0 if some area is bad.		*
 *									*
 ************************************************************************/
-int	lis_check_mem(void)
+int
+lis_check_mem(void)
 {
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
-    int			 rslt = 1 ;
-    lis_flags_t  	 psw;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	int rslt = 1;
+	lis_flags_t psw;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
-    for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
-    {
-	pp = (mem_link_space_t *) p ;
-	if (!lis_check_guard(pp+1, "lis_check_mem")) rslt = 0 ;
-    }
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
+	for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next) {
+		pp = (mem_link_space_t *) p;
+		if (!lis_check_guard(pp + 1, "lis_check_mem"))
+			rslt = 0;
+	}
 
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
-    return(rslt) ;
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
+	return (rslt);
 
-} /* lis_check_mem */
+}				/* lis_check_mem */
 
 /************************************************************************
 *                          lis_mark_mem                                 *
@@ -504,23 +493,25 @@ int	lis_check_mem(void)
 * to track down memory leaks.						*
 *									*
 ************************************************************************/
-void	_RP lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
+void
+lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
 {
 #if defined(CONFIG_DEV)
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
+	mem_link_t *p;
+	mem_link_space_t *pp;
 
-    if (ptr == NULL) return ;
+	if (ptr == NULL)
+		return;
 
-    pp = (mem_link_space_t *) ptr ;
-    pp-- ;					/* go back to link structure */
-    p = (mem_link_t *) pp ;
-    put_file_name(p, file_name) ;		/* copy in filename of caller */
-    p->line_nr	  = line_nr;			/* line number called from */
+	pp = (mem_link_space_t *) ptr;
+	pp--;			/* go back to link structure */
+	p = (mem_link_t *) pp;
+	put_file_name(p, file_name);	/* copy in filename of caller */
+	p->line_nr = line_nr;	/* line number called from */
 
-#endif			/* no memory links unless CONFIG_DEV defined */
+#endif				/* no memory links unless CONFIG_DEV defined */
 
-} /* lis_mark_mem */
+}				/* lis_mark_mem */
 
 /************************************************************************
 *                           lis_print_block                             *
@@ -531,66 +522,62 @@ void	_RP lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr)
 * link field and print it out in decoded form.				*
 *									*
 ************************************************************************/
-void	_RP lis_print_block(void *ptr)
+void
+lis_print_block(void *ptr)
 {
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
+	mem_link_t *p;
+	mem_link_space_t *pp;
 
-    pp = ((mem_link_space_t *) ptr) - 1 ;
-    p = (mem_link_t *) pp ;
+	pp = ((mem_link_space_t *) ptr) - 1;
+	p = (mem_link_t *) pp;
 
-    if (p->file_name != NULL)
-    {
-	switch (p->line_nr)
-	{
-	case MEM_QUEUE:
-	    if (LIS_DEBUG_DMP_QUEUE)
-	    {
-		queue_t		*q = (queue_t *) (pp+1) ;
+	if (p->file_name != NULL) {
+		switch (p->line_nr) {
+		case MEM_QUEUE:
+			if (LIS_DEBUG_DMP_QUEUE) {
+				queue_t *q = (queue_t *) (pp + 1);
 
-		lis_print_queue(q) ;	/* the read queue */
-		lis_print_queue(q+1) ;	/* the write queue */
-	    }
-	    else
-		printk("queue: \"%s\", size=%ld\n", p->file_name, p->size);
-	    break ;
-	case MEM_MSG:
-	    if (LIS_DEBUG_DMP_MBLK)
-		lis_print_msg((mblk_t *)(pp+1), p->file_name,
-			      (LIS_DEBUG_DMP_DBLK) ? PRINT_DATA_ENTIRE : 0) ;
-	    else
-		printk("mblk: \"%s\", size=%ld\n", p->file_name, p->size);
-	    break ;
-	case MEM_STRMHD:
-	    if (LIS_DEBUG_ADDRS)		/* printing addresses */
-		printk("0x%lx: ", (long) ptr) ;
+				lis_print_queue(q);	/* the read queue */
+				lis_print_queue(q + 1);	/* the write queue */
+			} else
+				printk("queue: \"%s\", size=%ld\n", p->file_name, p->size);
+			break;
+		case MEM_MSG:
+			if (LIS_DEBUG_DMP_MBLK)
+				lis_print_msg((mblk_t *) (pp + 1), p->file_name,
+					      (LIS_DEBUG_DMP_DBLK) ? PRINT_DATA_ENTIRE : 0);
+			else
+				printk("mblk: \"%s\", size=%ld\n", p->file_name, p->size);
+			break;
+		case MEM_STRMHD:
+			if (LIS_DEBUG_ADDRS)	/* printing addresses */
+				printk("0x%lx: ", (long) ptr);
 
-	    printk("stream-head: \"%s\", size=%ld\n", p->file_name, p->size);
-	    break ;
-	case MEM_TIMER:
-	    if (LIS_DEBUG_ADDRS)		/* printing addresses */
-		printk("0x%lx: ", (long) ptr) ;
+			printk("stream-head: \"%s\", size=%ld\n", p->file_name, p->size);
+			break;
+		case MEM_TIMER:
+			if (LIS_DEBUG_ADDRS)	/* printing addresses */
+				printk("0x%lx: ", (long) ptr);
 
-	    printk("timer: \"%s\", size=%ld\n", p->file_name, p->size);
-	    break ;
-	case 0:
-	    if (LIS_DEBUG_ADDRS)		/* printing addresses */
-		printk("0x%lx: ", (long) ptr) ;
+			printk("timer: \"%s\", size=%ld\n", p->file_name, p->size);
+			break;
+		case 0:
+			if (LIS_DEBUG_ADDRS)	/* printing addresses */
+				printk("0x%lx: ", (long) ptr);
 
-	    printk("\"%s\", size=%ld\n", p->file_name, p->size);
-	    break ;
-	default:
-	    if (LIS_DEBUG_ADDRS)		/* printing addresses */
-		printk("0x%lx: ", (long) ptr) ;
+			printk("\"%s\", size=%ld\n", p->file_name, p->size);
+			break;
+		default:
+			if (LIS_DEBUG_ADDRS)	/* printing addresses */
+				printk("0x%lx: ", (long) ptr);
 
-	    printk("%s #%d, size=%ld\n", p->file_name, p->line_nr, p->size);
-	    break ;
-	}
-    }
-    else
-	printk("unknown file and line number\n") ;
+			printk("%s #%d, size=%ld\n", p->file_name, p->line_nr, p->size);
+			break;
+		}
+	} else
+		printk("unknown file and line number\n");
 
-} /* lis_print_block */
+}				/* lis_print_block */
 
 /************************************************************************
 *                           lis_print_mem                               *
@@ -599,22 +586,22 @@ void	_RP lis_print_block(void *ptr)
 * Walk the memory link list and print out each element.			*
 *									*
 ************************************************************************/
-void	_RP lis_print_mem(void)
+void
+lis_print_mem(void)
 {
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
-    lis_flags_t  	 psw;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	lis_flags_t psw;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
-    for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
-    {
-	pp = (mem_link_space_t *) p ;
-	if (lis_check_guard(pp+1, "lis_print_mem"))
-	    lis_print_block(pp+1) ;
-    }
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
+	for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next) {
+		pp = (mem_link_space_t *) p;
+		if (lis_check_guard(pp + 1, "lis_print_mem"))
+			lis_print_block(pp + 1);
+	}
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
 
-} /* lis_print_mem */
+}				/* lis_print_mem */
 
 /************************************************************************
 *                           lis_print_queues                            *
@@ -623,33 +610,30 @@ void	_RP lis_print_mem(void)
 * Find all the queues that are allocated and print them out.		*
 *									*
 ************************************************************************/
-void  _RP lis_print_queues(void)
+void
+lis_print_queues(void)
 {
-    mem_link_t		*p ;
-    mem_link_space_t	*pp ;
-    lis_flags_t  	 psw;
+	mem_link_t *p;
+	mem_link_space_t *pp;
+	lis_flags_t psw;
 
-    lis_spin_lock_irqsave(&lis_mem_lock, &psw) ;
-    for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next)
-    {
-	pp = (mem_link_space_t *) p ;
-	if (   lis_check_guard(pp+1, "lis_print_queues")
-	    && p->line_nr == MEM_QUEUE)
-	{
-	    if (LIS_DEBUG_DMP_QUEUE)
-	    {
-		queue_t		*q = (queue_t *) (pp+1) ;
+	lis_spin_lock_irqsave(&lis_mem_lock, &psw);
+	for (p = lis_mem_head.next; p != &lis_mem_head; p = p->next) {
+		pp = (mem_link_space_t *) p;
+		if (lis_check_guard(pp + 1, "lis_print_queues")
+		    && p->line_nr == MEM_QUEUE) {
+			if (LIS_DEBUG_DMP_QUEUE) {
+				queue_t *q = (queue_t *) (pp + 1);
 
-		lis_print_queue(q) ;	/* the read queue */
-		lis_print_queue(q+1) ;	/* the write queue */
-	    }
-	    else
-		printk("queue: \"%s\", size=%ld\n", p->file_name, p->size);
+				lis_print_queue(q);	/* the read queue */
+				lis_print_queue(q + 1);	/* the write queue */
+			} else
+				printk("queue: \"%s\", size=%ld\n", p->file_name, p->size);
+		}
 	}
-    }
-    lis_spin_unlock_irqrestore(&lis_mem_lock, &psw) ;
+	lis_spin_unlock_irqrestore(&lis_mem_lock, &psw);
 
-} /* lis_print_queues */
+}				/* lis_print_queues */
 
 /************************************************************************
 *                           lis_strm_name                               *
@@ -661,35 +645,32 @@ void  _RP lis_print_queues(void)
 *									*
 ************************************************************************/
 
-const char	* _RP lis_strm_name(stdata_t *head)
+const char *
+lis_strm_name(stdata_t *head)
 {
-    const char	*name ;
+	const char *name;
 
 #if 1
-    if (head != NULL && head->magic != STDATA_MAGIC)
-	return(NULL) ;
-    
-    if (head->sd_name[0] != 0)
-	return(head->sd_name);
+	if (head != NULL && head->magic != STDATA_MAGIC)
+		return (NULL);
 
-    if (   head->sd_strtab != NULL
-	&& head->sd_strtab->st_rdinit != NULL
-	&& head->sd_strtab->st_rdinit->qi_minfo != NULL
-	&& (name = head->sd_strtab->st_rdinit->qi_minfo->mi_idname) != NULL
-       )
-	return(name);
+	if (head->sd_name[0] != 0)
+		return (head->sd_name);
+
+	if (head->sd_strtab != NULL && head->sd_strtab->st_rdinit != NULL
+	    && head->sd_strtab->st_rdinit->qi_minfo != NULL
+	    && (name = head->sd_strtab->st_rdinit->qi_minfo->mi_idname) != NULL)
+		return (name);
 #else
-    if (   head->sd_strtab != NULL
-	&& head->sd_strtab->st_rdinit != NULL
-	&& head->sd_strtab->st_rdinit->qi_minfo != NULL
-	&& (name = head->sd_strtab->st_rdinit->qi_minfo->mi_idname) != NULL
-       )
-	return(name);
+	if (head->sd_strtab != NULL && head->sd_strtab->st_rdinit != NULL
+	    && head->sd_strtab->st_rdinit->qi_minfo != NULL
+	    && (name = head->sd_strtab->st_rdinit->qi_minfo->mi_idname) != NULL)
+		return (name);
 #endif
 
-    return("(unknown)") ;
+	return ("(unknown)");
 
-} /* strm_name */
+}				/* strm_name */
 
 /************************************************************************
 *                     lis_strm_name_from_queue                          *
@@ -698,14 +679,15 @@ const char	* _RP lis_strm_name(stdata_t *head)
 * Find the stream name associated with the queue.			*
 *									*
 ************************************************************************/
-const char	* _RP lis_strm_name_from_queue(queue_t *q)
+const char *
+lis_strm_name_from_queue(queue_t *q)
 {
-    if (q->q_str != NULL)
-	return(lis_strm_name((stdata_t *) q->q_str)) ;
+	if (q->q_str != NULL)
+		return (lis_strm_name((stdata_t *) q->q_str));
 
-    return(NULL) ;
+	return (NULL);
 
-} /* lis_strm_name_from_queue */
+}				/* lis_strm_name_from_queue */
 
 /************************************************************************
 *                          lis_queue_name				*
@@ -717,22 +699,21 @@ const char	* _RP lis_strm_name_from_queue(queue_t *q)
 *									*
 ************************************************************************/
 
-const char	* _RP lis_queue_name(queue_t *q)
+const char *
+lis_queue_name(queue_t *q)
 {
-    const char	*name ;
+	const char *name;
 
-    if (!LIS_CHECK_Q_MAGIC(q))
-	return("(bad)") ;
+	if (!LIS_CHECK_Q_MAGIC(q))
+		return ("(bad)");
 
-    if (   q->q_qinfo != NULL
-	&& q->q_qinfo->qi_minfo != NULL
-	&& (name = q->q_qinfo->qi_minfo->mi_idname) != NULL
-       )
-	return(name);
+	if (q->q_qinfo != NULL && q->q_qinfo->qi_minfo != NULL
+	    && (name = q->q_qinfo->qi_minfo->mi_idname) != NULL)
+		return (name);
 
-    return("(unknown)") ;
+	return ("(unknown)");
 
-} /* lis_queue_name */
+}				/* lis_queue_name */
 
 /************************************************************************
 *                          lis_msg_type_name				*
@@ -742,45 +723,73 @@ const char	* _RP lis_queue_name(queue_t *q)
 *									*
 ************************************************************************/
 
-const char	* _RP lis_msg_type_name(mblk_t *mp)
+const char *
+lis_msg_type_name(mblk_t *mp)
 {
-    if (mp == NULL) return("NULL-MSG") ;
+	if (mp == NULL)
+		return ("NULL-MSG");
 
-    if (mp->b_datap == NULL) return("NO-DATA-BLK") ;
+	if (mp->b_datap == NULL)
+		return ("NO-DATA-BLK");
 
-    switch(lis_btype(mp))
-    {
-    case M_DATA:	return("M_DATA");
-    case M_PROTO:	return("M_PROTO");
-    case M_BREAK:	return("M_BREAK");
-    case M_CTL:		return("M_CTL");
-    case M_DELAY:	return("M_DELAY");
-    case M_IOCTL:	return("M_IOCTL");
-    case M_PASSFP:	return("M_PASSFP");
-    case M_RSE:		return("M_RSE");
-    case M_SETOPTS:	return("M_SETOPTS");
-    case M_SIG:		return("M_SIG");
-    case M_COPYIN:	return("M_COPYIN");
-    case M_COPYOUT:	return("M_COPYOUT");
-    case M_ERROR:	return("M_ERROR");
-    case M_FLUSH:	return("M_FLUSH");
-    case M_HANGUP:	return("M_HANGUP");
-    case M_IOCACK:	return("M_IOCACK");
-    case M_IOCNAK:	return("M_IOCNAK");
-    case M_IOCDATA:	return("M_IOCDATA");
-    case M_PCPROTO:	return("M_PCPROTO");
-    case M_PCRSE:	return("M_PCRSE");
-    case M_PCSIG:	return("M_PCSIG");
-    case M_READ:	return("M_READ");
-    case M_STOP:	return("M_STOP");
-    case M_START:	return("M_START");
-    case M_STARTI:	return("M_STARTI");
-    case M_STOPI:	return("M_STOPI");
-    }
+	switch (lis_btype(mp)) {
+	case M_DATA:
+		return ("M_DATA");
+	case M_PROTO:
+		return ("M_PROTO");
+	case M_BREAK:
+		return ("M_BREAK");
+	case M_CTL:
+		return ("M_CTL");
+	case M_DELAY:
+		return ("M_DELAY");
+	case M_IOCTL:
+		return ("M_IOCTL");
+	case M_PASSFP:
+		return ("M_PASSFP");
+	case M_RSE:
+		return ("M_RSE");
+	case M_SETOPTS:
+		return ("M_SETOPTS");
+	case M_SIG:
+		return ("M_SIG");
+	case M_COPYIN:
+		return ("M_COPYIN");
+	case M_COPYOUT:
+		return ("M_COPYOUT");
+	case M_ERROR:
+		return ("M_ERROR");
+	case M_FLUSH:
+		return ("M_FLUSH");
+	case M_HANGUP:
+		return ("M_HANGUP");
+	case M_IOCACK:
+		return ("M_IOCACK");
+	case M_IOCNAK:
+		return ("M_IOCNAK");
+	case M_IOCDATA:
+		return ("M_IOCDATA");
+	case M_PCPROTO:
+		return ("M_PCPROTO");
+	case M_PCRSE:
+		return ("M_PCRSE");
+	case M_PCSIG:
+		return ("M_PCSIG");
+	case M_READ:
+		return ("M_READ");
+	case M_STOP:
+		return ("M_STOP");
+	case M_START:
+		return ("M_START");
+	case M_STARTI:
+		return ("M_STARTI");
+	case M_STOPI:
+		return ("M_STOPI");
+	}
 
-    return("UNKNOWN-MSG") ;
+	return ("UNKNOWN-MSG");
 
-} /* lis_msg_type_name */
+}				/* lis_msg_type_name */
 
 /************************************************************************
 *                          lis_maj_min_name			 	*
@@ -795,23 +804,23 @@ const char	* _RP lis_msg_type_name(mblk_t *mp)
 *									*
 ************************************************************************/
 
-const char	* _RP lis_maj_min_name(stdata_t *head)
+const char *
+lis_maj_min_name(stdata_t *head)
 {
-    int			 inx ;
-    static char		 name[8][32] ;
-    static int		 index ;
+	int inx;
+	static char name[8][32];
+	static int index;
 
-    if ( head == NULL )
-	return("") ;
+	if (head == NULL)
+		return ("");
 
-    inx = index++ & 0x03 ;
-    sprintf(name[inx], "(%ld,%ld)",
-			(long)getmajor(head->sd_dev),
-			(long)getminor(head->sd_dev)) ;
+	inx = index++ & 0x03;
+	sprintf(name[inx], "(%ld,%ld)", (long) getmajor(head->sd_dev),
+		(long) getminor(head->sd_dev));
 
-    return(name[inx]) ;
+	return (name[inx]);
 
-} /* lis_maj_min_name */
+}				/* lis_maj_min_name */
 
 /************************************************************************
 *                           lis_print_queue                             *
@@ -820,57 +829,75 @@ const char	* _RP lis_maj_min_name(stdata_t *head)
 * Print out some of the interesting features about a queue.		*
 *									*
 ************************************************************************/
-void	 _RP lis_print_queue(queue_t *q)
+void
+lis_print_queue(queue_t *q)
 {
-    const char	*name ;
+	const char *name;
 
-    printk("queue \"%s\"", lis_queue_name(q)) ;
-    if (LIS_DEBUG_ADDRS)			/* printing addresses */
-	printk(" @ 0x%lx: q_ptr=0x%lx", (long)q, (long)q->q_ptr) ;
-    printk(" magic=0x%lx", q->q_magic) ;
-    if ((name = lis_strm_name_from_queue(q)) != NULL)
-	printk(" stream \"%s\"", name) ;
-    printk("\n      %s-q", F_ISSET(q->q_flag,QREADR) ? "read" : "write");
-    if (q->q_next == NULL)
-	printk(" q_next=NULL") ;
-    else
-	printk(" q_next=\"%s\"", lis_queue_name(q->q_next)) ;
+	printk("queue \"%s\"", lis_queue_name(q));
+	if (LIS_DEBUG_ADDRS)	/* printing addresses */
+		printk(" @ 0x%lx: q_ptr=0x%lx", (long) q, (long) q->q_ptr);
+	printk(" magic=0x%lx", q->q_magic);
+	if ((name = lis_strm_name_from_queue(q)) != NULL)
+		printk(" stream \"%s\"", name);
+	printk("\n      %s-q", F_ISSET(q->q_flag, QREADR) ? "read" : "write");
+	if (q->q_next == NULL)
+		printk(" q_next=NULL");
+	else
+		printk(" q_next=\"%s\"", lis_queue_name(q->q_next));
 
-    printk(" q_flag 0x%lx%s ", q->q_flag, q->q_flag != 0 ? ":" : "") ;
-    if (F_ISSET(q->q_flag,QENAB)) printk(" QENAB");
-    if (F_ISSET(q->q_flag,QWANTENAB)) printk(" QWANTENAB");
-    if (F_ISSET(q->q_flag,QWANTR)) printk(" QWANTR");
-    if (F_ISSET(q->q_flag,QWANTW)) printk(" QWANTW");
-    if (F_ISSET(q->q_flag,QFULL)) printk(" QFULL");
-    if (F_ISSET(q->q_flag,QREADR)) printk(" QREADR");
-    if (F_ISSET(q->q_flag,QUSE)) printk(" QUSE");
-    if (F_ISSET(q->q_flag,QNOENB)) printk(" QNOENB");
-    if (F_ISSET(q->q_flag,QBACK)) printk(" QBACK");
-    if (F_ISSET(q->q_flag,QRETRY)) printk(" QRETRY");
-    if (F_ISSET(q->q_flag,QSCAN)) printk(" QSCAN");
-    if (F_ISSET(q->q_flag,QCLOSEWT)) printk(" QCLOSEWT");
-    if (F_ISSET(q->q_flag,QCLOSING)) printk(" QCLOSING");
-    if (F_ISSET(q->q_flag,QOPENING)) printk(" QOPENING");
-    if (F_ISSET(q->q_flag,QDEFERRING)) printk(" QDEFERRING");
-    if (F_ISSET(q->q_flag,QFROZEN)) printk(" QFROZEN");
-    if (F_ISSET(q->q_flag,QWASFULL)) printk(" QWASFULL");
-    printk("\n") ;
+	printk(" q_flag 0x%lx%s ", q->q_flag, q->q_flag != 0 ? ":" : "");
+	if (F_ISSET(q->q_flag, QENAB))
+		printk(" QENAB");
+	if (F_ISSET(q->q_flag, QWANTENAB))
+		printk(" QWANTENAB");
+	if (F_ISSET(q->q_flag, QWANTR))
+		printk(" QWANTR");
+	if (F_ISSET(q->q_flag, QWANTW))
+		printk(" QWANTW");
+	if (F_ISSET(q->q_flag, QFULL))
+		printk(" QFULL");
+	if (F_ISSET(q->q_flag, QREADR))
+		printk(" QREADR");
+	if (F_ISSET(q->q_flag, QUSE))
+		printk(" QUSE");
+	if (F_ISSET(q->q_flag, QNOENB))
+		printk(" QNOENB");
+	if (F_ISSET(q->q_flag, QBACK))
+		printk(" QBACK");
+	if (F_ISSET(q->q_flag, QRETRY))
+		printk(" QRETRY");
+	if (F_ISSET(q->q_flag, QSCAN))
+		printk(" QSCAN");
+	if (F_ISSET(q->q_flag, QCLOSEWT))
+		printk(" QCLOSEWT");
+	if (F_ISSET(q->q_flag, QCLOSING))
+		printk(" QCLOSING");
+	if (F_ISSET(q->q_flag, QOPENING))
+		printk(" QOPENING");
+	if (F_ISSET(q->q_flag, QDEFERRING))
+		printk(" QDEFERRING");
+	if (F_ISSET(q->q_flag, QFROZEN))
+		printk(" QFROZEN");
+	if (F_ISSET(q->q_flag, QWASFULL))
+		printk(" QWASFULL");
+	printk("\n");
 
-    printk("      q_minpsz=%lu ", q->q_minpsz);
+	printk("      q_minpsz=%lu ", q->q_minpsz);
 
-    if (q->q_maxpsz == INFPSZ)
-	printk("q_maxpsz=INFPSZ ") ;
-    else
-	printk("q_maxpsz=%lu ", q->q_maxpsz);
+	if (q->q_maxpsz == INFPSZ)
+		printk("q_maxpsz=INFPSZ ");
+	else
+		printk("q_maxpsz=%lu ", q->q_maxpsz);
 
-    printk("q_hiwat=%lu q_lowat=%lu", q->q_hiwat, q->q_lowat);
+	printk("q_hiwat=%lu q_lowat=%lu", q->q_hiwat, q->q_lowat);
 
-    printk(", %d msgs, %ld bytes\n", lis_qsize(q), q->q_count) ;
+	printk(", %d msgs, %ld bytes\n", lis_qsize(q), q->q_count);
 #if 0
-    printk(" %son queue run list,", q->q_link != NULL ? "" : "not ");
-    printk(" %son queue scan list\n", q->q_scnxt != NULL ? "" : "not ");
+	printk(" %son queue run list,", q->q_link != NULL ? "" : "not ");
+	printk(" %son queue scan list\n", q->q_scnxt != NULL ? "" : "not ");
 #endif
-} /* lis_print_queue */
+}				/* lis_print_queue */
 
 /************************************************************************
 *                            lis_print_stream                           *
@@ -886,65 +913,60 @@ void	 _RP lis_print_queue(queue_t *q)
 /*
  * Worker routine for recursive printing
  */
-static void strm_print(stdata_t *hd, int indent)
+static void
+strm_print(stdata_t *hd, int indent)
 {
-    queue_t		*q ;
-    stdata_t		*hp ;
+	queue_t *q;
+	stdata_t *hp;
 
 #define	prefix	do { int i; for (i=0; i<indent; i+=2) printk(". ") ;} while (0)
 
-    prefix ;
+	prefix;
 
-    if (hd->magic != STDATA_MAGIC)
-    {
-	printk("STREAM head @0x%p: bad magic number 0x%lx, should be 0x%lx\n",
-		hd, hd->magic, STDATA_MAGIC) ;
-	return ;
-    }
-
-    printk("STREAM \"%s\": ", hd->sd_name) ;
-    if (hd->sd_mux.mx_index != 0)
-	printk("muxid=%u ", hd->sd_mux.mx_index) ;
-
-    printk(" %s", lis_queue_name(q = hd->sd_wq)) ;
-    if ( q != NULL )			/* wq is non-NULL (paranoid) */
-    {
-	int samestr = SAMESTR(q);   /* FIFO or pipe */
-	int sameq   = (!samestr && q->q_next == OTHER(q));  /* FIFO */
-
-	if (!sameq)
-	    for (q = q->q_next; q && !sameq; q = q->q_next)
-	    {
-		printk("%s%s",
-		       (samestr ? "<==>" : "<=X=>"),
-		       lis_queue_name(q)) ;
-		samestr = SAMESTR(q);
-		sameq   = (!samestr && q->q_next == OTHER(q));
-	    }
-   }
-
-    printk("\n") ;
-
-    if ( (hp = hd->sd_mux.mx_hd) != NULL)	/* is a ctl stream */
-    {
-	indent += 2 ;
-	prefix ;
-	printk("Lower multiplexors:\n") ;
-	for (; hp != NULL; hp = hp->sd_mux.mx_next)
-	{
-	    strm_print(hp, indent+2) ;
+	if (hd->magic != STDATA_MAGIC) {
+		printk("STREAM head @0x%p: bad magic number 0x%lx, should be 0x%lx\n", hd,
+		       hd->magic, STDATA_MAGIC);
+		return;
 	}
-    }
 
-} /* strm_print */
+	printk("STREAM \"%s\": ", hd->sd_name);
+	if (hd->sd_mux.mx_index != 0)
+		printk("muxid=%u ", hd->sd_mux.mx_index);
+
+	printk(" %s", lis_queue_name(q = hd->sd_wq));
+	if (q != NULL) {	/* wq is non-NULL (paranoid) */
+		int samestr = SAMESTR(q);	/* FIFO or pipe */
+		int sameq = (!samestr && q->q_next == OTHER(q));	/* FIFO */
+
+		if (!sameq)
+			for (q = q->q_next; q && !sameq; q = q->q_next) {
+				printk("%s%s", (samestr ? "<==>" : "<=X=>"), lis_queue_name(q));
+				samestr = SAMESTR(q);
+				sameq = (!samestr && q->q_next == OTHER(q));
+			}
+	}
+
+	printk("\n");
+
+	if ((hp = hd->sd_mux.mx_hd) != NULL) {	/* is a ctl stream */
+		indent += 2;
+		prefix;
+		printk("Lower multiplexors:\n");
+		for (; hp != NULL; hp = hp->sd_mux.mx_next) {
+			strm_print(hp, indent + 2);
+		}
+	}
+
+}				/* strm_print */
 
 #undef prefix
 
-void	 _RP lis_print_stream(stdata_t *hd)
+void
+lis_print_stream(stdata_t *hd)
 {
-    strm_print(hd, 0) ;
+	strm_print(hd, 0);
 
-} /* lis_print_stream */
+}				/* lis_print_stream */
 
 /************************************************************************
 *                         lis_print_data                                *
@@ -954,65 +976,58 @@ void	 _RP lis_print_stream(stdata_t *hd)
 *									*
 ************************************************************************/
 
-void	 _RP lis_print_data(mblk_t *mp, int opt, int cont)
+void
+lis_print_data(mblk_t *mp, int opt, int cont)
 {
-    const unsigned char	*p ;
-    unsigned char	*start ;
-    unsigned char	*end ;
-    int			 n ;
+	const unsigned char *p;
+	unsigned char *start;
+	unsigned char *end;
+	int n;
 
-    switch (opt)
-    {
-    case PRINT_DATA_ENTIRE:
-	if (mp->b_datap != NULL)
-	{
-	    start = mp->b_datap->db_base;
-	    end	  = mp->b_datap->db_lim;
+	switch (opt) {
+	case PRINT_DATA_ENTIRE:
+		if (mp->b_datap != NULL) {
+			start = mp->b_datap->db_base;
+			end = mp->b_datap->db_lim;
+		} else {
+			start = NULL;
+			end = NULL;
+		}
+		break;
+	case PRINT_DATA_RDWR:
+	default:
+		start = mp->b_rptr;
+		end = mp->b_wptr;
+		break;
 	}
-	else
-	{
-	    start = NULL;
-	    end	  = NULL;
+
+	if (start > end) {
+		printk("mblk@%lx: start (%lx) > end (%lx)\n", (long) mp, (long) start, (long) end);
+		return;
 	}
-	break ;
-    case PRINT_DATA_RDWR:
-    default:
-	start	= mp->b_rptr ;
-	end	= mp->b_wptr ;
-	break ;
-    }
 
-    if (start > end)
-    {
-	printk("mblk@%lx: start (%lx) > end (%lx)\n",
-				(long)mp, (long)start, (long)end) ;
-	return ;
-    }
+	if (start == NULL || end == NULL) {
+		printk("mblk@%lx: start (%lx) or end (%lx) NULL\n", (long) mp, (long) start,
+		       (long) end);
+		return;
+	}
 
-    if (start == NULL || end == NULL)
-    {
-	printk("mblk@%lx: start (%lx) or end (%lx) NULL\n",
-				(long)mp, (long)start, (long)end) ;
-	return ;
-    }
+	printk("    ");		/* indent 4 */
+	for (p = start, n = 0; p != end; p++, n++) {
+		if (n && (n & 0x0F) == 0)	/* printed 16th elt */
+			printk("\n    ");	/* indent 4 */
 
-    printk("    ") ;					/* indent 4 */
-    for (p = start, n = 0; p != end; p++, n++)
-    {
-	if (  n && (n & 0x0F) == 0)			/* printed 16th elt */
-	    printk("\n    ") ;				/* indent 4 */
+		printk("%c", (p == mp->b_wptr) ? '>' : ' ');
+		printk("%c", (p == mp->b_rptr) ? '<' : ' ');
+		printk("%02X", *p);
+	}
 
-	printk("%c",  (p == mp->b_wptr) ? '>' : ' ') ;
-	printk("%c",  (p == mp->b_rptr) ? '<' : ' ') ;
-	printk("%02X", *p) ;
-    }
+	if (n && p == mp->b_wptr)
+		printk(">");
 
-    if (n && p == mp->b_wptr)
-	printk(">") ;
+	printk("\n");
 
-    printk("\n") ;
-
-} /* lis_print_data */
+}				/* lis_print_data */
 
 /************************************************************************
 *                           lis_print_msg                               *
@@ -1023,38 +1038,37 @@ void	 _RP lis_print_data(mblk_t *mp, int opt, int cont)
 * 'opt' is the print format option, or zero for the short form.		*
 *									*
 ************************************************************************/
-void	 _RP lis_print_msg(mblk_t *mp, const char *prefix, int opt)
+void
+lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 {
-    int		nbytes ;
-    int		prnt_bfr ;
-    int		cont ;
+	int nbytes;
+	int prnt_bfr;
+	int cont;
 
-    if (mp == NULL)
-    {
-	printk("NULL message pointer\n") ;
-	return ;
-    }
+	if (mp == NULL) {
+		printk("NULL message pointer\n");
+		return;
+	}
 
-    printk("mblk: \"%s\"", prefix);
-    if (LIS_DEBUG_ADDRS)			/* printing addresses */
-	printk(" @ 0x%lx: b_next=0x%lx b_prev=0x%lx b_datap=0x%lx",
-	      (long)mp, (long)mp->b_next, (long)mp->b_prev, (long)mp->b_datap) ;
+	printk("mblk: \"%s\"", prefix);
+	if (LIS_DEBUG_ADDRS)	/* printing addresses */
+		printk(" @ 0x%lx: b_next=0x%lx b_prev=0x%lx b_datap=0x%lx", (long) mp,
+		       (long) mp->b_next, (long) mp->b_prev, (long) mp->b_datap);
 
-    for (cont = 0; mp != NULL; mp = mp->b_cont, cont++)
-    {
-	nbytes = mp->b_wptr - mp->b_rptr ;
-	prnt_bfr = (opt == PRINT_DATA_ENTIRE) || (opt != 0 && nbytes != 0) ;
-	if (cont)
-	    printk(">>   ") ;
+	for (cont = 0; mp != NULL; mp = mp->b_cont, cont++) {
+		nbytes = mp->b_wptr - mp->b_rptr;
+		prnt_bfr = (opt == PRINT_DATA_ENTIRE) || (opt != 0 && nbytes != 0);
+		if (cont)
+			printk(">>   ");
 
-	printk(" %s", lis_msg_type_name(mp)) ;
-	printk(" b_band=%d bytes=%d\n", mp->b_band, nbytes) ;
+		printk(" %s", lis_msg_type_name(mp));
+		printk(" b_band=%d bytes=%d\n", mp->b_band, nbytes);
 
-	if (prnt_bfr)
-	    lis_print_data(mp, opt, cont) ;
-    }
+		if (prnt_bfr)
+			lis_print_data(mp, opt, cont);
+	}
 
-} /* lis_print_msg */
+}				/* lis_print_msg */
 
 /************************************************************************
 *                           lis_poll_events                             *
@@ -1063,44 +1077,57 @@ void	 _RP lis_print_msg(mblk_t *mp, const char *prefix, int opt)
 * Return the ASCII decoding of a poll event mask.			*
 *									*
 ************************************************************************/
-char	* _RP lis_poll_events(short events)
+char *
+lis_poll_events(short events)
 {
-    static char		 event_names[8][150] ;
-    static int		 index ;
-    char		*ascii_events ;
-    int			 inx ;
+	static char event_names[8][150];
+	static int index;
+	char *ascii_events;
+	int inx;
 
-    inx = index++ & 0x03 ;
-    ascii_events = event_names[inx] ;
-    ascii_events[0] = 0 ;
+	inx = index++ & 0x03;
+	ascii_events = event_names[inx];
+	ascii_events[0] = 0;
 
-    if (events & POLLIN) strcat(ascii_events, "POLLIN ") ;
-    if (events & POLLRDNORM) strcat(ascii_events, "POLLRDNORM ") ;
-    if (events & POLLRDBAND) strcat(ascii_events, "POLLRDBAND ") ;
-    if (events & POLLPRI) strcat(ascii_events, "POLLPRI ") ;
-    if (events & POLLOUT) strcat(ascii_events, "POLLOUT ") ;
-    if (events & POLLWRNORM) strcat(ascii_events, "POLLWRNORM ") ;
-    if (events & POLLWRBAND) strcat(ascii_events, "POLLWRBAND ") ;
-    if (events & POLLMSG) strcat(ascii_events, "POLLMSG ") ;
-    if (events & POLLERR) strcat(ascii_events, "POLLERR ") ;
-    if (events & POLLHUP) strcat(ascii_events, "POLLHUP ") ;
-    if (events & POLLNVAL) strcat(ascii_events, "POLLNVAL ") ;
+	if (events & POLLIN)
+		strcat(ascii_events, "POLLIN ");
+	if (events & POLLRDNORM)
+		strcat(ascii_events, "POLLRDNORM ");
+	if (events & POLLRDBAND)
+		strcat(ascii_events, "POLLRDBAND ");
+	if (events & POLLPRI)
+		strcat(ascii_events, "POLLPRI ");
+	if (events & POLLOUT)
+		strcat(ascii_events, "POLLOUT ");
+	if (events & POLLWRNORM)
+		strcat(ascii_events, "POLLWRNORM ");
+	if (events & POLLWRBAND)
+		strcat(ascii_events, "POLLWRBAND ");
+	if (events & POLLMSG)
+		strcat(ascii_events, "POLLMSG ");
+	if (events & POLLERR)
+		strcat(ascii_events, "POLLERR ");
+	if (events & POLLHUP)
+		strcat(ascii_events, "POLLHUP ");
+	if (events & POLLNVAL)
+		strcat(ascii_events, "POLLNVAL ");
 
-    if (ascii_events[0] == 0)
-	sprintf(ascii_events, "0x%x", events) ;
+	if (ascii_events[0] == 0)
+		sprintf(ascii_events, "0x%x", events);
 
-    return(ascii_events) ;
+	return (ascii_events);
 
-} /* lis_poll_events */
+}				/* lis_poll_events */
 
 #if !defined(LINUX)
-const char *lis_basename( const char *filename )
+const char *
+lis_basename(const char *filename)
 {
-    char	*p ;
+	char *p;
 
-    p = strrchr(filename, '/') ;
-    if (p == NULL)
-	return(filename) ;
-    return(p+1) ;
+	p = strrchr(filename, '/');
+	if (p == NULL)
+		return (filename);
+	return (p + 1);
 }
 #endif

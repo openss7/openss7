@@ -60,7 +60,6 @@
  * Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
 
-
 #ifndef _CMD_ERR_H
 #define _CMD_ERR_H 1
 
@@ -68,24 +67,25 @@
 
 #include <sys/LiS/genconf.h>
 
-#define	CE_CONT		0		/* continue printing */
-#define	CE_NOTE		1		/* NOTICE */
-#define	CE_WARN		2		/* WARNING */
-#define	CE_PANIC	3		/* PANIC */
+#define	CE_CONT		0	/* continue printing */
+#define	CE_NOTE		1	/* NOTICE */
+#define	CE_WARN		2	/* WARNING */
+#define	CE_PANIC	3	/* PANIC */
 
 #ifdef __KERNEL__
 
-#if __LIS_INTERNAL__
-void    lis_cmn_err_init(void) ;	/* not exported */
+#ifdef __LIS_INTERNAL__
+void lis_cmn_err_init(void);		/* not exported */
 #endif
-void	lis_vcmn_err(int err_lvl, const char *fmt, va_list args) _RP;
-void	lis_cmn_err(int err_lvl, const char *fmt, ...) _RP __attribute__ ((format(printf, 2, 3)));
+void lis_vcmn_err(int err_lvl, const char *fmt, va_list args);
+void lis_cmn_err(int err_lvl, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+
 #define	cmn_err		lis_cmn_err
 #define vcmn_err	lis_vcmn_err
 
 #endif				/* __KERNEL__ */
 
-#endif /*!_CMD_ERR_H*/
+#endif				/* !_CMD_ERR_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.3 2005/07/12 13:54:42 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.4 2005/07/13 12:01:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.4  2005/07/13 12:01:48  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 0.9.2.3  2005/07/12 13:54:42  brian
  - changes for os7 compatibility and check pass
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -83,6 +86,7 @@
 #if defined(CONFIG_STREAMS_COMPAT_LFS) || defined(CONFIG_STREAMS_COMPAT_LFS_MODULE)
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
+#include <sys/sad.h>
 
 /* These functions are missing from LiS, but in the core in LfS */
 
@@ -98,6 +102,38 @@ __LFS_EXTERN_INLINE int apush_get(struct strapush *sap)
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap)
 {
 	return lis_apush_set(sap);
+}
+__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp)
+{
+	return lis_apush_vml(slp);
+}
+
+__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap)
+{
+	sap->sap_cmd = SAP_CLEAR;
+	return apush_set(sap);
+}
+__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap)
+{
+	return apush_set(sap);
+}
+__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods)
+{
+	struct str_list sl;
+	sl.sl_nmods = nmods;
+	sl.sl_modlist = ml;
+	return apush_vml(&sl);
+}
+__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev)
+{
+	struct strapush *sap;
+	if ((sap = kmem_alloc(sizeof(*sap), KM_NOSLEEP))) {
+		sap->sap_cmd = SAD_GAP;
+		sap->sap_major = getmajor(dev);
+		sap->sap_minor = getminor(dev);
+		apush_get(sap);
+	}
+	return (sap);
 }
 
 #define ANYBAND (-1)

@@ -70,11 +70,10 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-
 #include <sys/types.h>
-#include <sys/errno.h>	      /* for errno */
-#include <memory.h>	      /* for memcpy */
-#include <sys/signal.h>	      /* for signal numbers */
+#include <sys/errno.h>		/* for errno */
+#include <memory.h>		/* for memcpy */
+#include <sys/signal.h>		/* for signal numbers */
 
 /*
  * name changes for these structures.
@@ -91,7 +90,7 @@
 *									*
 ************************************************************************/
 
-#ifndef _INKERNEL		
+#ifndef _INKERNEL
 #define	_INKERNEL		1
 #endif
 
@@ -110,40 +109,36 @@
 #else
 
     /* not compiling ON SVR4, but compiling FOR SVR4 */
-    typedef unsigned long	major_t ;
-    typedef unsigned long	minor_t ;
+typedef unsigned long major_t;
+typedef unsigned long minor_t;
 
 #endif
 
-typedef unsigned long	port_dev_t ;		/* device major/minor */
+typedef unsigned long port_dev_t;	/* device major/minor */
 
-#undef uid 
+#undef uid
 #undef gid
 /* typedef int     o_uid_t; */
 /* typedef int     o_gid_t; */
-typedef unsigned   char uchar;
+typedef unsigned char uchar;
 typedef struct cred {
-	uid_t	cr_uid;			/* effective user id */
-	gid_t	cr_gid;			/* effective group id */
+	uid_t cr_uid;			/* effective user id */
+	gid_t cr_gid;			/* effective group id */
 } cred_t;
 
-typedef struct u_semaphore
-{
-    int			sem_count ;		/* semaphore counter */
-    long		sem_xxx[8] ;		/* just a placeholder */
+typedef struct u_semaphore {
+	int sem_count;			/* semaphore counter */
+	long sem_xxx[8];		/* just a placeholder */
 
-} u_semaphore_t ;
+} u_semaphore_t;
 
-
-
-#define	kvtophys(addr)		(addr)		/* user level fakery */
+#define	kvtophys(addr)		(addr)	/* user level fakery */
 
 /*
  * bzero and bcopy
  */
 #define	bzero(addr,nbytes)	memset(addr, 0, nbytes)
 #define	bcopy(src,dst,n)	memcpy(dst,src,n)
-
 
 #ifndef PORTABLE
 #define	PORTABLE	1
@@ -154,9 +149,6 @@ typedef struct u_semaphore
  */
 /* #define	SIGURG		31 */
 
-
-
-
 /*
  * Now include the portable stuff
  */
@@ -166,6 +158,5 @@ typedef struct u_semaphore
 #ifndef _PORT_MDEP_H
 #include <sys/LiS/port-mdep.h>
 #endif
-
 
 #endif

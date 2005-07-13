@@ -62,7 +62,7 @@
 *									*
 ************************************************************************/
 
-#include <sys/LiS/linux-mdep.h>		/* redefine dev_t b4 any kernel incls */
+#include <sys/LiS/linux-mdep.h>	/* redefine dev_t b4 any kernel incls */
 
 #undef  EXPORT_SYMTAB
 #define EXPORT_SYMTAB 1
@@ -88,26 +88,22 @@
 *									*
 ************************************************************************/
 
-
-extern int		lis_major;
-extern char		lis_kernel_version[];
-extern char		lis_version[] ;
-extern char		lis_date[] ;
-extern char		*lis_stropts_file ;
-extern char		*lis_poll_file;
-extern int              lis_num_cpus ;
-extern lis_atomic_t     lis_in_syscall ;
-extern lis_atomic_t     lis_queues_running ; 
-extern volatile unsigned long lis_runq_cnts[LIS_NR_CPUS] ;
-extern volatile unsigned long lis_queuerun_cnts[LIS_NR_CPUS] ;
-extern volatile unsigned long lis_setqsched_cnts[LIS_NR_CPUS] ;
-extern volatile unsigned long lis_setqsched_isr_cnts[LIS_NR_CPUS] ;
-extern lis_atomic_t	lis_strcount ;
-extern long		lis_max_mem ;
-extern int        	lis_seq_cntr ;
-
-
-
+extern int lis_major;
+extern char lis_kernel_version[];
+extern char lis_version[];
+extern char lis_date[];
+extern char *lis_stropts_file;
+extern char *lis_poll_file;
+extern int lis_num_cpus;
+extern lis_atomic_t lis_in_syscall;
+extern lis_atomic_t lis_queues_running;
+extern volatile unsigned long lis_runq_cnts[LIS_NR_CPUS];
+extern volatile unsigned long lis_queuerun_cnts[LIS_NR_CPUS];
+extern volatile unsigned long lis_setqsched_cnts[LIS_NR_CPUS];
+extern volatile unsigned long lis_setqsched_isr_cnts[LIS_NR_CPUS];
+extern lis_atomic_t lis_strcount;
+extern long lis_max_mem;
+extern int lis_seq_cntr;
 
 /************************************************************************
 *                             Exports                                   *
@@ -123,9 +119,11 @@ EXPORT_SYMBOL(lis_allocb);
 EXPORT_SYMBOL(lis_allocb_physreq);
 EXPORT_SYMBOL(lis_alloc_dma_fcn);
 EXPORT_SYMBOL(lis_alloc_kernel_fcn);
+EXPORT_SYMBOL(lis_allocq);
 EXPORT_SYMBOL(lis_appq);
-EXPORT_SYMBOL(lis_apush_get);		/* for sad */
-EXPORT_SYMBOL(lis_apush_set);		/* for sad */
+EXPORT_SYMBOL(lis_apush_get);	/* for sad */
+EXPORT_SYMBOL(lis_apush_set);	/* for sad */
+EXPORT_SYMBOL(lis_apush_vml);	/* for sad */
 EXPORT_SYMBOL(lis_assert_fail);
 EXPORT_SYMBOL(lis_atomic_add);
 EXPORT_SYMBOL(lis_atomic_dec);
@@ -171,6 +169,7 @@ EXPORT_SYMBOL(lis_free_irq);
 EXPORT_SYMBOL(lis_free_mem_fcn);
 EXPORT_SYMBOL(lis_freemsg);
 EXPORT_SYMBOL(lis_free_pages_fcn);
+EXPORT_SYMBOL(lis_freeq);
 EXPORT_SYMBOL(lis_freezestr);
 EXPORT_SYMBOL(lis_get_free_pages_atomic_fcn);
 EXPORT_SYMBOL(lis_get_free_pages_fcn);
@@ -205,7 +204,7 @@ EXPORT_SYMBOL(lis_malloc);
 EXPORT_SYMBOL(lis_mark_mem_fcn);
 #if (!defined(_S390_LIS_) && !defined(_S390X_LIS_) && !defined(_HPPA_LIS_))
 EXPORT_SYMBOL(lis_membar);
-#endif          /* S390 or S390X or HPPA */
+#endif				/* S390 or S390X or HPPA */
 EXPORT_SYMBOL(lis_milli_to_ticks);
 EXPORT_SYMBOL(lis_mknod);
 EXPORT_SYMBOL(lis_msecs);
@@ -272,7 +271,7 @@ EXPORT_SYMBOL(lis_pci_unmap_single);
 EXPORT_SYMBOL(lis_pci_write_config_byte);
 EXPORT_SYMBOL(lis_pci_write_config_dword);
 EXPORT_SYMBOL(lis_pci_write_config_word);
-#endif          /* S390 or S390X or HPPA */
+#endif				/* S390 or S390X or HPPA */
 EXPORT_SYMBOL(lis_phys_to_virt);
 EXPORT_SYMBOL(lis_print_block);
 EXPORT_SYMBOL(lis_print_data);
@@ -407,7 +406,7 @@ EXPORT_SYMBOL(lis_osif_pci_unmap_sg);
 EXPORT_SYMBOL(lis_osif_pci_unmap_single);
 EXPORT_SYMBOL(lis_osif_sg_dma_address);
 EXPORT_SYMBOL(lis_osif_sg_dma_len);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)      /* 2.4.13 or later */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,13)	/* 2.4.13 or later */
 #if HAVE_KFUNC_PCI_DAC_SET_DMA_MASK
 EXPORT_SYMBOL(lis_osif_pci_dac_set_dma_mask);
 #endif
@@ -426,7 +425,7 @@ EXPORT_SYMBOL(lis_osif_pci_dac_dma_sync_single_for_device);
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_to_offset);
 EXPORT_SYMBOL(lis_osif_pci_dac_dma_to_page);
 EXPORT_SYMBOL(lis_osif_pci_dac_page_to_dma);
-#endif                                  /* 2.4.13 */
+#endif				/* 2.4.13 */
 
 /*
  * Wrapper functions
@@ -446,5 +445,4 @@ EXPORT_SYMBOL(__wrap_memset);
 EXPORT_SYMBOL(__wrap_memcpy);
 EXPORT_SYMBOL(__wrap_memcmp);
 
-
-#endif          /* S390 or S390X */
+#endif				/* S390 or S390X */

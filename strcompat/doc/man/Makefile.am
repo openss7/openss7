@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/12 19:22:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 19:22:00 $ by $Author: brian $
+# Last Modified $Date: 2005/07/13 12:01:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,6 +64,7 @@ svr3_compat_pages = \
 
 svr4_compat_pages = \
 	man9/svr4compat.9 \
+	man9/bcmp.9 \
 	man9/dtimeout.9 \
 	man9/etoimajor.9 \
 	man9/getemajor.9 \
@@ -661,6 +662,11 @@ lfs_compat_pages = \
 	man9/lfscompat.9 \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
+	man9/apush_vml.9 \
+	man9/autopush_add.9 \
+	man9/autopush_del.9 \
+	man9/autopush_find.9 \
+	man9/autopush_vml.9 \
 	man9/bcanget.9 \
 	man9/canget.9 \
 	man9/copyin.9 \
@@ -681,8 +687,16 @@ lfs_compat_pages = \
 	man9/pcmsg.9 \
 	man9/putctl2.9 \
 	man9/putnextctl2.9 \
+	man9/register_strdev.9 \
+	man9/register_strdrv.9 \
+	man9/register_strmod.9 \
+	man9/register_strnod.9 \
+	man9/unregister_strdev.9 \
+	man9/unregister_strdrv.9 \
+	man9/unregister_strmod.9 \
+	man9/unregister_strnod.9 \
 	man9/strlog.9 \
-	man9/vstrlog_hook.9
+	man9/vstrlog.9
 
 mac_unimpl_pages = \
 	man9/allocbi.9 \
@@ -853,6 +867,7 @@ dist_noinst_svr3_compat_pages = \
 
 dist_noinst_svr4_compat_pages = \
 	man9/svr4compat.9.man \
+	man9/bcmp.9.man \
 	man9/dtimeout.9.man \
 	man9/etoimajor.9.man \
 	man9/getemajor.9.man \
@@ -1444,6 +1459,11 @@ dist_noinst_lfs_compat_pages = \
 	man9/lfscompat.9.man \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
+	man9/apush_vml.9.man \
+	man9/autopush_add.9.man \
+	man9/autopush_del.9.man \
+	man9/autopush_find.9.man \
+	man9/autopush_vml.9.man \
 	man9/bcanget.9.man \
 	man9/canget.9.man \
 	man9/copyin.9.man \
@@ -1464,8 +1484,16 @@ dist_noinst_lfs_compat_pages = \
 	man9/pcmsg.9.man \
 	man9/putctl2.9.man \
 	man9/putnextctl2.9.man \
+	man9/register_strdev.9.man \
+	man9/register_strdrv.9.man \
+	man9/register_strmod.9.man \
+	man9/register_strnod.9.man \
+	man9/unregister_strdev.9.man \
+	man9/unregister_strdrv.9.man \
+	man9/unregister_strmod.9.man \
+	man9/unregister_strnod.9.man \
 	man9/strlog.9.man \
-	man9/vstrlog_hook.9.man
+	man9/vstrlog.9.man
 
 dist_noinst_mac_unimpl_pages = \
 	man9/allocbi.9.man \

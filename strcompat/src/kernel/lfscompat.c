@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.9  2005/07/13 12:01:49  brian
+ - working up compat and check pass (finally lindented LiS)
+
  Revision 0.9.2.8  2005/07/12 13:54:45  brian
  - changes for os7 compatibility and check pass
 
@@ -77,9 +80,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $";
+static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:45 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -127,7 +130,7 @@ MODULE_ALIAS("streams-lfscompat");
 /*
  *  Functions missing from LiS:
  *
- *  alloclk, allocq, allocstr, apush_vml, autopush, autopush_add, autopush_del,
+ *  alloclk, allocq, allocstr, autopush, autopush_add, autopush_del,
  *  autopush_find, autopush_vml, freelk, freeq, freestr, kmem_alloc_node,
  *  kmem_zalloc_node, qattach, qclose, qdetach, qopen, qpop, qpush, qready,
  *  sealloc, sefree, setq, setqsched
@@ -149,6 +152,21 @@ EXPORT_SYMBOL(apush_get);
 
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
 EXPORT_SYMBOL(apush_set);
+
+__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
+EXPORT_SYMBOL(apush_vml);
+
+__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
+EXPORT_SYMBOL(autopush_del);
+
+__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap);
+EXPORT_SYMBOL(autopush_add);
+
+__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods);
+EXPORT_SYMBOL(autopush_vml);
+
+__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev);
+EXPORT_SYMBOL(autopush_find);
 
 int bcanget(queue_t *q, int band)
 {

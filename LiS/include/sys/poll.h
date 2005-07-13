@@ -76,7 +76,6 @@
 
 /*  -------------------------------------------------------------------  */
 
-
 #if defined(__linux__)
 /*
  * The strategy here is that if we are compiling for a 2.1 or 2.2 kernel
@@ -85,7 +84,7 @@
  * portable STREAMS with no kernel poll.h to be included.
  */
 # if !defined(_LIS_M_DEP_H) || !defined(__KERNEL__)
-# ifndef USER		/* Nonsense, and error if no linux/version.h */
+# ifndef USER			/* Nonsense, and error if no linux/version.h */
 #  include <linux/version.h>
 #  ifndef KERNEL_VERSION
 #  define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
@@ -106,7 +105,7 @@
 #define USED_LINUX_POLL_H	1
 #include <linux/poll.h>		/* instead of the rest of this file */
 #  if defined(_SPARC_LIS_) && !defined(POLLMSG)
-#    define POLLMSG         0x0200  /* supply missing def for SPARC */
+#    define POLLMSG         0x0200	/* supply missing def for SPARC */
 #  endif
 #else				/* use LiS's poll.h */
 				/* include the rest of this file */
@@ -133,19 +132,19 @@ struct pollfd {
 	int fd;				/* file desc to poll */
 	short events;			/* events of interest on fd */
 	short revents;			/* events that occurred on fd */
-} ;
+};
 
 /*
  * Testable select events
  */
-#define	POLLIN		0x0001		/* fd is readable */
-#define	POLLPRI		0x0002		/* high priority info at fd */
-#define	POLLOUT		0x0004		/* fd is writeable (won't block) */
-#define	POLLRDNORM	0x0040		/* normal data is readable */
+#define	POLLIN		0x0001	/* fd is readable */
+#define	POLLPRI		0x0002	/* high priority info at fd */
+#define	POLLOUT		0x0004	/* fd is writeable (won't block) */
+#define	POLLRDNORM	0x0040	/* normal data is readable */
 #define	POLLWRNORM	POLLOUT
-#define	POLLRDBAND	0x0080		/* out-of-band data is readable */
-#define	POLLWRBAND	0x0100		/* out-of-band data is writeable */
-#define	POLLMSG		0x0200		/* M_SIG at head of queue */
+#define	POLLRDBAND	0x0080	/* out-of-band data is readable */
+#define	POLLWRBAND	0x0100	/* out-of-band data is writeable */
+#define	POLLMSG		0x0200	/* M_SIG at head of queue */
 
 #define	POLLNORM	POLLRDNORM
 
@@ -153,33 +152,31 @@ struct pollfd {
  * Non-testable poll events (may not be specified in events field,
  * but may be returned in revents field).
  */
-#define	POLLERR		0x0008		/* fd has error condition */
-#define	POLLHUP		0x0010		/* fd has been hung up on */
-#define	POLLNVAL	0x0020		/* invalid pollfd entry */
+#define	POLLERR		0x0008	/* fd has error condition */
+#define	POLLHUP		0x0010	/* fd has been hung up on */
+#define	POLLNVAL	0x0020	/* invalid pollfd entry */
 
-#endif				 /* defined(KERNEL_2_1) */
+#endif				/* defined(KERNEL_2_1) */
 
 /*
  * The prototype for the routine called from user programs for the
  * poll system call.
  */
-#ifndef poll		/* no macro by that name */
+#ifndef poll			/* no macro by that name */
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef __BEGIN_DECLS
+/* *INDENT-OFF* */
+__BEGIN_DECLS
+/* *INDENT-ON* */
 #endif
 
-#if __LIS_INTERNAL__
 extern int poll(struct pollfd *fds, unsigned long nfds, int timeout);
-#endif
 
-#ifdef __cplusplus
-}
+#ifdef __END_DECLS
+/* *INDENT-OFF* */
+__END_DECLS
+/* *INDENT-ON* */
 #endif
-
 #endif
-
 /*  -------------------------------------------------------------------  */
-
-
-#endif	/* _SYS_POLL_H */
+#endif				/* _SYS_POLL_H */

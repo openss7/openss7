@@ -65,7 +65,6 @@
  *    nemo@ordago.uc3m.es
  */
 
-
 #ifndef _WAIT_H
 #define _WAIT_H 1
 
@@ -79,7 +78,6 @@
 #include <sys/LiS/head.h>	/* stream head */
 #endif
 
-
 /*  -------------------------------------------------------------------  */
 /*                         Shared global variables                       */
 
@@ -87,7 +85,6 @@
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
-
 
 /* The functions below are to achieve mutual exclusion on the stream
  * head. They use the sd_wopen wait queue to sleep and the sd_lock char to
@@ -103,15 +100,14 @@
  *   S wiocing: answer to ioc arrived
  * STATUS: complete(?), untested
  */
-#if __LIS_INTERNAL__
-extern int lis_sleep_on_wopen(struct stdata * sd) ;
-extern int lis_sleep_on_wioc(struct stdata * sd, char *f,int l) ;
-extern int lis_sleep_on_wwrite(struct stdata * sd);
-extern int lis_sleep_on_wread(struct stdata * sd);
-extern int lis_sleep_on_wiocing(struct stdata * sd);
-extern int lis_sleep_on_read_sem(struct stdata * sd);
+#ifdef __LIS_INTERNAL__
+extern int lis_sleep_on_wopen(struct stdata *sd);
+extern int lis_sleep_on_wioc(struct stdata *sd, char *f, int l);
+extern int lis_sleep_on_wwrite(struct stdata *sd);
+extern int lis_sleep_on_wread(struct stdata *sd);
+extern int lis_sleep_on_wiocing(struct stdata *sd);
+extern int lis_sleep_on_read_sem(struct stdata *sd);
 #endif
-
 
 /*  -------------------------------------------------------------------  */
 
@@ -123,13 +119,13 @@ extern int lis_sleep_on_read_sem(struct stdata * sd);
 
 /*  -------------------------------------------------------------------  */
 
-#if __LIS_INTERNAL__
-extern void	lis_wake_up_wwrite(struct stdata * sd) ;     /* wait.c */
-extern void	lis_wake_up_all_wwrite(struct stdata * sd) ; /* wait.c */
-extern void	lis_wake_up_wread(struct stdata * sd) ;      /* wait.c */
-extern void	lis_wake_up_all_wread(struct stdata * sd) ;  /* wait.c */
-extern void	lis_wake_up_read_sem(struct stdata * sd);    /* wait.c */
-extern void	lis_wake_up_all_read_sem(struct stdata * sd);    /* wait.c */
+#ifdef __LIS_INTERNAL__
+extern void lis_wake_up_wwrite(struct stdata *sd);	/* wait.c */
+extern void lis_wake_up_all_wwrite(struct stdata *sd);	/* wait.c */
+extern void lis_wake_up_wread(struct stdata *sd);	/* wait.c */
+extern void lis_wake_up_all_wread(struct stdata *sd);	/* wait.c */
+extern void lis_wake_up_read_sem(struct stdata *sd);	/* wait.c */
+extern void lis_wake_up_all_read_sem(struct stdata *sd);	/* wait.c */
 #endif
 
 #define lis_wake_up_wiocing(sd)						\
@@ -137,31 +133,27 @@ extern void	lis_wake_up_all_read_sem(struct stdata * sd);    /* wait.c */
 				    lis_up(&sd->sd_wiocing);		\
 				}
 
-
 /*  -------------------------------------------------------------------  */
 #define lis_unlock_wioc(sd)						\
 				{					\
 				    lis_up(&sd->sd_wioc);		\
 				}
 
-
 /*  -------------------------------------------------------------------  */
 
 /* Sched & cancel timeouts
  */
-typedef	void	tmout_fcn_t(ulong) ;
+typedef void tmout_fcn_t(ulong);
 
-#if __LIS_INTERNAL__
-extern void
-lis_tmout(struct timer_list *tl, tmout_fcn_t *fn, long arg, long ticks) ;
+#ifdef __LIS_INTERNAL__
+extern void lis_tmout(struct timer_list *tl, tmout_fcn_t * fn, long arg, long ticks);
 
-extern void
-lis_untmout( struct timer_list *tl) ;
+extern void lis_untmout(struct timer_list *tl);
 #endif
 
-#endif /* __KERNEL__ */
+#endif				/* __KERNEL__ */
 
-#endif /*!_WAIT_H*/
+#endif				/* !_WAIT_H */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

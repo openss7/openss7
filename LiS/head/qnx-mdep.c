@@ -70,25 +70,23 @@
 
 #include "port-mdep.c"
 
-#include <sys/LiS/head.h>		/* for strread, strwrite, etc */
+#include <sys/LiS/head.h>	/* for strread, strwrite, etc */
 
-struct file_operations
-lis_streams_fops = {
-	NULL,			/* lseek   -- no lseek  */
-	lis_strread,		/* read    		*/
-	lis_strwrite,		/* write to stream      */
-	NULL,			/* readdir -- no readdir*/
-	NULL,			/* select  		*/
-	lis_strioctl,		/* ioctl   		*/
-	NULL,			/* mmap    -- no mmap   */
-	lis_stropen,		/* open the stream      */
-	lis_strclose,		/* close the stream     */
-	NULL,			/* fsync   -- no fsync  */
-	NULL,			/* fasync  -- no fasync */
-	NULL,			/* check_media_change	*/
-	NULL,			/* revalidate		*/
-	lis_strputpmsg,		/* putpmsg & putmsg	*/
-	lis_strgetpmsg,		/* getpmsg & getmsg	*/
-	lis_strpoll		/* poll			*/
+struct file_operations lis_streams_fops = {
+	NULL,			/* lseek -- no lseek */
+	lis_strread,		/* read */
+	lis_strwrite,		/* write to stream */
+	NULL,			/* readdir -- no readdir */
+	NULL,			/* select */
+	lis_strioctl,		/* ioctl */
+	NULL,			/* mmap -- no mmap */
+	lis_stropen,		/* open the stream */
+	lis_strclose,		/* close the stream */
+	NULL,			/* fsync -- no fsync */
+	NULL,			/* fasync -- no fasync */
+	NULL,			/* check_media_change */
+	NULL,			/* revalidate */
+	lis_strputpmsg,		/* putpmsg & putmsg */
+	lis_strgetpmsg,		/* getpmsg & getmsg */
+	lis_strpoll		/* poll */
 };
-

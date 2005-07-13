@@ -69,10 +69,6 @@
 
 #ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:21 $"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * There is now a GNU stropts.h in /usr/include and /usr/include/bits.
  * We are attempting to maintain compatibility of constant values among
@@ -109,7 +105,6 @@ extern "C" {
 #include <sys/strconfig.h>
 #endif
 
-
 /*  *******************************************************************  */
 /*                                 Symbols                               */
 
@@ -118,10 +113,7 @@ extern "C" {
  */
 
 #define INFTIM          -1
-#define	LIS_DFLT_TIM	15		/* Streams Programmer's Guide
-					 * hints that this is the
-					 * value to use.
-					 */
+#define	LIS_DFLT_TIM	15	/* Streams Programmer's Guide hints that this is the value to use. */
 
 /*  *******************************************************************  */
 
@@ -129,19 +121,19 @@ extern "C" {
  * Write opts.
  */
 
-#define SNDZERO         0x001           /* send a zero length message */
-#define SNDPIPE         0x002           /* send SIGPIPE on write and */
-                                        /* putmsg if sd_werror is set */
+#define SNDZERO         0x001	/* send a zero length message */
+#define SNDPIPE         0x002	/* send SIGPIPE on write and */
+	/* putmsg if sd_werror is set */
 
 /*
  *  Read opts that can be defined with SO_READOPT (so_readopt values)
  */
 
-#define RNORM           0x0000  /* byte stream */
-#define RMSGD           0x0001  /* message discard */
-#define RMSGN           0x0002  /* message non-discard */
+#define RNORM           0x0000	/* byte stream */
+#define RMSGD           0x0001	/* message discard */
+#define RMSGN           0x0002	/* message non-discard */
 
-#define RMODEMASK       0x0003  /* RMODE bits */
+#define RMODEMASK       0x0003	/* RMODE bits */
 
 /* As Solaris' guys say:
  * "These next three read options are added for the sake of
@@ -159,11 +151,11 @@ extern "C" {
  * For compatibility, we use the same bits as SVR4.
  */
 
-#define RPROTDAT        0x0004  /* turn M*PROTO into M_DATA */
-#define RPROTDIS        0x0008  /* discard M*PROTO */
-#define RPROTNORM       0x0010  /* normal proto */
+#define RPROTDAT        0x0004	/* turn M*PROTO into M_DATA */
+#define RPROTDIS        0x0008	/* discard M*PROTO */
+#define RPROTNORM       0x0010	/* normal proto */
 
-#define RPROTMASK       0x001C  /* RPROT bits */
+#define RPROTMASK       0x001C	/* RPROT bits */
 
 /*  *******************************************************************  */
 
@@ -171,13 +163,13 @@ extern "C" {
  *  flags for M_FLUSH
  */
 
-#define FLUSHR          0x01    /* flush read side */
-#define FLUSHW          0x02    /* flush write side */
-#define FLUSHRW         0x03    /* flush both read & write sides */
+#define FLUSHR          0x01	/* flush read side */
+#define FLUSHW          0x02	/* flush write side */
+#define FLUSHRW         0x03	/* flush both read & write sides */
 #ifdef USE_OLD_CONSTS
-#define FLUSHBAND       0x10    /* flush msg for band priority */
+#define FLUSHBAND       0x10	/* flush msg for band priority */
 #else
-#define FLUSHBAND       0x04    /* flush msg for band priority */
+#define FLUSHBAND       0x04	/* flush msg for band priority */
 #endif
 
 /*  *******************************************************************  */
@@ -186,19 +178,19 @@ extern "C" {
  *  events for SIGPOLL to be sent
  */
 
-#define S_INPUT         0x0001          /* any msg but hipri on read Q */
-#define S_HIPRI         0x0002          /* high priority msg on read Q */
-#define S_OUTPUT        0x0004          /* write Q no longer full */
-#define S_MSG           0x0008          /* signal msg at front of read Q */
-#define S_ERROR         0x0010          /* error msg arrived at stream head */
-#define S_HANGUP        0x0020          /* hangup msg arrived at stream head */
-#define S_RDNORM        0x0040          /* normal msg on read Q */
+#define S_INPUT         0x0001	/* any msg but hipri on read Q */
+#define S_HIPRI         0x0002	/* high priority msg on read Q */
+#define S_OUTPUT        0x0004	/* write Q no longer full */
+#define S_MSG           0x0008	/* signal msg at front of read Q */
+#define S_ERROR         0x0010	/* error msg arrived at stream head */
+#define S_HANGUP        0x0020	/* hangup msg arrived at stream head */
+#define S_RDNORM        0x0040	/* normal msg on read Q */
 #define S_WRNORM        S_OUTPUT
-#define S_RDBAND        0x0080          /* out of band msg on read Q */
-#define S_WRBAND        0x0100          /* can write out of band */
-#define S_BANDURG       0x0200          /* modifier to S_RDBAND, to generate */
-                                        /* SIGURG instead of SIGPOLL */
-#define S_ALL		0x03FF		/* every event */
+#define S_RDBAND        0x0080	/* out of band msg on read Q */
+#define S_WRBAND        0x0100	/* can write out of band */
+#define S_BANDURG       0x0200	/* modifier to S_RDBAND, to generate */
+	/* SIGURG instead of SIGPOLL */
+#define S_ALL		0x03FF	/* every event */
 
 /*  *******************************************************************  */
 
@@ -206,11 +198,10 @@ extern "C" {
  * Stream buffer structure for putpmsg and getpmsg system calls
  */
 
-typedef
-struct strbuf {
-    int     maxlen;                 /* no. of bytes in buffer */
-    int     len;                    /* no. of bytes returned */
-    char    *buf;                   /* pointer to data */
+typedef struct strbuf {
+	int maxlen;			/* no. of bytes in buffer */
+	int len;			/* no. of bytes returned */
+	char *buf;			/* pointer to data */
 } strbuf_t;
 
 /*  *******************************************************************  */
@@ -218,27 +209,21 @@ struct strbuf {
 /*
  * User level routines for getmsg/putmsg, etc
  */
-int	putpmsg(int fd, struct strbuf *ctlptr,
-			struct strbuf *dataptr,
-			int band,
-			int flags) ;
-int	getpmsg(int fd, struct strbuf *ctlptr,
-			struct strbuf *dataptr,
-			int *bandp,
-			int *flagsp) ;
-int	getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp) ;
-int	putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags) ;
-int	fattach(int fd, const char *path) ;
-int	fdetach(const char *path) ;
-int	isastream(int fd) ;
-int     pipe(int fds[2]);
+int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+int getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
+int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
+int fattach(int fd, const char *path);
+int fdetach(const char *path);
+int isastream(int fd);
+int pipe(int fds[2]);
 
 #if 0
 #ifdef QNX
 #ifndef GCOM_OPEN
 #define open gcom_open
 #endif
-extern int gcom_open( const char *__path, int __oflag, ... );
+extern int gcom_open(const char *__path, int __oflag, ...);
 #endif
 #endif
 
@@ -248,8 +233,8 @@ extern int gcom_open( const char *__path, int __oflag, ... );
  * the first message on the stream head read queue and putpmsg() to send
  * a normal priority message.
  */
-#define RS_HIPRI        0x01    /* high priority message */
-#define RS_NORM         0x00    /* normal message */
+#define RS_HIPRI        0x01	/* high priority message */
+#define RS_NORM         0x00	/* normal message */
 
 /*  *******************************************************************  */
 
@@ -257,17 +242,16 @@ extern int gcom_open( const char *__path, int __oflag, ... );
  * These are settable by the user and will be set on return
  * to indicate the priority of message received.
  */
-#define MSG_HIPRI       0x01            /* send/recv high priority message */
-#define MSG_ANY         0x02            /* recv any messages */
-#define MSG_BAND        0x04            /* recv messages from specified band */
+#define MSG_HIPRI       0x01	/* send/recv high priority message */
+#define MSG_ANY         0x02	/* recv any messages */
+#define MSG_BAND        0x04	/* recv messages from specified band */
 
 /*  *******************************************************************  */
 
 /* Flags returned as value of getmsg() and getpmsg() syscall.
  */
-#define MORECTL         1               /* more ctl info is left in message */
-#define MOREDATA        2               /* more data is left in message */
-
+#define MORECTL         1	/* more ctl info is left in message */
+#define MOREDATA        2	/* more data is left in message */
 
 /*  *******************************************************************  */
 
@@ -293,7 +277,7 @@ extern int gcom_open( const char *__path, int __oflag, ... );
  *   STREAMS Ioctls
  */
 
-#if defined(STR)			/* possibly from <asm/hw_irq.h> */
+#if defined(STR)		/* possibly from <asm/hw_irq.h> */
 #undef STR
 #endif
 
@@ -355,7 +339,8 @@ extern int gcom_open( const char *__path, int __oflag, ... );
 #define I_PUTMSG	(__SID |41)	/* HP-UX, OSF putmsg() system call */
 #define I_GETPMSG	(__SID |42)	/* HP-UX, OSF, Mac OT (40), LiS (251), */
 #define I_PUTPMSG	(__SID |43)	/* HP-UX, OSF, Mac OT (41), LiS (250), */
-#define I_PIPE		(__SID |44)	/* HP-UX, OSF, Mac OT (49), LiS (254 then 243), connect two streams as a pipe */
+#define I_PIPE		(__SID |44)	/* HP-UX, OSF, Mac OT (49), LiS (254 then 243), connect two 
+					   streams as a pipe */
 #define I_FIFO		(__SID |45)	/* HP-UX, OSF, Mac OT (51), convert a stream into a FIFO */
 
 #define I_POLL		(__SID |42)	/* Mac OT */
@@ -371,7 +356,7 @@ extern int gcom_open( const char *__path, int __oflag, ... );
 /*
  * The following ioctls are specific to this STREAMS implementation.
  */
-#define I_LIS_PIPE              I_PIPE		/* pipe() */
+#define I_LIS_PIPE              I_PIPE	/* pipe() */
 #define I_LIS_FATTACH           I_FATTACH	/* fattach() */
 #define I_LIS_FDETACH           I_FDETACH	/* fdetach() */
 /*
@@ -396,7 +381,7 @@ extern int gcom_open( const char *__path, int __oflag, ... );
 #define I_LIS_SET_MAXMSGMEM	(__SID |249)
 #define I_LIS_GET_MAXMEM	(__SID |250)
 #define I_LIS_SET_MAXMEM	(__SID |251)
-#define I_LIS_GETSTATS 		(__SID |252)   /* see include/sys/LiS/stats.h */
+#define I_LIS_GETSTATS 		(__SID |252)	/* see include/sys/LiS/stats.h */
 #define I_LIS_PRNTSTRM 		(__SID |253)
 #define	I_LIS_PRNTMEM		(__SID |254)
 #define I_LIS_SDBGMSK  		(__SID |255)
@@ -408,12 +393,11 @@ extern int gcom_open( const char *__path, int __oflag, ... );
  * I_STR ioctl user data
  */
 
-typedef
-struct strioctl {
-    int     ic_cmd;                 /* command */
-    int     ic_timout;              /* timeout value */
-    int     ic_len;                 /* length of data */
-    char    *ic_dp;                 /* pointer to data */
+typedef struct strioctl {
+	int ic_cmd;			/* command */
+	int ic_timout;			/* timeout value */
+	int ic_len;			/* length of data */
+	char *ic_dp;			/* pointer to data */
 } strioctl_t;
 
 /*  *******************************************************************  */
@@ -422,11 +406,10 @@ struct strioctl {
  *  I_PEEK ioctl
  */
 
-typedef
-struct strpeek {
-    struct strbuf   ctlbuf;
-    struct strbuf   databuf;
-    long            flags;
+typedef struct strpeek {
+	struct strbuf ctlbuf;
+	struct strbuf databuf;
+	long flags;
 } strpeek_t;
 
 /*  *******************************************************************  */
@@ -435,38 +418,36 @@ struct strpeek {
  * Stream I_FDINSERT ioctl format
  */
 
-typedef
-struct strfdinsert {
-    struct strbuf   ctlbuf;
-    struct strbuf   databuf;
-    long            flags;
-    int             fildes;
-    int             offset;
+typedef struct strfdinsert {
+	struct strbuf ctlbuf;
+	struct strbuf databuf;
+	long flags;
+	int fildes;
+	int offset;
 } strfdinsert_t;
 
 /*
  * Receive file descriptor structure
  */
 
-typedef
-struct strrecvfd {
+typedef struct strrecvfd {
 #ifdef __KERNEL__
-    union {
-	struct file *fp;
-	int          fd;
-    } f;
+	union {
+		struct file *fp;
+		int fd;
+	} f;
 #else
-    int   fd;
+	int fd;
 #endif
-    uid_t uid;
-    gid_t gid;
+	uid_t uid;
+	gid_t gid;
 #ifdef __KERNEL__
-    struct {
-	struct file *fp;
-	struct stdata *hd;
-    } r;
+	struct {
+		struct file *fp;
+		struct stdata *hd;
+	} r;
 #else
-    char  fill[8];
+	char fill[8];
 #endif
 } strrecvfd_t;
 
@@ -476,15 +457,13 @@ struct strrecvfd {
  *  I_LIST ioctl.
  */
 
-typedef
-struct str_mlist {
-    char l_name[FMNAMESZ+1];
+typedef struct str_mlist {
+	char l_name[FMNAMESZ + 1];
 } str_mlist_t;
 
-typedef
-struct str_list {
-    int               sl_nmods;
-    struct str_mlist *sl_modlist;
+typedef struct str_list {
+	int sl_nmods;
+	struct str_mlist *sl_modlist;
 } str_list_t;
 
 /*  *******************************************************************  */
@@ -494,30 +473,28 @@ struct str_list {
  * band for which the operation applies.
  */
 
-typedef
-struct bandinfo {
-    unsigned char   bi_pri;
-    int             bi_flag;
+typedef struct bandinfo {
+	unsigned char bi_pri;
+	int bi_flag;
 } bandinfo_t;
 
 /*
  * For I_LIS_QRUN_STATS ioctl
  */
-typedef struct
-{
-    int			num_cpus ;
-    int			num_qrunners ;
-    int			queues_running ;
-    int			runq_req_cnt ;
-    unsigned long	runq_cnts[LIS_NR_CPUS] ;
-    unsigned long	queuerun_cnts[LIS_NR_CPUS] ;
-    int			active_flags[LIS_NR_CPUS] ;
-    int			runq_pids[LIS_NR_CPUS] ;
-    unsigned long	runq_wakeups[LIS_NR_CPUS] ;
-    unsigned long	setqsched_cnts[LIS_NR_CPUS] ;
-    unsigned long	setqsched_isr_cnts[LIS_NR_CPUS] ;
+typedef struct {
+	int num_cpus;
+	int num_qrunners;
+	int queues_running;
+	int runq_req_cnt;
+	unsigned long runq_cnts[LIS_NR_CPUS];
+	unsigned long queuerun_cnts[LIS_NR_CPUS];
+	int active_flags[LIS_NR_CPUS];
+	int runq_pids[LIS_NR_CPUS];
+	unsigned long runq_wakeups[LIS_NR_CPUS];
+	unsigned long setqsched_cnts[LIS_NR_CPUS];
+	unsigned long setqsched_isr_cnts[LIS_NR_CPUS];
 
-} lis_qrun_stats_t ;
+} lis_qrun_stats_t;
 
 /*  *******************************************************************  */
 /*
@@ -544,25 +521,23 @@ typedef struct
  *  Also, nobody does the argument passing this way.  See strpmsg below... -bb
  *  Wed Jun 22 22:41:03 MDT 2005
  */
-typedef struct getpmsg_args
-{
-    int		 	 fd ;
-    struct strbuf	*ctl ;
-    struct strbuf	*dat ;
-    int			*bandp ;
-    int			*flagsp ;
+typedef struct getpmsg_args {
+	int fd;
+	struct strbuf *ctl;
+	struct strbuf *dat;
+	int *bandp;
+	int *flagsp;
 
-} getpmsg_args_t ;
+} getpmsg_args_t;
 
-typedef struct putpmsg_args
-{
-    int		 	 fd ;
-    struct strbuf	*ctl ;
-    struct strbuf	*dat ;
-    int			 band ;
-    int			 flags ;
+typedef struct putpmsg_args {
+	int fd;
+	struct strbuf *ctl;
+	struct strbuf *dat;
+	int band;
+	int flags;
 
-} putpmsg_args_t ;
+} putpmsg_args_t;
 #endif
 
 /* for ioctl emulation of getmsg() getpmsg() putmsg() putpmsg(), matches Mac OT, HP-UX, OSF:
@@ -578,16 +553,9 @@ struct strpmsg {
 /*  *******************************************************************  */
 /*                         Shared global variables                       */
 
-
-
 /*  *******************************************************************  */
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /*!_SYS_STROPTS_H*/
-
+#endif				/* !_SYS_STROPTS_H */
 /*----------------------------------------------------------------------
 # Local Variables:      ***
 # change-log-default-name: "~/src/prj/streams/src/NOTES" ***

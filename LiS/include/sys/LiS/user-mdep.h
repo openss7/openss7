@@ -70,20 +70,19 @@
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
-#include <sys/errno.h>	      /* for errno */
+#include <sys/errno.h>		/* for errno */
 #ifndef _MEMORY_H
-#include <memory.h>	      /* for memcpy */
+#include <memory.h>		/* for memcpy */
 #endif
 #ifndef _SIGNAL_H
-#include <sys/signal.h>	      /* for signal numbers */
+#include <sys/signal.h>		/* for signal numbers */
 #endif
 #ifndef _SYS_TYPES_H
-#include <sys/types.h>	      /* uid_t and other types */
+#include <sys/types.h>		/* uid_t and other types */
 #endif
-#include <sys/time.h>         /* for gettimeofday */
+#include <sys/time.h>		/* for gettimeofday */
 #include <sys/LiS/config.h>
 #include <sys/LiS/genconf.h>
-
 
 /*
  * Used for memory allocation alignment
@@ -126,12 +125,12 @@
 #define	RDEV_TO_INT(rdev)	((int)(rdev))
 #define	GET_I_RDEV(inode)	inode->i_rdev
 
-typedef unsigned long	port_dev_t ;		/* device major/minor */
+typedef unsigned long port_dev_t;	/* device major/minor */
 
 #ifndef LIS_HAVE_MAJOR_T
 #define LIS_HAVE_MAJOR_T
-typedef unsigned short	major_t ;
-typedef unsigned short	minor_t ;
+typedef unsigned short major_t;
+typedef unsigned short minor_t;
 #endif
 
 #define	LIS_FIFO  FIFO__CMAJOR_0
@@ -149,7 +148,7 @@ typedef unsigned short	minor_t ;
  * Usage is: lis_atomic_t	av ;
  *           lis_atomic_set(&av, 1) ;
  */
-typedef	volatile int	lis_atomic_t ;
+typedef volatile int lis_atomic_t;
 
 #define lis_atomic_set(atomic_addr,valu)	*(atomic_addr) = (valu)
 #define lis_atomic_read(atomic_addr)		*(atomic_addr)
@@ -174,19 +173,19 @@ typedef	volatile int	lis_atomic_t ;
 /*
  * User ids and group ids are unique for each version
  */
-#undef uid 
+#undef uid
 #undef gid
 #ifndef LIS_HAVE_O_UID_T
 #define LIS_HAVE_O_UID_T
-typedef int     o_uid_t;
-typedef int     o_gid_t;
+typedef int o_uid_t;
+typedef int o_gid_t;
 #endif
-typedef unsigned   char uchar;
+typedef unsigned char uchar;
 typedef struct cred {
-	uid_t	cr_uid;			/* effective user id */
-	gid_t	cr_gid;			/* effective group id */
-	uid_t	cr_ruid;		/* real user id */
-	gid_t	cr_rgid;		/* real group id */
+	uid_t cr_uid;			/* effective user id */
+	gid_t cr_gid;			/* effective group id */
+	uid_t cr_ruid;			/* real user id */
+	gid_t cr_rgid;			/* real group id */
 } cred_t;
 
 /*
@@ -196,15 +195,13 @@ typedef struct cred {
 #define	semaphore	u_semaphore
 #define	semaphore_t	u_semaphore_t
 
-typedef struct u_semaphore
-{
-    int			sem_count ;		/* semaphore counter */
-    long		sem_xxx[8] ;		/* just a placeholder */
+typedef struct u_semaphore {
+	int sem_count;			/* semaphore counter */
+	long sem_xxx[8];		/* just a placeholder */
 
-} u_semaphore_t ;
+} u_semaphore_t;
 
-
-#define	kvtophys(addr)		(addr)		/* user level fakery */
+#define	kvtophys(addr)		(addr)	/* user level fakery */
 
 /*
  * bzero and bcopy
@@ -215,11 +212,10 @@ typedef struct u_semaphore
 /*
  * A dummy to support the select structure in stdata_t.
  */
-typedef struct lis_select_struct
-{
-    int		dummy ;
+typedef struct lis_select_struct {
+	int dummy;
 
-} lis_select_t ;
+} lis_select_t;
 
 #define	LIS_QSYNC_FREE		FREE
 #define	LIS_HEAD_FREE		FREE
@@ -229,7 +225,6 @@ typedef struct lis_select_struct
 #define LIS_QBAND_ALLOC(nb,s)	ALLOCF(nb,s)
 #define LIS_HEAD_ALLOC(nb,s)	ALLOCF(nb,s)
 #define LIS_QSYNC_ALLOC(nb,s)	ALLOCF(nb,s)
-
 
 #ifndef PORTABLE
 #define	PORTABLE	1
@@ -250,7 +245,7 @@ typedef struct lis_select_struct
  */
 #undef lis_runqueues
 #define	lis_runqueues()		lis_run_queues(0)
-void   lis_run_queues(int cpu) ;
+void lis_run_queues(int cpu);
 
 /*
  * Macros for locking and unlocking a queue structure.
@@ -264,7 +259,7 @@ void   lis_run_queues(int cpu) ;
  *  FIFO/pipe support
  */
 extern int user_get_fifo(struct file **);
-extern int user_get_pipe(struct file **,struct file **);
+extern int user_get_pipe(struct file **, struct file **);
 extern int user_pipe(unsigned int *);
 
 #endif

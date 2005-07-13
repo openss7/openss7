@@ -97,33 +97,33 @@
 /* local inlines for separate loadables that have included <linux/module.h> -
  * such sources are self-contained on this issue
  */
-static inline
-void lis_modget_local(const char *file, int line, const char *fn)
+static inline void
+lis_modget_local(const char *file, int line, const char *fn)
 {
 #if defined(LINUX) && defined(__KERNEL__) && defined(MODULE)
-    if (LIS_DEBUG_REFCNTS)
-	printk("lis_modget_local() <\"%s\">++ {%s@%d,%s()}\n",
-		     (THIS_MODULE)->name, file, line, fn) ;
+	if (LIS_DEBUG_REFCNTS)
+		printk("lis_modget_local() <\"%s\">++ {%s@%d,%s()}\n", (THIS_MODULE)->name, file,
+		       line, fn);
 
 #if defined(KERNEL_2_5)
-    try_module_get(THIS_MODULE);
+	try_module_get(THIS_MODULE);
 #else
-    MOD_INC_USE_COUNT;
+	MOD_INC_USE_COUNT;
 #endif
 #endif
 }
 
-static inline
-void lis_modput_local(const char *file, int line, const char *fn)
+static inline void
+lis_modput_local(const char *file, int line, const char *fn)
 {
 #if defined(LINUX) && defined(__KERNEL__) && defined(MODULE)
-    if (LIS_DEBUG_REFCNTS)
-	printk("lis_modput_local() <\"%s\">-- {%s@%d,%s()}\n",
-		     (THIS_MODULE)->name, file, line, fn) ;
+	if (LIS_DEBUG_REFCNTS)
+		printk("lis_modput_local() <\"%s\">-- {%s@%d,%s()}\n", (THIS_MODULE)->name, file,
+		       line, fn);
 #if defined(KERNEL_2_5)
-    module_put(THIS_MODULE);
+	module_put(THIS_MODULE);
 #else
-    MOD_DEC_USE_COUNT;
+	MOD_DEC_USE_COUNT;
 #endif
 #endif
 }
@@ -140,23 +140,19 @@ void lis_modput_local(const char *file, int line, const char *fn)
 #define MODGET()       lis_modget_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
 #define MODPUT()       lis_modput_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
 
-#endif		/* !_LINUX_MODULE_H */
-
-
+#endif				/* !_LINUX_MODULE_H */
 
 /* intra-module callables for production mode, for sources not including
  * <linux/module.h>.  these are defined in linux-mdep.c, and only wrap
  * the above ..._local inlines, as a convenience so that <linux/module.h>
  * need not be included to do module use reference counting
  */
-#if __LIS_INTERNAL__
-extern void lis_modget_dbg(const char *file, int line, const char *fn) _RP;
-extern void lis_modput_dbg(const char *file, int line, const char *fn) _RP;
+#ifdef __LIS_INTERNAL__
+extern void lis_modget_dbg(const char *file, int line, const char *fn);
+extern void lis_modput_dbg(const char *file, int line, const char *fn);
 #endif
 
 #define LIS_MODGET()       lis_modget_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
 #define LIS_MODPUT()       lis_modput_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
 
-
-
-#endif		/* LIS_MODCNT_H */
+#endif				/* LIS_MODCNT_H */

@@ -81,29 +81,28 @@
 *									*
 ************************************************************************/
 
-#define	LIS_PCI_MEM_CNT		12		/* # mem addrs */
+#define	LIS_PCI_MEM_CNT		12	/* # mem addrs */
 
-typedef struct lis_pci_dev
-{
-    unsigned		bus ;			/* bus number */
-    unsigned		dev_fcn ;		/* device/function code */
-    unsigned		vendor ;		/* vendor id */
-    unsigned		device ;		/* device id */
-    unsigned		class ;			/* class type */
-    unsigned		hdr_type ;		/* PCI header type */
-    unsigned		irq ;			/* IRQ number */
+typedef struct lis_pci_dev {
+	unsigned bus;			/* bus number */
+	unsigned dev_fcn;		/* device/function code */
+	unsigned vendor;		/* vendor id */
+	unsigned device;		/* device id */
+	unsigned class;			/* class type */
+	unsigned hdr_type;		/* PCI header type */
+	unsigned irq;			/* IRQ number */
 
-    unsigned long	mem_addrs[LIS_PCI_MEM_CNT] ;
+	unsigned long mem_addrs[LIS_PCI_MEM_CNT];
 
-    void		*user_ptr ;		/* private for user */
+	void *user_ptr;			/* private for user */
 
-    /*
-     * Fields below here are forbidden for the user to view
-     */
-    void		*kern_ptr ;		/* private for LiS */
-    struct lis_pci_dev	*next ;			/* list ptr */
-    
-} lis_pci_dev_t ;
+	/* 
+	 * Fields below here are forbidden for the user to view
+	 */
+	void *kern_ptr;			/* private for LiS */
+	struct lis_pci_dev *next;	/* list ptr */
+
+} lis_pci_dev_t;
 
 /*
  * Macros to isolate the "dev" from the "fcn" part of dev_fcn values.
@@ -130,43 +129,31 @@ typedef struct lis_pci_dev
 *									*
 ************************************************************************/
 
-lis_pci_dev_t	*lis_pci_find_device(unsigned vendor, unsigned device,
-				     lis_pci_dev_t *previous_struct) _RP;
-#if HAVE_KFUNC_PCI_FIND_CLASS
-#if __LIS_INTERNAL__
-lis_pci_dev_t	*lis_pci_find_class(unsigned class,
-				     lis_pci_dev_t *previous_struct) _RP;
-#endif
-#endif
-lis_pci_dev_t	*lis_pci_find_slot(unsigned bus, unsigned dev_fcn) _RP;
+lis_pci_dev_t *lis_pci_find_device(unsigned vendor, unsigned device,
+				   lis_pci_dev_t *previous_struct);
 
-int		 lis_pci_read_config_byte(lis_pci_dev_t *dev,
-					  unsigned       index,
-					  unsigned char *rtn_val) _RP;
-int		 lis_pci_read_config_word(lis_pci_dev_t  *dev,
-					  unsigned        index,
-					  unsigned short *rtn_val) _RP;
-int		 lis_pci_read_config_dword(lis_pci_dev_t *dev,
-					  unsigned        index,
-					  unsigned long  *rtn_val) _RP;
-int		 lis_pci_write_config_byte(lis_pci_dev_t *dev,
-					  unsigned        index,
-					  unsigned char   val) _RP;
-int		 lis_pci_write_config_word(lis_pci_dev_t  *dev,
-					  unsigned         index,
-					  unsigned short   val) _RP;
-int		 lis_pci_write_config_dword(lis_pci_dev_t *dev,
-					  unsigned         index,
-					  unsigned long    val) _RP;
-void		 lis_pci_set_master(lis_pci_dev_t *dev) _RP;
-int		 lis_pci_enable_device (lis_pci_dev_t *dev) _RP;
-void		 lis_pci_disable_device (lis_pci_dev_t *dev) _RP;
+#if HAVE_KFUNC_PCI_FIND_CLASS
+#ifdef __LIS_INTERNAL__
+lis_pci_dev_t *lis_pci_find_class(unsigned class, lis_pci_dev_t *previous_struct);
+#endif
+#endif
+lis_pci_dev_t *lis_pci_find_slot(unsigned bus, unsigned dev_fcn);
+
+int lis_pci_read_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char *rtn_val);
+int lis_pci_read_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short *rtn_val);
+int lis_pci_read_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long *rtn_val);
+int lis_pci_write_config_byte(lis_pci_dev_t *dev, unsigned index, unsigned char val);
+int lis_pci_write_config_word(lis_pci_dev_t *dev, unsigned index, unsigned short val);
+int lis_pci_write_config_dword(lis_pci_dev_t *dev, unsigned index, unsigned long val);
+void lis_pci_set_master(lis_pci_dev_t *dev);
+int lis_pci_enable_device(lis_pci_dev_t *dev);
+void lis_pci_disable_device(lis_pci_dev_t *dev);
 
 /*
  * Internal routine, not to be called by user
  */
-#if __LIS_INTERNAL__
-void    lis_pci_cleanup(void) ;
+#ifdef __LIS_INTERNAL__
+void lis_pci_cleanup(void);
 #endif
 
 /************************************************************************
@@ -181,48 +168,41 @@ void    lis_pci_cleanup(void) ;
 *									*
 ************************************************************************/
 
-typedef struct lis_dma_addr
-{
-    unsigned	   opaque[8] ;		/* opaque kernel structure */
-    int		   size ;		/* saved size */
-    void	  *vaddr ;		/* cpu virtual addr */
-    lis_pci_dev_t *dev ;		/* PCI device */
-    int		   direction ;		/* for map/unmap single */
+typedef struct lis_dma_addr {
+	unsigned opaque[8];		/* opaque kernel structure */
+	int size;			/* saved size */
+	void *vaddr;			/* cpu virtual addr */
+	lis_pci_dev_t *dev;		/* PCI device */
+	int direction;			/* for map/unmap single */
 
-} lis_dma_addr_t ;
+} lis_dma_addr_t;
 
 /*
  * Allocate 'size' bytes and return the CPU pointer to it via return value.
  * Return the DMA address via 'dma_handle'.
  */
-void	*lis_pci_alloc_consistent(lis_pci_dev_t	 *dev,
-				  size_t	  size,
-				  lis_dma_addr_t *dma_handle)_RP;
+void *lis_pci_alloc_consistent(lis_pci_dev_t *dev, size_t size, lis_dma_addr_t * dma_handle);
 
 /*
  * Deallocate memory allocated above.  'vaddr' is the address returned
  * by alloc_consistent.  'dma_handle' points to the DMA handle structure
  * returned by the allocate routine.
  */
-void	*lis_pci_free_consistent(lis_dma_addr_t *dma_handle)_RP;
+void *lis_pci_free_consistent(lis_dma_addr_t * dma_handle);
 
-u32	lis_pci_dma_handle_to_32(lis_dma_addr_t *dma_handle)_RP;
-u64	lis_pci_dma_handle_to_64(lis_dma_addr_t *dma_handle)_RP;
+u32 lis_pci_dma_handle_to_32(lis_dma_addr_t * dma_handle);
+u64 lis_pci_dma_handle_to_64(lis_dma_addr_t * dma_handle);
 
-void	lis_pci_map_single(lis_pci_dev_t *dev,
-			   void		*ptr,
-			   size_t	 size,
-			   lis_dma_addr_t *dma_handle,
-			   int		 direction)_RP;
+void lis_pci_map_single(lis_pci_dev_t *dev, void *ptr, size_t size, lis_dma_addr_t * dma_handle,
+			int direction);
 
-void *lis_pci_unmap_single(lis_dma_addr_t *dma_handle)_RP;
+void *lis_pci_unmap_single(lis_dma_addr_t * dma_handle);
 
 /*
  * Miscellaneous
  */
-int	lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask)_RP;
-int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)_RP;
-
+int lis_pci_dma_supported(lis_pci_dev_t *dev, u64 mask);
+int lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask);
 
 /************************************************************************
 *                       DMA Synchronization                             *
@@ -237,10 +217,8 @@ int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)_RP;
 #define LIS_SYNC_FOR_BOTH	3	/* direction value */
 
 #if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
-#if __LIS_INTERNAL__
-void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
-			     size_t		 size,
-			     int		 direction)_RP;
+#ifdef __LIS_INTERNAL__
+void lis_pci_dma_sync_single(lis_dma_addr_t * dma_handle, size_t size, int direction);
 #endif
 #endif
 
@@ -253,9 +231,6 @@ void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
 *									*
 ************************************************************************/
 
-void lis_membar(void) _RP;
-
-
-
+void lis_membar(void);
 
 #endif				/* SYS_LISPCI_H from top of file */

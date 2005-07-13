@@ -49,9 +49,7 @@
  Last Modified $Date$ by $Author$
 
  *****************************************************************************/
-
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
-
 /*                               -*- Mode: C -*- 
  * events.c --- streams events
  * Author          : Francisco J. Ballesteros
@@ -68,27 +66,22 @@
  *    You can reach us by email to
  *    nemo@ordago.uc3m.es, 100541.1151@compuserve.com
  */
-
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
-
 #include <sys/strport.h>
 #include <sys/strconfig.h>	/* config definitions */
-#include <sys/LiS/share.h>	/* streams shared defs*/
-#include <sys/LiS/events.h>		/* module interface */
-
+#include <sys/LiS/share.h>	/* streams shared defs */
+#include <sys/LiS/events.h>	/* module interface */
 /*  -------------------------------------------------------------------  */
 /*			   Local functions & macros                      */
-
 /*  -------------------------------------------------------------------  */
 /*				  Glob. Vars                             */
-
-struct strevent *lis_sefreelist; /* list of free stream events */
-struct strevent *lis_secachep;   /* reserve store of free stream events */
+struct strevent *lis_sefreelist;	/* list of free stream events */
+struct strevent *lis_secachep;		/* reserve store of free stream events */
 
 #if 0
 /* see long comment in header --nemo*/
-struct strinfo lis_strinfo[]; /* keeps track of allocated events	*/
+struct strinfo lis_strinfo[];		/* keeps track of allocated events */
 #endif
 
 /*  -------------------------------------------------------------------  */
@@ -105,84 +98,77 @@ struct strinfo lis_strinfo[]; /* keeps track of allocated events	*/
  * It would be better to use a hash w/ ovf lists table. --nemo.
  */
 
-
 /* get events for pid in list
  */
 short
-lis_get_elist_ent( strevent_t *list, pid_t pid )
+lis_get_elist_ent(strevent_t * list, pid_t pid)
 {
-    strevent_t *ev = NULL;
+	strevent_t *ev = NULL;
 
-    /* should think what kind of search is faster: fwd, bck, sorted,...*/
-    if (list == NULL) return(0) ;
+	/* should think what kind of search is faster: fwd, bck, sorted,... */
+	if (list == NULL)
+		return (0);
 
-    for(ev = list->se_next ; ev != list && ev->se_pid < pid; ev=ev->se_next )
-	;
-    if (ev != list && ev->se_pid == pid)
-	return(ev->se_evs);
-    else
-	return(0);
-}/*lis_get_elist_ent*/
+	for (ev = list->se_next; ev != list && ev->se_pid < pid; ev = ev->se_next) ;
+	if (ev != list && ev->se_pid == pid)
+		return (ev->se_evs);
+	else
+		return (0);
+}				/* lis_get_elist_ent */
 
 /*  -------------------------------------------------------------------  */
 
 /* add event to list
  */
 int
-lis_add_to_elist( strevent_t **list, pid_t pid, short events )
+lis_add_to_elist(strevent_t ** list, pid_t pid, short events)
 {
-    strevent_t *ev = NULL;
+	strevent_t *ev = NULL;
 
-    if (*list != NULL)
-    {
-	for (ev=(*list)->se_next;
-	     ev != *list && ev->se_pid < pid;
-	     ev=ev->se_next
-	    );    
-    }
-
-    if (ev == NULL || ev == *list)		/* no slot for pid in list */
-    {
-	if ((ev = (strevent_t*)ALLOCF(sizeof(strevent_t),"event "))==NULL)
-	    return(-ENOMEM);
-
-	if (!*list)			/* create dummy head node */
-	{
-	    strevent_t *hd;
-	    if ((hd = (strevent_t*)ALLOCF(sizeof(strevent_t),"event-head ")
-					 )==NULL)
-	    {
-		FREE(ev);
-		return(-ENOMEM);
-	    }
-	    (*list=hd)->se_pid=0;
-	    hd->se_next=hd->se_prev=hd;		/* empty list */
+	if (*list != NULL) {
+		for (ev = (*list)->se_next; ev != *list && ev->se_pid < pid; ev = ev->se_next) ;
 	}
 
-	/* link node last in the list */
-	ev->se_prev=(*list)->se_prev;
-	(*list)->se_prev->se_next=ev;
-	((*list)->se_prev=ev)->se_next=*list;
+	if (ev == NULL || ev == *list) {	/* no slot for pid in list */
+		if ((ev = (strevent_t *) ALLOCF(sizeof(strevent_t), "event ")) == NULL)
+			return (-ENOMEM);
 
-	ev->se_pid=pid;
-	ev->se_evs=0;
-    }
-    else if (ev->se_pid!=pid){	/* link node in the middle of the list */
-	strevent_t *new;
-	if ((new = (strevent_t*)ALLOCF(sizeof(strevent_t),"event "))==NULL){
-	    return(-ENOMEM);
+		if (!*list) {	/* create dummy head node */
+			strevent_t *hd;
+
+			if ((hd = (strevent_t *) ALLOCF(sizeof(strevent_t), "event-head ")
+			    ) == NULL) {
+				FREE(ev);
+				return (-ENOMEM);
+			}
+			(*list = hd)->se_pid = 0;
+			hd->se_next = hd->se_prev = hd;	/* empty list */
+		}
+
+		/* link node last in the list */
+		ev->se_prev = (*list)->se_prev;
+		(*list)->se_prev->se_next = ev;
+		((*list)->se_prev = ev)->se_next = *list;
+
+		ev->se_pid = pid;
+		ev->se_evs = 0;
+	} else if (ev->se_pid != pid) {	/* link node in the middle of the list */
+		strevent_t *new;
+
+		if ((new = (strevent_t *) ALLOCF(sizeof(strevent_t), "event ")) == NULL) {
+			return (-ENOMEM);
+		}
+		new->se_prev = ev->se_prev;
+		new->se_next = ev;
+		ev->se_prev->se_next = new;
+		ev->se_prev = new;
+		ev = new;	/* use new element */
+		ev->se_pid = pid;
+		ev->se_evs = 0;
 	}
-	new->se_prev=ev->se_prev;
-	new->se_next=ev;
-	ev->se_prev->se_next=new;
-	ev->se_prev=new;
-	ev = new ;				/* use new element */
-	ev->se_pid=pid;
-	ev->se_evs=0;
-    }
-    ev->se_evs|=events;
-    return(0);
-}/*lis_add_to_elist*/
+	ev->se_evs |= events;
+	return (0);
+}				/* lis_add_to_elist */
 
 /*  -------------------------------------------------------------------  */
 
@@ -190,51 +176,47 @@ lis_add_to_elist( strevent_t **list, pid_t pid, short events )
  * rets non-zero if not-found
  */
 int
-lis_del_from_elist( strevent_t **list, pid_t pid, short events )
+lis_del_from_elist(strevent_t ** list, pid_t pid, short events)
 {
-    strevent_t *ev = NULL;     
+	strevent_t *ev = NULL;
 
-    if (*list != NULL)
-    {
-	for (ev=(*list)->se_next;
-	     ev != *list && ev->se_pid < pid;
-	     ev=ev->se_next
-	    );    
-    }
+	if (*list != NULL) {
+		for (ev = (*list)->se_next; ev != *list && ev->se_pid < pid; ev = ev->se_next) ;
+	}
 
-    if (ev == NULL || ev == *list || ev->se_pid != pid )
-	return(1);
+	if (ev == NULL || ev == *list || ev->se_pid != pid)
+		return (1);
 
-    if ( (ev->se_evs &= ~events) == 0 ){	/* unlink */
-	if (ev->se_next)			/* should always be true */
-	    ev->se_next->se_prev=ev->se_prev;
-	if (ev->se_prev)			/* should always be true */
-	    ev->se_prev->se_next=ev->se_next;
-	FREE(ev);
-    }
-    return(0);
-}/*lis_del_from_elist*/
+	if ((ev->se_evs &= ~events) == 0) {	/* unlink */
+		if (ev->se_next)	/* should always be true */
+			ev->se_next->se_prev = ev->se_prev;
+		if (ev->se_prev)	/* should always be true */
+			ev->se_prev->se_next = ev->se_next;
+		FREE(ev);
+	}
+	return (0);
+}				/* lis_del_from_elist */
 
 /*  -------------------------------------------------------------------  */
 /* Free the entire elist
  */
 void
-lis_free_elist( strevent_t **list )
+lis_free_elist(strevent_t ** list)
 {
-    strevent_t  *ev;     
-    strevent_t	*nxt ;
+	strevent_t *ev;
+	strevent_t *nxt;
 
-    for (ev = *list; ev != NULL; )
-    {
-	nxt = ev->se_next ;
-	FREE(ev) ;
-	ev = nxt ;
-	if (ev == *list) break ;		/* all done */
-    }
+	for (ev = *list; ev != NULL;) {
+		nxt = ev->se_next;
+		FREE(ev);
+		ev = nxt;
+		if (ev == *list)
+			break;	/* all done */
+	}
 
-    *list = NULL ;
+	*list = NULL;
 
-}/*lis_free_elist*/
+}				/* lis_free_elist */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

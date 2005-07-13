@@ -79,98 +79,97 @@
 #include <sys/stream.h>
 #include <sys/osif.h>
 
-static struct module_info clone_minfo =
-{
-  0,				/* id */
-  "clone",			/* name */
-  0,				/* min packet size accepted */
-  0,				/* max packet size accepted */
-  0,				/* high water mark */
-  0				/* low water mark */
+static struct module_info clone_minfo = {
+	0,			/* id */
+	"clone",		/* name */
+	0,			/* min packet size accepted */
+	0,			/* max packet size accepted */
+	0,			/* high water mark */
+	0			/* low water mark */
 };
 
-static int   _RP clone_open  (queue_t *, dev_t*, int, int, cred_t *);
-static int   _RP clone_close (queue_t *, int, cred_t *);
+static int clone_open(queue_t *, dev_t *, int, int, cred_t *);
+static int clone_close(queue_t *, int, cred_t *);
 
 /* qinit structures (rd and wr side) 
  */
-static struct qinit clone_rinit =
-{
-  NULL,				/* put */       
-  NULL,				/* service  */  
-  clone_open,			/* open */      
-  clone_close,			/* close */     
-  NULL,				/* admin */     
-  &clone_minfo,			/* info */      
-  NULL				/* stat */      
+static struct qinit clone_rinit = {
+	NULL,			/* put */
+	NULL,			/* service */
+	clone_open,		/* open */
+	clone_close,		/* close */
+	NULL,			/* admin */
+	&clone_minfo,		/* info */
+	NULL			/* stat */
 };
 
-static struct qinit clone_winit =
-{
-  NULL, 	                   /* put */       
-  NULL, 			/* service  */  
-  NULL, 			/* open */      
-  NULL, 			/* close */     
-  NULL, 			/* admin */     
-  &clone_minfo, 		/* info */      
-  NULL				/* stat */      
+static struct qinit clone_winit = {
+	NULL,			/* put */
+	NULL,			/* service */
+	NULL,			/* open */
+	NULL,			/* close */
+	NULL,			/* admin */
+	&clone_minfo,		/* info */
+	NULL			/* stat */
 };
 
 /* streamtab for the clone driver.
  */
-struct streamtab clone_info =
-{
-  &clone_rinit,			/* read queue */
-  &clone_winit,			/* write queue */
-  NULL,				/* mux read queue  */
-  NULL				/* mux write queue */
+struct streamtab clone_info = {
+	&clone_rinit,		/* read queue */
+	&clone_winit,		/* write queue */
+	NULL,			/* mux read queue */
+	NULL			/* mux write queue */
 };
 
-
-static int _RP
-clone_open (queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
+static int
+clone_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-    int		 major_dev ;
-    int		 rslt ;
-    streamtab_t	*st ;
+	int major_dev;
+	int rslt;
+	streamtab_t *st;
 
-    if (sflag == CLONEOPEN) return(OPENFAIL) ;
+	if (sflag == CLONEOPEN)
+		return (OPENFAIL);
 
-    /*
-     * Minor passed to us functions as major for the target driver
-     */
-    major_dev = getminor (*devp);
-    st = lis_find_strdev(major_dev) ;
-    if (st == NULL) return(ENOENT) ;		/* no such driver */
+	/* 
+	 * Minor passed to us functions as major for the target driver
+	 */
+	major_dev = getminor(*devp);
+	st = lis_find_strdev(major_dev);
+	if (st == NULL)
+		return (ENOENT);	/* no such driver */
 
-    *devp = makedevice(major_dev, 0) ;		/* construct new major */
+	*devp = makedevice(major_dev, 0);	/* construct new major */
 
-    if (st->st_rdinit->qi_qopen == NULL) return(OPENFAIL) ;
-    lis_setq(q, st->st_rdinit, st->st_wrinit) ;	/* xfer queue params */
-    rslt = st->st_rdinit->qi_qopen (q, devp, flag, CLONEOPEN, credp) ;
-    if (rslt != 0) return(rslt) ;
+	if (st->st_rdinit->qi_qopen == NULL)
+		return (OPENFAIL);
+	lis_setq(q, st->st_rdinit, st->st_wrinit);	/* xfer queue params */
+	rslt = st->st_rdinit->qi_qopen(q, devp, flag, CLONEOPEN, credp);
+	if (rslt != 0)
+		return (rslt);
 
-    return(0) ;					/* success */
+	return (0);		/* success */
 
-} /* clone_open */
+}				/* clone_open */
 
-
-static int _RP
-clone_close (queue_t *q, int dummy, cred_t *credp)
+static int
+clone_close(queue_t *q, int dummy, cred_t *credp)
 {
-    (void) q ;					/* compiler happiness */
-    (void) dummy ;
-    (void) credp ;
+	(void) q;		/* compiler happiness */
+	(void) dummy;
+	(void) credp;
 
-    return(0) ;
+	return (0);
 }
 
-void _RP clone_init(void)
+void
+clone_init(void)
 {
-    /*
-     *  indicate that this is a CLONE pseudo device
-     */
-    LIS_DEVFLAGS(LIS_CLONE) |= LIS_MODFLG_CLONE;
+	/* 
+	 *  indicate that this is a CLONE pseudo device
+	 */
+	LIS_DEVFLAGS(LIS_CLONE) |= LIS_MODFLG_CLONE;
 }
 
 #ifdef MODULE_ALIAS

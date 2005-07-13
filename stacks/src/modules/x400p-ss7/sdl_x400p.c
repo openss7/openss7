@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +41,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:45:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 12:01:45 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -60,7 +60,7 @@ static char const ident[] =
 #define _DEBUG 1
 #define X400P_DOWNLOAD_FIRMWARE
 
-#include <os7/compat.h>
+#include <sys/os7/compat.h>
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -80,7 +80,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2005/07/05 22:45:59 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2005/07/13 12:01:45 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

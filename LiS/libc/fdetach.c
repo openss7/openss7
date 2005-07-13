@@ -54,7 +54,6 @@
 
 static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
-
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1
 #define _REENTRANT
