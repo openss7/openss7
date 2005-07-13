@@ -103,12 +103,14 @@
  *   S wiocing: answer to ioc arrived
  * STATUS: complete(?), untested
  */
+#if __LIS_INTERNAL__
 extern int lis_sleep_on_wopen(struct stdata * sd) ;
 extern int lis_sleep_on_wioc(struct stdata * sd, char *f,int l) ;
 extern int lis_sleep_on_wwrite(struct stdata * sd);
 extern int lis_sleep_on_wread(struct stdata * sd);
 extern int lis_sleep_on_wiocing(struct stdata * sd);
 extern int lis_sleep_on_read_sem(struct stdata * sd);
+#endif
 
 
 /*  -------------------------------------------------------------------  */
@@ -121,12 +123,14 @@ extern int lis_sleep_on_read_sem(struct stdata * sd);
 
 /*  -------------------------------------------------------------------  */
 
+#if __LIS_INTERNAL__
 extern void	lis_wake_up_wwrite(struct stdata * sd) ;     /* wait.c */
 extern void	lis_wake_up_all_wwrite(struct stdata * sd) ; /* wait.c */
 extern void	lis_wake_up_wread(struct stdata * sd) ;      /* wait.c */
 extern void	lis_wake_up_all_wread(struct stdata * sd) ;  /* wait.c */
 extern void	lis_wake_up_read_sem(struct stdata * sd);    /* wait.c */
 extern void	lis_wake_up_all_read_sem(struct stdata * sd);    /* wait.c */
+#endif
 
 #define lis_wake_up_wiocing(sd)						\
 				{					\
@@ -147,11 +151,13 @@ extern void	lis_wake_up_all_read_sem(struct stdata * sd);    /* wait.c */
  */
 typedef	void	tmout_fcn_t(ulong) ;
 
+#if __LIS_INTERNAL__
 extern void
 lis_tmout(struct timer_list *tl, tmout_fcn_t *fn, long arg, long ticks) ;
 
 extern void
 lis_untmout( struct timer_list *tl) ;
+#endif
 
 #endif /* __KERNEL__ */
 

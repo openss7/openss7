@@ -110,7 +110,9 @@ typedef struct polldat  polldat_t;
 #ifdef __KERNEL__
 /* poll() syscall entry point
  */
+#if __LIS_INTERNAL__
 int lis_syspoll(char *ubuff, unsigned long n, int tmout);
+#endif
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */

@@ -227,10 +227,12 @@ struct queue
 
 #define	Q_MAGIC		((ulong) (0x93390000L | sizeof(queue_t)) )
 
+#if __LIS_INTERNAL__
 int     lis_check_q_magic(queue_t *q, char *filename, int linenr) ;
 #define LIS_QMAGIC(q,f,l) \
 	(((q) && ((q)->q_magic == Q_MAGIC)) || lis_check_q_magic((q),(f),(l)))
 #define	LIS_CHECK_Q_MAGIC(q)	LIS_QMAGIC((q),__FILE__,__LINE__)
+#endif
 
 /*
  * Queue locking options
@@ -245,15 +247,19 @@ int     lis_check_q_magic(queue_t *q, char *filename, int linenr) ;
 /*
  * Queue locking functions.  These get the semaphore.
  */
+#if __LIS_INTERNAL__
 extern int  lis_lockq_fcn  (queue_t *q, char *file, int line);
 extern void lis_unlockq_fcn(queue_t *q, char *file, int line);
 extern int lis_set_q_sync(queue_t *q, int qlock_option);
+#endif
 
 /*
  * Routines to set and clear flags in a list of queues
  */
+#if __LIS_INTERNAL__
 extern void lis_set_q_flags(ulong flags, int both_qs, ...);
 extern void lis_clr_q_flags(ulong flags, int both_qs, ...);
+#endif
 
 /*
  * Queue isr locking macro.  To be used ONLY internally by LiS.
@@ -328,10 +334,13 @@ struct qband {
 
 #ifdef __KERNEL__
 #if (defined(LINUX) && defined(USE_KMEM_CACHE))
+#if __LIS_INTERNAL__
 extern void lis_init_queues(void);
 extern void lis_terminate_queues(void);
 #endif
+#endif
 
+#if __LIS_INTERNAL__
 /* Allocate a new queue pair
  * return NULL on failure 
  *
@@ -343,6 +352,7 @@ extern queue_t * lis_allocq( const char *name );
  *
  */
 extern void lis_freeq( queue_t *q );
+#endif
 
 #endif /* __KERNEL__ */
 
@@ -408,14 +418,18 @@ extern void lis_rmvq(queue_t *q, mblk_t *mp)_RP;
  */
 #ifdef __KERNEL__
 extern void lis_qenable(queue_t *q)_RP;
+#if __LIS_INTERNAL__
 extern void lis_retry_qenable(queue_t *q);
+#endif
 #endif				/* __KERNEL__ */
 
 /* lis_setq - Set queue variables
  *
  */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern void lis_setq(queue_t * q, struct qinit *rinit, struct qinit *winit);
+#endif
 #endif				/* __KERNEL__ */
 
 /* lis_flushband - flush messages in a specified priority band.
@@ -513,8 +527,10 @@ extern int lis_safe_SAMESTR(queue_t *q, char *f, int l)_RP;
 #define LIS_WR(q)	lis_safe_WR(q, __FILE__, __LINE__)
 #define LIS_SAMESTR(q)	lis_safe_SAMESTR(q, __FILE__, __LINE__)
 
+#if __LIS_INTERNAL__
 extern void lis_defer_msg(queue_t *q, mblk_t *mp, int retry, lis_flags_t *psw);
 extern void lis_do_deferred_puts(queue_t *q);
+#endif
 extern void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)_RP;
 extern void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)_RP;
 #define lis_putnext(q,mp) 	lis_safe_putnext(q, mp, __FILE__, __LINE__)

@@ -175,7 +175,9 @@ typedef unsigned int	uintptr_t;
 #endif
 
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern char	*lis_errmsg(int lvl) ;
+#endif
 extern void	*lis_malloc(int nbytes, int class, int use_cache,
 					char *file_name,int line_nr)_RP;
 extern void	 lis_free(void *ptr, char *file_name,int line_nr)_RP;

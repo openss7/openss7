@@ -169,7 +169,9 @@ struct pollfd {
 extern "C" {
 #endif
 
+#if __LIS_INTERNAL__
 extern int poll(struct pollfd *fds, unsigned long nfds, int timeout);
+#endif
 
 #ifdef __cplusplus
 }

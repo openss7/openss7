@@ -109,6 +109,7 @@ extern toid_t	lis_untimeout(toid_t id) _RP;
 /*
  * The following are internal routines not exported
  */
+#if __LIS_INTERNAL__
 void lis_initialize_dki(void) ;			/* dki.c */
 void lis_terminate_dki(void) ;			/* dki.c */
 
@@ -116,6 +117,7 @@ void *lis_alloc_timer(char *file, int line) ;	/* mdep rouitine */
 void *lis_free_timer(void *timerp) ;		/* mdep rouitine */
 void lis_init_timers(int size) ;		/* mdep routine */
 void lis_terminate_timers(void) ;		/* mdep rouitine */
+#endif
 
 #endif				/* __KERNEL__ */
 
@@ -153,12 +155,14 @@ unsigned lis_usectohz(unsigned usec) _RP;
 
 extern int	lis_mknod(char *name, int mode, dev_t dev) _RP;
 extern int	lis_unlink(char *name) _RP;
+#if __LIS_INTERNAL__
 extern int	lis_mount(char *dev_name,
 			  char *dir_name,
 			  char *fstype,
 			  unsigned long rwflag,
 			  void *data) ;
 extern int	lis_umount2(char *path, int flags) ;
+#endif
 
 
 

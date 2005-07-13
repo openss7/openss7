@@ -157,7 +157,9 @@
 /*				 Glob. Vars.                             */
 
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern lis_atomic_t lis_strstats[STRMAXSTAT][4]; /* the stats */
+#endif
 #endif			/* __KERNEL__ */
 
 /* If in user mode, include a stats dump routine 
@@ -171,14 +173,17 @@ typedef struct
 } itemname_t ;
 
 
+#if __LIS_INTERNAL__
 extern itemname_t  lis_itemnames[];
 extern char       *lis_countnames[];
+#endif
 #endif
 
 
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 /* increment count for one item
  */
 extern void LisUpCounter(int item, int n);
@@ -189,6 +194,7 @@ extern void LisUpCounter(int item, int n);
 extern void LisSetCounter(int item, int val);
 
 extern void    lis_stat_neg(void) ;
+#endif
 
 #define	LisUpCount(item)	LisUpCounter(item,1)
 

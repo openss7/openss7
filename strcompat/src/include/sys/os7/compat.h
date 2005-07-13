@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.20 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.21 2005/07/13 01:40:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 01:40:38 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -100,6 +100,19 @@ typedef void irqreturn_t;
 #ifdef LFS
 #include <sys/strsubr.h>
 #endif				/* LFS */
+
+#if LIS
+#undef db_frtnp
+#define db_frtnp frtnp
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+/* LIS forgets to typedef these */
+typedef int bcid_t;
+typedef int bufcall_id_t;
+#endif
 
 #include <sys/cmn_err.h>
 #include <sys/kmem.h>
@@ -158,18 +171,5 @@ typedef int tid_t;
 typedef lis_flags_t pl_t;
 #endif
 #endif				/* LFS */
-
-#if LIS
-#undef db_frtnp
-#define db_frtnp frtnp
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-/* LIS forgets to typedef these */
-typedef int bcid_t;
-typedef int bufcall_id_t;
-#endif
 
 #endif				/* __LOCAL_COMPAT_H__ */

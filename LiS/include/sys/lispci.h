@@ -133,8 +133,10 @@ typedef struct lis_pci_dev
 lis_pci_dev_t	*lis_pci_find_device(unsigned vendor, unsigned device,
 				     lis_pci_dev_t *previous_struct) _RP;
 #if HAVE_KFUNC_PCI_FIND_CLASS
+#if __LIS_INTERNAL__
 lis_pci_dev_t	*lis_pci_find_class(unsigned class,
 				     lis_pci_dev_t *previous_struct) _RP;
+#endif
 #endif
 lis_pci_dev_t	*lis_pci_find_slot(unsigned bus, unsigned dev_fcn) _RP;
 
@@ -163,7 +165,9 @@ void		 lis_pci_disable_device (lis_pci_dev_t *dev) _RP;
 /*
  * Internal routine, not to be called by user
  */
+#if __LIS_INTERNAL__
 void    lis_pci_cleanup(void) ;
+#endif
 
 /************************************************************************
 *                         PCI Memory Allocation                         *
@@ -233,9 +237,11 @@ int	lis_pci_set_dma_mask(lis_pci_dev_t *dev, u64 mask)_RP;
 #define LIS_SYNC_FOR_BOTH	3	/* direction value */
 
 #if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#if __LIS_INTERNAL__
 void lis_pci_dma_sync_single(lis_dma_addr_t	*dma_handle,
 			     size_t		 size,
 			     int		 direction)_RP;
+#endif
 #endif
 
 /************************************************************************

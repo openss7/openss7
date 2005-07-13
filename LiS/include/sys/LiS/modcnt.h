@@ -149,8 +149,10 @@ void lis_modput_local(const char *file, int line, const char *fn)
  * the above ..._local inlines, as a convenience so that <linux/module.h>
  * need not be included to do module use reference counting
  */
+#if __LIS_INTERNAL__
 extern void lis_modget_dbg(const char *file, int line, const char *fn) _RP;
 extern void lis_modput_dbg(const char *file, int line, const char *fn) _RP;
+#endif
 
 #define LIS_MODGET()       lis_modget_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)
 #define LIS_MODPUT()       lis_modput_dbg(__LIS_FILE__,__LINE__,__FUNCTION__)

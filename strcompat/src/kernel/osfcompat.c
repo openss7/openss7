@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 01:40:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/12 19:15:48 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/13 01:40:39 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"
@@ -384,7 +384,7 @@ int strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 	case STR_IS_DEVICE:
 		return lis_unregister_strdev(getmajor(dev));
 	case STR_IS_MODULE:
-		return lis_unregister_module(st)
+		return lis_unregister_strmod(st);
 	default:
 		return (EINVAL);
 	}

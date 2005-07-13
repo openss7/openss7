@@ -565,8 +565,10 @@ struct pci_dev	*lis_osif_pci_find_device(unsigned int vendor,
 				 unsigned int device,
 				 struct pci_dev *from)_RP;
 #if HAVE_KFUNC_PCI_FIND_CLASS
+#if __LIS_INTERNAL__
 struct pci_dev	*lis_osif_pci_find_class(unsigned int class,
 					 struct pci_dev *from)_RP;
+#endif
 #endif
 struct pci_dev	*lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)_RP;
 
@@ -603,12 +605,16 @@ extern int lis_osif_pci_map_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 extern void lis_osif_pci_unmap_sg(struct pci_dev *hwdev, struct scatterlist *sg,
 	                                int nents, int direction)_RP;
 #if HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
+#if __LIS_INTERNAL__
 extern void lis_osif_pci_dma_sync_single(struct pci_dev *hwdev,
 			   dma_addr_t dma_handle, size_t size, int direction)_RP;
 #endif
+#endif
 #if HAVE_KFUNC_PCI_DMA_SYNC_SG
+#if __LIS_INTERNAL__
 extern void lis_osif_pci_dma_sync_sg(struct pci_dev *hwdev,
 			   struct scatterlist *sg, int nelems, int direction)_RP;
+#endif
 #endif
 extern int lis_osif_pci_dma_supported(struct pci_dev *hwdev, u64 mask)_RP;
 extern int lis_osif_pci_set_dma_mask(struct pci_dev *hwdev, u64 mask)_RP;
@@ -636,8 +642,10 @@ extern struct page *lis_osif_pci_dac_dma_to_page(struct pci_dev *pdev,
 					dma64_addr_t dma_addr)_RP;
 extern unsigned long lis_osif_pci_dac_dma_to_offset(struct pci_dev *pdev,
 					dma64_addr_t dma_addr)_RP;
+#if __LIS_INTERNAL__
 extern void lis_osif_pci_dac_dma_sync_single(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
+#endif
 extern void lis_osif_pci_dac_dma_sync_single_for_cpu(struct pci_dev *pdev,
 			    dma64_addr_t dma_addr, size_t len, int direction)_RP;
 extern void lis_osif_pci_dac_dma_sync_single_for_device(struct pci_dev *pdev,
@@ -727,17 +735,21 @@ void         *lis_phys_to_virt(unsigned long addr) _RP;
 /*
  * I/O port routines <linux/ioport.h>
  */
+#if __LIS_INTERNAL__
 int  lis_check_region(unsigned int from, unsigned int extent) _RP;
+#endif
 void lis_request_region(unsigned int from,
 			 unsigned int extent,
 			 const char  *name) _RP;
 void lis_release_region(unsigned int from, unsigned int extent) _RP;
 
+#if __LIS_INTERNAL__
 int  lis_check_mem_region(unsigned int from, unsigned int extent) ;
 void lis_request_mem_region(unsigned int from,
 			 unsigned int extent,
 			 const char  *name) ;
 void lis_release_mem_region(unsigned int from, unsigned int extent) ;
+#endif
 
 
 /*
@@ -768,11 +780,13 @@ int lis_printk(const char *fmt, ...) __attribute__ ((format (printf, 1, 2))) _RP
 int lis_sprintf(char *bfr, const char *fmt, ...) __attribute__ ((format (printf, 2, 3))) _RP;
 int lis_vsprintf(char *bfr, const char *fmt, va_list args) __attribute__ ((format (printf, 2, 0))) _RP;
 
+#if __LIS_INTERNAL__
 /*
  * Timer routines.
  */
 void lis_add_timer(struct timer_list * timer)_RP;
 int  lis_del_timer(struct timer_list * timer)_RP;
+#endif
 
 /*
  * Time routines in <linux/time.h>
@@ -789,13 +803,19 @@ void lis_osif_do_settimeofday( struct timeval *tp ) _RP;
 #define	OSIF_WAIT_Q_ARG		wait_queue_head_t *wq
 #define	OSIF_WAIT_E_ARG		wait_queue_head_t  wq
 #if HAVE_KFUNC_SLEEP_ON
+#if __LIS_INTERNAL__
 void lis_sleep_on(OSIF_WAIT_Q_ARG) _RP;
 #endif
+#endif
 #if HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
+#if __LIS_INTERNAL__
 void lis_interruptible_sleep_on(OSIF_WAIT_Q_ARG) _RP;
 #endif
+#endif
 #if HAVE_KFUNC_SLEEP_ON_TIMEOUT
+#if __LIS_INTERNAL__
 void lis_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
+#endif
 #endif
 void lis_interruptible_sleep_on_timeout(OSIF_WAIT_Q_ARG, long timeout) _RP;
 void lis_wait_event(OSIF_WAIT_E_ARG, int condition) _RP;
@@ -825,9 +845,11 @@ extern __kernel_size_t _RP __wrap_strlen(const char *);
 extern void * _RP __wrap_memset(void *,int,__kernel_size_t);
 extern void * _RP __wrap_memcpy(void *,const void *,__kernel_size_t);
 extern int _RP __wrap_memcmp(const void *,const void *,__kernel_size_t);
+#if __LIS_INTERNAL__
 extern int _RP __wrap_sprintf(char *, const char *, ...);
 extern int _RP __wrap_snprintf(char *, size_t, const char *, ...);
 extern int _RP __wrap_vsprintf(char *, const char *, va_list);
 extern int _RP __wrap_vsnprintf(char *, size_t, const char *, va_list);
+#endif
 
 #endif			/* from top of file */

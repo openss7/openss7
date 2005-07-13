@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/13 01:40:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -127,16 +127,22 @@ int str_install_HPUX(struct stream_inst *inst)
 #if LIS
 	switch (inst->inst_flags & STR_TYPE_MASK) {
 	case STR_IS_DEVICE:
+	{
+		int err;
 		if (inst->inst_major == -1)
 			inst->inst_major = 0;
 		if ((err = lis_register_strdev(inst->inst_major, &inst->inst_str_tab, 255,
 					       inst->name)) > 0)
 			inst->inst_major = err;
 		return (err < 0 ? -err : 0);
+	}
 	case STR_IS_MODULE:
+	{
+		int err;
 		if ((err = lis_register_strmod(&inst->inst_str_tab, inst->name)) > 0)
 			inst->inst_major = err;
 		return (err < 0 ? -err : 0);
+	}
 	default:
 		return (EINVAL);
 	}

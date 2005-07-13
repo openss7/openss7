@@ -87,7 +87,9 @@ void	*lis_get_free_pages_fcn(int nbytes, int class, char *file, int line)_RP;
 void	*lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line) _RP;
 void	*lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) _RP;
 void	*lis_free_pages_fcn(void *ptr, char *file, int line) _RP;
+#if __LIS_INTERNAL__
 void	 lis_free_all_pages(void) _RP;	/* internal cleanup routine */
+#endif
 
 /*
  * These are the simplified routines that the STREAMS drivers call.

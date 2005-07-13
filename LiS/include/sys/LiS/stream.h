@@ -68,15 +68,10 @@
  *    gram@aztec.co.za, nemo@ordago.uc3m.es
  */
 
-#ifndef _STREAM_H
-#define _STREAM_H
-#define  STREAM_H
+#ifndef __SYS_LIS_STREAM_H__
+#define __SYS_LIS_STREAM_H__
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*  -------------------------------------------------------------------  */
 /*                               Dependencies                            */
@@ -101,8 +96,8 @@ extern "C" {
 #ifndef	DKI_H
 #include <sys/dki.h>		/* SVR4 compatible prototypes */
 #endif
-#ifndef	_DDI_H
-#include <sys/ddi.h>		/* SVR4 compatible prototypes */
+#ifndef	__SYS_LIS_DDI_H__
+#include <sys/LiS/ddi.h>	/* SVR4 compatible prototypes */
 #endif
 
 /*include everything exported to usr-level from LiS internal modules */
@@ -114,7 +109,7 @@ extern "C" {
 #include <sys/LiS/msg.h>	/* streams msgs management */
 #endif
 #ifndef _MSGUTL_H
-#include <sys/LiS/msgutl.h>	/* streams msg utilities  */
+#include <sys/LiS/msgutl.h>	/* streams msg utilities */
 #endif
 #ifndef _MOD_H
 #include <sys/LiS/mod.h>	/* streams modules */
@@ -141,8 +136,6 @@ extern "C" {
 #include <sys/LiS/strmdbg.h>	/* debugging stuff */
 #endif
 
-
-
 /*  -------------------------------------------------------------------  */
 /*                               Entry points                            */
 
@@ -151,7 +144,6 @@ extern "C" {
  * We shouldn't have exported symbols starting w/ other than `lis' to
  * avoid kernel namespace pollution. 
  */
-
 
 /* get ptr to the queue behind q. That queue with q_next == q.
  * returns NULL if no such queue
@@ -174,19 +166,19 @@ extern "C" {
 
 /*  -------------------------------------------------------------------  */
 #ifdef __KERNEL__
-#define  noenable    lis_noenable   
-#define  enableok    lis_enableok   
-#define  canenable   lis_canenable  
+#define  noenable    lis_noenable
+#define  enableok    lis_enableok
+#define  canenable   lis_canenable
 #define  putnext     lis_putnext
-#define  qreply      lis_qreply 
-#define	 OTHERQ      LIS_OTHERQ     
-#define	 OTHER       LIS_OTHERQ     
-#define	 RD          LIS_RD         
-#define	 WR          LIS_WR         
-#define  SAMESTR     LIS_SAMESTR    
+#define  qreply      lis_qreply
+#define	 OTHERQ      LIS_OTHERQ
+#define	 OTHER       LIS_OTHERQ
+#define	 RD          LIS_RD
+#define	 WR          LIS_WR
+#define  SAMESTR     LIS_SAMESTR
 #define	 strqset	lis_strqset
 #define	 strqget	lis_strqget
-extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)_RP;
+extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l) _RP;
 #define put(q,m)	lis_safe_putmsg((q),(m),__FILE__,__LINE__)
 #endif				/* __KERNEL__ */
 
@@ -275,8 +267,6 @@ extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)_RP;
 #define putctl1(q, t, p)	lis_putctl1((q),(t),(p), __FILE__,__LINE__)
 #define putnextctl1(q, t, p)	lis_putnextctl1((q),(t),(p), __FILE__,__LINE__)
 
-
-
 /* Schedule a service procedure */
 #define qenable		lis_qenable
 
@@ -304,23 +294,18 @@ extern void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)_RP;
 /*  -------------------------------------------------------------------  */
 
 #ifdef __KERNEL__
-extern int lis_init_stream_subsystem(int memlimit);
+#if __LIS_INTERNAL__
+	extern int lis_init_stream_subsystem(int memlimit);
+#endif
 /* void lis_scantmout_handler(unsigned long arg); */
 /* void lis_runqueues(void) ; */
-#endif /* __KERNEL_ */
+#endif				/* __KERNEL_ */
 
 /*  -------------------------------------------------------------------  */
 
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /*!_STREAM_H*/
-
+#endif				/* __SYS_LIS_STREAM_H__ */
 /*----------------------------------------------------------------------
 # Local Variables:      ***
 # change-log-default-name: "~/src/prj/streams/src/NOTES" ***
 # End: ***
   ----------------------------------------------------------------------*/
-

@@ -128,8 +128,10 @@ struct strinfo {};
 /*  -------------------------------------------------------------------  */
 /*				 Glob. Vars.                             */
 
+#if __LIS_INTERNAL__
 extern struct strevent *lis_sefreelist; /* list of free stream events */
 extern struct strevent *lis_secachep;   /* reserve store of free str events */
+#endif
 
 #if 0
 /* see long comment above -- nemo */
@@ -139,6 +141,7 @@ extern struct strinfo lis_strinfo[]; /* keeps track of allocated events	*/
 /*  -------------------------------------------------------------------  */
 /*			Exported functions & macros                      */
 
+#if __LIS_INTERNAL__
 /* get events for pid in list
  * STATUS: complete, untested
  */
@@ -163,6 +166,7 @@ lis_del_from_elist( strevent_t **list, pid_t pid, short events );
  */
 extern void
 lis_free_elist( strevent_t **list);
+#endif
 
 /*  -------------------------------------------------------------------  */
 #endif /* __KERNEL__ */

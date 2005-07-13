@@ -121,10 +121,14 @@ typedef struct bclist
  */
 #define	N_BCHASH	128		/* power of 2 */
 #define	BCHASH_MSK	(N_BCHASH - 1)
+#if __LIS_INTERNAL__
 extern volatile bclist_t	lis_bchash[N_BCHASH] ;	/* the bufcall table */
 extern volatile bcinfo_t	*lis_bcfreel ;		/* the free list */
+#endif
 
+#if __LIS_INTERNAL__
 extern volatile char lis_strbcflag;	/* the bufcall functions must be run */
+#endif
 
 /*
  * Timer ticks -- frequency to run bufcall timer.
@@ -163,10 +167,12 @@ extern void lis_unbufcall(int bcid)_RP;
 
 #ifdef __KERNEL__
 
+#if __LIS_INTERNAL__
 extern void lis_init_bufcall(void);
 extern void lis_terminate_bufcall(void);
 
 extern void lis_dobufcall(int) ;
+#endif
 
 #endif /* __KERNEL__ */
 

@@ -242,7 +242,9 @@ struct mdbblock{
 /*				 Glob. Vars.                             */
 #ifdef __KERNEL__
 
+#if __LIS_INTERNAL__
 extern volatile struct mdbblock  *lis_mdbfreelist; /* msg block free list */
+#endif
 
 #endif /* __KERNEL__ */
 /*  -------------------------------------------------------------------  */
@@ -252,18 +254,24 @@ extern volatile struct mdbblock  *lis_mdbfreelist; /* msg block free list */
 
 /* lis_strgiveback - return some free headers to system heap
  */
+#if __LIS_INTERNAL__
 extern void
 lis_strgiveback(unsigned long arg);
+#endif
 
 #if defined(LINUX) 
+#if __LIS_INTERNAL__
 extern void lis_init_msg(void);
+#endif
 #endif
 
 /*  lis_terminate_msg - do the final shutdown of the msg memory subsystem
  */
 #if !(defined(LINUX) && defined(USE_KMEM_CACHE))
+#if __LIS_INTERNAL__
 extern void
 lis_terminate_msg(void);
+#endif
 #endif
 
 /* allocb: allocate an M_DATA message block of the specified
@@ -297,7 +305,9 @@ lis_esballoc(unsigned char *base, int size, int priority,
  *
  */
 extern void lis_freeb(mblk_t *bp)_RP;
+#if __LIS_INTERNAL__
 extern void lis_freedb(mblk_t *bp, int free_hdr)_RP;
+#endif
 
 /* freemsg - free a whole message
  *

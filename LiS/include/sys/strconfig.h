@@ -126,7 +126,9 @@
 #define MAX_STRAMOD	8	/* max # of autopushed mods per str */
 #define MAX_APUSH       8	/* max # of autopushed mods */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern int lis_reuse_modsw;	/* we reuse modsw entries if this is true */
+#endif
 #endif				/* __KERNEL__ */
 
 
@@ -144,15 +146,23 @@ extern int lis_reuse_modsw;	/* we reuse modsw entries if this is true */
 #define LIS_MEMLIMIT	(1*1024*1024) /*  STREAMS memory limit */
 
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern unsigned long lis_strthresh;	/* configurable STREAMS memory limit */
+#endif
+#if __LIS_INTERNAL__
 extern int lis_nstrpush;	/* maximum # of pushed modules */
+#endif
+#if __LIS_INTERNAL__
 extern int lis_strhold;		/* if not zero str hold feature's activated*/
+#endif
 #endif				/* __KERNEL__ */
 
 /* From msg.h:
  */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern int lis_strmsgsz;		/* maximum stream message size */
+#endif
 #endif				/* __KERNEL__ */
 
 

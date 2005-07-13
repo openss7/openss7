@@ -273,7 +273,9 @@ lis_rw_lock_t *
 lis_flags_t	lis_splstr_fcn(FL) _RP;
 void	lis_splx_fcn(lis_flags_t x, FL) _RP;
 void	lis_spl0_fcn(FL) _RP;
+#if __LIS_INTERNAL__
 void	lis_print_spl_track(void) _RP;
+#endif
 int	lis_own_spl(void) _RP;		/* do I own the global spl lock? */
 
 /************************************************************************

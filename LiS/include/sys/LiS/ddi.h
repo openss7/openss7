@@ -69,8 +69,8 @@
  *
  */
 
-#ifndef _DDI_H
-#define _DDI_H 1
+#ifndef __SYS_LIS_DDI_H__
+#define __SYS_LIS_DDI_H__ 1
 
 #ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
 
@@ -93,7 +93,7 @@
 #define	getmajor		lis_getmajor
 #define	getminor		lis_getminor
 
-#endif /*!_DDI_H*/
+#endif				/* __SYS_LIS_DDI_H__ */
 
 /*----------------------------------------------------------------------
 # Local Variables:      ***

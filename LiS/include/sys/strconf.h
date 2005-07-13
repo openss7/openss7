@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: strconf.h,v 1.1.2.1 2005/07/13 01:37:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
 
  All Rights Reserved.
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 01:37:13 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strconf.h,v $
+ Revision 1.1.2.1  2005/07/13 01:37:13  brian
+ - added __LIS_INTERNAL__ to hide internal symbol in header files
 
  *****************************************************************************/
 
-#ifndef __SYS_DDI_H__
-#define __SYS_DDI_H__ 1
+#ifndef __SYS_STRCONF_H__
+#define __SYS_STRCONF_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -60,7 +66,7 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/LiS/ddi.h>
+#include <sys/LiS/strconf.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -68,4 +74,4 @@ __END_DECLS
 /* *INDENT-ON* */
 #endif
 
-#endif				/* __SYS_DDI_H__ */
+#endif				/* __SYS_STRCONF_H__ */

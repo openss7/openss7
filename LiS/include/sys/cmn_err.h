@@ -75,7 +75,9 @@
 
 #ifdef __KERNEL__
 
+#if __LIS_INTERNAL__
 void    lis_cmn_err_init(void) ;	/* not exported */
+#endif
 void	lis_vcmn_err(int err_lvl, const char *fmt, va_list args) _RP;
 void	lis_cmn_err(int err_lvl, const char *fmt, ...) _RP __attribute__ ((format(printf, 2, 3)));
 #define	cmn_err		lis_cmn_err

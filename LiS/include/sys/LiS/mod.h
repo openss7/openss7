@@ -225,7 +225,9 @@ typedef struct fmodsw {
 
 #ifdef __KERNEL__
 
+#if __LIS_INTERNAL__
 extern struct fmodsw lis_fstr_sw[MAX_STRDEV]; /* streams devices */
+#endif
 extern struct fmodsw lis_fmod_sw[MAX_STRMOD]; /* streams modules */
 
 #endif /* __KERNEL__ */
@@ -247,24 +249,32 @@ extern int lis_register_module_qlock_option(modID_t id, int qlock_option)_RP;
 /* Back compatible: Will go away when no longer used */
 #define	register_strdev		lis_register_strdev
 
+#if __LIS_INTERNAL__
 /* Find streamtab of a device */
 extern streamtab_t *lis_find_strdev(major_t major);
+#endif
 
 /* Find/load a module id by name */
 extern modID_t lis_findmod(const char *name);
+#if __LIS_INTERNAL__
 extern modID_t lis_loadmod(const char *name);
 extern modID_t lis_findmod_strtab(struct streamtab *strtab);
+#endif
 
 
 /* Autopush */
+#if __LIS_INTERNAL__
 extern int lis_apushm(dev_t dev, const char *mods[]);
+#endif
 extern int lis_apush_set(struct strapush *ap)_RP;
 extern int lis_apush_get(struct strapush *ap)_RP;
+#if __LIS_INTERNAL__
 extern int lis_valid_mod_list(struct str_list ml);	
 
 /* mod.c initialization and cleanup functions */
 extern void lis_init_mod(void);
 extern void lis_terminate_mod(void);
+#endif
 
 
 /* Get strtab for mod or NULL if not a valid id */

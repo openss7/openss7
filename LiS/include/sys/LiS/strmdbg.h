@@ -253,16 +253,22 @@ extern unsigned long	lis_debug_mask2 ;
 void		 lis_print_block(void *ptr) _RP;
 void		 lis_print_mem(void) _RP;
 void		 lis_print_queue(queue_t * q) _RP;
+#if __LIS_INTERNAL__
 void		 lis_print_queues(void) _RP;
 void		 lis_print_stream(stdata_t *head) _RP;
+#endif
 const char	*lis_strm_name(stdata_t *head) _RP;
 const char      *lis_strm_name_from_queue(queue_t *q) _RP;
 const char	*lis_queue_name(queue_t *q) _RP;
+#if __LIS_INTERNAL__
 const char	*lis_maj_min_name(stdata_t *head) _RP;
+#endif
 const char	*lis_msg_type_name(mblk_t *mp) _RP;
 void		 lis_print_data(mblk_t *mp, int opt, int cont) _RP;
 void		 lis_print_msg(mblk_t *mp, const char *prefix, int opt) _RP;
+#if __LIS_INTERNAL__
 char		*lis_poll_events(short events) _RP;
+#endif
 #endif				/* __KERNEL__ */
 
 /*  -------------------------------------------------------------------  */
@@ -290,9 +296,11 @@ void	 lis_mark_mem_fcn(void *ptr, const char *file_name, int line_nr) _RP;
 #else
 #define	lis_mark_mem(a, b, c)
 #endif
+#if __LIS_INTERNAL__
 int      lis_check_guard(void *ptr, char *msg) ;
 int      lis_check_mem(void) ;
 void     lis_terminate_mem(void) ;
+#endif
 
 #if defined(LINUX)
 static inline const char *lis_basename( const char *filename )
@@ -338,7 +346,9 @@ const char *lis_basename(const char *filename);
 /*                             Print Buffer				 */
 
 #define	LIS_PRINT_BUFFER_SIZE		50000	/* large-ish buffer */
+#if __LIS_INTERNAL__
 extern void	lis_bprintf(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));	/* print into buffer */
 extern void	lis_flush_print_buffer(void) ;	/* print out the buffer */
+#endif
 
 #endif

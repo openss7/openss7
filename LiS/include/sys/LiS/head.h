@@ -361,6 +361,7 @@ struct stdata
 		while (0)
 
 
+#if __LIS_INTERNAL__
 extern stdata_t		*lis_stdata_head ;	/* to list of stdatas */
 extern lis_atomic_t      lis_stdata_cnt;
 
@@ -374,16 +375,21 @@ extern lis_atomic_t      lis_mnt_cnt;
 
 extern void    		 lis_task_to_creds(lis_kcreds_t *cp) ;
 extern void    		 lis_creds_to_task(lis_kcreds_t *cp) ;
+#endif
 
 #if defined(CONFIG_DEV)
+#if __LIS_INTERNAL__
 extern stdata_t *lis_head_get_fcn(stdata_t *hd, const char *file, int line);
 extern stdata_t *lis_head_put_fcn(stdata_t *hd, const char *file, int line);
+#endif
 
 #define lis_head_get(hd)	lis_head_get_fcn(hd, __LIS_FILE__, __LINE__)
 #define lis_head_put(hd)	lis_head_put_fcn(hd, __LIS_FILE__, __LINE__)
 #else
+#if __LIS_INTERNAL__
 extern stdata_t *lis_head_get_fcn(stdata_t *hd);
 extern stdata_t *lis_head_put_fcn(stdata_t *hd);
+#endif
 
 #define lis_head_get(hd)	lis_head_get_fcn(hd)
 #define lis_head_put(hd)	lis_head_put_fcn(hd)
@@ -399,19 +405,23 @@ extern stdata_t *lis_head_put_fcn(stdata_t *hd);
 /* Scheduling  & scan list
  */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern volatile queue_t	*lis_qhead; /* first scheduled queue	*/
 extern volatile queue_t	*lis_qtail; /* last scheduled queue		*/
 extern volatile queue_t	*lis_scanqhead;	/* head of STREAMS scan q */
 extern volatile queue_t	*lis_scanqtail;	/* tail of STREAMS scan q */
 extern char lis_qrunflag;	/*set if there is at least one enabled queue*/
 extern char lis_queueflag;	/*the function queuerun is running    	*/
+#endif
 
 /* cfg. opts.
  */
+#if __LIS_INTERNAL__
 extern int lis_nstrpush;	/* maximum # of pushed modules */
 extern int lis_strhold;		/* if not zero str hold feature's activated*/
 extern unsigned long lis_strthresh;	/* configurable STREAMS memory limit */
 extern unsigned int lis_iocseq; /* ioctl id */
+#endif
 #endif			/* __KERNEL__ */
 
 
@@ -426,6 +436,7 @@ extern unsigned int lis_iocseq; /* ioctl id */
  * -- see "The design of the unix operating system" (Bach)
  */
 #ifdef __KERNEL__
+#if __LIS_INTERNAL__
 extern int lis_stropen( struct inode *, struct file *);
 extern int lis_strioctl(struct inode *, struct file *,
 			unsigned int, unsigned long);
@@ -486,6 +497,7 @@ extern struct streamtab clone_info;
  */
 extern void lis_clear_and_save_sigs(stdata_t *hd);
 extern void lis_restore_sigs(stdata_t *hd);
+#endif
 
 /*
  * Return the major device number of the LiS clone device.  Useful for
@@ -496,7 +508,9 @@ extern int lis_clone_major(void) _RP;
 /*
  * Set an errno in the stream head and wake up relevant processes
  */
+#if __LIS_INTERNAL__
 void	lis_stream_error(stdata_t *shead, int rderr, int wrerr) ;
+#endif
 
 #endif				/* __KERNEL__ */
 
