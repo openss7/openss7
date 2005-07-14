@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.27 2005/07/12 14:06:22 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.28 2005/07/14 10:38:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:22 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 10:38:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/12 14:06:22 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/14 10:38:53 $"
 
 #ifndef __SYS_STRSUBR_H__
 #warn "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -332,7 +332,7 @@ enum {
 	DYN_QBAND,			/* struct bandinfo */
 	DYN_STRAPUSH,			/* struct apinfo */
 	DYN_DEVINFO,			/* struct devinfo */
-	DYN_MODINFO,			/* struct modinfo */
+	DYN_MODINFO,			/* struct mdlinfo */
 	DYN_SYNCQ,			/* struct syncq */
 	DYN_SIZE,			/* size */
 };
@@ -484,7 +484,7 @@ struct devinfo {
 	struct devinfo *di_prev;	/* Strinfo list linkage */
 };
 
-struct modinfo {
+struct mdlinfo {
 	struct list_head mi_list;	/* list of modules for this switch table entry */
 	struct list_head mi_hash;	/* list of modid hashes in slot */
 	struct fmodsw *mi_mod;		/* switch table entry */
@@ -492,8 +492,8 @@ struct modinfo {
 	atomic_t mi_refs;		/* structure references */
 	atomic_t mi_count;		/* open count */
 	modID_t modid;			/* module id number */
-	struct modinfo *mi_next;	/* Strinfo list linkage */
-	struct modinfo *mi_prev;	/* Strinfo list linkage */
+	struct mdlinfo *mi_next;	/* Strinfo list linkage */
+	struct mdlinfo *mi_prev;	/* Strinfo list linkage */
 };
 
 #define was128	(32*sizeof(ulong))

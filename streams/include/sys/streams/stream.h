@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.36 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.37 2005/07/14 10:38:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 10:38:53 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2005/07/14 10:38:53 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -1190,7 +1190,5 @@ __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp)
 {
 	return putnext(OTHERQ(q), mp);
 }
-
-#define straln(a)   (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
 #endif				/* __SYS_STREAMS_STREAM_H__ */

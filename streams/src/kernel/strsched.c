@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/12 04:13:47 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 04:13:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 10:38:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/12 04:13:47 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/12 04:13:47 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 10:38:56 $";
 
 #include <linux/config.h>
 #include <linux/version.h>
@@ -525,10 +525,10 @@ EXPORT_SYMBOL(di_put);
  *
  *  -------------------------------------------------------------------------
  */
-static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
+static void mdlinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 {
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct modinfo *mi = obj;
+		struct mdlinfo *mi = obj;
 		bzero(mi, sizeof(*mi));
 		INIT_LIST_HEAD(&mi->mi_list);
 		INIT_LIST_HEAD(&mi->mi_hash);
@@ -537,9 +537,9 @@ static void modinfo_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 #endif
 	}
 }
-struct modinfo *modi_alloc(struct fmodsw *fmod)
+struct mdlinfo *modi_alloc(struct fmodsw *fmod)
 {
-	struct modinfo *mi;
+	struct mdlinfo *mi;
 	struct strinfo *si = &Strinfo[DYN_MODINFO];
 	if ((mi = kmem_cache_alloc(si->si_cache, SLAB_ATOMIC))) {
 #if defined CONFIG_STREAMS_DEBUG
@@ -558,7 +558,7 @@ struct modinfo *modi_alloc(struct fmodsw *fmod)
 	}
 	return (mi);
 }
-struct modinfo *modi_get(struct modinfo *mi)
+struct mdlinfo *modi_get(struct mdlinfo *mi)
 {
 	if (mi) {
 		if (atomic_read(&mi->mi_refs) < 1)
@@ -567,7 +567,7 @@ struct modinfo *modi_get(struct modinfo *mi)
 	}
 	return (mi);
 }
-void modi_put(struct modinfo *mi)
+void modi_put(struct mdlinfo *mi)
 {
 	if (mi) {
 		if (atomic_dec_and_test(&mi->mi_refs)) {
@@ -2273,7 +2273,7 @@ static struct cacheinfo {
 	"DYN_QBAND", sizeof(struct qbinfo), 0, SLAB_HWCACHE_ALIGN, &qbinfo_ctor, NULL}, {
 	"DYN_STRAPUSH", sizeof(struct apinfo), 0, SLAB_HWCACHE_ALIGN, &apinfo_ctor, NULL}, {
 	"DYN_DEVINFO", sizeof(struct devinfo), 0, SLAB_HWCACHE_ALIGN, &devinfo_ctor, NULL}, {
-	"DYN_MODINFO", sizeof(struct modinfo), 0, SLAB_HWCACHE_ALIGN, &modinfo_ctor, NULL}, {
+	"DYN_MODINFO", sizeof(struct mdlinfo), 0, SLAB_HWCACHE_ALIGN, &mdlinfo_ctor, NULL}, {
 	"DYN_SYNCQ", sizeof(struct syncq), 0, SLAB_HWCACHE_ALIGN, &syncq_ctor, NULL}
 };
 
