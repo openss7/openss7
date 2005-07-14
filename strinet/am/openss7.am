@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2005/07/13 01:37:12 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2005/07/14 08:35:51 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -47,7 +47,7 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2005/07/13 01:37:12 $ by $Author: brian $
+## Last Modified $Date: 2005/07/14 08:35:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -288,7 +288,38 @@ libtool: $(LIBTOOL_DEPS)
 # I use vim, not emacs.  The following triggers Automake 1.8 to include
 # targets for making vim tags files along with emacs TAGS files.
 ##
-CTAGSFLAGS = --language-force=C --c-types=+px -I _RP,__initdata,__exitdata,EXPORT_SYMBOL,EXPORT_SYMBOL_NOVERS,EXPORT_SYMBOL_GPL
+CTAGIDS			= -I __initdata \
+			  -I __exitdata \
+			  -I EXPORT_SYMBOL \
+			  -I EXPORT_SYMBOL_NOVERS \
+			  -I EXPORT_SYMBOL_GPL \
+			  -I __attribute__+ \
+			  -I __BEGIN_DECLS \
+			  -I __END_DECLS \
+			  -I __THROW \
+			  -I __const=const \
+			  -I __inline__=inline \
+			  -I _RP \
+			  -I __depr \
+			  -I HEAD_DECLARATION+ \
+			  -I STR_DECLARATION+ \
+			  -I __EXTERN_INLINE=inline \
+			  -I __AIX_EXTERN_INLINE=inline \
+			  -I __HPUX_EXTERN_INLINE=inline \
+			  -I __IRIX_EXTERN_INLINE=inline \
+			  -I __LIS_EXTERN_INLINE=inline \
+			  -I __LFS_EXTERN_INLINE=inline \
+			  -I __MAC_EXTERN_INLINE=inline \
+			  -I __MPS_EXTERN_INLINE=inline \
+			  -I __OS7_EXTERN_INLINE=inline \
+			  -I __OSF_EXTERN_INLINE=inline \
+			  -I __SUN_EXTERN_INLINE=inline \
+			  -I __SUX_EXTERN_INLINE=inline \
+			  -I __SVR3_EXTERN_INLINE=inline \
+			  -I __SVR4_EXTERN_INLINE=inline \
+			  -I __UW7_EXTERN_INLINE=inline \
+			  -I __UXP_EXTERN_INLINE=inline
+CTAGSFLAGS = --language-force=C --c-types=+px $(CTAGIDS)
 
 # if MAINTAINER_MODE
 # ALL_LOCAL		+= TAGS CTAGS
