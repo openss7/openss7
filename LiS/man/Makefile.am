@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2005/07/13 12:01:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.13 $) $Date: 2005/07/14 03:39:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/13 12:01:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 03:39:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,6 +97,7 @@ deprec_pages = \
 	man9/lis_strcount.9 \
 	man9/lis_timeout.9 \
 	man9/lis_umount.9 \
+	man9/lis_valid_mod_list.9 \
 	man9/qattach.9 \
 	man9/qdetach.9 \
 	man9/qclose.9 \
@@ -231,6 +232,7 @@ man_MANS = \
 	man9/lis_appq.9 \
 	man9/lis_apush_get.9 \
 	man9/lis_apush_set.9 \
+	man9/lis_apush_vml.9 \
 	man9/lis_apushm.9 \
 	man9/lis_assert_fail.9 \
 	man9/lis_atomic_add.9 \
@@ -640,7 +642,6 @@ man_MANS = \
 	man9/lis_up_fcn.9 \
 	man9/lis_usecs.9 \
 	man9/lis_usectohz.9 \
-	man9/lis_valid_mod_list.9 \
 	man9/lis_vcmn_err.9 \
 	man9/lis_version.9 \
 	man9/lis_vfree.9 \
@@ -759,6 +760,7 @@ dist_noinst_deprec_pages = \
 	man9/lis_strcount.9.man \
 	man9/lis_timeout.9.man \
 	man9/lis_umount.9.man \
+	man9/lis_valid_mod_list.9.man \
 	man9/qattach.9.man \
 	man9/qdetach.9.man \
 	man9/qclose.9.man \
@@ -891,6 +893,7 @@ dist_noinst_MANS = \
 	man9/lis_appq.9.man \
 	man9/lis_apush_get.9.man \
 	man9/lis_apush_set.9.man \
+	man9/lis_apush_vml.9.man \
 	man9/lis_apushm.9.man \
 	man9/lis_assert_fail.9.man \
 	man9/lis_atomic_add.9.man \
@@ -1300,7 +1303,6 @@ dist_noinst_MANS = \
 	man9/lis_up_fcn.9.man \
 	man9/lis_usecs.9.man \
 	man9/lis_usectohz.9.man \
-	man9/lis_valid_mod_list.9.man \
 	man9/lis_vcmn_err.9.man \
 	man9/lis_version.9.man \
 	man9/lis_vfree.9.man \

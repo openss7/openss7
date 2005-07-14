@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.10  2005/07/14 03:40:11  brian
+ - updates for check pass
+
  Revision 0.9.2.9  2005/07/13 12:01:49  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -80,9 +83,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $";
+static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 12:01:49 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:11 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.7a.3 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -147,26 +150,8 @@ MODULE_ALIAS("streams-lfscompat");
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp);
 EXPORT_SYMBOL(appq);
 
-__LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
-EXPORT_SYMBOL(apush_get);
-
-__LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
-EXPORT_SYMBOL(apush_set);
-
-__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
-EXPORT_SYMBOL(apush_vml);
-
-__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
-EXPORT_SYMBOL(autopush_del);
-
-__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap);
-EXPORT_SYMBOL(autopush_add);
-
-__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods);
-EXPORT_SYMBOL(autopush_vml);
-
-__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev);
-EXPORT_SYMBOL(autopush_find);
+__LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
+EXPORT_SYMBOL(bcmp);
 
 int bcanget(queue_t *q, int band)
 {
@@ -404,6 +389,58 @@ int strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...
 }
 
 EXPORT_SYMBOL(strlog);
+
+
+/*
+ *  The following are from src/include/sys/lfs/strconf.h
+ */
+
+__LFS_EXTERN_INLINE int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
+EXPORT_SYMBOL(register_strnod);
+
+__LFS_EXTERN_INLINE int register_strdev(struct cdevsw *cdev, major_t major);
+EXPORT_SYMBOL(register_strdev);
+
+__LFS_EXTERN_INLINE int register_strdrv(struct cdevsw *cdev);
+EXPORT_SYMBOL(register_strdrv);
+
+__LFS_EXTERN_INLINE int register_strmod(struct _fmodsw *fmod);
+EXPORT_SYMBOL(register_strmod);
+
+__LFS_EXTERN_INLINE int unregister_strnod(struct cdevsw *cdev, minor_t minor);
+EXPORT_SYMBOL(unregister_strnod);
+
+__LFS_EXTERN_INLINE int unregister_strdev(struct cdevsw *cdev, major_t major);
+EXPORT_SYMBOL(unregister_strdev);
+
+__LFS_EXTERN_INLINE int unregister_strdrv(struct cdevsw *cdev);
+EXPORT_SYMBOL(unregister_strdrv);
+
+__LFS_EXTERN_INLINE int unregister_strmod(struct _fmodsw *fmod);
+EXPORT_SYMBOL(unregister_strmod);
+
+__LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
+EXPORT_SYMBOL(apush_get);
+
+__LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
+EXPORT_SYMBOL(apush_set);
+
+__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
+EXPORT_SYMBOL(apush_vml);
+
+__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
+EXPORT_SYMBOL(autopush_del);
+
+__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap);
+EXPORT_SYMBOL(autopush_add);
+
+__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods);
+EXPORT_SYMBOL(autopush_vml);
+
+__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev);
+EXPORT_SYMBOL(autopush_find);
+
+
 
 #ifdef CONFIG_STREAMS_COMPAT_LFS_MODULE
 static

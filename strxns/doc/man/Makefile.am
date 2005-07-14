@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/05/14 08:26:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:40:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:26:04 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 03:40:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,10 +60,11 @@ if PKG_BUILD_INDEP
 man_MANS = \
 	man4/XNS.4 \
 	man4/ip2xinet.4 \
-	man4/ip_strm.4 \
-	man4/ip_strms_mod.4 \
+	man4/ip_strms.4 \
+	man4/ip_strm_mod.4 \
 	man4/ip_to_dlpi.4 \
 	man4/ldl.4 \
+	man4/link-driver.4 \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
 	man7/CD_ALLOW_INPUT_REQ.7 \
@@ -285,10 +286,11 @@ man_MANS = \
 dist_noinst_MANS = \
 	man4/XNS.4.man \
 	man4/ip2xinet.4.man \
-	man4/ip_strm.4.man \
-	man4/ip_strms_mod.4.man \
+	man4/ip_strms.4.man \
+	man4/ip_strm_mod.4.man \
 	man4/ip_to_dlpi.4.man \
 	man4/ldl.4.man \
+	man4/link-driver.4.man \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
 	man7/CD_ALLOW_INPUT_REQ.7.man \

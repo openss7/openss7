@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2005/07/13 01:40:38 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2005/07/14 03:40:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:40:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:07 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/13 01:40:38 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:07 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -141,23 +141,82 @@ struct cdevsw {
 #undef unregister_strdev
 #undef unregister_strmod
 
-extern int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);
-extern int register_strdev(struct cdevsw *cdev, major_t major);
-extern int register_strdrv(struct cdevsw *cdev);
-extern int register_strmod(struct _fmodsw *fmod);
-extern int unregister_strnod(struct cdevsw *cdev, minor_t minor);
-extern int unregister_strdev(struct cdevsw *cdev, major_t major);
-extern int unregister_strdrv(struct cdevsw *cdev);
-extern int unregister_strmod(struct _fmodsw *fmod);
+__LFS_EXTERN_INLINE int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
+{
+	return (-EOPNOTSUPP);
+}
+__LFS_EXTERN_INLINE int register_strdev(struct cdevsw *cdev, major_t major)
+{
+	int err;
+	if ((err = lis_register_strdev(major, cdev->d_str, 255, cdev->d_name)) < 0)
+		return (err);
+	return ((cdev->d_major = err));
+}
+__LFS_EXTERN_INLINE int register_strdrv(struct cdevsw *cdev)
+{
+	return register_strdev(cdev, cdev->d_major);
+}
+__LFS_EXTERN_INLINE int register_strmod(struct _fmodsw *fmod)
+{
+	return lis_register_strmod(fmod->f_str, fmod->f_name);
+}
+__LFS_EXTERN_INLINE int unregister_strnod(struct cdevsw *cdev, minor_t minor)
+{
+	return (-EOPNOTSUPP);
+}
+__LFS_EXTERN_INLINE int unregister_strdev(struct cdevsw *cdev, major_t major)
+{
+	return lis_unregister_strdev(major);
+}
+__LFS_EXTERN_INLINE int unregister_strdrv(struct cdevsw *cdev)
+{
+	return unregister_strdev(cdev, cdev->d_major);
+}
+__LFS_EXTERN_INLINE int unregister_strmod(struct _fmodsw *fmod)
+{
+	return lis_unregister_strmod(fmod->f_str);
+}
 
-extern int autopush_add(struct strapush *sap);
-extern int autopush_del(struct strapush *sap);
-extern int autopush_vml(struct str_mlist *smp, int nmods);
-extern struct strapush *autopush_find(dev_t dev);
+__LFS_EXTERN_INLINE int apush_get(struct strapush *sap)
+{
+	return lis_apush_get(sap);
+}
+__LFS_EXTERN_INLINE int apush_set(struct strapush *sap)
+{
+	return lis_apush_set(sap);
+}
+__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp)
+{
+	return lis_apush_vml(slp);
+}
 
-extern int apush_get(struct strapush *sap);
-extern int apush_set(struct strapush *sap);
-extern int apush_vml(struct str_list *slp);
+__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap)
+{
+	return apush_set(sap);
+}
+__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap)
+{
+	sap->sap_cmd = SAP_CLEAR;
+	return apush_set(sap);
+}
+__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods)
+{
+	struct str_list sl;
+	sl.sl_nmods = nmods;
+	sl.sl_modlist = ml;
+	return apush_vml(&sl);
+}
+__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev)
+{
+	struct strapush *sap;
+	if ((sap = kmem_alloc(sizeof(*sap), KM_NOSLEEP))) {
+		sap->sap_cmd = SAD_GAP;
+		sap->sap_major = getmajor(dev);
+		sap->sap_minor = getminor(dev);
+		apush_get(sap);
+	}
+	return (sap);
+}
 
 #elif defined(_LFS_SOURCE)
 #warning "_LFS_SOURCE defined but not CONFIG_STREAMS_COMPAT_LFS"

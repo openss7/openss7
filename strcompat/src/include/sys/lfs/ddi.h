@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.4 2005/07/13 12:01:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.5 2005/07/14 03:40:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.5  2005/07/14 03:40:06  brian
+ - updates for check pass
+
  Revision 0.9.2.4  2005/07/13 12:01:48  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -95,45 +98,10 @@ __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	return lis_appq(q, emp, nmp);
 }
-__LFS_EXTERN_INLINE int apush_get(struct strapush *sap)
-{
-	return lis_apush_get(sap);
-}
-__LFS_EXTERN_INLINE int apush_set(struct strapush *sap)
-{
-	return lis_apush_set(sap);
-}
-__LFS_EXTERN_INLINE int apush_vml(struct str_list *slp)
-{
-	return lis_apush_vml(slp);
-}
 
-__LFS_EXTERN_INLINE int autopush_del(struct strapush *sap)
+__LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len)
 {
-	sap->sap_cmd = SAP_CLEAR;
-	return apush_set(sap);
-}
-__LFS_EXTERN_INLINE int autopush_add(struct strapush *sap)
-{
-	return apush_set(sap);
-}
-__LFS_EXTERN_INLINE int autopush_vml(struct str_mlist *ml, int nmods)
-{
-	struct str_list sl;
-	sl.sl_nmods = nmods;
-	sl.sl_modlist = ml;
-	return apush_vml(&sl);
-}
-__LFS_EXTERN_INLINE struct strapush *autopush_find(dev_t dev)
-{
-	struct strapush *sap;
-	if ((sap = kmem_alloc(sizeof(*sap), KM_NOSLEEP))) {
-		sap->sap_cmd = SAD_GAP;
-		sap->sap_major = getmajor(dev);
-		sap->sap_minor = getminor(dev);
-		apush_get(sap);
-	}
-	return (sap);
+	return memcmp(s1, s2, len);
 }
 
 #define ANYBAND (-1)

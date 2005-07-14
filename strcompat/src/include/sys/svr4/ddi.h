@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2005/07/13 12:01:49 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2005/07/14 03:40:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:49 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:09 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:49 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 03:40:09 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -66,11 +66,6 @@
 #warning "_SVR4_SOURCE not defined but SVR4 ddi.h included"
 #define _SVR4_SOURCE 1
 #endif
-
-__SVR4_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len)
-{
-	return memcmp(s1, s2, len);
-}
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/08 12:15:16 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/14 03:57:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/08 12:15:16 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 03:57:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -124,7 +124,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    # First thing to do is to take user specified director(ies)
 	    strcomp_cv_includes="$with_compat"
 	fi
-	strcomp_what="os7/compat.h"
+	strcomp_what="sys/os7/compat.h"
 	if test ":${strcomp_cv_includes:-no}" = :no ; then
 	    # The next place to look now is for a peer package being built under
 	    # the same top directory, and then the higher level directory.
@@ -322,7 +322,7 @@ dnl properly, so we use defines.
 # =============================================================================
 # _STRCOMP_KERNEL
 # -----------------------------------------------------------------------------
-# Need to know about irqreturn_t for os7/compat.h STREAMS compatibility file.
+# Need to know about irqreturn_t for sys/os7/compat.h STREAMS compatibility file.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_KERNEL], [dnl
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [

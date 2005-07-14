@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2005/07/13 12:01:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2005/07/14 03:40:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:08 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 12:01:48 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 03:40:08 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -184,6 +184,7 @@ extern void *lis_alloc_dma_fcn(int nbytes, char *file, int line) __depr;
 extern void *lis_alloc_kernel_fcn(int nbytes, char *file, int line) __depr;
 extern int lis_apush_get(struct lis_strapush *ap) __depr;
 extern int lis_apush_set(struct lis_strapush *ap) __depr;
+extern int lis_apush_vml(struct str_list *slp) __depr;
 #if 0
 extern int lis_apushm(dev_t dev, const char *mods[]) __depr;
 #endif

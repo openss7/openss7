@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 13:54:46 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/12 13:54:46 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 03:40:15 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL"
@@ -98,7 +98,7 @@ MODULE_ALIAS("streams-uw7compat");
 
 
 /* don't use these - these are fakes */
-#if LFS
+#undef allocb_physreq
 /**
  *  allocb_physreq:	- allocate a message block with physical requirements
  *  @size:		number of bytes to allocate
@@ -107,6 +107,10 @@ MODULE_ALIAS("streams-uw7compat");
  */
 mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
+#if LIS
+	return lis_allocb_physreq(size, priority, prp, __FILE__, __LINE__);
+#endif
+#if LFS
 	if (prp->phys_align > 8)
 		return (NULL);
 	if (prp->phys_boundary != 0)
@@ -116,10 +120,10 @@ mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp)
 	if (prp->phys_flags & PREQ_PHYSCONTIG)
 		return (NULL);
 	return (allocb(size, priority));
+#endif
 }
 
 EXPORT_SYMBOL(allocb_physreq);	/* uw7/ddi.h */
-#endif
 mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp)
 {
 	if (prp->phys_align > 8)

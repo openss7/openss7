@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: check_mans,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/12 04:57:52 $
+# @(#) $RCSfile: check_mans,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2005/07/14 09:10:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 04:57:52 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 09:10:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,6 +91,22 @@ function echo_w()
 #	fi
 	echo "$me:$2: W: $1" >&5
 	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
 }
 
 export -p | while read line
@@ -269,11 +285,13 @@ usedpages=
 for page in $pagelist ; do
 	usedpages="${usedpages:+$usedpages }$page"
 done
+unusedpages=
 for page in $MANS_UNUSED ; do
-	usedpages="${usedpages:+$usedpages }$page"
+	unusedpages="${unusedpages:+$unusedpages }$page"
 done
 
 echo_d "Used pages are: $usedpages" $LINENO
+echo_d "Unused pages are: $unusedpages" $LINENO
 
 for page in $MANS
 do
@@ -305,15 +323,17 @@ do
 	#echo_v "testing manual page $base for use"
 	case " $usedpages " in
 	*" $page "*)
-		echo_s "manual page $page is used" $LINENO
-		;;
+		echo_s "manual page $page is used" $LINENO ;;
 	*)
 		if ( echo $page | egrep '\.(5|7)' >/dev/null 2>&1 ) ; then
 			echo_s "manual page $page is unused" $LINENO
 		else
-			echo_e "manual page $page is unused" $LINENO
-		fi
-		;;
+			case " $unusedpages " in
+			*" $page "*)
+				echo_w "manual page $page is unused" $LINENO ;;
+			*)	echo_e "manual page $page is unused" $LINENO ;;
+			esac
+		fi ;;
 	esac
 	# check for cross reference
 	xref='no'
@@ -451,6 +471,30 @@ do
 	echo_d "rm -f ${me}_$$.out ${me}_$$.err" $LINENO
 	rm -f ${me}_$$.out ${me}_$$.err
 done
+
+#
+# Another check: check manpages that exist in the source directory that are not
+# included in the build directory.  These are manpages that have been struck
+# from the install lists but have not been struck from CVS or the distribution.
+# Warn about these.
+#
+srcdir=`(cd $srcdir; pwd)`
+srcmask=`echo "$srcdir" | sed -e 's|.|.|g'`
+for spage in `find ${srcdir} -name "*.man" -type f -size +0`
+do
+	echo_t "testing source page $spage"
+	page=`echo "$spage" | sed -e 's|^'$srcmask'/||;s|\.man$||'`
+	sect=`echo "$page" | sed -e 's|^man||;s|/.*$||'`
+	case $page in
+		*."$sect"*) ;;
+		*) page="$page.$sect" ;;
+	esac
+	if test -f ./$page
+	then echo_s "target page $page exists" $LINENO
+	else echo_flw $spage 1 "target page $page does not exist for source file" $LINENO
+	fi
+done
+
 
 retval=0
 if test $warnings -gt 0

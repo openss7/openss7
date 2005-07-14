@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/13 12:01:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:39:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/13 12:01:47 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 03:39:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,6 @@ svr3_compat_pages = \
 
 svr4_compat_pages = \
 	man9/svr4compat.9 \
-	man9/bcmp.9 \
 	man9/dtimeout.9 \
 	man9/etoimajor.9 \
 	man9/getemajor.9 \
@@ -325,6 +324,7 @@ lis_compat_pages = \
 	man9/lis_appq.9 \
 	man9/lis_apush_get.9 \
 	man9/lis_apush_set.9 \
+	man9/lis_apush_vml.9 \
 	man9/lis_assert_fail.9 \
 	man9/lis_atomic_add.9 \
 	man9/lis_atomic_dec.9 \
@@ -380,8 +380,6 @@ lis_compat_pages = \
 	man9/lis_kernel_down.9 \
 	man9/lis_kernel_up.9 \
 	man9/lis_kernel_version.9 \
-	man9/lis_kfree.9 \
-	man9/lis_kmalloc.9 \
 	man9/lis_linkb.9 \
 	man9/lis_major.9 \
 	man9/lis_malloc.9 \
@@ -612,6 +610,8 @@ lis_deprec_pages = \
 	man9/lis_ioc_fdetach.9 \
 	man9/lis_ioc_pipe.9 \
 	man9/lis__kfree.9 \
+	man9/lis_kfree.9 \
+	man9/lis_kmalloc.9 \
 	man9/lis_kill_pg.9 \
 	man9/lis_kill_proc.9 \
 	man9/lis__kmalloc.9 \
@@ -660,6 +660,7 @@ lis_deprec_pages = \
 
 lfs_compat_pages = \
 	man9/lfscompat.9 \
+	man9/allocq.9 \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
 	man9/apush_vml.9 \
@@ -668,6 +669,7 @@ lfs_compat_pages = \
 	man9/autopush_find.9 \
 	man9/autopush_vml.9 \
 	man9/bcanget.9 \
+	man9/bcmp.9 \
 	man9/canget.9 \
 	man9/copyin.9 \
 	man9/copyout.9 \
@@ -681,6 +683,7 @@ lfs_compat_pages = \
 	man9/drv_usectohz.9 \
 	man9/drv_usecwait.9 \
 	man9/enableq.9 \
+	man9/freeq.9 \
 	man9/getadmin.9 \
 	man9/getmid.9 \
 	man9/linkmsg.9 \
@@ -691,11 +694,11 @@ lfs_compat_pages = \
 	man9/register_strdrv.9 \
 	man9/register_strmod.9 \
 	man9/register_strnod.9 \
+	man9/strlog.9 \
 	man9/unregister_strdev.9 \
 	man9/unregister_strdrv.9 \
 	man9/unregister_strmod.9 \
 	man9/unregister_strnod.9 \
-	man9/strlog.9 \
 	man9/vstrlog.9
 
 mac_unimpl_pages = \
@@ -867,7 +870,6 @@ dist_noinst_svr3_compat_pages = \
 
 dist_noinst_svr4_compat_pages = \
 	man9/svr4compat.9.man \
-	man9/bcmp.9.man \
 	man9/dtimeout.9.man \
 	man9/etoimajor.9.man \
 	man9/getemajor.9.man \
@@ -1122,6 +1124,7 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_appq.9.man \
 	man9/lis_apush_get.9.man \
 	man9/lis_apush_set.9.man \
+	man9/lis_apush_vml.9.man \
 	man9/lis_assert_fail.9.man \
 	man9/lis_atomic_add.9.man \
 	man9/lis_atomic_dec.9.man \
@@ -1177,8 +1180,6 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_kernel_down.9.man \
 	man9/lis_kernel_up.9.man \
 	man9/lis_kernel_version.9.man \
-	man9/lis_kfree.9.man \
-	man9/lis_kmalloc.9.man \
 	man9/lis_linkb.9.man \
 	man9/lis_major.9.man \
 	man9/lis_malloc.9.man \
@@ -1409,6 +1410,8 @@ dist_noinst_lis_deprec_pages = \
 	man9/lis_ioc_fdetach.9.man \
 	man9/lis_ioc_pipe.9.man \
 	man9/lis__kfree.9.man \
+	man9/lis_kfree.9.man \
+	man9/lis_kmalloc.9.man \
 	man9/lis_kill_pg.9.man \
 	man9/lis_kill_proc.9.man \
 	man9/lis__kmalloc.9.man \
@@ -1456,7 +1459,7 @@ dist_noinst_lis_deprec_pages = \
 	man9/lis_valid_mod_list.9.man
 
 dist_noinst_lfs_compat_pages = \
-	man9/lfscompat.9.man \
+	man9/allocq.9.man \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
 	man9/apush_vml.9.man \
@@ -1465,6 +1468,7 @@ dist_noinst_lfs_compat_pages = \
 	man9/autopush_find.9.man \
 	man9/autopush_vml.9.man \
 	man9/bcanget.9.man \
+	man9/bcmp.9.man \
 	man9/canget.9.man \
 	man9/copyin.9.man \
 	man9/copyout.9.man \
@@ -1478,8 +1482,10 @@ dist_noinst_lfs_compat_pages = \
 	man9/drv_usectohz.9.man \
 	man9/drv_usecwait.9.man \
 	man9/enableq.9.man \
+	man9/freeq.9.man \
 	man9/getadmin.9.man \
 	man9/getmid.9.man \
+	man9/lfscompat.9.man \
 	man9/linkmsg.9.man \
 	man9/pcmsg.9.man \
 	man9/putctl2.9.man \
@@ -1488,11 +1494,11 @@ dist_noinst_lfs_compat_pages = \
 	man9/register_strdrv.9.man \
 	man9/register_strmod.9.man \
 	man9/register_strnod.9.man \
+	man9/strlog.9.man \
 	man9/unregister_strdev.9.man \
 	man9/unregister_strdrv.9.man \
 	man9/unregister_strmod.9.man \
 	man9/unregister_strnod.9.man \
-	man9/strlog.9.man \
 	man9/vstrlog.9.man
 
 dist_noinst_mac_unimpl_pages = \

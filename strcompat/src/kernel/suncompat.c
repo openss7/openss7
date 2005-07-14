@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/14 03:40:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 03:40:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/14 03:40:13 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/14 03:40:13 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/12 13:54:46 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/14 03:40:13 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -546,7 +546,6 @@ EXPORT_SYMBOL(ddi_prop_op);
 struct mod_ops mod_strmops = { MODREV_1, 0, };
 EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
-#if LFS
 int mod_install(struct modlinkage *ml)
 {
 	/* FIXME: this is our register function, write it! */
@@ -558,13 +557,24 @@ int mod_install(struct modlinkage *ml)
 		return (DDI_FAILURE);
 	if (ml->ml_linkage[0] == (void *) &mod_strmops) {
 		struct modlstrmod *mod = ml->ml_linkage[0];
+		int err;
+#if LIS
+		struct streamtab *st = mod->strmod_fmodsw->f_str;
+		if ((err = lis_register_strmod(st, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
+			/* for LiS we save the modid in the mi_idnum */
+			st->st_rdinit->qi_minfo->mi_idnum = err;
+			return (DDI_SUCCESS);
+		}
+		return (-err);
+#endif
+#if LFS
 		/* registering a module */
 		struct fmodsw *fmod;
-		int err;
 		/* FIXME: write this */
 		if ((fmod = kmem_zalloc(sizeof(*fmod), KM_NOSLEEP))) {
-			fmod->f_name = mod->strmod_fmodsw->f_str->st_rdinit->qi_minfo->mi_idname;
-			fmod->f_str = mod->strmod_fmodsw->f_str;
+			struct streamtab *st = mod->strmod_fmodsw->f_str;
+			fmod->f_name = st->st_rdinit->qi_minfo->mi_idname;
+			fmod->f_str = st;
 			fmod->f_flag = mod->strmod_fmodsw->f_flag;
 			fmod->f_kmod = NULL;
 			atomic_set(&fmod->f_count, 0);
@@ -576,16 +586,28 @@ int mod_install(struct modlinkage *ml)
 			}
 			return (DDI_SUCCESS);
 		}
+#endif
 	} else {
 		struct modldrv *drv = ml->ml_linkage[0];
+		int err;
+#if LIS
+		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+		if ((err =
+		     lis_register_strdev(0, st, 255, st->st_rdinit->qi_minfo->mi_idname)) >= 0) {
+			/* for LiS we save the major in the mi_idnum */
+			st->st_rdinit->qi_minfo->mi_idnum = err;
+			return (DDI_SUCCESS);
+		}
+		return (-err);
+#endif
+#if LFS
 		/* registering a driver */
 		struct cdevsw *cdev;
-		int err;
 		if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP))) {
 			/* call device attach function to get node information */
-			cdev->d_name =
-			    drv->drv_dev_ops->devo_cb_ops->cb_str->st_rdinit->qi_minfo->mi_idname;
-			cdev->d_str = drv->drv_dev_ops->devo_cb_ops->cb_str;
+			struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+			cdev->d_name = st->st_rdinit->qi_minfo->mi_idname;
+			cdev->d_str = st;
 			cdev->d_flag = drv->drv_dev_ops->devo_cb_ops->cb_flag;	/* convert these? */
 			cdev->d_kmod = NULL;
 			atomic_set(&cdev->d_count, 0);
@@ -599,11 +621,13 @@ int mod_install(struct modlinkage *ml)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
+#endif
 	}
 	return (ENOMEM);
 }
 
 EXPORT_SYMBOL(mod_install);	/* strconf.h */
+
 int mod_remove(struct modlinkage *ml)
 {
 	/* FIXME: this is our unregister function, write it! */
@@ -616,9 +640,17 @@ int mod_remove(struct modlinkage *ml)
 	if (ml->ml_linkage[0] == (void *) &mod_strmops) {
 		/* was a module */
 		struct modlstrmod *mod = ml->ml_linkage[0];
-		struct fmodsw *fmod;
 		int err;
-		if ((fmod = fmod_str(mod->strmod_fmodsw->f_str))) {
+#if LIS
+		struct streamtab *st = mod->strmod_fmodsw->f_str;
+		if ((err = lis_unregister_strmod(st)) >= 0)
+			return (DDI_SUCCESS);
+		return (-err);
+#endif
+#if LFS
+		struct fmodsw *fmod;
+		struct streamtab *st = mod->strmod_fmodsw->f_str;
+		if ((fmod = fmod_str(st))) {
 			printd(("%s: %s: streams module\n", __FUNCTION__, fmod->f_name));
 			err = unregister_strmod(fmod);
 			printd(("%s: %s: putting module\n", __FUNCTION__, fmod->f_name));
@@ -627,28 +659,38 @@ int mod_remove(struct modlinkage *ml)
 				kmem_free(fmod, sizeof(*fmod));
 			return (-err);
 		}
+#endif
 	} else {
 		/* was a driver */
 		struct modldrv *drv = ml->ml_linkage[0];
-		struct cdevsw *cdev;
 		int err;
-		if ((cdev = cdev_str(drv->drv_dev_ops->devo_cb_ops->cb_str))) {
+#if LIS
+		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+		if ((err = lis_unregister_strdev(st->st_rdinit->qi_minfo->mi_idnum)) >= 0)
+			return (DDI_SUCCESS);
+		return (-err);
+#endif
+#if LFS
+		struct cdevsw *cdev;
+		struct streamtab *st = drv->drv_dev_ops->devo_cb_ops->cb_str;
+		if ((cdev = cdev_str(st))) {
 			if ((err = unregister_strdev(cdev, 0)) == 0)
 				kmem_free(cdev, sizeof(*cdev));
 			return (-err);
 		}
+#endif
 	}
 	return (ENXIO);
 }
 
 EXPORT_SYMBOL(mod_remove);	/* strconf.h */
+
 int mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */
 }
 
 EXPORT_SYMBOL(mod_info);	/* strconf.h */
-#endif
 
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 static

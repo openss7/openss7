@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/12 08:42:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/14 03:39:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/12 08:42:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 03:39:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,10 +57,46 @@ if PKG_BUILD_INDEP
 
 SUBDIRS = . man manual
 
+##
+## The following symbols are exposed by the header files (to ctags) but are only
+## conditionally exposed.  These symbols would generate an unexported symbol
+## error unless we list them here and tell check_decls about them.  We use
+## AM_EXPOSED_SYMBOLS here and leave the EXPOSED_SYMBOLS susbtitution variable
+## available to configure.  We should actually use configure to assemble this
+## list: that is, when we check for support for the symbol and find that it is
+## not supported, we should add it to the EXPOSED_SYMBOLS list in configure.
+## We list them here manually for the moment.
+##
+# Can't support qwait or qwait_sig on LiS without additional support from LiS.
+# Use SV_WAIT in qopen/qclose and SV_SIGNAL or SV_BROADCAST in put or srv
+# procedure instead.
+#
+# Can't support wantio in LiS at all.
+##
+AM_EXPOSED_SYMBOLS 	= lis_osif_pci_dac_dma_sync_single \
+			  lis_osif_pci_dma_sync_sg \
+			  lis_osif_pci_dma_sync_single \
+			  lis_osif_pci_find_class \
+			  lis_pcibios_find_class \
+			  lis_pcibios_find_device \
+			  lis_pcibios_init \
+			  lis_pcibios_present \
+			  lis_pcibios_read_config_byte \
+			  lis_pcibios_read_config_dword \
+			  lis_pcibios_read_config_word \
+			  lis_pcibios_write_config_byte \
+			  lis_pcibios_write_config_dword \
+			  lis_pcibios_write_config_word \
+			  qwait \
+			  qwait_sig \
+			  wantio
+
+
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
-TESTS_ENVIRONMENT	+= PKG_MANPATH='$(PKG_MANPATH)' \
+TESTS_ENVIRONMENT	+= EXPOSED_SYMBOLS='$(EXPOSED_SYMBOLS) $(AM_EXPOSED_SYMBOLS)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= $(top_builddir)/check_decls.log
 DISTCLEANFILES		+= *.err *.out
@@ -69,3 +105,5 @@ endif
 
 ## PKG_BUILD_INDEP
 endif
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
