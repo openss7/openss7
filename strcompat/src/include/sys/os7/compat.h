@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.21 2005/07/13 01:40:38 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.22 2005/07/14 22:03:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:40:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:55 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -96,6 +96,12 @@ typedef void irqreturn_t;
 
 #define _OS7_SOURCE
 
+#if LIS
+/* LIS forgets to typedef these */
+typedef int bcid_t;
+typedef int bufcall_id_t;
+#endif
+
 #include <sys/stream.h>
 #ifdef LFS
 #include <sys/strsubr.h>
@@ -109,9 +115,6 @@ union ioctypes {
 	struct copyreq copyreq;
 	struct copyresp copyresp;
 };
-/* LIS forgets to typedef these */
-typedef int bcid_t;
-typedef int bufcall_id_t;
 #endif
 
 #include <sys/cmn_err.h>

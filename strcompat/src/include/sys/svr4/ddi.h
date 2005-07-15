@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.16 2005/07/14 03:40:09 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.17 2005/07/14 22:04:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:09 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:04 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 03:40:09 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 22:04:04 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -68,25 +68,6 @@
 #endif
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
-
-/* don't use these functions, they are way too dangerous */
-struct stdata;
-extern long MPSTR_QLOCK(queue_t *q);
-#ifndef MPSTR_QLOCK
-#define MPSTR_QLOCK(__q) MPSTR_QLOCK(__q)
-#endif
-extern void MPSTR_QRELE(queue_t *q, long s);
-#ifndef MPSTR_QRELE
-#define MPSTR_QRELE(__q,__f) MPSTR_QRELE(__q,__f)
-#endif
-extern long MPSTR_STPLOCK(struct stdata *stp);
-#ifndef MPSTR_STPLOCK
-#define MPSTR_STPLOCK(__s) MPSTR_STPLOCK(__s)
-#endif
-extern void MPSTR_STPRELE(struct stdata *stp, long s);
-#ifndef MPSTR_STPRELE
-#define MPSTR_STPRELE(__s,__f) MPSTR_STPRELE(__s,__f)
-#endif
 
 typedef spinlock_t lock_t;
 

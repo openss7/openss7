@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.13 $) $Date: 2005/07/14 03:39:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2005/07/14 22:03:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 03:39:48 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:03:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,8 +58,6 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 junk_pages = \
-	man9/allocq.9 \
-	man9/freeq.9 \
 	man9/mknod.9 \
 	man9/mount.9 \
 	man9/umount2.9 \
@@ -106,7 +104,8 @@ deprec_pages = \
 
 MANS_UNUSED = \
 	man2/poll.2s \
-	man9/Intro.9
+	man9/Intro.9 \
+	$(deprec_pages)
 
 man_MANS = \
 	man1/oc.1 \
@@ -157,6 +156,7 @@ man_MANS = \
 	man8/thrtst.8 \
 	man8/timetst.8 \
 	man9/LiS.9 \
+	man9/LisSetCounter.9 \
 	man9/LisUpCounter.9 \
 	man9/OTHER.9 \
 	man9/OTHERQ.9 \
@@ -184,6 +184,7 @@ man_MANS = \
 	man9/adjmsg.9 \
 	man9/allocb.9 \
 	man9/allocb_physreq.9 \
+	man9/allocq.9 \
 	man9/appq.9 \
 	man9/backq.9 \
 	man9/bcanput.9 \
@@ -207,7 +208,9 @@ man_MANS = \
 	man9/flushq.9 \
 	man9/freeb.9 \
 	man9/freemsg.9 \
+	man9/freeq.9 \
 	man9/freezestr.9 \
+	man9/frtn_t.9 \
 	man9/getmajor.9 \
 	man9/getminor.9 \
 	man9/getq.9 \
@@ -220,6 +223,7 @@ man_MANS = \
 	man9/linkb.9 \
 	man9/lis__kfree.9 \
 	man9/lis__kmalloc.9 \
+	man9/lis_add_timer.9 \
 	man9/lis_add_to_elist.9 \
 	man9/lis_adjmsg.9 \
 	man9/lis_alloc_atomic_fcn.9 \
@@ -259,6 +263,7 @@ man_MANS = \
 	man9/lis_check_mem.9 \
 	man9/lis_check_mem_region.9 \
 	man9/lis_check_q_magic.9 \
+	man9/lis_check_region.9 \
 	man9/lis_check_umem.9 \
 	man9/lis_cleanup_file_closing.9 \
 	man9/lis_cleanup_file_opening.9 \
@@ -280,6 +285,7 @@ man_MANS = \
 	man9/lis_debug_mask2.9 \
 	man9/lis_defer_msg.9 \
 	man9/lis_del_from_elist.9 \
+	man9/lis_del_timer.9 \
 	man9/lis_deprec.9 \
 	man9/lis_dget.9 \
 	man9/lis_disable_irq.9 \
@@ -315,6 +321,7 @@ man_MANS = \
 	man9/lis_flushq.9 \
 	man9/lis_fmod_sw.9 \
 	man9/lis_free.9 \
+	man9/lis_free_all_pages.9 \
 	man9/lis_free_dma.9 \
 	man9/lis_free_elist.9 \
 	man9/lis_free_irq.9 \
@@ -323,6 +330,7 @@ man_MANS = \
 	man9/lis_free_passfp.9 \
 	man9/lis_free_timer.9 \
 	man9/lis_freeb.9 \
+	man9/lis_freedb.9 \
 	man9/lis_freemsg.9 \
 	man9/lis_freeq.9 \
 	man9/lis_freezestr.9 \
@@ -332,6 +340,7 @@ man_MANS = \
 	man9/lis_get_free_pages_atomic_fcn.9 \
 	man9/lis_get_free_pages_fcn.9 \
 	man9/lis_get_free_pages_kernel_fcn.9 \
+	man9/lis_get_pipe.9 \
 	man9/lis_getint.9 \
 	man9/lis_getmajor.9 \
 	man9/lis_getminor.9 \
@@ -355,6 +364,7 @@ man_MANS = \
 	man9/lis_initialize_dki.9 \
 	man9/lis_inode_str.9 \
 	man9/lis_insq.9 \
+	man9/lis_interruptible_sleep_on.9 \
 	man9/lis_interruptible_sleep_on_timeout.9 \
 	man9/lis_ioc_fattach.9 \
 	man9/lis_ioc_fdetach.9 \
@@ -381,6 +391,7 @@ man_MANS = \
 	man9/lis_loadable_load.9 \
 	man9/lis_loadmod.9 \
 	man9/lis_lockq_fcn.9 \
+	man9/lis_maj_min_name.9 \
 	man9/lis_major.9 \
 	man9/lis_makedevice.9 \
 	man9/lis_malloc.9 \
@@ -396,7 +407,9 @@ man_MANS = \
 	man9/lis_mntget_fcn.9 \
 	man9/lis_mntput.9 \
 	man9/lis_mntput_fcn.9 \
+	man9/lis_modget_dbg.9 \
 	man9/lis_modget_local.9 \
+	man9/lis_modput_dbg.9 \
 	man9/lis_modput_local.9 \
 	man9/lis_mount.9 \
 	man9/lis_msecs.9 \
@@ -417,6 +430,7 @@ man_MANS = \
 	man9/lis_osif_do_settimeofday.9 \
 	man9/lis_osif_pci_alloc_consistent.9 \
 	man9/lis_osif_pci_dac_dma_supported.9 \
+	man9/lis_osif_pci_dac_dma_sync_single.9 \
 	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9 \
 	man9/lis_osif_pci_dac_dma_sync_single_for_device.9 \
 	man9/lis_osif_pci_dac_dma_to_offset.9 \
@@ -425,7 +439,10 @@ man_MANS = \
 	man9/lis_osif_pci_dac_set_dma_mask.9 \
 	man9/lis_osif_pci_disable_device.9 \
 	man9/lis_osif_pci_dma_supported.9 \
+	man9/lis_osif_pci_dma_sync_sg.9 \
+	man9/lis_osif_pci_dma_sync_single.9 \
 	man9/lis_osif_pci_enable_device.9 \
+	man9/lis_osif_pci_find_class.9 \
 	man9/lis_osif_pci_find_device.9 \
 	man9/lis_osif_pci_find_slot.9 \
 	man9/lis_osif_pci_free_consistent.9 \
@@ -455,7 +472,9 @@ man_MANS = \
 	man9/lis_pci_dma_handle_to_32.9 \
 	man9/lis_pci_dma_handle_to_64.9 \
 	man9/lis_pci_dma_supported.9 \
+	man9/lis_pci_dma_sync_single.9 \
 	man9/lis_pci_enable_device.9 \
+	man9/lis_pci_find_class.9 \
 	man9/lis_pci_find_device.9 \
 	man9/lis_pci_find_slot.9 \
 	man9/lis_pci_free_consistent.9 \
@@ -483,11 +502,15 @@ man_MANS = \
 	man9/lis_phys_to_virt.9 \
 	man9/lis_pipe.9 \
 	man9/lis_poll_2_1.9 \
+	man9/lis_poll_events.9 \
 	man9/lis_print_block.9 \
 	man9/lis_print_data.9 \
 	man9/lis_print_mem.9 \
 	man9/lis_print_msg.9 \
 	man9/lis_print_queue.9 \
+	man9/lis_print_queues.9 \
+	man9/lis_print_spl_track.9 \
+	man9/lis_print_stream.9 \
 	man9/lis_printk.9 \
 	man9/lis_pullupmsg.9 \
 	man9/lis_put_inode.9 \
@@ -564,7 +587,9 @@ man_MANS = \
 	man9/lis_set_up_inode.9 \
 	man9/lis_setq.9 \
 	man9/lis_setqsched.9 \
+	man9/lis_sleep_on.9 \
 	man9/lis_sleep_on_read_sem.9 \
+	man9/lis_sleep_on_timeout.9 \
 	man9/lis_sleep_on_wioc.9 \
 	man9/lis_sleep_on_wiocing.9 \
 	man9/lis_sleep_on_wopen.9 \
@@ -581,8 +606,11 @@ man_MANS = \
 	man9/lis_spin_unlock_fcn.9 \
 	man9/lis_spin_unlock_irq_fcn.9 \
 	man9/lis_spin_unlock_irqrestore_fcn.9 \
+	man9/lis_spl0.9 \
 	man9/lis_spl0_fcn.9 \
+	man9/lis_splstr.9 \
 	man9/lis_splstr_fcn.9 \
+	man9/lis_splx.9 \
 	man9/lis_splx_fcn.9 \
 	man9/lis_sprintf.9 \
 	man9/lis_stat_neg.9 \
@@ -612,6 +640,7 @@ man_MANS = \
 	man9/lis_sys_fdetach.9 \
 	man9/lis_sys_pipe.9 \
 	man9/lis_syspoll.9 \
+	man9/lis_target_time.9 \
 	man9/lis_task_to_creds.9 \
 	man9/lis_terminate_bufcall.9 \
 	man9/lis_terminate_dki.9 \
@@ -625,6 +654,7 @@ man_MANS = \
 	man9/lis_testb.9 \
 	man9/lis_thread_start.9 \
 	man9/lis_thread_stop.9 \
+	man9/lis_time_till.9 \
 	man9/lis_timeout_fcn.9 \
 	man9/lis_tmout.9 \
 	man9/lis_udelay.9 \
@@ -657,6 +687,7 @@ man_MANS = \
 	man9/lis_wake_up_all_wwrite.9 \
 	man9/lis_wake_up_interruptible.9 \
 	man9/lis_wake_up_read_sem.9 \
+	man9/lis_wake_up_wread.9 \
 	man9/lis_wake_up_wwrite.9 \
 	man9/lis_xmsgsize.9 \
 	man9/lis_zmalloc.9 \
@@ -683,46 +714,25 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/sparc_ioremap.9 \
+	man9/spl0.9 \
+	man9/splstr.9 \
+	man9/splx.9 \
 	man9/strqget.9 \
 	man9/strqset.9 \
 	man9/testb.9 \
 	man9/timeout.9 \
+	man9/timeout_id_t.9 \
+	man9/timo_fcn_t.9 \
+	man9/tmout_fcn_t.9 \
+	man9/toid_t.9 \
 	man9/unbufcall.9 \
 	man9/unfreezestr.9 \
 	man9/unlinkb.9 \
 	man9/untimeout.9 \
-	man9/lis_add_timer.9 \
-	man9/lis_check_region.9 \
-	man9/lis_del_timer.9 \
-	man9/lis_freedb.9 \
-	man9/lis_get_pipe.9 \
-	man9/lis_interruptible_sleep_on.9 \
-	man9/lis_maj_min_name.9 \
-	man9/lis_osif_pci_dac_dma_sync_single.9 \
-	man9/lis_osif_pci_dma_sync_sg.9 \
-	man9/lis_osif_pci_dma_sync_single.9 \
-	man9/lis_osif_pci_find_class.9 \
-	man9/lis_pci_dma_sync_single.9 \
-	man9/lis_pci_find_class.9 \
-	man9/lis_poll_events.9 \
-	man9/lis_print_queues.9 \
-	man9/lis_print_spl_track.9 \
-	man9/lis_print_stream.9 \
-	man9/lis_sleep_on.9 \
-	man9/lis_sleep_on_timeout.9 \
-	man9/lis_free_all_pages.9 \
-	man9/lis_modget_dbg.9 \
-	man9/lis_modput_dbg.9 \
-	man9/lis_target_time.9 \
-	man9/lis_time_till.9 \
-	man9/LisSetCounter.9 \
-	man9/lis_wake_up_wread.9 \
 	man9/xmsgsize.9 \
 	$(MANS_UNUSED)
 
 dist_noinst_junk_pages = \
-	man9/allocq.9.man \
-	man9/freeq.9.man \
 	man9/mknod.9.man \
 	man9/mount.9.man \
 	man9/umount2.9.man \
@@ -818,6 +828,7 @@ dist_noinst_MANS = \
 	man8/timetst.8.man \
 	man9/Intro.9.man \
 	man9/LiS.9.man \
+	man9/LisSetCounter.9.man \
 	man9/LisUpCounter.9.man \
 	man9/OTHER.9.man \
 	man9/OTHERQ.9.man \
@@ -845,6 +856,7 @@ dist_noinst_MANS = \
 	man9/adjmsg.9.man \
 	man9/allocb.9.man \
 	man9/allocb_physreq.9.man \
+	man9/allocq.9.man \
 	man9/appq.9.man \
 	man9/backq.9.man \
 	man9/bcanput.9.man \
@@ -868,7 +880,9 @@ dist_noinst_MANS = \
 	man9/flushq.9.man \
 	man9/freeb.9.man \
 	man9/freemsg.9.man \
+	man9/freeq.9.man \
 	man9/freezestr.9.man \
+	man9/frtn_t.9.man \
 	man9/getmajor.9.man \
 	man9/getminor.9.man \
 	man9/getq.9.man \
@@ -881,6 +895,7 @@ dist_noinst_MANS = \
 	man9/linkb.9.man \
 	man9/lis__kfree.9.man \
 	man9/lis__kmalloc.9.man \
+	man9/lis_add_timer.9.man \
 	man9/lis_add_to_elist.9.man \
 	man9/lis_adjmsg.9.man \
 	man9/lis_alloc_atomic_fcn.9.man \
@@ -920,6 +935,7 @@ dist_noinst_MANS = \
 	man9/lis_check_mem.9.man \
 	man9/lis_check_mem_region.9.man \
 	man9/lis_check_q_magic.9.man \
+	man9/lis_check_region.9.man \
 	man9/lis_check_umem.9.man \
 	man9/lis_cleanup_file_closing.9.man \
 	man9/lis_cleanup_file_opening.9.man \
@@ -941,6 +957,7 @@ dist_noinst_MANS = \
 	man9/lis_debug_mask2.9.man \
 	man9/lis_defer_msg.9.man \
 	man9/lis_del_from_elist.9.man \
+	man9/lis_del_timer.9.man \
 	man9/lis_deprec.9.man \
 	man9/lis_dget.9.man \
 	man9/lis_disable_irq.9.man \
@@ -976,6 +993,7 @@ dist_noinst_MANS = \
 	man9/lis_flushq.9.man \
 	man9/lis_fmod_sw.9.man \
 	man9/lis_free.9.man \
+	man9/lis_free_all_pages.9.man \
 	man9/lis_free_dma.9.man \
 	man9/lis_free_elist.9.man \
 	man9/lis_free_irq.9.man \
@@ -984,6 +1002,7 @@ dist_noinst_MANS = \
 	man9/lis_free_passfp.9.man \
 	man9/lis_free_timer.9.man \
 	man9/lis_freeb.9.man \
+	man9/lis_freedb.9.man \
 	man9/lis_freemsg.9.man \
 	man9/lis_freeq.9.man \
 	man9/lis_freezestr.9.man \
@@ -993,6 +1012,7 @@ dist_noinst_MANS = \
 	man9/lis_get_free_pages_atomic_fcn.9.man \
 	man9/lis_get_free_pages_fcn.9.man \
 	man9/lis_get_free_pages_kernel_fcn.9.man \
+	man9/lis_get_pipe.9.man \
 	man9/lis_getint.9.man \
 	man9/lis_getmajor.9.man \
 	man9/lis_getminor.9.man \
@@ -1016,6 +1036,7 @@ dist_noinst_MANS = \
 	man9/lis_initialize_dki.9.man \
 	man9/lis_inode_str.9.man \
 	man9/lis_insq.9.man \
+	man9/lis_interruptible_sleep_on.9.man \
 	man9/lis_interruptible_sleep_on_timeout.9.man \
 	man9/lis_ioc_fattach.9.man \
 	man9/lis_ioc_fdetach.9.man \
@@ -1042,6 +1063,7 @@ dist_noinst_MANS = \
 	man9/lis_loadable_load.9.man \
 	man9/lis_loadmod.9.man \
 	man9/lis_lockq_fcn.9.man \
+	man9/lis_maj_min_name.9.man \
 	man9/lis_major.9.man \
 	man9/lis_makedevice.9.man \
 	man9/lis_malloc.9.man \
@@ -1057,7 +1079,9 @@ dist_noinst_MANS = \
 	man9/lis_mntget_fcn.9.man \
 	man9/lis_mntput.9.man \
 	man9/lis_mntput_fcn.9.man \
+	man9/lis_modget_dbg.9.man \
 	man9/lis_modget_local.9.man \
+	man9/lis_modput_dbg.9.man \
 	man9/lis_modput_local.9.man \
 	man9/lis_mount.9.man \
 	man9/lis_msecs.9.man \
@@ -1078,6 +1102,7 @@ dist_noinst_MANS = \
 	man9/lis_osif_do_settimeofday.9.man \
 	man9/lis_osif_pci_alloc_consistent.9.man \
 	man9/lis_osif_pci_dac_dma_supported.9.man \
+	man9/lis_osif_pci_dac_dma_sync_single.9.man \
 	man9/lis_osif_pci_dac_dma_sync_single_for_cpu.9.man \
 	man9/lis_osif_pci_dac_dma_sync_single_for_device.9.man \
 	man9/lis_osif_pci_dac_dma_to_offset.9.man \
@@ -1086,7 +1111,10 @@ dist_noinst_MANS = \
 	man9/lis_osif_pci_dac_set_dma_mask.9.man \
 	man9/lis_osif_pci_disable_device.9.man \
 	man9/lis_osif_pci_dma_supported.9.man \
+	man9/lis_osif_pci_dma_sync_sg.9.man \
+	man9/lis_osif_pci_dma_sync_single.9.man \
 	man9/lis_osif_pci_enable_device.9.man \
+	man9/lis_osif_pci_find_class.9.man \
 	man9/lis_osif_pci_find_device.9.man \
 	man9/lis_osif_pci_find_slot.9.man \
 	man9/lis_osif_pci_free_consistent.9.man \
@@ -1116,7 +1144,9 @@ dist_noinst_MANS = \
 	man9/lis_pci_dma_handle_to_32.9.man \
 	man9/lis_pci_dma_handle_to_64.9.man \
 	man9/lis_pci_dma_supported.9.man \
+	man9/lis_pci_dma_sync_single.9.man \
 	man9/lis_pci_enable_device.9.man \
+	man9/lis_pci_find_class.9.man \
 	man9/lis_pci_find_device.9.man \
 	man9/lis_pci_find_slot.9.man \
 	man9/lis_pci_free_consistent.9.man \
@@ -1144,11 +1174,15 @@ dist_noinst_MANS = \
 	man9/lis_phys_to_virt.9.man \
 	man9/lis_pipe.9.man \
 	man9/lis_poll_2_1.9.man \
+	man9/lis_poll_events.9.man \
 	man9/lis_print_block.9.man \
 	man9/lis_print_data.9.man \
 	man9/lis_print_mem.9.man \
 	man9/lis_print_msg.9.man \
 	man9/lis_print_queue.9.man \
+	man9/lis_print_queues.9.man \
+	man9/lis_print_spl_track.9.man \
+	man9/lis_print_stream.9.man \
 	man9/lis_printk.9.man \
 	man9/lis_pullupmsg.9.man \
 	man9/lis_put_inode.9.man \
@@ -1225,7 +1259,9 @@ dist_noinst_MANS = \
 	man9/lis_set_up_inode.9.man \
 	man9/lis_setq.9.man \
 	man9/lis_setqsched.9.man \
+	man9/lis_sleep_on.9.man \
 	man9/lis_sleep_on_read_sem.9.man \
+	man9/lis_sleep_on_timeout.9.man \
 	man9/lis_sleep_on_wioc.9.man \
 	man9/lis_sleep_on_wiocing.9.man \
 	man9/lis_sleep_on_wopen.9.man \
@@ -1242,8 +1278,11 @@ dist_noinst_MANS = \
 	man9/lis_spin_unlock_fcn.9.man \
 	man9/lis_spin_unlock_irq_fcn.9.man \
 	man9/lis_spin_unlock_irqrestore_fcn.9.man \
+	man9/lis_spl0.9.man \
 	man9/lis_spl0_fcn.9.man \
+	man9/lis_splstr.9.man \
 	man9/lis_splstr_fcn.9.man \
+	man9/lis_splx.9.man \
 	man9/lis_splx_fcn.9.man \
 	man9/lis_sprintf.9.man \
 	man9/lis_stat_neg.9.man \
@@ -1273,6 +1312,7 @@ dist_noinst_MANS = \
 	man9/lis_sys_fdetach.9.man \
 	man9/lis_sys_pipe.9.man \
 	man9/lis_syspoll.9.man \
+	man9/lis_target_time.9.man \
 	man9/lis_task_to_creds.9.man \
 	man9/lis_terminate_bufcall.9.man \
 	man9/lis_terminate_dki.9.man \
@@ -1286,6 +1326,7 @@ dist_noinst_MANS = \
 	man9/lis_testb.9.man \
 	man9/lis_thread_start.9.man \
 	man9/lis_thread_stop.9.man \
+	man9/lis_time_till.9.man \
 	man9/lis_timeout_fcn.9.man \
 	man9/lis_tmout.9.man \
 	man9/lis_udelay.9.man \
@@ -1318,6 +1359,7 @@ dist_noinst_MANS = \
 	man9/lis_wake_up_all_wwrite.9.man \
 	man9/lis_wake_up_interruptible.9.man \
 	man9/lis_wake_up_read_sem.9.man \
+	man9/lis_wake_up_wread.9.man \
 	man9/lis_wake_up_wwrite.9.man \
 	man9/lis_xmsgsize.9.man \
 	man9/lis_zmalloc.9.man \
@@ -1344,41 +1386,23 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/sparc_ioremap.9.man \
+	man9/spl0.9.man \
+	man9/splstr.9.man \
+	man9/splx.9.man \
 	man9/strqget.9.man \
 	man9/strqset.9.man \
 	man9/testb.9.man \
 	man9/timeout.9.man \
+	man9/timeout_id_t.9.man \
+	man9/timo_fcn_t.9.man \
+	man9/tmout_fcn_t.9.man \
+	man9/toid_t.9.man \
 	man9/unbufcall.9.man \
 	man9/unfreezestr.9.man \
 	man9/unlinkb.9.man \
 	man9/untimeout.9.man \
-	man9/lis_add_timer.9.man \
-	man9/lis_check_region.9.man \
-	man9/lis_del_timer.9.man \
-	man9/lis_freedb.9.man \
-	man9/lis_get_pipe.9.man \
-	man9/lis_interruptible_sleep_on.9.man \
-	man9/lis_maj_min_name.9.man \
-	man9/lis_osif_pci_dac_dma_sync_single.9.man \
-	man9/lis_osif_pci_dma_sync_sg.9.man \
-	man9/lis_osif_pci_dma_sync_single.9.man \
-	man9/lis_osif_pci_find_class.9.man \
-	man9/lis_pci_dma_sync_single.9.man \
-	man9/lis_pci_find_class.9.man \
-	man9/lis_poll_events.9.man \
-	man9/lis_print_queues.9.man \
-	man9/lis_print_spl_track.9.man \
-	man9/lis_print_stream.9.man \
-	man9/lis_sleep_on.9.man \
-	man9/lis_sleep_on_timeout.9.man \
-	man9/lis_free_all_pages.9.man \
-	man9/lis_modget_dbg.9.man \
-	man9/lis_modput_dbg.9.man \
-	man9/lis_target_time.9.man \
-	man9/lis_time_till.9.man \
-	man9/LisSetCounter.9.man \
-	man9/lis_wake_up_wread.9.man \
-	man9/xmsgsize.9.man
+	man9/xmsgsize.9.man \
+	$(dist_noinst_deprec_pages)
 
 ## PKG_BUILD_INDEP
 endif
@@ -1386,7 +1410,8 @@ endif
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
-TESTS_ENVIRONMENT	+= WARN_EXCESS=yes \
+TESTS_ENVIRONMENT	+= EXPOSED_SYMBOLS='$(EXPOSED_SYMBOLS) $(AM_EXPOSED_SYMBOLS)' \
+			   WARN_EXCESS=yes \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= $(top_builddir)/check_decls.log

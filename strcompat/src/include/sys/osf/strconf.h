@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2005/07/12 19:15:47 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2005/07/14 22:03:57 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:57 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_STRCONF_H__
 #define __SYS_OSF_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/12 19:15:47 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 22:03:57 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -73,6 +73,10 @@
 #include <sys/strcompat/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 #if 0				/* we don't support the static configuration */
 

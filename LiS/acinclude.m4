@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.31 $) $Date: 2005/07/13 01:37:11 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.32 $) $Date: 2005/07/14 22:03:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/13 01:37:11 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:03:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -440,6 +440,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
+    AC_SUBST([EXPOSED_SYMBOLS])dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
@@ -452,7 +453,19 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
-			num_online_cpus generic_delete_inode], [:], [:], [
+			num_online_cpus generic_delete_inode], [:], [
+			case "$lk_func" in
+			    pcibios_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			    pci_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_osif_${lk_func}"
+				;;
+			    *sleep_on*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			esac ], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

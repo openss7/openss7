@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:45 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:04:05  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:45  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SVR4_STREAM_H__
 #define __SYS_SVR4_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/svr4/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,24 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_SVR4 || defined CONFIG_STREAMS_COMPAT_SVR4_MODULE
+
+/* don't use these functions, they are way too dangerous */
+extern long MPSTR_QLOCK(queue_t *q);
+#ifndef MPSTR_QLOCK
+#define MPSTR_QLOCK(__q) MPSTR_QLOCK(__q)
+#endif
+extern void MPSTR_QRELE(queue_t *q, long s);
+#ifndef MPSTR_QRELE
+#define MPSTR_QRELE(__q,__f) MPSTR_QRELE(__q,__f)
+#endif
+extern long MPSTR_STPLOCK(struct stdata *stp);
+#ifndef MPSTR_STPLOCK
+#define MPSTR_STPLOCK(__s) MPSTR_STPLOCK(__s)
+#endif
+extern void MPSTR_STPRELE(struct stdata *stp, long s);
+#ifndef MPSTR_STPRELE
+#define MPSTR_STPRELE(__s,__f) MPSTR_STPRELE(__s,__f)
+#endif
 
 #elif defined _SVR4_SOURCE
 #warning "_SVR4_SOURCE defined by not CONFIG_STREAMS_COMPAT_SVR4"

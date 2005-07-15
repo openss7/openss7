@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/10 11:44:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:44:07 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:04:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -212,23 +212,26 @@ xnet_man_MANS	= \
 	man3/t_bind.3 \
 	man3/t_close.3 \
 	man3/t_connect.3 \
+	man3/t_errlist.3 \
 	man3/t_errno.3 \
 	man3/t_error.3 \
+	man3/t_errstr.3 \
 	man3/t_free.3 \
 	man3/t_getinfo.3 \
 	man3/t_getprotaddr.3 \
 	man3/t_getstate.3 \
 	man3/t_listen.3 \
 	man3/t_look.3 \
+	man3/t_nerr.3 \
 	man3/t_open.3 \
 	man3/t_optmgmt.3 \
 	man3/t_rcv.3 \
 	man3/t_rcvconnect.3 \
 	man3/t_rcvdis.3 \
 	man3/t_rcvleafchange.3 \
+	man3/t_rcvopt.3 \
 	man3/t_rcvrel.3 \
 	man3/t_rcvreldata.3 \
-	man3/t_rcvopt.3 \
 	man3/t_rcvudata.3 \
 	man3/t_rcvuderr.3 \
 	man3/t_rcvv.3 \
@@ -447,23 +450,26 @@ xnet_dist_noinst_MANS	= \
 	man3/t_bind.3.man \
 	man3/t_close.3.man \
 	man3/t_connect.3.man \
+	man3/t_errlist.3.man \
 	man3/t_errno.3.man \
 	man3/t_error.3.man \
+	man3/t_errstr.3.man \
 	man3/t_free.3.man \
 	man3/t_getinfo.3.man \
 	man3/t_getprotaddr.3.man \
 	man3/t_getstate.3.man \
 	man3/t_listen.3.man \
 	man3/t_look.3.man \
+	man3/t_nerr.3.man \
 	man3/t_open.3.man \
 	man3/t_optmgmt.3.man \
 	man3/t_rcv.3.man \
 	man3/t_rcvconnect.3.man \
 	man3/t_rcvdis.3.man \
 	man3/t_rcvleafchange.3.man \
+	man3/t_rcvopt.3.man \
 	man3/t_rcvrel.3.man \
 	man3/t_rcvreldata.3.man \
-	man3/t_rcvopt.3.man \
 	man3/t_rcvudata.3.man \
 	man3/t_rcvuderr.3.man \
 	man3/t_rcvv.3.man \

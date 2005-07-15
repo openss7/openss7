@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.16 2005/07/14 03:40:08 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.17 2005/07/14 22:03:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:08 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:49 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 03:40:08 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 22:03:49 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -80,17 +80,6 @@
 #if HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_irq() and friends */
 #endif
-
-#define LIS_MAXAPUSH	8
-#define LIS_FMNAMESZ	8
-struct lis_strapush {
-	unsigned sap_cmd;
-	unsigned long sap_major;
-	unsigned long sap_minor;
-	unsigned long sap_lastminor;
-	unsigned int sap_npush;
-	char sap_list[LIS_MAXAPUSH][LIS_FMNAMESZ + 1];
-};
 
 typedef volatile long lis_atomic_t;
 
@@ -157,19 +146,6 @@ typedef struct lis_pci_dev {
 	struct lis_pci_dev *next;
 } lis_pci_dev_t;
 
-typedef struct lis_strrecvfd {
-	union {
-		struct file *fp;
-		int fd;
-	} f;
-	uid_t uid;
-	gid_t gid;
-	struct {
-		struct file *fp;
-		struct stdata *hd;
-	} r;
-} strrecvfd_t;
-
 #ifndef dev_t
 #define dev_t __streams_dev_t
 #endif
@@ -182,12 +158,6 @@ extern void lis_add_timer(struct timer_list *timer) __depr;
 extern void *lis_alloc_atomic_fcn(int nbytes, char *file, int line) __depr;
 extern void *lis_alloc_dma_fcn(int nbytes, char *file, int line) __depr;
 extern void *lis_alloc_kernel_fcn(int nbytes, char *file, int line) __depr;
-extern int lis_apush_get(struct lis_strapush *ap) __depr;
-extern int lis_apush_set(struct lis_strapush *ap) __depr;
-extern int lis_apush_vml(struct str_list *slp) __depr;
-#if 0
-extern int lis_apushm(dev_t dev, const char *mods[]) __depr;
-#endif
 extern void lis_assert_fail(const char *expr, const char *objname, const char *file,
 			    unsigned int line) __depr;
 extern void lis_atomic_add(lis_atomic_t *atomic_addr, int amt) __depr;
@@ -202,11 +172,9 @@ extern void lis_bprintf(char *fmt, ...) __depr;
 extern int lis_can_unload(void) __depr;
 extern int lis_check_guard(void *ptr, char *msg) __depr;
 extern int lis_check_mem(void) __depr;
-extern int lis_check_q_magic(queue_t *q, char *file, int line) __depr;
 extern int lis_check_region(unsigned int from, unsigned int extent) __depr;
 extern int lis_check_umem(struct file *fp, int rd_wr_fcn, const void *usr_addr, int lgth) __depr;
 #endif
-extern int lis_clone_major(void) __depr;
 extern void lis_cmn_err(int err_lvl, char *fmt, ...) __depr;
 extern char lis_date[] __depr;
 extern unsigned long lis_debug_mask __depr;
@@ -226,43 +194,14 @@ extern unsigned long lis_dsecs(void) __depr;
 extern void lis_enable_intr(struct streamtab *strtab, int major, const char *name) __depr;
 #endif
 extern void lis_enable_irq(unsigned int irq) __depr;
-#if 0
-#if HAVE_KERNEL_FATTACH_SUPPORT
-extern int lis_fattach(struct file *f, const char *path) __depr;
-extern int lis_fdetach(const char *path) __depr;
-#endif
-extern void lis_fdetach_all(void) __depr;
-extern void lis_fdetach_stream(struct stdata *head) __depr;
-extern void lis_fifo_close_sync(struct inode *i, struct file *f) __depr;
-extern int lis_fifo_open_sync(struct inode *i, struct file *f) __depr;
-extern int lis_fifo_write_sync(struct inode *i, int written) __depr;
-extern struct inode *lis_file_inode(struct file *f) __depr;
-extern struct stdata *lis_file_str(struct file *f) __depr;
-extern streamtab_t *lis_find_strdev(major_t major) __depr;
-extern void lis_flush_print_buffer(void) __depr;
-extern struct fmodsw *lis_fmod_sw __depr;
-#endif
 extern void lis_free(void *ptr, char *file_name, int line_nr) __depr;
 extern void lis_free_dma(unsigned int dma_nr) __depr;
 extern void lis_free_irq(unsigned int irq, void *dev_id) __depr;
 extern void *lis_free_mem_fcn(void *mem_area, char *file, int line) __depr;
 extern void *lis_free_pages_fcn(void *ptr, char *file, int line) __depr;
-#if 0
-extern void lis_free_passfp(mblk_t *mp) __depr;
-extern void lis_freedb(mblk_t *bp, int free_hdr) __depr;
-#endif
-extern void lis_freezestr(queue_t *q);
-#if 0
-extern struct fmodsw *lis_fstr_sw __depr;
-extern int lis_get_fifo(struct file **f) __depr;
-#endif
 extern void *lis_get_free_pages_atomic_fcn(int nbytes, char *file, int line) __depr;
 extern void *lis_get_free_pages_fcn(int nbytes, int class, char *file, int line) __depr;
 extern void *lis_get_free_pages_kernel_fcn(int nbytes, char *file, int line) __depr;
-#if 0
-extern mblk_t *lis_get_passfp(void) __depr;
-extern int lis_get_pipe(struct file **f0, struct file **f1) __depr;
-#endif
 extern int lis_getint(unsigned char **p) __depr;
 extern void lis_gettimeofday(struct timeval *tv) __depr;
 extern unsigned long lis_hitime(void) __depr;
@@ -272,11 +211,6 @@ extern void lis_inc_mod_cnt_fcn(const char *file, int line) __depr;
 extern void lis_init_bufcall(void) __depr;
 #endif
 extern void lis_interruptible_sleep_on(wait_queue_head_t *wq) __depr;
-#if 0
-extern int lis_ioc_fattach(struct file *f, char *path) __depr;
-extern int lis_ioc_fdetach(char *path) __depr;
-extern int lis_ioc_pipe(unsigned int *fildes) __depr;
-#endif
 extern void *lis_ioremap(unsigned long offset, unsigned long size) __depr;
 extern void *lis_ioremap_nocache(unsigned long offset, unsigned long size) __depr;
 extern void lis_iounmap(void *ptr) __depr;
@@ -305,10 +239,6 @@ extern int lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long
 extern unsigned long lis_msecs(void) __depr;
 extern const char *lis_msg_type_name(mblk_t *mp) __depr;
 extern int lis_num_cpus __depr;
-#if 0
-extern struct inode *lis_old_inode(struct file *f, struct inode *i) __depr;
-extern lis_atomic_t lis_open_cnt __depr;
-#endif
 extern void lis_osif_cli(void) __depr;
 extern void lis_osif_do_gettimeofday(struct timeval *tp) __depr;
 #ifdef HAVE_TIMESPEC_DO_SETTIMEOFDAY
@@ -319,33 +249,17 @@ extern void lis_osif_do_settimeofday(struct timeval *tp) __depr;
 extern void lis_osif_sti(void) __depr;
 extern int lis_own_spl(void) __depr;
 extern void *lis_phys_to_virt(unsigned long addr) __depr;
-#if 0
-#if HAVE_KERNEL_PIPE_SUPPORT
-extern int lis_pipe(unsigned int *fd) __depr;
-#endif
-extern unsigned lis_poll_2_1(struct file *fp, poll_table * wait) __depr;
-extern unsigned lis_poll_bits(struct stdata *hd) __depr;
-extern char *lis_poll_events(short events) __depr;
-extern char *lis_poll_file __depr;
-#endif
 extern void lis_print_block(void *ptr) __depr;
 extern void lis_print_data(mblk_t *mp, int opt, int cont) __depr;
 extern void lis_print_mem(void) __depr;
 extern void lis_print_msg(mblk_t *mp, const char *prefix, int opt) __depr;
 extern void lis_print_queue(queue_t *q) __depr;
 #if 0
-extern void lis_print_queues(void) __depr;
 extern void lis_print_spl_track(void) __depr;
-extern void lis_print_stream(struct stdata *hd) __depr;
 #endif
 extern int lis_printk(const char *fmt, ...) __depr;
 extern void lis_putbyte(unsigned char **p, unsigned char byte) __depr;
 extern const char *lis_queue_name(queue_t *q) __depr;
-#if 0
-extern volatile unsigned long lis_queuerun_cnts[NR_CPUS] __depr;
-extern lis_atomic_t lis_queues_running __depr;
-extern int lis_recvfd(struct stdata *recvhd, strrecvfd_t * recv, struct file *fp) __depr;
-#endif
 extern void lis_release_region(unsigned int from, unsigned int extent) __depr;
 extern int lis_request_dma(unsigned int dma_nr, const char *device_id) __depr;
 #if HAVE_KTYPE_IRQRETURN_T
@@ -356,10 +270,6 @@ extern int lis_request_irq(unsigned int irq, void (*handler) (int, void *, struc
 			   unsigned long flags, const char *device, void *dev_id) __depr;
 #endif
 extern void lis_request_region(unsigned int from, unsigned int extent, const char *name) __depr;
-#if 0
-extern volatile unsigned long lis_runq_cnts[NR_CPUS] __depr;
-extern lis_atomic_t lis_runq_req_cnt __depr;
-#endif
 extern lis_rw_lock_t *lis_rw_lock_alloc_fcn(const char *name, char *file, int line) __depr;
 extern lis_rw_lock_t *lis_rw_lock_free_fcn(lis_rw_lock_t *lock, const char *name, char *file,
 					   int line) __depr;
@@ -382,13 +292,6 @@ extern unsigned long lis_secs(void) __depr;
 extern lis_semaphore_t *lis_sem_alloc(int count) __depr;
 extern lis_semaphore_t *lis_sem_destroy(lis_semaphore_t *lsem) __depr;
 extern void lis_sem_init(lis_semaphore_t *lsem, int count) __depr;
-#if 0
-extern int lis_sendfd(struct stdata *sendhd, unsigned int fd, struct file *fp) __depr;
-extern void lis_set_file_str(struct file *f, struct stdata *s) __depr;
-extern void lis_setqsched(int can_call) __depr;
-extern volatile unsigned long lis_setqsched_cnts[NR_CPUS] __depr;
-extern volatile unsigned long lis_setqsched_isr_cnts[NR_CPUS] __depr;
-#endif
 extern void lis_sleep_on(wait_queue_head_t *wq) __depr;
 extern int lis_spin_is_locked_fcn(lis_spin_lock_t *lock, char *file, int line) __depr;
 extern lis_spin_lock_t *lis_spin_lock_alloc_fcn(const char *name, char *file, int line) __depr;
@@ -405,27 +308,9 @@ extern void lis_spl0_fcn(char *file, int line) __depr;
 extern int lis_splstr_fcn(char *file, int line) __depr;
 extern void lis_splx_fcn(int x, char *file, int line) __depr;
 extern int lis_sprintf(char *bfr, const char *fmt, ...) __depr;
-#if 0
-extern lis_atomic_t lis_stdata_cnt __depr;
-extern int lis_strclose(struct inode *i, struct file *f) __depr;
-extern lis_atomic_t lis_strcount __depr;
-extern int lis_strgetpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int *bandp,
-			  int *flagsp, int doit) __depr;
-extern int lis_strioctl(struct inode *i, struct file *f, unsigned int cmd, unsigned long arg) __depr;
-#endif
 extern const char *lis_strm_name(struct stdata *head) __depr;
 extern const char *lis_strm_name_from_queue(queue_t *q) __depr;
-#if 0
-extern int lis_stropen(struct inode *i, struct file *f) __depr;
-#endif
 extern char *lis_stropts_file __depr;
-#if 0
-extern int lis_strputpmsg(struct inode *i, struct file *fp, void *ctlp, void *datp, int band,
-			  int flags) __depr;
-extern ssize_t lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op) __depr;
-extern lis_atomic_t lis_strstats[24][4] __depr;
-extern ssize_t lis_strwrite(struct file *fp, const char *ubuff, size_t ulen, loff_t *op) __depr;
-#endif
 extern pid_t lis_thread_start(int (*fcn) (void *), void *arg, const char *name) __depr;
 extern int lis_thread_stop(pid_t pid) __depr;
 extern void lis_udelay(long micro_secs) __depr;
@@ -436,9 +321,6 @@ extern int lis_unlink(char *name) __depr;
 extern void lis_up_fcn(lis_semaphore_t *lsem, char *file, int line) __depr;
 extern unsigned long lis_usecs(void) __depr;
 extern unsigned lis_usectohz(unsigned usec) __depr;
-#if 0
-extern int lis_valid_mod_list(struct str_list ml) __depr;
-#endif
 extern char lis_version[] __depr;
 extern void lis_vfree(void *ptr) __depr;
 extern unsigned long lis_virt_to_phys(volatile void *addr) __depr;
@@ -448,13 +330,6 @@ extern int lis_vsprintf(char *bfr, const char *fmt, va_list args) __depr;
 extern void lis_wake_up(wait_queue_head_t *wq) __depr;
 extern void lis_wake_up_interruptible(wait_queue_head_t *wq) __depr;
 extern void *lis_zmalloc(int nbytes, int class, char *file_name, int line_nr) __depr;
-
-/* defined in strconf.h */
-extern int lis_register_strdev(major_t major, struct streamtab *strtab, int nminor,
-			       const char *name) __depr;
-extern modID_t lis_register_strmod(struct streamtab *strtab, const char *name) __depr;
-extern int lis_unregister_strdev(major_t major) __depr;
-extern int lis_unregister_strmod(struct streamtab *strtab) __depr;
 
 #ifdef CONFIG_PCI
 #include <linux/pci.h>
@@ -549,63 +424,6 @@ extern int lis_pcibios_write_config_word(unsigned char bus, unsigned char dev_fn
 					 unsigned char where, unsigned short val) __depr;
 #endif
 
-__LIS_EXTERN_INLINE int lis_adjmsg(mblk_t *mp, int length)
-{
-	return adjmsg(mp, length);
-}
-__LIS_EXTERN_INLINE struct msgb *lis_allocb(int size, unsigned int priority, char *file_name,
-					    int line_nr)
-{
-	return allocb(size, priority);
-}
-__LIS_EXTERN_INLINE struct msgb *lis_allocb_physreq(int size, unsigned int priority,
-						    void *physreq_ptr, char *file_name, int line_nr)
-{
-	return allocb(size, priority);
-}
-#if 0
-__LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name)
-{
-	return allocq();
-}
-#endif
-__LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
-{
-	return appq(q, mp1, mp2);
-}
-__LIS_EXTERN_INLINE queue_t *lis_backq(queue_t *q)
-{
-	return backq(q);
-}
-__LIS_EXTERN_INLINE queue_t *lis_backq_fcn(queue_t *q, char *f, int l)
-{
-	return backq(q);
-}
-__LIS_EXTERN_INLINE int lis_bcanput(queue_t *q, unsigned char band)
-{
-	return bcanput(q, band);
-}
-__LIS_EXTERN_INLINE int lis_bcanputnext(queue_t *q, unsigned char band)
-{
-	return bcanputnext(q, band);
-}
-__LIS_EXTERN_INLINE int lis_bcanputnext_anyband(queue_t *q)
-{
-	return bcanputnext(q, ANYBAND);
-}
-__LIS_EXTERN_INLINE int lis_bufcall(unsigned size, int priority, void (*function) (long), long arg)
-{
-	return bufcall(size, priority, function, arg);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_copyb(mblk_t *mp)
-{
-	return copyb(mp);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_copymsg(mblk_t *mp)
-{
-	return copymsg(mp);
-}
-#if 0
 __LIS_EXTERN_INLINE int lis_copyin(struct file *fp, void *kbuf, const void *ubuf, int len)
 {
 	return copyin(ubuf, kbuf, len);
@@ -614,235 +432,11 @@ __LIS_EXTERN_INLINE int lis_copyout(struct file *fp, const void *kbuf, void *ubu
 {
 	return copyout(kbuf, ubuf, len);
 }
-#endif
-__LIS_EXTERN_INLINE mblk_t *lis_dupb(mblk_t *mp)
-{
-	return dupb(mp);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_dupmsg(mblk_t *mp)
-{
-	return dupmsg(mp);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_esballoc(unsigned char *base, int size, int priority,
-					 frtn_t *freeinfo, char *file_name, int line_nr)
-{
-	return esballoc(base, size, priority, freeinfo);
-}
-__LIS_EXTERN_INLINE int lis_esbbcall(int priority, void (*function) (long), long arg)
-{
-	return esbbcall(priority, function, arg);
-}
-__LIS_EXTERN_INLINE void lis_flushband(queue_t *q, unsigned char band, int flag)
-{
-	return flushband(q, band, flag);
-}
-__LIS_EXTERN_INLINE void lis_flushq(queue_t *q, int flag)
-{
-	return flushq(q, flag);
-}
-__LIS_EXTERN_INLINE void lis_freeb(mblk_t *bp)
-{
-	return freeb(bp);
-}
-__LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp)
-{
-	return freemsg(mp);
-}
-__LIS_EXTERN_INLINE void lis_freezestr(queue_t *q)
-{
-	return (void)freezestr(q);
-}
-#if 0
-__LIS_EXTERN_INLINE void lis_freeq(queue_t *q)
-{
-	return freeq(q);
-}
-#endif
-__LIS_EXTERN_INLINE mblk_t *lis_getq(queue_t *q)
-{
-	return getq(q);
-}
 
-__LIS_EXTERN_INLINE int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
-{
-	return insq(q, emp, mp);
-}
-
-__LIS_EXTERN_INLINE void lis_linkb(mblk_t *mp1, mblk_t *mp2)
-{
-	return linkb(mp1, mp2);
-}
-__LIS_EXTERN_INLINE int lis_max(int a, int b)
-{
-	return max(a, b);
-}
-__LIS_EXTERN_INLINE int lis_min(int a, int b)
-{
-	return min(a, b);
-}
-__LIS_EXTERN_INLINE int lis_msgdsize(mblk_t *mp)
-{
-	return msgdsize(mp);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_msgpullup(mblk_t *mp, int len)
-{
-	return msgpullup(mp, len);
-}
-__LIS_EXTERN_INLINE int lis_msgsize(mblk_t *mp)
-{
-	return msgsize(mp);
-}
-__LIS_EXTERN_INLINE int lis_pullupmsg(mblk_t *mp, int length)
-{
-	return pullupmsg(mp, length);
-}
-__LIS_EXTERN_INLINE int lis_putbq(queue_t *q, mblk_t *mp)
-{
-	return putbq(q, mp);
-}
-__LIS_EXTERN_INLINE int lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
-{
-	return putctl(q, type);
-}
-__LIS_EXTERN_INLINE int lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
-{
-	return putctl1(q, type, param);
-}
-__LIS_EXTERN_INLINE int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
-{
-	return putnextctl(q, type);
-}
-__LIS_EXTERN_INLINE int lis_putnextctl1(queue_t *q, int type, int param, char *file_name,
-					int line_nr)
-{
-	return putnextctl1(q, type, param);
-}
-__LIS_EXTERN_INLINE int lis_putq(queue_t *q, mblk_t *mp)
-{
-	return putq(q, mp);
-}
-__LIS_EXTERN_INLINE int lis_qcountstrm(queue_t *q)
-{
-	return qcountstrm(q);
-}
-#if 0
-__LIS_EXTERN_INLINE void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
-{
-	return (void) qdetach(q, flag, creds);
-}
-#endif
-__LIS_EXTERN_INLINE void lis_qenable(queue_t *q)
-{
-	return qenable(q);
-}
-__LIS_EXTERN_INLINE void lis_qprocsoff(queue_t *rdq)
-{
-	return qprocsoff(rdq);
-}
-__LIS_EXTERN_INLINE void lis_qprocson(queue_t *rdq)
-{
-	return qprocson(rdq);
-}
-__LIS_EXTERN_INLINE int lis_qsize(queue_t *q)
-{
-	return qsize(q);
-}
-__LIS_EXTERN_INLINE mblk_t *lis_rmvb(mblk_t *mp, mblk_t *bp)
-{
-	return rmvb(mp, bp);
-}
-__LIS_EXTERN_INLINE void lis_rmvq(queue_t *q, mblk_t *mp)
-{
-	return rmvq(q, mp);
-}
-__LIS_EXTERN_INLINE queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
-{
-	return OTHERQ(q);
-}
-__LIS_EXTERN_INLINE queue_t *lis_safe_RD(queue_t *q, char *f, int l)
-{
-	return RD(q);
-}
-__LIS_EXTERN_INLINE int lis_safe_SAMESTR(queue_t *q, char *f, int l)
-{
-	return SAMESTR(q);
-}
-__LIS_EXTERN_INLINE queue_t *lis_safe_WR(queue_t *q, char *f, int l)
-{
-	return WR(q);
-}
-__LIS_EXTERN_INLINE int lis_safe_canenable(queue_t *q, char *f, int l)
-{
-	return canenable(q);
-}
-__LIS_EXTERN_INLINE void lis_safe_enableok(queue_t *q, char *f, int l)
-{
-	return enableok(q);
-}
-__LIS_EXTERN_INLINE void lis_safe_noenable(queue_t *q, char *f, int l)
-{
-	return noenable(q);
-}
-__LIS_EXTERN_INLINE void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
-{
-	return put(q, mp);
-}
-__LIS_EXTERN_INLINE void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
-{
-	return putnext(q, mp);
-}
-__LIS_EXTERN_INLINE void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
-{
-	return qreply(q, mp);
-}
-#if 0
-__LIS_EXTERN_INLINE void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
-{
-	return setq(q, rinit, winit);
-}
-#endif
-__LIS_EXTERN_INLINE int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
-{
-	return strqget(q, what, band, val);
-}
-__LIS_EXTERN_INLINE int lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
-{
-	return strqset(q, what, band, val);
-}
-__LIS_EXTERN_INLINE int lis_testb(int size, unsigned int priority)
-{
-	return testb(size, priority);
-}
-__LIS_EXTERN_INLINE toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-					   char *file_name, int line_nr)
-{
-	return timeout(timo_fcn, arg, ticks);
-}
-__LIS_EXTERN_INLINE void lis_unbufcall(int bcid)
-{
-	unbufcall(bcid);
-}
-__LIS_EXTERN_INLINE void lis_unfreezestr(queue_t *q)
-{
-	unfreezestr(q, 5); /* note 5 is splstr */
-}
-__LIS_EXTERN_INLINE mblk_t *lis_unlinkb(mblk_t *mp)
-{
-	return unlinkb(mp);
-}
-__LIS_EXTERN_INLINE toid_t lis_untimeout(toid_t id)
-{
-	return (toid_t) untimeout(id);
-}
-__LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
-{
-	return xmsgsize(mp);
-}
 #ifndef __LIS_NO_MACROS
 #define lis_alloc_atomic(__p1) lis_alloc_atomic_fcn(__p1, __FILE__, __LINE__)
 #define lis_alloc_dma(__p1) lis_alloc_dma_fcn(__p1, __FILE__, __LINE__)
 #define lis_alloc_kernel(__p1) lis_alloc_kernel_fcn(__p1, __FILE__, __LINE__)
-//#define lis_backq(__p1) lis_backq_fcn(__p1, __FILE__, __LINE__)
 //#define lis_dec_mod_cnt() lis_dec_mod_cnt_fcn(__FILE__, __LINE__)
 #define lis_down(__p1) lis_down_fcn(__p1, __FILE__, __LINE__)
 #define lis_free_mem(__p1) lis_free_mem_fcn(__p1, __FILE__, __LINE__)
@@ -880,21 +474,7 @@ __LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
 #define lis_spl0() lis_spl0_fcn(__FILE__, __LINE__)
 #define lis_splstr() lis_splstr_fcn(__FILE__,__LINE__)
 #define lis_splx(__p1) lis_splx_fcn(__p1, __FILE__, __LINE__)
-#define lis_timeout(__p1, __p2, __p3) lis_timeout_fcn(__p1, __p2, __p3, __FILE__, __LINE__)
 #define lis_up(__p2) lis_up_fcn(__p2, __FILE__, __LINE__)
-
-#define lis_OTHERQ(__q) lis_safe_OTHERQ(__q, __FILE__, __LINE__)
-#define lis_RD(__q) lis_safe_RD(__q, __FILE__, __LINE__)
-#define lis_SAMESTR(__q) lis_safe_SAMESTR(__q, __FILE__, __LINE__)
-#define lis_WR(__q) lis_safe_WR(__q, __FILE__, __LINE__)
-#define lis_canenable(__q) lis_safe_canenable(__q, __FILE__, __LINE__)
-#define lis_enableok(__q) lis_safe_enableok(__q, __FILE__, __LINE__)
-#define lis_noenable(__q) lis_safe_noenable(__q, __FILE__, __LINE__)
-#define lis_putmsg(__q, __mp) lis_safe_putmsg(__q, __mp, __FILE__, __LINE__)
-#define lis_putnext(__q, __mp) lis_safe_putnext(__q, __mp, __FILE__, __LINE__)
-#define lis_qreply(__q, __mp) lis_safe_qreply(__q, __mp, __FILE__, __LINE__)
-#define lis_OTHER(__q) lis_OTHERQ(__q)
-#define OTHER(__q) lis_OTHERQ(__q)
 #endif
 
 #endif				/* __SYS_LIS_DDI_H__ */

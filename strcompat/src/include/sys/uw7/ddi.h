@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.12 2005/07/12 19:15:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.13 2005/07/14 22:04:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:06 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_UW7_DDI_H__
 #define __SYS_UW7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/12 19:15:48 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:06 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -72,57 +72,6 @@
 #define _SVR4_SOURCE
 #endif
 #include <sys/svr4/ddi.h>
-
-typedef unsigned long paddr_t;
-typedef struct physreq {
-	paddr_t phys_align;
-	paddr_t phys_boundary;
-	unsigned char phys_dmasize;
-	/* 0 - DMA not used */
-	/* 24 - ISA device */
-	/* 32 - PCI, EISA, MCA device */
-	/* 64 - 64-bit device */
-	unsigned char phys_max_scgth;
-	unsigned char phys_flags;
-#define PREQ_PHYSCONTIG	    0x01
-} physreq_t;
-
-typedef struct {
-	uint32_t sg_base;
-	uint32_t sg_size;
-} scgth_el32_t;
-
-typedef struct {
-	uint32_t sg_base[2];
-	uint32_t sg_size;
-	uint32_t _sg_reserved;
-} scgth_el64_t;
-
-typedef struct {
-	union {
-		scgth_el32_t el32;
-		scgth_el64_t el64;
-	} sg_elem;
-	union {
-		scgth_el32_t el32;
-		scgth_el64_t el64;
-	} sg_el_addr;
-	unsigned char sg_nelem;
-	unsigned char sg_format;
-} scgth_t;
-
-#if LFS
-/* already defined by LiS */
-extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
-#endif
-extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
-extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
-extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
-
-#if 0
-/* not implemented yet */
-int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
-#endif
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 

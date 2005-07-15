@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/14 03:39:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/14 22:03:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 03:39:52 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:03:39 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../am/openss7.am
+
+AM_EXPOSED_SYMBOLS	=
+
+if WITH_LIS
+AM_EXPOSED_SYMBOLS	+= qbufcall qtimeout qwriter streams_put
+endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -73,23 +79,7 @@ SUBDIRS = . man manual
 #
 # Can't support wantio in LiS at all.
 ##
-AM_EXPOSED_SYMBOLS 	= lis_osif_pci_dac_dma_sync_single \
-			  lis_osif_pci_dma_sync_sg \
-			  lis_osif_pci_dma_sync_single \
-			  lis_osif_pci_find_class \
-			  lis_pcibios_find_class \
-			  lis_pcibios_find_device \
-			  lis_pcibios_init \
-			  lis_pcibios_present \
-			  lis_pcibios_read_config_byte \
-			  lis_pcibios_read_config_dword \
-			  lis_pcibios_read_config_word \
-			  lis_pcibios_write_config_byte \
-			  lis_pcibios_write_config_dword \
-			  lis_pcibios_write_config_word \
-			  qwait \
-			  qwait_sig \
-			  wantio
+AM_EXPOSED_SYMBOLS 	+= qwait qwait_sig wantio
 
 
 if PERFORM_CHECKS

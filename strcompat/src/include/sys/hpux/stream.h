@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:42 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:03:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:03:45  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:42  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_HPUX_STREAM_H__
 #define __SYS_HPUX_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/hpux/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,11 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_HPUX || defined CONFIG_STREAMS_COMPAT_HPUX_MODULE
+
+#if LFS
+typedef void (*streams_put_t) (void *, mblk_t *);
+extern void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
+#endif
 
 #elif defined _HPUX_SOURCE
 #warning "_HPUX_SOURCE defined by not CONFIG_STREAMS_COMPAT_HPUX"

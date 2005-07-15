@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.5 2005/07/13 12:01:52 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.6 2005/07/14 22:04:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:52 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_TIUSER_H
 #define _SYS_TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
 
 #include <sys/tpi.h>	/* common definitions */
 
@@ -299,6 +299,7 @@ extern int t_sync __P((int fd));
 extern int t_unbind __P((int fd));
 /* TLI Library - deprecated direct access to error list */
 extern char *t_errlist[];
+extern char *t_errstr[];
 /* TLI Library - deprecated length of error list */
 extern int t_nerr;
 

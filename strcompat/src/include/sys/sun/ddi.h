@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.14 2005/07/12 19:15:48 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.15 2005/07/14 22:03:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:59 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2005/07/12 19:15:48 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/14 22:03:59 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -74,111 +74,6 @@
 #define PERIM_OUTER	2	/* Solaris used with qwriter() */
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-
-__SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
-{
-	freezestr(q);
-}
-
-#undef freezestr
-#define freezestr freezestr_SUN
-
-__SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
-{
-#if LFS
-	unfreezestr(q, -1UL);
-#endif
-#if LIS
-	unfreezestr(q);
-#endif
-}
-
-#undef unfreezestr
-#define unfreezestr unfreezestr_SUN
-
-#if LFS
-extern void qwait(queue_t *rq);
-extern int qwait_sig(queue_t *rq);
-#endif
-
-#if LFS
-/**
- *  qbufcall:	- schedule a buffer callout
- *  @q:		queue used for synchronization
- *  @size:	the number of bytes of data buffer needed
- *  @priority:	the priority of the buffer allocation (ignored)
- *  @function:	the callback function when bytes and headers are available
- *  @arg:	a client argument to pass to the callback function
- */
-__SUN_EXTERN_INLINE bufcall_id_t qbufcall(queue_t *q, size_t size, int priority,
-					  void (*function) (void *), void *arg)
-{
-	extern bcid_t __bufcall(queue_t *q, unsigned size, int priority, void (*function) (long), long arg);
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	return __bufcall(q, size, priority, (void (*)(long)) function, (long) arg);
-}
-
-__SUN_EXTERN_INLINE timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg,
-					  long ticks)
-{
-	extern toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-				unsigned long pl, int cpu);
-	// queue_t *rq = RD(q);
-	// assert(!test_bit(QHLIST_BIT, &rq->q_flag));
-	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
-}
-
-/**
- *  qunbufcall: - cancel a buffer callout
- *  @q:		queue used for synchronization
- *  @bcid:	buffer call id returned by qbufcall()
- *  Notices:	Don't ever call this function with an expired bufcall id.
- */
-__SUN_EXTERN_INLINE void qunbufcall(queue_t *q, bufcall_id_t bcid)
-{
-	unbufcall(bcid);
-}
-#endif
-
-__SUN_EXTERN_INLINE clock_t quntimeout(queue_t *q, timeout_id_t toid)
-{
-	return untimeout(toid);
-}
-
-#if LFS
-/* LiS already defines this */
-__SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
-{
-	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
-}
-#endif
-
-#if LFS
-/**
- *  qwriter:	- deferred call to a callback function.
- *  @qp:	a pointer to the RD() queue of a queue pair
- *  @mp:	message pointer to pass to writer function
- *  @func:	writer function
- *  @perimeter:	perimeter to enter
- *
- *  qwriter() will defer the function @func until it can enter @perimeter associated with queue pair
- *  @qp.  Once the @perimeter has been entered, the STREAMS executive will call the callback
- *  function @func with arguments @qp and @mp.  qwriter() is closely related to streams_put() above.
- *
- *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
- *  qwriter().  @func is guarateed not to run until the caller exits or preempts.
- */
-__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp),
-				 int perimeter)
-{
-	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-			      int perim, int type);
-	if (defer_func((void (*)(void *, mblk_t *)) func, qp, mp, qp, perimeter, SE_WRITER) == 0)
-		return;
-	// never();
-}
-#endif
 
 __SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
 {

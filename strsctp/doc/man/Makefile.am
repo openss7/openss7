@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/11 12:47:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/14 22:04:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/11 12:47:59 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:04:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,6 @@ man_MANS += \
 	man4/sctp.4 \
 	man4/sctp_n.4 \
 	man4/sctp_t.4 \
-	man4/strsctp_soon.4 \
 	man7/tpi_sctp.7
 ## ! WITH_OPENSS7_SCTP
 endif
@@ -87,7 +86,6 @@ dist_noinst_MANS = \
 	man4/sctp.4.man \
 	man4/sctp_n.4.man \
 	man4/sctp_t.4.man \
-	man4/strsctp_soon.4.man \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
 	man7/strsctp_soon.7.man \

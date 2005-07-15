@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:40:12 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.13  2005/07/14 22:04:09  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.12  2005/07/14 03:40:12  brian
  - updates for check pass
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:40:12 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:40:12 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:40:12 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:09 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -142,7 +145,7 @@ MODULE_ALIAS("streams-mpscompat");
  *  MI_BCMP
  *  -------------------------------------------------------------------------
  */
-int mi_bcmp(const void *s1, const void *s2, size_t len) __attribute__((alias("bcmp")));
+__MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len);
 EXPORT_SYMBOL(mi_bcmp);
 
 /*

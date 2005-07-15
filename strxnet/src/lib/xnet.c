@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/22 07:41:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $"
 
-static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/06/22 07:41:48 $";
+static char const ident[] = "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:04:27 $";
 
 #define _XOPEN_SOURCE 600
 #define _REENTRANT
@@ -649,7 +649,7 @@ static int
 __xnet_u_max_etsdu(struct _t_user *user)
 {
 	return ((user->info.etsdu == T_INFINITE
-		|| user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
+		 || user->info.etsdu == 0) ? MAXINT : (user->info.etsdu >= 0 ? user->info.etsdu : 0));
 }
 static int
 __xnet_u_max_connect(struct _t_user *user)
@@ -5389,7 +5389,7 @@ int t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsign
     __attribute__ ((alias("__xnet_t_sndvudata_r")));
 
 /* *INDENT-OFF* */
-const char *_t_errstr[] = {
+const char *__xnet_t_errlist[] = {
 /*
 TRANS No error is indicated in the t_errno variable.  The last operation was a
 TRANS success.  t_errno will not be set to this value (zero) by the library,
@@ -5618,6 +5618,13 @@ TRANS error codes not known to the XTI library.
 };
 /* *INDENT-ON* */
 
+extern const char **t_errstr __attribute__ ((alias("__xnet_t_errlist")));
+extern const char **t_errlist __attribute__ ((alias("__xnet_t_errlist")));
+
+int __xnet_t_nerr = 31;
+
+extern int t_nerr __attribute__ ((alias("__xnet_t_nerr")));
+
 /**
  * @fn const char *t_strerror(int errnum)
  * @brief produce an error message string.
@@ -5629,8 +5636,8 @@ const char *
 __xnet_t_strerror(int errnum)
 {
 	if (0 <= errnum && errnum <= TPROTO)
-		return gettext(_t_errstr[errnum]);
-	return gettext(_t_errstr[TPROTO + 1]);
+		return gettext(__xnet_t_errlist[errnum]);
+	return gettext(__xnet_t_errlist[TPROTO + 1]);
 }
 
 const char *t_strerror(int errnum)
@@ -5897,10 +5904,10 @@ int t_unbind(int fd)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.12 $).
+ * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.13 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.12 $)
- * @date \$Date: 2005/06/22 07:41:48 $
+ * @version \$Name:  $(\$Revision: 0.9.2.13 $)
+ * @date \$Date: 2005/07/14 22:04:27 $
  *
  * @}
  */

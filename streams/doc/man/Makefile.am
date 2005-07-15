@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2005/07/14 10:38:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2005/07/14 22:04:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 10:38:43 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:04:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1086,7 +1086,6 @@ man_MANS = \
 	man9/vcmn_err.9 \
 	man9/vstrlog.9 \
 	man9/vstrlog_t.9 \
-	man9/wantio.9 \
 	man9/weld_arg_t.9 \
 	man9/weld_fcn_t.9 \
 	man9/weldq.9 \
@@ -2121,7 +2120,6 @@ dist_noinst_MANS = \
 	man9/vcmn_err.9.man \
 	man9/vstrlog.9.man \
 	man9/vstrlog_t.9.man \
-	man9/wantio.9.man \
 	man9/weld_arg_t.9.man \
 	man9/weld_fcn_t.9.man \
 	man9/weldq.9.man \

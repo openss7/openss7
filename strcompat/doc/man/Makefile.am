@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 03:39:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/14 22:03:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 03:39:53 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:03:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -94,7 +94,6 @@ svr4_compat_pages = \
 	man9/SLEEP_LOCK_SIG.9 \
 	man9/SLEEP_TRYLOCK.9 \
 	man9/SLEEP_UNLOCK.9 \
-	man9/spl0.9 \
 	man9/spl1.9 \
 	man9/spl2.9 \
 	man9/spl3.9 \
@@ -106,10 +105,8 @@ svr4_compat_pages = \
 	man9/splbase.9 \
 	man9/spldisk.9 \
 	man9/splhi.9 \
-	man9/splstr.9 \
 	man9/spltimeout.9 \
 	man9/spltty.9 \
-	man9/splx.9 \
 	man9/SV_ALLOC.9 \
 	man9/SV_BROADCAST.9 \
 	man9/SV_DEALLOC.9 \
@@ -119,6 +116,14 @@ svr4_compat_pages = \
 	man9/TRYLOCK.9 \
 	man9/UNLOCK.9 \
 	man9/wakeup.9
+
+if WITH_LFS
+svr4_compat_pages += \
+	man9/spl0.9 \
+	man9/splstr.9 \
+	man9/splx.9
+endif
+
 
 mps_unimpl_pages = \
 	man9/mi_mpprintf.9 \
@@ -660,7 +665,6 @@ lis_deprec_pages = \
 
 lfs_compat_pages = \
 	man9/lfscompat.9 \
-	man9/allocq.9 \
 	man9/apush_get.9 \
 	man9/apush_set.9 \
 	man9/apush_vml.9 \
@@ -683,7 +687,6 @@ lfs_compat_pages = \
 	man9/drv_usectohz.9 \
 	man9/drv_usecwait.9 \
 	man9/enableq.9 \
-	man9/freeq.9 \
 	man9/getadmin.9 \
 	man9/getmid.9 \
 	man9/linkmsg.9 \
@@ -900,7 +903,6 @@ dist_noinst_svr4_compat_pages = \
 	man9/SLEEP_LOCK_SIG.9.man \
 	man9/SLEEP_TRYLOCK.9.man \
 	man9/SLEEP_UNLOCK.9.man \
-	man9/spl0.9.man \
 	man9/spl1.9.man \
 	man9/spl2.9.man \
 	man9/spl3.9.man \
@@ -912,10 +914,8 @@ dist_noinst_svr4_compat_pages = \
 	man9/splbase.9.man \
 	man9/spldisk.9.man \
 	man9/splhi.9.man \
-	man9/splstr.9.man \
 	man9/spltimeout.9.man \
 	man9/spltty.9.man \
-	man9/splx.9.man \
 	man9/SV_ALLOC.9.man \
 	man9/SV_BROADCAST.9.man \
 	man9/SV_DEALLOC.9.man \
@@ -925,6 +925,13 @@ dist_noinst_svr4_compat_pages = \
 	man9/TRYLOCK.9.man \
 	man9/UNLOCK.9.man \
 	man9/wakeup.9.man
+
+if WITH_LFS
+dist_noinst_svr4_compat_pages += \
+	man9/spl0.9.man \
+	man9/splstr.9.man \
+	man9/splx.9.man
+endif
 
 dist_noinst_mps_compat_pages = \
 	man9/mpscompat.9.man \
@@ -1459,7 +1466,6 @@ dist_noinst_lis_deprec_pages = \
 	man9/lis_valid_mod_list.9.man
 
 dist_noinst_lfs_compat_pages = \
-	man9/allocq.9.man \
 	man9/apush_get.9.man \
 	man9/apush_set.9.man \
 	man9/apush_vml.9.man \
@@ -1482,7 +1488,6 @@ dist_noinst_lfs_compat_pages = \
 	man9/drv_usectohz.9.man \
 	man9/drv_usecwait.9.man \
 	man9/enableq.9.man \
-	man9/freeq.9.man \
 	man9/getadmin.9.man \
 	man9/getmid.9.man \
 	man9/lfscompat.9.man \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 01:40:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -74,7 +74,7 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/13 01:40:38 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/14 22:04:08 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -118,7 +118,34 @@ lock_t *get_sleep_lock(caddr_t event) __attribute__((alias("streams_get_sleep_lo
 EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
 #if LFS
-__HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv);
+/**
+ *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
+ *  @func:  put function (often the put() function)
+ *  @q:	    queue against which to defer the call
+ *  @mp:    message block to pass to the callback function
+ *  @priv:  private data to pass to the callback function (often @q)
+ *
+ *  streams_put() will defer the function @func until it can synchronize with @q.  Once the @q has
+ *  been syncrhonized, the STREAMS scheduler will call the callback function @func with arguments
+ *  @priv and @mp.  streams_put() is closely related to qwrite() below.
+ *
+ *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
+ *  streams_put().  @func is guarateed not to run until the caller exits or preempts.
+ *
+ *  Usage: streams_put() is intended to be called from contexts outside of the STREAMS scheduler
+ *  (e.g. interrupt service routines) where @func is intended to run under the STREAMS scheduler.
+ *
+ *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
+ *  guaranteed to be executed within the STREAMS scheduler.
+ */
+void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
+{
+	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
+			      int perim, int type);
+	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
+		return;
+	// never();
+}
 EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 #endif
 

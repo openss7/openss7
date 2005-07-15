@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.8 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.9 2005/07/14 22:04:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:00 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_STRCONF_H__
 #define __SYS_SUN_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/12 13:54:44 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/14 22:04:00 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -157,7 +157,7 @@ typedef enum {
 	DDI_RESET = 1,
 } ddi_reset_cmn_t;
 
-struct dev_info;
+//struct dev_info;
 typedef struct dev_info dev_info_t;
 
 struct dev_ops {
@@ -227,7 +227,9 @@ struct modlinkage {
 	void *ml_linkage[4];		/* null terminated array of linkage structures */
 };
 
-struct modinfo;
+struct modinfo {
+	int __dummy ;
+};
 
 extern int mod_install(struct modlinkage *ml);
 extern int mod_remove(struct modlinkage *ml);

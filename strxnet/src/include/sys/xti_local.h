@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_local.h,v 0.9.2.2 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.3 2005/07/14 22:04:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:26 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -71,8 +71,8 @@ __BEGIN_DECLS
  * should consult the documentation found in xti(3).
  *
  * \author Brian F. G. Bidulock
- * \version \$Name:  $(\$Revision: 0.9.2.2 $)
- * \date \$Date: 2005/05/14 08:28:29 $
+ * \version \$Name:  $(\$Revision: 0.9.2.3 $)
+ * \date \$Date: 2005/07/14 22:04:26 $
  */
 
 #define _SC_T_IOV_MAX		0
@@ -94,9 +94,6 @@ __BEGIN_DECLS
 extern pthread_mutex_t _t_fds_mutex;
 #endif
 
-extern struct t_info *fds[];
-
-extern int t_errno;
 extern int *_t_errno(void);
 extern int _t_ioctl(int fd, int cmd, void *arg);
 extern int _t_strioctl(int fd, int cmd, void *arg, size_t arglen);

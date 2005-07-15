@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:42 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:03:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:03:51  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:42  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_LIS_STREAM_H__
 #define __SYS_LIS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lis/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,297 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_LIS || defined CONFIG_STREAMS_COMPAT_LIS_MODULE
+
+extern void lis_freezestr(queue_t *q);
+
+__LIS_EXTERN_INLINE int lis_adjmsg(mblk_t *mp, int length)
+{
+	return adjmsg(mp, length);
+}
+__LIS_EXTERN_INLINE struct msgb *lis_allocb(int size, unsigned int priority, char *file_name,
+					    int line_nr)
+{
+	return allocb(size, priority);
+}
+__LIS_EXTERN_INLINE struct msgb *lis_allocb_physreq(int size, unsigned int priority,
+						    void *physreq_ptr, char *file_name, int line_nr)
+{
+	return allocb(size, priority);
+}
+__LIS_EXTERN_INLINE queue_t *lis_allocq(const char *name)
+{
+	return allocq();
+}
+__LIS_EXTERN_INLINE int lis_appq(queue_t *q, mblk_t *mp1, mblk_t *mp2)
+{
+	return appq(q, mp1, mp2);
+}
+__LIS_EXTERN_INLINE queue_t *lis_backq(queue_t *q)
+{
+	return backq(q);
+}
+__LIS_EXTERN_INLINE queue_t *lis_backq_fcn(queue_t *q, char *f, int l)
+{
+	return backq(q);
+}
+__LIS_EXTERN_INLINE int lis_bcanput(queue_t *q, unsigned char band)
+{
+	return bcanput(q, band);
+}
+__LIS_EXTERN_INLINE int lis_bcanputnext(queue_t *q, unsigned char band)
+{
+	return bcanputnext(q, band);
+}
+__LIS_EXTERN_INLINE int lis_bcanputnext_anyband(queue_t *q)
+{
+	return bcanputnext(q, ANYBAND);
+}
+__LIS_EXTERN_INLINE int lis_bufcall(unsigned size, int priority, void (*function) (long), long arg)
+{
+	return bufcall(size, priority, function, arg);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_copyb(mblk_t *mp)
+{
+	return copyb(mp);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_copymsg(mblk_t *mp)
+{
+	return copymsg(mp);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_dupb(mblk_t *mp)
+{
+	return dupb(mp);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_dupmsg(mblk_t *mp)
+{
+	return dupmsg(mp);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_esballoc(unsigned char *base, int size, int priority,
+					 frtn_t *freeinfo, char *file_name, int line_nr)
+{
+	return esballoc(base, size, priority, freeinfo);
+}
+__LIS_EXTERN_INLINE int lis_esbbcall(int priority, void (*function) (long), long arg)
+{
+	return esbbcall(priority, function, arg);
+}
+__LIS_EXTERN_INLINE void lis_flushband(queue_t *q, unsigned char band, int flag)
+{
+	return flushband(q, band, flag);
+}
+__LIS_EXTERN_INLINE void lis_flushq(queue_t *q, int flag)
+{
+	return flushq(q, flag);
+}
+__LIS_EXTERN_INLINE void lis_freeb(mblk_t *bp)
+{
+	return freeb(bp);
+}
+__LIS_EXTERN_INLINE void lis_freemsg(mblk_t *mp)
+{
+	return freemsg(mp);
+}
+__LIS_EXTERN_INLINE void lis_freezestr(queue_t *q)
+{
+	return (void)freezestr(q);
+}
+__LIS_EXTERN_INLINE void lis_freeq(queue_t *q)
+{
+	return freeq(q);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_getq(queue_t *q)
+{
+	return getq(q);
+}
+
+__LIS_EXTERN_INLINE int lis_insq(queue_t *q, mblk_t *emp, mblk_t *mp)
+{
+	return insq(q, emp, mp);
+}
+
+__LIS_EXTERN_INLINE void lis_linkb(mblk_t *mp1, mblk_t *mp2)
+{
+	return linkb(mp1, mp2);
+}
+__LIS_EXTERN_INLINE int lis_max(int a, int b)
+{
+	return max(a, b);
+}
+__LIS_EXTERN_INLINE int lis_min(int a, int b)
+{
+	return min(a, b);
+}
+__LIS_EXTERN_INLINE int lis_msgdsize(mblk_t *mp)
+{
+	return msgdsize(mp);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_msgpullup(mblk_t *mp, int len)
+{
+	return msgpullup(mp, len);
+}
+__LIS_EXTERN_INLINE int lis_msgsize(mblk_t *mp)
+{
+	return msgsize(mp);
+}
+__LIS_EXTERN_INLINE int lis_pullupmsg(mblk_t *mp, int length)
+{
+	return pullupmsg(mp, length);
+}
+__LIS_EXTERN_INLINE int lis_putbq(queue_t *q, mblk_t *mp)
+{
+	return putbq(q, mp);
+}
+__LIS_EXTERN_INLINE int lis_putctl(queue_t *q, int type, char *file_name, int line_nr)
+{
+	return putctl(q, type);
+}
+__LIS_EXTERN_INLINE int lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr)
+{
+	return putctl1(q, type, param);
+}
+__LIS_EXTERN_INLINE int lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr)
+{
+	return putnextctl(q, type);
+}
+__LIS_EXTERN_INLINE int lis_putnextctl1(queue_t *q, int type, int param, char *file_name,
+					int line_nr)
+{
+	return putnextctl1(q, type, param);
+}
+__LIS_EXTERN_INLINE int lis_putq(queue_t *q, mblk_t *mp)
+{
+	return putq(q, mp);
+}
+__LIS_EXTERN_INLINE int lis_qcountstrm(queue_t *q)
+{
+	return qcountstrm(q);
+}
+__LIS_EXTERN_INLINE void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds)
+{
+	return (void) qdetach(q, flag, creds);
+}
+__LIS_EXTERN_INLINE void lis_qenable(queue_t *q)
+{
+	return qenable(q);
+}
+__LIS_EXTERN_INLINE void lis_qprocsoff(queue_t *rdq)
+{
+	return qprocsoff(rdq);
+}
+__LIS_EXTERN_INLINE void lis_qprocson(queue_t *rdq)
+{
+	return qprocson(rdq);
+}
+__LIS_EXTERN_INLINE int lis_qsize(queue_t *q)
+{
+	return qsize(q);
+}
+__LIS_EXTERN_INLINE mblk_t *lis_rmvb(mblk_t *mp, mblk_t *bp)
+{
+	return rmvb(mp, bp);
+}
+__LIS_EXTERN_INLINE void lis_rmvq(queue_t *q, mblk_t *mp)
+{
+	return rmvq(q, mp);
+}
+__LIS_EXTERN_INLINE queue_t *lis_safe_OTHERQ(queue_t *q, char *f, int l)
+{
+	return OTHERQ(q);
+}
+__LIS_EXTERN_INLINE queue_t *lis_safe_RD(queue_t *q, char *f, int l)
+{
+	return RD(q);
+}
+__LIS_EXTERN_INLINE int lis_safe_SAMESTR(queue_t *q, char *f, int l)
+{
+	return SAMESTR(q);
+}
+__LIS_EXTERN_INLINE queue_t *lis_safe_WR(queue_t *q, char *f, int l)
+{
+	return WR(q);
+}
+__LIS_EXTERN_INLINE int lis_safe_canenable(queue_t *q, char *f, int l)
+{
+	return canenable(q);
+}
+__LIS_EXTERN_INLINE void lis_safe_enableok(queue_t *q, char *f, int l)
+{
+	return enableok(q);
+}
+__LIS_EXTERN_INLINE void lis_safe_noenable(queue_t *q, char *f, int l)
+{
+	return noenable(q);
+}
+__LIS_EXTERN_INLINE void lis_safe_putmsg(queue_t *q, mblk_t *mp, char *f, int l)
+{
+	return put(q, mp);
+}
+__LIS_EXTERN_INLINE void lis_safe_putnext(queue_t *q, mblk_t *mp, char *f, int l)
+{
+	return putnext(q, mp);
+}
+__LIS_EXTERN_INLINE void lis_safe_qreply(queue_t *q, mblk_t *mp, char *f, int l)
+{
+	return qreply(q, mp);
+}
+__LIS_EXTERN_INLINE void lis_setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
+{
+	return setq(q, rinit, winit);
+}
+__LIS_EXTERN_INLINE int lis_strqget(queue_t *q, qfields_t what, unsigned char band, long *val)
+{
+	return strqget(q, what, band, val);
+}
+__LIS_EXTERN_INLINE int lis_strqset(queue_t *q, qfields_t what, unsigned char band, long val)
+{
+	return strqset(q, what, band, val);
+}
+__LIS_EXTERN_INLINE int lis_testb(int size, unsigned int priority)
+{
+	return testb(size, priority);
+}
+__LIS_EXTERN_INLINE toid_t lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
+					   char *file_name, int line_nr)
+{
+	return timeout(timo_fcn, arg, ticks);
+}
+__LIS_EXTERN_INLINE void lis_unbufcall(int bcid)
+{
+	unbufcall(bcid);
+}
+__LIS_EXTERN_INLINE void lis_unfreezestr(queue_t *q)
+{
+	unfreezestr(q, 5); /* note 5 is splstr */
+}
+__LIS_EXTERN_INLINE mblk_t *lis_unlinkb(mblk_t *mp)
+{
+	return unlinkb(mp);
+}
+__LIS_EXTERN_INLINE toid_t lis_untimeout(toid_t id)
+{
+	return (toid_t) untimeout(id);
+}
+__LIS_EXTERN_INLINE int lis_xmsgsize(mblk_t *mp)
+{
+	return xmsgsize(mp);
+}
+
+#ifndef __LIS_NO_MACROS
+//#define lis_backq(__p1) lis_backq_fcn(__p1, __FILE__, __LINE__)
+#define lis_timeout(__p1, __p2, __p3) lis_timeout_fcn(__p1, __p2, __p3, __FILE__, __LINE__)
+#define lis_OTHERQ(__q) lis_safe_OTHERQ(__q, __FILE__, __LINE__)
+#define lis_RD(__q) lis_safe_RD(__q, __FILE__, __LINE__)
+#define lis_SAMESTR(__q) lis_safe_SAMESTR(__q, __FILE__, __LINE__)
+#define lis_WR(__q) lis_safe_WR(__q, __FILE__, __LINE__)
+#define lis_canenable(__q) lis_safe_canenable(__q, __FILE__, __LINE__)
+#define lis_enableok(__q) lis_safe_enableok(__q, __FILE__, __LINE__)
+#define lis_noenable(__q) lis_safe_noenable(__q, __FILE__, __LINE__)
+#define lis_putmsg(__q, __mp) lis_safe_putmsg(__q, __mp, __FILE__, __LINE__)
+#define lis_putnext(__q, __mp) lis_safe_putnext(__q, __mp, __FILE__, __LINE__)
+#define lis_qreply(__q, __mp) lis_safe_qreply(__q, __mp, __FILE__, __LINE__)
+#define lis_OTHER(__q) lis_OTHERQ(__q)
+#define OTHER(__q) lis_OTHERQ(__q)
+#endif
 
 #elif defined _LIS_SOURCE
 #warning "_LIS_SOURCE defined by not CONFIG_STREAMS_COMPAT_LIS"

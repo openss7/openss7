@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:41 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:03:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:03:43  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:41  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_AIX_STREAM_H__
 #define __SYS_AIX_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/aix/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,30 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_AIX || defined CONFIG_STREAMS_COMPAT_AIX_MODULE
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
+
+/* These are MPS definitions exposed by AIX, but implemented in mpscompat.c */
+extern int mi_open_comm(caddr_t *mi_list, uint size, queue_t *q, dev_t *dev, int flag, int sflag, cred_t *credp);
+extern int mi_close_comm(caddr_t *mi_list, queue_t *q);
+extern caddr_t mi_next_ptr(caddr_t strptr);
+extern caddr_t mi_prev_ptr(caddr_t strptr);
+extern void mi_bufcall(queue_t *q, int size, int priority);
+
+#if LFS
+extern int wantio(queue_t *q, struct wantio *w);
+
+__AIX_EXTERN_INLINE int wantmsg(queue_t *q, int (*func) (mblk_t *))
+{
+	if (!q->q_qinfo->qi_srvp) {
+		q->q_ftmsg = func;
+		return (1);
+	}
+	return (0);
+}
+#endif
 
 #elif defined _AIX_SOURCE
 #warning "_AIX_SOURCE defined by not CONFIG_STREAMS_COMPAT_AIX"

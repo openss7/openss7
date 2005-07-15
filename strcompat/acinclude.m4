@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/14 03:39:51 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 22:03:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 03:39:51 $ by $Author: brian $
+# Last Modified $Date: 2005/07/14 22:03:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -660,6 +660,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
+    AC_SUBST([EXPOSED_SYMBOLS])dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
@@ -671,7 +672,19 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			read_trylock write_trylock \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [
+			case "$lk_func" in
+			    pcibios_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			    pci_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_osif_${lk_func}"
+				;;
+			    *sleep_on*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			esac ], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>

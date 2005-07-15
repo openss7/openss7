@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:04:01  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:44  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,54 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_SUN || defined CONFIG_STREAMS_COMPAT_SUN_MODULE
+
+__SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q)
+{
+	freezestr(q);
+}
+
+#undef freezestr
+#define freezestr freezestr_SUN
+
+__SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q)
+{
+#if LFS
+	unfreezestr(q, -1UL);
+#endif
+#if LIS
+	unfreezestr(q);
+#endif
+}
+
+#undef unfreezestr
+#define unfreezestr unfreezestr_SUN
+
+#if LFS
+extern void qwait(queue_t *rq);
+extern int qwait_sig(queue_t *rq);
+#endif
+
+#if LFS
+extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void (*function) (void *), void *arg);
+extern timeout_id_t qtimeout(queue_t *q, void (*timo_fcn) (void *), void *arg, long ticks);
+#endif
+
+extern void qunbufcall(queue_t *q, bufcall_id_t bcid);
+extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
+
+#if LFS
+/* LiS already defines this */
+__SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp)
+{
+	return (mp->b_datap->db_type < QPCTL ? QNORM : QPCTL);
+}
+#endif
+
+#if LFS
+extern void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+#endif
+
+#define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
 #elif defined _SUN_SOURCE
 #warning "_SUN_SOURCE defined by not CONFIG_STREAMS_COMPAT_SUN"

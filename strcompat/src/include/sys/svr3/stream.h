@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 01:03:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 01:03:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/15 01:03:40  brian
+ - i should reverse ddi and stream includes...
+
+ Revision 0.9.2.2  2005/07/14 22:04:03  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:44  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +64,7 @@
 #ifndef __SYS_SVR3_STREAM_H__
 #define __SYS_SVR3_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/svr3/stream.h directly, include sys/stream.h instead."
@@ -79,6 +85,39 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_SVR3 || defined CONFIG_STREAMS_COMPAT_SVR3_MODULE
+
+#ifndef bzero
+#define bzero(__s,__n) memset((__s), 0, (__n))
+#endif
+
+__SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
+{
+	mblk_t *mp = NULL, *dp = NULL;
+	if (psize && !(mp = allocb(psize, bpri)))
+		goto enobufs;
+	if (dsize && !(dp = allocb(dsize, bpri)))
+		goto enobufs;
+	if (mp) {
+		mp->b_datap->db_type = type;
+		mp->b_wptr = mp->b_rptr + psize;
+		bzero(mp->b_rptr, psize);
+		mp->b_cont = dp;
+	}
+	if (dp) {
+		dp->b_datap->db_type = M_DATA;
+		dp->b_wptr = dp->b_rptr + dsize;
+		bzero(dp->b_rptr, dsize);
+	}
+	return (mp ? mp : dp);
+      enobufs:
+	if (mp)
+		freemsg(mp);
+	if (dp)
+		freemsg(dp);
+	return (NULL);
+}
+
+#undef bzero
 
 #elif defined _SVR3_SOURCE
 #warning "_SVR3_SOURCE defined by not CONFIG_STREAMS_COMPAT_SVR3"

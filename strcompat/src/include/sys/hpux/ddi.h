@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.7 2005/07/12 13:54:42 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.8 2005/07/14 22:03:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:44 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_HPUX_DDI_H__
 #define __SYS_HPUX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/12 13:54:42 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/14 22:03:44 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -75,38 +75,6 @@
 
 extern lock_t *get_sleep_lock(caddr_t event);
 extern lock_t *streams_get_sleep_lock(caddr_t event);
-
-#if LFS
-typedef void (*streams_put_t) (void *, mblk_t *);
-/**
- *  streams_put: - deferred call to a STREAMS module qi_putp() procedure.
- *  @func:  put function (often the put() function)
- *  @q:	    queue against which to defer the call
- *  @mp:    message block to pass to the callback function
- *  @priv:  private data to pass to the callback function (often @q)
- *
- *  streams_put() will defer the function @func until it can synchronize with @q.  Once the @q has
- *  been syncrhonized, the STREAMS scheduler will call the callback function @func with arguments
- *  @priv and @mp.  streams_put() is closely related to qwrite() below.
- *
- *  Notices: @func will be called by the STREAMS executive on the same CPU as the CPU that called
- *  streams_put().  @func is guarateed not to run until the caller exits or preempts.
- *
- *  Usage: streams_put() is intended to be called from contexts outside of the STREAMS scheduler
- *  (e.g. interrupt service routines) where @func is intended to run under the STREAMS scheduler.
- *
- *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
- *  guaranteed to be executed within the STREAMS scheduler.
- */
-__HPUX_EXTERN_INLINE void streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
-{
-	extern int defer_func(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg,
-			      int perim, int type);
-	if (defer_func(func, q, mp, priv, 0, SE_STRPUT) == 0)
-		return;
-	// never();
-}
-#endif
 
 #elif defined(_HPUX_SOURCE)
 #warning "_HPUX_SOURCE defined but not CONFIG_STREAMS_COMPAT_HPUX"

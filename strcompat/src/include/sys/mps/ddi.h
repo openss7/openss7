@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2005/07/12 19:15:47 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/14 22:03:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 19:15:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.7  2005/07/14 22:03:52  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.6  2005/07/12 19:15:47  brian
  - updates and check passes
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -101,7 +104,10 @@
 #define dev_t __streams_dev_t
 #endif
 
-extern int mi_bcmp(const void *s1, const void *s2, size_t len);
+__MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len)
+{
+	return bcmp(s1, s2, len);
+}
 
 /*
  *  Memory allocation functions.

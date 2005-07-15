@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.1 2005/07/12 13:54:45 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.2  2005/07/14 22:04:07  brian
+ - updates for check pass and header splitting
+
  Revision 0.9.2.1  2005/07/12 13:54:45  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_UW7_STREAM_H__
 #define __SYS_UW7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/uw7/stream.h directly, include sys/stream.h instead."
@@ -79,6 +82,57 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_UW7 || defined CONFIG_STREAMS_COMPAT_UW7_MODULE
+
+typedef unsigned long paddr_t;
+typedef struct physreq {
+	paddr_t phys_align;
+	paddr_t phys_boundary;
+	unsigned char phys_dmasize;
+	/* 0 - DMA not used */
+	/* 24 - ISA device */
+	/* 32 - PCI, EISA, MCA device */
+	/* 64 - 64-bit device */
+	unsigned char phys_max_scgth;
+	unsigned char phys_flags;
+#define PREQ_PHYSCONTIG	    0x01
+} physreq_t;
+
+typedef struct {
+	uint32_t sg_base;
+	uint32_t sg_size;
+} scgth_el32_t;
+
+typedef struct {
+	uint32_t sg_base[2];
+	uint32_t sg_size;
+	uint32_t _sg_reserved;
+} scgth_el64_t;
+
+typedef struct {
+	union {
+		scgth_el32_t el32;
+		scgth_el64_t el64;
+	} sg_elem;
+	union {
+		scgth_el32_t el32;
+		scgth_el64_t el64;
+	} sg_el_addr;
+	unsigned char sg_nelem;
+	unsigned char sg_format;
+} scgth_t;
+
+#if LFS
+/* already defined by LiS */
+extern mblk_t *allocb_physreq(size_t size, uint priority, physreq_t * prp);
+#endif
+extern mblk_t *msgphysreq(mblk_t *mp, physreq_t * prp);
+extern mblk_t *msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp);
+extern mblk_t *msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp);
+
+#if 0
+/* not implemented yet */
+int strioccall(int (*func) (void *), void *arg, uint iocid, queue_t *q);
+#endif
 
 #elif defined _UW7_SOURCE
 #warning "_UW7_SOURCE defined by not CONFIG_STREAMS_COMPAT_UW7"

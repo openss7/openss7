@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.5 2005/07/12 13:54:44 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.6 2005/07/14 22:03:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:56 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_DDI_H__
 #define __SYS_OSF_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/07/12 13:54:44 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/14 22:03:56 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -72,14 +72,6 @@
 #define dev_t __streams_dev_t
 #endif
 
-extern int streams_close_comm(queue_t *, int, cred_t *);
-extern int streams_open_comm(unsigned int, queue_t *, dev_t *, int, int, cred_t *);
-extern int streams_open_ocomm(dev_t, unsigned int, queue_t *, dev_t *, int, int, cred_t *);
-
-__OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp)
-{
-	put(q, mp);
-}
 __OSF_EXTERN_INLINE time_t lbolt(void)
 {
 	return jiffies;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.4 2005/05/14 08:28:29 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.5 2005/07/14 22:04:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:29 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _SYS_XTI_H
 #define _SYS_XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
 
 #ifndef t_scalar_t
 /**
@@ -337,6 +337,8 @@ extern int t_rcvconnect __P((int, struct t_call *));
 extern int t_rcvdis __P((int, struct t_discon *));
 /* XTI Library Function: t_rcvleafchange - acknowledge receipt of a leaf change indication */
 extern int t_rcvleafchange __P((int, struct t_leaf_status *));
+/* XTI Library Function: t_rcvopt - receive data with options */
+extern int t_rcvopt __P((int fd, struct t_unitdata *optdata, int *flags));
 /* XTI Library Function: t_rcvrel - acknowledge receipt of an orderly release indication */
 extern int t_rcvrel __P((int));
 /* XTI Library Function: t_rcvreldata - receive an orderly release indication or confirmation
@@ -349,6 +351,8 @@ extern int t_rcvuderr __P((int, struct t_uderr *));
 /* XTI Library Function: t_rcvv - receive data or expedited data sent over a connection and put the 
    data into one or more noncontiguous buffers */
 extern int t_rcvv __P((int, struct t_iovec *, unsigned int, int *));
+/* XTI Library Function: t_rcvvudata - receive data with options into one or more noncontiguous buffers */
+//extern int t_rcvvopt __P((int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags));
 /* XTI Library Function: t_rcvvudata - receive a data unit into one or more noncontiguous buffers */
 extern int t_rcvvudata __P((int, struct t_unitdata *, struct t_iovec *, unsigned int, int *));
 /* XTI Library Function: t_removeleaf - remove a leaf from a point to multipoint connection */
@@ -357,6 +361,8 @@ extern int t_removeleaf __P((int, int, int));
 extern int t_snd __P((int, char *, unsigned int, int));
 /* XTI Library Function: t_snddis - send user-initiated disconnect request */
 extern int t_snddis __P((int, const struct t_call *));
+/* XTI Library Function: t_sndopt - send data with options */
+extern int t_sndopt __P((int fd, const struct t_unitdata *optdata, int flags));
 /* XTI Library Function: t_sndrel - initiate an orderly release */
 extern int t_sndrel __P((int));
 /* XTI Library Function: t_sndreldata - initiate or respond to an orderly release with user data */
@@ -366,6 +372,8 @@ extern int t_sndudata __P((int, const struct t_unitdata *));
 /* XTI Library Function: t_sndv - send data or expedited data, from one or more noncontiguous
    buffers, on a connection */
 extern int t_sndv __P((int, const struct t_iovec *, unsigned int, int));
+/* XTI Library Function: t_sndvopt - send data with options from one or more non-contiguous buffers */
+extern int t_sndvopt __P((int fd, const struct t_unitdata *optdata, const struct t_iovec *iov, unsigned int iovcount, int flags));
 /* XTI Library Function: t_sndvudata - send a data unit from one or more non-contiguous buffers */
 extern int t_sndvudata __P((int, struct t_unitdata *, struct t_iovec *, unsigned int));
 /* XTI Library Function: t_strerror - generate error message string */

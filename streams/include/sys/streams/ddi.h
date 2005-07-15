@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.24 2005/07/12 14:06:21 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.25 2005/07/14 22:04:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 14:06:21 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:04:12 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/12 14:06:21 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/14 22:04:12 $"
 
 #ifndef __SYS_DDI_H__
 #warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -108,13 +108,6 @@ __EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor)
 	ulong min = minor & 0x0000ffff;
 	return ((maj << 16) | min);
 }
-
-typedef void timo_fcn_t (caddr_t arg);
-typedef int toid_t;			/* SVR4 */
-typedef int timeout_id_t;		/* Solaris */
-
-extern toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks);
-extern clock_t untimeout(toid_t toid);
 
 #if 0
 int mknod(const char *pathname, mode_t mode, dev_t dev);

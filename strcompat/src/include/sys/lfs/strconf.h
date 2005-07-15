@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.10 2005/07/14 03:40:07 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.11 2005/07/14 22:03:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 03:40:07 $ by $Author: brian $
+ Last Modified $Date: 2005/07/14 22:03:47 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 03:40:07 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/14 22:03:47 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -87,7 +87,7 @@ struct _fmodsw {
 	struct module *f_kmod;		/* kernel module */
 };
 
-struct cdevsw;
+//struct cdevsw;
 
 struct devnode {
 	struct list_head n_list;	/* list of all nodes for this device */
@@ -110,7 +110,7 @@ struct devnode {
 };
 #define N_MAJOR		0x01	/* major device node */
 
-struct file_operations;
+//struct file_operations;
 
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
