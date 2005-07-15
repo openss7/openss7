@@ -1,0 +1,1 @@
+.so man8/test-tcpc.8.man

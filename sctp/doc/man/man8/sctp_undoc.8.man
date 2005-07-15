@@ -1,0 +1,290 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: sctp_undoc.8.man,v 0.9.2.1 2005/07/15 12:38:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/15 12:38:27 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so sctp.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sctp.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH SCTP_UNDOC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Administration"
+.\"
+.\"
+.SH NAME
+.B test-sctpc, test-sctp-dc, test-sctp-ds, test-sctps, test-sctp-sc, test-sctp-ss, test-sctp-tc, test-sctp-ts, test-tcpc, test-tcp-dc, test-tcp-ds, test-tcps, test-tcp-tc, test-tcp-ts, test-udpc, test-udps
+\- undocumented test programs
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+\fBcommand\fR {\fB-h\fR|\fB--help\fR}
+.PD 0
+.HP
+\fBcommand\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBcommand\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+These are undocumented adminstrative test commands that still need a manual page written for them.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B command
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B command
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B command
+displays copying information on
+.I stdout
+and exits.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+Various.
+.\"
+.\"
+.SH NOTICES
+.PP
+Try using the --help option for each individual administrative command.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+None.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/sctp/test-sctpc
+The
+.B test-sctpc
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-dc
+The
+.B test-sctp-dc
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-ds
+The
+.B test-sctp-ds
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctps
+The
+.B test-sctps
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-sc
+The
+.B test-sctp-sc
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-ss
+The
+.B test-sctp-ss
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-tc
+The
+.B test-sctp-tc
+test program.
+.TP
+.B /usr/libexec/sctp/test-sctp-ts
+The
+.B test-sctp-ts
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcpc
+The
+.B test-tcpc
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcp-dc
+The
+.B test-tcp-dc
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcp-ds
+The
+.B test-tcp-ds
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcps
+The
+.B test-tcps
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcp-tc
+The
+.B test-tcp-tc
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcp-ts
+The
+.B test-tcp-ts
+test program.
+.TP
+.B /usr/libexec/sctp/test-udpc
+The
+.B test-udpc
+test program.
+.TP
+.B /usr/libexec/sctp/test-udps
+The
+.B test-udps
+test program.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sctp (7),
+.BR tcp (7),
+.BR udp (7).
+.\"
+.\"
+.SH BUGS
+.PP
+These functions need a manual page.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+See
+.BR sctp (7),
+.BR tcp (7)
+and
+.BR udp (7),
+for addiitonal compatibiltiy considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH VERSIONS
+.PP
+Many of these test programs were new for Linux 2.2.
+.\"
+.\"
+.XX
+.[
+rfc2960
+.]
+.[
+rfc1122
+.]
+.[
+rfc3309
+.]
+.[
+rfc3168
+.]
+.[
+sctp-mib-10
+.]
+.[
+sctpimpguide-10
+.]
+.[
+sctpsocket-07
+.]
+.[
+addip-sctp-08
+.]
+.[
+rfc3758
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

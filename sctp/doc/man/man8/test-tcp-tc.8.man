@@ -1,0 +1,351 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
+.\"
+.\" @(#) $Id: test-tcp-tc.8.man,v 0.9.2.2 2005/07/15 13:34:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2005/07/15 13:34:07 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.so sctp.macros
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sctp.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.\"
+.\"
+.TH TEST-TCP-DC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Administration"
+.\"
+.\"
+.SH NAME
+.B test-tcp-tc, test-tcp-ts
+\- client and server TCP test programs
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+\fBtest-tcp-tc\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBtest-tcp-tc\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-tcp-tc\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-tcp-tc\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.HP
+\fBtest-tcp-ts\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBtest-tcp-ts\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-tcp-ts\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-tcp-ts\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+These commands are client
+.RB ( test-tcp-tc )
+and server
+.RB ( test-tcp-ts )
+programs for transferring test data between server and client.  These programs are written in the
+same fashion as a pair of test programs for both
+.BR tcp (7)
+and
+.BR udp (7)
+that are documented in the
+.BR test-sctp-tc (8),
+.BR test-sctp-ts (8),
+.BR test-udpc (8)
+and
+.BR test-udps (8)
+manual pages.
+The purpose of this set of 6 programs is to perform comparison tests between SCTP, TCP and UDP.
+.PP
+When the server
+.RB ( test-tcp-ts )
+is started, it listens on a specified port number (or port
+.B 10000
+if no port number is specified) for incoming connections.  When a connection arrives, as a result of
+the client
+.RB ( test-tcp-tc )
+being started, the server polls for received packets and sends them back to their source.
+.PP
+Then the client
+.RB ( test-tcp-tc )
+is started, it connects to a specified port number (or port
+.B 10000
+if no port number is specified) and beings sending data at a specified length as fast as possible.
+.PP
+Both the server
+.RB ( test-tcp-ts )
+and the client
+.RB ( test-tcp-tc )
+report the number of bytes transmitted on an interval
+.RB ( 1
+second if not specified).
+Both programs run continuously until they are killed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+These commands do not take non-option arguments.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The following options are applicable to both
+.B test-tcp-tc
+and
+.BR test-tcp-ts :
+.TP
+\fB-l\fR, \fB--loc_host\fR \fIADDRESS\fR
+Specify the local host (bind address).  The default is
+.BR 0.0.0.0 .
+.TP
+\fB-p\fR, \fB--port\fR \fIPORTNUM\fR
+Specify the port number.  For
+.B test-tcp-tc
+this is the remote port number to which to connect.  For
+.B test-tcp-ts
+this is the local port number to which to bind.
+The default is
+.BR 10000 .
+.TP
+\fB-w\fR, \fB--length\fR \fILENGTH\fR
+Specify the \fILENGTH\fR of sent messages in bytes.  The default is
+.BR 64 .
+.TP
+\fB-n\fR, \fB--nagle\fR
+Suppress Nagle's algorithm.
+.TP
+\fB-t\fR, \fB--rep_time\fR \fIINTERVAL\fR
+Specify the report time \fIINTERVAL\fR in seconds.  The default is
+.BR 1 .
+.TP
+\fB-q\fR, \fB--quiet\fR
+Suppress normal output.  This option is equivalent to \fB--verbose\fR=\fI0\fR.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increase or set (to \fILEVEL\fR) the output verbosity.  This option may be repeated.  If not
+specified, the verbosity level is
+.BR 1 .
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B command
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B command
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B command
+displays copying information on
+.I stdout
+and exits.
+.\"
+.SS test-tcp-tc Options
+.PP
+The following options are applicable only to
+.BR test-tcp-tc :
+.TP
+\fB-r\fR, \fB--rem_host\fR \fIADDRESS\fR
+Specify the remote host (connect address).  The default is
+.BR 127.0.0.2 .
+.\"
+.SS test-tcp-ts Options
+.PP
+The following options are applicable only to
+.BR test-tcp-ts :
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When an error occurs,
+.B test-tcp-tc
+and
+.B test-tcp-ts
+will print a diagnostic message to
+.I stderr
+and exit with a non-zero exit code.
+Errors result from an error of a system call on the TCP socket, or an error in the option arguments
+passed to the command.  The exit status will be
+.B 1
+in the case of a socket error and
+.B 2
+in the case of a option argument error.
+.\"
+.\"
+.SH NOTICES
+.PP
+These are crude programs and were only used for adhoc checkout testing.  They will be eventually
+dropped from the
+.B @PACKAGE_TITLE@
+release.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+At one terminal type:
+.RS
+.nf
+\fC\s-1
+test-tcp-ts -l 127.0.0.2 -p 10000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+to start the server program.  In another terminal type:
+.RS
+.nf
+\fC\s-1
+test-tcp-tc -r 127.0.0.2 -p 10000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+Each command will display the number of bytes and messages sent and a total count of the number of
+bytes and messages sent every 5 seconds.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/libexec/tcp/test-tcp-tc
+The
+.B test-tcp-tc
+test program.
+.TP
+.B /usr/libexec/tcp/test-tcp-ts
+The
+.B test-tcp-ts
+test program.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tcp (7),
+.BR test-sctp-tc (8),
+.BR test-sctp-ts (8),
+.BR sctp (7),
+.BR test-udpc (8),
+.BR test-udps (8),
+.BR udp (7).
+.\"
+.\"
+.SH BUGS
+.PP
+These test programs do not function very well and will often hang.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+See
+.BR sctp (7),
+.BR tcp (7)
+and
+.BR udp (7),
+for addiitonal compatibiltiy considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH VERSIONS
+.PP
+Many of these test programs were new for Linux 2.2.
+.\"
+.\"
+.XX
+.[
+rfc2960
+.]
+.[
+rfc1122
+.]
+.[
+rfc3309
+.]
+.[
+rfc3168
+.]
+.[
+rfc3758
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

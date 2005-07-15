@@ -1,0 +1,1 @@
+.so man8/test-sctp-sc.8.man

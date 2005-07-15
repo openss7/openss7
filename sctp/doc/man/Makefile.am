@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:29:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/15 13:34:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:29:32 $ by $Author: brian $
+# Last Modified $Date: 2005/07/15 13:34:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,10 +58,42 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 man_MANS = \
-	man7/sctp.7
+	man7/sctp.7 \
+	man8/test-sctpc.8 \
+	man8/test-sctp-dc.8 \
+	man8/test-sctp-ds.8 \
+	man8/test-sctps.8 \
+	man8/test-sctp-sc.8 \
+	man8/test-sctp-ss.8 \
+	man8/test-sctp-tc.8 \
+	man8/test-sctp-ts.8 \
+	man8/test-tcpc.8 \
+	man8/test-tcp-dc.8 \
+	man8/test-tcp-ds.8 \
+	man8/test-tcps.8 \
+	man8/test-tcp-tc.8 \
+	man8/test-tcp-ts.8 \
+	man8/test-udpc.8 \
+	man8/test-udps.8
 
 dist_noinst_MANS = \
-	man7/sctp.7.man
+	man7/sctp.7.man \
+	man8/test-sctpc.8.man \
+	man8/test-sctp-dc.8.man \
+	man8/test-sctp-ds.8.man \
+	man8/test-sctps.8.man \
+	man8/test-sctp-sc.8.man \
+	man8/test-sctp-ss.8.man \
+	man8/test-sctp-tc.8.man \
+	man8/test-sctp-ts.8.man \
+	man8/test-tcpc.8.man \
+	man8/test-tcp-dc.8.man \
+	man8/test-tcp-ds.8.man \
+	man8/test-tcps.8.man \
+	man8/test-tcp-tc.8.man \
+	man8/test-tcp-ts.8.man \
+	man8/test-udpc.8.man \
+	man8/test-udps.8.man
 
 ## PKG_BUILD_INDEP
 endif
