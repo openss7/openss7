@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.22 2005/07/14 22:03:55 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.23 2005/07/15 23:09:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:55 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:16 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -96,26 +96,7 @@ typedef void irqreturn_t;
 
 #define _OS7_SOURCE
 
-#if LIS
-/* LIS forgets to typedef these */
-typedef int bcid_t;
-typedef int bufcall_id_t;
-#endif
-
 #include <sys/stream.h>
-#ifdef LFS
-#include <sys/strsubr.h>
-#endif				/* LFS */
-
-#if LIS
-#undef db_frtnp
-#define db_frtnp frtnp
-union ioctypes {
-	struct iocblk iocblk;
-	struct copyreq copyreq;
-	struct copyresp copyresp;
-};
-#endif
 
 #include <sys/cmn_err.h>
 #include <sys/kmem.h>
@@ -124,11 +105,6 @@ union ioctypes {
 
 #include <sys/strconf.h>
 #include <sys/strlog.h>
-
-#ifndef tid_t
-typedef int tid_t;
-#define tid_t tid_t
-#endif				/* tid_t */
 
 /* minor device number range */
 #if defined LIS
@@ -139,21 +115,6 @@ typedef int tid_t;
 #define NMINORS		((1UL<<8)-1)	/* be conservative for others */
 #endif
 
-#ifdef LISASSERT
-#undef LISASSERT
-#define LISASSERT(__assertion) assert((__assertion))
-#undef ASSERT
-#endif
-
-#ifndef ASSERT
-#define ASSERT(__assertion) assert((__assertion))
-#endif
-
-//#ifdef LINUX
-//#include <linux/interrupt.h>
-//#include "bufpool.h"          /* generic buffer pooling */
-//#endif
-
 #ifdef LINUX
 #ifdef MODULE
 #define MODULE_STATIC STATIC
@@ -163,16 +124,5 @@ typedef int tid_t;
 #else				/* LINUX */
 #define MODULE_STATIC STATIC
 #endif				/* LINUX */
-
-#ifdef LFS
-#define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
-#define FREE(__p) kmem_free((__p), sizeof(*(__p)))
-#define SPLSTR(__pl) ({ (__pl) = splstr(); (void)0; })
-#define SPLX(__pl) splx(__pl)
-#else				/* LFS */
-#if 0
-typedef lis_flags_t pl_t;
-#endif
-#endif				/* LFS */
 
 #endif				/* __LOCAL_COMPAT_H__ */

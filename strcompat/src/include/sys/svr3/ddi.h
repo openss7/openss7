@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.8 2005/07/14 22:04:02 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.9 2005/07/15 23:09:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:02 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:33 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR3_DDI_H__
 #define __SYS_SVR3_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/14 22:04:02 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/15 23:09:33 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -68,8 +68,38 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_SVR3) || defined(CONFIG_STREAMS_COMPAT_SVR3_MODULE)
 
-#include <sys/kmem.h>		/* for kmem_alloc/free */
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
+__SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t dsize, int type, uint bpri)
+{
+	mblk_t *mp = NULL, *dp = NULL;
+	if (psize && !(mp = allocb(psize, bpri)))
+		goto enobufs;
+	if (dsize && !(dp = allocb(dsize, bpri)))
+		goto enobufs;
+	if (mp) {
+		mp->b_datap->db_type = type;
+		mp->b_wptr = mp->b_rptr + psize;
+		bzero(mp->b_rptr, psize);
+		mp->b_cont = dp;
+	}
+	if (dp) {
+		dp->b_datap->db_type = M_DATA;
+		dp->b_wptr = dp->b_rptr + dsize;
+		bzero(dp->b_rptr, dsize);
+	}
+	return (mp ? mp : dp);
+      enobufs:
+	if (mp)
+		freemsg(mp);
+	if (dp)
+		freemsg(dp);
+	return (NULL);
+}
+
+/* these two are included here because we need the STREAMS version of dev_t */
 __SVR3_EXTERN_INLINE major_t emajor(dev_t dev)
 {
 	return (getmajor(dev) + MAJOR(getminor(dev)));

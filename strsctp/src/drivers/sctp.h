@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.3 2005/05/14 08:29:15 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.4 2005/07/15 23:09:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,15 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:29:15 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:55 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_H__
 #define __SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/05/14 08:29:15 $"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/15 23:09:55 $"
 
-#ifndef tid_t
-typedef int tid_t;
-#endif
 /*
  *  =========================================================================
  *
@@ -192,9 +189,9 @@ struct sctp_daddr {
 	size_t cwnd;			/* congestion window */
 	size_t ssthresh;		/* slow start threshold */
 
-	tid_t timer_heartbeat;		/* heartbeat timer (for acks) */
-	tid_t timer_retrans;		/* retrans (RTO) timer */
-	tid_t timer_idle;		/* idle timer */
+	toid_t timer_heartbeat;		/* heartbeat timer (for acks) */
+	toid_t timer_retrans;		/* retrans (RTO) timer */
+	toid_t timer_idle;		/* idle timer */
 
 	ulong when;			/* last time transmitting */
 	size_t ack_accum;		/* accumulator for acks */
@@ -352,10 +349,10 @@ struct sctp {
 	size_t max_retrans;		/* max association retransmits */
 	size_t max_inits;		/* max init retransmits */
 
-	tid_t timer_init;		/* init timer */
-	tid_t timer_cookie;		/* cookie timer */
-	tid_t timer_shutdown;		/* shutdown timer */
-	tid_t timer_sack;		/* sack timer */
+	toid_t timer_init;		/* init timer */
+	toid_t timer_cookie;		/* cookie timer */
+	toid_t timer_shutdown;		/* shutdown timer */
+	toid_t timer_sack;		/* sack timer */
 };
 /*
  *  Some flags.

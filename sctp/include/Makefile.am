@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 22:03:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/15 23:07:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:36 $ by $Author: brian $
+# Last Modified $Date: 2005/07/15 23:07:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,11 +58,13 @@ if PKG_BUILD_ARCH
 nobase_include_HEADERS = \
 	netinet/sctp.h
 
+nobase_nodist_include_HEADERS =
+
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
 TESTS_ENVIRONMENT	+= CTAGS='$(CTAGIDS)' \
-			   PKG_HEADERS='$(nobase_pkginclude_HEADERS) $(nobase_nodist_pkginclude_HEADERS)' \
+			   PKG_HEADERS='$(nobase_include_HEADERS) $(nobase_nodist_include_HEADERS)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= $(top_builddir)/check_headers.log

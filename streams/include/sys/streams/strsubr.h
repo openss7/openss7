@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.28 2005/07/14 10:38:53 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.29 2005/07/15 23:09:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 10:38:53 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:51 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/14 10:38:53 $"
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/15 23:09:51 $"
 
 #ifndef __SYS_STRSUBR_H__
-#warn "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
+#warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
 #endif
 
 #ifndef __KERNEL__

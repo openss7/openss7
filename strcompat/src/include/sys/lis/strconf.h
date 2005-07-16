@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.9 2005/07/14 22:03:50 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.10 2005/07/15 23:08:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/14 22:03:50 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/15 23:08:50 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -83,6 +83,10 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_LIS) || defined(CONFIG_STREAMS_COMPAT_LIS_MODULE)
 
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
+
 typedef struct lis_strrecvfd {
 	union {
 		struct file *fp;
@@ -95,10 +99,6 @@ typedef struct lis_strrecvfd {
 		struct stdata *hd;
 	} r;
 } strrecvfd_t;
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
-#endif
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.1 2005/07/12 13:54:43 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.2 2005/07/15 23:09:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:19 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OS7_DDI_H__
 #define __SYS_OS7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/12 13:54:43 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/15 23:09:19 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -65,15 +65,6 @@
 #ifndef _OS7_SOURCE
 #warning "_OS7_SOURCE not defined but OS7 ddi.h included"
 #endif
-
-#include <sys/os7/debug.h>		/* generic debugging macros */
-#include <sys/os7/bufq.h>		/* generic buffer queues */
-#include <sys/os7/priv.h>		/* generic data structures */
-#include <sys/os7/lock.h>		/* generic queue locking functions */
-#include <sys/os7/queue.h>		/* generic put and srv routines */
-#include <sys/os7/allocb.h>		/* generic buffer allocation routines */
-#include <sys/os7/timer.h>		/* generic timer handling */
-#include <sys/os7/bufpool.h>		/* generic buffer pools */
 
 #if defined(CONFIG_STREAMS_COMPAT_OS7) || defined(CONFIG_STREAMS_COMPAT_OS7_MODULE)
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2005/07/14 22:03:46 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/15 23:08:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:46 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.7  2005/07/15 23:08:37  brian
+ - checking in for sync
+
  Revision 0.9.2.6  2005/07/14 22:03:46  brian
  - updates for check pass and header splitting
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -93,6 +96,10 @@
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
 #include <sys/sad.h>
+
+#ifndef ASSERT
+#define ASSERT(__assertion) assert((__assertion))
+#endif
 
 /* These functions are missing from LiS, but in the core in LfS */
 

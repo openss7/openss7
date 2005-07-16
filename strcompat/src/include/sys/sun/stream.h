@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:04:01 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 23:09:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:01 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/15 23:09:30  brian
+ - checking in for sync
+
  Revision 0.9.2.2  2005/07/14 22:04:01  brian
  - updates for check pass and header splitting
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -130,6 +133,41 @@ extern void qwriter(queue_t *qp, mblk_t *mp, void (*func) (queue_t *qp, mblk_t *
 #endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
+
+__SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
+{
+	mblk_t *mp;
+	union ioctypes *iocp;
+	static atomic_t ioc_id = ATOMIC_INIT(0);
+	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
+		mp->b_datap->db_type = M_IOCTL;
+		mp->b_wptr += sizeof(*iocp);
+		mp->b_cont = NULL;
+		iocp = (typeof(iocp)) mp->b_rptr;
+		iocp->iocblk.ioc_cmd = command;
+		atomic_inc(&ioc_id);
+		iocp->iocblk.ioc_id = atomic_read(&ioc_id);	/* FIXME: need better unique id */
+		iocp->iocblk.ioc_cr = NULL;	/* FIXME: need maximum credentials pointer */
+		iocp->iocblk.ioc_count = 0;
+		iocp->iocblk.ioc_rval = 0;
+		iocp->iocblk.ioc_error = 0;
+#if 0
+		iocp->iocblk.ioc_flag = IOC_NATIVE;
+#endif
+	}
+	return (mp);
+}
+
+/* These are MPS definitions exposed by OpenSolaris, but implemented in mpscompat.c */
+extern mblk_t *mi_timer_alloc_SUN(size_t size);
+extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+extern void mi_timer_stop(mblk_t *mp);
+extern void mi_timer_move(queue_t *q, mblk_t *mp);
+extern int mi_timer_valid(mblk_t *mp);
+extern void mi_timer_free(mblk_t *mp);
+
+#define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
+#define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)
 
 #elif defined _SUN_SOURCE
 #warning "_SUN_SOURCE defined by not CONFIG_STREAMS_COMPAT_SUN"

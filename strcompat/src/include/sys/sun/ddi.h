@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2005/07/14 22:03:59 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2005/07/15 23:09:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:59 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:27 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/14 22:03:59 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/15 23:09:27 $"
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -74,30 +74,6 @@
 #define PERIM_OUTER	2	/* Solaris used with qwriter() */
 
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
-
-__SUN_EXTERN_INLINE mblk_t *mkiocb(unsigned int command)
-{
-	mblk_t *mp;
-	union ioctypes *iocp;
-	static atomic_t ioc_id = ATOMIC_INIT(0);
-	if ((mp = allocb(sizeof(*iocp), BPRI_MED))) {
-		mp->b_datap->db_type = M_IOCTL;
-		mp->b_wptr += sizeof(*iocp);
-		mp->b_cont = NULL;
-		iocp = (typeof(iocp)) mp->b_rptr;
-		iocp->iocblk.ioc_cmd = command;
-		atomic_inc(&ioc_id);
-		iocp->iocblk.ioc_id = atomic_read(&ioc_id);	/* FIXME: need better unique id */
-		iocp->iocblk.ioc_cr = NULL;	/* FIXME: need maximum credentials pointer */
-		iocp->iocblk.ioc_count = 0;
-		iocp->iocblk.ioc_rval = 0;
-		iocp->iocblk.ioc_error = 0;
-#if 0
-		iocp->iocblk.ioc_flag = IOC_NATIVE;
-#endif
-	}
-	return (mp);
-}
 
 #if LFS
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void)
@@ -433,17 +409,6 @@ extern int ddi_umem_lock(void);
 extern int ddi_umem_unlock(void);
 extern int ddi_unmap_regs(void);
 #endif
-
-/* These are MPS definitions exposed by OpenSolaris, but implemented in mpscompat.c */
-extern mblk_t *mi_timer_alloc_SUN(size_t size);
-extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
-extern void mi_timer_stop(mblk_t *mp);
-extern void mi_timer_move(queue_t *q, mblk_t *mp);
-extern int mi_timer_valid(mblk_t *mp);
-extern void mi_timer_free(mblk_t *mp);
-
-#define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
-#define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)
 
 #elif defined(_SUN_SOURCE)
 #warning "_SUN_SOURCE defined but not CONFIG_STREAMS_COMPAT_SUN"

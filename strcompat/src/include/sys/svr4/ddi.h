@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.17 2005/07/14 22:04:04 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.18 2005/07/15 23:09:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:04 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:39 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 22:04:04 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/15 23:09:39 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -69,9 +69,15 @@
 
 #include <sys/kmem.h>		/* for kmem_alloc/free */
 
+#ifndef lock_t
 typedef spinlock_t lock_t;
+#define lock_t lock_t
+#endif
 
+#ifndef pl_t
 typedef long pl_t;
+#define pl_t pl_t
+#endif
 
 typedef struct lkinfo {
 	char *lk_name;
@@ -330,12 +336,7 @@ __SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 extern int sleep(caddr_t event, pl_t pl);
 extern void wakeup(caddr_t event);
 
-#ifdef DEBUG
-#ifdef ASSERT
 #undef ASSERT
-#endif
-#define ASSERT(__exp) \
-do { if (!(__exp)) { panic("assertion failed: " #__exp ", file: " __FILE__ ", line: %d\n", __LINE__); } } while(0)
-#endif
+#define ASSERT(__assertion) assert((__assertion))
 
 #endif				/* __SYS_SVR4_DDI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/15 23:10:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/05 22:46:11 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:10:26 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/15 23:10:26 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2005/07/05 22:46:11 $";
+static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2005/07/15 23:10:26 $";
 
 #define __NO_VERSION__
 
@@ -3177,7 +3177,7 @@ sctp_cumm_ack(sp, ack)
 STATIC void
 sctp_ack_calc(sp, tp)
 	sctp_t *sp;			/* private structure for stream */
-	tid_t *tp;			/* timer to cancel */
+	toid_t *tp;			/* timer to cancel */
 {
 	sctp_tcb_t *cb;
 	sctp_daddr_t *sd;

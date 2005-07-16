@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.2 2005/07/14 22:03:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 23:08:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.3  2005/07/15 23:08:43  brian
+ - checking in for sync
+
  Revision 0.9.2.2  2005/07/14 22:03:48  brian
  - updates for check pass and header splitting
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -82,6 +85,10 @@
 #include <sys/strcompat/config.h>
 
 #if defined CONFIG_STREAMS_COMPAT_LFS || defined CONFIG_STREAMS_COMPAT_LFS_MODULE
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
 
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp)

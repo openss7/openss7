@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.14 2005/07/12 13:54:40 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.15 2005/07/15 23:08:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/12 13:54:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.15  2005/07/15 23:08:18  brian
+ - checking in for sync
+
  Revision 0.9.2.14  2005/07/12 13:54:40  brian
  - changes for os7 compatibility and check pass
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_DDI_H__
 #define __SYS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifdef LIS
 #include <sys/LiS/ddi.h>
@@ -99,8 +102,8 @@
 #include <sys/uw7/ddi.h>
 #endif
 #ifdef _SUN_SOURCE
-#include <sys/strsun.h>
 #include <sys/sunddi.h>
+#include <sys/strsun.h>
 #endif
 #ifdef _MAC_SOURCE
 #include <sys/mac/ddi.h>

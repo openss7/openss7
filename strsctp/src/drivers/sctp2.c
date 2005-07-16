@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/15 23:10:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/06/23 10:50:55 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:10:05 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/15 23:10:05 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/15 23:10:05 $";
 
 #include "sctp_compat.h"
 
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/06/23 10:50:55 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2005/07/15 23:10:05 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -364,7 +364,7 @@ typedef struct sctp_tcb sctp_tcb_t;
 struct sctp_timer;
 typedef struct sctp_timer sctp_timer_t;
 struct sctp_timer {
-	tid_t tid;			/* timer id */
+	toid_t tid;			/* timer id */
 	unsigned long expires;		/* timer expiry */
 	caddr_t data;			/* timeout function argument */
 	timo_fcn_t *function;		/* timeout function */
@@ -2563,7 +2563,7 @@ sd_init_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp, timo_fcn_t *fnc)
 STATIC INLINE void
 sp_del_timeout(sctp_t *sp, sctp_timer_t *tidp)
 {
-	tid_t tid;
+	toid_t tid;
 	if ((tid = xchg(&tidp->tid, 0))) {
 		untimeout(tid);
 		sctp_put(sp);
@@ -2572,7 +2572,7 @@ sp_del_timeout(sctp_t *sp, sctp_timer_t *tidp)
 STATIC INLINE void
 sd_del_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp)
 {
-	tid_t tid;
+	toid_t tid;
 	if ((tid = xchg(&tidp->tid, 0))) {
 		untimeout(tid);
 		sctp_dput(sd);
@@ -2581,7 +2581,7 @@ sd_del_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp)
 STATIC INLINE void
 sp_set_timeout(sctp_t *sp, sctp_timer_t *tidp, long ticks)
 {
-	tid_t tid;
+	toid_t tid;
 	sctp_hold(sp);
 	if (ticks < SCTP_TIMER_MINIMUM)
 		ticks = SCTP_TIMER_MINIMUM;
@@ -2595,7 +2595,7 @@ sp_set_timeout(sctp_t *sp, sctp_timer_t *tidp, long ticks)
 STATIC INLINE void
 sd_set_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp, long ticks)
 {
-	tid_t tid;
+	toid_t tid;
 	sctp_dhold(sd);
 	if (ticks < SCTP_TIMER_MINIMUM)
 		ticks = SCTP_TIMER_MINIMUM;
@@ -2609,7 +2609,7 @@ sd_set_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp, long ticks)
 STATIC INLINE void
 sp_mod_timeout(sctp_t *sp, sctp_timer_t *tidp, long ticks)
 {
-	tid_t tid;
+	toid_t tid;
 	sctp_hold(sp);
 	if (ticks < SCTP_TIMER_MINIMUM)
 		ticks = SCTP_TIMER_MINIMUM;
@@ -2622,7 +2622,7 @@ sp_mod_timeout(sctp_t *sp, sctp_timer_t *tidp, long ticks)
 STATIC INLINE void
 sd_mod_timeout(struct sctp_daddr *sd, sctp_timer_t *tidp, long ticks)
 {
-	tid_t tid;
+	toid_t tid;
 	sctp_dhold(sd);
 	if (ticks < SCTP_TIMER_MINIMUM)
 		ticks = SCTP_TIMER_MINIMUM;

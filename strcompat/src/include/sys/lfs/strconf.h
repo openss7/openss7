@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.11 2005/07/14 22:03:47 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.12 2005/07/15 23:08:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:40 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/14 22:03:47 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/15 23:08:40 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -73,6 +73,12 @@
 #include <sys/strcompat/config.h>
 
 #if defined(CONFIG_STREAMS_COMPAT_LFS) || defined(CONFIG_STREAMS_COMPAT_LFS_MODULE)
+
+#ifndef dev_t
+#define dev_t __streams_dev_t
+#endif
+
+#include <sys/dki.h>			/* for kmem_alloc */
 
 struct _fmodsw {
 	struct list_head f_list;	/* list of all structures */

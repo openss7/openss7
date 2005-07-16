@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.10 2005/07/14 22:03:42 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.11 2005/07/15 23:08:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_AIX_DDI_H__
 #define __SYS_AIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/07/14 22:03:42 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/15 23:08:25 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -67,10 +67,6 @@
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_AIX) || defined(CONFIG_STREAMS_COMPAT_AIX_MODULE)
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
-#endif
 
 #elif defined(_AIX_SOURCE)
 #warning "_AIX_SOURCE defined but not CONFIG_STREAMS_COMPAT_AIX"

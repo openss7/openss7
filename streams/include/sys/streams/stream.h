@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.38 2005/07/14 22:04:13 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.39 2005/07/15 23:09:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:13 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:48 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2005/07/14 22:04:13 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/15 23:09:48 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -837,8 +837,12 @@ struct wantio {
 	int (*putpmsg) (struct file *, struct strbuf *, struct strbuf *, int, int);
 };
 
+#undef bcid_t
 typedef int bcid_t;
+#define bcid_t bcid_t
+#undef bufcall_id_t
 typedef int bufcall_id_t;
+#define bufcall_id_t bufcall_id_t
 
 typedef void *weld_arg_t;
 typedef void (*weld_fcn_t) (weld_arg_t);
@@ -1191,9 +1195,15 @@ __EXTERN_INLINE void qreply(queue_t *q, mblk_t *mp)
 	return putnext(OTHERQ(q), mp);
 }
 
+#undef timo_fcn_t
 typedef void timo_fcn_t (caddr_t arg);
+#define timo_fcn_t timo_fcn_t
+#undef toid_t
 typedef int toid_t;			/* SVR4 */
+#define toid_t toid_t
+#undef timout_id_t
 typedef int timeout_id_t;		/* Solaris */
+#define timeout_id_t timeout_id_t
 
 extern toid_t timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks);
 extern clock_t untimeout(toid_t toid);

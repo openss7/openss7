@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.25 2005/07/14 22:04:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.26 2005/07/15 23:09:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:04:12 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:43 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/14 22:04:12 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/15 23:09:43 $"
 
 #ifndef __SYS_DDI_H__
 #warn "Do no include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -77,10 +77,6 @@
 #include <sys/dki.h>
 #if 0
 #include <sys/map.h>		/* for rm map definitions */
-#endif
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
 #endif
 
 __EXTERN_INLINE major_t getmajor(dev_t dev)

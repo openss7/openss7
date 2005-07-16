@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.6 2005/07/14 22:03:56 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.7 2005/07/15 23:09:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:56 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:09:24 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_OSF_DDI_H__
 #define __SYS_OSF_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/14 22:03:56 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/15 23:09:24 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -67,10 +67,6 @@
 #endif
 
 #if defined(CONFIG_STREAMS_COMPAT_OSF) || defined(CONFIG_STREAMS_COMPAT_OSF_MODULE)
-
-#ifndef dev_t
-#define dev_t __streams_dev_t
-#endif
 
 __OSF_EXTERN_INLINE time_t lbolt(void)
 {

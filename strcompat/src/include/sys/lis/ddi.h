@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.17 2005/07/14 22:03:49 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.18 2005/07/15 23:08:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/14 22:03:49 $ by $Author: brian $
+ Last Modified $Date: 2005/07/15 23:08:45 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/14 22:03:49 $"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2005/07/15 23:08:45 $"
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -146,9 +146,10 @@ typedef struct lis_pci_dev {
 	struct lis_pci_dev *next;
 } lis_pci_dev_t;
 
-#ifndef dev_t
-#define dev_t __streams_dev_t
-#endif
+#define ALLOC(__s) kmem_alloc((__s), KM_NOSLEEP)
+#define FREE(__p) kmem_free((__p), sizeof(*(__p)))
+#define SPLSTR(__pl) ({ (__pl) = splstr(); (void)0; })
+#define SPLX(__pl) splx(__pl)
 
 extern void *lis__kfree(void *ptr) __depr;
 extern void *lis__kmalloc(int nbytes, int class, int use_cache) __depr;
