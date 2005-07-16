@@ -50,7 +50,7 @@
 #
 # =============================================================================
 
-SUBDIRS = compat doc include src
+SUBDIRS = compat include src doc
 
 ##
 ## General rules

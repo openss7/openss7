@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: iperf.1.man,v 1.1.2.7 2005/05/14 08:29:49 brian Exp $
+.\" @(#) $Id: iperf.1.man,v 1.1.2.8 2005/07/16 06:54:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/05/14 08:29:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/16 06:54:00 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .\"
@@ -126,6 +126,7 @@ sort-adjacent-labels
 {\fB-s\fR|\fB--server\fR}
 [\fISERVER-OPTIONS\fR]
 [\fICLIENT-SERVER-OPTIONS\fR]
+.PD 0
 .HP 12
 \fBiperf\fR
 {\fB-c\fR|\fB--client\fR} \fIHOST\fR
@@ -140,6 +141,7 @@ sort-adjacent-labels
 .HP 12
 \fBiperf\fR
 \fB--copying\fR
+.PD
 .\" =========================================================================
 .\" =========================================================================
 .SH DESCRIPTION
