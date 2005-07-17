@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/14 22:04:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/16 22:03:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,19 +46,29 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:04:18 $ by $Author: brian $
+# Last Modified $Date: 2005/07/16 22:03:19 $ by $Author: brian $
 #
 # =============================================================================
 
-include ../am/openss7.am
+include ../../am/openss7.am
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = 
+nobase_pkginclude_HEADERS =  \
+	sys/log.h \
+	sys/sad.h \
+	sys/sc.h \
+	sys/strlog.h \
+	sys/strutil/log.h \
+	sys/strutil/sad.h \
+	sys/strutil/sc.h \
+	sys/strutil/strlog.h
+
 
 nobase_nodist_pkginclude_HEADERS = \
-	sys/strutil/version.h
+	sys/strutil/version.h \
+	sys/strutil/config.h
 #	sys/strutil/modversions.h
 
 if PERFORM_CHECKS
