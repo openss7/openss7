@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2005/07/09 21:59:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/16 22:03:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:59:43 $ by $Author: brian $
+# Last Modified $Date: 2005/07/16 22:03:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,9 +57,97 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-man_MANS = 
+man_MANS = \
+	man1/strchg.1 \
+	man1/strconf.1 \
+	man1/strreset.1 \
+	man1/xxx.1 \
+	man3/pipe.3 \
+	man3/s_pipe.3 \
+	man4/clone.4 \
+	man4/connld.4 \
+	man4/connld.old.4 \
+	man4/echo.4 \
+	man4/fifo.4 \
+	man4/fifo.4s \
+	man4/fifo.old.4 \
+	man4/nsdev.4 \
+	man4/nuls.4 \
+	man4/pipe.4 \
+	man4/pipemod.4 \
+	man4/pipemod.old.4 \
+	man4/sad.4 \
+	man4/sc.4 \
+	man4/s_fifo.4 \
+	man4/sfx.4 \
+	man4/spx.4 \
+	man4/strlog.4 \
+	man5/autopush.5 \
+	man5/strsetup.conf.5 \
+	man5/xxx.5 \
+	man8/autopush.8 \
+	man8/fattach.8 \
+	man8/fattach.old.8 \
+	man8/fdetach.8 \
+	man8/fdetach.old.8 \
+	man8/insf.8 \
+	man8/scls.8 \
+	man8/soon.8 \
+	man8/strace.8 \
+	man8/strclean.8 \
+	man8/strconf.8 \
+	man8/strerr.8 \
+	man8/strinfo.8 \
+	man8/strload.8 \
+	man8/strsetup.8 \
+	man8/strvf.8 \
+	man8/xxx.8
 
-dist_noinst_MANS = 
+dist_noinst_MANS = \
+	man1/strchg.1.man \
+	man1/strconf.1.man \
+	man1/strreset.1.man \
+	man1/xxx.1.man \
+	man3/pipe.3.man \
+	man3/s_pipe.3.man \
+	man4/clone.4.man \
+	man4/connld.4.man \
+	man4/connld.old.4.man \
+	man4/echo.4.man \
+	man4/fifo.4.man \
+	man4/fifo.4s.man \
+	man4/fifo.old.4.man \
+	man4/nsdev.4.man \
+	man4/nuls.4.man \
+	man4/pipe.4.man \
+	man4/pipemod.4.man \
+	man4/pipemod.old.4.man \
+	man4/sad.4.man \
+	man4/sc.4.man \
+	man4/s_fifo.4.man \
+	man4/sfx.4.man \
+	man4/spx.4.man \
+	man4/strlog.4.man \
+	man5/autopush.5.man \
+	man5/strsetup.conf.5.man \
+	man5/xxx.5.man \
+	man8/autopush.8.man \
+	man8/fattach.8.man \
+	man8/fattach.old.8.man \
+	man8/fdetach.8.man \
+	man8/fdetach.old.8.man \
+	man8/insf.8.man \
+	man8/scls.8.man \
+	man8/soon.8.man \
+	man8/strace.8.man \
+	man8/strclean.8.man \
+	man8/strconf.8.man \
+	man8/strerr.8.man \
+	man8/strinfo.8.man \
+	man8/strload.8.man \
+	man8/strsetup.8.man \
+	man8/strvf.8.man \
+	man8/xxx.8.man
 
 ## PKG_BUILD_INDEP
 endif

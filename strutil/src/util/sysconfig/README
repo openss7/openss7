@@ -1,15 +1,13 @@
 This directory contains configuration files for use with init scripts as
 follows:
 
-  specfs    - initializes the specfs file system and /dev/streams mount point
-  streams   - brings up the STREAMS subsystem
   strerr    - initializes the error logger
   strace    - initializes the trace logger
 
 
 # *****************************************************************************
 # 
-# $Id: README,v 0.9.2.1 2005/02/06 19:38:22 brian Exp $
+# $Id: README,v 0.9.2.2 2005/07/16 22:03:20 brian Exp $
 # 
 # *****************************************************************************
 # 
@@ -54,6 +52,6 @@ follows:
 # 
 # *****************************************************************************
 # 
-# Last Modified $Date: 2005/02/06 19:38:22 $ by $Author: brian $
+# Last Modified $Date: 2005/07/16 22:03:20 $ by $Author: brian $
 # 
 # *****************************************************************************
