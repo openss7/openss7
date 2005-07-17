@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/16 22:03:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/17 08:06:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/16 22:03:17 $ by $Author: brian $
+# Last Modified $Date: 2005/07/17 08:06:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -219,6 +219,12 @@ AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_util_pipemod="$enableval"],
 	    [enable_util_pipemod='module'])
+    AC_ARG_ENABLE([util-connld],
+	AS_HELP_STRING([--enable-util-connld],
+	    [enable connld module.
+	    @<:@default=module@:>@]),
+	    [enable_util_connld="$enableval"],
+	    [enable_util_connld='module'])
     AC_ARG_ENABLE([util-sc],
 	AS_HELP_STRING([--enable-util-sc],
 	    [enable sc module.
@@ -279,6 +285,11 @@ AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
 	util_pipemod="${enable_util_pipemod:-module}"
 	if test :$util_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 	    util_pipemod='yes'
+	fi])
+    AC_CACHE_CHECK([for util connld module], [util_connld], [dnl
+	util_connld="${enable_util_connld:-module}"
+	if test :$util_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    util_connld='yes'
 	fi])
     AC_CACHE_CHECK([for util sc module], [util_sc], [dnl
 	util_sc="${enable_util_sc:-module}"
@@ -428,6 +439,19 @@ AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
 	    module.])
 	    ;;
     esac
+    case ${util_connld:-module} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CONNLD], [], [When defined,] AC_PACKAGE_NAME [
+	    will include the connld module for linkage with the kernel.  When undefined,]
+	    AC_PACKAGE_NAME [will not include the connld module for linkage with the kernel.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_CONNLD_MODULE], [], [When defined,]
+	    AC_PACKAGE_NAME [will include the connld module as a loadable kernel module.  When
+	    undefined,] AC_PACKAGE_NAME [will not include the connld module as a loadable kernel
+	    module.])
+	    ;;
+    esac
     case ${util_sc:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTIL_SC], [], [When defined,] AC_PACKAGE_NAME [
@@ -463,6 +487,8 @@ AC_DEFUN([_UTIL_SETUP_OPTIONS], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SPX_MODULE],	[test :${util_spx:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPEMOD],	[test :${util_pipemod:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_UTIL_PIPEMOD_MODULE],[test :${util_pipemod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CONNLD],	[test :${util_connld:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_UTIL_CONNLD_MODULE],	[test :${util_connld:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SC],		[test :${util_sc:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_UTIL_SC_MODULE],	[test :${util_sc:-module}	= :module])
 ])# _UTIL_SETUP_OPTIONS
@@ -676,7 +702,7 @@ AC_DEFUN([_UTIL_OUTPUT], [dnl
 # _UTIL_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_UTIL_STRCONF], [dnl
-    strconf_cv_stem='lis.conf'
+    strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=245
     strconf_cv_config='strconf.h'

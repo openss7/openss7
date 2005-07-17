@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:48 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,33 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:48 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:40 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:48 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:40 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
  *  existing pipe-end.
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/kmem.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
+#ifdef LIS
+#define CONFIG_STREAMS_CONNLD_MODID	CONNLD_MOD_ID
+#define CONFIG_STREAMS_CONNLD_NAME	CONNLD_MOD_NAME
+#define fmodsw				_fmodsw
+#endif
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:48 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:40 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -86,7 +84,7 @@ static char const ident[] =
 #define CONNLD_SPLASH		CONNLD_DEVICE		" - " \
 				CONNLD_REVISION		"\n"
 
-#ifdef CONFIG_STREAMS_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
 MODULE_AUTHOR(CONNLD_CONTACT);
 MODULE_DESCRIPTION(CONNLD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
@@ -174,13 +172,13 @@ static struct fmodsw connld_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
 static
 #endif
 int __init connld_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
 	printk(KERN_INFO CONNLD_BANNER);
 #else
 	printk(KERN_INFO CONNLD_SPLASH);
@@ -192,7 +190,7 @@ int __init connld_init(void)
 		modid = err;
 	return (0);
 };
-#ifdef CONFIG_STREAMS_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
 static
 #endif
 void __exit connld_exit(void)
@@ -203,7 +201,7 @@ void __exit connld_exit(void)
 	return (void) (0);
 };
 
-#ifdef CONFIG_STREAMS_CONNLD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CONNLD_MODULE
 module_init(connld_init);
 module_exit(connld_exit);
 #endif

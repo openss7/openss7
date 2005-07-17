@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strconf.8.man,v 0.9.2.13 2005/07/16 22:03:19 brian Exp $
+.\" @(#) $Id: strconf.8.man,v 0.9.2.14 2005/07/17 08:01:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/17 08:01:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -87,7 +87,7 @@ sort-adjacent-labels
 .\"
 .SH OPTIONS
 .HP 12
-\fBstrconf\fR ...
+\fBstrconf\fR [\fIoptions\fR] [\fICONFIGFILE\fR \fI...\fR]
 .PD 0
 .HP 12
 \fBstrconf\fR {\fB-h\fR|\fB--help\fR}
@@ -97,7 +97,7 @@ sort-adjacent-labels
 \fBstrconf\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .TP
-.BI "-b " number
+\fB-b\fR, \fB--basemajor\fR \fIMAJOR\fR
 Set the base major number for automatic assignment of major device numbers.
 The
 .B LiS
@@ -112,21 +112,146 @@ to set this parameter, or a default value if this variable is not defined.  By
 defining this symbol in your environment, you can override the default base
 for major device numbers.
 .TP
-.BI "-h " file
+\fB-B\fR, \fB--minorbits\fR \fIMINORBITS\fR
+number of bits in a minor device number.  Default
+.RB ' 8 '.
 .TP
-.BI "-l " file
+\fB-h\fR, \fB--hconfig\fR [\fIHCONFIG\fR]
+full path and filename of the
+.I STREAMS
+configuration header file.  Default
+.RB ' config.h '.
+This option must be specified to cause
+.B strconf
+to generate the
+.I STREAMS
+configuration header file.
 .TP
-.BI "-L " file
+\fB-o\fR, \fB--modconf\fR [\fIMODCONFINC\fR]
+full path and filename of the module configuration include file.  Default
+.RB ' modconf.inc '.
+This option must be specified to cause
+.B strconf
+to generate the
+module configuration include file.
 .TP
-.BI "-m " file
+\fB-m\fR, \fB--makenodes\fR [\fIMAKENODES\fR]
+full path and filename of the makenodes file.  Default
+.RB ' makenodes.c '.
+This option must be specified to cause
+.B strconf
+to generate the
+makenodes file.
 .TP
-.BI "-M " name
+\fB-p\fR, \fB--permission\fR [\fIPERM\fR]
+permissions to assign to created files.  Default
+.RB ' 0666 '.
 .TP
-.BI "-o " file
+\fB-l\fR, \fB--driverconf\fR [\fIDRIVERCONF\fR]
+full path and filename of the driver configuration file.  Default
+.RB ' drvconf.mk '.
+This option must be specified to cause
+.B strconf
+to generate the
+driver configuration file.
 .TP
-.BI "-p " perm
+\fB-L\fR, \fB--confmodules\fR [\fICONFMODULES\fR]
+full path and filename of the modules configuration file.  Default
+.RB ' conf.modules '.
+This option must be specified to cause
+.B strconf
+to generate the
+modules configuration file.
 .TP
-.BI "-r " name
+\fB-r\fR, \fB--functionname\fR [\fIFUNCNAME\fR]
+function name of the function in makenodes.  Default
+.RB ' main '.
+.TP
+\fB-s\fR, \fB--strmknods\fR [\fIMAKEDEVICES\fR]
+full path and filename of the makedevices script.  Default
+.RB ' makedev.lst '.
+This option must be specified to cause
+.B strconf
+to generate the
+makedevices script.
+.TP
+\fB-S\fR, \fB--strsetup\fR [\fISTRSETUP\fR]
+full path and filename of the
+.BR strsetup (8)
+configuration file.  Default
+.RB ' strsetup.conf '.
+This option must be specified to cause
+.B strconf
+to generate the
+.BR strsetup (8)
+configuration file.
+.TP
+\fB-O\fR, \fB--strload\fR [\fISTRLOAD\fR]
+full path and filename of the
+.BR strload (8)
+configuration file.  Default
+.RB ' strload.conf '.
+This option must be specified to cause
+.B strconf
+to generate the
+.BR strload (8)
+configuration file.
+.TP
+\fB-k\fR, \fB--package\fR [\fIPACKAGE\fR]
+name of
+.I STREAMS
+package.  Default
+.RB ' LiS '.
+The option can be one of:
+.RS
+.TP
+.B LiS
+the Linux STREAMS package.
+.[
+lis
+.]
+.PD 0
+.TP
+.B LfS
+the Linux Fast-STREAMS package.
+.[
+lfs
+.]
+.PD
+.RE
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+[\fICONFIGFILE\fR \fI...\fR]
+specifies the input configuration file.  If no configuration file is specified for input,
+.B strconf
+will read input from
+.IR stdin .
+If more than one input configuration file is specified, each will be read in the sequence specified
+on the command line.
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B --strsetup
+option generates a configuration file suitable for use by
+.BR strsetup (8).
+For more information on the format of
+.BR strsetup (8)
+configuration files, see
+.BR strsetup (8).
+.PP
+The
+.B --strload
+option generates a configuration file suitable for use by
+.BR strload (8).
+For more information on the format of
+.BR strload (8)
+configuration files, see
+.BR strload (8).
 .\"
 .\"
 .SH DIAGNOSTICS

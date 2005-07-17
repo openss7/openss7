@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 20:17:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:47 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2005/07/01 20:17:37 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -81,7 +81,7 @@ static char const ident[] =
 #include <signal.h>
 #include <syslog.h>
 #include <sys/utsname.h>
-#include <strlog.h>
+#include <sys/strlog.h>
 
 static int nomead = 1;			/* default daemon mode */
 static int debug = 0;			/* default no debug */

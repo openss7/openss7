@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/17 08:06:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/01 07:29:32 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.17  2005/07/17 08:06:43  brian
+ - changes for first build
+
  Revision 0.9.2.16  2005/07/01 07:29:32  brian
  - updates for LE2005 build
 
@@ -117,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/17 08:06:43 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/01 07:29:32 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/17 08:06:43 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2733,6 +2736,7 @@ struct test_stream test_2_19_3 = { &preamble_0, &test_case_2_19_3, &postamble_0 
 #define test_case_2_19_3_stream_1 (NULL)
 #define test_case_2_19_3_stream_2 (NULL)
 
+#ifdef SNDHOLD
 #define tgrp_case_2_19_4 test_group_2
 #define numb_case_2_19_4 "2.19.4"
 #define name_case_2_19_4 "Perform streamio I_SWROPT - SNDHOLD."
@@ -2752,6 +2756,7 @@ struct test_stream test_2_19_4 = { &preamble_0, &test_case_2_19_4, &postamble_0 
 #define test_case_2_19_4_stream_0 (&test_2_19_4)
 #define test_case_2_19_4_stream_1 (NULL)
 #define test_case_2_19_4_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_19_5 test_group_2
 #define numb_case_2_19_5 "2.19.5"
@@ -2773,6 +2778,7 @@ struct test_stream test_2_19_5 = { &preamble_0, &test_case_2_19_5, &postamble_0 
 #define test_case_2_19_5_stream_1 (NULL)
 #define test_case_2_19_5_stream_2 (NULL)
 
+#ifdef SNDHOLD
 #define tgrp_case_2_19_6 test_group_2
 #define numb_case_2_19_6 "2.19.6"
 #define name_case_2_19_6 "Perform streamio I_SWROPT - SNDZERO | SNDHOLD."
@@ -2832,6 +2838,7 @@ struct test_stream test_2_19_8 = { &preamble_0, &test_case_2_19_8, &postamble_0 
 #define test_case_2_19_8_stream_0 (&test_2_19_8)
 #define test_case_2_19_8_stream_1 (NULL)
 #define test_case_2_19_8_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_19_9 test_group_2
 #define numb_case_2_19_9 "2.19.9"
@@ -2961,6 +2968,7 @@ struct test_stream test_2_20_4 = { &preamble_0, &test_case_2_20_4, &postamble_0 
 #define test_case_2_20_4_stream_1 (NULL)
 #define test_case_2_20_4_stream_2 (NULL)
 
+#ifdef SNDHOLD
 #define tgrp_case_2_20_5 test_group_2
 #define numb_case_2_20_5 "2.20.5"
 #define name_case_2_20_5 "Perform streamio I_GWROPT - SNDHOLD."
@@ -2987,6 +2995,7 @@ struct test_stream test_2_20_5 = { &preamble_0, &test_case_2_20_5, &postamble_0 
 #define test_case_2_20_5_stream_0 (&test_2_20_5)
 #define test_case_2_20_5_stream_1 (NULL)
 #define test_case_2_20_5_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_20_6 test_group_2
 #define numb_case_2_20_6 "2.20.6"
@@ -3015,6 +3024,7 @@ struct test_stream test_2_20_6 = { &preamble_0, &test_case_2_20_6, &postamble_0 
 #define test_case_2_20_6_stream_1 (NULL)
 #define test_case_2_20_6_stream_2 (NULL)
 
+#ifdef SNDHOLD
 #define tgrp_case_2_20_7 test_group_2
 #define numb_case_2_20_7 "2.20.7"
 #define name_case_2_20_7 "Perform streamio I_GWROPT - SNDZERO | SNDHOLD."
@@ -3095,6 +3105,7 @@ struct test_stream test_2_20_9 = { &preamble_0, &test_case_2_20_9, &postamble_0 
 #define test_case_2_20_9_stream_0 (&test_2_20_9)
 #define test_case_2_20_9_stream_1 (NULL)
 #define test_case_2_20_9_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_20_10 test_group_2
 #define numb_case_2_20_10 "2.20.10"
@@ -3430,6 +3441,7 @@ struct test_stream test_2_30_1 = { &preamble_0, &test_case_2_30_1, &postamble_0 
 #define test_case_2_30_1_stream_1 (NULL)
 #define test_case_2_30_1_stream_2 (NULL)
 
+#ifdef RERRNONPERSIST
 #define tgrp_case_2_30_2 test_group_2
 #define numb_case_2_30_2 "2.30.2"
 #define name_case_2_30_2 "Perform streamio I_SERROPT - RERRNONPERSIST."
@@ -3448,7 +3460,9 @@ struct test_stream test_2_30_2 = { &preamble_0, &test_case_2_30_2, &postamble_0 
 #define test_case_2_30_2_stream_0 (&test_2_30_2)
 #define test_case_2_30_2_stream_1 (NULL)
 #define test_case_2_30_2_stream_2 (NULL)
+#endif
 
+#ifdef WERRNONPERSIST
 #define tgrp_case_2_30_3 test_group_2
 #define numb_case_2_30_3 "2.30.3"
 #define name_case_2_30_3 "Perform streamio I_SERROPT - WERRNONPERSIST."
@@ -3467,7 +3481,9 @@ struct test_stream test_2_30_3 = { &preamble_0, &test_case_2_30_3, &postamble_0 
 #define test_case_2_30_3_stream_0 (&test_2_30_3)
 #define test_case_2_30_3_stream_1 (NULL)
 #define test_case_2_30_3_stream_2 (NULL)
+#endif
 
+#ifdef RERRNONPERSIST
 #define tgrp_case_2_30_4 test_group_2
 #define numb_case_2_30_4 "2.30.4"
 #define name_case_2_30_4 "Perform streamio I_SERROPT - RERRNONPERSIST | WERRNONPERSIST."
@@ -3486,6 +3502,7 @@ struct test_stream test_2_30_4 = { &preamble_0, &test_case_2_30_4, &postamble_0 
 #define test_case_2_30_4_stream_0 (&test_2_30_4)
 #define test_case_2_30_4_stream_1 (NULL)
 #define test_case_2_30_4_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_30_5 test_group_2
 #define numb_case_2_30_5 "2.30.5"
@@ -3509,6 +3526,7 @@ struct test_stream test_2_30_5 = { &preamble_0, &test_case_2_30_5, &postamble_0 
 /*
  *  Perform IOCTL on one stream - I_GERROPT	(Solaris)
  */
+#if defined RERRNORM && defined WERRNORM
 #define tgrp_case_2_31_1 test_group_2
 #define numb_case_2_31_1 "2.31.1"
 #define name_case_2_31_1 "Perform streamio I_GERROPT - default."
@@ -3559,7 +3577,9 @@ struct test_stream test_2_31_2 = { &preamble_0, &test_case_2_31_2, &postamble_0 
 #define test_case_2_31_2_stream_0 (&test_2_31_2)
 #define test_case_2_31_2_stream_1 (NULL)
 #define test_case_2_31_2_stream_2 (NULL)
+#endif
 
+#if defined RERRNONPERSIST && defined WERRNORM
 #define tgrp_case_2_31_3 test_group_2
 #define numb_case_2_31_3 "2.31.3"
 #define name_case_2_31_3 "Perform streamio I_GERROPT - RERRNONPERSIST."
@@ -3586,7 +3606,9 @@ struct test_stream test_2_31_3 = { &preamble_0, &test_case_2_31_3, &postamble_0 
 #define test_case_2_31_3_stream_0 (&test_2_31_3)
 #define test_case_2_31_3_stream_1 (NULL)
 #define test_case_2_31_3_stream_2 (NULL)
+#endif
 
+#ifdef WERRNONPERSIST
 #define tgrp_case_2_31_4 test_group_2
 #define numb_case_2_31_4 "2.31.4"
 #define name_case_2_31_4 "Perform streamio I_GERROPT - WERRNONPERSIST."
@@ -3613,7 +3635,9 @@ struct test_stream test_2_31_4 = { &preamble_0, &test_case_2_31_4, &postamble_0 
 #define test_case_2_31_4_stream_0 (&test_2_31_4)
 #define test_case_2_31_4_stream_1 (NULL)
 #define test_case_2_31_4_stream_2 (NULL)
+#endif
 
+#ifdef RERRNONPERSIST
 #define tgrp_case_2_31_5 test_group_2
 #define numb_case_2_31_5 "2.31.5"
 #define name_case_2_31_5 "Perform streamio I_GERROPT - RERRNONPERSIST | WERRNONPERSIST."
@@ -3640,6 +3664,7 @@ struct test_stream test_2_31_5 = { &preamble_0, &test_case_2_31_5, &postamble_0 
 #define test_case_2_31_5_stream_0 (&test_2_31_5)
 #define test_case_2_31_5_stream_1 (NULL)
 #define test_case_2_31_5_stream_2 (NULL)
+#endif
 
 #define tgrp_case_2_31_6 test_group_2
 #define numb_case_2_31_6 "2.31.6"
@@ -4242,21 +4267,29 @@ struct test_case {
 		numb_case_2_19_1, tgrp_case_2_19_1, name_case_2_19_1, desc_case_2_19_1, sref_case_2_19_1, { test_case_2_19_1_stream_0, test_case_2_19_1_stream_1, test_case_2_19_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_2, tgrp_case_2_19_2, name_case_2_19_2, desc_case_2_19_2, sref_case_2_19_2, { test_case_2_19_2_stream_0, test_case_2_19_2_stream_1, test_case_2_19_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_3, tgrp_case_2_19_3, name_case_2_19_3, desc_case_2_19_3, sref_case_2_19_3, { test_case_2_19_3_stream_0, test_case_2_19_3_stream_1, test_case_2_19_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#ifdef SNDHOLD
 		numb_case_2_19_4, tgrp_case_2_19_4, name_case_2_19_4, desc_case_2_19_4, sref_case_2_19_4, { test_case_2_19_4_stream_0, test_case_2_19_4_stream_1, test_case_2_19_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_19_5, tgrp_case_2_19_5, name_case_2_19_5, desc_case_2_19_5, sref_case_2_19_5, { test_case_2_19_5_stream_0, test_case_2_19_5_stream_1, test_case_2_19_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#ifdef SNDHOLD
 		numb_case_2_19_6, tgrp_case_2_19_6, name_case_2_19_6, desc_case_2_19_6, sref_case_2_19_6, { test_case_2_19_6_stream_0, test_case_2_19_6_stream_1, test_case_2_19_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_7, tgrp_case_2_19_7, name_case_2_19_7, desc_case_2_19_7, sref_case_2_19_7, { test_case_2_19_7_stream_0, test_case_2_19_7_stream_1, test_case_2_19_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_19_8, tgrp_case_2_19_8, name_case_2_19_8, desc_case_2_19_8, sref_case_2_19_8, { test_case_2_19_8_stream_0, test_case_2_19_8_stream_1, test_case_2_19_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_19_9, tgrp_case_2_19_9, name_case_2_19_9, desc_case_2_19_9, sref_case_2_19_9, { test_case_2_19_9_stream_0, test_case_2_19_9_stream_1, test_case_2_19_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_1, tgrp_case_2_20_1, name_case_2_20_1, desc_case_2_20_1, sref_case_2_20_1, { test_case_2_20_1_stream_0, test_case_2_20_1_stream_1, test_case_2_20_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_2, tgrp_case_2_20_2, name_case_2_20_2, desc_case_2_20_2, sref_case_2_20_2, { test_case_2_20_2_stream_0, test_case_2_20_2_stream_1, test_case_2_20_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_3, tgrp_case_2_20_3, name_case_2_20_3, desc_case_2_20_3, sref_case_2_20_3, { test_case_2_20_3_stream_0, test_case_2_20_3_stream_1, test_case_2_20_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_4, tgrp_case_2_20_4, name_case_2_20_4, desc_case_2_20_4, sref_case_2_20_4, { test_case_2_20_4_stream_0, test_case_2_20_4_stream_1, test_case_2_20_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#ifdef SNDHOLD
 		numb_case_2_20_5, tgrp_case_2_20_5, name_case_2_20_5, desc_case_2_20_5, sref_case_2_20_5, { test_case_2_20_5_stream_0, test_case_2_20_5_stream_1, test_case_2_20_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_20_6, tgrp_case_2_20_6, name_case_2_20_6, desc_case_2_20_6, sref_case_2_20_6, { test_case_2_20_6_stream_0, test_case_2_20_6_stream_1, test_case_2_20_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#ifdef SNDHOLD
 		numb_case_2_20_7, tgrp_case_2_20_7, name_case_2_20_7, desc_case_2_20_7, sref_case_2_20_7, { test_case_2_20_7_stream_0, test_case_2_20_7_stream_1, test_case_2_20_7_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_8, tgrp_case_2_20_8, name_case_2_20_8, desc_case_2_20_8, sref_case_2_20_8, { test_case_2_20_8_stream_0, test_case_2_20_8_stream_1, test_case_2_20_8_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_20_9, tgrp_case_2_20_9, name_case_2_20_9, desc_case_2_20_9, sref_case_2_20_9, { test_case_2_20_9_stream_0, test_case_2_20_9_stream_1, test_case_2_20_9_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_20_10, tgrp_case_2_20_10, name_case_2_20_10, desc_case_2_20_10, sref_case_2_20_10, { test_case_2_20_10_stream_0, test_case_2_20_10_stream_1, test_case_2_20_10_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_21, tgrp_case_2_21, name_case_2_21, desc_case_2_21, sref_case_2_21, { test_case_2_21_stream_0, test_case_2_21_stream_1, test_case_2_21_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_22, tgrp_case_2_22, name_case_2_22, desc_case_2_22, sref_case_2_22, { test_case_2_22_stream_0, test_case_2_22_stream_1, test_case_2_22_stream_2}, &begin_tests, &end_tests, 0, 0}, {
@@ -4273,15 +4306,29 @@ struct test_case {
 		numb_case_2_29_3, tgrp_case_2_29_3, name_case_2_29_3, desc_case_2_29_3, sref_case_2_29_3, { test_case_2_29_3_stream_0, test_case_2_29_3_stream_1, test_case_2_29_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_29_4, tgrp_case_2_29_4, name_case_2_29_4, desc_case_2_29_4, sref_case_2_29_4, { test_case_2_29_4_stream_0, test_case_2_29_4_stream_1, test_case_2_29_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_30_1, tgrp_case_2_30_1, name_case_2_30_1, desc_case_2_30_1, sref_case_2_30_1, { test_case_2_30_1_stream_0, test_case_2_30_1_stream_1, test_case_2_30_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#ifdef RERRNONPERSIST
 		numb_case_2_30_2, tgrp_case_2_30_2, name_case_2_30_2, desc_case_2_30_2, sref_case_2_30_2, { test_case_2_30_2_stream_0, test_case_2_30_2_stream_1, test_case_2_30_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#ifdef WERRNONPERSIST
 		numb_case_2_30_3, tgrp_case_2_30_3, name_case_2_30_3, desc_case_2_30_3, sref_case_2_30_3, { test_case_2_30_3_stream_0, test_case_2_30_3_stream_1, test_case_2_30_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#ifdef RERRNONPERSIST
 		numb_case_2_30_4, tgrp_case_2_30_4, name_case_2_30_4, desc_case_2_30_4, sref_case_2_30_4, { test_case_2_30_4_stream_0, test_case_2_30_4_stream_1, test_case_2_30_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_30_5, tgrp_case_2_30_5, name_case_2_30_5, desc_case_2_30_5, sref_case_2_30_5, { test_case_2_30_5_stream_0, test_case_2_30_5_stream_1, test_case_2_30_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#if defined RERRNORM && defined WERRNORM
 		numb_case_2_31_1, tgrp_case_2_31_1, name_case_2_31_1, desc_case_2_31_1, sref_case_2_31_1, { test_case_2_31_1_stream_0, test_case_2_31_1_stream_1, test_case_2_31_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_31_2, tgrp_case_2_31_2, name_case_2_31_2, desc_case_2_31_2, sref_case_2_31_2, { test_case_2_31_2_stream_0, test_case_2_31_2_stream_1, test_case_2_31_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#if defined RERRNONPERSIST && defined WERRNORM
 		numb_case_2_31_3, tgrp_case_2_31_3, name_case_2_31_3, desc_case_2_31_3, sref_case_2_31_3, { test_case_2_31_3_stream_0, test_case_2_31_3_stream_1, test_case_2_31_3_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#ifdef WERRNONPERSIST
 		numb_case_2_31_4, tgrp_case_2_31_4, name_case_2_31_4, desc_case_2_31_4, sref_case_2_31_4, { test_case_2_31_4_stream_0, test_case_2_31_4_stream_1, test_case_2_31_4_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
+#ifdef RERRNONPERSIST
 		numb_case_2_31_5, tgrp_case_2_31_5, name_case_2_31_5, desc_case_2_31_5, sref_case_2_31_5, { test_case_2_31_5_stream_0, test_case_2_31_5_stream_1, test_case_2_31_5_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+#endif
 		numb_case_2_31_6, tgrp_case_2_31_6, name_case_2_31_6, desc_case_2_31_6, sref_case_2_31_6, { test_case_2_31_6_stream_0, test_case_2_31_6_stream_1, test_case_2_31_6_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 		numb_case_2_32, tgrp_case_2_32, name_case_2_32, desc_case_2_32, sref_case_2_32, { test_case_2_32_stream_0, test_case_2_32_stream_1, test_case_2_32_stream_2}, &begin_tests, &end_tests, 0, 0}, {
 #if 0

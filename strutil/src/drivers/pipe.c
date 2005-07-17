@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/04 20:07:42 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,33 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:42 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/04 20:07:42 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/04 20:07:42 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
-#include "src/kernel/strreg.h"
-#include "src/kernel/strsched.h"
-#include "src/kernel/strsad.h"		/* for autopush */
-#include "src/modules/sth.h"
 #include "pipe.h"		/* extern verification */
+
+#ifdef LIS
+#define CONFIG_STREAMS_PIPE_MODID	PIPE_DRV_ID
+#define CONFIG_STREAMS_PIPE_NAME	PIPE_DRV_NAME
+#define CONFIG_STREAMS_PIPE_MAJOR	PIPE_CMAJOR_0
+extern int strrput(queue_t *, mblk_t *);
+extern int strwsrv(queue_t *);
+extern struct file_operations strm_f_ops;
+#endif
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/04 20:07:42 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2005/07/17 08:06:36 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -86,7 +84,7 @@ static char const ident[] =
 #define PIPE_SPLASH	PIPE_DEVICE	" - " \
 			PIPE_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_PIPE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 MODULE_AUTHOR(PIPE_CONTACT);
 MODULE_DESCRIPTION(PIPE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(PIPE_DEVICE);
@@ -184,6 +182,9 @@ static struct streamtab pipe_info = {
  */
 static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
+#if LIS
+	return (ENXIO);
+#else
 	int err;
 	if (q->q_ptr != NULL) {
 		/* we walk down the queue chain calling open on each of the modules and the driver */
@@ -220,11 +221,14 @@ static int pipe_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		}
 	}
 	return (-EIO);		/* can't be opened as module or clone */
+#endif
 }
 static int pipe_close(queue_t *q, int oflag, cred_t *crp)
 {
+#if LFS
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
+#endif
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }
@@ -238,13 +242,13 @@ static struct cdevsw pipe_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_PIPE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 static
 #endif
 int __init pipe_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_PIPE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 	printk(KERN_INFO PIPE_BANNER);
 #else
 	printk(KERN_INFO PIPE_SPLASH);
@@ -256,7 +260,7 @@ int __init pipe_init(void)
 		major = err;
 	return (0);
 };
-#ifdef CONFIG_STREAMS_PIPE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 static
 #endif
 void __exit pipe_exit(void)
@@ -264,7 +268,7 @@ void __exit pipe_exit(void)
 	unregister_strdev(&pipe_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_PIPE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_PIPE_MODULE
 module_init(pipe_init);
 module_exit(pipe_exit);
 #endif

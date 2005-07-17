@@ -18,15 +18,15 @@
 #	name		prefix	major	n-minors  n-majors
 driver	clone		clone	*
 driver	fifo		fifo	*
-driver	loop		loop	*
+#driver	loop		loop	*
 driver	sad		sad	*
 driver	nsdev		nsdev	*
 driver	echo		echo	*
 driver	nuls		nuls	*
 driver	pipe		pipe	*
 driver	log		log	*
-#driver	sfx		sfx	*
-#driver	spx		spx	*
+driver	sfx		sfx	*
+driver	spx		spx	*
 #driver	socksys		socksys	*
 #driver	unix		unix	*
 #driver	xnet		xnet	*
@@ -41,15 +41,15 @@ driver	log		log	*
 #	type	name		object name
 objname driver	clone		clone
 objname driver	fifo		fifo
-objname driver	loop		loop
+#objname driver	loop		loop
 objname driver	sad		sad
 objname	driver	nsdev		nsdev
 objname	driver	echo		echo
 objname	driver	nuls		nuls
 objname	driver	pipe		pipe
 objname driver	log		log
-#objname	driver	sfx		sfx
-#objname	driver	spx		spx
+objname	driver	sfx		sfx
+objname	driver	spx		spx
 #objname	driver	socksys		socksys
 #objname	driver	unix		unix
 #objname	driver	xnet		xnet
@@ -68,17 +68,17 @@ objname driver	log		log
 #
 # Loadable specifications
 #
-@CONFIG_STREAMS_CLONE_MODULE_TRUE@loadable clone
-@CONFIG_STREAMS_FIFO_MODULE_TRUE@loadable fifo
-@CONFIG_STREAMS_LOOP_MODULE_TRUE@loadable loop
-@CONFIG_STREAMS_SAD_MODULE_TRUE@loadable sad
-@CONFIG_STREAMS_NSDEV_MODULE_TRUE@loadable nsdev
-@CONFIG_STREAMS_ECHO_MODULE_TRUE@loadable echo
-@CONFIG_STREAMS_NULS_MODULE_TRUE@loadable nuls
-@CONFIG_STREAMS_PIPE_MODULE_TRUE@loadable pipe
-@CONFIG_STREAMS_LOG_MODULE_TRUE@loadable log
-#loadable sfx
-#loadable spx
+@CONFIG_STREAMS_UTIL_CLONE_MODULE_TRUE@loadable clone
+@CONFIG_STREAMS_UTIL_FIFO_MODULE_TRUE@loadable fifo
+#@CONFIG_STREAMS_UTIL_LOOP_MODULE_TRUE@loadable loop
+@CONFIG_STREAMS_UTIL_SAD_MODULE_TRUE@loadable sad
+@CONFIG_STREAMS_UTIL_NSDEV_MODULE_TRUE@loadable nsdev
+@CONFIG_STREAMS_UTIL_ECHO_MODULE_TRUE@loadable echo
+@CONFIG_STREAMS_UTIL_NULS_MODULE_TRUE@loadable nuls
+@CONFIG_STREAMS_UTIL_PIPE_MODULE_TRUE@loadable pipe
+@CONFIG_STREAMS_UTIL_LOG_MODULE_TRUE@loadable log
+loadable sfx
+loadable spx
 #loadable socksys
 #loadable unix
 #loadable xnet
@@ -110,15 +110,15 @@ objname driver	log		log
 #node	/dev/loop_clone	     c	*	clone-drvr	loop-around
 node	/dev/clone	     c	*	clone		0
 node	/dev/fifo	     c  0666    clone		fifo
-node	/dev/loop	     c  0666    clone		loop
+#node	/dev/loop	     c  0666    clone		loop
 node	/dev/sad	     c	*	clone		sad
 node	/dev/nsdev	     c	*	nsdev		0
 node	/dev/echo	     c	*	clone		echo
 node	/dev/nuls	     c	*	clone		nuls
 node	/dev/pipe	     c	*	pipe		0
 node	/dev/strlog	     c	*	clone		log
-#node	/dev/sfx	     c	*	sfx		0
-#node	/dev/spx	     c	*	spx		0
+node	/dev/sfx	     c	*	sfx		0
+node	/dev/spx	     c	*	spx		0
 #node	/dev/socksys	     c	*	socksys		0
 #node	/dev/unix	     c	*	unix		0
 #node	/dev/xnet	     c	*	xnet		0

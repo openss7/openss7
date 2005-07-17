@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:38 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,36 +46,37 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:38 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:38 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:38 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <asm/semaphore.h>
+#include <sys/os7/compat.h>
 
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-
-#include "sys/config.h"
-#include "src/kernel/strsched.h"	/* for allocstr */
-#include "src/kernel/strsad.h"	/* for autopush */
-#include "src/modules/sth.h"
 #include "fifo.h"		/* extern verification */
+
+#if LIS
+#define CONFIG_STREAMS_FIFO_MODID	FIFO_DRV_ID
+#define CONFIG_STREAMS_FIFO_NAME	FIFO_DRV_NAME
+#define CONFIG_STREAMS_FIFO_MAJOR	FIFO_CMAJOR_0
+#define LFSSTATIC
+extern int strrput(queue_t *, mblk_t *);
+extern int strwsrv(queue_t *);
+extern struct file_operations strm_f_ops;
+#endif
+#if LFS
+#define LFSSTATIC static
+#endif
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/04 20:07:38 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/17 08:06:36 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -87,7 +88,7 @@ static char const ident[] =
 #define FIFO_SPLASH	FIFO_DEVICE	" - " \
 			FIFO_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_FIFO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
 MODULE_AUTHOR(FIFO_CONTACT);
 MODULE_DESCRIPTION(FIFO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
@@ -139,7 +140,7 @@ MODULE_ALIAS("/dev/streams/fifo");
 MODULE_ALIAS("/dev/streams/fifo/*");
 #endif
 
-static struct module_info fifo_minfo = {
+LFSSTATIC struct module_info fifo_minfo = {
 	mi_idnum:CONFIG_STREAMS_FIFO_MODID,
 	mi_idname:CONFIG_STREAMS_FIFO_NAME,
 	mi_minpsz:0,
@@ -148,22 +149,22 @@ static struct module_info fifo_minfo = {
 	mi_lowat:STRLOW,
 };
 
-static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
-static int fifo_qclose(queue_t *q, int oflag, cred_t *crp);
+LFSSTATIC int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+LFSSTATIC int fifo_qclose(queue_t *q, int oflag, cred_t *crp);
 
-static struct qinit fifo_rinit = {
+LFSSTATIC struct qinit fifo_rinit = {
 	qi_putp:strrput,
 	qi_qopen:fifo_qopen,
 	qi_qclose:fifo_qclose,
 	qi_minfo:&fifo_minfo,
 };
 
-static struct qinit fifo_winit = {
+LFSSTATIC struct qinit fifo_winit = {
 	qi_srvp:strwsrv,
 	qi_minfo:&fifo_minfo,
 };
 
-static struct streamtab fifo_info = {
+LFSSTATIC struct streamtab fifo_info = {
 	st_rdinit:&fifo_rinit,
 	st_wrinit:&fifo_winit,
 };
@@ -185,8 +186,11 @@ static struct streamtab fifo_info = {
  *  @sflag:	STREAMS flags (%DRVOPEN or %MODOPEN or %CLONEOPEN)
  *  @crp:	pointer to user's credentials structure
  */
-static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+LFSSTATIC int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
+#if LIS
+	return (ENXIO);
+#else
 	struct stdata *sd;
 	int err = 0;
 	if ((sd = q->q_ptr) != NULL) {
@@ -283,11 +287,14 @@ static int fifo_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp
 	if (!q->q_ptr)
 		q->q_ptr = WR(q)->q_ptr = sd;
 	return (0);
+#endif
 }
-static int fifo_qclose(queue_t *q, int oflag, cred_t *crp)
+LFSSTATIC int fifo_qclose(queue_t *q, int oflag, cred_t *crp)
 {
+#if LFS
 	if (!q->q_ptr || q->q_ptr != ((struct queinfo *) q)->qu_str)
 		return (ENXIO);
+#endif
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	return (0);
 }
@@ -300,7 +307,7 @@ static int fifo_qclose(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-static struct cdevsw fifo_cdev = {
+LFSSTATIC struct cdevsw fifo_cdev = {
 	d_name:CONFIG_STREAMS_FIFO_NAME,
 	d_str:&fifo_info,
 	d_flag:0,
@@ -327,7 +334,7 @@ static struct cdevsw fifo_cdev = {
  *  opens, see spec_dev_open() in strspecfs.c).  The character device inode is opened directly and
  *  no inode in the shadow filesystem is addressed.
  */
-STATIC int fifo_open(struct inode *inode, struct file *file)
+LFSSTATIC int fifo_open(struct inode *inode, struct file *file)
 {
 	int err;
 	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
@@ -343,7 +350,7 @@ STATIC int fifo_open(struct inode *inode, struct file *file)
 	return (err);
 }
 
-STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
+LFSSTATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
 	open:fifo_open,
 };
@@ -357,18 +364,18 @@ STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
  */
 
 #ifdef CONFIG_STREAMS_FIFO_OVERRIDE
-static const struct file_operations *_def_fifo_ops =
+LFSSTATIC const struct file_operations *_def_fifo_ops =
     ((typeof(_def_fifo_ops)) HAVE_DEF_FIFO_OPS_ADDR);
 
-static struct file_operations fifo_tmp_ops;
+LFSSTATIC struct file_operations fifo_tmp_ops;
 
-STATIC void register_fifo(void)
+LFSSTATIC void register_fifo(void)
 {
 	fifo_tmp_ops = *_def_fifo_ops;
 	_def_fifo_ops->owner = fifo_f_ops.owner;
 	_def_fifo_ops->open = fifo_f_ops.open;
 }
-STATIC void unregister_fifo(void)
+LFSSTATIC void unregister_fifo(void)
 {
 	_def_fifo_ops->open = fifo_tmp_ops.open;
 	_def_fifo_ops->owner = fifo_tmp_ops.owner;
@@ -383,13 +390,16 @@ STATIC void unregister_fifo(void)
  *  -------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_STREAMS_FIFO_MODULE
-static
+#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+LFSSTATIC
 #endif
 int __init fifo_init(void)
 {
+#if LIS
+	return (ENXIO);
+#else
 	int err;
-#ifdef CONFIG_STREAMS_FIFO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
 	printk(KERN_INFO FIFO_BANNER);
 #else
 	printk(KERN_INFO FIFO_SPLASH);
@@ -403,20 +413,23 @@ int __init fifo_init(void)
 	if (major == 0 && err > 0)
 		major = err;
 	return (0);
+#endif
 };
 
-#ifdef CONFIG_STREAMS_FIFO_MODULE
-static
+#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
+LFSSTATIC
 #endif
 void __exit fifo_exit(void)
 {
+#if LFS
 #ifdef CONFIG_STREAMS_FIFO_OVERRIDE
 	unregister_fifo();	/* This is not safe... */
 #endif
 	unregister_cmajor(&fifo_cdev, major);
+#endif
 };
 
-#ifdef CONFIG_STREAMS_FIFO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_FIFO_MODULE
 module_init(fifo_init);
 module_exit(fifo_exit);
 #endif

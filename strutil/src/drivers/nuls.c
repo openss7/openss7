@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/04 20:07:41 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/04 20:07:41 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/04 20:07:41 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/kmem.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
+#ifdef LIS
+#define CONFIG_STREAMS_NULS_MODID	NULS_DRV_ID
+#define CONFIG_STREAMS_NULS_NAME	NULS_DRV_NAME
+#define CONFIG_STREAMS_NULS_MAJOR	NULS_CMAJOR_0
+#endif
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/04 20:07:41 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -82,7 +79,7 @@ static char const ident[] =
 #define NULS_SPLASH	NULS_DEVICE	" - " \
 			NULS_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_NULS_MODULE
+#ifdef CONFIG_STREAMS_UTIL_NULS_MODULE
 MODULE_AUTHOR(NULS_CONTACT);
 MODULE_DESCRIPTION(NULS_DESCRIP);
 MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
@@ -310,13 +307,13 @@ static struct cdevsw nuls_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_NULS_MODULE
+#ifdef CONFIG_STREAMS_UTIL_NULS_MODULE
 static
 #endif
 int __init nuls_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_NULS_MODULE
+#ifdef CONFIG_STREAMS_UTIL_NULS_MODULE
 	printk(KERN_INFO NULS_BANNER);
 #else
 	printk(KERN_INFO NULS_SPLASH);
@@ -328,7 +325,7 @@ int __init nuls_init(void)
 		major = err;
 	return (0);
 };
-#ifdef CONFIG_STREAMS_NULS_MODULE
+#ifdef CONFIG_STREAMS_UTIL_NULS_MODULE
 static
 #endif
 void __exit nuls_exit(void)
@@ -336,7 +333,7 @@ void __exit nuls_exit(void)
 	unregister_strdev(&nuls_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_NULS_MODULE
+#ifdef CONFIG_STREAMS_UTIL_NULS_MODULE
 module_init(nuls_init);
 module_exit(nuls_exit);
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,33 +46,30 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:39 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/kmem.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-#include <sys/strlog.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
 #include "log.h"
+
+#ifdef LIS
+#define CONFIG_STREAMS_LOG_MODID	LOG_DRV_ID
+#define CONFIG_STREAMS_LOG_NAME		LOG_DRV_NAME
+#define CONFIG_STREAMS_LOG_MAJOR	LOG_CMAJOR_0
+#endif
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:39 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -84,7 +81,7 @@ static char const ident[] =
 #define LOG_SPLASH	LOG_DEVICE	" - " \
 			LOG_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_LOG_MODULE
+#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 MODULE_AUTHOR(LOG_CONTACT);
 MODULE_DESCRIPTION(LOG_DESCRIP);
 MODULE_SUPPORTED_DEVICE(LOG_DEVICE);
@@ -345,13 +342,13 @@ static struct cdevsw log_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_LOG_MODULE
+#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 static
 #endif
 int __init log_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_LOG_MODULE
+#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 	printk(KERN_INFO LOG_BANNER);
 #else
 	printk(KERN_INFO LOG_SPLASH);
@@ -363,7 +360,7 @@ int __init log_init(void)
 		major = err;
 	return (0);
 }
-#ifdef CONFIG_STREAMS_LOG_MODULE
+#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 static
 #endif
 void __exit log_exit(void)
@@ -371,7 +368,7 @@ void __exit log_exit(void)
 	unregister_strdev(&log_cdev, major);
 }
 
-#ifdef CONFIG_STREAMS_LOG_MODULE
+#ifdef CONFIG_STREAMS_UTIL_LOG_MODULE
 module_init(log_init);
 module_exit(log_exit);
 #endif

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fattach.8.man,v 0.9.2.12 2005/07/16 22:03:19 brian Exp $
+.\" @(#) $Id: fattach.8.man,v 0.9.2.13 2005/07/17 08:01:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/17 08:01:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -81,44 +81,232 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
-.\"
-.\"
-.SH DESCRIPTION
-.PP
+.HP 12
+\fBfattach\fR [\fIoptions\fR] {\fB-p\fR|\fB--pipe\fR} \fIPATH\fR \fI...\fR
+.PD 0
+.HP
+\fBfattach\fR [\fIoptions\fR] {\fB-c\fR|\fB--connld\fR} \fIPATH\fR \fI...\fR
+.HP
+\fBfattach\fR [\fIoptions\fR] \fIDEVICE\fR \fIPATH\fR \fI...\fR
+.HP
+\fBfattach\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBfattach\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBfattach\fR {\fB-C\fR|\fB--copying\fR}
+.PD
 .\"
 .\"
 .SH OPTIONS
 .PP
-.HP 12
-\fBfattach\fR {\fB-h\fR|\fB--help\fR}
-.HP 12
-\fBfattach\fR {\fB-V\fR|\fB--version\fR}
-.HP 12
-\fBfattach\fR {\fB-C\fR|\fB--copying\fR}
+The following options are command options.  When
+.B --pipe
+or
+.B --connld
+or
+both are specified, a
+.BR pipe (4)
+stream is opened and attached to
+.IR PATH .
+When
+.B --connld
+is specified, the
+.BR connld (4)
+module is also pushed onto the pipe end that is then attached.
+If neither
+.B --pipe
+or
+.B --connld
+is specified, the first non-option argument must be a path to a STREAMS
+.I DEVICE
+that will be opened and attached instead of a
+.BR pipe (4).
+.TP
+\fB-p\fR, \fB--pipe\fR
+create a pipe to attach to
+.IR PATH .
+.TP
+\fB-c\fR, \fB--connld\fR
+push
+.BR connld (4)
+on the first side of the pipe (implies
+.BR -p ).
+.PP
+The following
+.I options
+can be used in conjunction with the command options listed above.
+.TP
+\fB-m\fR, \fB--mode\fR
+apply the mode of the old file after attaching to
+.IR PATH .
+.TP
+\fB-u\fR, \fB--umask\fR
+apply the umask after attaching to
+.IR PATH .
+.TP
+\fB-M\fR, \fB--mode\fR
+apply mode
+.I MODE
+after attaching the
+.IR PATH .
+.TP
+\fB-q\fR, \fB--quiet\fR
+suppress normal output (equivalent to
+.BR --verbose = 0 ).
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+increment or set output verbosity to \fILEVEL\fR.  This option can be repeated.
+.PP
+The following options are general purpose command options.  When the option is encountered, the
+information is displayed and
+.B fattach
+exists without processing further options or arguments.
+.TP
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B fattach
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B fattach
+displays version information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B fattach
+displays copying and copyright information on
+.I stdout
+and exits.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I DEVICE
+a
+.I STREAMS
+special character device to open and attach.
+.TP
+.I PATH
+the filesystem path to which to attach the open stream.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B fattach
+command provides a method for the caller to open a
+.I STREAMS
+device or
+.BR pipe (4),
+optionally pushing a
+.BR connld (4)
+module on the pipe, and attaching the resulting stream to a filesystem path using
+.BR fattach (3).
+The
+.B fattach
+command also provides the ability to adjust the permissions on the resulting file attached stream.
+.PP
+There are three forms of the
+.B fattach
+command.  The first is used to open a new
+.BR pipe (4)
+and attach one end to the specified
+.IR PATH .
+The second form also opens a new
+.BR pipe (4)
+and attaches one end to the specified
+.IR PATH ;
+however, it also pushes the
+.BR connld (4)
+module onto that end of the pipe before attaching it.
+The third form is more general and opens the specified
+.I DEVICE
+and attaches that open stream to
+.IR PATH .
+.BR fattach (3)
+is used to perform the attachment of the stream to
+.IR PATH .
+.\"
+.\"
+.SH USAGE
+.PP
+.B fattach
+is useful for use by startup scripts and other scripts that cannot directly use the
+.BR fattach (3)
+library call.  It can be used to establish named streams for servers.  The use of
+.BR pipe (4)
+and
+.BR connld (4)
+and their value in establishing local servers without the use of UNIX domain sockets
+is described on those manual pages and in Stevens.
+.[
+advprog
+.]
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed to
+.IR stderr .
 .\"
 .\"
 .SH NOTICES
 .PP
+The
+.B fattach
+command requires the availability of the
+.BR fattach (3)
+library call.
 .\"
 .\"
 .SH ENVIRONMENT
 .PP
+.B fattach
+does not examine any environment variables.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR connld (4)
+.I STREAMS connection line discipline pipe module.
+.TP
+.BR /dev/pipe, /dev/spx
+.I STREAMS
+.BR pipe (4)
+devices
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.B /usr/sbin/fattach
+contains the
+.B fattach
+command
 .\"
 .\"
 .SH SEE\ ALSO
 .PP
+.BR fdetach (8),
+.BR fattach (3),
+.BR pipe (4),
+.BR connld (4).
 .\"
 .\"
 .SH BUGS
 .PP
+.B fattach
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -156,6 +344,12 @@ documentation.
 .\"
 .SH HISTORY
 .PP
+.B fattach
+first appeared in
+.BR LiS .
+.[
+lis
+.]
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: nsdev.4.man,v 0.9.2.14 2005/07/16 22:03:18 brian Exp $
+.\" @(#) $Id: nsdev.4.man,v 0.9.2.15 2005/07/17 08:01:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/17 08:01:22 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -144,7 +144,7 @@ Devices knowing only the character major device number associated with the
 .B nsdev
 driver and demand load other
 .I STREAMS
-modules and drivers that may then dynamically allocated their major device
+modules and drivers that may then dynamically allocate their major device
 numbers (or not allocate any major device numbers at all).
 .PP
 For additional information on device numbers, see the
@@ -195,6 +195,9 @@ major device number to devices with the name
 .BI clone. yyy
 and assigning the traditional clone device minor number (see
 .BR clone (4)).
+In this way, it is not even necessary to know the device major number of the
+.BR clone (4)
+device.
 .\"
 .\"
 .SH NOTICES

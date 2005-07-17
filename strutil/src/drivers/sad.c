@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:43 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,33 +46,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:43 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:43 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
+#include <sys/os7/compat.h>
 
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-#include <sys/sad.h>
-
-#include "sys/config.h"
-//#include "src/kernel/strreg.h"
-#include "src/kernel/strsad.h"		/* for autopush functions */
+#ifdef LIS
+#define CONFIG_STREAMS_SAD_MODID	SAD_DRV_ID
+#define CONFIG_STREAMS_SAD_NAME		SAD_DRV_NAME
+#define CONFIG_STREAMS_SAD_MAJOR	SAD_CMAJOR_0
+#endif
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/04 20:07:43 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/17 08:06:36 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -84,7 +78,7 @@ static char const ident[] =
 #define SAD_SPLASH	SAD_DEVICE	" - " \
 			SAD_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_SAD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 MODULE_AUTHOR(SAD_CONTACT);
 MODULE_DESCRIPTION(SAD_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SAD_DEVICE);
@@ -428,13 +422,13 @@ static struct devnode sad_node_user = {
 	n_mode:S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-#ifdef CONFIG_STREAMS_SAD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 static
 #endif
 int __init sad_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_SAD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 	printk(KERN_INFO SAD_BANNER);
 #else
 	printk(KERN_INFO SAD_SPLASH);
@@ -449,7 +443,7 @@ int __init sad_init(void)
 	register_strnod(&sad_cdev, &sad_node_user, 1);
 	return (0);
 };
-#ifdef CONFIG_STREAMS_SAD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 static
 #endif
 void __exit sad_exit(void)
@@ -459,7 +453,7 @@ void __exit sad_exit(void)
 	unregister_strdev(&sad_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_SAD_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SAD_MODULE
 module_init(sad_init);
 module_exit(sad_exit);
 #endif

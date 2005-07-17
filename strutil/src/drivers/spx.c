@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:45 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:45 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:45 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:45 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
+#include <sys/os7/compat.h>
 
-#include <sys/kmem.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-
-#include "sys/config.h"
-#include "strreg.h"
+#if LIS
+#define CONFIG_STREAMS_SPX_MODID	SPX_DRV_ID
+#define CONFIG_STREAMS_SPX_NAME		SPX_DRV_NAME
+#define CONFIG_STREAMS_SPX_MAJOR	SPX_CMAJOR_0
+#endif
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2005/07/04 20:07:45 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2005/07/17 08:06:36 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -83,7 +78,7 @@ static char const ident[] =
 #define SPX_SPLASH	SPX_DEVICE	" - " \
 			SPX_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_SPX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 MODULE_AUTHOR(SPX_CONTACT);
 MODULE_DESCRIPTION(SPX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SPX_DEVICE);
@@ -203,7 +198,10 @@ static int spx_wput(queue_t *q, mblk_t *mp)
 			spin_lock(&spx_lock);
 			for (x = spx_list; x && x->q != oq; x = x->next) ;
 			if (x && x->q == oq) {
+#if LIS
+#else
 				weldq(WR(q), oq, WR(oq), q, NULL, NULL, NULL);
+#endif
 				spin_unlock(&spx_lock);
 				/* FIXME: welding is probably not enough.  We probably have to link 
 				   the two stream heads together, pipe-style as well as setting
@@ -344,13 +342,13 @@ static struct cdevsw spx_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_SPX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 static
 #endif
 int __init spx_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_SPX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 	printk(KERN_INFO SPX_BANNER);
 #else
 	printk(KERN_INFO SPX_SPLASH);
@@ -363,7 +361,7 @@ int __init spx_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_SPX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 static
 #endif
 void __exit spx_exit(void)
@@ -371,7 +369,7 @@ void __exit spx_exit(void)
 	unregister_strdev(&spx_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_SPX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SPX_MODULE
 module_init(spx_init);
 module_exit(spx_exit);
 #endif

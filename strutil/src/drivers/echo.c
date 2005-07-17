@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:37 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/kmem.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
+#if LIS
+#define CONFIG_STREAMS_ECHO_MODID	ECHO_DRV_ID
+#define CONFIG_STREAMS_ECHO_NAME	ECHO_DRV_NAME
+#define CONFIG_STREAMS_ECHO_MAJOR	ECHO_CMAJOR_0
+#endif
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2005/07/04 20:07:37 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2005/07/17 08:06:36 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -82,7 +79,7 @@ static char const ident[] =
 #define ECHO_SPLASH	ECHO_DEVICE	" - " \
 			ECHO_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
 MODULE_AUTHOR(ECHO_CONTACT);
 MODULE_DESCRIPTION(ECHO_DESCRIP);
 MODULE_SUPPORTED_DEVICE(ECHO_DEVICE);
@@ -313,13 +310,13 @@ static struct cdevsw echo_cdev = {
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
 static
 #endif
 int __init echo_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_ECHO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
 	printk(KERN_INFO ECHO_BANNER);
 #else
 	printk(KERN_INFO ECHO_SPLASH);
@@ -331,7 +328,7 @@ int __init echo_init(void)
 		major = err;
 	return (0);
 };
-#ifdef CONFIG_STREAMS_ECHO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
 static
 #endif
 void __exit echo_exit(void)
@@ -339,7 +336,7 @@ void __exit echo_exit(void)
 	unregister_strdev(&echo_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_ECHO_MODULE
+#ifdef CONFIG_STREAMS_UTIL_ECHO_MODULE
 module_init(echo_init);
 module_exit(echo_exit);
 #endif

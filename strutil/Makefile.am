@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/07/16 22:03:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2005/07/17 08:06:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/16 22:03:17 $ by $Author: brian $
+# Last Modified $Date: 2005/07/17 08:06:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -266,15 +266,15 @@ test_pipe_LDADD			= $(STREAMS_LDADD)
 test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS)
 
-test_pipemod_SOURCES		= src/test/test-pipemod.c
-test_pipemod_LDADD		= $(STREAMS_LDADD)
-test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_pipemod_CFLAGS		= $(LFS_CFLAGS)
-
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_LDADD			= $(STREAMS_LDADD)
 test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS)
+
+test_pipemod_SOURCES		= src/test/test-pipemod.c
+test_pipemod_LDADD		= $(STREAMS_LDADD)
+test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_pipemod_CFLAGS		= $(LFS_CFLAGS)
 
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_LDADD			= $(STREAMS_LDADD)
@@ -299,19 +299,34 @@ ADDON_OBJS			=
 noinst_LIBRARIES		= libUTILlink.a libUTILmods.a libUTILdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
+EXTRA_libUTILlink_a_SOURCES	= \
+				  src/drivers/clone.c \
+				  src/drivers/echo.c \
+				  src/drivers/fifo.c \
+				  src/drivers/log.c \
+				  src/drivers/nsdev.c \
+				  src/drivers/nuls.c \
+				  src/drivers/pipe.c \
+				  src/drivers/sad.c \
+				  src/drivers/sfx.c \
+				  src/drivers/spx.c \
+				  src/modules/pipemod.c \
+				  src/modules/connld.c \
+				  src/modules/sc.c
+
 libUTILlink_a_SOURCES		= \
 				  src/drivers/clone.h \
 				  src/drivers/fifo.h \
 				  src/drivers/log.h \
 				  src/drivers/pipe.h \
-				  include/sys/log.h \
-				  include/sys/sad.h \
-				  include/sys/sc.h \
-				  include/sys/strlog.h \
-				  include/sys/strutil/log.h \
-				  include/sys/strutil/sad.h \
-				  include/sys/strutil/sc.h \
-				  include/sys/strutil/strlog.h
+				  src/include/sys/log.h \
+				  src/include/sys/sad.h \
+				  src/include/sys/sc.h \
+				  src/include/sys/strlog.h \
+				  src/include/sys/strutil/log.h \
+				  src/include/sys/strutil/sad.h \
+				  src/include/sys/strutil/sc.h \
+				  src/include/sys/strutil/strlog.h
 
 libUTILlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
@@ -329,7 +344,7 @@ libUTILlink_a_DEPENDENCIES	+= src/drivers/fifo.h
 endif
 if CONFIG_STREAMS_UTIL_LOG
 libUTILlink_a_SOURCES		+= src/drivers/log.c
-libUTILlink_a_DEPENDENCIES	+= src/drivers/log.h include/sys/log.h include/sys/strlog.h include/sys/strutil/log.h include/sys/strutil/strlog.h
+libUTILlink_a_DEPENDENCIES	+= src/drivers/log.h src/include/sys/log.h src/include/sys/strlog.h src/include/sys/strutil/log.h src/include/sys/strutil/strlog.h
 endif
 if CONFIG_STREAMS_UTIL_NSDEV
 libUTILlink_a_SOURCES		+= src/drivers/nsdev.c
@@ -345,7 +360,7 @@ libUTILlink_a_DEPENDENCIES	+= src/drivers/pipe.h
 endif
 if CONFIG_STREAMS_UTIL_SAD
 libUTILlink_a_SOURCES		+= src/drivers/sad.c
-libUTILlink_a_DEPENDENCIES	+= include/sys/sad.h include/sys/strutil/sad.h
+libUTILlink_a_DEPENDENCIES	+= src/include/sys/sad.h src/include/sys/strutil/sad.h
 endif
 if CONFIG_STREAMS_UTIL_SFX
 libUTILlink_a_SOURCES		+= src/drivers/sfx.c
@@ -356,12 +371,16 @@ libUTILlink_a_SOURCES		+= src/drivers/spx.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
 if CONFIG_STREAMS_UTIL_PIPEMOD
-libUTILlink_a_SOURCES		+= src/drivers/pipemod.c
+libUTILlink_a_SOURCES		+= src/modules/pipemod.c
+libUTILlink_a_DEPENDENCIES	+=
+endif
+if CONFIG_STREAMS_UTIL_CONNLD
+libUTILlink_a_SOURCES		+= src/modules/connld.c
 libUTILlink_a_DEPENDENCIES	+=
 endif
 if CONFIG_STREAMS_UTIL_SC
-libUTILlink_a_SOURCES		+= src/drivers/sc.c
-libUTILlink_a_DEPENDENCIES	+= include/sys/sc.h include/sys/strutil/sc.h
+libUTILlink_a_SOURCES		+= src/modules/sc.c
+libUTILlink_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
 
 libUTILlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -369,19 +388,28 @@ libUTILlink_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILlink_a_OBJECTS):	$(libUTILlink_a_SOURCES) $(libUTILlink_a_DEPENDENCIES)
 
+EXTRA_libUTILmods_a_SOURCES	= \
+				  src/modules/pipemod.c \
+				  src/modules/connld.c \
+				  src/modules/sc.c
+
 libUTILmods_a_SOURCES		= \
-				  include/sys/sc.h \
-				  include/sys/strutil/sc.h
+				  src/include/sys/sc.h \
+				  src/include/sys/strutil/sc.h
 
 libUTILmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
 if CONFIG_STREAMS_UTIL_PIPEMOD_MODULE
-libUTILmods_a_SOURCES		+= src/drivers/pipemod.c
+libUTILmods_a_SOURCES		+= src/modules/pipemod.c
+libUTILmods_a_DEPENDENCIES	+=
+endif
+if CONFIG_STREAMS_UTIL_CONNLD_MODULE
+libUTILmods_a_SOURCES		+= src/modules/connld.c
 libUTILmods_a_DEPENDENCIES	+=
 endif
 if CONFIG_STREAMS_UTIL_SC_MODULE
-libUTILmods_a_SOURCES		+= src/drivers/sc.c
-libUTILmods_a_DEPENDENCIES	+= include/sys/sc.h include/sys/strutil/sc.h
+libUTILmods_a_SOURCES		+= src/modules/sc.c
+libUTILmods_a_DEPENDENCIES	+= src/include/sys/sc.h src/include/sys/strutil/sc.h
 endif
 
 libUTILmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
@@ -389,17 +417,29 @@ libUTILmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libUTILmods_a_OBJECTS):	$(libUTILmods_a_DEPENDENCIES)
 
+EXTRA_libUTILdrvs_a_SOURCES	= \
+				  src/drivers/clone.c \
+				  src/drivers/echo.c \
+				  src/drivers/fifo.c \
+				  src/drivers/log.c \
+				  src/drivers/nsdev.c \
+				  src/drivers/nuls.c \
+				  src/drivers/pipe.c \
+				  src/drivers/sad.c \
+				  src/drivers/sfx.c \
+				  src/drivers/spx.c
+
 libUTILdrvs_a_SOURCES		= \
 				  src/drivers/clone.h \
 				  src/drivers/fifo.h \
 				  src/drivers/log.h \
 				  src/drivers/pipe.h \
-				  include/sys/log.h \
-				  include/sys/sad.h \
-				  include/sys/strlog.h \
-				  include/sys/strutil/log.h \
-				  include/sys/strutil/sad.h \
-				  include/sys/strutil/strlog.h
+				  src/include/sys/log.h \
+				  src/include/sys/sad.h \
+				  src/include/sys/strlog.h \
+				  src/include/sys/strutil/log.h \
+				  src/include/sys/strutil/sad.h \
+				  src/include/sys/strutil/strlog.h
 
 libUTILdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
 
@@ -417,7 +457,7 @@ libUTILdrvs_a_DEPENDENCIES	+= src/drivers/fifo.h
 endif
 if CONFIG_STREAMS_UTIL_LOG_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/log.c
-libUTILdrvs_a_DEPENDENCIES	+= src/drivers/log.h include/sys/log.h include/sys/strlog.h include/sys/strutil/log.h include/sys/strutil/strlog.h
+libUTILdrvs_a_DEPENDENCIES	+= src/drivers/log.h src/include/sys/log.h src/include/sys/strlog.h src/include/sys/strutil/log.h src/include/sys/strutil/strlog.h
 endif
 if CONFIG_STREAMS_UTIL_NSDEV_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/nsdev.c
@@ -433,7 +473,7 @@ libUTILdrvs_a_DEPENDENCIES	+= src/drivers/pipe.h
 endif
 if CONFIG_STREAMS_UTIL_SAD_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/sad.c
-libUTILdrvs_a_DEPENDENCIES	+= include/sys/sad.h include/sys/strutil/sad.h
+libUTILdrvs_a_DEPENDENCIES	+= src/include/sys/sad.h src/include/sys/strutil/sad.h
 endif
 if CONFIG_STREAMS_UTIL_SFX_MODULE
 libUTILdrvs_a_SOURCES		+= src/drivers/sfx.c
@@ -504,7 +544,7 @@ endif
 ##
 ##include am/libraries.am
 ##
-AUTOCONFIG_H			= $(PKGINCL)/config.h
+AUTOCONFIG_H			= src/$(PKGINCL)/config.h
 ##
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 ##
@@ -543,8 +583,7 @@ if WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/strace.sh \
-				  src/util/init/strerr.sh \
-				  src/util/init/@PACKAGE_LCNAME@.sh
+				  src/util/init/strerr.sh
 
 ## WITH_RCSD_DIRECTORY
 else
@@ -552,21 +591,18 @@ else
 
 dist_initrd_SCRIPTS		= \
 				  src/util/init/strace \
-				  src/util/init/strerr \
-				  src/util/init/@PACKAGE_LCNAME@
+				  src/util/init/strerr
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
 dist_sysconf_DATA		= \
 				  strsetup.conf \
-				  strload.conf \
-				  src/util/sysconfig/@PACKAGE_LCNAME@.conf
+				  strload.conf
 
 dist_config_DATA		= \
 				  src/util/sysconfig/strace \
-				  src/util/sysconfig/strerr \
-				  src/util/sysconfig/@PACKAGE_LCNAME@
+				  src/util/sysconfig/strerr
 
 ## INSTALL_INITSCRIPTS
 endif

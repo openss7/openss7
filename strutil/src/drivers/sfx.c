@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,34 +46,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:44 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
-
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
-
-#include "sys/config.h"
-#include "strsched.h"
-#include "strsad.h"		/* for autopush */
-#include "sth.h"
+#define _LFS_SOURCE
+#include <sys/os7/compat.h>
 #include "fifo.h"		/* for fifo stuff */
+
+#ifdef LIS
+#define CONFIG_STREAMS_SFX_MODID	SFX_DRV_ID
+#define CONFIG_STREAMS_SFX_NAME		SFX_DRV_NAME
+#define CONFIG_STREAMS_SFX_MAJOR	SFX_CMAJOR_0
+extern int strrput(queue_t *, mblk_t *);
+extern int strwsrv(queue_t *);
+extern struct file_operations strm_f_ops;
+#endif
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2005/07/04 20:07:44 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2005/07/17 08:06:36 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"
@@ -85,7 +82,7 @@ static char const ident[] =
 #define SFX_SPLASH	SFX_DESCRIP	" - " \
 			SFX_COPYRIGHT	"\n"
 
-#ifdef CONFIG_STREAMS_SFX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SFX_MODULE
 MODULE_AUTHOR(SFX_CONTACT);
 MODULE_DESCRIPTION(SFX_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SFX_DEVICE);
@@ -146,6 +143,9 @@ static struct module_info sfx_minfo = {
 	mi_lowat:STRLOW,
 };
 
+static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
+static int sfx_close(queue_t *q, int oflag, cred_t *crp);
+
 static struct qinit sfx_rinit = {
 	qi_putp:strrput,
 	qi_qopen:sfx_open,
@@ -174,6 +174,9 @@ static struct streamtab sfx_info = {
  */
 static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
+#if LIS
+	return (ENXIO);
+#else
 	int err;
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
@@ -211,6 +214,7 @@ static int sfx_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
       error:
 	MOD_DEC_USE_COUNT;
 	return (err <= 0 ? err : -err);
+#endif
 }
 static int sfx_close(queue_t *q, int oflag, cred_t *crp)
 {
@@ -221,18 +225,18 @@ static struct cdevsw sfx_cdev = {
 	d_name:CONFIG_STREAMS_SFX_NAME,
 	d_str:&sfx_info,
 	d_flag:0,
-	d_fop:&sfx_ops,
+	d_fop:&strm_f_ops,
 	d_mode:S_IFIFO | S_IRUGO | S_IWUGO,
 	d_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_SFX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SFX_MODULE
 static
 #endif
 int __init sfx_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_SFX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SFX_MODULE
 	printk(KERN_INFO SFX_BANNER);
 #else
 	printk(KERN_INFO SFX_SPLASH);
@@ -244,7 +248,7 @@ int __init sfx_init(void)
 		major = err;
 	return (0);
 };
-#ifdef CONFIG_STREAMS_SFX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SFX_MODULE
 static
 #endif
 void __exit sfx_exit(void)
@@ -252,7 +256,7 @@ void __exit sfx_exit(void)
 	unregister_strdev(&sfx_cdev, major);
 };
 
-#ifdef CONFIG_STREAMS_SFX_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SFX_MODULE
 module_init(sfx_init);
 module_exit(sfx_exit);
 #endif

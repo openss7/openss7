@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: fdetach.8.man,v 0.9.2.15 2005/07/16 22:03:19 brian Exp $
+.\" @(#) $Id: fdetach.8.man,v 0.9.2.16 2005/07/17 08:01:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/17 08:01:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -82,7 +82,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP
-\fBfdetach\fR [\fIoptions\fR] [\fIpath\fR]
+\fBfdetach\fR [\fIoptions\fR] [\fIPATH\fR]
 .PD 0
 .HP
 \fBfdetach\fR {\fB-h\fR|\fB--help\fR}
@@ -95,11 +95,9 @@ sort-adjacent-labels
 .\"
 .SH OPTIONS
 .PP
-.TP
-.I path
-the path to the file to which the
-.I STREAMS
-special file is attached.
+The following options can be used in conjunction with a
+.I PATH
+argument:
 .TP
 .BR -d ", " --debug " [" \fIlevel\fR ]
 Increase or specify the debug verbosity level of the output.  This option may
@@ -111,6 +109,11 @@ Suppresses normal output.
 .BR -v ", " --verbose " [" \fIlevel\fR ]
 Increase or specify the verbosity level of the output.  This option may be
 repeated.
+.PP
+The following options are general command options.  When one of these options is encountered, the
+requested information is displayed and
+.B fdetach
+exits without processing further options or arguments and without performing any other actions.
 .TP
 .BR -h ", " --help
 When this option is encountered,
@@ -136,8 +139,17 @@ and exits.
 If
 .B fdetach
 is executed without a
-.I path
+.I PATH
 name, a short usage summary is printed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+[\fIPATH\fR]
+the path to the file to which the
+.I STREAMS
+special file is attached.
 .\"
 .\"
 .SH DESCRIPTION
@@ -193,7 +205,7 @@ stream.
 simply calls
 .BR fdetach (3)
 for the specified
-.IR path .
+.IR PATH .
 .\"
 .\"
 .SH "SEE ALSO"
@@ -242,7 +254,7 @@ command.  However,
 may be used in its stead.
 For compatibility with
 .IR AIX \(rg,
-.B Linux Fast-STREAMS
+.I @PACKAGE_TITLE@
 supports the use of the
 .BR umount (8)
 command to detach named streams.

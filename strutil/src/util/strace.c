@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/17 08:06:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:46 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/17 08:06:46 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2005/05/14 08:34:47 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2005/07/17 08:06:46 $";
 
 /* 
  *  AIX Utility: strace - Prints STREAMS trace messages.
@@ -69,6 +69,7 @@ static char const ident[] =
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -76,7 +77,7 @@ static char const ident[] =
 
 #include <time.h>
 #include <stropts.h>
-#include <strlog.h>
+#include <sys/strlog.h>
 #include <syslog.h>
 
 static int debug = 0;

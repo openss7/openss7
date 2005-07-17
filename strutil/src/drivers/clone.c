@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,34 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/07 20:29:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $";
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/os7/compat.h>
 
-#include "sys/config.h"
-#include "src/kernel/strreg.h"	/* for spec_open() */
 #include "clone.h"		/* extern verification */
+
+#ifdef LIS
+#define CONFIG_STREAMS_CLONE_MODID	CLONE_DRV_ID
+#define CONFIG_STREAMS_CLONE_NAME	CLONE_DRV_NAME
+#define CONFIG_STREAMS_CLONE_MAJOR	CLONE_CMAJOR_0
+#define LFSSTATIC
+#endif
+#if LFS
+#define LFSSTATIC static
+#endif
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2005/07/07 20:29:43 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2005/07/17 08:06:36 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -83,7 +85,7 @@ static char const ident[] =
 #define CLONE_SPLASH	CLONE_DEVICE	" - " \
 			CLONE_REVISION	"\n"
 
-#ifdef CONFIG_STREAMS_CLONE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
 MODULE_AUTHOR(CLONE_CONTACT);
 MODULE_DESCRIPTION(CLONE_DESCRIP);
 MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
@@ -135,7 +137,7 @@ MODULE_ALIAS("/dev/streams/clone");
 MODULE_ALIAS("/dev/streams/clone/*");
 #endif
 
-static struct module_info clone_minfo = {
+LFSSTATIC struct module_info clone_minfo = {
 	mi_idnum:CONFIG_STREAMS_CLONE_MODID,
 	mi_idname:CONFIG_STREAMS_CLONE_NAME,
 	mi_minpsz:0,
@@ -144,17 +146,17 @@ static struct module_info clone_minfo = {
 	mi_lowat:STRLOW,
 };
 
-static struct qinit clone_rinit = {
+LFSSTATIC struct qinit clone_rinit = {
 	//qi_putp:putq,
 	qi_minfo:&clone_minfo,
 };
 
-static struct qinit clone_winit = {
+LFSSTATIC struct qinit clone_winit = {
 	//qi_putp:putq,
 	qi_minfo:&clone_minfo,
 };
 
-static struct streamtab clone_info = {
+LFSSTATIC struct streamtab clone_info = {
 	st_rdinit:&clone_rinit,
 	st_wrinit:&clone_winit,
 };
@@ -170,8 +172,11 @@ static struct streamtab clone_info = {
  *  number has our extended device numbering as a inode number and we chain the call within the
  *  shadow special filesystem.
  */
-static int cloneopen(struct inode *inode, struct file *file)
+LFSSTATIC int cloneopen(struct inode *inode, struct file *file)
 {
+#if LIS
+	return (ENXIO);
+#else
 	struct cdevsw *cdev;
 	dev_t dev = inode->i_ino;
 	int err;
@@ -188,6 +193,7 @@ static int cloneopen(struct inode *inode, struct file *file)
 	sdev_put(cdev);
 exit:
 	return (err);
+#endif
 }
 
 struct file_operations clone_ops ____cacheline_aligned = {
@@ -203,7 +209,7 @@ struct file_operations clone_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-static struct cdevsw clone_cdev = {
+LFSSTATIC struct cdevsw clone_cdev = {
 	d_name:"clone",
 	d_str:&clone_info,
 	d_flag:D_CLONE,
@@ -233,8 +239,11 @@ static struct cdevsw clone_cdev = {
  *  This is the separation point where we convert the external device number to an internal device
  *  number.  The external device number is contained in inode->i_rdev.
  */
-STATIC int clone_open(struct inode *inode, struct file *file)
+LFSSTATIC int clone_open(struct inode *inode, struct file *file)
 {
+#if LIS
+	return (ENXIO);
+#else
 	int err;
 	struct cdevsw *cdev;
 	major_t major;
@@ -272,9 +281,10 @@ STATIC int clone_open(struct inode *inode, struct file *file)
 	up(&inode->i_sem);
       exit:
 	return (err);
+#endif
 }
 
-STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
+LFSSTATIC struct file_operations clone_f_ops ____cacheline_aligned = {
 	owner:THIS_MODULE,
 	open:clone_open,
 };
@@ -287,6 +297,7 @@ STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
+#if LFS
 int register_clone(struct cdevsw *cdev)
 {
 	int err;
@@ -336,6 +347,7 @@ int unregister_clone(struct cdevsw *cdev)
 }
 
 EXPORT_SYMBOL(unregister_clone);
+#endif
 
 /* 
  *  -------------------------------------------------------------------------
@@ -345,13 +357,14 @@ EXPORT_SYMBOL(unregister_clone);
  *  -------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_STREAMS_CLONE_MODULE
-static
+#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+LFSSTATIC
 #endif
 int __init clone_init(void)
 {
+#if LFS
 	int err;
-#ifdef CONFIG_STREAMS_CLONE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
 	printk(KERN_INFO CLONE_BANNER);
 #else
 	printk(KERN_INFO CLONE_SPLASH);
@@ -361,18 +374,21 @@ int __init clone_init(void)
 		return (err);
 	if (major == 0 && err > 0)
 		major = err;
+#endif
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_CLONE_MODULE
-static
+#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
+LFSSTATIC
 #endif
 void __exit clone_exit(void)
 {
+#if LFS
 	unregister_cmajor(&clone_cdev, major);
+#endif
 };
 
-#ifdef CONFIG_STREAMS_CLONE_MODULE
+#ifdef CONFIG_STREAMS_UTIL_CLONE_MODULE
 module_init(clone_init);
 module_exit(clone_exit);
 #endif

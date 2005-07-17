@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strace.8.man,v 0.9.2.13 2005/07/16 22:03:19 brian Exp $
+.\" @(#) $Id: strace.8.man,v 0.9.2.14 2005/07/17 08:01:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:19 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/17 08:01:25 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -82,7 +82,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBstrace\fR [ \fImod\fR \fIsub\fR \fIpri\fR ] ...
+\fBstrace\fR [\fIoptions\fR] [\fImod\fR \fIsub\fR \fIpri\fR] ...
 .PD 0
 .HP 12
 \fBstrace\fR {\fB-h\fR|\fB--help\fR}
@@ -91,27 +91,6 @@ sort-adjacent-labels
 .HP 12
 \fBstrace\fR {\fB-C\fR|\fB--copying\fR}
 .PD
-.\"
-.\"
-.SH DESCRIPTION
-.PP
-The
-.B strace
-command gets
-.I STREAMS
-event trace messages from
-.I STREAMS
-drivers and modules via the
-.I STREAMS
-log driver
-.RB ( strlog (4)),
-and writes these messages to standard output.  By default,
-.B strace
-without arguments writes all
-.I STREAMS
-trace messages from all drivers and modules.
-.B strace
-with command-line arguments limits the trace messages received.
 .\"
 .\"
 .SH OPTIONS
@@ -126,21 +105,21 @@ and
 .B stderr
 to
 .IR ERRFILE .
+.RS
 .TP
 \fB-d\fR, \fB--directory\fR \fIDIRECTORY\fR
-Only significant when running as a daemon.
 Specifies a directory to contain the messages.  Default is to search for
 .RB \(lq /var/adm/streams \(rq
 and then
 .RB \(lq /var/log/streams .\(rq
+This option is only significant when running as a daemon.
 .TP
 \fB-b\fR, \fB--basename\fR \fIBASENAME\fR
-Only significant when running as a daemon.
 Specify the log and error file base name.  Default is
 .RB \(lq trace \(rq.
+This option is only significant when running as a daemon.
 .TP
 \fB-o\fR, \fB--outfile\fR \fIOUTFILE\fR
-Only significant when running as a daemon.
 Specify the log file output name.  Default is
 .RI \(lq BASENAME . pid ,\(rq
 where
@@ -149,22 +128,24 @@ is the current process id.
 When run in the foreground,
 .B strace
 ignores the default.
+This option is only significant when running as a daemon.
 .TP
 \fB-e\fR, \fB--errfile\fR \fIERRFILE\fR
-Only significant when running as a daemon.
 Specify the error file name.  Default is
 .RI \(lq BASENAME . error .\(rq
 When run in the foreground,
 .B strace
 ignores the default.
+This option is only significant when running as a daemon.
 .TP
 \fB-p\fR, \fB--pidfile\fR \fIPIDFILE\fR
-Only significant when running as a daemon.
 Specify the pid file name to which to write the pid of the daemon process.  The default is
 .RB \(lq /var/run/strace.pid .\(rq
 When run in the foreground,
 .B strace
 ignores the default.
+This option is only significant when running as a daemon.
+.RE
 .TP
 \fB-l\fR, \fB--logdev\fR \fILOGDEVICE\fR
 Specifies the log device.  Default is to search
@@ -209,17 +190,17 @@ and exits.
 .PP
 The arguments, which must be specified in groups of three, are:
 .TP
-.B mod
+.I mod
 Specifies the
 .I STREAMS
 module identification number from the
 .B streamtab
 entry.
 .TP
-.B sub
+.I sub
 Specifies a sub-identification number (often corresponding to a minor device).
 .TP
-.B pri
+.I pri
 Specifies a tracing priority level.
 .B strace
 gets messages of a level equal to or less than the value specified by
@@ -241,6 +222,27 @@ actual trace message, returning only messages that satisfy the specified
 criteria.
 .\"
 .\"
+.SH DESCRIPTION
+.PP
+The
+.B strace
+command gets
+.I STREAMS
+event trace messages from
+.I STREAMS
+drivers and modules via the
+.I STREAMS
+log driver
+.RB ( strlog (4)),
+and writes these messages to standard output.  By default,
+.B strace
+without arguments writes all
+.I STREAMS
+trace messages from all drivers and modules.
+.B strace
+with command-line arguments limits the trace messages received.
+.\"
+.\"
 .SH FORMAT
 .PP
 .I STREAMS
@@ -249,9 +251,11 @@ trace event messages have the following format:
 .RB < seq "> <" time "> <" tick "> <" pri "> <" ind "> <" mod "> <" sub "> <" text >
 .PP
 Components are interpreted as follows:
+.RS
 .TP
 .RB < seq >
 Trace event sequence number.
+.PD 0
 .TP
 .RB < time >
 Time the message was sent expressed in hh:mm:ss.
@@ -283,6 +287,8 @@ Sub-identification number of the trace message source.
 .TP
 .RB < text >
 Trace message text.
+.PD
+.RE
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -374,6 +380,9 @@ directory containing the error log files.
 .TP
 .BI /var/log/streams/trace. "pid \fR or " /var/adm/streams/trace. pid
 trace log file.
+.TP
+.BR /etc/init.d/strace " or " /etc/strace.sh
+an SysV or Debian init script for starting the trace logger.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -407,10 +416,7 @@ with the following compatibility considerations:
 Options
 .BI -D ", " -b ", " -o ", " -e " and " -l ,
 and all long options, are specific to this
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
+.I @PACKAGE_TITLE@
 implementation of
 .B strace
 and should not be used by portable applications.
@@ -431,10 +437,7 @@ and system based on
 permit only on
 .B strace
 process to be active at a time.
-.B Linux Fast-STREAMS
-.[
-lfs
-.]
+.I @PACKAGE_TITLE@
 .B strace
 permits multiple
 .B strace

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/17 08:06:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/04 20:07:50 $ by $Author: brian $
+ Last Modified $Date: 2005/07/17 08:06:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/17 08:06:40 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/17 08:06:40 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -61,26 +61,20 @@ static char const ident[] =
  *  be pushed over that module or over the NULS (Null STREAM) driver.
  */
 
-#include <linux/config.h>
-#include <linux/version.h>
-#include <linux/module.h>
-#include <linux/init.h>
+#define _LFS_SOURCE
 
-#include <sys/kmem.h>
-#include <sys/cmn_err.h>
-#include <sys/stream.h>
-#include <sys/strconf.h>
-#include <sys/strsubr.h>
-#include <sys/ddi.h>
+#include <sys/os7/compat.h>
 
-#include <sys/sc.h>
+#include "sys/sc.h"
 
-#include "sys/config.h"
-#include "src/kernel/strlookup.h"
+#if LIS
+#define CONFIG_STREAMS_SC_MODID		SC_MOD_ID
+#define CONFIG_STREAMS_SC_NAME		SC_MOD_NAME
+#endif
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2005/07/04 20:07:50 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2005/07/17 08:06:40 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -92,7 +86,7 @@ static char const ident[] =
 #define SC_SPLASH	SC_DEVICE	" - " \
 			SC_REVISION
 
-#ifdef CONFIG_STREAMS_SC_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
 MODULE_AUTHOR(SC_CONTACT);
 MODULE_DESCRIPTION(SC_DESCRIP);
 MODULE_SUPPORTED_DEVICE(SC_DEVICE);
@@ -210,10 +204,20 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 		case SC_IOC_LIST:
 			err = -(long) ioc->copyresp.cp_rval;
 			if (err == 0) {
+#if LIS
+				int i;
+				struct fmodsw *fmod;
+				struct fmodsw *cdev;
+#endif
+#if LFS
+				struct fmodsw *fmod;
+				struct cdevsw *cdev;
+				struct list_head *pos;
+#endif
 				int n, count;
 				struct sc_list *list;
 				struct sc_mlist *mlist;
-				struct list_head *pos;
+				struct qinit *qinit;
 				switch (sc->iocstate) {
 				case 1:
 				      sc_list_state_1:
@@ -222,6 +226,18 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 					if (!dp)
 						goto nak;
 					if (dp->b_wptr == dp->b_rptr) {
+#if LIS
+						int i, cdev_count = 0, fmod_count = 0;
+						for (i = 0; i < MAX_STRDEV; i++)
+							if (lis_fstr_sw[i].f_str
+							    && lis_fstr_sw[i].f_count)
+								cdev_count++;
+						for (i = 1; i < MAX_STRMOD; i++)
+							if ((lis_fmod_sw[i].
+							     f_state & LIS_MODSTATE_INITED)
+							    && lis_fmod_sw[i].f_count)
+								fmod_count++;
+#endif
 						err = 0;
 						rval = cdev_count + fmod_count;
 						goto ack;
@@ -236,42 +252,70 @@ static int sc_wput(queue_t *q, mblk_t *mp)
 					count = sc->count;
 					list->sc_nmods = count;
 					mlist = (typeof(mlist)) dp->b_rptr;
+#if LFS
 					/* list all devices */
 					read_lock(&cdevsw_lock);
 					list_for_each(pos, &cdevsw_list) {
-						if (n < count) {
-							struct cdevsw *cdev =
-							    list_entry(pos, struct cdevsw, d_list);
-							struct qinit *qinit =
-							    cdev->d_str->st_rdinit;
-							mlist->major = cdev->d_major;
-							mlist->mi = *qinit->qi_minfo;
-							if (qinit->qi_mstat)
-								mlist->ms = *qinit->qi_mstat;
-							n++;
-							mlist++;
-						} else
+						if (n >= count)
 							break;
+						cdev = list_entry(pos, struct cdevsw, d_list);
+						qinit = cdev->d_str->st_rdinit;
+						mlist->major = cdev->d_major;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
 					}
 					read_unlock(&cdevsw_lock);
 					/* list all modules */
 					read_lock(&fmodsw_lock);
 					list_for_each(pos, &fmodsw_list) {
-						if (n < count) {
-							struct fmodsw *fmod =
-							    list_entry(pos, struct fmodsw, f_list);
-							struct qinit *qinit =
-							    fmod->f_str->st_rdinit;
-							mlist->major = 0;
-							mlist->mi = *qinit->qi_minfo;
-							if (qinit->qi_mstat)
-								mlist->ms = *qinit->qi_mstat;
-							n++;
-							mlist++;
-						} else
+						if (n >= count)
 							break;
+						fmod = list_entry(pos, struct fmodsw, f_list);
+						qinit = fmod->f_str->st_rdinit;
+						mlist->major = 0;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
 					}
 					read_unlock(&fmodsw_lock);
+#endif
+#if LIS
+					/* list all devices */
+					for (i = 0; i < MAX_STRDEV; i++) {
+						cdev = &lis_fstr_sw[i];
+						if (!cdev->f_str || !cdev->f_count)
+							continue;
+						if (n >= count)
+							break;
+						qinit = cdev->f_str->st_rdinit;
+						mlist->major = i;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
+					}
+					/* list all modules */
+					for (i = 1; i < MAX_STRMOD; i++) {
+						fmod = &lis_fmod_sw[i];
+						if (!fmod->f_str || !fmod->f_count)
+							continue;
+						if (n >= count)
+							break;
+						qinit = fmod->f_str->st_rdinit;
+						mlist->major = i;
+						mlist->mi = *qinit->qi_minfo;
+						if (qinit->qi_mstat)
+							mlist->ms = *qinit->qi_mstat;
+						n++;
+						mlist++;
+					}
+#endif
 					/* zero all excess elements */
 					for (; n < count; n++, mlist++) {
 						mlist->major = -1;
@@ -378,6 +422,9 @@ static struct streamtab sc_info = {
 	st_wrinit:&sc_wqinit,
 };
 
+#if LIS
+#define fmodsw _fmodsw
+#endif
 static struct fmodsw sc_fmod = {
 	f_name:CONFIG_STREAMS_SC_NAME,
 	f_str:&sc_info,
@@ -385,13 +432,13 @@ static struct fmodsw sc_fmod = {
 	f_kmod:THIS_MODULE,
 };
 
-#ifdef CONFIG_STREAMS_SC_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
 static
 #endif
 int __init sc_init(void)
 {
 	int err;
-#ifdef CONFIG_STREAMS_SC_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
 	printk(KERN_INFO SC_BANNER);
 #else
 	printk(KERN_INFO SC_SPLASH);
@@ -404,7 +451,7 @@ int __init sc_init(void)
 	return (0);
 };
 
-#ifdef CONFIG_STREAMS_SC_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
 static
 #endif
 void __exit sc_exit(void)
@@ -415,7 +462,7 @@ void __exit sc_exit(void)
 	return (void) (0);
 };
 
-#ifdef CONFIG_STREAMS_SC_MODULE
+#ifdef CONFIG_STREAMS_UTIL_SC_MODULE
 module_init(sc_init);
 module_exit(sc_exit);
 #endif
