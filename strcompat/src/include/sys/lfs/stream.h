@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.3 2005/07/15 23:08:43 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.4 2005/07/18 01:00:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:43 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 01:00:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.4  2005/07/18 01:00:30  brian
+ - added missing STRHIGH, STRLOW, STRMAXPSZ and STRMINPSZ definitions
+
  Revision 0.9.2.3  2005/07/15 23:08:43  brian
  - checking in for sync
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -268,5 +271,10 @@ __LFS_EXTERN_INLINE int putnextctl2(queue_t *q, int type, int param1, int param2
 #elif defined _LFS_SOURCE
 #warning "_LFS_SOURCE defined by not CONFIG_STREAMS_COMPAT_LFS"
 #endif
+
+#define STRHIGH		5120	/* default hi water mark */
+#define STRLOW		1024	/* default lo water mark */
+#define STRMAXPSZ	(1<<12)	/* default max psz */
+#define STRMINPSZ	0	/* default max psz */
 
 #endif				/* __SYS_LFS_STREAM_H__ */

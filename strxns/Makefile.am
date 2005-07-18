@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2005/07/09 21:48:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2005/07/18 00:58:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/09 21:48:41 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 00:58:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,16 +71,18 @@ if PUBLIC_RELEASE
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
+EXTRA_PROGRAMS			+= \
+				  ldltest \
+				  ldlconfig \
+				  @PACKAGE_TARNAME@_mknod
+
 libexec_PROGRAMS		= \
 				  ldltest
 
-EXTRA_PROGRAMS			+= \
-				  ldltest \
-				  ldlconfig
 
-
-sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod \
-				  ldlconfig
+sbin_PROGRAMS			= \
+				  ldlconfig \
+				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -282,7 +284,8 @@ EXPORT_SRCFILES			=
 
 EXPORT_VERFILES			=
 
-GENKSYMS_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+GENKSYMS_CPPFLAGS		= \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols

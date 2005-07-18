@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2005/07/10 02:41:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2005/07/18 00:58:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 02:41:21 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 00:58:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,8 +60,6 @@ include am/openss7.am
 ##
 include am/help.am
 
-dist_sysconf_DATA =
-
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -69,45 +67,40 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 bin_PROGRAMS			= \
-				strchg \
-				strconf \
-				strreset
+				  strchg \
+				  strconf \
+				  strreset
 
 sbin_PROGRAMS			= \
-				autopush \
-				fattach \
-				fdetach \
-				insf \
-				scls \
-				strace \
-				strerr \
-				strinfo \
-				strvf \
-				@PACKAGE_TARNAME@_mknod
+				  autopush \
+				  fattach \
+				  fdetach \
+				  insf \
+				  scls \
+				  strace \
+				  strerr \
+				  strinfo \
+				  strvf \
+				  @PACKAGE_TARNAME@_mknod
 
 dist_sbin_SCRIPTS		= \
-				src/util/strclean \
-				src/util/strload \
-				src/util/strsetup
-
-dist_sysconf_DATA		+= \
-				strsetup.conf \
-				strload.conf
-
+				  src/util/strclean \
+				  src/util/strload \
+				  src/util/strsetup
 
 libexec_PROGRAMS		= \
-				test-clone \
-				test-connld \
-				test-echo \
-				test-fifo \
-				test-log \
-				test-nsdev \
-				test-nuls \
-				test-pipe \
-				test-pipemod \
-				test-sad \
-				test-sc \
-				test-streams
+				  test-clone \
+				  test-connld \
+				  test-echo \
+				  test-fifo \
+				  test-log \
+				  test-nsdev \
+				  test-nuls \
+				  test-pipe \
+				  test-pipemod \
+				  test-sad \
+				  test-sc \
+				  test-streams
 
 
 #LFS_EXTRA_TESTS		= 
@@ -553,38 +546,38 @@ AUTOCONFIG_H			= include/sys/config.h
 ##EXTRA_DIST			+= $(AUTOCONFIG_H).in
 
 EXPORT_SRCFILES			= \
-				src/kernel/strattach.c \
-				src/kernel/strlookup.c \
-				src/kernel/strpipe.c \
-				src/kernel/strreg.c \
-				src/kernel/strsad.c \
-				src/kernel/strsched.c \
-				src/kernel/strspecfs.c \
-				src/kernel/strsysctl.c \
-				src/kernel/strutil.c \
-				src/kernel/strsyms.c \
-				src/drivers/clone.c \
-				src/modules/sth.c
+				  src/kernel/strattach.c \
+				  src/kernel/strlookup.c \
+				  src/kernel/strpipe.c \
+				  src/kernel/strreg.c \
+				  src/kernel/strsad.c \
+				  src/kernel/strsched.c \
+				  src/kernel/strspecfs.c \
+				  src/kernel/strsysctl.c \
+				  src/kernel/strutil.c \
+				  src/kernel/strsyms.c \
+				  src/drivers/clone.c \
+				  src/modules/sth.c
 
 EXPORT_VERFILES			= \
-				$(PKGINCL)/versions/strattach.ver \
-				$(PKGINCL)/versions/strlookup.ver \
-				$(PKGINCL)/versions/strpipe.ver \
-				$(PKGINCL)/versions/strreg.ver \
-				$(PKGINCL)/versions/strsad.ver \
-				$(PKGINCL)/versions/strsched.ver \
-				$(PKGINCL)/versions/strspecfs.ver \
-				$(PKGINCL)/versions/strsysctl.ver \
-				$(PKGINCL)/versions/strutil.ver \
-				$(PKGINCL)/versions/strsyms.ver \
-				$(PKGINCL)/versions/clone.ver \
-				$(PKGINCL)/versions/sth.ver
+				  $(PKGINCL)/versions/strattach.ver \
+				  $(PKGINCL)/versions/strlookup.ver \
+				  $(PKGINCL)/versions/strpipe.ver \
+				  $(PKGINCL)/versions/strreg.ver \
+				  $(PKGINCL)/versions/strsad.ver \
+				  $(PKGINCL)/versions/strsched.ver \
+				  $(PKGINCL)/versions/strspecfs.ver \
+				  $(PKGINCL)/versions/strsysctl.ver \
+				  $(PKGINCL)/versions/strutil.ver \
+				  $(PKGINCL)/versions/strsyms.ver \
+				  $(PKGINCL)/versions/clone.ver \
+				  $(PKGINCL)/versions/sth.ver
 
 GENKSYMS_CPPFLAGS		= \
-				-I./src/kernel -I$(srcdir)/src/kernel \
-				-I./src/drivers -I$(srcdir)/src/drivers \
-				-I./src/modules -I$(srcdir)/src/modules \
-				$(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+				  -I./src/kernel -I$(srcdir)/src/kernel \
+				  -I./src/drivers -I$(srcdir)/src/drivers \
+				  -I./src/modules -I$(srcdir)/src/modules \
+				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
 
 ##
 ## Rules for generating versioned kernel symbols
@@ -611,32 +604,34 @@ if WITH_RCSD_DIRECTORY
 ## WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
-				src/util/init/specfs.sh \
-				src/util/init/strace.sh \
-				src/util/init/streams.sh \
-				src/util/init/strerr.sh
+				  src/util/init/specfs.sh \
+				  src/util/init/strace.sh \
+				  src/util/init/strerr.sh \
+				  src/util/init/@PACKAGE_LCNAME@.sh
 
 ## WITH_RCSD_DIRECTORY
 else
 ## ! WITH_RCSD_DIRECTORY
 
 dist_initrd_SCRIPTS		= \
-				src/util/init/specfs \
-				src/util/init/strace \
-				src/util/init/streams \
-				src/util/init/strerr
+				  src/util/init/specfs \
+				  src/util/init/strace \
+				  src/util/init/strerr \
+				  src/util/init/@PACKAGE_LCNAME@
 
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		+= \
-				src/util/sysconfig/streams.conf
+dist_sysconf_DATA		= \
+				  strsetup.conf \
+				  strload.conf \
+				  src/util/sysconfig/@PACKAGE_LCNAME@.conf
 
 dist_config_DATA		= \
-				src/util/sysconfig/specfs \
-				src/util/sysconfig/strace \
-				src/util/sysconfig/streams \
-				src/util/sysconfig/strerr
+				  src/util/sysconfig/specfs \
+				  src/util/sysconfig/strace \
+				  src/util/sysconfig/strerr \
+				  src/util/sysconfig/@PACKAGE_LCNAME@
 
 ## INSTALL_INITSCRIPTS
 endif
@@ -675,23 +670,23 @@ include am/rpm.am
 ##
 include am/deb.am
 
-EXTRA_DIST		+= \
-			debian/README.Debian \
-			debian/TODO.Debian
+EXTRA_DIST			+= \
+				  debian/README.Debian \
+				  debian/TODO.Debian
 
-MAINTAINERCLEANFILES	+= \
-			$(top_srcdir)/aclocal.m4 \
-			$(top_srcdir)/config.h.in \
-			$(top_srcdir)/configure \
-			$(top_srcdir)/COPYING \
-			$(top_srcdir)/INSTALL \
-			$(top_srcdir)/scripts/compile \
-			$(top_srcdir)/scripts/config.guess \
-			$(top_srcdir)/scripts/config.sub \
-			$(top_srcdir)/scripts/depcomp \
-			$(top_srcdir)/scripts/install-sh \
-			$(top_srcdir)/scripts/ltmain.sh \
-			$(top_srcdir)/scripts/missing \
-			$(top_srcdir)/scripts/texinfo.tex
+MAINTAINERCLEANFILES		+= \
+				  $(top_srcdir)/aclocal.m4 \
+				  $(top_srcdir)/config.h.in \
+				  $(top_srcdir)/configure \
+				  $(top_srcdir)/COPYING \
+				  $(top_srcdir)/INSTALL \
+				  $(top_srcdir)/scripts/compile \
+				  $(top_srcdir)/scripts/config.guess \
+				  $(top_srcdir)/scripts/config.sub \
+				  $(top_srcdir)/scripts/depcomp \
+				  $(top_srcdir)/scripts/install-sh \
+				  $(top_srcdir)/scripts/ltmain.sh \
+				  $(top_srcdir)/scripts/missing \
+				  $(top_srcdir)/scripts/texinfo.tex
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

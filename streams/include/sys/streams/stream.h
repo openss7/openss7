@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.39 2005/07/15 23:09:48 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.40 2005/07/18 00:58:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:09:48 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 00:58:50 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2005/07/15 23:09:48 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2005/07/18 00:58:50 $"
 
 #ifndef __SYS_STREAM_H__
 #warn "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -585,31 +585,6 @@ struct fmodsw {
 	struct module *f_kmod;		/* kernel module */
 };
 
-struct cdevsw;
-
-struct devnode {
-	struct list_head n_list;	/* list of all nodes for this device */
-	struct list_head n_hash;	/* list of major hashes in slot */
-	const char *n_name;		/* node name */
-	struct streamtab *n_str;	/* streamtab for node */
-	uint n_flag;			/* node flags */
-	uint n_modid;			/* node module id */
-	atomic_t n_count;		/* open count */
-	int n_sqlvl;			/* q sychronization level */
-	struct syncq *n_syncq;		/* synchronization queue */
-	struct module *n_kmod;		/* kernel module */
-	/* above must match fmodsw */
-	int n_major;			/* node major device number */
-	struct inode *n_inode;		/* specfs inode */
-	mode_t n_mode;			/* inode mode */
-	/* above must match cdevsw */
-	int n_minor;			/* node minor device number */
-	struct cdevsw *n_dev;		/* character device */
-};
-#define N_MAJOR		0x01	/* major device node */
-
-struct file_operations;
-
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
 	struct list_head d_hash;	/* list of module hashes in slot */
@@ -633,6 +608,27 @@ struct cdevsw {
 	struct stdata *d_plinks;	/* permanent links for this device */
 	struct list_head d_stlist;	/* stream head list for this device */
 };
+
+struct devnode {
+	struct list_head n_list;	/* list of all nodes for this device */
+	struct list_head n_hash;	/* list of major hashes in slot */
+	const char *n_name;		/* node name */
+	struct streamtab *n_str;	/* streamtab for node */
+	uint n_flag;			/* node flags */
+	uint n_modid;			/* node module id */
+	atomic_t n_count;		/* open count */
+	int n_sqlvl;			/* q sychronization level */
+	struct syncq *n_syncq;		/* synchronization queue */
+	struct module *n_kmod;		/* kernel module */
+	/* above must match fmodsw */
+	int n_major;			/* node major device number */
+	struct inode *n_inode;		/* specfs inode */
+	mode_t n_mode;			/* inode mode */
+	/* above must match cdevsw */
+	int n_minor;			/* node minor device number */
+	struct cdevsw *n_dev;		/* character device */
+};
+#define N_MAJOR		0x01	/* major device node */
 
 #define PERIM_INNER	1
 #define PERIM_OUTER	2

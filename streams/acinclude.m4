@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2005/07/10 11:41:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2005/07/18 01:01:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/10 11:41:01 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 01:01:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -548,7 +548,9 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
-			  linux/locks.h asm/softirq.h linux/slab.h linux/hardirq.h linux/security.h], [:], [:], [
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -563,6 +565,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
+    AC_SUBST([EXPOSED_SYMBOLS])dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
@@ -573,8 +576,22 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
-			read_trylock write_trylock \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [:], [
+			cpumask_scnprintf __symbol_get __symbol_put \
+			read_trylock write_trylock path_lookup \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
+			num_online_cpus generic_delete_inode], [:], [
+			case "$lk_func" in
+			    pcibios_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			    pci_*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_osif_${lk_func}"
+				;;
+			    *sleep_on*)
+				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
+				;;
+			esac ], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -587,6 +604,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#if HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
@@ -607,9 +627,13 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
-			 read_trylock write_trylock], [:], [:], [
+			 read_trylock write_trylock num_online_cpus \
+			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -639,6 +663,9 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#if HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
     _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
 #include <linux/compiler.h>
@@ -677,14 +704,17 @@ dnl specific information has been put in place instead.  We don't really care
 dnl one way to the other, but this check discovers which way is used.
 dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
-			 struct task_struct.session,
-			 struct task_struct.pgrp,
-			 struct super_block.s_fs_info,
-			 struct super_block.u.generic_sbp,
-			 struct file_system_type.read_super,
-			 struct file_system_type.get_sb,
-			 struct super_operations.read_inode2,
-			 struct kstatfs.f_type], [:], [:], [
+			  struct file_operations.flush,
+			  struct super_operations.drop_inode,
+			  struct task_struct.session,
+			  struct task_struct.pgrp,
+			  struct super_block.s_fs_info,
+			  struct super_block.u.generic_sbp,
+			  struct file_system_type.read_super,
+			  struct file_system_type.get_sb,
+			  struct super_operations.read_inode2,
+			  struct kstatfs.f_type,
+			  struct kobject.kref], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
@@ -706,6 +736,7 @@ dnl
 #include <linux/namespace.h>
 #endif
 ])
+	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])

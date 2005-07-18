@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: $
+ @(#) $Id: mod.h,v 1.1.1.4.4.5 2005/07/13 12:01:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: $ by $Author: $
+ Last Modified $Date: 2005/07/13 12:01:20 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -68,7 +68,7 @@
 #ifndef _MOD_H
 #define _MOD_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: mod.h,v $ $Name:  $($Revision: 1.1.1.4.4.5 $) $Date: 2005/07/13 12:01:20 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */
@@ -221,9 +221,7 @@ typedef struct fmodsw {
 
 #ifdef __KERNEL__
 
-#ifdef __LIS_INTERNAL__
 extern struct fmodsw lis_fstr_sw[MAX_STRDEV];	/* streams devices */
-#endif
 extern struct fmodsw lis_fmod_sw[MAX_STRMOD];	/* streams modules */
 
 #endif				/* __KERNEL__ */

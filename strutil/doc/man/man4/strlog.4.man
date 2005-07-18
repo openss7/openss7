@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff noautoindent nocindent nosmartindent
 .\"
-.\" @(#) $Id: strlog.4.man,v 0.9.2.11 2005/07/16 22:03:18 brian Exp $
+.\" @(#) $Id: strlog.4.man,v 0.9.2.13 2005/07/18 06:18:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/16 22:03:18 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/18 06:18:53 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strutil.macros
@@ -310,6 +310,7 @@ specifies the level for screening lower-level event messages from a tracer.
 .I flags
 contains several flags that can be set in various combinations.  The flags are
 as follows:
+.sp
 .DS
 .RS
 .TS
@@ -341,7 +342,7 @@ T}
 .DE
 .TP
 .I ltime
-tim in seconds since January 1, 1970.
+time in seconds since January 1, 1970.
 .TP
 .I ttime
 time in ticks since boot time.
@@ -380,21 +381,30 @@ Different sequence number are maintained for the error logging and trace
 logging streams so that gaps in the sequence of messages can be determined.
 (During times of high message traffic, some message may not be delivered by
 the logger to avoid tying up system resources).  The data part of the message
-contains the unexpanded text of the format string (null-terminated), followed
-by the arguments to the format string (up to the number specified by the
+contains the unexpanded text of the format string (null-terminated), followed by
+the arguments to the format string (up to the number specified by the
 .B NLOGARGS
-value), aligned on the first word boundary following the format string.
+value), aligned on the first word
+.RB ( int )
+boundary following the format string.
 .PP
-A process may also send a message of the same structure to the log driver,
-even if it is not an error or trace logger.  The only fields of the
+A process may also send a message of the same structure to the log driver, even
+if it is not an error or trace logger.  The only fields of the
 .B log_ctl
 structure in the control part of the message that are accepted are the
 .IR level " and " flags
-fields.  All other fields are filled in by the log driver before being
-forwarded to the appropriate logger.  The data portion must contain a
-null-terminated format string, and any arguments (up to NLOGARGS) must be
-packed one word each, on the next word boundary following the end of the
-format string.
+fields.  All other fields are filled in by the log driver before being forwarded
+to the appropriate logger.  The data portion must contain a null-terminated
+format string, and any arguments (up to
+.BR NLOGARGS )
+must be packed in an integral number of words
+.RB ( int )
+each, on the next word
+.RB ( int )
+boundary following the end of the format string.
+The
+.BR strlog (1)
+facility is provided for issuing log messages from shell scripts.
 .PP
 Attempting to issue an
 .I I_TRCLOG
@@ -427,6 +437,15 @@ device.
 .\"
 .SH IOCTLS
 .PP
+The
+.B strlog
+driver only supports
+.BR streamio (7)
+.B I_STR
+input output controls.
+.I TRANSPARENT
+input output controls are not supported and will result in a return value of
+.RB [ ENXIO ].
 The
 .B strlog
 drivers supports the following

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 01:03:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/17 08:06:47 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 01:03:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 01:03:10 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2005/07/17 08:06:47 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2005/07/18 01:03:10 $";
 
 /* 
  *  AIX Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -69,6 +69,7 @@ static char const ident[] =
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <ctype.h>
 #include <sys/stat.h>
 #include <sys/poll.h>
 #include <sys/time.h>
@@ -100,7 +101,353 @@ char devname[256] = "";
 char mailuid[256] = "";
 char pidfile[256] = "";
 
-static void version(int argc, char **argv)
+#define FLAG_ZEROPAD	(1<<0)	/* pad with zero */
+#define FLAG_SIGN	(1<<1)	/* unsigned/signed long */
+#define FLAG_PLUS	(1<<2)	/* show plus */
+#define FLAG_SPACE	(1<<3)	/* space if plus */
+#define FLAG_LEFT	(1<<4)	/* left justified */
+#define FLAG_SPECIAL	(1<<5)	/* 0x */
+#define FLAG_LARGE	(1<<6)	/* use 'ABCDEF' instead of 'abcdef' */
+
+#define __WSIZE		(sizeof(short))
+#define WORD_ALIGN(__x) (((__x) + __WSIZE - 1) & ~(__WSIZE - 1))
+
+/*
+ *  This function prints a formatted number to a file pointer.  It is largely
+ *  taken from /usr/src/linux/lib/vsprintf.c
+ */
+static void number(FILE * fp, long long num, int base, int width, int decimal, int flags)
+{
+	char sign;
+	int i;
+	char tmp[66];
+	if (flags & FLAG_LEFT)
+		flags &= ~FLAG_ZEROPAD;
+	if (base < 2 || base > 16)
+		return;
+	sign = '\0';
+	if (flags & FLAG_SIGN) {
+		if (num < 0) {
+			sign = '-';
+			num = -num;
+			width--;
+		} else if (flags & FLAG_PLUS) {
+			sign = '+';
+			width--;
+		} else if (flags & FLAG_SPACE) {
+			sign = ' ';
+			width--;
+		}
+	}
+	if (flags & FLAG_SPECIAL) {
+		switch (base) {
+		case 16:
+			width -= 2;	/* for 0x */
+			break;
+		case 8:
+			width--;	/* for 0 */
+			break;
+		}
+	}
+	i = 0;
+	if (num == 0)
+		tmp[i++] = '0';
+	else {
+		const char *hexdig = (flags & FLAG_LARGE) ? "0123456789ABCDEF" : "0123456789abcdef";
+		while (num != 0) {
+			lldiv_t result = lldiv(num, base);
+			tmp[i++] = hexdig[result.rem];
+			num = result.quot;
+		}
+	}
+	if (i > decimal)
+		decimal = i;
+	width -= decimal;
+	if (!(flags & (FLAG_ZEROPAD | FLAG_LEFT)))
+		while (width-- > 0)
+			fputc(' ', fp);
+	if (sign != '\0')
+		fputc(sign, fp);
+	if (flags & FLAG_SPECIAL) {
+		switch (base) {
+		case 8:
+			fputc('0', fp);
+			break;
+		case 16:
+			fputc('0', fp);
+			if (flags & FLAG_LARGE)
+				fputc('X', fp);
+			else
+				fputc('x', fp);
+			break;
+		}
+	}
+	if (!(flags & FLAG_LEFT)) {
+		char pad = (flags & FLAG_ZEROPAD) ? '0' : ' ';
+		while (width-- > 0)
+			fputc(pad, fp);
+	}
+	while (i < decimal--)
+		fputc('0', fp);
+	while (i-- > 0)
+		fputc(tmp[i], fp);
+	while (width-- > 0)
+		fputc(' ', fp);
+	return;
+}
+
+/*
+ *  This function does an fprintf from the buffer using a slight variation of
+ *  the fprintf that is identical to that used inside the kernel.  There are
+ *  some constructs that are not supported.  Also, the kernel passes a format
+ *  string followed by the arguments on the next word aligned boundary, and this
+ *  is what is necessary to format them.
+ *
+ *  This function is largely adapted from /usr/src/linux/lib/vsprintf.c
+ */
+static void fprintf_text(FILE * fp, const char *buf, int len)
+{
+	const char *fmt, *args, *end;
+	char type;
+	size_t flen, plen;
+	int flags = 0, width = -1, decimal = -1, base = 10;
+
+	fmt = buf;
+	flen = strnlen(fmt, len);
+	plen = WORD_ALIGN(flen + 1);
+	args = &buf[plen];
+	end = buf + len;
+	for (; *fmt; ++fmt) {
+		const char *pos;
+		unsigned long long num = 0;
+
+		if (*fmt != '%') {
+			fputc(*fmt, fp);
+			continue;
+		}
+		pos = fmt;	/* remember position of % */
+		/* process flags */
+		for (++fmt;; ++fmt) {
+			switch (*fmt) {
+			case '-':
+				flags |= FLAG_LEFT;
+				continue;
+			case '+':
+				flags |= FLAG_PLUS;
+				continue;
+			case ' ':
+				flags |= FLAG_SPACE;
+				continue;
+			case '#':
+				flags |= FLAG_SPECIAL;
+				continue;
+			case '0':
+				flags |= FLAG_ZEROPAD;
+				continue;
+			default:
+				break;
+			}
+		}
+		/* get field width */
+		if (isdigit(*fmt))
+			for (width = 0; isdigit(*fmt); width *= 10, width += (*fmt - '0')) ;
+		else if (*fmt == '*') {
+			++fmt;
+			if (args + sizeof(int) <= end) {
+				if ((width = *(int *) args) < 0) {
+					args += sizeof(int);
+					width = -width;
+					flags |= FLAG_LEFT;
+				}
+			} else
+				args = end;
+		}
+		/* get the decimal precision */
+		if (*fmt == '.') {
+			++fmt;
+			if (isdigit(*fmt))
+				for (decimal = 0; isdigit(*fmt);
+				     decimal *= 10, decimal += (*fmt - '0')) ;
+			else if (*fmt == '*') {
+				if (args + sizeof(int) <= end) {
+					decimal = *(int *) args;
+					args += sizeof(int);
+					if (decimal < 0)
+						decimal = 0;
+				} else
+					args = end;
+			}
+		}
+		/* get conversion type */
+		type = 'i';
+		switch (*fmt) {
+		case 'h':
+		case 'L':
+		case 'Z':
+			type = *fmt;
+			break;
+		case 'l':
+			type = *fmt;
+			++fmt;
+			if (*fmt == 'l') {
+				type = 'L';
+				++fmt;
+			}
+			break;
+		}
+		switch (*fmt) {
+		case 'c':
+		{
+			char c = ' ';
+			if (!(flags & FLAG_LEFT))
+				while (--width > 0)
+					fputc(' ', fp);
+			if (args + sizeof(short) <= end) {
+				c = (char) *(short *) args;
+				args += sizeof(short);
+			} else
+				args = end;
+			fputc(c, fp);
+			while (--width > 0)
+				fputc(' ', fp);
+			continue;
+		}
+		case 's':
+		{
+			const char *s;
+			int i;
+			size_t prec, len = 0, plen = 0;
+
+			s = args;
+			prec = decimal;
+			if (decimal < 0 || decimal > 64)
+				prec = 64;
+			if (args < end) {
+				len = strnlen(s, prec);
+				plen = WORD_ALIGN(len + 1);
+			} else
+				args = end;
+			if (args + plen <= end)
+				args += plen;
+			else
+				args = end;
+			if (!(flags & FLAG_LEFT))
+				while (len < width--)
+					fputc(' ', fp);
+			for (i = 0; i < len; ++i, ++s)
+				fputc(*s, fp);
+			while (len < width--)
+				fputc(' ', fp);
+			continue;
+		}
+		case '%':
+			fputc('%', fp);
+			continue;
+		case 'p':
+		case 'o':
+		case 'X':
+		case 'x':
+		case 'd':
+		case 'i':
+		case 'u':
+			switch (*fmt) {
+			case 'p':
+				type = 'p';
+				if (width == -1) {
+					width = 2 * sizeof(void *);
+					flags |= FLAG_ZEROPAD;
+				}
+				base = 16;
+				break;
+			case 'o':
+				base = 8;
+				break;
+			case 'X':
+				flags |= FLAG_LARGE;
+			case 'x':
+				base = 16;
+				break;
+			case 'd':
+			case 'i':
+				flags |= FLAG_SIGN;
+			case 'u':
+				break;
+			}
+			switch (type) {
+			case 'p':
+				if (args + sizeof(void *) <= end) {
+					num = (unsigned long) *(void **) args;
+					args += sizeof(void *);
+				} else
+					args = end;
+				flags &= ~FLAG_SIGN;
+				break;
+			case 'l':
+				if (args + sizeof(unsigned long) <= end) {
+					num = *(unsigned long *) args;
+					args += sizeof(unsigned long);
+				} else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed long) num;
+				break;
+			case 'L':
+				if (args + sizeof(unsigned long long) <= end) {
+					num = *(unsigned long long *) args;
+					args += sizeof(unsigned long long);
+				} else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed long long) num;
+				break;
+			case 'Z':
+				if (args + sizeof(size_t) <= end) {
+					num = *(size_t *) args;
+					args += sizeof(size_t);
+				} else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (ssize_t) num;
+				break;
+			case 'h':
+				if (args + sizeof(unsigned short) <= end) {
+					num = *(unsigned short *) args;
+					args += sizeof(unsigned short);
+				} else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed short) num;
+				break;
+			default:
+				if (args + sizeof(unsigned int) <= end) {
+					num = *(unsigned int *) args;
+					args += sizeof(unsigned int);
+				} else
+					args = end;
+				if (flags & FLAG_SIGN)
+					num = (signed int) num;
+				break;
+			}
+			number(fp, num, base, width, decimal, flags);
+			continue;
+		case '\0':
+			fputc('%', fp);	/* put the original % back */
+			/* put the bad format characters */
+			for (; fmt > pos; fputc(*pos, fp), pos++) ;
+			break;
+		default:
+			fputc('%', fp);	/* put the original % back */
+			/* put the bad format characters */
+			for (; fmt > pos; fputc(*pos, fp), pos++) ;
+			continue;
+		}
+		break;
+	}
+}
+
+
+static void
+version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -112,7 +459,8 @@ See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-static void usage(int argc, char **argv)
+static void
+usage(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -125,7 +473,8 @@ Usage:\n\
 ", argv[0]);
 }
 
-static void help(int argc, char **argv)
+static void
+help(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
@@ -167,7 +516,8 @@ Options:\n\
 ", argv[0]);
 }
 
-static void copying(int argc, char *argv[])
+static void
+copying(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -224,10 +574,12 @@ enum {
 	STRERR_FAILURE = -1,
 };
 
-int sig_register(int signum, RETSIGTYPE(*handler) (int))
+int
+sig_register(int signum, RETSIGTYPE(*handler) (int))
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = handler ? handler : SIG_DFL;
 	act.sa_flags = handler ? SA_RESTART : 0;
 	sigemptyset(&act.sa_mask);
@@ -243,45 +595,53 @@ int alm_signal = 0;
 int hup_signal = 0;
 int trm_signal = 0;
 
-RETSIGTYPE alm_handler(int signum)
+RETSIGTYPE
+alm_handler(int signum)
 {
 	alm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int alm_catch(void)
+int
+alm_catch(void)
 {
 	return sig_register(SIGALRM, &alm_handler);
 }
 
-int alm_block(void)
+int
+alm_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
-int alm_action(void)
+int
+alm_action(void)
 {
 	alm_signal = 0;
 	return (0);
 }
 
-RETSIGTYPE hup_handler(int signum)
+RETSIGTYPE
+hup_handler(int signum)
 {
 	hup_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int hup_catch(void)
+int
+hup_catch(void)
 {
 	return sig_register(SIGALRM, &hup_handler);
 }
 
-int hup_block(void)
+int
+hup_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
-int hup_action(void)
+int
+hup_action(void)
 {
 	hup_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGHUP, reopening files.");
@@ -309,52 +669,60 @@ int hup_action(void)
 	return (0);
 }
 
-RETSIGTYPE trm_handler(int signum)
+RETSIGTYPE
+trm_handler(int signum)
 {
 	trm_signal = 1;
 	return (RETSIGTYPE) (0);
 }
 
-int trm_catch(void)
+int
+trm_catch(void)
 {
 	return sig_register(SIGALRM, &trm_handler);
 }
 
-int trm_block(void)
+int
+trm_block(void)
 {
 	return sig_register(SIGALRM, NULL);
 }
 
 void strerr_exit(int retval);
 
-int trm_action(void)
+int
+trm_action(void)
 {
 	trm_signal = 0;
 	syslog(LOG_WARNING, "Caught SIGTERM, shutting down");
 	strerr_exit(0);
-	return (0); /* should be no return */
+	return (0);		/* should be no return */
 }
 
-void sig_catch(void)
+void
+sig_catch(void)
 {
 	alm_catch();
 	hup_catch();
 	trm_catch();
 }
 
-void sig_block(void)
+void
+sig_block(void)
 {
 	alm_block();
 	hup_block();
 	trm_block();
 }
 
-int start_timer(long duration)
+int
+start_timer(long duration)
 {
 	struct itimerval setting = {
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (alm_catch())
 		return STRERR_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -365,7 +733,8 @@ int start_timer(long duration)
 
 int sterr_stop(void);
 
-void strerr_exit(int retval)
+void
+strerr_exit(int retval)
 {
 	syslog(LOG_NOTICE, "Exiting %d", retval);
 	fflush(stdout);
@@ -376,10 +745,12 @@ void strerr_exit(int retval)
 	exit(retval);
 }
 
-void strerr_enter(int argc, char *argv[])
+void
+strerr_enter(int argc, char *argv[])
 {
 	if (nomead) {
 		pid_t pid;
+
 		if ((pid = fork()) < 0) {
 			perror(__FUNCTION__);
 			exit(2);
@@ -395,13 +766,16 @@ void strerr_enter(int argc, char *argv[])
 		} else if (pid != 0) {
 			if (nomead || pidfile[0] != '\0') {
 				FILE *pidf;
+
 				/* initialize default filename */
 				if (pidfile[0] == '\0')
-					snprintf(pidfile, sizeof(pidfile), "%s", "/var/run/strerr.pid");
+					snprintf(pidfile, sizeof(pidfile), "%s",
+						 "/var/run/strerr.pid");
 				if (output > 1)
-					syslog(LOG_NOTICE, "Writing daemon pid to file %s", pidfile);
+					syslog(LOG_NOTICE, "Writing daemon pid to file %s",
+					       pidfile);
 				if ((pidf = fopen(pidfile, "w+"))) {
-					fprintf(pidf, "%d", (int)pid);
+					fprintf(pidf, "%d", (int) pid);
 					fflush(pidf);
 					fclose(pidf);
 				} else {
@@ -429,6 +803,7 @@ void strerr_enter(int argc, char *argv[])
 	if (nomead || outfile[0] != '\0') {
 		struct tm tm;
 		time_t curtime;
+
 		time(&curtime);
 		localtime_r(&curtime, &tm);
 		/* initialize default filename */
@@ -464,9 +839,11 @@ void strerr_enter(int argc, char *argv[])
 	syslog(LOG_NOTICE, "Startup complete.");
 }
 
-void strerr_open(void)
+void
+strerr_open(void)
 {
 	struct strioctl ioc;
+
 	/* open log device */
 	if (devname[0] == '\0') {
 		/* search if not specified */
@@ -494,16 +871,19 @@ void strerr_open(void)
 		strerr_exit(1);
 	}
 }
-void strerr_close(void)
+void
+strerr_close(void)
 {
 	if (close(strlog_fd) < 0)
 		perror(__FUNCTION__);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -526,6 +906,7 @@ int main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long_only(argc, argv, "a:d:nb:o:e:p:l:qDvhVC?", long_options,
 				     &option_index);
 #else
@@ -633,6 +1014,7 @@ int main(int argc, char *argv[])
 		struct pollfd pfd[] = {
 			{strlog_fd, POLLIN | POLLPRI | POLLERR | POLLHUP, 0}
 		};
+
 		if (trm_signal)
 			trm_action();
 		if (hup_signal)
@@ -659,6 +1041,7 @@ int main(int argc, char *argv[])
 				struct strbuf ctl = { 1024, 1024, cbuf };
 				struct strbuf dat = { 1024, 1024, dbuf };
 				struct log_ctl *lc;
+
 				if ((ret = getmsg(strlog_fd, &ctl, &dat, &flags)) < 0) {
 					perror(__FUNCTION__);
 					exit(1);
@@ -705,6 +1088,7 @@ int main(int argc, char *argv[])
 				}
 				fprintf(stdout, "%d", lc->mid);
 				fprintf(stdout, "%d", lc->sid);
+				fprintf_text(stdout, dbuf, dat.len);
 				fprintf(stdout, "\n");
 				fflush(stdout);
 			}

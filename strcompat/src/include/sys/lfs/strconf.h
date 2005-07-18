@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.12 2005/07/15 23:08:40 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.13 2005/07/18 00:59:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/15 23:08:40 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 00:59:52 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_LFS_STRCONF_H__
 #define __SYS_LFS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/15 23:08:40 $"
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 00:59:52 $"
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -93,31 +93,6 @@ struct _fmodsw {
 	struct module *f_kmod;		/* kernel module */
 };
 
-//struct cdevsw;
-
-struct devnode {
-	struct list_head n_list;	/* list of all nodes for this device */
-	struct list_head n_hash;	/* list of major hashes in slot */
-	const char *n_name;		/* node name */
-	struct streamtab *n_str;	/* streamtab for node */
-	uint n_flag;			/* node flags */
-	uint n_modid;			/* node module id */
-	atomic_t n_count;		/* open count */
-	int n_sqlvl;			/* q sychronization level */
-	struct syncq *n_syncq;		/* synchronization queue */
-	struct module *n_kmod;		/* kernel module */
-	/* above must match fmodsw */
-	int n_major;			/* node major device number */
-	struct inode *n_inode;		/* specfs inode */
-	mode_t n_mode;			/* inode mode */
-	/* above must match cdevsw */
-	int n_minor;			/* node minor device number */
-	struct cdevsw *n_dev;		/* character device */
-};
-#define N_MAJOR		0x01	/* major device node */
-
-//struct file_operations;
-
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
 	struct list_head d_hash;	/* list of module hashes in slot */
@@ -141,6 +116,48 @@ struct cdevsw {
 	struct stdata *d_plinks;	/* permanent links for this device */
 	struct list_head d_stlist;	/* stream head list for this device */
 };
+
+struct devnode {
+	struct list_head n_list;	/* list of all nodes for this device */
+	struct list_head n_hash;	/* list of major hashes in slot */
+	const char *n_name;		/* node name */
+	struct streamtab *n_str;	/* streamtab for node */
+	uint n_flag;			/* node flags */
+	uint n_modid;			/* node module id */
+	atomic_t n_count;		/* open count */
+	int n_sqlvl;			/* q sychronization level */
+	struct syncq *n_syncq;		/* synchronization queue */
+	struct module *n_kmod;		/* kernel module */
+	/* above must match fmodsw */
+	int n_major;			/* node major device number */
+	struct inode *n_inode;		/* specfs inode */
+	mode_t n_mode;			/* inode mode */
+	/* above must match cdevsw */
+	int n_minor;			/* node minor device number */
+	struct cdevsw *n_dev;		/* character device */
+};
+#define N_MAJOR		0x01	/* major device node */
+
+// #define D_REOPEN (1<<0) /* clone can reopen */
+#define D_CLONE		(1<<1)	/* clone */
+#define D_SAFE		(1<<2)	/* requires safe (interrupts off) callbacks */
+#define D_UP		(1<<3)	/* per-stream sync, uniprocessor emulation */
+// #define D_FIFO (1<<2) /* fifo */
+// #define D_PIPE (1<<3) /* pipe */
+// #define D_SOCK (1<<4) /* socket */
+// #define D_LIS (1<<5) /* LiS compatible */
+// #define D_HEAD (1<<6) /* stream head */
+// #define D_NSDEV (1<<7) /* named streams device */
+/* Solaris perimeter flags */
+#define D_MP		(1<<8)	/* module is MP-safe */
+#define D_MTPERMOD	(1<<9)	/* inner module perimeter */
+#define D_MTQPAIR	(1<<10)	/* inner qpair perimeter */
+#define D_MTPERQ	(1<<11)	/* inner queue perimeter */
+#define D_MTOUTPERIM	(1<<12)	/* outer module perimeter */
+#define D_MTOCEXCL	(1<<13)	/* open and close exclusive at outer perimeter */
+#define D_MTPUTSHARED	(1<<14)	/* put procedures shared at the innner perimeter */
+#define D_64BIT		(1<<15)	/* properly handles 64-bit offsets */
+#define D_NEW		(1<<16)	/* SVR4 open and close */
 
 #undef register_strdev
 #undef register_strmod

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.32 $) $Date: 2005/07/14 22:03:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.33 $) $Date: 2005/07/18 00:59:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:20 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 00:59:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -428,12 +428,16 @@ dnl
 AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
     _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
 			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
-			  linux/cpumask.h linux/kref.h linux/security.h asm/uaccess.h], [:], [:], [
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -452,6 +456,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
+			read_trylock write_trylock path_lookup \
 			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti \
 			num_online_cpus generic_delete_inode], [:], [
 			case "$lk_func" in
@@ -492,7 +497,13 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #if HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
+#if HAVE_KINC_LINUX_NAMEI_H
+#include <linux/namei.h>
+#endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
 #if HAVE_KINC_ASM_UACCESS_H
@@ -500,7 +511,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
-			 num_online_cpus \
+			 read_trylock write_trylock num_online_cpus \
 			 cpumask_scnprintf access_ok], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/config.h>
@@ -518,6 +529,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/cpumask.h>
 #endif
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -540,11 +552,15 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -555,11 +571,22 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/time.h>		/* for struct timespec */
 ])
+dnl 
+dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
+dnl union u itself have been removed and a simple void pointer for filesystem
+dnl specific information has been put in place instead.  We don't really care
+dnl one way to the other, but this check discovers which way is used.
+dnl 
     _LINUX_CHECK_MEMBERS([struct task_struct.namespace.sem,
 			  struct file_operations.flush,
 			  struct super_operations.drop_inode,
+			  struct task_struct.session,
+			  struct task_struct.pgrp,
 			  struct super_block.s_fs_info,
 			  struct super_block.u.generic_sbp,
 			  struct file_system_type.read_super,
@@ -572,11 +599,15 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
@@ -584,7 +615,11 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 ])
-    _LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
+	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
+	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
+	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq_irqoff])
+	_LINUX_KERNEL_SYMBOL_EXPORT([put_filp])
 	_LINUX_KERNEL_ENV([dnl
 	    AC_CACHE_CHECK([for kernel inode_operation lookup with nameidata],
 			   [linux_cv_have_iop_lookup_nameidata], [dnl
@@ -595,6 +630,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -626,11 +664,15 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#if HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #if HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #if HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -644,6 +686,9 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#if HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/time.h>		/* for struct timespec */]],
 			[[struct timespec ts;
 int retval;
@@ -771,11 +816,11 @@ AC_DEFUN([_LIS_CONFIG_SYSCALLS], [dnl
 	fi ])
     _LINUX_KERNEL_SYMBOL_EXPORT([sys_umount], [dnl
 	if test :"${linux_cv_k_marchdir}" = :parisc ; then
-	    AC_MSG_WARN([lis_mount() will always return ENOSYS])
+	    AC_MSG_WARN([lis_umount() will always return ENOSYS])
 	fi ])
     _LINUX_KERNEL_SYMBOL_EXPORT([sys_mount], [dnl
 	if test :"${linux_cv_k_marchdir}" = :parisc ; then
-	    AC_MSG_WARN([lis_umount() will always return ENOSYS])
+	    AC_MSG_WARN([lis_mount() will always return ENOSYS])
 	fi ]) dnl
 ])# _LIS_CONFIG_SYSCALLS
 # =============================================================================

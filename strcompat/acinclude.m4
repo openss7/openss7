@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2005/07/14 22:03:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2005/07/18 00:58:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/14 22:03:38 $ by $Author: brian $
+# Last Modified $Date: 2005/07/18 00:58:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -108,7 +108,7 @@ AC_DEFUN([AC_COMPAT], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I$(top_builddir)/src/include -I$(top_srcdir)/src/include'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-   	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
     fi
     PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
     AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
@@ -178,56 +178,56 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	AS_HELP_STRING([--enable-compat-sol8],
 	    [enable source compatibility with Solaris 8 variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_sol8="$enableval"],
-	[enable_compat_sol8='module'])
+	    [enable_compat_sol8="$enableval"],
+	    [enable_compat_sol8='module'])
     AC_ARG_ENABLE([compat-uw7],
 	AS_HELP_STRING([--enable-compat-uw7],
 	    [enable source compatibility with UnixWare 7 variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_uw7="$enableval"],
-	[enable_compat_uw7='module'])
+	    [enable_compat_uw7="$enableval"],
+	    [enable_compat_uw7='module'])
     AC_ARG_ENABLE([compat-osf],
 	AS_HELP_STRING([--enable-compat-osf],
 	    [enable source compatibility with OSF/1.2 variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_osf="$enableval"],
-	[enable_compat_osf='module'])
+	    [enable_compat_osf="$enableval"],
+	    [enable_compat_osf='module'])
     AC_ARG_ENABLE([compat-aix],
 	AS_HELP_STRING([--enable-compat-aix],
 	    [enable source compatibility with AIX 4 variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_aix="$enableval"],
-	[enable_compat_aix='module'])
+	    [enable_compat_aix="$enableval"],
+	    [enable_compat_aix='module'])
     AC_ARG_ENABLE([compat-hpux],
 	AS_HELP_STRING([--enable-compat-hpux],
 	    [enable source compatibility with HPUX variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_hpux="$enableval"],
-	[enable_compat_hpux='module'])
+	    [enable_compat_hpux="$enableval"],
+	    [enable_compat_hpux='module'])
     AC_ARG_ENABLE([compat-irix],
 	AS_HELP_STRING([--enable-compat-irix],
 	    [enable source compatibility with IRIX variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_irix="$enableval"],
-	[enable_compat_irix='module'])
+	    [enable_compat_irix="$enableval"],
+	    [enable_compat_irix='module'])
     AC_ARG_ENABLE([compat-lis],
 	AS_HELP_STRING([--enable-compat-lis],
 	    [enable source compatibility with LiS variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_lis="$enableval"],
-	[enable_compat_lis='module'])
+	    [enable_compat_lis="$enableval"],
+	    [enable_compat_lis='module'])
     AC_ARG_ENABLE([compat-lfs],
 	AS_HELP_STRING([--enable-compat-lfs],
 	    [enable source compatibility with LiS variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_lfs="$enableval"],
-	[enable_compat_lfs='module'])
+	    [enable_compat_lfs="$enableval"],
+	    [enable_compat_lfs='module'])
     AC_ARG_ENABLE([compat-mac],
 	AS_HELP_STRING([--enable-compat-mac],
 	    [enable source compatibility with MacOT variants.
 	    @<:@default=module@:>@]),
-	[enable_compat_mac="$enableval"],
-	[enable_compat_mac='module'])
+	    [enable_compat_mac="$enableval"],
+	    [enable_compat_mac='module'])
     AC_CACHE_CHECK([for STREAMS OpenSS7 compatibility], [compat_compat_os7], [dnl
 	compat_compat_os7="${enable_compat_os7:-module}"
 	if test :$compat_compat_os7 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
@@ -583,32 +583,32 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7],		[test :${compat_compat_os7:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE],	[test :${compat_compat_os7:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${compat_compat_svr3:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${compat_compat_svr3:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${compat_compat_svr4:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${compat_compat_svr4:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS],		[test :${compat_compat_mps:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE],	[test :${compat_compat_mps:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${compat_compat_sol8:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE],	[test :${compat_compat_sol8:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7],		[test :${compat_compat_uw7:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE],	[test :${compat_compat_uw7:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF],		[test :${compat_compat_osf:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE],	[test :${compat_compat_osf:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX],		[test :${compat_compat_aix:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE],	[test :${compat_compat_aix:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX],	[test :${compat_compat_hpux:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${compat_compat_hpux:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${compat_compat_irix:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${compat_compat_irix:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${compat_compat_lis:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${compat_compat_lis:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test :${compat_compat_lfs:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test :${compat_compat_lfs:-module} = :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${compat_compat_mac:-module} = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${compat_compat_mac:-module} = :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7],		[test :${compat_compat_os7:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE],	[test :${compat_compat_os7:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${compat_compat_svr3:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${compat_compat_svr3:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${compat_compat_svr4:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${compat_compat_svr4:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS],		[test :${compat_compat_mps:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE],	[test :${compat_compat_mps:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${compat_compat_sol8:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE],	[test :${compat_compat_sol8:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7],		[test :${compat_compat_uw7:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE],	[test :${compat_compat_uw7:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF],		[test :${compat_compat_osf:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE],	[test :${compat_compat_osf:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX],		[test :${compat_compat_aix:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE],	[test :${compat_compat_aix:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX],	[test :${compat_compat_hpux:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${compat_compat_hpux:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${compat_compat_irix:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${compat_compat_irix:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${compat_compat_lis:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${compat_compat_lis:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test :${compat_compat_lfs:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test :${compat_compat_lfs:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${compat_compat_mac:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${compat_compat_mac:-module}	= :module])
 ])# _COMPAT_SETUP_COMPAT
 # =============================================================================
 

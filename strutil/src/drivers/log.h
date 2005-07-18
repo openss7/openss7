@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2005/05/14 08:34:41 $
+ @(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/18 01:03:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:34:41 $ by $Author: brian $
+ Last Modified $Date: 2005/07/18 01:03:01 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __LOCAL_STRLOG_H__
 #define __LOCAL_STRLOG_H__
+
+#define LOG_EMERG	0
+#define LOG_ALERT	1
+#define LOG_CRIT	2
+#define LOG_ERR		3
+#define LOG_WARNING	4
+#define LOG_NOTICE	5
+#define LOG_INFO	6
+#define LOG_DEBUG	7
+
+#define LOG_KERN	(0<<3)
 
 #endif				/* __LOCAL_STRLOG_H__ */
