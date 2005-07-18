@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocindent nosmartindent noautoindent
 .\"
-.\" @(#) $Id: strlog.9.man,v 0.9.2.10 2005/07/04 19:28:49 brian Exp $
+.\" @(#) $Id: strlog.9.man,v 0.9.2.11 2005/07/18 06:19:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,7 +53,7 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2005/07/04 19:28:49 $ by $Author: brian $
+.\" Last Modified $Date: 2005/07/18 06:19:21 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .so strcompat.macros
@@ -244,7 +244,22 @@ always logs with
 .I facility
 of
 .BR LOG_KERN .
+.SS Default Logger
 .PP
+.I @PACKAGE_TITLE@
+does not provide a
+.IR STREAMS -based
+logger.  Instead it logs all messages sent to
+.BR strlog ()
+to the kernel logger with
+.BR printk (9).
+Following are additional considerations for this default logger:
+.IP \(em \w'\(em\(em'u
+Because the default logger uses
+.BR printk (9),
+the only conversion specifiers supported are:
+.IR %c ", " %s ", " %p ", " %n ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+.IP \(em
 .BR strlog ()
 prefixes the string:
 .BI \*(lqstrlog( xxx )[ yyy , zzz "]: \*(rq"
@@ -261,7 +276,7 @@ argument, and
 is the
 .I sid
 argument.
-.PP
+.IP \(em
 As
 .B Linux
 does not have a
@@ -269,16 +284,72 @@ does not have a
 logger, the BSD
 .BR syslog (8)
 facilities apply.
-.PP
+.IP \(em
 .BR strlog ()
 always returns success.
-.PP
+.IP \(em
 .B Linux Fast-STREAMS
 has a partial implementation of a full
 .I STREAMS
 logger waiting in the wings.  This full
 .I STREAMS
-logger will function an filter properly.
+logger will function and filter properly.
+.SS \fISTREAMS\fP Logger
+.PP
+The
+.I OpenSS7 STREAMS Utilities
+package provides a full
+.IR STREAMS -based
+logger and
+.BR strace (8)
+and
+.BR strerr (8)
+utilities.
+Following are additional considerations for the full
+.IR STREAMS -based
+logger:
+.IP \(em \w'\(em\(em'u
+The 
+.IR STREAMS -based
+logger only supports the following conversion specifiers:
+.IR %c ", " %s ", " %p ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+The only
+.BR printk (9)
+supported conversion specifier that is not supported by the
+.IR STREAMS -based
+logger is
+.IR %n .
+.IP \(em
+Unlike the default logger, the
+.IR STREAMS -based
+logger uses the
+.BR strace (8)
+and
+.BR strerr (8)
+facilities to transfer log events to the system logs.
+.IP \(em
+Unlinke the default logger, that always returns success, the
+.IR STREAMS -based
+logger filters trace messages with trace ids requested by the
+.BR strace (8)
+trace logger, and returns failure if no error or trace logger was found to accept the message.
+The
+.IR STREAMS -based
+logger also returns failure when the message band corresponding to the priority of the message is
+flow controlled.
+Because the
+.IR STREAMS -based
+logger filters messages passed from
+.BR strlog (),
+it is more efficient in the utilization of system resources when performing trace debugging of
+.I STREAMS
+modules and drivers.
+.IP \(em
+Unlinke the default logger, which formats the message string in the kernel using the calling thread,
+the
+.IR STREAMS -based
+logger passes the format string an argument to the userspace error or trace logger daemon which then
+formats the message.  This is more efficient in the utilization of system resources.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -319,9 +390,18 @@ svr4dk
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 .BR strlog ()
-supports all
+supports the following
 .BR printf (3)
-conversion specifiers in the format string.
+conversion specifiers in the format string:
+.IR %c ", " %s ", " %p ", " %% ", " %o ", " %X ", " %x ", " %d ", " %i " and " %u .
+.BR strlog ()
+does
+.I not
+support the following
+.BR printf (3)
+conversion specifiers in the format string:
+.IR %e ", " %E ", " %f ", " %F ", " %g ", " %G ", " %a ", " %A ", " %n .
+.IR %
 .IR AIX \(rg
 states that conversion specifiers
 .IR %s ", " %f ", " %e ", " %E ", " %g " and " %G
